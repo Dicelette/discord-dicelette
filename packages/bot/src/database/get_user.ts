@@ -40,7 +40,6 @@ export function getUserByEmbed(
 	const damageFields = getEmbeds(ul, message, "damage")?.toJSON() as Djs.Embed;
 	const templateDamage = parseEmbedToDamage(parseEmbedFields(damageFields));
 	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template");
-	const templateFields = parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
 		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)

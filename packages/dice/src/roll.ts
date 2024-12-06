@@ -101,7 +101,8 @@ export function parseResult(
 	output: Resultat,
 	ul: Translation,
 	critical?: { failure?: number; success?: number },
-	interaction?: boolean
+	interaction?: boolean,
+	customCritical?: { [name: string]: CustomCritical }
 ) {
 	//result is in the form of "d% //comment: [dice] = result"
 	//parse into
@@ -109,7 +110,7 @@ export function parseResult(
 	let msgSuccess: string;
 	const messageResult = output.result.split(";");
 	let successOrFailure = "";
-	let isCritical: undefined | "failure" | "success" = undefined;
+	let isCritical: undefined | "failure" | "success" | "custom" = undefined;
 	if (output.compare) {
 		msgSuccess = "";
 		let total = 0;
@@ -147,6 +148,17 @@ export function parseResult(
 					isCritical = "success";
 				}
 			}
+			if (customCritical) {
+				for (const [name, custom] of Object.entries(customCritical)) {
+					const valueToCompare = custom.onNaturalDice ? natural : total;
+					const success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
+					if (success) {
+						successOrFailure = `**${name}**`;
+						isCritical = "custom";
+						break;
+					}
+				}
+			}
 			const totalSuccess = output.compare
 				? ` = \`${total} ${goodCompareSign(output.compare, total)} [${output.compare.value}]\``
 				: `= \`${total}\``;
@@ -156,13 +168,12 @@ export function parseResult(
 				.replaceAll("*", "\\*")}\n`;
 			total = 0;
 		}
-	} else {
+	} else
 		msgSuccess = `${output.result
 			.replaceAll(";", "\n")
 			.replaceAll(":", " ⟶")
 			.replaceAll(/ = (\S+)/g, " = ` $1 `")
 			.replaceAll("*", "\\*")}`;
-	}
 	const comment = output.comment
 		? `*${output.comment
 				.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
@@ -191,6 +202,8 @@ export function parseResult(
 			res = res.replace(regexForFormulesDices, `**${ul("roll.critical.failure")}** —`);
 		} else if (isCritical === "success") {
 			res = res.replace(regexForFormulesDices, `**${ul("roll.critical.success")}** —`);
+		} else if (isCritical === "custom") {
+			res = res.replace(regexForFormulesDices, `${successOrFailure} —`);
 		} else {
 			res = res
 				.replace("✕", `**${ul("roll.failure")}** —`)
@@ -267,4 +280,20 @@ export function parseCustomCritical(
 			onNaturalDice,
 		},
 	};
+}
+
+export function convertCustomCriticalValue(
+	custom: { [name: string]: CustomCritical },
+	stats: number
+) {
+	const customCritical: { [name: string]: CustomCritical } = {};
+	for (const [name, value] of Object.entries(custom)) {
+		const newValue = value.value.replace("$", stats.toString());
+		customCritical[name] = {
+			onNaturalDice: value.onNaturalDice,
+			sign: value.sign,
+			value: newValue,
+		};
+	}
+	return customCritical;
 }
