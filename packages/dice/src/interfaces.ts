@@ -4,7 +4,7 @@ export const DETECT_DICE_MESSAGE = /([\w\.]+|(\{.*\})) (.*)/i;
 
 export interface Server {
 	lang: Djs.Locale;
-	userId: string;
+	userId?: string;
 	config?: Partial<GuildData>;
 }
 

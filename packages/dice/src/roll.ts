@@ -7,51 +7,258 @@ import {
 } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
-import { DETECT_DICE_MESSAGE, type RollResult, type Server } from "./interfaces";
+import { DETECT_DICE_MESSAGE, type Server } from "./interfaces";
 import { timestamp } from "./utils.js";
 import "uniformize";
 import { ln } from "@dicelette/localization";
-/**
- * create the roll dice, parse interaction etc... When the slash-commands is used for dice
- */
-export function rollText(
-	result: Resultat | undefined,
-	data: Server,
-	critical?: { failure?: number; success?: number },
-	charName?: string,
-	infoRoll?: { name: string; standardized: string },
-	edit?: boolean,
-	context?: { guildId: string; channelId: string; messageId: string },
-	logUrl?: string
-): RollResult {
-	const ul = ln(data.lang);
-	if (!result) {
-		return { error: true, result: ul("roll.error") };
+
+export class ResultAsText {
+	parser?: string;
+	private readonly mentionUser: string;
+	private readonly titleCharName: string;
+	private readonly charName?: string;
+	private readonly data: Server;
+	private readonly ul: Translation;
+	error?: boolean;
+	private readonly infoRoll?: { name: string; standardized: string };
+	private readonly resultat?: Resultat;
+	output: string;
+	constructor(
+		result: Resultat | undefined,
+		data: Server,
+		critical?: { failure?: number; success?: number },
+		charName?: string,
+		infoRoll?: { name: string; standardized: string },
+		customCritical?: { [name: string]: CustomCritical }
+	) {
+		this.data = data;
+		this.infoRoll = infoRoll;
+		this.ul = ln(data.lang);
+		this.resultat = result;
+		let parser = "";
+		if (!result) {
+			this.error = true;
+			this.output = this.ul("roll.error");
+		} else {
+			parser = this.parseResult(!!infoRoll, critical, customCritical);
+		}
+		this.output = parser;
+		this.parser = parser;
+		const mentionUser = `<@${data.userId}>`;
+		this.charName = charName;
+		this.titleCharName = `__**${charName?.capitalize()}**__`;
+		this.mentionUser = this.charName
+			? `${this.titleCharName} (${mentionUser})`
+			: mentionUser;
 	}
-	const parser = parseResult(result, ul, critical, !!infoRoll);
-	let mentionUser = `<@${data.userId}>`;
-	const titleCharName = `__**${charName?.capitalize()}**__`;
-	mentionUser = charName ? `${titleCharName} (${mentionUser})` : mentionUser;
-	const infoRollTotal = (mention?: boolean, time?: boolean) => {
+
+	defaultMessage() {
+		return !this.error
+			? `${this.infoRollTotal(true)}${this.parser}`
+			: this.ul("roll.error");
+	}
+
+	private infoRollTotal(mention?: boolean, time?: boolean) {
 		let user = " ";
-		if (mention) user = mentionUser;
-		else if (charName) user = titleCharName;
-		if (time) user += `${timestamp(data.config?.timestamp)}`;
-		if (user.trim().length > 0) user += `${ul("common.space")}:\n`;
-		if (infoRoll) return `${user}[__${infoRoll.name.capitalize()}__] `;
+		if (mention) user = this.mentionUser;
+		else if (this.charName) user = this.titleCharName;
+		if (time) user += `${timestamp(this.data?.config?.timestamp)}`;
+		if (user.trim().length > 0) user += `${this.ul("common.space")}:\n`;
+		if (this.infoRoll) return `${user}[__${this.infoRoll.name.capitalize()}__] `;
 		return user;
-	};
-	const retrieveUser = infoRollTotal(true);
-	if (edit) return { result: `${infoRollTotal(true, true)}${parser}` };
-	if (logUrl)
+	}
+	edit() {
+		return { result: `${this.infoRollTotal(true, true)}${this.parser}` };
+	}
+	logUrl(url?: string) {
 		return {
-			result: `${infoRollTotal(true, true)}${parser}${createUrl(ul, undefined, logUrl)}`,
+			result: `${this.infoRollTotal(true, true)}${this.parser}${this.createUrl(undefined, url)}`,
 		};
-	if (context) return { result: `${retrieveUser}${parser}${createUrl(ul, context)}` };
-	return { result: `${retrieveUser}${parser}` };
+	}
+	context(context: { guildId: string; channelId: string; messageId: string }) {
+		return {
+			result: `${this.infoRollTotal(true, true)}${this.parser}${this.createUrl(context)}`,
+		};
+	}
+
+	createUrl(
+		context?: { guildId: string; channelId: string; messageId: string },
+		logUrl?: string
+	) {
+		if (logUrl) return `\n\n-# ↪ ${logUrl}`;
+		if (!context) return "";
+		const { guildId, channelId, messageId } = context;
+		return `\n\n-# ↪ [${this.ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
+	}
+
+	private parseResult(
+		interaction?: boolean,
+		critical?: { failure?: number; success?: number },
+		customCritical?: { [name: string]: CustomCritical }
+	) {
+		if (!this.resultat) return "";
+		const regexForFormulesDices = /^[✕◈✓]/;
+		let msgSuccess: string;
+		const messageResult = this.resultat.result.split(";");
+		let successOrFailure = "";
+		let isCritical: undefined | "failure" | "success" | "custom" = undefined;
+		if (this.resultat.compare) {
+			msgSuccess = "";
+			let total = 0;
+			const natural: number[] = [];
+			for (const r of messageResult) {
+				if (r.match(regexForFormulesDices)) {
+					msgSuccess += `${r
+						.replaceAll(";", "\n")
+						.replaceAll(":", " ⟶")
+						.replaceAll(/ = (\S+)/g, " = ` $1 `")
+						.replaceAll("*", "\\*")}\n`;
+					continue;
+				}
+				const tot = r.match(/ = (\d+)/);
+				if (tot) {
+					total = Number.parseInt(tot[1], 10);
+				}
+
+				successOrFailure = evaluate(
+					`${total} ${this.resultat.compare.sign} ${this.resultat.compare.value}`
+				)
+					? `**${this.ul("roll.success")}**`
+					: `**${this.ul("roll.failure")}**`;
+				// noinspection RegExpRedundantEscape
+				const naturalDice = r.matchAll(/\[(\d+)\]/gi);
+				for (const dice of naturalDice) {
+					natural.push(Number.parseInt(dice[1], 10));
+				}
+				if (critical) {
+					if (critical.failure && natural.includes(critical.failure)) {
+						successOrFailure = `**${this.ul("roll.critical.failure")}**`;
+						isCritical = "failure";
+					} else if (critical.success && natural.includes(critical.success)) {
+						successOrFailure = `**${this.ul("roll.critical.success")}**`;
+						isCritical = "success";
+					}
+				}
+				if (customCritical) {
+					for (const [name, custom] of Object.entries(customCritical)) {
+						const valueToCompare = custom.onNaturalDice ? natural : total;
+						const success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
+						console.debug(success);
+						if (success) {
+							successOrFailure = `**${name}**`;
+							isCritical = "custom";
+							break;
+						}
+					}
+				}
+				const totalSuccess = this.resultat.compare
+					? ` = \`${total} ${this.goodCompareSign(this.resultat.compare, total)} [${this.resultat.compare.value}]\``
+					: `= \`${total}\``;
+				msgSuccess += `${successOrFailure} — ${r
+					.replaceAll(":", " ⟶")
+					.replaceAll(/ = (\S+)/g, totalSuccess)
+					.replaceAll("*", "\\*")}\n`;
+				total = 0;
+			}
+		} else
+			msgSuccess = `${this.resultat.result
+				.replaceAll(";", "\n")
+				.replaceAll(":", " ⟶")
+				.replaceAll(/ = (\S+)/g, " = ` $1 `")
+				.replaceAll("*", "\\*")}`;
+		const comment = this.resultat.comment
+			? `*${this.resultat.comment
+					.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
+					.replaceAll("×", "*")
+					.trim()}*\n`
+			: interaction
+				? "\n"
+				: "";
+		const dicesResult = /(?<entry>\S+) ⟶ (?<calc>.*) =/;
+		const splitted = msgSuccess.split("\n");
+		const finalRes = [];
+		for (let res of splitted) {
+			const matches = dicesResult.exec(res);
+			if (matches) {
+				const { entry, calc } = matches.groups || {};
+				if (entry) {
+					const entryStr = entry.replaceAll("\\*", "×");
+					res = res.replace(entry, `\`${entryStr}\``);
+				}
+				if (calc) {
+					const calcStr = calc.replaceAll("\\*", "×");
+					res = res.replace(calc, `\`${calcStr}\``);
+				}
+			}
+			if (isCritical === "failure") {
+				res = res.replace(
+					regexForFormulesDices,
+					`**${this.ul("roll.critical.failure")}** —`
+				);
+			} else if (isCritical === "success") {
+				res = res.replace(
+					regexForFormulesDices,
+					`**${this.ul("roll.critical.success")}** —`
+				);
+			} else if (isCritical === "custom") {
+				res = res.replace(regexForFormulesDices, `${successOrFailure} —`);
+			} else {
+				res = res
+					.replace("✕", `**${this.ul("roll.failure")}** —`)
+					.replace("✓", `**${this.ul("roll.success")}** —`);
+			}
+
+			finalRes.push(res.trimStart());
+		}
+		return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
+	}
+
+	/**
+	 * Replace the compare sign as it will invert the result for a better reading
+	 * As the comparaison is after the total (like 20>10)
+	 * @param {Compare} compare
+	 * @param {number} total
+	 */
+	private goodCompareSign(
+		compare: Compare,
+		total: number
+	): "<" | ">" | "≥" | "≤" | "=" | "!=" | "==" | "" {
+		//as the comparaison value is AFTER the total, we need to invert the sign to have a good comparaison string
+		const { sign, value } = compare;
+		const success = evaluate(`${total} ${sign} ${value}`);
+		if (success) {
+			return sign.replace(">=", "≥").replace("<=", "≤") as
+				| "<"
+				| ">"
+				| "≥"
+				| "≤"
+				| "="
+				| ""
+				| "!="
+				| "==";
+		}
+		switch (sign) {
+			case "<":
+				return ">";
+			case ">":
+				return "<";
+			case ">=":
+				return "≤";
+			case "<=":
+				return "≥";
+			case "=":
+				return "=";
+			case "!=":
+				return "!=";
+			case "==":
+				return "==";
+			default:
+				return "";
+		}
+	}
 }
 
-export function getRoll(ul: Translation, dice: string): Resultat | undefined {
+export function getRoll(dice: string): Resultat | undefined {
 	const comments = dice.match(DETECT_DICE_MESSAGE)?.[3].replaceAll("*", "\\*");
 	if (comments) {
 		dice = dice.replace(DETECT_DICE_MESSAGE, "$1");
@@ -68,17 +275,6 @@ export function getRoll(ul: Translation, dice: string): Resultat | undefined {
 	return rollDice;
 }
 
-export function createUrl(
-	ul: Translation,
-	context?: { guildId: string; channelId: string; messageId: string },
-	logUrl?: string
-) {
-	if (logUrl) return `\n-# ↪ ${logUrl}`;
-	if (!context) return "";
-	const { guildId, channelId, messageId } = context;
-	return `\n\n-# ↪ [${ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
-}
-
 export function rollContent(
 	result: Resultat,
 	parser: string,
@@ -93,170 +289,6 @@ export function rollContent(
 		: "";
 	const authorMention = `*<@${authorId}>* (🎲 \`${result.dice.replace(COMMENT_REGEX, "")}${signMessage ? ` ${signMessage}` : ""}\`)`;
 	return `${authorMention}${timestamp(time)}\n${parser}${linkToOriginal}`;
-}
-/**
- * Parse the result of the dice to be readable
- */
-export function parseResult(
-	output: Resultat,
-	ul: Translation,
-	critical?: { failure?: number; success?: number },
-	interaction?: boolean,
-	customCritical?: { [name: string]: CustomCritical }
-) {
-	//result is in the form of "d% //comment: [dice] = result"
-	//parse into
-	const regexForFormulesDices = /^[✕◈✓]/;
-	let msgSuccess: string;
-	const messageResult = output.result.split(";");
-	let successOrFailure = "";
-	let isCritical: undefined | "failure" | "success" | "custom" = undefined;
-	if (output.compare) {
-		msgSuccess = "";
-		let total = 0;
-		const natural: number[] = [];
-		for (const r of messageResult) {
-			if (r.match(regexForFormulesDices)) {
-				msgSuccess += `${r
-					.replaceAll(";", "\n")
-					.replaceAll(":", " ⟶")
-					.replaceAll(/ = (\S+)/g, " = ` $1 `")
-					.replaceAll("*", "\\*")}\n`;
-				continue;
-			}
-			const tot = r.match(/ = (\d+)/);
-			if (tot) {
-				total = Number.parseInt(tot[1], 10);
-			}
-
-			successOrFailure = evaluate(
-				`${total} ${output.compare.sign} ${output.compare.value}`
-			)
-				? `**${ul("roll.success")}**`
-				: `**${ul("roll.failure")}**`;
-			// noinspection RegExpRedundantEscape
-			const naturalDice = r.matchAll(/\[(\d+)\]/gi);
-			for (const dice of naturalDice) {
-				natural.push(Number.parseInt(dice[1], 10));
-			}
-			if (critical) {
-				if (critical.failure && natural.includes(critical.failure)) {
-					successOrFailure = `**${ul("roll.critical.failure")}**`;
-					isCritical = "failure";
-				} else if (critical.success && natural.includes(critical.success)) {
-					successOrFailure = `**${ul("roll.critical.success")}**`;
-					isCritical = "success";
-				}
-			}
-			if (customCritical) {
-				for (const [name, custom] of Object.entries(customCritical)) {
-					const valueToCompare = custom.onNaturalDice ? natural : total;
-					const success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
-					if (success) {
-						successOrFailure = `**${name}**`;
-						isCritical = "custom";
-						break;
-					}
-				}
-			}
-			const totalSuccess = output.compare
-				? ` = \`${total} ${goodCompareSign(output.compare, total)} [${output.compare.value}]\``
-				: `= \`${total}\``;
-			msgSuccess += `${successOrFailure} — ${r
-				.replaceAll(":", " ⟶")
-				.replaceAll(/ = (\S+)/g, totalSuccess)
-				.replaceAll("*", "\\*")}\n`;
-			total = 0;
-		}
-	} else
-		msgSuccess = `${output.result
-			.replaceAll(";", "\n")
-			.replaceAll(":", " ⟶")
-			.replaceAll(/ = (\S+)/g, " = ` $1 `")
-			.replaceAll("*", "\\*")}`;
-	const comment = output.comment
-		? `*${output.comment
-				.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
-				.replaceAll("×", "*")
-				.trim()}*\n`
-		: interaction
-			? "\n"
-			: "";
-	const dicesResult = /(?<entry>\S+) ⟶ (?<calc>.*) =/;
-	const splitted = msgSuccess.split("\n");
-	const finalRes = [];
-	for (let res of splitted) {
-		const matches = dicesResult.exec(res);
-		if (matches) {
-			const { entry, calc } = matches.groups || {};
-			if (entry) {
-				const entryStr = entry.replaceAll("\\*", "×");
-				res = res.replace(entry, `\`${entryStr}\``);
-			}
-			if (calc) {
-				const calcStr = calc.replaceAll("\\*", "×");
-				res = res.replace(calc, `\`${calcStr}\``);
-			}
-		}
-		if (isCritical === "failure") {
-			res = res.replace(regexForFormulesDices, `**${ul("roll.critical.failure")}** —`);
-		} else if (isCritical === "success") {
-			res = res.replace(regexForFormulesDices, `**${ul("roll.critical.success")}** —`);
-		} else if (isCritical === "custom") {
-			res = res.replace(regexForFormulesDices, `${successOrFailure} —`);
-		} else {
-			res = res
-				.replace("✕", `**${ul("roll.failure")}** —`)
-				.replace("✓", `**${ul("roll.success")}** —`);
-		}
-
-		finalRes.push(res.trimStart());
-	}
-	return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
-}
-
-/**
- * Replace the compare sign as it will invert the result for a better reading
- * As the comparaison is after the total (like 20>10)
- * @param {Compare} compare
- * @param {number} total
- */
-function goodCompareSign(
-	compare: Compare,
-	total: number
-): "<" | ">" | "≥" | "≤" | "=" | "!=" | "==" | "" {
-	//as the comparaison value is AFTER the total, we need to invert the sign to have a good comparaison string
-	const { sign, value } = compare;
-	const success = evaluate(`${total} ${sign} ${value}`);
-	if (success) {
-		return sign.replace(">=", "≥").replace("<=", "≤") as
-			| "<"
-			| ">"
-			| "≥"
-			| "≤"
-			| "="
-			| ""
-			| "!="
-			| "==";
-	}
-	switch (sign) {
-		case "<":
-			return ">";
-		case ">":
-			return "<";
-		case ">=":
-			return "≤";
-		case "<=":
-			return "≥";
-		case "=":
-			return "=";
-		case "!=":
-			return "!=";
-		case "==":
-			return "==";
-		default:
-			return "";
-	}
 }
 
 /**
@@ -292,7 +324,7 @@ export function convertCustomCriticalValue(
 		customCritical[name] = {
 			onNaturalDice: value.onNaturalDice,
 			sign: value.sign,
-			value: newValue,
+			value: evaluate(newValue.replaceAll("{{", "").replaceAll("}}", "")).toString(),
 		};
 	}
 	return customCritical;

@@ -1,5 +1,14 @@
-import { generateStatsDice, replaceFormulaInDice } from "@dicelette/core";
-import { type Server, getRoll, rollText } from "@dicelette/dice";
+import {
+	type CustomCritical,
+	generateStatsDice,
+	replaceFormulaInDice,
+} from "@dicelette/core";
+import {
+	ResultAsText,
+	type Server,
+	convertCustomCriticalValue,
+	getRoll,
+} from "@dicelette/dice";
 import { ln, t } from "@dicelette/localization";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -25,7 +34,8 @@ export async function rollWithInteraction(
 	user?: Djs.User,
 	charName?: string,
 	infoRoll?: { name: string; standardized: string },
-	hideResult?: boolean | null
+	hideResult?: boolean | null,
+	customCritical?: { [name: string]: CustomCritical } | undefined
 ) {
 	if (!channel || channel.isDMBased() || !channel.isTextBased() || !interaction.guild)
 		return;
@@ -39,11 +49,19 @@ export async function rollWithInteraction(
 		userId: user?.id ?? interaction.user.id,
 		config: db.get(interaction.guild.id),
 	};
-	const result = getRoll(ul, dice);
-	const defaultMsg = rollText(result, data, critical, charName, infoRoll, false);
+	const result = getRoll(dice);
+	const defaultMsg = new ResultAsText(
+		result,
+		data,
+		critical,
+		charName,
+		infoRoll,
+		customCritical
+	);
+	const output = defaultMsg.output;
 	if (defaultMsg.error) {
 		await reply(interaction, {
-			embeds: [embedError(defaultMsg.result, ul)],
+			embeds: [embedError(output, ul)],
 			ephemeral: true,
 		});
 		return;
@@ -67,8 +85,8 @@ export async function rollWithInteraction(
 			isHidden = hideResultConfig;
 		} else if (typeof hideResultConfig === "boolean") {
 			await reply(interaction, {
-				content: defaultMsg.result,
-				allowedMentions: { users: [data.userId] },
+				content: output,
+				allowedMentions: { users: [data!.userId as string] },
 				ephemeral: true,
 			});
 			return;
@@ -76,8 +94,8 @@ export async function rollWithInteraction(
 	}
 	if (channel.name.startsWith("🎲") || disableThread || rollChannel === channel.id) {
 		await reply(interaction, {
-			content: defaultMsg.result,
-			allowedMentions: { users: [data.userId] },
+			content: output,
+			allowedMentions: { users: [data!.userId as string] },
 			ephemeral: !!hidden,
 		});
 		return;
@@ -85,23 +103,14 @@ export async function rollWithInteraction(
 
 	const thread = await threadToSend(db, channel, ul, isHidden);
 	const rolLog = await thread.send("_ _");
-	const editMessage = rollText(result, data, critical, charName, infoRoll, true).result;
+	const editMessage = defaultMsg.edit().result;
 	await rolLog.edit(editMessage);
 	const rollLogEnabled = db.get(interaction.guild.id, "linkToLogs");
 	const rolLogUrl = rollLogEnabled ? rolLog.url : undefined;
-	const rollTextUrl = rollText(
-		result,
-		data,
-		critical,
-		charName,
-		infoRoll,
-		false,
-		undefined,
-		rolLogUrl
-	).result;
+	const rollTextUrl = defaultMsg.logUrl(rolLogUrl).result;
 	const inter = await reply(interaction, {
 		content: rollTextUrl,
-		allowedMentions: { users: [data.userId] },
+		allowedMentions: { users: [data!.userId as string] },
 		ephemeral: !!hidden,
 	});
 	const anchor = db.get(interaction.guild.id, "context");
@@ -114,16 +123,11 @@ export async function rollWithInteraction(
 			const messageBefore = await findMessageBefore(channel, inter, interaction.client);
 			if (messageBefore) messageId = messageBefore.id;
 		}
-		const res = rollText(
-			result,
-			data,
-			critical,
-			charName,
-			infoRoll,
-			false,
-			{ guildId: interaction.guild.id, channelId: channel.id, messageId },
-			undefined
-		).result;
+		const res = defaultMsg.context({
+			guildId: interaction.guild.id,
+			channelId: channel.id,
+			messageId,
+		}).result;
 		await rolLog.edit(res);
 	}
 	if (!disableThread) await deleteAfter(inter, timer);
@@ -266,6 +270,9 @@ export async function rollStatistique(
 		comparator = comparatorMatch[0];
 	}
 	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${comparator} ${comments}`;
+	const customCritical = template.customCritical
+		? convertCustomCriticalValue(template.customCritical, userStat)
+		: undefined;
 	await rollWithInteraction(
 		interaction,
 		roll,
@@ -275,6 +282,7 @@ export async function rollStatistique(
 		user,
 		optionChar,
 		{ name: statistic, standardized: standardizedStatistic },
-		hideResult
+		hideResult,
+		customCritical
 	);
 }

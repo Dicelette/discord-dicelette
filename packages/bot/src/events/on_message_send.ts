@@ -1,4 +1,4 @@
-import { createUrl, isRolling, parseResult, rollContent } from "@dicelette/dice";
+import { ResultAsText, isRolling, rollContent } from "@dicelette/dice";
 import { lError, ln } from "@dicelette/localization";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -26,8 +26,8 @@ export default (client: EClient): void => {
 			const ul = ln(userLang);
 			const channel = message.channel;
 			if (!result) return;
-
-			const parser = parseResult(result, ul);
+			const resultAsText = new ResultAsText(result, { lang: userLang });
+			const parser = resultAsText.output;
 			if (
 				channel.name.startsWith("🎲") ||
 				client.settings.get(message.guild.id, "disableThread") === true ||
@@ -41,14 +41,14 @@ export default (client: EClient): void => {
 				if (client.settings.get(message.guild.id, "context")) {
 					const messageBefore = await findMessageBefore(channel, message, client);
 					if (messageBefore)
-						linkToOriginal = createUrl(ul, {
+						linkToOriginal = resultAsText.createUrl({
 							guildId: message.guildId ?? "",
 							channelId: channel.id,
 							messageId: messageBefore.id,
 						});
 				}
 			} else {
-				linkToOriginal = createUrl(ul, {
+				linkToOriginal = resultAsText.createUrl({
 					guildId: message.guildId ?? "",
 					channelId: channel.id,
 					messageId: message.id,
@@ -65,7 +65,7 @@ export default (client: EClient): void => {
 			);
 			await msgToEdit.edit(msg);
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
-				? createUrl(ul, undefined, msgToEdit.url)
+				? resultAsText.createUrl(undefined, msgToEdit.url)
 				: "";
 			const reply = deleteInput
 				? await channel.send({
