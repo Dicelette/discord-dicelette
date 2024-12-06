@@ -94,7 +94,6 @@ export async function getUserFromMessage(
 	}
 ) {
 	if (!options)
-		//biome-ignore lint/style/noParameterAssign: We need to assign a default value
 		options = { integrateCombinaison: true, allowAccess: true, skipNotFound: false };
 	const { integrateCombinaison, allowAccess, skipNotFound } = options;
 	const ul = ln(interaction.locale);
