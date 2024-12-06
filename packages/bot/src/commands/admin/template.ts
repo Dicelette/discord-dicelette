@@ -312,6 +312,17 @@ export const registerTemplate = {
 				value: msgComparator,
 			});
 		}
+		if (templateData.customCritical) {
+			for (const [name, value] of Object.entries(templateData.customCritical)) {
+				const nameCritical = value.onNaturalDice
+					? `(N) ${name.capitalize()}`
+					: name.capitalize();
+				embedTemplate.addFields({
+					name: nameCritical,
+					value: `\`${value.sign}${value.value}\``,
+				});
+			}
+		}
 		if (templateData.total)
 			embedTemplate.addFields({
 				name: ul("common.total"),

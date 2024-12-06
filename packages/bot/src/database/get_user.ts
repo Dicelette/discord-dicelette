@@ -1,6 +1,16 @@
+import {
+	parseEmbedToDamage,
+	parseEmbedToStats,
+	parseTemplateField,
+} from "@dicelette/dice/src/convert_embed";
 import { findln, ln } from "@dicelette/localization";
-import type { CharDataWithName, PersonnageIds, UserData } from "@dicelette/types";
-import type { Settings, Translation } from "@dicelette/types";
+import type {
+	CharDataWithName,
+	PersonnageIds,
+	Settings,
+	Translation,
+	UserData,
+} from "@dicelette/types";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, parseEmbedFields, reply } from "messages";
@@ -26,39 +36,13 @@ export function getUserByEmbed(
 		user.userName = charNameFields.value;
 	}
 	const statsFields = getEmbeds(ul, message, "stats")?.toJSON()?.fields;
-	let stats: { [name: string]: number } | undefined = undefined;
-	if (statsFields) {
-		stats = {};
-		for (const stat of statsFields) {
-			const value = Number.parseInt(stat.value.removeBacktick(), 10);
-			if (Number.isNaN(value)) {
-				//it's a combinaison
-				//remove the `x` = text;
-				const combinaison = stat.value.split("=")[1].trim();
-				if (integrateCombinaison)
-					stats[stat.name.unidecode()] = Number.parseInt(combinaison, 10);
-			} else stats[stat.name.unidecode()] = value;
-		}
-	}
-	user.stats = stats;
+	user.stats = parseEmbedToStats(statsFields, integrateCombinaison);
 	const damageFields = getEmbeds(ul, message, "damage")?.toJSON()?.fields;
-	let templateDamage: { [name: string]: string } | undefined = undefined;
-	if (damageFields) {
-		templateDamage = {};
-		for (const damage of damageFields) {
-			templateDamage[damage.name.unidecode()] = damage.value.removeBacktick();
-		}
-	}
+	const templateDamage = parseEmbedToDamage(damageFields);
 	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template");
 	const templateFields = parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed);
 	user.damage = templateDamage;
-	user.template = {
-		diceType: templateFields?.["common.dice"] || undefined,
-		critical: {
-			success: Number.parseInt(templateFields?.["roll.critical.success"], 10),
-			failure: Number.parseInt(templateFields["roll.critical.failure"], 10),
-		},
-	};
+	user.template = parseTemplateField(templateFields);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
 	if (fetchChannel) user.channel = message.channel.id;
 	return user as UserData;

@@ -1,4 +1,4 @@
-import type { Critical } from "@dicelette/core";
+import type { Critical, CustomCritical } from "@dicelette/core";
 import type * as Djs from "discord.js";
 
 export interface GuildData {
@@ -117,6 +117,9 @@ export interface UserData {
 	template: {
 		diceType?: string;
 		critical?: Critical;
+		customCritical?: {
+			[name: string]: CustomCritical;
+		};
 	};
 	/**
 	 * The skill dice that the user can do

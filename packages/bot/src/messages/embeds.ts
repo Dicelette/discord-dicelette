@@ -236,20 +236,3 @@ export function removeEmbedsFromList(
 		if (which === "template") return title !== "embed.template";
 	});
 }
-
-/**
- * Parse the fields in stats, used to fix combinaison and get only them and not their result
- */
-export function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
-	const stats = parseEmbedFields(statsEmbed.toJSON() as Djs.Embed);
-	const parsedStats: { [name: string]: number } = {};
-	for (const [name, value] of Object.entries(stats)) {
-		let number = Number.parseInt(value, 10);
-		if (Number.isNaN(number)) {
-			const combinaison = value.replace(/`(.*)` =/, "").trim();
-			number = Number.parseInt(combinaison, 10);
-		}
-		parsedStats[name] = number;
-	}
-	return parsedStats;
-}

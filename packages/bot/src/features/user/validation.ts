@@ -184,13 +184,14 @@ export async function validateUser(
 		template: {
 			diceType: template.diceType,
 			critical: template.critical,
+			customCritical: template.customCritical,
 		},
 		damage: templateDamage,
 		private: isPrivate,
 		avatar: userEmbed.toJSON().thumbnail?.url,
 	};
 	let templateEmbed: Djs.EmbedBuilder | undefined = undefined;
-	if (template.diceType || template.critical) {
+	if (template.diceType || template.critical || template.customCritical) {
 		templateEmbed = createTemplateEmbed(ul);
 		if (template.diceType)
 			templateEmbed.addFields({
@@ -209,6 +210,17 @@ export async function validateUser(
 			templateEmbed.addFields({
 				name: ul("roll.critical.failure"),
 				value: `\`${template.critical.failure}\``,
+				inline: true,
+			});
+		}
+		const criticalTemplate = template.customCritical ?? {};
+		for (const [name, value] of Object.entries(criticalTemplate)) {
+			const nameCritical = value.onNaturalDice
+				? `(N) ${name.capitalize()}`
+				: name.capitalize();
+			templateEmbed.addFields({
+				name: nameCritical,
+				value: `\`${value.sign} ${value.value}\``,
 				inline: true,
 			});
 		}

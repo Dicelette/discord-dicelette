@@ -1,4 +1,10 @@
-import { COMMENT_REGEX, type Compare, type Resultat, roll } from "@dicelette/core";
+import {
+	COMMENT_REGEX,
+	type Compare,
+	type CustomCritical,
+	type Resultat,
+	roll,
+} from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import { DETECT_DICE_MESSAGE, type RollResult, type Server } from "./interfaces";
@@ -238,4 +244,26 @@ function goodCompareSign(
 		default:
 			return "";
 	}
+}
+
+/**
+ * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`
+ */
+export function parseCustomCritical(
+	customCritical: string
+): { [name: string]: CustomCritical } | undefined {
+	const findPart = /(?<name>.*?)(?<sign>([<>=!]+))(?<value>.*)/gi;
+	const match = findPart.exec(customCritical);
+	if (!match) return;
+	const { name, sign, value } = match.groups || {};
+	if (!name || !sign || !value) return;
+	const onNaturalDice = name.startsWith("(N)");
+	const nameStr = onNaturalDice ? name.replace("(N)", "") : name;
+	return {
+		[nameStr.trimAll()]: {
+			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "=" | "!=" | "==",
+			value: value.trimAll(),
+			onNaturalDice,
+		},
+	};
 }
