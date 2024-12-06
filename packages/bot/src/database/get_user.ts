@@ -35,14 +35,16 @@ export function getUserByEmbed(
 	if (charNameFields && charNameFields.value !== "common.noSet") {
 		user.userName = charNameFields.value;
 	}
-	const statsFields = getEmbeds(ul, message, "stats")?.toJSON()?.fields;
-	user.stats = parseEmbedToStats(statsFields, integrateCombinaison);
-	const damageFields = getEmbeds(ul, message, "damage")?.toJSON()?.fields;
-	const templateDamage = parseEmbedToDamage(damageFields);
+	const statsFields = getEmbeds(ul, message, "stats")?.toJSON() as Djs.Embed;
+	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
+	const damageFields = getEmbeds(ul, message, "damage")?.toJSON() as Djs.Embed;
+	const templateDamage = parseEmbedToDamage(parseEmbedFields(damageFields));
 	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template");
 	const templateFields = parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed);
 	user.damage = templateDamage;
-	user.template = parseTemplateField(templateFields);
+	user.template = parseTemplateField(
+		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
+	);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
 	if (fetchChannel) user.channel = message.channel.id;
 	return user as UserData;

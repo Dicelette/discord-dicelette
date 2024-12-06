@@ -250,12 +250,13 @@ function goodCompareSign(
  * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`
  */
 export function parseCustomCritical(
+	name: string,
 	customCritical: string
 ): { [name: string]: CustomCritical } | undefined {
-	const findPart = /(?<name>.*?)(?<sign>([<>=!]+))(?<value>.*)/gi;
+	const findPart = /(?<sign>([<>=!]+))(?<value>.*)/gi;
 	const match = findPart.exec(customCritical);
 	if (!match) return;
-	const { name, sign, value } = match.groups || {};
+	const { sign, value } = match.groups || {};
 	if (!name || !sign || !value) return;
 	const onNaturalDice = name.startsWith("(N)");
 	const nameStr = onNaturalDice ? name.replace("(N)", "") : name;

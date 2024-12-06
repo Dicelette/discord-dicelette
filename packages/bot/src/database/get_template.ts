@@ -4,7 +4,7 @@ import {
 	verifyTemplateValue,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Settings, Translation } from "@dicelette/types";
+import type { Settings } from "@dicelette/types";
 import * as Djs from "discord.js";
 import type { Message } from "discord.js";
 
@@ -30,7 +30,7 @@ export async function getTemplateWithDB(
 	if (!channel || channel instanceof Djs.CategoryChannel) return;
 	try {
 		const message = await channel.messages.fetch(messageId);
-		return getTemplate(message, enmap, ul);
+		return getTemplate(message, enmap);
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
 			throw new Error(ul("error.noTemplateId", { channelId, messageId }));
@@ -43,8 +43,7 @@ export async function getTemplateWithDB(
  */
 export async function getTemplate(
 	message: Message,
-	enmap: Settings,
-	ul: Translation
+	enmap: Settings
 ): Promise<StatisticalTemplate | undefined> {
 	const template = message?.attachments.first();
 	if (!template) return;

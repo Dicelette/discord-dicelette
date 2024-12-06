@@ -10,8 +10,8 @@ export function parseEmbedToCritical(embed: { [name: string]: string }): {
 	embed["roll.critical.failure"] = "";
 	embed["common.dice"] = "";
 	for (const [name, value] of Object.entries(embed)) {
-		if (!value.length === 0) continue;
-		const custom = parseCustomCritical(value);
+		if (value.length === 0) continue;
+		const custom = parseCustomCritical(name, value);
 		if (custom) {
 			Object.assign(customCritical, custom);
 		}
@@ -23,8 +23,8 @@ export function parseEmbedToDamage(embed?: { [name: string]: string }) {
 	let templateDamage: { [name: string]: string } | undefined = undefined;
 	if (embed) {
 		templateDamage = {};
-		for (const damage of embed) {
-			templateDamage[damage.name.unidecode()] = damage.value.removeBacktick();
+		for (const [name, value] of Object.values(embed)) {
+			templateDamage[name.unidecode()] = value.removeBacktick();
 		}
 	}
 	return templateDamage;
@@ -37,15 +37,15 @@ export function parseEmbedToStats(
 	let stats: { [name: string]: number } | undefined = undefined;
 	if (embed) {
 		stats = {};
-		for (const stat of embed) {
-			const value = Number.parseInt(stat.value.removeBacktick(), 10);
+		for (const [name, damageValue] of Object.entries(embed)) {
+			const value = Number.parseInt(damageValue.removeBacktick(), 10);
 			if (Number.isNaN(value)) {
 				//it's a combinaison
 				//remove the `x` = text;
-				const combinaison = stat.value.split("=")[1].trim();
+				const combinaison = damageValue.split("=")[1].trim();
 				if (integrateCombinaison)
-					stats[stat.name.unidecode()] = Number.parseInt(combinaison, 10);
-			} else stats[stat.name.unidecode()] = value;
+					stats[name.unidecode()] = Number.parseInt(combinaison, 10);
+			} else stats[name.unidecode()] = value;
 		}
 	}
 	return stats;

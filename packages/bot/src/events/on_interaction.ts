@@ -41,7 +41,7 @@ export default (client: EClient): void => {
 				if (!command) return;
 				await command.autocomplete(autocompleteInteraction, client);
 			} else if (interaction.isButton()) {
-				let template = await getTemplate(interaction.message, client.settings, ul);
+				let template = await getTemplate(interaction.message, client.settings);
 				template = template
 					? template
 					: await getTemplateWithDB(interaction, client.settings);
