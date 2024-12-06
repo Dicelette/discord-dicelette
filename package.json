@@ -42,7 +42,7 @@
 		"wait-on": "^8.0.1"
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.5.1",
+		"@dicelette/core": "link:../core",
 		"@types/node": "^22.10.1",
 		"concurrently": "^9.1.0",
 		"cross-os": "^1.5.0",
