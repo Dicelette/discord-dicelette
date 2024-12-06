@@ -234,18 +234,37 @@ export const registerTemplate = {
 			});
 			return;
 		}
+		const allowedChannelType = [
+			Djs.ChannelType.PublicThread,
+			Djs.ChannelType.GuildText,
+			Djs.ChannelType.PrivateThread,
+		];
 		const res = await fetch(template.url).then((res) => res.json());
 		const templateData = verifyTemplateValue(res);
 		const guildId = interaction.guild.id;
-		const channel = options.getChannel(t("common.channel"), true);
-		const publicChannel = options.getChannel(t("register.options.public.name"), false);
-		const privateChannel = options.getChannel(t("register.options.private.name"), false);
+		const channel = options.getChannel(t("common.channel"), true, allowedChannelType) as
+			| Djs.AnyThreadChannel
+			| Djs.TextChannel;
 
-		if (
-			(!(channel instanceof Djs.TextChannel) &&
-				!(channel instanceof Djs.ThreadChannel)) ||
-			(!publicChannel && !(channel instanceof Djs.TextChannel))
-		) {
+		let publicChannel = options.getChannel(t("register.options.public.name"), false);
+		const privateChannel = options.getChannel(t("register.options.private.name"), false);
+		if (channel instanceof Djs.TextChannel && !publicChannel) {
+			publicChannel = await createDefaultThread(
+				channel,
+				client.settings,
+				interaction,
+				false
+			);
+		} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
+			await reply(interaction, {
+				embeds: [
+					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
+				],
+				ephemeral: true,
+			});
+			return;
+		}
+		if (!publicChannel) {
 			await reply(interaction, {
 				embeds: [
 					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
@@ -385,22 +404,8 @@ export const registerTemplate = {
 				damageName: damageName ?? [],
 				valid: true,
 			};
-			if (publicChannel) json.managerId = publicChannel.id;
-			else if (interaction.channel instanceof Djs.TextChannel) {
-				const thread = await createDefaultThread(
-					channel,
-					client.settings,
-					interaction,
-					false
-				);
-				json.managerId = thread.id;
-			} else {
-				await reply(interaction, {
-					embeds: [embedError(ul("error.public"), ul)],
-					ephemeral: true,
-				});
-				return;
-			}
+			json.managerId = publicChannel.id;
+
 			if (privateChannel) json.privateChannel = privateChannel.id;
 			client.settings.set(guildId, json);
 		} else {
@@ -418,15 +423,14 @@ export const registerTemplate = {
 			};
 			client.settings.set(guildId, newData);
 		}
-
-		if (options.getBoolean(t("register.options.update.name")))
-			await bulkEditTemplateUser(client.settings, interaction, ul, templateData);
-		else if (options.getBoolean(t("register.options.delete.name")))
-			await bulkDeleteCharacters(client.settings, interaction, ul);
 		await reply(interaction, {
 			content: ul("register.embed.registered"),
 			files: downloadTutorialImages(),
 		});
+		if (options.getBoolean(t("register.options.update.name")))
+			await bulkEditTemplateUser(client.settings, interaction, ul, templateData);
+		else if (options.getBoolean(t("register.options.delete.name")))
+			await bulkDeleteCharacters(client.settings, interaction, ul);
 	},
 };
 
