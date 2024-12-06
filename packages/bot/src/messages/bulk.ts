@@ -108,7 +108,6 @@ export async function bulkDeleteCharacters(
 			filter: collectorFilter,
 			time: 60_000,
 		});
-		console.log(confirm);
 		if (confirm.customId === "delete_all_confirm") {
 			guildData.delete(interaction.guild!.id, "user");
 			await rep.edit({

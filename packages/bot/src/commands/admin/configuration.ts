@@ -625,7 +625,6 @@ async function anchor(
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	client.settings.set(interaction.guild!.id, toggle, "context");
-	console.log(client.settings.get(interaction.guild!.id, "context"));
 	const deleteLogs = client.settings.get(interaction.guild!.id, "deleteAfter") === 0;
 	if (toggle) {
 		if (deleteLogs)
