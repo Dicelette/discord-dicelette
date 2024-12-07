@@ -24,7 +24,7 @@ To create your own translation, you need to copy and translate the [`en.ts`](./s
 > The name must follow the [Discord.js Locale](https://github.com/discordjs/discord-api-types/blob/main/rest/common.ts#L300)
 > For example, `ChineseCN` for Chinese (China) or `ChineseTW` for Chinese (Taiwan).
 
-You need, after that, to update the [`index.ts`](./src/localizations/index.ts) file to add your translation :
+You need, after that, to update the [`database.ts`](./src/localizations/index.ts) file to add your translation :
 ```ts
 import newTranslation from "./locales/{translation}";
 

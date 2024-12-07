@@ -29,11 +29,12 @@
 		"removeComments": true,
 		"typeRoots": ["packages/@types", "node_modules/@types"],
 		"sourceMap": false,
-		"composite": false,
+		"composite": true,
 		"baseUrl": ".",
-		"declaration": false,
+		"declaration": true,
 		"declarationMap": false,
 		"paths": {
+			"@dicelette/*": ["packages/*/index.js"],
 			"client": ["packages/bot/src/client.js"],
 			"messages": ["packages/bot/src/messages/index.js"],
 			"utils": ["packages/bot/src/utils/index.js"],
@@ -44,6 +45,6 @@
 			"locales": ["packages/bot/src/locales.js"]
 		}
 	},
-	"exclude": ["node_modules", "dist"],
+	"exclude": ["node_modules"],
 	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"]
 }

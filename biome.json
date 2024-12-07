@@ -4,8 +4,7 @@
 		"ignore": ["node_modules", "dist"]
 	},
 	"organizeImports": {
-		"enabled": true,
-		"ignore": ["src/index.ts"]
+		"enabled": true
 	},
 	"linter": {
 		"rules": {
@@ -14,6 +13,7 @@
 				"noVar": "error",
 				"useFilenamingConvention": "error",
 				"useImportType": "error",
+				"noParameterAssign": "off",
 				"useNamingConvention": {
 					"level": "warn",
 					"options": {
@@ -88,17 +88,7 @@
 		{ "include": ["**/*.js"] },
 		{ "include": ["*.json"] },
 		{
-			"include": ["src/@types/essential-md.d.ts"],
-			"linter": {
-				"rules": {
-					"suspicious": {
-						"noExplicitAny": "off"
-					}
-				}
-			}
-		},
-		{
-			"include": ["src/commands/gimmick/graph.ts"],
+			"include": ["packages/src/bot/commands/tools/graph.ts"],
 			"linter": {
 				"rules": {
 					"style": {

@@ -1,0 +1,19 @@
+{
+	"name": "@dicelette/localization",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"main": "dist/index.js",
+	"scripts": {
+		"prebuild": "rimraf dist",
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Mara-Li/discord-dicelette.git"
+	},
+	"private": true,
+	"dependencies": {
+		"@dicelette/utils": "workspace:*"
+	}
+}
