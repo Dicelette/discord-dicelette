@@ -3,7 +3,7 @@ import {
 	parseEmbedToDamage,
 	parseEmbedToStats,
 	parseTemplateField,
-} from "@dicelette/parse_result/src/convert_embed";
+} from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
 	PersonnageIds,
