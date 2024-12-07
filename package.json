@@ -37,7 +37,7 @@
 		"vitest": "^2.1.8"
 	},
 	"dependencies": {
-		"@dicelette/core": "link:../core",
+		"@dicelette/core": "link:..\\core",
 		"@types/node": "^22.10.1",
 		"discord.js": "^14.16.3",
 		"dotenv": "^16.4.7",
