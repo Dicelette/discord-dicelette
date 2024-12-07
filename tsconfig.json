@@ -29,9 +29,9 @@
 		"removeComments": true,
 		"typeRoots": ["packages/@types", "node_modules/@types"],
 		"sourceMap": false,
-		"composite": true,
+		"composite": false,
 		"baseUrl": ".",
-		"declaration": true,
+		"declaration": false,
 		"declarationMap": false,
 		"paths": {
 			"client": ["packages/bot/src/client.js"],
