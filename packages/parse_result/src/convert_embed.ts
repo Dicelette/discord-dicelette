@@ -19,17 +19,6 @@ export function parseEmbedToCritical(embed: { [name: string]: string }): {
 	return customCritical;
 }
 
-export function parseEmbedToDamage(embed?: { [name: string]: string }) {
-	let templateDamage: { [name: string]: string } | undefined = undefined;
-	if (embed) {
-		templateDamage = {};
-		for (const [name, value] of Object.values(embed)) {
-			templateDamage[name.unidecode()] = value.removeBacktick();
-		}
-	}
-	return templateDamage;
-}
-
 export function parseEmbedToStats(
 	embed?: { [name: string]: string },
 	integrateCombinaison = true

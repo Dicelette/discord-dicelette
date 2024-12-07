@@ -109,7 +109,7 @@ export function parseEmbedFields(embed: Djs.Embed): { [name: string]: string } {
 	if (!fields) return {};
 	const parsedFields: { [name: string]: string } = {};
 	for (const field of fields) {
-		parsedFields[findln(field.name.removeBacktick())] = findln(
+		parsedFields[findln(field.name.removeBacktick().unidecode())] = findln(
 			field.value.removeBacktick()
 		);
 	}

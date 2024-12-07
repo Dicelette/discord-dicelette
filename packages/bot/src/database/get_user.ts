@@ -1,9 +1,5 @@
 import { findln, ln } from "@dicelette/localization";
-import {
-	parseEmbedToDamage,
-	parseEmbedToStats,
-	parseTemplateField,
-} from "@dicelette/parse_result";
+import { parseEmbedToStats, parseTemplateField } from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
 	PersonnageIds,
@@ -38,7 +34,7 @@ export function getUserByEmbed(
 	const statsFields = getEmbeds(ul, message, "stats")?.toJSON() as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
 	const damageFields = getEmbeds(ul, message, "damage")?.toJSON() as Djs.Embed;
-	const templateDamage = parseEmbedToDamage(parseEmbedFields(damageFields));
+	const templateDamage = parseEmbedFields(damageFields);
 	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template");
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
