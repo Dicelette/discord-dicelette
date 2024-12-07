@@ -12,7 +12,8 @@
 		"watch:bot": "tsx watch --clear-screen=false packages/bot/index.ts",
 		"watch": "run-p -ln watch:*",
 		"prestart": "pnpm run --recursive build",
-		"start": "node packages/bot/dist/index.js"
+		"start": "node packages/bot/dist/index.js",
+		"dev": "tsx watch --clear-screen=false packages/bot/index.ts"
 	},
 	"engines": {
 		"node": "^20.0.0"

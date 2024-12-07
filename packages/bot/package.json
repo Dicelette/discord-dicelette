@@ -20,7 +20,7 @@
 	},
 	"private": true,
 	"dependencies": {
-		"@dicelette/dice": "workspace:*",
+		"@dicelette/parse_result": "workspace:*",
 		"@dicelette/localization": "workspace:*",
 		"@dicelette/types": "workspace:*",
 		"@dicelette/utils": "workspace:*",

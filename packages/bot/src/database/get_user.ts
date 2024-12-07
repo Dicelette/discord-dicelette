@@ -1,9 +1,9 @@
+import { findln, ln } from "@dicelette/localization";
 import {
 	parseEmbedToDamage,
 	parseEmbedToStats,
 	parseTemplateField,
-} from "@dicelette/dice/src/convert_embed";
-import { findln, ln } from "@dicelette/localization";
+} from "@dicelette/parse_result/src/convert_embed";
 import type {
 	CharDataWithName,
 	PersonnageIds,

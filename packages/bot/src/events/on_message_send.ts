@@ -1,5 +1,5 @@
-import { ResultAsText, isRolling, rollContent } from "@dicelette/dice";
 import { lError, ln } from "@dicelette/localization";
+import { ResultAsText, isRolling, rollContent } from "@dicelette/parse_result";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";

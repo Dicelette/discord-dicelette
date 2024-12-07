@@ -3,13 +3,13 @@ import {
 	generateStatsDice,
 	replaceFormulaInDice,
 } from "@dicelette/core";
+import { ln, t } from "@dicelette/localization";
 import {
 	ResultAsText,
 	type Server,
 	convertCustomCriticalValue,
 	getRoll,
-} from "@dicelette/dice";
-import { ln, t } from "@dicelette/localization";
+} from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";

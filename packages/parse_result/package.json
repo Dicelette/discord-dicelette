@@ -1,5 +1,5 @@
 {
-	"name": "@dicelette/dice",
+	"name": "@dicelette/parse_result",
 	"version": "1.0.0",
 	"description": "",
 	"main": "dist/index.js",
