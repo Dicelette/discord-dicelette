@@ -6,6 +6,7 @@
 	"scripts": {
 		"lint": "biome format --write packages",
 		"build": "pnpm run --recursive build",
+		"predev": "pnpm run --recursive prebuild",
 		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
 		"prerelease": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json",
 		"release": "commit-and-tag-version",
