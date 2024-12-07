@@ -11,7 +11,6 @@
 		"outDir": "./dist",
 		"rootDir": "./",
 		"paths": {
-			"@dicelette/*": ["packages/*/index.js"],
 			"client": ["packages/bot/src/client.js"],
 			"messages": ["packages/bot/src/messages/index.js"],
 			"utils": ["packages/bot/src/utils/index.js"],
