@@ -58,7 +58,7 @@ export async function rollWithInteraction(
 		infoRoll,
 		customCritical
 	);
-	const output = defaultMsg.output;
+	const output = defaultMsg.defaultMessage();
 	if (defaultMsg.error) {
 		await reply(interaction, {
 			embeds: [embedError(output, ul)],
