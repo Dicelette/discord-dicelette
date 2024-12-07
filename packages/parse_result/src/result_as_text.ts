@@ -303,7 +303,7 @@ export function parseCustomCritical(
 	const nameStr = onNaturalDice ? name.replace("(N)", "") : name;
 	return {
 		[nameStr.trimAll()]: {
-			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "=" | "!=" | "==",
+			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
 			value: value.trimAll(),
 			onNaturalDice,
 		},
