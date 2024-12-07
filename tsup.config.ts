@@ -1,5 +1,6 @@
 // tsup.config.ts
 import { defineConfig } from "tsup";
+import { builtinModules } from "module";
 
 export default defineConfig({
 	entry: ["./packages/bot/index.ts"], // Point d'entrée principal
@@ -13,7 +14,7 @@ export default defineConfig({
 	treeshake: true, // Activer le treeshaking
 	minify: true, // Minifier le code
 	tsconfig: "tsconfig.dev.json", // Chemin vers votre tsconfig
-	external: ["fs", "path", "enmap", ...require("node:module").builtinModules], // Inclure toutes les dépendances dans le bundle
+	external: ["fs", "path", "enmap", ...builtinModules], // Inclure toutes les dépendances dans le bundle
 	esbuildOptions(options) {
 		options.platform = "node";
 		options.target = "esnext";
