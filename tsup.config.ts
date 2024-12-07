@@ -1,6 +1,7 @@
+import { builtinModules } from "node:module";
+import dedent from "dedent";
 // tsup.config.ts
 import { defineConfig } from "tsup";
-import { builtinModules } from "module";
 
 export default defineConfig({
 	entry: ["./packages/bot/index.ts"], // Point d'entrée principal
@@ -19,7 +20,9 @@ export default defineConfig({
 		options.platform = "node";
 		options.target = "esnext";
 		options.banner = {
-			js: `import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import path from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = path.dirname(__filename);`,
+			js: dedent(
+				`import { createRequire } from 'module';const require = createRequire(import.meta.url);import { fileURLToPath } from 'url';import path from 'path';const __filename = fileURLToPath(import.meta.url);const __dirname = path.dirname(__filename);const { ChartJSNodeCanvas } = require('chartjs-node-canvas');const { Chart } = require('chart.js');`
+			),
 		};
 	},
 });

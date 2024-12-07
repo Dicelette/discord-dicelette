@@ -20,7 +20,7 @@
 		"@dicelette/utils": "workspace:*",
 		"@discordjs/rest": "^2.4.0",
 		"@types/parse-color": "^1.0.3",
-		"canvas": "^2.11.2",
+		"canvas": "^2.8.0",
 		"chart.js": "3.9.1",
 		"chartjs-node-canvas": "^4.1.6",
 		"discord-api-types": "^0.37.104",
