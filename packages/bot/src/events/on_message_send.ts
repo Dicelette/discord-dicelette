@@ -27,7 +27,8 @@ export default (client: EClient): void => {
 			const channel = message.channel;
 			if (!result) return;
 			const resultAsText = new ResultAsText(result, { lang: userLang });
-			const parser = resultAsText.output;
+			const parser = resultAsText.parser;
+			if (!parser) return;
 			if (
 				channel.name.startsWith("🎲") ||
 				client.settings.get(message.guild.id, "disableThread") === true ||

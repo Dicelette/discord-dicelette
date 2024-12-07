@@ -14,15 +14,13 @@ import { ln } from "@dicelette/localization";
 
 export class ResultAsText {
 	parser?: string;
-	private readonly mentionUser: string;
-	private readonly titleCharName: string;
-	private readonly charName?: string;
+	error?: boolean;
+	output: string;
 	private readonly data: Server;
 	private readonly ul: Translation;
-	error?: boolean;
+	private readonly charName?: string;
 	private readonly infoRoll?: { name: string; standardized: string };
 	private readonly resultat?: Resultat;
-	output: string;
 	constructor(
 		result: Resultat | undefined,
 		data: Server,
@@ -42,14 +40,9 @@ export class ResultAsText {
 		} else {
 			parser = this.parseResult(!!infoRoll, critical, customCritical);
 		}
-		this.output = parser;
+		this.output = this.defaultMessage();
 		this.parser = parser;
-		const mentionUser = `<@${data.userId}>`;
 		this.charName = charName;
-		this.titleCharName = `__**${charName?.capitalize()}**__`;
-		this.mentionUser = this.charName
-			? `${this.titleCharName} (${mentionUser})`
-			: mentionUser;
 	}
 
 	defaultMessage() {
@@ -59,9 +52,12 @@ export class ResultAsText {
 	}
 
 	private infoRollTotal(mention?: boolean, time?: boolean) {
+		let mentionUser = `<@${this.data.userId}>`;
+		const titleCharName = `__**${this.charName?.capitalize()}**__`;
+		mentionUser = this.charName ? `${titleCharName} (${mentionUser})` : mentionUser;
 		let user = " ";
-		if (mention) user = this.mentionUser;
-		else if (this.charName) user = this.titleCharName;
+		if (mention) user = mentionUser;
+		else if (this.charName) user = titleCharName;
 		if (time) user += `${timestamp(this.data?.config?.timestamp)}`;
 		if (user.trim().length > 0) user += `${this.ul("common.space")}:\n`;
 		if (this.infoRoll) return `${user}[__${this.infoRoll.name.capitalize()}__] `;
