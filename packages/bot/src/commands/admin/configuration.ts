@@ -504,7 +504,7 @@ async function display(
 		if (!settings) return ul("common.no");
 		if (typeof settings === "boolean") return ul("common.yes");
 		if (typeof settings === "number") {
-			if (settings === 0 || guildSettings.disableThread) return ul("common.no");
+			if (settings === 0 || guildSettings?.disableThread) return ul("common.no");
 			return `\`${settings / 1000}\`s (\`${settings / 60000}\`min)`;
 		}
 		if (type === "role") return `<@&${settings}>`;
