@@ -4,5 +4,6 @@
 		"outDir": "./dist",
 		"rootDir": "./"
 	},
-	"include": ["./src/**/*", "locales/**/*.json", "index.ts"]
+	"include": ["./src/**/*", "locales/**/*.json", "index.ts"],
+	"exclude": ["./dist"]
 }

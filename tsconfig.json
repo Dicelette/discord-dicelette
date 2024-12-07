@@ -44,6 +44,6 @@
 			"locales": ["packages/bot/src/locales.js"]
 		}
 	},
-	"exclude": ["node_modules"],
+	"exclude": ["node_modules", "dist", "packages/**/*.test.ts", "packages/**/*.test.js"],
 	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"]
 }

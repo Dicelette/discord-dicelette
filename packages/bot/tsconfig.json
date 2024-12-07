@@ -21,5 +21,6 @@
 			"locales": ["packages/bot/src/locales.js"]
 		}
 	},
-	"include": ["src", "index.ts", "package.json"]
+	"include": ["src", "index.ts", "package.json"],
+	"exclude": ["./dist"]
 }
