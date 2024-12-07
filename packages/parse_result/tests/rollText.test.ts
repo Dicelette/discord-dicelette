@@ -3,7 +3,7 @@ import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
 import type { Server } from "../src/interfaces";
-import { ResultAsText, convertCustomCriticalValue, getRoll } from "../src/roll";
+import { ResultAsText, convertCustomCriticalValue, getRoll } from "../src/result_as_text";
 const data: Server = {
 	lang: Djs.Locale.EnglishUS,
 	userId: "mara__li",
