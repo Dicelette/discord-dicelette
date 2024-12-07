@@ -5,14 +5,8 @@
 	"type": "module",
 	"main": "dist/index.js",
 	"scripts": {
-		"prebuild": "cross-os clean",
+		"prebuild": "rimraf dist",
 		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
-	},
-	"cross-os": {
-		"clean": {
-			"linux": "rm -rf dist",
-			"win32": "rmdir /s /q dist"
-		}
 	},
 	"repository": {
 		"type": "git",

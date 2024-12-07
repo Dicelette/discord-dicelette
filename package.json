@@ -18,12 +18,6 @@
 	"engines": {
 		"node": "^20.0.0"
 	},
-	"cross-os": {
-		"clean": {
-			"linux": "rm -rf dist",
-			"win32": "rmdir /s /q dist"
-		}
-	},
 	"commit-and-tag-version": {
 		"t": ""
 	},
@@ -35,6 +29,7 @@
 		"cpx": "^1.5.0",
 		"i18next": "^24.0.5",
 		"npm-run-all": "^4.1.5",
+		"rimraf": "^6.0.1",
 		"tsc-alias": "^1.8.10",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.7.2",
@@ -44,7 +39,6 @@
 	"dependencies": {
 		"@dicelette/core": "link:../core",
 		"@types/node": "^22.10.1",
-		"cross-os": "^1.5.0",
 		"discord.js": "^14.16.3",
 		"dotenv": "^16.4.7",
 		"tslog": "^4.9.3",
