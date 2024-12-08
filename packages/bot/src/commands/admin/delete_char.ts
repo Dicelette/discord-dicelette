@@ -12,7 +12,7 @@ import { deleteUser, deleteUserInChar, getDatabaseChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
-import { searchUserChannel } from "utils";
+import { optionInteractions, searchUserChannel } from "utils";
 export const t = i18next.getFixedT("en");
 
 export const deleteChar = {
@@ -65,15 +65,9 @@ export const deleteChar = {
 				.setAutocomplete(true)
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const guildData = client.settings.get(interaction.guildId as string);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
-		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
-			return;
-		}
-		const user = options.getUser(t("display.userLowercase"));
+		const int = await optionInteractions(interaction, client);
+		if (!int) return;
+		const { options, guildData, ul, user } = int;
 		let charName = options.getString(t("common.character"))?.toLowerCase();
 		const charData = await getDatabaseChar(interaction, client, t);
 		const mention = Djs.userMention(user?.id ?? interaction.user.id);

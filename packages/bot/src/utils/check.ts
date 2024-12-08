@@ -86,3 +86,19 @@ export function autoComplete(interaction: Djs.AutocompleteInteraction, client: E
 	if (typeof userID !== "string") userID = interaction.user.id;
 	return { fixed, guildData, choices, ul, userID };
 }
+
+export async function optionInteractions(
+	interaction: Djs.CommandInteraction,
+	client: EClient
+) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const guildData = client.settings.get(interaction.guildId as string);
+	const lang = guildData?.lang ?? interaction.locale;
+	const ul = ln(lang);
+	if (!guildData) {
+		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		return;
+	}
+	const user = options.getUser(t("display.userLowercase"));
+	return { options, guildData, lang, ul, user };
+}

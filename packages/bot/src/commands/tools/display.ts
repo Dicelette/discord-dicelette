@@ -1,5 +1,5 @@
 import { generateStatsDice } from "@dicelette/core";
-import { cmdLn, findln, ln, t } from "@dicelette/localization";
+import { cmdLn, findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -13,7 +13,7 @@ import {
 	getEmbeds,
 	reply,
 } from "messages";
-import { autoComplete, haveAccess } from "utils";
+import { autoComplete, haveAccess, optionInteractions } from "utils";
 
 export const displayUser = {
 	data: new Djs.SlashCommandBuilder()
@@ -63,15 +63,9 @@ export const displayUser = {
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const guildData = client.settings.get(interaction.guildId as string);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
-		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
-			return;
-		}
-		const user = options.getUser(t("display.userLowercase"));
+		const int = await optionInteractions(interaction, client);
+		if (!int) return;
+		const { options, user, ul } = int;
 		const charData = await getDatabaseChar(interaction, client, t, false);
 		const charName = options.getString(t("common.character"))?.toLowerCase();
 		if (!charData) {

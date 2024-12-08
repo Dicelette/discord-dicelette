@@ -1,4 +1,4 @@
-import { cmdLn, findln, ln, t } from "@dicelette/localization";
+import { cmdLn, findln, t } from "@dicelette/localization";
 import type { DiscordChannel } from "@dicelette/types";
 import type { PersonnageIds, UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
@@ -14,7 +14,7 @@ import {
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
 import { reply } from "messages";
-import { autoComplete, getButton, haveAccess } from "utils";
+import { autoComplete, getButton, haveAccess, optionInteractions } from "utils";
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
@@ -132,15 +132,9 @@ export const editAvatar = {
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const guildData = client.settings.get(interaction.guildId as string);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
-		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
-			return;
-		}
-		const user = options.getUser(t("display.userLowercase"));
+		const int = await optionInteractions(interaction, client);
+		if (!int) return;
+		const { options, ul, user } = int;
 		const isModerator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
