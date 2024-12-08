@@ -16,7 +16,7 @@ export class EClient extends Djs.Client {
 			cloneLevel: "deep",
 		});
 
-		//@ts-ignore
+		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
 		this.characters = new Enmap({ inMemory: true });
 	}
 }
