@@ -1,7 +1,7 @@
-import { logger } from "./src/logger";
+import { important, logger } from "./src/logger";
 import "uniformize";
 
-export { logger };
+export { logger, important };
 
 /**
  * filter the choices by removing the accents and check if it includes the removedAccents focused

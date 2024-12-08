@@ -2,6 +2,7 @@ import { logger } from "@dicelette/utils";
 import dotenv from "dotenv";
 import "uniformize";
 import process from "node:process";
+import { important } from "@dicelette/utils";
 import { client } from "client";
 import {
 	onDeleteChannel,
@@ -37,5 +38,11 @@ try {
 	logger.fatal(error);
 }
 
-// noinspection JSIgnoredPromiseFromCall
-client.login(process.env.DISCORD_TOKEN);
+client
+	.login(process.env.DISCORD_TOKEN)
+	.then(() => {
+		important.info("Bot started");
+	})
+	.catch((error) => {
+		logger.fatal(error);
+	});

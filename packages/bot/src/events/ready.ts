@@ -1,5 +1,5 @@
 import type { Settings, UserData } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { commandsList, contextMenus } from "commands";
 import * as Djs from "discord.js";
@@ -44,10 +44,10 @@ export default (client: EClient): void => {
 			);
 
 			convertDatabaseUser(client.settings, guild);
-			logger.info(`User saved in memory for ${guild.name}`);
+			logger.silly(`User saved in memory for ${guild.name}`);
 			await fetchAllCharacter(client, guild);
 		}
-		logger.warn("Bot is ready");
+		important.info("Bot is ready");
 		cleanData(client);
 	});
 };

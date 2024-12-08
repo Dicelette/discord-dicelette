@@ -7,4 +7,6 @@ const optionLoggers =
 	process.env.NODE_ENV === "development"
 		? { minLevel: 0 }
 		: { minLevel: 4, hideLogPositionForProduction: true };
+
 export const logger: Logger<ILogObj> = new Logger(optionLoggers);
+export const important: Logger<ILogObj> = new Logger({ name: "Note", minLevel: 0 });
