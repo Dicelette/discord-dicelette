@@ -2,6 +2,7 @@ import { logger } from "@dicelette/utils";
 import dotenv from "dotenv";
 import "uniformize";
 import process from "node:process";
+import { important } from "@dicelette/utils";
 import { client } from "client";
 import {
 	onDeleteChannel,
@@ -18,7 +19,7 @@ import {
 } from "event";
 import packageJson from "./package.json" assert { type: "json" };
 dotenv.config({ path: ".env" });
-logger.info("Starting bot...");
+important.info("Starting bot...");
 //@ts-ignore
 export const VERSION = packageJson.version ?? "/";
 try {
@@ -37,4 +38,11 @@ try {
 	logger.fatal(error);
 }
 
-client.login(process.env.DISCORD_TOKEN);
+client
+	.login(process.env.DISCORD_TOKEN)
+	.then(() => {
+		important.info("Bot started");
+	})
+	.catch((error) => {
+		logger.fatal(error);
+	});

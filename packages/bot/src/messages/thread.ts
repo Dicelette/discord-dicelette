@@ -1,14 +1,16 @@
 import type {
 	CharDataWithName,
 	CharacterData,
+	Characters,
 	PersonnageIds,
 	Settings,
 	Translation,
 	UserData,
 	UserRegistration,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { registerUser, setDefaultManagerId } from "database";
+import { registerUser, setDefaultManagerId, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import { deleteAfter, embedError, reply, sendLogs } from "messages";
 import { editUserButtons, haveAccess, searchUserChannel, selectEditMenu } from "utils";
@@ -74,7 +76,8 @@ export async function repostInThread(
 	ul: Translation,
 	which: { stats?: boolean; dice?: boolean; template?: boolean },
 	guildData: Settings,
-	threadId: string
+	threadId: string,
+	characters: Characters
 ) {
 	userTemplate.userName = userTemplate.userName
 		? userTemplate.userName.toLowerCase()
@@ -138,6 +141,10 @@ export async function repostInThread(
 		damage: damageName,
 		msgId: [msg.id, thread.id],
 	};
+	logger.trace("User Data", userTemplate);
+	updateCharactersDb(characters, interaction.guild!.id, userId, ul, {
+		userData: userTemplate,
+	});
 	await registerUser(userRegister, interaction, guildData);
 }
 

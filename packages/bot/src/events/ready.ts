@@ -1,13 +1,12 @@
-// noinspection ES6MissingAwait
-
-import type { Settings } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import type { Settings, UserData } from "@dicelette/types";
+import { important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { commandsList, contextMenus } from "commands";
 import * as Djs from "discord.js";
 import type { Guild } from "discord.js";
 import dotenv from "dotenv";
 import { VERSION } from "../../index.js";
+import { getUser } from "../database";
 dotenv.config({ path: ".env" });
 
 const rest = new Djs.REST().setToken(process.env.DISCORD_TOKEN ?? "0");
@@ -45,7 +44,10 @@ export default (client: EClient): void => {
 			);
 
 			convertDatabaseUser(client.settings, guild);
+			logger.silly(`User saved in memory for ${guild.name}`);
+			await fetchAllCharacter(client, guild);
 		}
+		important.info("Bot is ready");
 		cleanData(client);
 	});
 };
@@ -98,5 +100,20 @@ function cleanData(client: EClient) {
 			);
 			client.settings.delete(guildId);
 		}
+	}
+}
+
+async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
+	const db = client.settings;
+	const characters = client.characters;
+	const allUsers = db.get(guild.id, "user");
+	if (!allUsers) return;
+	for (const [userId, chars] of Object.entries(allUsers)) {
+		const allCharacters: UserData[] = [];
+		for (const char of chars) {
+			const userStats = await getUser(char.messageId, guild, client);
+			if (userStats) allCharacters.push(userStats);
+		}
+		characters.set(guild.id, allCharacters, userId);
 	}
 }

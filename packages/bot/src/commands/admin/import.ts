@@ -148,7 +148,8 @@ export const bulkAdd = {
 					{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
 					client.settings,
 					char.channel ??
-						(char.private && privateChannel ? privateChannel : defaultChannel)
+						(char.private && privateChannel ? privateChannel : defaultChannel),
+					client.characters
 				);
 				await addAutoRole(
 					interaction,

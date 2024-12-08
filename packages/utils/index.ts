@@ -1,7 +1,7 @@
-import { logger } from "./src/logger";
+import { important, logger } from "./src/logger";
 import "uniformize";
 
-export { logger };
+export { logger, important };
 
 /**
  * filter the choices by removing the accents and check if it includes the removedAccents focused
@@ -18,7 +18,7 @@ export function filterChoices(choices: string[], focused: string) {
 }
 
 function uniqueValues(array: string[]) {
-	const seen: { [key: string]: boolean } = {};
+	const seen: Record<string, boolean> = {};
 	const uniqueArray: string[] = [];
 
 	for (const item of array) {

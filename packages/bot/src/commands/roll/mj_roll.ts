@@ -216,13 +216,9 @@ export const mjRoll = {
 		const user = options.getUser(t("display.userLowercase"), true);
 		const charName = options.getString(t("common.character"), false)?.toLowerCase();
 		let optionChar = options.getString(t("common.character")) ?? undefined;
-		let charData = await getUserFromMessage(
-			client.settings,
-			user.id,
-			interaction,
-			charName,
-			{ skipNotFound: true }
-		);
+		let charData = await getUserFromMessage(client, user.id, interaction, charName, {
+			skipNotFound: true,
+		});
 		const serializedNameQueries = serializeName(charData, charName);
 		if (charName && !serializedNameQueries) {
 			await reply(interaction, {

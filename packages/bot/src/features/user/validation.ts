@@ -1,6 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { UserData } from "@dicelette/types";
+import type { Characters, UserData } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
@@ -64,12 +64,13 @@ export async function validateUserButton(
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
 	ul: Translation,
-	db: Settings
+	db: Settings,
+	characters: Characters
 ) {
 	const isModerator = interaction.guild?.members.cache
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-	if (isModerator) await validateUser(interaction, template, db);
+	if (isModerator) await validateUser(interaction, template, db, characters);
 	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
 }
 
@@ -80,7 +81,8 @@ export async function validateUserButton(
 export async function validateUser(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
-	db: Settings
+	db: Settings,
+	characters: Characters
 ) {
 	const lang = db.get(interaction.guild!.id, "lang") ?? interaction.locale;
 	const ul = ln(lang);
@@ -145,24 +147,28 @@ export async function validateUser(
 		});
 	}
 
-	const templateStat = template.statistics ? Object.keys(template.statistics) : [];
 	const parsedStats = statsEmbed
 		? parseEmbedFields(statsEmbed.toJSON() as Djs.Embed)
 		: undefined;
-	const stats: { [name: string]: number } = {};
-	if (parsedStats)
-		for (const stat of templateStat) {
-			stats[stat] = Number.parseInt(parsedStats[stat.unidecode()], 10);
+	const stats: Record<string, number> = {};
+	for (const [name, value] of Object.entries(parsedStats ?? {})) {
+		let statValue = Number.parseInt(value, 10);
+		if (Number.isNaN(statValue)) {
+			statValue = Number.parseInt(
+				value.removeBacktick().split("=")[1].trim().removeBacktick().standardize(),
+				10
+			);
 		}
+		stats[name] = statValue;
+	}
 
 	const damageFields = diceEmbed?.toJSON().fields ?? [];
-	let templateDamage: { [name: string]: string } | undefined = undefined;
-
+	let templateDamage: Record<string, string> | undefined = undefined;
 	if (damageFields.length > 0) {
 		templateDamage = {};
 
 		for (const damage of damageFields) {
-			templateDamage[damage.name.unidecode()] = damage.value;
+			templateDamage[damage.name.unidecode(true)] = damage.value;
 		}
 	}
 	for (const [name, dice] of Object.entries(template.damage ?? {})) {
@@ -234,7 +240,8 @@ export async function validateUser(
 		ul,
 		{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
 		db,
-		channelToPost.replace("<#", "").replace(">", "")
+		channelToPost.replace("<#", "").replace(">", ""),
+		characters
 	);
 	try {
 		await interaction.message.delete();

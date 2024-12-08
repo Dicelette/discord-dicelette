@@ -4,7 +4,7 @@ import type { PersonnageIds, UserMessageId } from "@dicelette/types";
 import type { DiscordChannel } from "@dicelette/types";
 import type { EClient } from "client";
 import { rename } from "commands";
-import { getUserByEmbed } from "database";
+import { getUserByEmbed, updateCharactersDb } from "database";
 import type * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 
@@ -30,7 +30,7 @@ export async function validateRename(
 		channelId: interaction.channel.id,
 		messageId: interaction.message.id,
 	};
-	const charData = getUserByEmbed(interaction.message, ul);
+	const charData = getUserByEmbed({ message: interaction.message }, ul);
 	if (!charData) throw new Error(ul("error.notFound"));
 	const oldData: {
 		charName?: string | null;
@@ -45,6 +45,11 @@ export async function validateRename(
 	};
 	const guildData = client.settings.get(interaction.guildId as string);
 	if (!guildData) return;
+	//update the characters database
+	//remove the old chara
+	updateCharactersDb(client.characters, interaction.guild!.id, userId, ul, {
+		userData: charData,
+	});
 	await rename(
 		newName,
 		interaction,

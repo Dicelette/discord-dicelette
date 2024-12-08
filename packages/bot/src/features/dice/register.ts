@@ -3,11 +3,13 @@ import { findln, ln } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed } from "@dicelette/utils";
+import type { EClient } from "client";
 import {
 	getTemplateWithDB,
 	getUserByEmbed,
 	getUserNameAndChar,
 	registerUser,
+	updateCharactersDb,
 } from "database";
 import * as Djs from "discord.js";
 import {
@@ -26,14 +28,15 @@ import { addAutoRole, editUserButtons } from "utils";
  * @param interaction {Djs.ModalSubmitInteraction}
  * @param ul {Translation}
  * @param interactionUser {User}
- * @param db
+ * @param client
  */
 export async function storeDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
-	db: Settings
+	client: EClient
 ) {
+	const db = client.settings;
 	const template = await getTemplateWithDB(interaction, db);
 	if (!template) {
 		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
@@ -49,7 +52,7 @@ export async function storeDamageDice(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (user || isModerator)
-		await registerDamageDice(interaction, db, interaction.customId.includes("first"));
+		await registerDamageDice(interaction, client, interaction.customId.includes("first"));
 	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
 }
 
@@ -80,16 +83,17 @@ export function registerDmgButton(ul: Translation) {
 /**
  * Register the new skill dice in the embed and database
  * @param interaction {Djs.ModalSubmitInteraction}
- * @param db
+ * @param client
  * @param first {boolean}
  * - true: It's the modal when the user is registered
  * - false: It's the modal when the user is already registered and a new dice is added to edit the user
  */
 export async function registerDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
-	db: Settings,
+	client: EClient,
 	first?: boolean
 ) {
+	const db = client.settings;
 	const lang = db.get(interaction.guild!.id, "lang") ?? interaction.locale;
 	const ul = ln(lang);
 	const name = interaction.fields.getTextInputValue("damageName");
@@ -116,7 +120,7 @@ export async function registerDamageDice(
 				diceEmbed.addFields(field);
 			}
 		}
-	const user = getUserByEmbed(interaction.message, ul, first);
+	const user = getUserByEmbed({ message: interaction.message }, ul, first);
 	if (!user) throw new Error(ul("error.user")); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
@@ -137,7 +141,7 @@ export async function registerDamageDice(
 			acc[field.name] = field.value.removeBacktick();
 			return acc;
 		},
-		{} as { [name: string]: string }
+		{} as Record<string, string>
 	);
 	if (damageName && Object.keys(damageName).length > 25) {
 		await reply(interaction, { content: ul("modals.dice.max"), ephemeral: true });
@@ -151,17 +155,18 @@ export async function registerDamageDice(
 		false,
 		db
 	);
+	let allEmbeds: Djs.EmbedBuilder[] = [];
+	let components: Djs.ActionRowBuilder<Djs.ButtonBuilder>;
+	const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
+	const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
+	if (!userEmbed) throw new NoEmbed();
+	allEmbeds = [userEmbed];
+	if (statsEmbed) allEmbeds.push(statsEmbed);
+	allEmbeds.push(diceEmbed);
 	if (!first) {
-		const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
-		if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
-		const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
-		const allEmbeds = [userEmbed];
-		if (statsEmbed) allEmbeds.push(statsEmbed);
-		allEmbeds.push(diceEmbed);
 		if (templateEmbed) allEmbeds.push(templateEmbed);
-		const components = editUserButtons(ul, !!statsEmbed, true);
-
+		components = editUserButtons(ul, !!statsEmbed, true);
 		const userRegister: {
 			userID: string;
 			charName: string | undefined;
@@ -174,38 +179,36 @@ export async function registerDamageDice(
 			msgId: [interaction.message.id, interaction.message.channel.id],
 		};
 		await registerUser(userRegister, interaction, db, false);
-		await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
-		await reply(interaction, { content: ul("modals.added.dice"), ephemeral: true });
-		await sendLogs(
-			ul("logs.dice.add", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: interaction.message.url,
-				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-			}),
-			interaction.guild as Djs.Guild,
-			db
-		);
-		return;
+		updateCharactersDb(client.characters, interaction.guild.id, userID, ul, {
+			embeds: allEmbeds,
+		});
+	} else {
+		components = registerDmgButton(ul);
 	}
 
-	const components = registerDmgButton(ul);
-	const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
-	if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
-	const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
-	const allEmbeds = [userEmbed];
-	if (statsEmbed) allEmbeds.push(statsEmbed);
-	allEmbeds.push(diceEmbed);
+	await edit(db, interaction, ul, allEmbeds, components, userID, userName);
+}
+
+async function edit(
+	db: Settings,
+	interaction: Djs.ModalSubmitInteraction,
+	ul: Translation,
+	allEmbeds: Djs.EmbedBuilder[],
+	components: Djs.ActionRowBuilder<Djs.ButtonBuilder>,
+	userID: string,
+	userName?: string
+) {
 	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
 	await reply(interaction, { content: ul("modals.added.dice"), ephemeral: true });
-
 	await sendLogs(
 		ul("logs.dice.add", {
 			user: Djs.userMention(interaction.user.id),
-			fiche: interaction.message.url,
+			fiche: interaction.message?.url ?? "no url",
 			char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 		}),
 		interaction.guild as Djs.Guild,
 		db
 	);
+
 	return;
 }

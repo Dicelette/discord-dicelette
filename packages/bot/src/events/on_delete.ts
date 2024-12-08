@@ -1,7 +1,7 @@
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteIfChannelOrThread } from "database";
+import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import { sendLogs } from "messages";
 
 export const onDeleteChannel = (client: EClient): void => {
@@ -9,8 +9,7 @@ export const onDeleteChannel = (client: EClient): void => {
 		try {
 			if (channel.isDMBased()) return;
 			const guildID = channel.guild.id;
-			const db = client.settings;
-			deleteIfChannelOrThread(db, guildID, channel);
+			deleteIfChannelOrThread(client, guildID, channel);
 		} catch (error) {
 			logger.error(error);
 			if (channel.isDMBased()) return;
@@ -23,6 +22,7 @@ export const onKick = (client: EClient): void => {
 		//delete guild from database
 		try {
 			client.settings.delete(guild.id);
+			client.characters.delete(guild.id);
 		} catch (error) {
 			logger.error(error);
 		}
@@ -34,9 +34,8 @@ export const onDeleteThread = (client: EClient): void => {
 		try {
 			//search channelID in database and delete it
 			const guildID = thread.guild.id;
-			const db = client.settings;
 			//verify if the user message was in the thread
-			deleteIfChannelOrThread(db, guildID, thread);
+			deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
 			logger.error(error);
 			if (thread.isDMBased()) return;
@@ -67,6 +66,8 @@ export const onDeleteMessage = (client: EClient): void => {
 						if (persoId.messageId === messageId && persoId.channelId === channel.id) {
 							logger.silly(`Deleted character ${value.charName} for user ${user}`);
 							values.splice(index, 1);
+							//delete in characters database
+							deleteUserInChar(client.characters, user, guildID, value.charName);
 						}
 					}
 					if (values.length === 0) delete dbUser[user];

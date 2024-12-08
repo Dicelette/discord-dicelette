@@ -147,7 +147,7 @@ function getHelpDBCmd(
 		t("graph.name"),
 		t("display.title"),
 	];
-	const ids: { [key: string]: string | undefined } = {};
+	const ids: Record<string, string | undefined> = {};
 	for (const cmd of commandToFind) {
 		ids[cmd] = commandsID.findKey((command) => command.name === cmd);
 	}
@@ -173,7 +173,7 @@ function createHelpMessageDB(
 function getIDForAdminNoDB(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
-	const ids: { [key: string]: string | undefined } = {};
+	const ids: Record<string, string | undefined> = {};
 	const idConfig = commandsID.findKey((command) => command.name === t("config.name"));
 	if (!idConfig) {
 		return;
@@ -200,7 +200,7 @@ function getIDForAdminDB(
 		t("dbRoll.name"),
 		t("rAtq.name"),
 	];
-	const ids: { [key: string]: string | undefined } = {};
+	const ids: Record<string, string | undefined> = {};
 	for (const cmd of commandToFind) {
 		if (cmd === t("mjRoll.name")) {
 			const id = commandsID.findKey((command) => command.name === cmd);

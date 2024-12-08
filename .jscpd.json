@@ -1,0 +1,8 @@
+{
+	"ignorePattern": ["import.*from\\s*'.*'", "export.*from\\s*'.*'"],
+	"pattern": "**/*.ts",
+	"ignore": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+	"gitignore": true,
+	"output": "./report/",
+	"reporters": ["markdown", "json", "html"]
+}

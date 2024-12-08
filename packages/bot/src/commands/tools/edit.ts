@@ -1,14 +1,20 @@
-import { cmdLn, findln, ln, t } from "@dicelette/localization";
+import { cmdLn, findln, t } from "@dicelette/localization";
 import type { DiscordChannel } from "@dicelette/types";
 import type { PersonnageIds, UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
 import { filterChoices, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteUser, getDatabaseChar, registerUser } from "database";
+import {
+	deleteUser,
+	getDatabaseChar,
+	getUserByEmbed,
+	moveUserInDatabase,
+	registerUser,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
 import { reply } from "messages";
-import { editUserButtons, haveAccess, selectEditMenu } from "utils";
+import { autoComplete, getButton, haveAccess, optionInteractions } from "utils";
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
@@ -105,15 +111,10 @@ export const editAvatar = {
 				)
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const fixed = options.getFocused(true);
-		const guildData = client.settings.get(interaction.guildId as string);
-		if (!guildData) return;
-		const choices: string[] = [];
-		const lang = guildData.lang ?? interaction.locale;
-		const ul = ln(lang);
-		let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
-		if (typeof userID !== "string") userID = interaction.user.id;
+		const param = autoComplete(interaction, client);
+		if (!param) return;
+		const { guildData, ul, userID, fixed, choices } = param;
+
 		if (fixed.name === t("common.character")) {
 			const guildChars = guildData.user[userID];
 			if (!guildChars) return;
@@ -131,15 +132,9 @@ export const editAvatar = {
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const guildData = client.settings.get(interaction.guildId as string);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
-		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
-			return;
-		}
-		const user = options.getUser(t("display.userLowercase"));
+		const int = await optionInteractions(interaction, client);
+		if (!int) return;
+		const { options, ul, user } = int;
 		const isModerator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
@@ -238,16 +233,7 @@ async function generateButton(
 	ul: Translation,
 	embedsList: Djs.EmbedBuilder[]
 ) {
-	const oldsButtons = message.components;
-
-	const haveStats = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_stats")
-	);
-	const haveDice = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_dice")
-	);
-	const buttons = editUserButtons(ul, haveStats, haveDice);
-	const select = selectEditMenu(ul);
+	const { buttons, select } = getButton(message, ul);
 	await message.edit({ embeds: embedsList, components: [buttons, select] });
 }
 
@@ -283,6 +269,41 @@ export async function rename(
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
 	};
+	const oldChar = client.characters.get(
+		interaction.guild!.id,
+		user?.id ?? interaction.user.id
+	);
+	if (!oldChar) {
+		const userData = getUserByEmbed({ message }, ul);
+		if (!userData) return;
+		userData.userName = name;
+		client.characters.set(
+			interaction.guild!.id,
+			[userData],
+			user?.id ?? interaction.user.id
+		);
+	} else {
+		const oldCharData = oldChar.find((char) =>
+			char.userName?.subText(oldData.charName, true)
+		);
+		if (!oldCharData) {
+			const userData = getUserByEmbed({ message }, ul);
+			if (!userData) return;
+			userData.userName = name;
+			client.characters.set(
+				interaction.guild!.id,
+				oldChar.push(userData),
+				user?.id ?? interaction.user.id
+			);
+		} else {
+			oldCharData.userName = name;
+			client.characters.set(
+				interaction.guild!.id,
+				oldChar,
+				user?.id ?? interaction.user.id
+			);
+		}
+	}
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
@@ -340,6 +361,14 @@ export async function move(
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
 	};
+	moveUserInDatabase(
+		client,
+		interaction.guild!,
+		newUser.id,
+		oldData.messageId,
+		oldData.charName,
+		user?.id
+	);
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
@@ -354,7 +383,7 @@ export async function move(
 	}
 	const guildData = client.settings.get(interaction.guildId as string);
 	const newData = deleteUser(interaction, guildData!, user, oldData.charName);
-	//save the new data
+
 	client.settings.set(interaction.guildId as string, newData);
 	await generateButton(message, ul, embedsList.list);
 	await reply(interaction, {
@@ -364,15 +393,6 @@ export async function move(
 }
 
 export function resetButton(message: Djs.Message, ul: Translation) {
-	const oldsButtons = message.components;
-
-	const haveStats = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_stats")
-	);
-	const haveDice = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_dice")
-	);
-	const buttons = editUserButtons(ul, haveStats, haveDice);
-	const select = selectEditMenu(ul);
+	const { buttons, select } = getButton(message, ul);
 	return message.edit({ components: [buttons, select] });
 }

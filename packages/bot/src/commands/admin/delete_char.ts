@@ -8,11 +8,11 @@ import type {
 import type { Translation } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteUser, getDatabaseChar } from "database";
+import { deleteUser, deleteUserInChar, getDatabaseChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
-import { searchUserChannel } from "utils";
+import { optionInteractions, searchUserChannel } from "utils";
 export const t = i18next.getFixedT("en");
 
 export const deleteChar = {
@@ -65,15 +65,9 @@ export const deleteChar = {
 				.setAutocomplete(true)
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const guildData = client.settings.get(interaction.guildId as string);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
-		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
-			return;
-		}
-		const user = options.getUser(t("display.userLowercase"));
+		const int = await optionInteractions(interaction, client);
+		if (!int) return;
+		const { options, guildData, ul, user } = int;
 		let charName = options.getString(t("common.character"))?.toLowerCase();
 		const charData = await getDatabaseChar(interaction, client, t);
 		const mention = Djs.userMention(user?.id ?? interaction.user.id);
@@ -272,6 +266,7 @@ async function deleteNoUserMessage(
 ) {
 	const newGuildData = deleteUser(interaction, guildData, user, charName);
 	client.settings.set(interaction.guildId as string, newGuildData);
+	//delete in characters db
 	await reply(
 		interaction,
 		ul("deleteChar.success", {
@@ -300,7 +295,6 @@ async function deleteOneChar(
 		const message = await userChannel.messages.fetch(messageID);
 		await message.delete();
 		const newGuildData = deleteUser(interaction, guildData, user, charName);
-
 		await reply(interaction, ul("deleteChar.success", { user: msg }));
 		client.settings.set(interaction.guildId as string, newGuildData);
 	} catch (e) {
@@ -348,6 +342,12 @@ async function deleteUserByLocation(
 	userChannel: DiscordChannel | undefined,
 	msg: string
 ) {
+	deleteUserInChar(
+		client.characters,
+		user?.id ?? interaction.user.id,
+		interaction.guild!.id,
+		charName
+	);
 	if (!userChannel) {
 		return await deleteNoUserMessage(interaction, client, ul, guildData, user, charName);
 	}

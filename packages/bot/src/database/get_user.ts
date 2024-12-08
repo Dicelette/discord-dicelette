@@ -2,26 +2,34 @@ import { findln, ln } from "@dicelette/localization";
 import { parseEmbedToStats, parseTemplateField } from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
+	Characters,
 	PersonnageIds,
 	Settings,
 	Translation,
 	UserData,
+	UserMessageId,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
+import { CategoryChannel, type EmbedBuilder } from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, parseEmbedFields, reply } from "messages";
 import { haveAccess, searchUserChannel } from "utils";
 
 export function getUserByEmbed(
-	message: Djs.Message,
+	data: {
+		message?: Djs.Message;
+		embeds?: EmbedBuilder[];
+	},
 	ul: Translation,
 	first: boolean | undefined = false,
 	integrateCombinaison = true,
 	fetchAvatar = false,
 	fetchChannel = false
 ) {
+	const { message, embeds } = data;
 	const user: Partial<UserData> = {};
-	const userEmbed = first ? ensureEmbed(message) : getEmbeds(ul, message, "user");
+	const userEmbed = first ? ensureEmbed(message) : getEmbeds(ul, message, "user", embeds);
 	if (!userEmbed) return;
 	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	const charNameFields = [
@@ -31,17 +39,17 @@ export function getUserByEmbed(
 	if (charNameFields && charNameFields.value !== "common.noSet") {
 		user.userName = charNameFields.value;
 	}
-	const statsFields = getEmbeds(ul, message, "stats")?.toJSON() as Djs.Embed;
+	const statsFields = getEmbeds(ul, message, "stats", embeds)?.toJSON() as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
-	const damageFields = getEmbeds(ul, message, "damage")?.toJSON() as Djs.Embed;
+	const damageFields = getEmbeds(ul, message, "damage", embeds)?.toJSON() as Djs.Embed;
 	const templateDamage = parseEmbedFields(damageFields);
-	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template");
+	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
 		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
 	);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
-	if (fetchChannel) user.channel = message.channel.id;
+	if (fetchChannel && message) user.channel = message.channel.id;
 	return user as UserData;
 }
 
@@ -64,7 +72,7 @@ export async function getFirstRegisteredChar(
 	const firstChar = userData[0];
 	const optionChar = firstChar.charName?.capitalize();
 	const userStatistique = await getUserFromMessage(
-		client.settings,
+		client,
 		interaction.user.id,
 		interaction,
 		firstChar.charName
@@ -73,11 +81,55 @@ export async function getFirstRegisteredChar(
 	return { optionChar, userStatistique };
 }
 
+export function getCharaInMemory(
+	characters: Characters,
+	userID: string,
+	guildID: string,
+	charName?: string | null
+) {
+	const getChara = characters.get(guildID, userID);
+	const found = getChara?.find((char) => char.userName?.subText(charName, true));
+	logger.debug(`Found ${charName} in memory`, found);
+	return found;
+}
+
+export async function getUser(
+	messageId: UserMessageId,
+	guild: Djs.Guild,
+	client: EClient
+) {
+	const sheetLocation: PersonnageIds = {
+		channelId: messageId[1],
+		messageId: messageId[0],
+	};
+	let channel = client.channels.cache.get(sheetLocation.channelId);
+	if (channel instanceof CategoryChannel) {
+		logger.warn(`Channel ${sheetLocation.channelId} not found`);
+		return;
+	}
+	if (!channel) {
+		//get the channel from the guild
+		const fetchChannel = await guild.channels.fetch(sheetLocation.channelId);
+		if (!fetchChannel || fetchChannel instanceof CategoryChannel) {
+			logger.warn(`Channel ${sheetLocation.channelId} not found`);
+			return;
+		}
+		channel = fetchChannel;
+	}
+	const message = await channel.messages.fetch(sheetLocation.messageId);
+	if (!message) {
+		logger.warn(`Message ${sheetLocation.messageId} not found`);
+		return;
+	}
+	const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
+	return getUserByEmbed({ message }, ul);
+}
+
 /**
  * Create the UserData starting from the guildData and using a userId
  */
 export async function getUserFromMessage(
-	guildData: Settings,
+	client: EClient,
 	userId: string,
 	interaction: Djs.BaseInteraction,
 	charName?: string | null,
@@ -89,10 +141,15 @@ export async function getUserFromMessage(
 		fetchChannel?: boolean;
 	}
 ) {
+	const guildData = client.settings;
+	const characters = client.characters;
+	const getChara = getCharaInMemory(characters, userId, interaction.guild!.id, charName);
+	if (getChara) return getChara;
+
 	if (!options)
 		options = { integrateCombinaison: true, allowAccess: true, skipNotFound: false };
 	const { integrateCombinaison, allowAccess, skipNotFound } = options;
-	const ul = ln(interaction.locale);
+	const ul = ln(guildData.get(interaction.guild!.id, "lang") ?? interaction.locale);
 	const guild = interaction.guild;
 	const user = guildData.get(guild!.id, `user.${userId}`)?.find((char) => {
 		return char.charName?.subText(charName);
@@ -114,14 +171,19 @@ export async function getUserFromMessage(
 	}
 	try {
 		const message = await thread.messages.fetch(userMessageId.messageId);
-		return getUserByEmbed(
-			message,
+		const userData = getUserByEmbed(
+			{ message },
 			ul,
 			undefined,
 			integrateCombinaison,
 			options.fetchAvatar,
 			options.fetchChannel
 		);
+		//set chara in memory
+		updateCharactersDb(characters, guild!.id, userId, ul, {
+			userData,
+		});
+		return userData;
 	} catch (error) {
 		if (!skipNotFound) throw new Error(ul("error.user"), { cause: "404 not found" });
 	}
@@ -243,4 +305,31 @@ export async function getUserNameAndChar(
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
 	return { userID, userName, thread: interaction.channel };
+}
+
+export async function updateCharactersDb(
+	characters: Characters,
+	guildId: string,
+	userID: string,
+	ul: Translation,
+	data: Partial<{ userData: UserData; message: Djs.Message; embeds: EmbedBuilder[] }>
+) {
+	let { userData, message, embeds } = data;
+	if (!userData) {
+		if (embeds) userData = getUserByEmbed({ embeds }, ul);
+		else if (message) userData = getUserByEmbed({ message }, ul);
+		else return;
+		if (!userData) return;
+	}
+	const userChar = characters.get(guildId, userID);
+	if (userChar) {
+		const findChar = userChar.find((char) =>
+			char.userName?.subText(userData.userName, true)
+		);
+		if (findChar) {
+			const index = userChar.indexOf(findChar);
+			userChar[index] = userData;
+		} else userChar.push(userData);
+		characters.set(guildId, userChar, userID);
+	} else characters.set(guildId, [userData], userID);
 }

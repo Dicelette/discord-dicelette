@@ -1,7 +1,8 @@
 import { evalStatsDice, roll } from "@dicelette/core";
 import type { UserMessageId, UserRegistration } from "@dicelette/types";
-import type { Settings, Translation } from "@dicelette/types";
-import { getUserNameAndChar, registerUser } from "database";
+import type { Translation } from "@dicelette/types";
+import type { EClient } from "client";
+import { getUserNameAndChar, registerUser, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -21,13 +22,14 @@ import { editUserButtons } from "utils";
  * Edit the embed with the new dice or remove it if it's empty
  * @param interaction {Djs.ModalSubmitInteraction}
  * @param ul {Translation}
- * @param db
+ * @param client
  */
 export async function validateDiceEdit(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	db: Settings
+	client: EClient
 ) {
+	const db = client.settings;
 	if (!interaction.message) return;
 	const diceEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "damage");
 	if (!diceEmbeds) return;
@@ -41,7 +43,7 @@ export async function validateDiceEdit(
 			acc[name] = value;
 			return acc;
 		},
-		{} as { [name: string]: string }
+		{} as Record<string, string>
 	);
 	const newEmbedDice: Djs.APIEmbedField[] = [];
 	for (const [skill, dice] of Object.entries(dices)) {
@@ -119,6 +121,9 @@ export async function validateDiceEdit(
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
 		await interaction.message.edit({ embeds: toAdd, components: [components] });
+		updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+			embeds: toAdd,
+		});
 		await reply(interaction, { content: ul("modals.removed.dice"), ephemeral: true });
 
 		const userRegister: UserRegistration = {
@@ -145,7 +150,7 @@ export async function validateDiceEdit(
 				acc[field.name] = field.value;
 				return acc;
 			},
-			{} as { [name: string]: string }
+			{} as Record<string, string>
 		)
 	);
 	const userRegister = {
@@ -168,6 +173,9 @@ export async function validateDiceEdit(
 		fiche: interaction.message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
+	updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+		embeds: embedsList.list,
+	});
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
 }
 
@@ -176,7 +184,7 @@ export async function validateDiceEdit(
  */
 function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
 	const stats = parseEmbedFields(statsEmbed.toJSON() as Djs.Embed);
-	const parsedStats: { [name: string]: number } = {};
+	const parsedStats: Record<string, number> = {};
 	for (const [name, value] of Object.entries(stats)) {
 		let number = Number.parseInt(value, 10);
 		if (Number.isNaN(number)) {

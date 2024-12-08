@@ -107,7 +107,7 @@ export const generateTemplate = {
 		}
 
 		const atqName = options.getString(t("generate.options.damage.name"));
-		let atqDice: { [name: string]: string } | undefined = undefined;
+		let atqDice: Record<string, string> | undefined = undefined;
 		if (atqName) {
 			const atq = atqName.split(/[, ]+/);
 			atqDice = {};

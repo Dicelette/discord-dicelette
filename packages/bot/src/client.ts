@@ -1,9 +1,10 @@
-import type { GuildData } from "@dicelette/types";
+import type { GuildData, UserDatabase } from "@dicelette/types";
 import * as Djs from "discord.js";
 import Enmap from "enmap";
 
 export class EClient extends Djs.Client {
 	public settings: Enmap<string, GuildData, unknown>;
+	public characters: Enmap<string, UserDatabase, unknown>;
 
 	constructor(options: Djs.ClientOptions) {
 		super(options);
@@ -14,6 +15,9 @@ export class EClient extends Djs.Client {
 			autoFetch: true,
 			cloneLevel: "deep",
 		});
+
+		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
+		this.characters = new Enmap({ inMemory: true });
 	}
 }
 

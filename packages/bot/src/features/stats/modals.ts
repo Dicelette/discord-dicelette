@@ -5,8 +5,9 @@ import {
 	evalOneCombinaison,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Settings, Translation } from "@dicelette/types";
-import { getTemplateWithDB, getUserNameAndChar } from "database";
+import type { Translation } from "@dicelette/types";
+import type { EClient } from "client";
+import { getTemplateWithDB, getUserNameAndChar, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
 import {
@@ -60,7 +61,7 @@ export async function registerStatistics(
 	const embedObject = statEmbeds.toJSON();
 	const fields = embedObject.fields;
 	if (!fields) return;
-	const parsedFields: { [name: string]: string } = {};
+	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
 		parsedFields[field.name.standardize()] = field.value.removeBacktick().standardize();
 	}
@@ -70,7 +71,7 @@ export async function registerStatistics(
 	);
 	if (Object.keys(embedStats).length === statsWithoutCombinaison.length) {
 		// noinspection JSUnusedAssignment
-		let combinaison: { [name: string]: number } = {};
+		let combinaison: Record<string, number> = {};
 		combinaison = evalCombinaison(combinaisonFields, embedStats);
 		//add combinaison to the embed
 		for (const stat of Object.keys(combinaison)) {
@@ -100,13 +101,15 @@ export async function registerStatistics(
  * Validate the stats and edit the embed with the new stats for editing
  * @param interaction {Djs.ModalSubmitInteraction}
  * @param ul {Translation}
- * @param db
+ * @param client
  */
 export async function editStats(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	db: Settings
+	client: EClient
 ) {
+	const db = client.settings;
+	const characters = client.characters;
 	if (!interaction.message) return;
 	const statsEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "stats");
 	if (!statsEmbeds) return;
@@ -123,7 +126,7 @@ export async function editStats(
 			acc[name] = value;
 			return acc;
 		},
-		{} as { [name: string]: string }
+		{} as Record<string, string>
 	);
 	//verify value from template
 	const template = Object.fromEntries(
@@ -225,6 +228,9 @@ export async function editStats(
 		interaction.message
 	);
 	await interaction.message.edit({ embeds: list });
+	updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
+		embeds: list,
+	});
 	await reply(interaction, { content: ul("embed.edit.stats"), ephemeral: true });
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
@@ -232,5 +238,6 @@ export async function editStats(
 		fiche: interaction.message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
+	//update the characters in the memory ;
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
 }

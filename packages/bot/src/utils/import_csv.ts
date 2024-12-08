@@ -193,7 +193,7 @@ async function step(
 			console.warn(`Duplicate character name for ${user}`);
 			continue;
 		}
-		const stats: { [name: string]: number } = {};
+		const stats: Record<string, number> = {};
 		//get the stats
 		if (guildTemplate.statistics) {
 			const emptyStats = Object.keys(guildTemplate.statistics).filter(
@@ -216,7 +216,7 @@ async function step(
 				stats[key] = data[key] as number;
 			}
 		}
-		const dice: { [name: string]: string } | undefined = data.dice?.replaceAll("'", "")
+		const dice: Record<string, string> | undefined = data.dice?.replaceAll("'", "")
 			? data.dice.split(/\r?\n/).reduce(
 					(acc, line) => {
 						const match = line.match(/-\s*([^:]+)\s*:\s*(.+)/);
@@ -226,7 +226,7 @@ async function step(
 						}
 						return acc;
 					},
-					{} as { [name: string]: string }
+					{} as Record<string, string>
 				)
 			: undefined;
 		const newChar: UserData = {

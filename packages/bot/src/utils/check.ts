@@ -1,6 +1,7 @@
-import { findln, ln } from "@dicelette/localization";
+import { findln, ln, t } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
+import type { EClient } from "client";
 import { verifyIfEmbedInDB } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, reply } from "messages";
@@ -71,4 +72,33 @@ export function serializeName(
 		serializedNameDB !== serializedNameQueries ||
 		(serializedNameQueries && serializedNameDB?.includes(serializedNameQueries))
 	);
+}
+
+export function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const fixed = options.getFocused(true);
+	const guildData = client.settings.get(interaction.guildId as string);
+	if (!guildData) return;
+	const choices: string[] = [];
+	const lang = guildData.lang ?? interaction.locale;
+	const ul = ln(lang);
+	let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
+	if (typeof userID !== "string") userID = interaction.user.id;
+	return { fixed, guildData, choices, ul, userID };
+}
+
+export async function optionInteractions(
+	interaction: Djs.CommandInteraction,
+	client: EClient
+) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const guildData = client.settings.get(interaction.guildId as string);
+	const lang = guildData?.lang ?? interaction.locale;
+	const ul = ln(lang);
+	if (!guildData) {
+		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		return;
+	}
+	const user = options.getUser(t("display.userLowercase"));
+	return { options, guildData, lang, ul, user };
 }

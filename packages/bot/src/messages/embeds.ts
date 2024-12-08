@@ -81,13 +81,17 @@ export function getEmbedsList(
 export function getEmbeds(
 	ul: Translation,
 	message?: Djs.Message,
-	which?: "user" | "stats" | "damage" | "template"
+	which?: "user" | "stats" | "damage" | "template",
+	allEmbeds?: Djs.EmbedBuilder[] | Djs.Embed[]
 ) {
-	const allEmbeds = message?.embeds;
-	if (!allEmbeds) throw new Error(ul("error.noEmbed"));
-	for (const embed of allEmbeds) {
-		const embedJSON = embed.toJSON();
-		const titleKey = findln(embed.title ?? "");
+	if (!allEmbeds) {
+		allEmbeds = message?.embeds;
+	}
+	if (!allEmbeds) return;
+
+	const allEmbedsJson = allEmbeds?.map((embed) => embed.toJSON()) ?? [];
+	for (const embedJSON of allEmbedsJson) {
+		const titleKey = findln(embedJSON.title ?? "");
 		const userKeys = ["embed.user", "embed.add", "embed.old"];
 		const statsKeys = ["common.statistic", "common.statistics"];
 		if (userKeys.includes(titleKey) && which === "user")
@@ -104,10 +108,10 @@ export function getEmbeds(
 /**
  * Parse the embed fields and remove the backtick if any
  */
-export function parseEmbedFields(embed: Djs.Embed): { [name: string]: string } {
-	const fields = embed.fields;
+export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
+	const fields = embed?.fields;
 	if (!fields) return {};
-	const parsedFields: { [name: string]: string } = {};
+	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
 		parsedFields[findln(field.name.removeBacktick().unidecode(true))] = findln(
 			field.value.removeBacktick()
@@ -187,8 +191,8 @@ export function getStatistiqueFields(
 	templateData: StatisticalTemplate,
 	ul: Translation
 ) {
-	const combinaisonFields: { [name: string]: string } = {};
-	const stats: { [name: string]: number } = {};
+	const combinaisonFields: Record<string, string> = {};
+	const stats: Record<string, number> = {};
 	let total = templateData.total;
 	if (!templateData.statistics) return { combinaisonFields, stats };
 	for (const [key, value] of Object.entries(templateData.statistics)) {

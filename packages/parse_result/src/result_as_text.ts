@@ -27,7 +27,7 @@ export class ResultAsText {
 		critical?: { failure?: number; success?: number },
 		charName?: string,
 		infoRoll?: { name: string; standardized: string },
-		customCritical?: { [name: string]: CustomCritical }
+		customCritical?: Record<string, CustomCritical>
 	) {
 		this.data = data;
 		this.infoRoll = infoRoll;
@@ -90,7 +90,7 @@ export class ResultAsText {
 	private parseResult(
 		interaction?: boolean,
 		critical?: { failure?: number; success?: number },
-		customCritical?: { [name: string]: CustomCritical }
+		customCritical?: Record<string, CustomCritical>
 	) {
 		if (!this.resultat) return "";
 		const regexForFormulesDices = /^[✕◈✓]/;
@@ -293,7 +293,7 @@ export function rollContent(
 export function parseCustomCritical(
 	name: string,
 	customCritical: string
-): { [name: string]: CustomCritical } | undefined {
+): Record<string, CustomCritical> | undefined {
 	const findPart = /(?<sign>([<>=!]+))(?<value>.*)/gi;
 	const match = findPart.exec(customCritical);
 	if (!match) return;
@@ -311,10 +311,10 @@ export function parseCustomCritical(
 }
 
 export function convertCustomCriticalValue(
-	custom: { [name: string]: CustomCritical },
+	custom: Record<string, CustomCritical>,
 	stats: number
 ) {
-	const customCritical: { [name: string]: CustomCritical } = {};
+	const customCritical: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(custom)) {
 		const newValue = value.value.replace("$", stats.toString());
 		customCritical[name] = {

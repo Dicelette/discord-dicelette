@@ -1,6 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { lError, ln } from "@dicelette/localization";
-import type { Settings, Translation } from "@dicelette/types";
+import type { Characters, Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import {
 	autCompleteCmd,
@@ -52,7 +52,14 @@ export default (client: EClient): void => {
 					});
 					return;
 				}
-				await buttonSubmit(interaction, ul, interactionUser, template, client.settings);
+				await buttonSubmit(
+					interaction,
+					ul,
+					interactionUser,
+					template,
+					client.settings,
+					client.characters
+				);
 			} else if (interaction.isModalSubmit())
 				await modalSubmit(interaction, ul, interactionUser, client);
 			else if (interaction.isStringSelectMenu())
@@ -99,15 +106,15 @@ async function modalSubmit(
 ) {
 	const db = client.settings;
 	if (interaction.customId.includes("damageDice"))
-		await features.storeDamageDice(interaction, ul, interactionUser, db);
+		await features.storeDamageDice(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
 		await features.pageNumber(interaction, ul, db);
 	else if (interaction.customId === "editStats")
-		await features.editStats(interaction, ul, db);
+		await features.editStats(interaction, ul, client);
 	else if (interaction.customId === "firstPage")
 		await features.recordFirstPage(interaction, db);
 	else if (interaction.customId === "editDice")
-		await features.validateDiceEdit(interaction, ul, db);
+		await features.validateDiceEdit(interaction, ul, client);
 	else if (interaction.customId === "editAvatar")
 		await features.validateAvatarEdit(interaction, ul);
 	else if (interaction.customId === "rename")
@@ -123,13 +130,15 @@ async function modalSubmit(
  * @param interactionUser {User}
  * @param template {StatisticalTemplate}
  * @param db
+ * @param characters
  */
 async function buttonSubmit(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
-	db: Settings
+	db: Settings,
+	characters: Characters
 ) {
 	if (interaction.customId === "register")
 		await features.startRegisterUser(
@@ -146,7 +155,14 @@ async function buttonSubmit(
 	else if (interaction.customId === "edit_stats")
 		await features.triggerEditStats(interaction, ul, interactionUser, db);
 	else if (interaction.customId === "validate")
-		await features.validateUserButton(interaction, interactionUser, template, ul, db);
+		await features.validateUserButton(
+			interaction,
+			interactionUser,
+			template,
+			ul,
+			db,
+			characters
+		);
 	else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, interactionUser);
 	else if (interaction.customId === "edit_dice")
