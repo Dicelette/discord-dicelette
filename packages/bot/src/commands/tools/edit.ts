@@ -14,7 +14,7 @@ import {
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
 import { reply } from "messages";
-import { getButton, haveAccess } from "utils";
+import { autoComplete, getButton, haveAccess } from "utils";
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
@@ -111,15 +111,10 @@ export const editAvatar = {
 				)
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const fixed = options.getFocused(true);
-		const guildData = client.settings.get(interaction.guildId as string);
-		if (!guildData) return;
-		const choices: string[] = [];
-		const lang = guildData.lang ?? interaction.locale;
-		const ul = ln(lang);
-		let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
-		if (typeof userID !== "string") userID = interaction.user.id;
+		const param = autoComplete(interaction, client);
+		if (!param) return;
+		const { guildData, ul, userID, fixed, choices } = param;
+
 		if (fixed.name === t("common.character")) {
 			const guildChars = guildData.user[userID];
 			if (!guildChars) return;

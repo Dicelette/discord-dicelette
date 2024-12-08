@@ -13,7 +13,7 @@ import {
 	getEmbeds,
 	reply,
 } from "messages";
-import { haveAccess } from "utils";
+import { autoComplete, haveAccess } from "utils";
 
 export const displayUser = {
 	data: new Djs.SlashCommandBuilder()
@@ -43,15 +43,9 @@ export const displayUser = {
 		interaction: Djs.AutocompleteInteraction,
 		client: EClient
 	): Promise<void> {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const fixed = options.getFocused(true);
-		const guildData = client.settings.get(interaction.guildId as string);
-		if (!guildData) return;
-		const choices: string[] = [];
-		const lang = guildData.lang ?? interaction.locale;
-		const ul = ln(lang);
-		let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
-		if (typeof userID !== "string") userID = interaction.user.id;
+		const param = autoComplete(interaction, client);
+		if (!param) return;
+		const { fixed, guildData, userID, ul, choices } = param;
 		if (fixed.name === t("common.character")) {
 			const guildChars = guildData.user?.[userID];
 			if (!guildChars) return;
