@@ -4,7 +4,13 @@ import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import type { EClient } from "client";
-import { findChara, getDatabaseChar, getTemplateWithDB, getUserByEmbed } from "database";
+import {
+	findChara,
+	getCharaInMemory,
+	getDatabaseChar,
+	getTemplateWithDB,
+	getUserByEmbed,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
@@ -244,11 +250,19 @@ export const graph = {
 				await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
 				return;
 			}
-			const message = await thread.messages.fetch(sheetLocation.messageId);
-			const userStatistique = getUserByEmbed(message, ul, undefined, false);
+			let userStatistique = getCharaInMemory(
+				client.characters,
+				userId,
+				interaction.guild.id,
+				charName
+			);
 			if (!userStatistique) {
-				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
-				return;
+				const message = await thread.messages.fetch(sheetLocation.messageId);
+				userStatistique = getUserByEmbed(message, ul, undefined, false);
+				if (!userStatistique) {
+					await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+					return;
+				}
 			}
 			if (!userStatistique.stats) {
 				await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });

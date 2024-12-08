@@ -105,7 +105,7 @@ export function getEmbeds(
  * Parse the embed fields and remove the backtick if any
  */
 export function parseEmbedFields(embed: Djs.Embed): { [name: string]: string } {
-	const fields = embed.fields;
+	const fields = embed?.fields;
 	if (!fields) return {};
 	const parsedFields: { [name: string]: string } = {};
 	for (const field of fields) {

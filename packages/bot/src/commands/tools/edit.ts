@@ -280,6 +280,41 @@ export async function rename(
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
 	};
+	const oldChar = client.characters.get(
+		interaction.guild!.id,
+		user?.id ?? interaction.user.id
+	);
+	if (!oldChar) {
+		const userData = getUserByEmbed(message, ul);
+		if (!userData) return;
+		userData.userName = name;
+		client.characters.set(
+			interaction.guild!.id,
+			[userData],
+			user?.id ?? interaction.user.id
+		);
+	} else {
+		const oldCharData = oldChar.find((char) =>
+			char.userName?.subText(oldData.charName, true)
+		);
+		if (!oldCharData) {
+			const userData = getUserByEmbed(message, ul);
+			if (!userData) return;
+			userData.userName = name;
+			client.characters.set(
+				interaction.guild!.id,
+				oldChar.push(userData),
+				user?.id ?? interaction.user.id
+			);
+		} else {
+			oldCharData.userName = name;
+			client.characters.set(
+				interaction.guild!.id,
+				oldChar,
+				user?.id ?? interaction.user.id
+			);
+		}
+	}
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {

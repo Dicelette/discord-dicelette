@@ -84,7 +84,9 @@ export function getCharaInMemory(
 	charName?: string | null
 ) {
 	const getChara = characters.get(guildID, userID);
-	return getChara?.find((char) => char.userName === charName);
+	const found = getChara?.find((char) => char.userName?.subText(charName, true));
+	logger.debug(`Found ${charName} in memory`, found);
+	return found;
 }
 
 export async function getUser(
@@ -96,10 +98,19 @@ export async function getUser(
 		channelId: messageId[1],
 		messageId: messageId[0],
 	};
-	const channel = client.channels.cache.get(sheetLocation.channelId);
-	if (!channel || channel instanceof CategoryChannel) {
+	let channel = client.channels.cache.get(sheetLocation.channelId);
+	if (channel instanceof CategoryChannel) {
 		logger.warn(`Channel ${sheetLocation.channelId} not found`);
 		return;
+	}
+	if (!channel) {
+		//get the channel from the guild
+		const fetchChannel = await guild.channels.fetch(sheetLocation.channelId);
+		if (!fetchChannel || fetchChannel instanceof CategoryChannel) {
+			logger.warn(`Channel ${sheetLocation.channelId} not found`);
+			return;
+		}
+		channel = fetchChannel;
 	}
 	const message = await channel.messages.fetch(sheetLocation.messageId);
 	if (!message) {
@@ -156,7 +167,7 @@ export async function getUserFromMessage(
 	}
 	try {
 		const message = await thread.messages.fetch(userMessageId.messageId);
-		return getUserByEmbed(
+		const userData = getUserByEmbed(
 			message,
 			ul,
 			undefined,
@@ -164,6 +175,11 @@ export async function getUserFromMessage(
 			options.fetchAvatar,
 			options.fetchChannel
 		);
+		//set chara in memory
+		updateCharactersDb(characters, guild!.id, userId, ul, {
+			userData,
+		});
+		return userData;
 	} catch (error) {
 		if (!skipNotFound) throw new Error(ul("error.user"), { cause: "404 not found" });
 	}
@@ -300,11 +316,14 @@ export async function updateCharactersDb(
 	if (!userData) return;
 	const userChar = characters.get(guildId, userID);
 	if (userChar) {
-		const findChar = userChar.find((char) => char.userName === userData.userName);
+		const findChar = userChar.find(
+			(char) => char.userName?.standardize() === userData.userName?.standardize()
+		);
 		if (findChar) {
 			const index = userChar.indexOf(findChar);
 			userChar[index] = userData;
 		} else userChar.push(userData);
 		characters.set(guildId, userChar, userID);
 	} else characters.set(guildId, [userData], userID);
+	logger.trace(characters.get(guildId, userID));
 }

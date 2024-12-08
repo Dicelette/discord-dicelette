@@ -130,6 +130,7 @@ async function modalSubmit(
  * @param interactionUser {User}
  * @param template {StatisticalTemplate}
  * @param db
+ * @param characters
  */
 async function buttonSubmit(
 	interaction: Djs.ButtonInteraction,

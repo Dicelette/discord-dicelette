@@ -29,7 +29,7 @@ export function deleteUserInChar(
 ) {
 	const userData = characters.get(guildId, userId);
 	if (userData) {
-		const filter = userData.filter((char) => char.userName !== charName);
+		const filter = userData.filter((char) => !char.userName?.subText(charName, true));
 		if (filter.length === 0) characters.delete(guildId, userId);
 		else characters.set(guildId, filter, userId);
 	}

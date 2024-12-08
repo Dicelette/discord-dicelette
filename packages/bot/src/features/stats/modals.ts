@@ -101,6 +101,7 @@ export async function registerStatistics(
  * @param interaction {Djs.ModalSubmitInteraction}
  * @param ul {Translation}
  * @param db
+ * @param characters
  */
 export async function editStats(
 	interaction: Djs.ModalSubmitInteraction,
