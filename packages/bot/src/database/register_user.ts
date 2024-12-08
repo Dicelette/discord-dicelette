@@ -1,8 +1,15 @@
 import { ln } from "@dicelette/localization";
-import type { PersonnageIds, UserRegistration } from "@dicelette/types";
+import type {
+	PersonnageIds,
+	UserData,
+	UserMessageId,
+	UserRegistration,
+} from "@dicelette/types";
 import type { Settings } from "@dicelette/types";
 import type * as Djs from "discord.js";
 import { searchUserChannel } from "utils";
+import type { EClient } from "../client";
+import { getUser } from "./get_user";
 
 /**
  * Register the managerId in the database
@@ -79,4 +86,35 @@ export async function registerUser(
 		return;
 	}
 	enmap.set(interaction.guild.id, [newChar], `user.${userID}`);
+}
+
+export async function moveUserInDatabase(
+	client: EClient,
+	guild: Djs.Guild,
+	userId: string,
+	location: UserMessageId,
+	charName?: string | null,
+	oldUserId?: string | null
+) {
+	if (!oldUserId) return;
+	const characters = client.characters;
+	const guildId = guild.id;
+	const allCharsNewUser = characters.get(guildId, userId);
+	const allCharsOldUser = characters.get(guildId, oldUserId);
+	if (allCharsOldUser)
+		//remove the character from the old user
+		characters.set(
+			guildId,
+			allCharsOldUser.filter((char) => char.userName !== charName),
+			oldUserId
+		);
+	let char: UserData | undefined = undefined;
+	if (allCharsOldUser) char = allCharsOldUser.find((char) => char.userName === charName);
+	else char = await getUser(location, guild, client);
+	if (allCharsNewUser) {
+		//prevent duplicate
+		if (!allCharsNewUser.find((char) => char.userName === charName)) {
+			characters.set(guildId, [...allCharsNewUser, char], userId);
+		}
+	} else characters.set(guildId, [char], userId);
 }

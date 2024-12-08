@@ -2,13 +2,17 @@ import { findln, ln } from "@dicelette/localization";
 import { parseEmbedToStats, parseTemplateField } from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
+	Characters,
 	PersonnageIds,
 	Settings,
 	Translation,
 	UserData,
+	UserMessageId,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
+import { CategoryChannel } from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, parseEmbedFields, reply } from "messages";
 import { haveAccess, searchUserChannel } from "utils";
 
@@ -64,7 +68,7 @@ export async function getFirstRegisteredChar(
 	const firstChar = userData[0];
 	const optionChar = firstChar.charName?.capitalize();
 	const userStatistique = await getUserFromMessage(
-		client.settings,
+		client,
 		interaction.user.id,
 		interaction,
 		firstChar.charName
@@ -73,11 +77,44 @@ export async function getFirstRegisteredChar(
 	return { optionChar, userStatistique };
 }
 
+export function getCharaInMemory(
+	characters: Characters,
+	userID: string,
+	guildID: string,
+	charName?: string | null
+) {
+	const getChara = characters.get(guildID, userID);
+	return getChara?.find((char) => char.userName === charName);
+}
+
+export async function getUser(
+	messageId: UserMessageId,
+	guild: Djs.Guild,
+	client: EClient
+) {
+	const sheetLocation: PersonnageIds = {
+		channelId: messageId[1],
+		messageId: messageId[0],
+	};
+	const channel = client.channels.cache.get(sheetLocation.channelId);
+	if (!channel || channel instanceof CategoryChannel) {
+		logger.warn(`Channel ${sheetLocation.channelId} not found`);
+		return;
+	}
+	const message = await channel.messages.fetch(sheetLocation.messageId);
+	if (!message) {
+		logger.warn(`Message ${sheetLocation.messageId} not found`);
+		return;
+	}
+	const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
+	return getUserByEmbed(message, ul);
+}
+
 /**
  * Create the UserData starting from the guildData and using a userId
  */
 export async function getUserFromMessage(
-	guildData: Settings,
+	client: EClient,
 	userId: string,
 	interaction: Djs.BaseInteraction,
 	charName?: string | null,
@@ -89,10 +126,15 @@ export async function getUserFromMessage(
 		fetchChannel?: boolean;
 	}
 ) {
+	const guildData = client.settings;
+	const characters = client.characters;
+	const getChara = getCharaInMemory(characters, userId, interaction.guild!.id, charName);
+	if (getChara) return getChara;
+
 	if (!options)
 		options = { integrateCombinaison: true, allowAccess: true, skipNotFound: false };
 	const { integrateCombinaison, allowAccess, skipNotFound } = options;
-	const ul = ln(interaction.locale);
+	const ul = ln(guildData.get(interaction.guild!.id, "lang") ?? interaction.locale);
 	const guild = interaction.guild;
 	const user = guildData.get(guild!.id, `user.${userId}`)?.find((char) => {
 		return char.charName?.subText(charName);
@@ -243,4 +285,26 @@ export async function getUserNameAndChar(
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
 	return { userID, userName, thread: interaction.channel };
+}
+
+export async function updateCharactersDb(
+	characters: Characters,
+	guildId: string,
+	userID: string,
+	ul: Translation,
+	data: Partial<{ userData: UserData; message: Djs.Message }>
+) {
+	let { userData, message } = data;
+	if (!userData || !message) return;
+	if (message && !userData) userData = getUserByEmbed(message, ul);
+	if (!userData) return;
+	const userChar = characters.get(guildId, userID);
+	if (userChar) {
+		const findChar = userChar.find((char) => char.userName === userData.userName);
+		if (findChar) {
+			const index = userChar.indexOf(findChar);
+			userChar[index] = userData;
+		} else userChar.push(userData);
+		characters.set(guildId, userChar, userID);
+	} else characters.set(guildId, [userData], userID);
 }

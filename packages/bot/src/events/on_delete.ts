@@ -1,7 +1,7 @@
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteIfChannelOrThread } from "database";
+import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import { sendLogs } from "messages";
 
 export const onDeleteChannel = (client: EClient): void => {
@@ -23,6 +23,7 @@ export const onKick = (client: EClient): void => {
 		//delete guild from database
 		try {
 			client.settings.delete(guild.id);
+			client.characters.delete(guild.id);
 		} catch (error) {
 			logger.error(error);
 		}
@@ -67,6 +68,8 @@ export const onDeleteMessage = (client: EClient): void => {
 						if (persoId.messageId === messageId && persoId.channelId === channel.id) {
 							logger.silly(`Deleted character ${value.charName} for user ${user}`);
 							values.splice(index, 1);
+							//delete in characters database
+							deleteUserInChar(client.characters, user, guildID, value.charName);
 						}
 					}
 					if (values.length === 0) delete dbUser[user];

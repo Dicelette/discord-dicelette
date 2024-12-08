@@ -1,6 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { UserData } from "@dicelette/types";
+import type { Characters, UserData } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
@@ -64,12 +64,13 @@ export async function validateUserButton(
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
 	ul: Translation,
-	db: Settings
+	db: Settings,
+	characters: Characters
 ) {
 	const isModerator = interaction.guild?.members.cache
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-	if (isModerator) await validateUser(interaction, template, db);
+	if (isModerator) await validateUser(interaction, template, db, characters);
 	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
 }
 
@@ -80,7 +81,8 @@ export async function validateUserButton(
 export async function validateUser(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
-	db: Settings
+	db: Settings,
+	characters: Characters
 ) {
 	const lang = db.get(interaction.guild!.id, "lang") ?? interaction.locale;
 	const ul = ln(lang);
@@ -234,7 +236,8 @@ export async function validateUser(
 		ul,
 		{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
 		db,
-		channelToPost.replace("<#", "").replace(">", "")
+		channelToPost.replace("<#", "").replace(">", ""),
+		characters
 	);
 	try {
 		await interaction.message.delete();

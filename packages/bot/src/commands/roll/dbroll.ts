@@ -91,7 +91,7 @@ export const dbRoll = {
 		const charName = optionChar?.standardize();
 
 		let userStatistique = await getUserFromMessage(
-			client.settings,
+			client,
 			interaction.user.id,
 			interaction,
 			charName,

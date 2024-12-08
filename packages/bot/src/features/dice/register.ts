@@ -185,6 +185,7 @@ export async function registerDamageDice(
 			interaction.guild as Djs.Guild,
 			db
 		);
+
 		return;
 	}
 

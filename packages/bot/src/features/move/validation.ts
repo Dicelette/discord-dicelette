@@ -64,6 +64,26 @@ export async function validateMove(
 		});
 		return await resetButton(interaction.message, ul);
 	}
+	//update the characters in the database characters
+	const allCharsNewUser = client.characters.get(interaction.guild!.id, userId);
+	const allCharsOldUser = client.characters.get(interaction.guild!.id, oldUserId);
+	if (allCharsOldUser)
+		//remove the character from the old user
+		client.characters.set(
+			interaction.guild!.id,
+			allCharsOldUser.filter((char) => char.userName !== charData.userName),
+			oldUserId
+		);
+	if (allCharsNewUser) {
+		//prevent duplicate
+		if (!allCharsNewUser.find((char) => char.userName === charData.userName))
+			client.characters.set(
+				interaction.guild!.id,
+				[...allCharsNewUser, charData],
+				userId
+			);
+	}
+
 	const oldData: {
 		charName?: string | null;
 		messageId: UserMessageId;

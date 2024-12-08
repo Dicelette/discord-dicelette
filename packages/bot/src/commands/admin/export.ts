@@ -51,13 +51,11 @@ export const exportData = {
 					? data.filter((char) => !char.isPrivate)
 					: data;
 			for (const char of chara) {
-				const stats = await getUserFromMessage(
-					client.settings,
-					user,
-					interaction,
-					char.charName,
-					{ skipNotFound: true, fetchAvatar: true, fetchChannel: true }
-				);
+				const stats = await getUserFromMessage(client, user, interaction, char.charName, {
+					skipNotFound: true,
+					fetchAvatar: true,
+					fetchChannel: true,
+				});
 				if (!stats) continue;
 				//reparse the statsName to get the name with accented characters
 				const dice: undefined | string = stats.damage

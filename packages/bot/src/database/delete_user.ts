@@ -1,7 +1,6 @@
-import type { GuildData } from "@dicelette/types";
+import type { Characters, GuildData, Settings } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-import type Enmap from "enmap";
 
 export function deleteUser(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -22,13 +21,28 @@ export function deleteUser(
 	return guildData;
 }
 
+export function deleteUserInChar(
+	characters: Characters,
+	userId: string,
+	guildId: string,
+	charName?: string | null
+) {
+	const userData = characters.get(guildId, userId);
+	if (userData) {
+		const filter = userData.filter((char) => char.userName !== charName);
+		if (filter.length === 0) characters.delete(guildId, userId);
+		else characters.set(guildId, filter, userId);
+	}
+}
+
 export function deleteIfChannelOrThread(
-	db: Enmap<string, GuildData, unknown>,
+	db: Settings,
 	guildID: string,
-	channel: Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel
+	channel: Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel,
+	characters: Characters
 ) {
 	const channelID = channel.id;
-	cleanUserDB(db, channel);
+	cleanUserDB(db, channel, characters);
 	if (db.get(guildID, "templateID.channelId") === channelID)
 		db.delete(guildID, "templateID");
 	if (db.get(guildID, "logs") === channelID) db.delete(guildID, "logs");
@@ -39,8 +53,9 @@ export function deleteIfChannelOrThread(
 }
 
 function cleanUserDB(
-	guildDB: Enmap<string, GuildData, unknown>,
-	thread: Djs.GuildTextBasedChannel | Djs.ThreadChannel | Djs.NonThreadGuildBasedChannel
+	guildDB: Settings,
+	thread: Djs.GuildTextBasedChannel | Djs.ThreadChannel | Djs.NonThreadGuildBasedChannel,
+	characters: Characters
 ) {
 	const dbUser = guildDB.get(thread.guild.id, "user");
 	if (!dbUser) return;
@@ -51,10 +66,17 @@ function cleanUserDB(
 		const filterChar = data.filter((char) => {
 			return char.messageId[1] !== thread.id;
 		});
+		const charDeleted = data.find((char) => {
+			return char.messageId[1] === thread.id;
+		});
 		logger.silly(
 			`Deleted ${data.length - filterChar.length} characters for user ${user}`
 		);
-		if (filterChar.length === 0) guildDB.delete(thread.guild.id, `user.${user}`);
-		else guildDB.set(thread.guild.id, filterChar, `user.${user}`);
+		if (filterChar.length === 0) {
+			guildDB.delete(thread.guild.id, `user.${user}`);
+			characters.delete(thread.guild.id, user);
+		} else guildDB.set(thread.guild.id, filterChar, `user.${user}`);
+		if (charDeleted)
+			deleteUserInChar(characters, user, thread.guild.id, charDeleted?.charName);
 	}
 }

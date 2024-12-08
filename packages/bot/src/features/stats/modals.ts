@@ -5,8 +5,8 @@ import {
 	evalOneCombinaison,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Settings, Translation } from "@dicelette/types";
-import { getTemplateWithDB, getUserNameAndChar } from "database";
+import type { Characters, Settings, Translation } from "@dicelette/types";
+import { getTemplateWithDB, getUserNameAndChar, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
 import {
@@ -105,7 +105,8 @@ export async function registerStatistics(
 export async function editStats(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	db: Settings
+	db: Settings,
+	characters: Characters
 ) {
 	if (!interaction.message) return;
 	const statsEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "stats");
@@ -232,5 +233,9 @@ export async function editStats(
 		fiche: interaction.message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
+	//update the characters in the memory ;
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
+	updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
+		message: interaction.message,
+	});
 }

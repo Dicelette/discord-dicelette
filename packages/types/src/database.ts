@@ -151,3 +151,7 @@ export type CharacterData = {
 export type CharDataWithName = {
 	[p: string]: CharacterData;
 };
+
+export interface UserDatabase {
+	[userID: string]: UserData[];
+}

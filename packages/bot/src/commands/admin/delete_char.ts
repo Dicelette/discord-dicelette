@@ -8,7 +8,7 @@ import type {
 import type { Translation } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteUser, getDatabaseChar } from "database";
+import { deleteUser, deleteUserInChar, getDatabaseChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
@@ -272,6 +272,7 @@ async function deleteNoUserMessage(
 ) {
 	const newGuildData = deleteUser(interaction, guildData, user, charName);
 	client.settings.set(interaction.guildId as string, newGuildData);
+	//delete in characters db
 	await reply(
 		interaction,
 		ul("deleteChar.success", {
@@ -300,7 +301,6 @@ async function deleteOneChar(
 		const message = await userChannel.messages.fetch(messageID);
 		await message.delete();
 		const newGuildData = deleteUser(interaction, guildData, user, charName);
-
 		await reply(interaction, ul("deleteChar.success", { user: msg }));
 		client.settings.set(interaction.guildId as string, newGuildData);
 	} catch (e) {
@@ -348,6 +348,12 @@ async function deleteUserByLocation(
 	userChannel: DiscordChannel | undefined,
 	msg: string
 ) {
+	deleteUserInChar(
+		client.characters,
+		user?.id ?? interaction.user.id,
+		interaction.guild!.id,
+		charName
+	);
 	if (!userChannel) {
 		return await deleteNoUserMessage(interaction, client, ul, guildData, user, charName);
 	}

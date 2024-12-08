@@ -125,7 +125,7 @@ export default {
 		const ul = ln(lang);
 		try {
 			let userStatistique = await getUserFromMessage(
-				client.settings,
+				client,
 				interaction.user.id,
 				interaction,
 				charName,

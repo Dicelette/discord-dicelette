@@ -4,7 +4,7 @@ import type { PersonnageIds, UserMessageId, UserRegistration } from "@dicelette/
 import type { Translation } from "@dicelette/types";
 import { filterChoices, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteUser, getDatabaseChar, registerUser } from "database";
+import { deleteUser, getDatabaseChar, moveUserInDatabase, registerUser } from "database";
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
 import { reply } from "messages";
@@ -340,6 +340,14 @@ export async function move(
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
 	};
+	moveUserInDatabase(
+		client,
+		interaction.guild!,
+		newUser.id,
+		oldData.messageId,
+		oldData.charName,
+		user?.id
+	);
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
@@ -354,7 +362,7 @@ export async function move(
 	}
 	const guildData = client.settings.get(interaction.guildId as string);
 	const newData = deleteUser(interaction, guildData!, user, oldData.charName);
-	//save the new data
+
 	client.settings.set(interaction.guildId as string, newData);
 	await generateButton(message, ul, embedsList.list);
 	await reply(interaction, {
