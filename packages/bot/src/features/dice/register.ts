@@ -153,17 +153,16 @@ export async function registerDamageDice(
 	);
 	let allEmbeds: Djs.EmbedBuilder[] = [];
 	let components: Djs.ActionRowBuilder<Djs.ButtonBuilder>;
+	const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
+	const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
+	if (!userEmbed) throw new NoEmbed();
+	allEmbeds = [userEmbed];
+	if (statsEmbed) allEmbeds.push(statsEmbed);
+	allEmbeds.push(diceEmbed);
 	if (!first) {
-		const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
-		if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
-		const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
-		allEmbeds = [userEmbed];
-		if (statsEmbed) allEmbeds.push(statsEmbed);
-		allEmbeds.push(diceEmbed);
 		if (templateEmbed) allEmbeds.push(templateEmbed);
 		components = editUserButtons(ul, !!statsEmbed, true);
-
 		const userRegister: {
 			userID: string;
 			charName: string | undefined;
@@ -178,15 +177,8 @@ export async function registerDamageDice(
 		await registerUser(userRegister, interaction, db, false);
 	} else {
 		components = registerDmgButton(ul);
-		const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
-		if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
-		const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
-		allEmbeds = [userEmbed];
-		if (statsEmbed) allEmbeds.push(statsEmbed);
-		allEmbeds.push(diceEmbed);
 	}
 	await edit(db, interaction, ul, allEmbeds, components, userID, userName);
-	return;
 }
 
 async function edit(
