@@ -116,13 +116,18 @@ export async function getUser(
 		}
 		channel = fetchChannel;
 	}
-	const message = await channel.messages.fetch(sheetLocation.messageId);
-	if (!message) {
-		logger.warn(`Message ${sheetLocation.messageId} not found`);
+	try {
+		const message = await channel.messages.fetch(sheetLocation.messageId);
+		if (!message) {
+			logger.warn(`Message ${sheetLocation.messageId} not found`);
+			return;
+		}
+		const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
+		return getUserByEmbed({ message }, ul);
+	} catch (error) {
+		logger.error(`Error while fetching the message ${sheetLocation.messageId}`, error);
 		return;
 	}
-	const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
-	return getUserByEmbed({ message }, ul);
 }
 
 /**
