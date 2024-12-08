@@ -151,16 +151,18 @@ export async function registerDamageDice(
 		false,
 		db
 	);
+	let allEmbeds: Djs.EmbedBuilder[] = [];
+	let components: Djs.ActionRowBuilder<Djs.ButtonBuilder>;
 	if (!first) {
 		const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
 		if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
 		const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
-		const allEmbeds = [userEmbed];
+		allEmbeds = [userEmbed];
 		if (statsEmbed) allEmbeds.push(statsEmbed);
 		allEmbeds.push(diceEmbed);
 		if (templateEmbed) allEmbeds.push(templateEmbed);
-		const components = editUserButtons(ul, !!statsEmbed, true);
+		components = editUserButtons(ul, !!statsEmbed, true);
 
 		const userRegister: {
 			userID: string;
@@ -174,39 +176,39 @@ export async function registerDamageDice(
 			msgId: [interaction.message.id, interaction.message.channel.id],
 		};
 		await registerUser(userRegister, interaction, db, false);
-		await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
-		await reply(interaction, { content: ul("modals.added.dice"), ephemeral: true });
-		await sendLogs(
-			ul("logs.dice.add", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: interaction.message.url,
-				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-			}),
-			interaction.guild as Djs.Guild,
-			db
-		);
-
-		return;
+	} else {
+		components = registerDmgButton(ul);
+		const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
+		if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
+		const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
+		allEmbeds = [userEmbed];
+		if (statsEmbed) allEmbeds.push(statsEmbed);
+		allEmbeds.push(diceEmbed);
 	}
+	await edit(db, interaction, ul, allEmbeds, components, userID, userName);
+	return;
+}
 
-	const components = registerDmgButton(ul);
-	const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
-	if (!userEmbed) throw new NoEmbed(); //mean that there is no embed
-	const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
-	const allEmbeds = [userEmbed];
-	if (statsEmbed) allEmbeds.push(statsEmbed);
-	allEmbeds.push(diceEmbed);
+async function edit(
+	db: Settings,
+	interaction: Djs.ModalSubmitInteraction,
+	ul: Translation,
+	allEmbeds: Djs.EmbedBuilder[],
+	components: Djs.ActionRowBuilder<Djs.ButtonBuilder>,
+	userID: string,
+	userName?: string
+) {
 	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
 	await reply(interaction, { content: ul("modals.added.dice"), ephemeral: true });
-
 	await sendLogs(
 		ul("logs.dice.add", {
 			user: Djs.userMention(interaction.user.id),
-			fiche: interaction.message.url,
+			fiche: interaction.message?.url ?? "no url",
 			char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 		}),
 		interaction.guild as Djs.Guild,
 		db
 	);
+
 	return;
 }

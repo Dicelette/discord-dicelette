@@ -4,11 +4,17 @@ import type { PersonnageIds, UserMessageId, UserRegistration } from "@dicelette/
 import type { Translation } from "@dicelette/types";
 import { filterChoices, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteUser, getDatabaseChar, moveUserInDatabase, registerUser } from "database";
+import {
+	deleteUser,
+	getDatabaseChar,
+	getUserByEmbed,
+	moveUserInDatabase,
+	registerUser,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
 import { reply } from "messages";
-import { editUserButtons, haveAccess, selectEditMenu } from "utils";
+import { getButton, haveAccess } from "utils";
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
@@ -238,16 +244,7 @@ async function generateButton(
 	ul: Translation,
 	embedsList: Djs.EmbedBuilder[]
 ) {
-	const oldsButtons = message.components;
-
-	const haveStats = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_stats")
-	);
-	const haveDice = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_dice")
-	);
-	const buttons = editUserButtons(ul, haveStats, haveDice);
-	const select = selectEditMenu(ul);
+	const { buttons, select } = getButton(message, ul);
 	await message.edit({ embeds: embedsList, components: [buttons, select] });
 }
 
@@ -372,15 +369,6 @@ export async function move(
 }
 
 export function resetButton(message: Djs.Message, ul: Translation) {
-	const oldsButtons = message.components;
-
-	const haveStats = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_stats")
-	);
-	const haveDice = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_dice")
-	);
-	const buttons = editUserButtons(ul, haveStats, haveDice);
-	const select = selectEditMenu(ul);
+	const { buttons, select } = getButton(message, ul);
 	return message.edit({ components: [buttons, select] });
 }

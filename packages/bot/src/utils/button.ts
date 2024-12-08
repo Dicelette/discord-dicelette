@@ -106,3 +106,17 @@ export function continueCancelButtons(ul: Translation) {
 		cancelButton,
 	]);
 }
+
+export function getButton(message: Djs.Message, ul: Translation) {
+	const oldsButtons = message.components;
+
+	const haveStats = oldsButtons.some((row) =>
+		row.components.some((button) => button.customId === "edit_stats")
+	);
+	const haveDice = oldsButtons.some((row) =>
+		row.components.some((button) => button.customId === "edit_dice")
+	);
+	const buttons = editUserButtons(ul, haveStats, haveDice);
+	const select = selectEditMenu(ul);
+	return { buttons, select };
+}
