@@ -56,7 +56,7 @@ export async function validateMove(
 		channelId: interaction.channel!.id,
 		messageId: interaction.message.id,
 	};
-	const charData = getUserByEmbed(interaction.message, ul);
+	const charData = getUserByEmbed({ message: interaction.message }, ul);
 	if (!charData) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.notFound"), ul)],

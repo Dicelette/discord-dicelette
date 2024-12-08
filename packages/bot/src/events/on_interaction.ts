@@ -106,15 +106,15 @@ async function modalSubmit(
 ) {
 	const db = client.settings;
 	if (interaction.customId.includes("damageDice"))
-		await features.storeDamageDice(interaction, ul, interactionUser, db);
+		await features.storeDamageDice(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
 		await features.pageNumber(interaction, ul, db);
 	else if (interaction.customId === "editStats")
-		await features.editStats(interaction, ul, db, client.characters);
+		await features.editStats(interaction, ul, client);
 	else if (interaction.customId === "firstPage")
 		await features.recordFirstPage(interaction, db);
 	else if (interaction.customId === "editDice")
-		await features.validateDiceEdit(interaction, ul, db);
+		await features.validateDiceEdit(interaction, ul, client);
 	else if (interaction.customId === "editAvatar")
 		await features.validateAvatarEdit(interaction, ul);
 	else if (interaction.customId === "rename")

@@ -8,6 +8,7 @@ import {
 	getUserByEmbed,
 	getUserNameAndChar,
 	registerUser,
+	updateCharactersDb,
 } from "database";
 import * as Djs from "discord.js";
 import {
@@ -19,6 +20,7 @@ import {
 	sendLogs,
 } from "messages";
 import { addAutoRole, editUserButtons } from "utils";
+import type { EClient } from "../../client";
 
 /**
  * Interaction to submit the new skill dice
@@ -26,14 +28,15 @@ import { addAutoRole, editUserButtons } from "utils";
  * @param interaction {Djs.ModalSubmitInteraction}
  * @param ul {Translation}
  * @param interactionUser {User}
- * @param db
+ * @param client
  */
 export async function storeDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
-	db: Settings
+	client: EClient
 ) {
+	const db = client.settings;
 	const template = await getTemplateWithDB(interaction, db);
 	if (!template) {
 		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
@@ -49,7 +52,7 @@ export async function storeDamageDice(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (user || isModerator)
-		await registerDamageDice(interaction, db, interaction.customId.includes("first"));
+		await registerDamageDice(interaction, client, interaction.customId.includes("first"));
 	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
 }
 
@@ -80,16 +83,17 @@ export function registerDmgButton(ul: Translation) {
 /**
  * Register the new skill dice in the embed and database
  * @param interaction {Djs.ModalSubmitInteraction}
- * @param db
+ * @param client
  * @param first {boolean}
  * - true: It's the modal when the user is registered
  * - false: It's the modal when the user is already registered and a new dice is added to edit the user
  */
 export async function registerDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
-	db: Settings,
+	client: EClient,
 	first?: boolean
 ) {
+	const db = client.settings;
 	const lang = db.get(interaction.guild!.id, "lang") ?? interaction.locale;
 	const ul = ln(lang);
 	const name = interaction.fields.getTextInputValue("damageName");
@@ -116,7 +120,7 @@ export async function registerDamageDice(
 				diceEmbed.addFields(field);
 			}
 		}
-	const user = getUserByEmbed(interaction.message, ul, first);
+	const user = getUserByEmbed({ message: interaction.message }, ul, first);
 	if (!user) throw new Error(ul("error.user")); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
@@ -175,9 +179,13 @@ export async function registerDamageDice(
 			msgId: [interaction.message.id, interaction.message.channel.id],
 		};
 		await registerUser(userRegister, interaction, db, false);
+		updateCharactersDb(client.characters, interaction.guild.id, userID, ul, {
+			embeds: allEmbeds,
+		});
 	} else {
 		components = registerDmgButton(ul);
 	}
+
 	await edit(db, interaction, ul, allEmbeds, components, userID, userName);
 }
 

@@ -44,8 +44,10 @@ export default (client: EClient): void => {
 			);
 
 			convertDatabaseUser(client.settings, guild);
+			logger.info(`User saved in memory for ${guild.name}`);
 			await fetchAllCharacter(client, guild);
 		}
+		logger.warn("Bot is ready");
 		cleanData(client);
 	});
 };

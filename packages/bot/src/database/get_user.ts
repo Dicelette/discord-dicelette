@@ -12,20 +12,24 @@ import type {
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { CategoryChannel } from "discord.js";
+import { CategoryChannel, type EmbedBuilder } from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, parseEmbedFields, reply } from "messages";
 import { haveAccess, searchUserChannel } from "utils";
 
 export function getUserByEmbed(
-	message: Djs.Message,
+	data: {
+		message?: Djs.Message;
+		embeds?: EmbedBuilder[];
+	},
 	ul: Translation,
 	first: boolean | undefined = false,
 	integrateCombinaison = true,
 	fetchAvatar = false,
 	fetchChannel = false
 ) {
+	const { message, embeds } = data;
 	const user: Partial<UserData> = {};
-	const userEmbed = first ? ensureEmbed(message) : getEmbeds(ul, message, "user");
+	const userEmbed = first ? ensureEmbed(message) : getEmbeds(ul, message, "user", embeds);
 	if (!userEmbed) return;
 	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	const charNameFields = [
@@ -35,17 +39,17 @@ export function getUserByEmbed(
 	if (charNameFields && charNameFields.value !== "common.noSet") {
 		user.userName = charNameFields.value;
 	}
-	const statsFields = getEmbeds(ul, message, "stats")?.toJSON() as Djs.Embed;
+	const statsFields = getEmbeds(ul, message, "stats", embeds)?.toJSON() as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
-	const damageFields = getEmbeds(ul, message, "damage")?.toJSON() as Djs.Embed;
+	const damageFields = getEmbeds(ul, message, "damage", embeds)?.toJSON() as Djs.Embed;
 	const templateDamage = parseEmbedFields(damageFields);
-	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template");
+	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
 		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
 	);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
-	if (fetchChannel) user.channel = message.channel.id;
+	if (fetchChannel && message) user.channel = message.channel.id;
 	return user as UserData;
 }
 
@@ -118,7 +122,7 @@ export async function getUser(
 		return;
 	}
 	const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
-	return getUserByEmbed(message, ul);
+	return getUserByEmbed({ message }, ul);
 }
 
 /**
@@ -168,7 +172,7 @@ export async function getUserFromMessage(
 	try {
 		const message = await thread.messages.fetch(userMessageId.messageId);
 		const userData = getUserByEmbed(
-			message,
+			{ message },
 			ul,
 			undefined,
 			integrateCombinaison,
@@ -308,16 +312,23 @@ export async function updateCharactersDb(
 	guildId: string,
 	userID: string,
 	ul: Translation,
-	data: Partial<{ userData: UserData; message: Djs.Message }>
+	data: Partial<{ userData: UserData; message: Djs.Message; embeds: EmbedBuilder[] }>
 ) {
-	let { userData, message } = data;
-	if (!userData || !message) return;
-	if (message && !userData) userData = getUserByEmbed(message, ul);
-	if (!userData) return;
+	let { userData, message, embeds } = data;
+	if (!userData) {
+		if (embeds) userData = getUserByEmbed({ embeds }, ul);
+		else if (message) userData = getUserByEmbed({ message }, ul);
+		else logger.trace("No data to update");
+		if (!userData) logger.warn("No data to update");
+	}
+	if (!userData) {
+		logger.warn("No data to update");
+		return;
+	}
 	const userChar = characters.get(guildId, userID);
 	if (userChar) {
-		const findChar = userChar.find(
-			(char) => char.userName?.standardize() === userData.userName?.standardize()
+		const findChar = userChar.find((char) =>
+			char.userName?.subText(userData.userName, true)
 		);
 		if (findChar) {
 			const index = userChar.indexOf(findChar);
@@ -325,5 +336,4 @@ export async function updateCharactersDb(
 		} else userChar.push(userData);
 		characters.set(guildId, userChar, userID);
 	} else characters.set(guildId, [userData], userID);
-	logger.trace(characters.get(guildId, userID));
 }

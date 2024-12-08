@@ -5,7 +5,7 @@ import {
 	evalOneCombinaison,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Characters, Settings, Translation } from "@dicelette/types";
+import type { Translation } from "@dicelette/types";
 import { getTemplateWithDB, getUserNameAndChar, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
@@ -20,6 +20,7 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
+import type { EClient } from "../../client";
 
 /**
  * Embed to display the statistics when adding a new user
@@ -100,15 +101,15 @@ export async function registerStatistics(
  * Validate the stats and edit the embed with the new stats for editing
  * @param interaction {Djs.ModalSubmitInteraction}
  * @param ul {Translation}
- * @param db
- * @param characters
+ * @param client
  */
 export async function editStats(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	db: Settings,
-	characters: Characters
+	client: EClient
 ) {
+	const db = client.settings;
+	const characters = client.characters;
 	if (!interaction.message) return;
 	const statsEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "stats");
 	if (!statsEmbeds) return;
@@ -227,6 +228,9 @@ export async function editStats(
 		interaction.message
 	);
 	await interaction.message.edit({ embeds: list });
+	updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
+		embeds: list,
+	});
 	await reply(interaction, { content: ul("embed.edit.stats"), ephemeral: true });
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
@@ -236,7 +240,4 @@ export async function editStats(
 	});
 	//update the characters in the memory ;
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
-	updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
-		message: interaction.message,
-	});
 }

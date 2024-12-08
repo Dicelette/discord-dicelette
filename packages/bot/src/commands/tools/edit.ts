@@ -285,7 +285,7 @@ export async function rename(
 		user?.id ?? interaction.user.id
 	);
 	if (!oldChar) {
-		const userData = getUserByEmbed(message, ul);
+		const userData = getUserByEmbed({ message }, ul);
 		if (!userData) return;
 		userData.userName = name;
 		client.characters.set(
@@ -298,7 +298,7 @@ export async function rename(
 			char.userName?.subText(oldData.charName, true)
 		);
 		if (!oldCharData) {
-			const userData = getUserByEmbed(message, ul);
+			const userData = getUserByEmbed({ message }, ul);
 			if (!userData) return;
 			userData.userName = name;
 			client.characters.set(

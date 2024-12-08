@@ -258,7 +258,7 @@ export const graph = {
 			);
 			if (!userStatistique) {
 				const message = await thread.messages.fetch(sheetLocation.messageId);
-				userStatistique = getUserByEmbed(message, ul, undefined, false);
+				userStatistique = getUserByEmbed({ message }, ul, undefined, false);
 				if (!userStatistique) {
 					await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
 					return;

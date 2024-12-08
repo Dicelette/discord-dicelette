@@ -81,13 +81,17 @@ export function getEmbedsList(
 export function getEmbeds(
 	ul: Translation,
 	message?: Djs.Message,
-	which?: "user" | "stats" | "damage" | "template"
+	which?: "user" | "stats" | "damage" | "template",
+	allEmbeds?: Djs.EmbedBuilder[] | Djs.Embed[]
 ) {
-	const allEmbeds = message?.embeds;
-	if (!allEmbeds) throw new Error(ul("error.noEmbed"));
-	for (const embed of allEmbeds) {
-		const embedJSON = embed.toJSON();
-		const titleKey = findln(embed.title ?? "");
+	if (!allEmbeds) {
+		allEmbeds = message?.embeds;
+	}
+	if (!allEmbeds) return;
+
+	const allEmbedsJson = allEmbeds?.map((embed) => embed.toJSON()) ?? [];
+	for (const embedJSON of allEmbedsJson) {
+		const titleKey = findln(embedJSON.title ?? "");
 		const userKeys = ["embed.user", "embed.add", "embed.old"];
 		const statsKeys = ["common.statistic", "common.statistics"];
 		if (userKeys.includes(titleKey) && which === "user")
