@@ -1,7 +1,7 @@
 import type { Critical, CustomCritical } from "@dicelette/core";
 import { parseCustomCritical } from "./result_as_text";
 
-export function parseEmbedToCritical(embed: { [name: string]: string }): {
+export function parseEmbedToCritical(embed: Record<string, string>): {
 	[name: string]: CustomCritical;
 } {
 	const customCritical: { [name: string]: CustomCritical } = {};
@@ -20,10 +20,10 @@ export function parseEmbedToCritical(embed: { [name: string]: string }): {
 }
 
 export function parseEmbedToStats(
-	embed?: { [name: string]: string },
+	embed?: Record<string, string>,
 	integrateCombinaison = true
 ) {
-	let stats: { [name: string]: number } | undefined = undefined;
+	let stats: Record<string, number> | undefined = undefined;
 	if (embed) {
 		stats = {};
 		for (const [name, damageValue] of Object.entries(embed)) {
@@ -40,7 +40,7 @@ export function parseEmbedToStats(
 	return stats;
 }
 
-export function parseTemplateField(embed: { [name: string]: string }): {
+export function parseTemplateField(embed: Record<string, string>): {
 	diceType?: string;
 	critical?: Critical;
 	customCritical?: {

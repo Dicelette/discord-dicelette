@@ -74,15 +74,15 @@ export interface GuildData {
 		damageName: string[];
 		valid?: boolean;
 	};
-	user: {
-		[userID: string]: {
-			charName?: string | null;
-			messageId: UserMessageId;
-			damageName?: string[];
-			isPrivate?: boolean;
-		}[];
-	};
+	user: Record<string, UserGuildData[]>;
 }
+
+type UserGuildData = {
+	charName?: string | null;
+	messageId: UserMessageId;
+	damageName?: string[];
+	isPrivate?: boolean;
+};
 
 export type UserMessageId = [string, string];
 
@@ -108,25 +108,19 @@ export interface UserData {
 	/** by default, will be the id of the user, if changed to a string, it will be used */
 	userName?: string | null;
 	/** The statistics as value */
-	stats?: {
-		[name: string]: number;
-	};
+	stats?: Record<string, number>;
 	/**
 	 * Allow to prevent returning each time to the JSON template for roll
 	 */
 	template: {
 		diceType?: string;
 		critical?: Critical;
-		customCritical?: {
-			[name: string]: CustomCritical;
-		};
+		customCritical?: Record<string, CustomCritical>;
 	};
 	/**
 	 * The skill dice that the user can do
 	 */
-	damage?: {
-		[name: string]: string;
-	};
+	damage?: Record<string, string>;
 	/**
 	 * If the character is private or not
 	 */
@@ -148,10 +142,6 @@ export type CharacterData = {
 	isPrivate?: boolean;
 };
 
-export type CharDataWithName = {
-	[p: string]: CharacterData;
-};
+export type CharDataWithName = Record<string, CharacterData>;
 
-export interface UserDatabase {
-	[userID: string]: UserData[];
-}
+export type UserDatabase = Record<string, UserData[]>;

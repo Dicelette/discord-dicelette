@@ -61,7 +61,7 @@ export async function registerStatistics(
 	const embedObject = statEmbeds.toJSON();
 	const fields = embedObject.fields;
 	if (!fields) return;
-	const parsedFields: { [name: string]: string } = {};
+	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
 		parsedFields[field.name.standardize()] = field.value.removeBacktick().standardize();
 	}
@@ -71,7 +71,7 @@ export async function registerStatistics(
 	);
 	if (Object.keys(embedStats).length === statsWithoutCombinaison.length) {
 		// noinspection JSUnusedAssignment
-		let combinaison: { [name: string]: number } = {};
+		let combinaison: Record<string, number> = {};
 		combinaison = evalCombinaison(combinaisonFields, embedStats);
 		//add combinaison to the embed
 		for (const stat of Object.keys(combinaison)) {
@@ -126,7 +126,7 @@ export async function editStats(
 			acc[name] = value;
 			return acc;
 		},
-		{} as { [name: string]: string }
+		{} as Record<string, string>
 	);
 	//verify value from template
 	const template = Object.fromEntries(

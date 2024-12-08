@@ -179,7 +179,7 @@ function generateDice(fields?: Djs.APIEmbedField[], statsFields?: Djs.APIEmbedFi
 			if (stat && value) acc[field.name.standardize()] = value;
 			return acc;
 		},
-		{} as { [name: string]: number }
+		{} as Record<string, number>
 	);
 	for (const field of fields) {
 		const dice = generateStatsDice(field.value.standardize() as string, stats);

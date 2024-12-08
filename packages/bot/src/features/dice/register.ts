@@ -141,7 +141,7 @@ export async function registerDamageDice(
 			acc[field.name] = field.value.removeBacktick();
 			return acc;
 		},
-		{} as { [name: string]: string }
+		{} as Record<string, string>
 	);
 	if (damageName && Object.keys(damageName).length > 25) {
 		await reply(interaction, { content: ul("modals.dice.max"), ephemeral: true });

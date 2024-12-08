@@ -108,10 +108,10 @@ export function getEmbeds(
 /**
  * Parse the embed fields and remove the backtick if any
  */
-export function parseEmbedFields(embed: Djs.Embed): { [name: string]: string } {
+export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
 	const fields = embed?.fields;
 	if (!fields) return {};
-	const parsedFields: { [name: string]: string } = {};
+	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
 		parsedFields[findln(field.name.removeBacktick().unidecode(true))] = findln(
 			field.value.removeBacktick()
@@ -191,8 +191,8 @@ export function getStatistiqueFields(
 	templateData: StatisticalTemplate,
 	ul: Translation
 ) {
-	const combinaisonFields: { [name: string]: string } = {};
-	const stats: { [name: string]: number } = {};
+	const combinaisonFields: Record<string, string> = {};
+	const stats: Record<string, number> = {};
 	let total = templateData.total;
 	if (!templateData.statistics) return { combinaisonFields, stats };
 	for (const [key, value] of Object.entries(templateData.statistics)) {

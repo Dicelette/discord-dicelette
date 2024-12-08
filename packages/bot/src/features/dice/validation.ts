@@ -43,7 +43,7 @@ export async function validateDiceEdit(
 			acc[name] = value;
 			return acc;
 		},
-		{} as { [name: string]: string }
+		{} as Record<string, string>
 	);
 	const newEmbedDice: Djs.APIEmbedField[] = [];
 	for (const [skill, dice] of Object.entries(dices)) {
@@ -150,7 +150,7 @@ export async function validateDiceEdit(
 				acc[field.name] = field.value;
 				return acc;
 			},
-			{} as { [name: string]: string }
+			{} as Record<string, string>
 		)
 	);
 	const userRegister = {
@@ -184,7 +184,7 @@ export async function validateDiceEdit(
  */
 function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
 	const stats = parseEmbedFields(statsEmbed.toJSON() as Djs.Embed);
-	const parsedStats: { [name: string]: number } = {};
+	const parsedStats: Record<string, number> = {};
 	for (const [name, value] of Object.entries(stats)) {
 		let number = Number.parseInt(value, 10);
 		if (Number.isNaN(number)) {

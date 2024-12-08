@@ -150,7 +150,7 @@ export async function validateUser(
 	const parsedStats = statsEmbed
 		? parseEmbedFields(statsEmbed.toJSON() as Djs.Embed)
 		: undefined;
-	const stats: { [name: string]: number } = {};
+	const stats: Record<string, number> = {};
 	for (const [name, value] of Object.entries(parsedStats ?? {})) {
 		let statValue = Number.parseInt(value, 10);
 		if (Number.isNaN(statValue)) {
@@ -163,7 +163,7 @@ export async function validateUser(
 	}
 
 	const damageFields = diceEmbed?.toJSON().fields ?? [];
-	let templateDamage: { [name: string]: string } | undefined = undefined;
+	let templateDamage: Record<string, string> | undefined = undefined;
 	if (damageFields.length > 0) {
 		templateDamage = {};
 
