@@ -35,7 +35,7 @@ export async function rollWithInteraction(
 	charName?: string,
 	infoRoll?: { name: string; standardized: string },
 	hideResult?: boolean | null,
-	customCritical?: { [name: string]: CustomCritical } | undefined
+	customCritical?: Record<string, CustomCritical> | undefined
 ) {
 	if (!channel || channel.isDMBased() || !channel.isTextBased() || !interaction.guild)
 		return;

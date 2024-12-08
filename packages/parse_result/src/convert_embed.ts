@@ -4,7 +4,7 @@ import { parseCustomCritical } from "./result_as_text";
 export function parseEmbedToCritical(embed: Record<string, string>): {
 	[name: string]: CustomCritical;
 } {
-	const customCritical: { [name: string]: CustomCritical } = {};
+	const customCritical: Record<string, CustomCritical> = {};
 	//remove the 3 first field from the embed
 	embed["roll.critical.success"] = "";
 	embed["roll.critical.failure"] = "";

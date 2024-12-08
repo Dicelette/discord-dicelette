@@ -18,7 +18,7 @@ export function filterChoices(choices: string[], focused: string) {
 }
 
 function uniqueValues(array: string[]) {
-	const seen: { [key: string]: boolean } = {};
+	const seen: Record<string, boolean> = {};
 	const uniqueArray: string[] = [];
 
 	for (const item of array) {
