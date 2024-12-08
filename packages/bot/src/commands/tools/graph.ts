@@ -10,6 +10,7 @@ import {
 	getDatabaseChar,
 	getTemplateWithDB,
 	getUserByEmbed,
+	updateCharactersDb,
 } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
@@ -263,6 +264,9 @@ export const graph = {
 					await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
 					return;
 				}
+				updateCharactersDb(client.characters, interaction.guild.id, userId, ul, {
+					message,
+				});
 			}
 			if (!userStatistique.stats) {
 				await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
