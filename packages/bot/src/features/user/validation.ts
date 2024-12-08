@@ -147,24 +147,28 @@ export async function validateUser(
 		});
 	}
 
-	const templateStat = template.statistics ? Object.keys(template.statistics) : [];
 	const parsedStats = statsEmbed
 		? parseEmbedFields(statsEmbed.toJSON() as Djs.Embed)
 		: undefined;
 	const stats: { [name: string]: number } = {};
-	if (parsedStats)
-		for (const stat of templateStat) {
-			stats[stat] = Number.parseInt(parsedStats[stat.unidecode()], 10);
+	for (const [name, value] of Object.entries(parsedStats ?? {})) {
+		let statValue = Number.parseInt(value, 10);
+		if (Number.isNaN(statValue)) {
+			statValue = Number.parseInt(
+				value.removeBacktick().split("=")[1].trim().removeBacktick().standardize(),
+				10
+			);
 		}
+		stats[name] = statValue;
+	}
 
 	const damageFields = diceEmbed?.toJSON().fields ?? [];
 	let templateDamage: { [name: string]: string } | undefined = undefined;
-
 	if (damageFields.length > 0) {
 		templateDamage = {};
 
 		for (const damage of damageFields) {
-			templateDamage[damage.name.unidecode()] = damage.value;
+			templateDamage[damage.name.unidecode(true)] = damage.value;
 		}
 	}
 	for (const [name, dice] of Object.entries(template.damage ?? {})) {

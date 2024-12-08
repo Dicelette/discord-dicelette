@@ -8,6 +8,7 @@ import type {
 	UserData,
 	UserRegistration,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { registerUser, setDefaultManagerId, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
@@ -140,6 +141,7 @@ export async function repostInThread(
 		damage: damageName,
 		msgId: [msg.id, thread.id],
 	};
+	logger.trace("User Data", userTemplate);
 	updateCharactersDb(characters, interaction.guild!.id, userId, ul, {
 		userData: userTemplate,
 	});
