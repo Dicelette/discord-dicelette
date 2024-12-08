@@ -37,4 +37,5 @@ try {
 	logger.fatal(error);
 }
 
+// noinspection JSIgnoredPromiseFromCall
 client.login(process.env.DISCORD_TOKEN);
