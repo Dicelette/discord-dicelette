@@ -1,6 +1,7 @@
-import type { Characters, GuildData, Settings } from "@dicelette/types";
+import type { Characters, GuildData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
+import type { EClient } from "../client";
 
 export function deleteUser(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -33,16 +34,17 @@ export function deleteUserInChar(
 		if (filter.length === 0) characters.delete(guildId, userId);
 		else characters.set(guildId, filter, userId);
 	}
+	logger.trace(characters.get(guildId, userId));
 }
 
 export function deleteIfChannelOrThread(
-	db: Settings,
+	client: EClient,
 	guildID: string,
-	channel: Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel,
-	characters: Characters
+	channel: Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel
 ) {
+	const db = client.settings;
 	const channelID = channel.id;
-	cleanUserDB(db, channel, characters);
+	cleanUserDB(client, channel);
 	if (db.get(guildID, "templateID.channelId") === channelID)
 		db.delete(guildID, "templateID");
 	if (db.get(guildID, "logs") === channelID) db.delete(guildID, "logs");
@@ -53,10 +55,11 @@ export function deleteIfChannelOrThread(
 }
 
 function cleanUserDB(
-	guildDB: Settings,
-	thread: Djs.GuildTextBasedChannel | Djs.ThreadChannel | Djs.NonThreadGuildBasedChannel,
-	characters: Characters
+	client: EClient,
+	thread: Djs.GuildTextBasedChannel | Djs.ThreadChannel | Djs.NonThreadGuildBasedChannel
 ) {
+	const guildDB = client.settings;
+	const characters = client.characters;
 	const dbUser = guildDB.get(thread.guild.id, "user");
 	if (!dbUser) return;
 	if (!thread.isTextBased()) return;

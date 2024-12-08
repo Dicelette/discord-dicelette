@@ -1,5 +1,4 @@
 import type { CustomCritical, Resultat } from "@dicelette/core";
-import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
 import type { Server } from "../src/interfaces";
@@ -37,7 +36,6 @@ describe("custom critical roll", () => {
 			total: 4,
 		};
 		const critical = convertCustomCriticalValue({ test: customCritical }, 6);
-		const ul = ln(data.lang);
 		const res = new ResultAsText(
 			result,
 			data,

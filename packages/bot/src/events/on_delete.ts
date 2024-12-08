@@ -9,8 +9,7 @@ export const onDeleteChannel = (client: EClient): void => {
 		try {
 			if (channel.isDMBased()) return;
 			const guildID = channel.guild.id;
-			const db = client.settings;
-			deleteIfChannelOrThread(db, guildID, channel, client.characters);
+			deleteIfChannelOrThread(client, guildID, channel);
 		} catch (error) {
 			logger.error(error);
 			if (channel.isDMBased()) return;
@@ -35,9 +34,8 @@ export const onDeleteThread = (client: EClient): void => {
 		try {
 			//search channelID in database and delete it
 			const guildID = thread.guild.id;
-			const db = client.settings;
 			//verify if the user message was in the thread
-			deleteIfChannelOrThread(db, guildID, thread, client.characters);
+			deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
 			logger.error(error);
 			if (thread.isDMBased()) return;
