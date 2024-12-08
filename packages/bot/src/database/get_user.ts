@@ -318,12 +318,8 @@ export async function updateCharactersDb(
 	if (!userData) {
 		if (embeds) userData = getUserByEmbed({ embeds }, ul);
 		else if (message) userData = getUserByEmbed({ message }, ul);
-		else logger.trace("No data to update");
-		if (!userData) logger.warn("No data to update");
-	}
-	if (!userData) {
-		logger.warn("No data to update");
-		return;
+		else return;
+		if (!userData) return;
 	}
 	const userChar = characters.get(guildId, userID);
 	if (userChar) {
