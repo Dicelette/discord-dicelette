@@ -1,7 +1,7 @@
 import type { Characters, GuildData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
+import type { EClient } from "client";
 import type * as Djs from "discord.js";
-import type { EClient } from "../client";
 
 export function deleteUser(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,

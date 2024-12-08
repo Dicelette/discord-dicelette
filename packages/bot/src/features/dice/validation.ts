@@ -1,6 +1,7 @@
 import { evalStatsDice, roll } from "@dicelette/core";
 import type { UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
+import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import {
@@ -14,7 +15,6 @@ import {
 	sendLogs,
 } from "messages";
 import { editUserButtons } from "utils";
-import type { EClient } from "../../client";
 
 /**
  * Validate the edit of the dice from the modals

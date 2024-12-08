@@ -6,6 +6,7 @@ import {
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
+import type { EClient } from "client";
 import { getTemplateWithDB, getUserNameAndChar, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
@@ -20,7 +21,6 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
-import type { EClient } from "../../client";
 
 /**
  * Embed to display the statistics when adding a new user

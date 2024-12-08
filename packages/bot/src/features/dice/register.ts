@@ -3,6 +3,7 @@ import { findln, ln } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed } from "@dicelette/utils";
+import type { EClient } from "client";
 import {
 	getTemplateWithDB,
 	getUserByEmbed,
@@ -20,7 +21,6 @@ import {
 	sendLogs,
 } from "messages";
 import { addAutoRole, editUserButtons } from "utils";
-import type { EClient } from "../../client";
 
 /**
  * Interaction to submit the new skill dice
