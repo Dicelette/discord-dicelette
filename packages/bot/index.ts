@@ -18,7 +18,8 @@ import {
 	ready,
 } from "event";
 import packageJson from "./package.json" assert { type: "json" };
-dotenv.config({ path: ".env" });
+
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 important.info("Starting bot...");
 //@ts-ignore
 export const VERSION = packageJson.version ?? "/";

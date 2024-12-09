@@ -115,8 +115,10 @@ pnpm-lock.yaml
 enmap.*
 !enmap.d.ts
 data/*
+data_prod/*
 enmap.sqlite-*
 ._*
+test.js
 
 # DATABASE
 .env**

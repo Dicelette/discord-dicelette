@@ -1,3 +1,4 @@
+import process from "node:process";
 import type { Settings, UserData } from "@dicelette/types";
 import { important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -7,7 +8,7 @@ import type { Guild } from "discord.js";
 import dotenv from "dotenv";
 import { VERSION } from "../../index.js";
 import { getUser } from "../database";
-dotenv.config({ path: ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const rest = new Djs.REST().setToken(process.env.DISCORD_TOKEN ?? "0");
 

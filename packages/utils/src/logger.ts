@@ -1,7 +1,7 @@
 import process from "node:process";
 import dotenv from "dotenv";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
-dotenv.config({ path: ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const optionLoggers: ISettingsParam<ILogObj> =
 	process.env.NODE_ENV === "development"

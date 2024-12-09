@@ -1,8 +1,9 @@
+import process from "node:process";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import dotenv from "dotenv";
 
-dotenv.config({ path: ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 export default (client: EClient): void => {
 	client.on("error", async (error) => {
