@@ -152,6 +152,7 @@ export async function rollDice(
 	atq = atq.standardize();
 	const comments = options.getString(t("dbRoll.options.comments.name")) ?? "";
 	//search dice
+
 	let dice = userStatistique.damage?.[atq];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!dice) {

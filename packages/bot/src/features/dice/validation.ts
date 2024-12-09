@@ -29,6 +29,8 @@ export async function validateDiceEdit(
 	ul: Translation,
 	client: EClient
 ) {
+	const compareUnidecode = (a: string, b: string) =>
+		a.unidecode().standardize() === b.unidecode().standardize();
 	const db = client.settings;
 	if (!interaction.message) return;
 	const diceEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "damage");
@@ -48,8 +50,7 @@ export async function validateDiceEdit(
 	const newEmbedDice: Djs.APIEmbedField[] = [];
 	for (const [skill, dice] of Object.entries(dices)) {
 		//test if dice is valid
-		if (newEmbedDice.find((field) => field.name.unidecode() === skill.unidecode()))
-			continue;
+		if (newEmbedDice.find((field) => compareUnidecode(field.name, skill))) continue;
 		if (dice === "X" || dice.trim().length === 0 || dice === "0") {
 			newEmbedDice.push({
 				name: skill.capitalize(),
@@ -81,7 +82,7 @@ export async function validateDiceEdit(
 	if (oldDice) {
 		for (const field of oldDice) {
 			const name = field.name.toLowerCase();
-			if (!newEmbedDice.find((field) => field.name.unidecode() === name.unidecode())) {
+			if (!newEmbedDice.find((field) => compareUnidecode(field.name, name))) {
 				//register the old value
 				newEmbedDice.push({
 					name: name.capitalize(),
@@ -97,7 +98,7 @@ export async function validateDiceEdit(
 		const name = field.name.toLowerCase();
 		const dice = field.value;
 		if (
-			fieldsToAppend.find((f) => f.name.unidecode() === name.unidecode()) ||
+			fieldsToAppend.find((f) => compareUnidecode(f.name, name)) ||
 			dice.toLowerCase() === "x" ||
 			dice.trim().length === 0 ||
 			dice === "0"
@@ -121,7 +122,7 @@ export async function validateDiceEdit(
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
 		await interaction.message.edit({ embeds: toAdd, components: [components] });
-		updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+		await updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
 			embeds: toAdd,
 		});
 		await reply(interaction, { content: ul("modals.removed.dice"), ephemeral: true });
@@ -173,7 +174,7 @@ export async function validateDiceEdit(
 		fiche: interaction.message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
-	updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+	await updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
 		embeds: embedsList.list,
 	});
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);

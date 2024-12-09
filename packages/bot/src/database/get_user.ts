@@ -13,7 +13,14 @@ import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { CategoryChannel, type EmbedBuilder } from "discord.js";
-import { embedError, ensureEmbed, getEmbeds, parseEmbedFields, reply } from "messages";
+import {
+	embedError,
+	ensureEmbed,
+	getEmbeds,
+	parseDamageFields,
+	parseEmbedFields,
+	reply,
+} from "messages";
 import { haveAccess, searchUserChannel } from "utils";
 
 export function getUserByEmbed(
@@ -42,7 +49,7 @@ export function getUserByEmbed(
 	const statsFields = getEmbeds(ul, message, "stats", embeds)?.toJSON() as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
 	const damageFields = getEmbeds(ul, message, "damage", embeds)?.toJSON() as Djs.Embed;
-	const templateDamage = parseEmbedFields(damageFields);
+	const templateDamage = parseDamageFields(damageFields);
 	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
@@ -185,7 +192,7 @@ export async function getUserFromMessage(
 			options.fetchChannel
 		);
 		//set chara in memory
-		updateCharactersDb(characters, guild!.id, userId, ul, {
+		await updateCharactersDb(characters, guild!.id, userId, ul, {
 			userData,
 		});
 		return userData;

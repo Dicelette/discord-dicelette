@@ -120,6 +120,16 @@ export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
 	return parsedFields;
 }
 
+export function parseDamageFields(embed: Djs.Embed): Record<string, string> {
+	const fields = embed.fields;
+	if (!fields) return {};
+	const parsedFields: Record<string, string> = {};
+	for (const field of fields) {
+		parsedFields[field.name.standardize()] = field.value.standardize().removeBacktick();
+	}
+	return parsedFields;
+}
+
 /**
  * Create the userEmbed and embedding the avatar user in the thumbnail
  * @param ul {Translation}
