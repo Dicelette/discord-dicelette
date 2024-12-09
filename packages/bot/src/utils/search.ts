@@ -1,6 +1,7 @@
 // noinspection SuspiciousTypeOfGuard
 
 import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 export async function searchUserChannel(
@@ -37,7 +38,7 @@ export async function searchUserChannel(
 		}
 		thread = channel;
 	} catch (error) {
-		console.error("Error while fetching channel", error);
+		logger.error("Error while fetching channel", error);
 		return;
 	}
 	if (!thread) {

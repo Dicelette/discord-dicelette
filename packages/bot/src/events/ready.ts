@@ -78,7 +78,7 @@ function convertDatabaseUser(db: Settings, guild: Guild) {
 				}
 				if (toUpdate) db.set(guild.id, data, `user.${userId}.${index}`);
 				else {
-					console.warn(
+					logger.warn(
 						`No channel to update for ${userId}/${data.charName} => Deleting it`
 					);
 					db.delete(guild.id, `user.${userId}.${index}`);
