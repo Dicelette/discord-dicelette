@@ -47,7 +47,7 @@ export const dbRoll = {
 				.setDescriptionLocalizations(cmdLn("dbRoll.options.override.description"))
 				.setRequired(false)
 		)
-		.addNumberOption((option) =>
+		.addStringOption((option) =>
 			option
 				.setName(t("dbRoll.options.modificator.name"))
 				.setDescription(t("dbRoll.options.modificator.description"))

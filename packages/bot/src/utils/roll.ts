@@ -8,7 +8,9 @@ import {
 	ResultAsText,
 	type Server,
 	convertCustomCriticalValue,
+	getModif,
 	getRoll,
+	replaceValue,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -183,15 +185,15 @@ export async function rollDice(
 		return;
 	}
 	dice = generateStatsDice(dice, userStatistique.stats);
-	const modificator = options.getNumber(t("dbRoll.options.modificator.name")) ?? 0;
-	const modificatorString =
-		modificator > 0 ? `+${modificator}` : modificator < 0 ? `${modificator}` : "";
-	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(\d+))/.exec(dice);
+	const modificator = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	const modificatorString = getModif(modificator, userStatistique.stats);
+	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
 		dice = dice.replace(comparatorMatch[0], "");
 		comparator = comparatorMatch[0];
 	}
+	comparator = replaceValue(comparator, userStatistique.stats);
 	const roll = `${dice.trimAll()}${modificatorString}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
@@ -221,7 +223,7 @@ export async function rollStatistique(
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
 	const comments = options.getString(t("dbRoll.options.comments.name")) ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
-	const modification = options.getNumber(t("dbRoll.options.modificator.name")) ?? 0;
+	const modification = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 
 	let userStat = userStatistique.stats?.[standardizedStatistic];
 	// noinspection LoopStatementThatDoesntLoopJS
@@ -252,7 +254,7 @@ export async function rollStatistique(
 		return;
 	}
 	if (override) {
-		const signRegex = /(?<sign>[><=!]+)(?<comparator>(\d+))/;
+		const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
 		const diceMatch = signRegex.exec(dice);
 		const overrideMatch = signRegex.exec(override);
 		if (diceMatch && overrideMatch && diceMatch.groups && overrideMatch.groups) {
@@ -261,16 +263,18 @@ export async function rollStatistique(
 			dice += overrideMatch[0];
 		}
 	}
-	const modificationString =
-		modification > 0 ? `+${modification}` : modification < 0 ? `${modification}` : "";
-	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(\d+))/.exec(dice);
+	logger.info(`Dice: ${dice}`);
+	const modificationString = getModif(modification, userStatistique.stats, userStat);
+	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
 		//remove from dice
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${comparator} ${comments}`;
+	logger.trace("comparator: ", comparator);
+	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${replaceValue(comparator, userStatistique.stats, userStat)} ${comments}`;
+	logger.trace(`Rolling: ${roll}`);
 	const customCritical = template.customCritical
 		? convertCustomCriticalValue(template.customCritical, userStat)
 		: undefined;

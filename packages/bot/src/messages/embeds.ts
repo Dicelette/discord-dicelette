@@ -121,7 +121,7 @@ export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
 }
 
 export function parseDamageFields(embed: Djs.Embed): Record<string, string> {
-	const fields = embed.fields;
+	const fields = embed?.fields;
 	if (!fields) return {};
 	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {

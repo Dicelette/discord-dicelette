@@ -3,6 +3,7 @@ import {
 	type Compare,
 	type CustomCritical,
 	type Resultat,
+	replaceFormulaInDice,
 	roll,
 } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
@@ -11,6 +12,7 @@ import { DETECT_DICE_MESSAGE, type Server } from "./interfaces";
 import { timestamp } from "./utils.js";
 import "uniformize";
 import { ln } from "@dicelette/localization";
+import { logger } from "@dicelette/utils";
 
 export class ResultAsText {
 	parser?: string;
@@ -21,19 +23,22 @@ export class ResultAsText {
 	private readonly charName?: string;
 	private readonly infoRoll?: { name: string; standardized: string };
 	private readonly resultat?: Resultat;
+	private readonly modificator?: string | number = 0;
 	constructor(
 		result: Resultat | undefined,
 		data: Server,
 		critical?: { failure?: number; success?: number },
 		charName?: string,
 		infoRoll?: { name: string; standardized: string },
-		customCritical?: Record<string, CustomCritical>
+		customCritical?: Record<string, CustomCritical>,
+		modificator?: string | number
 	) {
 		this.data = data;
 		this.infoRoll = infoRoll;
 		this.ul = ln(data.lang);
 		this.resultat = result;
 		let parser = "";
+		this.modificator = modificator ?? 0;
 		if (!result) {
 			this.error = true;
 			this.output = this.ul("roll.error");
@@ -151,7 +156,7 @@ export class ResultAsText {
 					}
 				}
 				const totalSuccess = this.resultat.compare
-					? ` = \`[${total}] ${this.goodCompareSign(this.resultat.compare, total)} ${this.resultat.compare.value}\``
+					? ` = \`[${total}] ${this.goodCompareSign(this.resultat.compare, total)} ${this.compareValue("`")}`
 					: `= \`[${total}]\``;
 				msgSuccess += `${successOrFailure} — ${this.messageResult(r, totalSuccess)}\n`;
 				total = 0;
@@ -202,6 +207,13 @@ export class ResultAsText {
 			finalRes.push(res.trimStart());
 		}
 		return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
+	}
+
+	private compareValue(lastChar?: string) {
+		const char = lastChar ? lastChar : "";
+		if (this.resultat?.compare?.rollValue)
+			return `${char}${this.resultat.compare.rollValue}`;
+		return `${this.resultat?.compare?.value}${char}`;
 	}
 
 	/**
@@ -263,7 +275,7 @@ export class ResultAsText {
 			linkToOriginal = this.createUrl(undefined, context);
 		}
 		const signMessage = this.resultat?.compare
-			? `${this.resultat.compare.sign} ${this.resultat.compare.value}`
+			? `${this.resultat.compare.sign} ${this.compareValue()}`
 			: "";
 		const mention = authorId ? `*<@${authorId}>* ` : "";
 		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "")}${signMessage ? ` ${signMessage}` : ""}\`)`;
@@ -325,4 +337,38 @@ export function convertCustomCriticalValue(
 		};
 	}
 	return customCritical;
+}
+
+export function getModif(
+	modif: string,
+	statistics?: Record<string, number>,
+	statValue?: number
+): string {
+	const isNumber = (value: unknown): boolean =>
+		typeof value === "number" ||
+		(!Number.isNaN(Number(value)) && typeof value === "string");
+	if (isNumber(modif)) {
+		const res = Number.parseInt(modif, 10);
+		if (res > 0) return `+${res}`;
+		if (res < 0) return `${res}`;
+		return "";
+	}
+	modif = replaceValue(modif, statistics, statValue);
+	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
+	return modif;
+}
+
+export function replaceValue(
+	modif: string,
+	statistics?: Record<string, number>,
+	statValue?: number
+) {
+	if (statValue) modif = modif.replaceAll("$", statValue.toString());
+	if (statistics) {
+		for (const [stat, value] of Object.entries(statistics)) {
+			modif = modif.standardize().replaceAll(stat.standardize(), value.toString());
+		}
+	}
+	logger.trace(`Modif: ${modif}`);
+	return replaceFormulaInDice(modif);
 }
