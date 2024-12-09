@@ -13,6 +13,11 @@ describe("roll", () => {
 		const rollIng = getRoll("1d20");
 		expect(rollIng?.total).toBeLessThanOrEqual(20);
 	});
+	it("A result within a simple roll", () => {
+		const dice = getRoll("1d20+6d2");
+		const res = new ResultAsText(dice, data).parser;
+		expect(res).toContain("d20");
+	});
 });
 
 describe("custom critical roll", () => {
