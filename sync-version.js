@@ -15,4 +15,4 @@ targetJson.version = sourceJson.version;
 // Écrire dans le fichier cible
 fs.writeFileSync(targetPath, JSON.stringify(targetJson, null, 2), "utf8");
 
-console.log(`Version mise à jour : ${targetJson.version}`);
+console.info(`Version mise à jour : ${targetJson.version}`);
