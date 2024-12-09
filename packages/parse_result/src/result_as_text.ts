@@ -87,6 +87,14 @@ export class ResultAsText {
 		return `\n\n-# ↪ [${this.ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
 	}
 
+	private messageResult(result: string, tot?: string | number) {
+		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
+		if (!tot) resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, " = ` $1 `")}`;
+		else resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, `${tot}`)}`;
+		resultEdited = resultEdited.replaceAll("*", "\\*");
+		return resultEdited;
+	}
+
 	private parseResult(
 		interaction?: boolean,
 		critical?: { failure?: number; success?: number },
@@ -104,11 +112,7 @@ export class ResultAsText {
 			const natural: number[] = [];
 			for (const r of messageResult) {
 				if (r.match(regexForFormulesDices)) {
-					msgSuccess += `${r
-						.replaceAll(";", "\n")
-						.replaceAll(":", " ⟶")
-						.replaceAll(/ = (\S+)/g, " = ` $1 `")
-						.replaceAll("*", "\\*")}\n`;
+					msgSuccess += `${this.messageResult(r)}\n`;
 					continue;
 				}
 				const tot = r.match(/ = (\d+)/);
@@ -139,7 +143,6 @@ export class ResultAsText {
 					for (const [name, custom] of Object.entries(customCritical)) {
 						const valueToCompare = custom.onNaturalDice ? natural : total;
 						const success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
-						console.debug(success);
 						if (success) {
 							successOrFailure = `**${name}**`;
 							isCritical = "custom";
@@ -148,20 +151,12 @@ export class ResultAsText {
 					}
 				}
 				const totalSuccess = this.resultat.compare
-					? ` = \`${total} ${this.goodCompareSign(this.resultat.compare, total)} [${this.resultat.compare.value}]\``
-					: `= \`${total}\``;
-				msgSuccess += `${successOrFailure} — ${r
-					.replaceAll(":", " ⟶")
-					.replaceAll(/ = (\S+)/g, totalSuccess)
-					.replaceAll("*", "\\*")}\n`;
+					? ` = \`[${total}] ${this.goodCompareSign(this.resultat.compare, total)} ${this.resultat.compare.value}\``
+					: `= \`[${total}]\``;
+				msgSuccess += `${successOrFailure} — ${this.messageResult(r, totalSuccess)}\n`;
 				total = 0;
 			}
-		} else
-			msgSuccess = `${this.resultat.result
-				.replaceAll(";", "\n")
-				.replaceAll(":", " ⟶")
-				.replaceAll(/ = (\S+)/g, " = ` $1 `")
-				.replaceAll("*", "\\*")}`;
+		} else msgSuccess = `${this.messageResult(this.resultat.result, " = ` [$1] `")}`;
 		const comment = this.resultat.comment
 			? `*${this.resultat.comment
 					.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
@@ -252,6 +247,28 @@ export class ResultAsText {
 				return "";
 		}
 	}
+
+	onMessageSend(
+		context?: { guildId: string; channelId: string; messageId: string } | string,
+		authorId?: string
+	) {
+		let linkToOriginal = "";
+		if (typeof context === "object") {
+			const linkToOriginal = this.createUrl({
+				guildId: context.guildId,
+				channelId: context.channelId,
+				messageId: context.messageId,
+			});
+		} else if (context) {
+			linkToOriginal = this.createUrl(undefined, context);
+		}
+		const signMessage = this.resultat?.compare
+			? `${this.resultat.compare.sign} ${this.resultat.compare.value}`
+			: "";
+		const mention = authorId ? `*<@${authorId}>* ` : "";
+		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "")}${signMessage ? ` ${signMessage}` : ""}\`)`;
+		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
+	}
 }
 
 export function getRoll(dice: string): Resultat | undefined {
@@ -269,22 +286,6 @@ export function getRoll(dice: string): Resultat | undefined {
 		rollDice.dice = `${dice} /* ${comments} */`;
 	}
 	return rollDice;
-}
-
-export function rollContent(
-	result: Resultat,
-	parser: string,
-	linkToOriginal: string,
-	authorId?: string,
-	time?: boolean,
-	reply?: boolean
-) {
-	if (reply) return `${parser}${linkToOriginal}`;
-	const signMessage = result.compare
-		? `${result.compare.sign} ${result.compare.value}`
-		: "";
-	const authorMention = `*<@${authorId}>* (🎲 \`${result.dice.replace(COMMENT_REGEX, "")}${signMessage ? ` ${signMessage}` : ""}\`)`;
-	return `${authorMention}${timestamp(time)}\n${parser}${linkToOriginal}`;
 }
 
 /**

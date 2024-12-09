@@ -1,5 +1,5 @@
 import { lError, ln } from "@dicelette/localization";
-import { ResultAsText, isRolling, rollContent } from "@dicelette/parse_result";
+import { ResultAsText, isRolling } from "@dicelette/parse_result";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
@@ -37,43 +37,35 @@ export default (client: EClient): void => {
 				await message.reply({ content: parser, allowedMentions: { repliedUser: true } });
 				return;
 			}
-			let linkToOriginal = "";
+			let context = {
+				guildId: message.guildId ?? "",
+				channelId: channel.id,
+				messageId: message.id,
+			};
 			if (deleteInput) {
 				if (client.settings.get(message.guild.id, "context")) {
 					const messageBefore = await findMessageBefore(channel, message, client);
 					if (messageBefore)
-						linkToOriginal = resultAsText.createUrl({
+						context = {
 							guildId: message.guildId ?? "",
 							channelId: channel.id,
 							messageId: messageBefore.id,
-						});
+						};
 				}
-			} else {
-				linkToOriginal = resultAsText.createUrl({
-					guildId: message.guildId ?? "",
-					channelId: channel.id,
-					messageId: message.id,
-				});
 			}
 			const thread = await threadToSend(client.settings, channel, ul);
 			const msgToEdit = await thread.send("_ _");
-			const msg = rollContent(
-				result,
-				parser,
-				linkToOriginal,
-				message.author.id,
-				client.settings.get(message.guild.id, "timestamp")
-			);
+			const msg = resultAsText.onMessageSend(context, message.author.id);
 			await msgToEdit.edit(msg);
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
-				? resultAsText.createUrl(undefined, msgToEdit.url)
-				: "";
+				? msgToEdit.url
+				: undefined;
 			const reply = deleteInput
 				? await channel.send({
-						content: rollContent(result, parser, idMessage, message.author.id),
+						content: resultAsText.onMessageSend(idMessage, message.author.id),
 					})
 				: await message.reply({
-						content: rollContent(result, parser, idMessage),
+						content: resultAsText.onMessageSend(idMessage),
 						allowedMentions: { repliedUser: true },
 					});
 			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
