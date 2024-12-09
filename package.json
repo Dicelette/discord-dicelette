@@ -12,9 +12,9 @@
 		"prerelease": "pnpm run --recursive tsc",
 		"release": "commit-and-tag-version",
 		"postrelease": "node sync-version.js && git commit . --amend --no-edit",
-		"pm2:start": "pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
+		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
+		"pm2:restart": "pnpm run build && pm2 restart dicelette",
 		"pm2:stop": "pm2 stop dicelette",
-		"pm2:restart": "pm2 restart dicelette",
 		"pm2:delete": "pm2 delete dicelette",
 		"prod": "cross-env PROD=true node test.js"
 	},

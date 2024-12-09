@@ -21,5 +21,4 @@ jobs:
             cd dicelette/
             git pull
             pnpm i
-            pnpm run build
             pnpm run pm2:restart
