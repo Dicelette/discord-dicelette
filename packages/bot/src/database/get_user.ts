@@ -96,7 +96,7 @@ export function getCharaInMemory(
 ) {
 	const getChara = characters.get(guildID, userID);
 	const found = getChara?.find((char) => char.userName?.subText(charName, true));
-	logger.debug(`Found ${charName} in memory`, found);
+	logger.warn(`Found ${charName} in memory`, found);
 	return found;
 }
 
