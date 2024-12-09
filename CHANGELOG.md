@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.25.0](https://github.com/Dicelette/discord-dicelette/compare/1.24.0...1.25.0) (2024-12-09)
+
+
+### Features
+
+* update dotenv configuration for production environment ([d72d6a1](https://github.com/Dicelette/discord-dicelette/commit/d72d6a1dee6074a2f99c66a9da486546feed9509))
+
+
+### Bug Fixes
+
+* **skill:** improve dice validation and parsing in bot ([bfc5522](https://github.com/Dicelette/discord-dicelette/commit/bfc5522d1c13dc7833e700159c239330e04aceb0))
+
 ## [1.24.0](https://github.com/Dicelette/discord-dicelette/compare/1.23.0...1.24.0) (2024-12-09)
 
 
