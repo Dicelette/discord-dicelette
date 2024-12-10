@@ -263,7 +263,6 @@ export async function rollStatistique(
 			dice += overrideMatch[0];
 		}
 	}
-	logger.info(`Dice: ${dice}`);
 	const modificationString = getModif(modification, userStatistique.stats, userStat);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
@@ -272,11 +271,10 @@ export async function rollStatistique(
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	logger.trace("comparator: ", comparator);
 	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${replaceValue(comparator, userStatistique.stats, userStat)} ${comments}`;
 	logger.trace(`Rolling: ${roll}`);
 	const customCritical = template.customCritical
-		? convertCustomCriticalValue(template.customCritical, userStat)
+		? convertCustomCriticalValue(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
 	await rollWithInteraction(
 		interaction,

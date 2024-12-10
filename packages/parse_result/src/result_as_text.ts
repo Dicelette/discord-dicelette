@@ -12,7 +12,6 @@ import { DETECT_DICE_MESSAGE, type Server } from "./interfaces";
 import { timestamp } from "./utils.js";
 import "uniformize";
 import { ln } from "@dicelette/localization";
-import { logger } from "@dicelette/utils";
 
 export class ResultAsText {
 	parser?: string;
@@ -144,19 +143,26 @@ export class ResultAsText {
 						isCritical = "success";
 					}
 				}
+				let testValue = this.resultat.compare;
+				let goodSign = this.goodCompareSign(testValue, total);
 				if (customCritical) {
 					for (const [name, custom] of Object.entries(customCritical)) {
 						const valueToCompare = custom.onNaturalDice ? natural : total;
-						const success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
+						let success: unknown;
+						if (custom.onNaturalDice)
+							success = natural.includes(Number.parseInt(custom.value));
+						else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 						if (success) {
 							successOrFailure = `**${name}**`;
 							isCritical = "custom";
+							testValue = this.convertCustomCriticalToCompare(custom);
+							goodSign = this.goodCompareSign(testValue, total);
 							break;
 						}
 					}
 				}
-				const totalSuccess = this.resultat.compare
-					? ` = \`[${total}] ${this.goodCompareSign(this.resultat.compare, total)} ${this.compareValue("`")}`
+				const totalSuccess = testValue
+					? ` = \`[${total}] ${goodSign} ${this.compareValue(testValue, "`")}`
 					: `= \`[${total}]\``;
 				msgSuccess += `${successOrFailure} — ${this.messageResult(r, totalSuccess)}\n`;
 				total = 0;
@@ -209,10 +215,11 @@ export class ResultAsText {
 		return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
 	}
 
-	private compareValue(lastChar?: string) {
+	private compareValue(compare?: Compare, lastChar?: string) {
 		const char = lastChar ? lastChar : "";
-		if (this.resultat?.compare?.rollValue)
-			return `${char}${this.resultat.compare.rollValue}`;
+		console.log(compare);
+		if (compare?.rollValue) return `${char}${compare.rollValue}`;
+		if (compare?.value) return `${compare.value}${char}`;
 		return `${this.resultat?.compare?.value}${char}`;
 	}
 
@@ -266,7 +273,7 @@ export class ResultAsText {
 	) {
 		let linkToOriginal = "";
 		if (typeof context === "object") {
-			const linkToOriginal = this.createUrl({
+			linkToOriginal = this.createUrl({
 				guildId: context.guildId,
 				channelId: context.channelId,
 				messageId: context.messageId,
@@ -280,6 +287,18 @@ export class ResultAsText {
 		const mention = authorId ? `*<@${authorId}>* ` : "";
 		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "")}${signMessage ? ` ${signMessage}` : ""}\`)`;
 		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
+	}
+
+	private convertCustomCriticalToCompare(custom: CustomCritical) {
+		const compare: Compare = {
+			sign: custom.sign,
+			value: Number.parseInt(custom.value, 10),
+		};
+		if (custom.dice) {
+			compare.originalDice = custom.dice.originalDice;
+			compare.rollValue = custom.dice.rollValue;
+		}
+		return compare;
 	}
 }
 
@@ -325,16 +344,30 @@ export function parseCustomCritical(
 
 export function convertCustomCriticalValue(
 	custom: Record<string, CustomCritical>,
-	stats: number
+	statValue?: number,
+	statistics?: Record<string, number>
 ) {
 	const customCritical: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(custom)) {
-		const newValue = value.value.replace("$", stats.toString());
-		customCritical[name] = {
-			onNaturalDice: value.onNaturalDice,
-			sign: value.sign,
-			value: evaluate(newValue.replaceAll("{{", "").replaceAll("}}", "")).toString(),
-		};
+		const replacedValue = replaceValue(value.value, statistics, statValue);
+		const rolledValue = roll(replacedValue);
+		if (rolledValue?.total)
+			customCritical[name] = {
+				onNaturalDice: value.onNaturalDice,
+				sign: value.sign,
+				value: rolledValue.total.toString(),
+				dice: {
+					originalDice: rolledValue.dice,
+					rollValue: rolledValue.result,
+				},
+			};
+		else {
+			customCritical[name] = {
+				onNaturalDice: value.onNaturalDice,
+				sign: value.sign,
+				value: evaluate(replacedValue).toString(),
+			};
+		}
 	}
 	return customCritical;
 }
@@ -369,6 +402,5 @@ export function replaceValue(
 			modif = modif.standardize().replaceAll(stat.standardize(), value.toString());
 		}
 	}
-	logger.trace(`Modif: ${modif}`);
 	return replaceFormulaInDice(modif);
 }
