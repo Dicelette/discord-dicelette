@@ -1,5 +1,6 @@
 import type { Critical, CustomCritical } from "@dicelette/core";
-import { parseCustomCritical } from "./result_as_text";
+
+import { parseCustomCritical } from "./custom_critical";
 
 export function parseEmbedToCritical(embed: Record<string, string>): {
 	[name: string]: CustomCritical;

@@ -145,3 +145,19 @@ export type CharacterData = {
 export type CharDataWithName = Record<string, CharacterData>;
 
 export type UserDatabase = Record<string, UserData[]>;
+
+export type CustomCriticalRoll = CustomCritical & {
+	/**
+	 * If the original value is a dice throw, set the result of the dice here
+	 */
+	dice?: {
+		/**
+		 * The original dice throw
+		 */
+		originalDice: string;
+		/**
+		 * The result of the dice throw
+		 */
+		rollValue: string;
+	};
+};

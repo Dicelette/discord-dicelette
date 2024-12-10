@@ -8,6 +8,7 @@ import {
 	ResultAsText,
 	type Server,
 	convertCustomCriticalValue,
+	filterCustomCritical,
 	getModif,
 	getRoll,
 	replaceValue,
@@ -204,7 +205,8 @@ export async function rollDice(
 		user,
 		charOptions,
 		infoRoll,
-		hideResult
+		hideResult,
+		filterCustomCritical(userStatistique.template.customCritical)
 	);
 }
 

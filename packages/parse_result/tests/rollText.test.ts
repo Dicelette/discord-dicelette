@@ -1,8 +1,10 @@
 import type { CustomCritical, Resultat } from "@dicelette/core";
 import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
+import { convertCustomCriticalValue } from "../src/custom_critical";
 import type { Server } from "../src/interfaces";
-import { ResultAsText, convertCustomCriticalValue, getRoll } from "../src/result_as_text";
+import { ResultAsText } from "../src/result_as_text";
+import { getRoll } from "../src/utils";
 const data: Server = {
 	lang: Djs.Locale.EnglishUS,
 	userId: "mara__li",
@@ -65,7 +67,7 @@ describe("custom critical roll", () => {
 	}
 	it("should display the name of critical roll", () => {
 		const result: Resultat = {
-			dice: "1d20",
+			dice: "1d20>25",
 			compare: {
 				sign: ">",
 				value: 3,
@@ -83,6 +85,7 @@ describe("custom critical roll", () => {
 			critical
 		);
 		const text = res.defaultMessage();
+		console.log(text);
 		expect(text).toContain("test");
 	});
 });
