@@ -3,12 +3,10 @@ import {
 	type Compare,
 	type CustomCritical,
 	type Resultat,
-	replaceFormulaInDice,
-	roll,
 } from "@dicelette/core";
-import type { Translation } from "@dicelette/types";
+import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
-import { DETECT_DICE_MESSAGE, type Server } from "./interfaces";
+import type { Server } from "./interfaces";
 import { timestamp } from "./utils.js";
 import "uniformize";
 import { ln } from "@dicelette/localization";
@@ -289,7 +287,7 @@ export class ResultAsText {
 		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
 	}
 
-	private convertCustomCriticalToCompare(custom: CustomCritical) {
+	private convertCustomCriticalToCompare(custom: CustomCriticalRoll) {
 		const compare: Compare = {
 			sign: custom.sign,
 			value: Number.parseInt(custom.value, 10),
@@ -300,107 +298,4 @@ export class ResultAsText {
 		}
 		return compare;
 	}
-}
-
-export function getRoll(dice: string): Resultat | undefined {
-	const comments = dice.match(DETECT_DICE_MESSAGE)?.[3].replaceAll("*", "\\*");
-	if (comments) {
-		dice = dice.replace(DETECT_DICE_MESSAGE, "$1");
-	}
-	dice = dice.trim();
-	const rollDice = roll(dice.trim().toLowerCase());
-	if (!rollDice) {
-		return undefined;
-	}
-	if (comments) {
-		rollDice.comment = comments;
-		rollDice.dice = `${dice} /* ${comments} */`;
-	}
-	return rollDice;
-}
-
-/**
- * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`
- */
-export function parseCustomCritical(
-	name: string,
-	customCritical: string
-): Record<string, CustomCritical> | undefined {
-	const findPart = /(?<sign>([<>=!]+))(?<value>.*)/gi;
-	const match = findPart.exec(customCritical);
-	if (!match) return;
-	const { sign, value } = match.groups || {};
-	if (!name || !sign || !value) return;
-	const onNaturalDice = name.startsWith("(N)");
-	const nameStr = onNaturalDice ? name.replace("(N)", "") : name;
-	return {
-		[nameStr.trimAll()]: {
-			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
-			value: value.trimAll(),
-			onNaturalDice,
-		},
-	};
-}
-
-export function convertCustomCriticalValue(
-	custom: Record<string, CustomCritical>,
-	statValue?: number,
-	statistics?: Record<string, number>
-) {
-	const customCritical: Record<string, CustomCritical> = {};
-	for (const [name, value] of Object.entries(custom)) {
-		const replacedValue = replaceValue(value.value, statistics, statValue);
-		const rolledValue = roll(replacedValue);
-		if (rolledValue?.total)
-			customCritical[name] = {
-				onNaturalDice: value.onNaturalDice,
-				sign: value.sign,
-				value: rolledValue.total.toString(),
-				dice: {
-					originalDice: rolledValue.dice,
-					rollValue: rolledValue.result,
-				},
-			};
-		else {
-			customCritical[name] = {
-				onNaturalDice: value.onNaturalDice,
-				sign: value.sign,
-				value: evaluate(replacedValue).toString(),
-			};
-		}
-	}
-	return customCritical;
-}
-
-export function getModif(
-	modif: string,
-	statistics?: Record<string, number>,
-	statValue?: number
-): string {
-	const isNumber = (value: unknown): boolean =>
-		typeof value === "number" ||
-		(!Number.isNaN(Number(value)) && typeof value === "string");
-	if (isNumber(modif)) {
-		const res = Number.parseInt(modif, 10);
-		if (res > 0) return `+${res}`;
-		if (res < 0) return `${res}`;
-		return "";
-	}
-	modif = replaceValue(modif, statistics, statValue);
-	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
-	return modif;
-}
-
-export function replaceValue(
-	modif: string,
-	statistics?: Record<string, number>,
-	statValue?: number
-) {
-	if (statValue) modif = modif.replaceAll("$", statValue.toString());
-	if (statistics) {
-		for (const [stat, value] of Object.entries(statistics)) {
-			modif = modif.standardize().replaceAll(stat.standardize(), value.toString());
-		}
-	}
-	return replaceFormulaInDice(modif);
 }
