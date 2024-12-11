@@ -215,7 +215,6 @@ export class ResultAsText {
 
 	private compareValue(compare?: Compare, lastChar?: string) {
 		const char = lastChar ? lastChar : "";
-		console.log(compare);
 		if (compare?.rollValue) return `${char}${compare.rollValue}`;
 		if (compare?.value) return `${compare.value}${char}`;
 		return `${this.resultat?.compare?.value}${char}`;
