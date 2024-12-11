@@ -49,9 +49,22 @@ export function getModif(
 export function replaceValue(
 	modif: string,
 	statistics?: Record<string, number>,
-	statValue?: number
+	statValue?: number | string
 ) {
 	if (statValue) modif = modif.replaceAll("$", statValue.toString());
 	if (statistics) modif = generateStatsDice(modif, statistics);
 	return replaceFormulaInDice(modif);
+}
+
+export function convertNameToValue(
+	diceName: string,
+	statistics?: Record<string, number>
+) {
+	if (!statistics) return diceName;
+	const formule = /\((?<formula>.+)\)/gm;
+	const match = formule.exec(diceName);
+	if (!match) return undefined;
+	const { formula } = match.groups || {};
+	if (!formula) return undefined;
+	return replaceValue(formula, statistics);
 }

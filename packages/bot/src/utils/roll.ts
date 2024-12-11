@@ -8,6 +8,7 @@ import {
 	ResultAsText,
 	type Server,
 	convertCustomCriticalValue,
+	convertNameToValue,
 	filterCustomCritical,
 	getModif,
 	getRoll,
@@ -196,6 +197,9 @@ export async function rollDice(
 	}
 	comparator = replaceValue(comparator, userStatistique.stats);
 	const roll = `${dice.trimAll()}${modificatorString}${comparator} ${comments}`;
+	const dollarValue = convertNameToValue(atq, userStatistique.stats);
+	if (dollarValue)
+		infoRoll.name = infoRoll.name.replace(/\((?<formula>.+)\)/, "").trimEnd();
 	await rollWithInteraction(
 		interaction,
 		roll,
@@ -206,7 +210,11 @@ export async function rollDice(
 		charOptions,
 		infoRoll,
 		hideResult,
-		filterCustomCritical(userStatistique.template.customCritical)
+		filterCustomCritical(
+			userStatistique.template.customCritical,
+			userStatistique.stats,
+			dollarValue
+		)
 	);
 }
 

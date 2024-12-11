@@ -1,7 +1,7 @@
 import { type CustomCritical, roll } from "@dicelette/core";
 import type { CustomCriticalRoll } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
-
 import { replaceValue } from "./utils";
 
 /**
@@ -21,9 +21,9 @@ export function parseCustomCritical(
 	const affectSkill = nameStr.includes("(S)");
 	nameStr = nameStr.replace("(S)", "");
 	return {
-		[nameStr.standardize()]: {
+		[nameStr.trimStart()]: {
 			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
-			value: value.standardize(),
+			value: value.standardize().trimAll(),
 			onNaturalDice,
 			affectSkill,
 		},
@@ -61,12 +61,22 @@ export function convertCustomCriticalValue(
 }
 
 export function filterCustomCritical(
-	customCritical?: Record<string, CustomCritical>
+	customCritical?: Record<string, CustomCritical>,
+	statistics?: Record<string, number>,
+	dollarsValue?: string | number
 ): Record<string, CustomCritical> | undefined {
 	if (!customCritical) return undefined;
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(customCritical)) {
-		if (value.affectSkill) customCriticalFiltered[name] = value;
+		if (value.affectSkill) {
+			let customValue = value.value;
+			if (dollarsValue) {
+				customValue = evaluate(replaceValue(value.value, statistics, dollarsValue));
+				logger.trace(`Custom critical value for ${name} is now ${customValue}`);
+			} else customValue = evaluate(customValue);
+			value.value = customValue.toString();
+			customCriticalFiltered[name] = value;
+		}
 	}
 	if (Object.keys(customCriticalFiltered).length === 0) return undefined;
 	return customCriticalFiltered;
