@@ -142,7 +142,7 @@ export async function repostInThread(
 		msgId: [msg.id, thread.id],
 	};
 	logger.trace("User Data", userTemplate);
-	updateCharactersDb(characters, interaction.guild!.id, userId, ul, {
+	await updateCharactersDb(characters, interaction.guild!.id, userId, ul, {
 		userData: userTemplate,
 	});
 	await registerUser(userRegister, interaction, guildData);
