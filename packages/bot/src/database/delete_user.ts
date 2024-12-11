@@ -34,7 +34,6 @@ export function deleteUserInChar(
 		if (filter.length === 0) characters.delete(guildId, userId);
 		else characters.set(guildId, filter, userId);
 	}
-	logger.trace(characters.get(guildId, userId));
 }
 
 export function deleteIfChannelOrThread(
