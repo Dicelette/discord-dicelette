@@ -1,4 +1,4 @@
-import type { StatisticalTemplate } from "@dicelette/core";
+import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { NoEmbed } from "@dicelette/utils";
@@ -225,4 +225,22 @@ export function removeEmbedsFromList(
 		if (which === "damage") return title !== "embed.dice";
 		if (which === "template") return title !== "embed.template";
 	});
+}
+
+export function createCustomCritical(
+	templateEmbed: Djs.EmbedBuilder,
+	criticalTemplate: Record<string, CustomCritical>
+) {
+	for (const [name, value] of Object.entries(criticalTemplate)) {
+		const effectOnSkill = value.affectSkill ? "(S) " : "";
+		const onNaturalDice = value.onNaturalDice ? "(N) " : "";
+		const tags = `${effectOnSkill}${onNaturalDice}`;
+		const nameCritical = `${tags}${name.capitalize()}`;
+		templateEmbed.addFields({
+			name: nameCritical,
+			value: `\`${value.sign} ${value.value}\``,
+			inline: true,
+		});
+	}
+	return templateEmbed;
 }

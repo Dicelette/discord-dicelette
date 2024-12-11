@@ -3,7 +3,12 @@ import type { PersonnageIds } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { createTemplateEmbed, getEmbeds, getEmbedsList } from "messages";
+import {
+	createCustomCritical,
+	createTemplateEmbed,
+	getEmbeds,
+	getEmbedsList,
+} from "messages";
 import { searchUserChannel } from "utils";
 
 /**
@@ -38,7 +43,7 @@ export async function bulkEditTemplateUser(
 				const userMessages = await thread.messages.fetch(sheetLocation.messageId);
 				const templateEmbed = getEmbeds(ul, userMessages, "template");
 				if (!templateEmbed) continue;
-				const newEmbed = createTemplateEmbed(ul);
+				let newEmbed = createTemplateEmbed(ul);
 				if (template.diceType)
 					newEmbed.addFields({
 						name: ul("common.dice"),
@@ -57,6 +62,9 @@ export async function bulkEditTemplateUser(
 						value: `\`${template.critical.failure}\``,
 						inline: true,
 					});
+				if (template.customCritical) {
+					newEmbed = createCustomCritical(newEmbed, template.customCritical);
+				}
 				const listEmbed = getEmbedsList(
 					ul,
 					{ which: "template", embed: newEmbed },

@@ -3,10 +3,11 @@ import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, UserData } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed, logger } from "@dicelette/utils";
+import { NoEmbed, isNumber, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { showStatistiqueModal } from "features";
 import {
+	createCustomCritical,
 	createDiceEmbed,
 	createEmbedsList,
 	createStatsEmbed,
@@ -153,7 +154,7 @@ export async function validateUser(
 	const stats: Record<string, number> = {};
 	for (const [name, value] of Object.entries(parsedStats ?? {})) {
 		let statValue = Number.parseInt(value, 10);
-		if (Number.isNaN(statValue)) {
+		if (isNumber(statValue)) {
 			statValue = Number.parseInt(
 				value.removeBacktick().split("=")[1].trim().removeBacktick().standardize(),
 				10
@@ -220,16 +221,7 @@ export async function validateUser(
 			});
 		}
 		const criticalTemplate = template.customCritical ?? {};
-		for (const [name, value] of Object.entries(criticalTemplate)) {
-			const nameCritical = value.onNaturalDice
-				? `(N) ${name.capitalize()}`
-				: name.capitalize();
-			templateEmbed.addFields({
-				name: nameCritical,
-				value: `\`${value.sign} ${value.value}\``,
-				inline: true,
-			});
-		}
+		templateEmbed = createCustomCritical(templateEmbed, criticalTemplate);
 	}
 	const allEmbeds = createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed);
 	await repostInThread(

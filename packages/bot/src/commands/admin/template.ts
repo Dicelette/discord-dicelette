@@ -15,6 +15,7 @@ import * as Djs from "discord.js";
 import {
 	bulkDeleteCharacters,
 	bulkEditTemplateUser,
+	createCustomCritical,
 	createDefaultThread,
 	embedError,
 	reply,
@@ -281,7 +282,7 @@ export const registerTemplate = {
 		const components = new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(
 			button
 		);
-		const embedTemplate = new Djs.EmbedBuilder()
+		let embedTemplate = new Djs.EmbedBuilder()
 			.setTitle(ul("register.embed.title"))
 			.setDescription(ul("register.embed.description"))
 			.setThumbnail(
@@ -331,18 +332,8 @@ export const registerTemplate = {
 					value: msgComparator,
 				});
 		}
-		if (templateData.customCritical) {
-			for (const [name, value] of Object.entries(templateData.customCritical)) {
-				const affectSkill = value.affectSkill ? "(S) " : "";
-				const onNaturalDice = value.onNaturalDice ? "(N) " : "";
-				const tags = `${affectSkill}${onNaturalDice}`;
-				const nameCritical = `${tags}${name.capitalize()}`;
-				embedTemplate.addFields({
-					name: nameCritical,
-					value: `\`${value.sign}${value.value}\``,
-				});
-			}
-		}
+		if (templateData.customCritical)
+			embedTemplate = createCustomCritical(embedTemplate, templateData.customCritical);
 		if (templateData.total)
 			embedTemplate.addFields({
 				name: ul("common.total"),
