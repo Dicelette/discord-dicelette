@@ -1,5 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
+import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, UserData } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed, logger } from "@dicelette/utils";
@@ -13,7 +14,6 @@ import {
 	createUserEmbed,
 	embedError,
 	getEmbeds,
-	parseEmbedFields,
 	reply,
 	repostInThread,
 } from "messages";

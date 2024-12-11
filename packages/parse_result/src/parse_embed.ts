@@ -1,5 +1,8 @@
 import type { Critical, CustomCritical } from "@dicelette/core";
 
+import { findln } from "@dicelette/localization";
+import { isNumber } from "@dicelette/utils";
+import type * as Djs from "discord.js";
 import { parseCustomCritical } from "./custom_critical";
 
 export function parseEmbedToCritical(embed: Record<string, string>): {
@@ -28,14 +31,13 @@ export function parseEmbedToStats(
 	if (embed) {
 		stats = {};
 		for (const [name, damageValue] of Object.entries(embed)) {
-			const value = Number.parseInt(damageValue.removeBacktick(), 10);
-			if (Number.isNaN(value)) {
+			if (!isNumber(damageValue)) {
 				//it's a combinaison
 				//remove the `x` = text;
 				const combinaison = damageValue.split("=")[1].trim();
 				if (integrateCombinaison)
 					stats[name.unidecode()] = Number.parseInt(combinaison, 10);
-			} else stats[name.unidecode()] = value;
+			} else stats[name.unidecode()] = Number.parseInt(damageValue, 10);
 		}
 	}
 	return stats;
@@ -48,12 +50,40 @@ export function parseTemplateField(embed: Record<string, string>): {
 		[name: string]: CustomCritical;
 	};
 } {
+	const success = embed?.["roll.critical.success"];
+	const failure = embed?.["roll.critical.failure"];
 	return {
 		diceType: embed?.["common.dice"] || undefined,
 		critical: {
-			success: Number.parseInt(embed?.["roll.critical.success"], 10),
-			failure: Number.parseInt(embed?.["roll.critical.failure"], 10),
+			success: isNumber(success) ? Number.parseInt(success, 10) : undefined,
+			failure: isNumber(failure) ? Number.parseInt(failure, 10) : undefined,
 		},
 		customCritical: parseEmbedToCritical(embed),
 	};
+}
+
+/**
+ * Parse the embed fields and remove the backtick if any
+ */
+export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
+	const fields = embed?.fields;
+	if (!fields) return {};
+	const parsedFields: Record<string, string> = {};
+	for (const field of fields) {
+		parsedFields[findln(field.name.removeBacktick().unidecode(true))] = findln(
+			field.value.removeBacktick()
+		);
+	}
+	return parsedFields;
+}
+
+export function parseDamageFields(embed: Djs.Embed): Record<string, string> {
+	const fields = embed?.fields;
+	if (!fields) return {};
+	const parsedFields: Record<string, string> = {};
+	for (const field of fields) {
+		const { name, value } = field;
+		parsedFields[name.standardize()] = value.standardize().removeBacktick();
+	}
+	return parsedFields;
 }

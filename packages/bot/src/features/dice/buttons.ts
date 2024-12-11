@@ -1,7 +1,8 @@
 import { ln } from "@dicelette/localization";
+import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { getEmbeds, parseEmbedFields } from "messages";
+import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
 
 /**

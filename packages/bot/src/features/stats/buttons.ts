@@ -1,10 +1,11 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
+import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import { isArrayEqual } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
-import { getEmbeds, parseEmbedFields, reply } from "messages";
+import { getEmbeds, reply } from "messages";
 import { allowEdit } from "utils";
 
 /**

@@ -1,5 +1,10 @@
 import { findln, ln } from "@dicelette/localization";
-import { parseEmbedToStats, parseTemplateField } from "@dicelette/parse_result";
+import {
+	parseDamageFields,
+	parseEmbedFields,
+	parseEmbedToStats,
+	parseTemplateField,
+} from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
 	Characters,
@@ -13,14 +18,7 @@ import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { CategoryChannel, type EmbedBuilder } from "discord.js";
-import {
-	embedError,
-	ensureEmbed,
-	getEmbeds,
-	parseDamageFields,
-	parseEmbedFields,
-	reply,
-} from "messages";
+import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import { haveAccess, searchUserChannel } from "utils";
 
 export function getUserByEmbed(

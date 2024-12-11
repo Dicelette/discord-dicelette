@@ -3,6 +3,7 @@ import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { NoEmbed } from "@dicelette/utils";
 import * as Djs from "discord.js";
+
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];
 	if (!oldEmbeds || !oldEmbeds?.fields) throw new NoEmbed();
@@ -103,31 +104,6 @@ export function getEmbeds(
 		if (titleKey === "embed.template" && which === "template")
 			return new Djs.EmbedBuilder(embedJSON);
 	}
-}
-
-/**
- * Parse the embed fields and remove the backtick if any
- */
-export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
-	const fields = embed?.fields;
-	if (!fields) return {};
-	const parsedFields: Record<string, string> = {};
-	for (const field of fields) {
-		parsedFields[findln(field.name.removeBacktick().unidecode(true))] = findln(
-			field.value.removeBacktick()
-		);
-	}
-	return parsedFields;
-}
-
-export function parseDamageFields(embed: Djs.Embed): Record<string, string> {
-	const fields = embed?.fields;
-	if (!fields) return {};
-	const parsedFields: Record<string, string> = {};
-	for (const field of fields) {
-		parsedFields[field.name.standardize()] = field.value.standardize().removeBacktick();
-	}
-	return parsedFields;
 }
 
 /**

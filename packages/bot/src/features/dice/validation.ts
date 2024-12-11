@@ -1,4 +1,5 @@
 import { evalStatsDice, roll } from "@dicelette/core";
+import { parseEmbedFields } from "@dicelette/parse_result";
 import type { UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
@@ -9,7 +10,6 @@ import {
 	displayOldAndNewStats,
 	getEmbeds,
 	getEmbedsList,
-	parseEmbedFields,
 	removeEmbedsFromList,
 	reply,
 	sendLogs,
