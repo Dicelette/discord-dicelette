@@ -1,3 +1,5 @@
+// noinspection ES6MissingAwait
+
 import process from "node:process";
 import type { Settings, UserData } from "@dicelette/types";
 import { important, logger } from "@dicelette/utils";
@@ -45,7 +47,7 @@ export default (client: EClient): void => {
 			);
 
 			convertDatabaseUser(client.settings, guild);
-			logger.silly(`User saved in memory for ${guild.name}`);
+			logger.info(`User saved in memory for ${guild.name}`);
 			await fetchAllCharacter(client, guild);
 		}
 		important.info("Bot is ready");

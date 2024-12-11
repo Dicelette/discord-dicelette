@@ -71,7 +71,7 @@ function cleanUserDB(
 		const charDeleted = data.find((char) => {
 			return char.messageId[1] === thread.id;
 		});
-		logger.silly(
+		logger.trace(
 			`Deleted ${data.length - filterChar.length} characters for user ${user}`
 		);
 		if (filterChar.length === 0) {

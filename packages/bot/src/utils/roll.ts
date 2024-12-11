@@ -76,7 +76,7 @@ export async function rollWithInteraction(
 		| string
 		| boolean
 		| undefined;
-	logger.debug(
+	logger.trace(
 		`hideResultConfig: ${hideResultConfig} - disable thread: ${disableThread}; rollChannel: ${rollChannel}`
 	);
 	const hidden = hideResult && hideResultConfig;

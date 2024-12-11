@@ -64,7 +64,7 @@ export const onDeleteMessage = (client: EClient): void => {
 							channelId: value.messageId[1],
 						};
 						if (persoId.messageId === messageId && persoId.channelId === channel.id) {
-							logger.silly(`Deleted character ${value.charName} for user ${user}`);
+							logger.info(`Deleted character ${value.charName} for user ${user}`);
 							values.splice(index, 1);
 							//delete in characters database
 							deleteUserInChar(client.characters, user, guildID, value.charName);

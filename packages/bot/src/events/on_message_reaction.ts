@@ -13,7 +13,7 @@ export const onReactionAdd = (client: EClient): void => {
 				return;
 			}
 		}
-		logger.silly(
+		logger.trace(
 			`${user.globalName} reacted with "${reaction.emoji.name}" on message ${reaction.message.id}`
 		);
 		if (!reaction.message.guild) return;
@@ -29,7 +29,7 @@ export const onReactionAdd = (client: EClient): void => {
 		}
 		if (reaction.emoji.name === "🔗") {
 			//add button to the message
-			logger.debug("Adding button 🔗 to the message");
+			logger.trace("Adding button 🔗 to the message");
 			const lang =
 				client.settings.get(reaction.message.guild.id, "lang") ??
 				reaction.message.guild?.preferredLocale ??
@@ -101,7 +101,7 @@ async function copyReaction(reaction: Djs.MessageReaction | Djs.PartialMessageRe
 	try {
 		await messageToCopy.react(reaction.emoji);
 	} catch (error) {
-		logger.debug(error);
+		logger.trace(error);
 	}
 }
 
@@ -115,7 +115,7 @@ export const onReactionRemove = (client: EClient): void => {
 				return;
 			}
 		}
-		logger.silly(
+		logger.trace(
 			`${user.globalName} removed reaction "${reaction.emoji.name}" from message ${reaction.message.id}`
 		);
 		if (!reaction.message.guild) return;
