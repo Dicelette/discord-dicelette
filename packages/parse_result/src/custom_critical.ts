@@ -17,12 +17,15 @@ export function parseCustomCritical(
 	const { sign, value } = match.groups || {};
 	if (!name || !sign || !value) return;
 	const onNaturalDice = name.startsWith("(N)");
-	const nameStr = onNaturalDice ? name.replace("(N)", "") : name;
+	let nameStr = onNaturalDice ? name.replace("(N)", "") : name;
+	const affectSkill = nameStr.includes("(S)");
+	nameStr = nameStr.replace("(S)", "");
 	return {
-		[nameStr.trimAll()]: {
+		[nameStr.standardize()]: {
 			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
-			value: value.trimAll(),
+			value: value.standardize(),
 			onNaturalDice,
+			affectSkill,
 		},
 	};
 }

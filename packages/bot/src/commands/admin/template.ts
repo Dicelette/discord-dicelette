@@ -333,12 +333,10 @@ export const registerTemplate = {
 		}
 		if (templateData.customCritical) {
 			for (const [name, value] of Object.entries(templateData.customCritical)) {
-				const affectSkill = value.affectSkill ? "(S)" : "";
-				const onNaturalDice = value.onNaturalDice ? " (N) " : "";
+				const affectSkill = value.affectSkill ? "(S) " : "";
+				const onNaturalDice = value.onNaturalDice ? "(N) " : "";
 				const tags = `${affectSkill}${onNaturalDice}`;
-				const nameCritical = value.onNaturalDice
-					? `${tags}${name.capitalize()}`
-					: name.capitalize();
+				const nameCritical = `${tags}${name.capitalize()}`;
 				embedTemplate.addFields({
 					name: nameCritical,
 					value: `\`${value.sign}${value.value}\``,
