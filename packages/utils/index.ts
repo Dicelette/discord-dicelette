@@ -50,4 +50,11 @@ export function isArrayEqual(array1: string[] | undefined, array2: string[] | un
 	);
 }
 
+export const isNumber = (value: unknown): boolean =>
+	value !== undefined &&
+	(typeof value === "number" ||
+		(!Number.isNaN(Number(value)) &&
+			typeof value === "string" &&
+			value.trim().length > 0));
+
 export * from "./src/errors";

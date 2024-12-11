@@ -4,6 +4,7 @@ import {
 	replaceFormulaInDice,
 	roll,
 } from "@dicelette/core";
+import { isNumber } from "@dicelette/utils";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
 
@@ -34,9 +35,6 @@ export function getModif(
 	statistics?: Record<string, number>,
 	statValue?: number
 ): string {
-	const isNumber = (value: unknown): boolean =>
-		typeof value === "number" ||
-		(!Number.isNaN(Number(value)) && typeof value === "string");
 	if (isNumber(modif)) {
 		const res = Number.parseInt(modif, 10);
 		if (res > 0) return `+${res}`;
