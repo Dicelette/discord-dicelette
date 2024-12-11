@@ -1,10 +1,10 @@
-import moment from "moment";
 import {
 	type Resultat,
 	generateStatsDice,
 	replaceFormulaInDice,
 	roll,
-} from "../../../../core";
+} from "@dicelette/core";
+import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
 
 export function timestamp(time?: boolean) {

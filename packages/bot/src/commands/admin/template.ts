@@ -314,27 +314,30 @@ export const registerTemplate = {
 				});
 			}
 		}
-
 		if (templateData.diceType)
 			embedTemplate.addFields({
 				name: ul("common.dice").capitalize(),
 				value: `\`${templateData.diceType}\``,
 			});
-		let msgComparator = "";
 		if (templateData.critical) {
-			if (templateData.critical.success)
+			let msgComparator = "";
+			if (templateData.critical?.success)
 				msgComparator += `- ${ul("roll.critical.success")}${ul("common.space")}: \`${templateData.critical.success}\`\n`;
-			if (templateData.critical.failure)
+			if (templateData.critical?.failure)
 				msgComparator += `- ${ul("roll.critical.failure")}${ul("common.space")}: \`${templateData.critical.failure}\`\n`;
-			embedTemplate.addFields({
-				name: ul("register.embed.comparator"),
-				value: msgComparator,
-			});
+			if (msgComparator.length > 0)
+				embedTemplate.addFields({
+					name: ul("register.embed.comparator"),
+					value: msgComparator,
+				});
 		}
 		if (templateData.customCritical) {
 			for (const [name, value] of Object.entries(templateData.customCritical)) {
+				const affectSkill = value.affectSkill ? "(S)" : "";
+				const onNaturalDice = value.onNaturalDice ? " (N) " : "";
+				const tags = `${affectSkill}${onNaturalDice}`;
 				const nameCritical = value.onNaturalDice
-					? `(N) ${name.capitalize()}`
+					? `${tags}${name.capitalize()}`
 					: name.capitalize();
 				embedTemplate.addFields({
 					name: nameCritical,
