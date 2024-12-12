@@ -71,7 +71,7 @@ export function skillCustomCritical(
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(customCritical)) {
 		if (value.affectSkill) {
-			value.value = evaluate(replaceValue(value.value, statistics, dollarsValue));
+			value.value = replaceValue(value.value, statistics, dollarsValue);
 			logger.trace(`Custom critical value for ${name} is now ${value.value}`);
 			customCriticalFiltered[name] = rollOneCustomCritical(value);
 		}
