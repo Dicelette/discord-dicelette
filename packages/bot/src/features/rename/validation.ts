@@ -47,7 +47,7 @@ export async function validateRename(
 	if (!guildData) return;
 	//update the characters database
 	//remove the old chara
-	updateCharactersDb(client.characters, interaction.guild!.id, userId, ul, {
+	await updateCharactersDb(client.characters, interaction.guild!.id, userId, ul, {
 		userData: charData,
 	});
 	await rename(

@@ -264,7 +264,7 @@ export const graph = {
 					await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
 					return;
 				}
-				updateCharactersDb(client.characters, interaction.guild.id, userId, ul, {
+				await updateCharactersDb(client.characters, interaction.guild.id, userId, ul, {
 					message,
 				});
 			}

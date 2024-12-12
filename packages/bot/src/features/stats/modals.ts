@@ -228,7 +228,7 @@ export async function editStats(
 		interaction.message
 	);
 	await interaction.message.edit({ embeds: list });
-	updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
+	await updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
 	});
 	await reply(interaction, { content: ul("embed.edit.stats"), ephemeral: true });

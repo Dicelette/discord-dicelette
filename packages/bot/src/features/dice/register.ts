@@ -179,7 +179,7 @@ export async function registerDamageDice(
 			msgId: [interaction.message.id, interaction.message.channel.id],
 		};
 		await registerUser(userRegister, interaction, db, false);
-		updateCharactersDb(client.characters, interaction.guild.id, userID, ul, {
+		await updateCharactersDb(client.characters, interaction.guild.id, userID, ul, {
 			embeds: allEmbeds,
 		});
 	} else {

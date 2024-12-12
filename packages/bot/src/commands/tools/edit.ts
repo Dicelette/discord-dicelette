@@ -361,7 +361,7 @@ export async function move(
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
 	};
-	moveUserInDatabase(
+	await moveUserInDatabase(
 		client,
 		interaction.guild!,
 		newUser.id,
