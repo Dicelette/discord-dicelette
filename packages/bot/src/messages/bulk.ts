@@ -1,7 +1,9 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { PersonnageIds } from "@dicelette/types";
-import type { Settings, Translation } from "@dicelette/types";
+import type { Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
+import type { EClient } from "client";
+import { updateCharactersDb } from "database";
 import * as Djs from "discord.js";
 import {
 	createCustomCritical,
@@ -13,7 +15,7 @@ import { searchUserChannel } from "utils";
 
 /**
  * Update the template of existing user when the template is edited by moderation
- * @param guildData {GuildData}
+ * @param client
  * @param interaction {Djs.CommandInteraction}
  * @param ul {Translation}
  * @param template {StatisticalTemplate}
@@ -80,16 +82,17 @@ export async function bulkEditTemplateUser(
 
 /**
  * Delete all characters from the guild
- * @param guildData {Settings}
+ * @param client
  * @param interaction {Djs.CommandInteraction}
  * @param ul {Translation}
  */
 export async function bulkDeleteCharacters(
-	guildData: Settings,
+	client: EClient,
 	interaction: Djs.CommandInteraction,
 	ul: Translation
 ) {
 	//first add a warning using buttons
+	const guildData = client.settings;
 	const msg = ul("register.delete.confirm");
 	const embed = new Djs.EmbedBuilder()
 		.setTitle(ul("deleteChar.confirm.title"))
@@ -117,7 +120,9 @@ export async function bulkDeleteCharacters(
 			time: 60_000,
 		});
 		if (confirm.customId === "delete_all_confirm") {
+			await deleteMessageChar(client, interaction, ul);
 			guildData.delete(interaction.guild!.id, "user");
+			client.characters.delete(interaction.guild!.id);
 			await rep.edit({
 				components: [],
 				content: ul("register.delete.done"),
@@ -130,4 +135,25 @@ export async function bulkDeleteCharacters(
 		logger.error(err);
 	}
 	return;
+}
+
+async function deleteMessageChar(
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	ul: Translation
+) {
+	const guildData = client.settings;
+	const users = guildData.get(interaction.guild!.id, "user");
+	for (const [, userData] of Object.entries(users ?? {})) {
+		for (const character of userData) {
+			const [messageId, channelId] = character.messageId;
+			const thread = await searchUserChannel(guildData, interaction, ul, channelId);
+			if (!thread) continue;
+			try {
+				await thread.messages.delete(messageId);
+			} catch (err) {
+				logger.error(err);
+			}
+		}
+	}
 }

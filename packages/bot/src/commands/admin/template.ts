@@ -420,7 +420,7 @@ export const registerTemplate = {
 			files: downloadTutorialImages(),
 		});
 		if (options.getBoolean(t("register.options.update.name")))
-			await bulkEditTemplateUser(client.settings, interaction, ul, templateData);
+			await bulkEditTemplateUser(client, interaction, ul, templateData);
 		else if (options.getBoolean(t("register.options.delete.name")))
 			await bulkDeleteCharacters(client.settings, interaction, ul);
 	},
