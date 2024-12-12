@@ -15,7 +15,6 @@ import {
 	skillCustomCritical,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import {
@@ -77,9 +76,6 @@ export async function rollWithInteraction(
 		| string
 		| boolean
 		| undefined;
-	logger.trace(
-		`hideResultConfig: ${hideResultConfig} - disable thread: ${disableThread}; rollChannel: ${rollChannel}`
-	);
 	const hidden = hideResult && hideResultConfig;
 	let isHidden: undefined | string = undefined;
 	if (hidden) {
@@ -195,11 +191,17 @@ export async function rollDice(
 		dice = dice.replace(comparatorMatch[0], "");
 		comparator = comparatorMatch[0];
 	}
-	comparator = replaceValue(comparator, userStatistique.stats);
-	const roll = `${dice.trimAll()}${modificatorString}${comparator} ${comments}`;
+
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
-	if (dollarValue)
-		infoRoll.name = infoRoll.name.replace(/\((?<formula>.+)\)/, "").trimEnd();
+	if (dollarValue) {
+		if (dollarValue.diceResult)
+			infoRoll.name = infoRoll.name
+				.replace(/\((?<formula>.+)\)/, `(\`${dollarValue.diceResult}\`)`)
+				.trimEnd();
+		else infoRoll.name = infoRoll.name.replace(/\((?<formula>.+)\)/, "").trimEnd();
+	}
+	comparator = replaceValue(comparator, userStatistique.stats, dollarValue?.total);
+	const roll = `${dice.trimAll()}${modificatorString}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
 		roll,
@@ -213,7 +215,7 @@ export async function rollDice(
 		skillCustomCritical(
 			userStatistique.template.customCritical,
 			userStatistique.stats,
-			dollarValue
+			dollarValue?.total
 		)
 	);
 }
@@ -273,6 +275,7 @@ export async function rollStatistique(
 			dice += overrideMatch[0];
 		}
 	}
+
 	const modificationString = getModif(modification, userStatistique.stats, userStat);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
@@ -282,7 +285,6 @@ export async function rollStatistique(
 		comparator = comparatorMatch[0];
 	}
 	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${replaceValue(comparator, userStatistique.stats, userStat)} ${comments}`;
-	logger.trace(`Rolling: ${roll}`);
 	const customCritical = template.customCritical
 		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
