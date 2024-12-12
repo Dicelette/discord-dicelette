@@ -422,7 +422,7 @@ export const registerTemplate = {
 		if (options.getBoolean(t("register.options.update.name")))
 			await bulkEditTemplateUser(client, interaction, ul, templateData);
 		else if (options.getBoolean(t("register.options.delete.name")))
-			await bulkDeleteCharacters(client.settings, interaction, ul);
+			await bulkDeleteCharacters(client, interaction, ul);
 	},
 };
 
