@@ -30,7 +30,7 @@ export function parseCustomCritical(
 	};
 }
 
-export function convertCustomCriticalValue(
+export function rollCustomCritical(
 	custom: Record<string, CustomCritical>,
 	statValue?: number,
 	statistics?: Record<string, number>
@@ -65,15 +65,13 @@ export function filterCustomCritical(
 	statistics?: Record<string, number>,
 	dollarsValue?: string | number
 ): Record<string, CustomCritical> | undefined {
-	if (!customCritical) return undefined;
+	if (!customCritical || !dollarsValue) return undefined;
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(customCritical)) {
 		if (value.affectSkill) {
 			let customValue = value.value;
-			if (dollarsValue) {
-				customValue = evaluate(replaceValue(value.value, statistics, dollarsValue));
-				logger.trace(`Custom critical value for ${name} is now ${customValue}`);
-			} else customValue = evaluate(customValue);
+			customValue = evaluate(replaceValue(value.value, statistics, dollarsValue));
+			logger.trace(`Custom critical value for ${name} is now ${customValue}`);
 			value.value = customValue.toString();
 			customCriticalFiltered[name] = value;
 		}
