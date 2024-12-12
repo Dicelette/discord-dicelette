@@ -83,7 +83,9 @@ type UserGuildData = {
 	damageName?: string[];
 	isPrivate?: boolean;
 };
-
+/**
+ * `[messageId, channelId]`
+ */
 export type UserMessageId = [string, string];
 
 export type PersonnageIds = { channelId: string; messageId: string };
