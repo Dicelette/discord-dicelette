@@ -21,11 +21,12 @@ import { searchUserChannel } from "utils";
  * @param template {StatisticalTemplate}
  */
 export async function bulkEditTemplateUser(
-	guildData: Settings,
+	client: EClient,
 	interaction: Djs.CommandInteraction,
 	ul: Translation,
 	template: StatisticalTemplate
 ) {
+	const guildData = client.settings;
 	const users = guildData.get(interaction.guild!.id, "user");
 
 	for (const userID in users) {
@@ -73,6 +74,9 @@ export async function bulkEditTemplateUser(
 					userMessages
 				);
 				await userMessages.edit({ embeds: listEmbed.list });
+				await updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+					embeds: listEmbed.list,
+				});
 			} catch {
 				//pass
 			}
