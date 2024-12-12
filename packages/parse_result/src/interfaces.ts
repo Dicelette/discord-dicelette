@@ -7,8 +7,3 @@ export interface Server {
 	userId?: string;
 	config?: Partial<GuildData>;
 }
-
-export type RollResult = {
-	error?: boolean;
-	result: string;
-};
