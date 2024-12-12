@@ -30,6 +30,25 @@ export function parseCustomCritical(
 	};
 }
 
+function rollOneCustomCritical(critical: CustomCritical) {
+	const rolledValue = roll(critical.value);
+	if (rolledValue?.total)
+		return {
+			onNaturalDice: critical.onNaturalDice,
+			sign: critical.sign,
+			value: rolledValue.total.toString(),
+			dice: {
+				originalDice: rolledValue.dice,
+				rollValue: rolledValue.result,
+			},
+		};
+	return {
+		onNaturalDice: critical.onNaturalDice,
+		sign: critical.sign,
+		value: evaluate(critical.value).toString(),
+	};
+}
+
 export function rollCustomCritical(
 	custom: Record<string, CustomCritical>,
 	statValue?: number,
@@ -37,30 +56,13 @@ export function rollCustomCritical(
 ) {
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
-		const replacedValue = replaceValue(value.value, statistics, statValue);
-		const rolledValue = roll(replacedValue);
-		if (rolledValue?.total)
-			customCritical[name] = {
-				onNaturalDice: value.onNaturalDice,
-				sign: value.sign,
-				value: rolledValue.total.toString(),
-				dice: {
-					originalDice: rolledValue.dice,
-					rollValue: rolledValue.result,
-				},
-			};
-		else {
-			customCritical[name] = {
-				onNaturalDice: value.onNaturalDice,
-				sign: value.sign,
-				value: evaluate(replacedValue).toString(),
-			};
-		}
+		value.value = replaceValue(value.value, statistics, statValue);
+		customCritical[name] = rollOneCustomCritical(value);
 	}
 	return customCritical;
 }
 
-export function filterCustomCritical(
+export function skillCustomCritical(
 	customCritical?: Record<string, CustomCritical>,
 	statistics?: Record<string, number>,
 	dollarsValue?: string | number
@@ -69,11 +71,9 @@ export function filterCustomCritical(
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(customCritical)) {
 		if (value.affectSkill) {
-			let customValue = value.value;
-			customValue = evaluate(replaceValue(value.value, statistics, dollarsValue));
-			logger.trace(`Custom critical value for ${name} is now ${customValue}`);
-			value.value = customValue.toString();
-			customCriticalFiltered[name] = value;
+			value.value = evaluate(replaceValue(value.value, statistics, dollarsValue));
+			logger.trace(`Custom critical value for ${name} is now ${value.value}`);
+			customCriticalFiltered[name] = rollOneCustomCritical(value);
 		}
 	}
 	if (Object.keys(customCriticalFiltered).length === 0) return undefined;
