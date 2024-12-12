@@ -8,11 +8,11 @@ import {
 	ResultAsText,
 	type Server,
 	convertNameToValue,
-	filterCustomCritical,
 	getModif,
 	getRoll,
 	replaceValue,
 	rollCustomCritical,
+	skillCustomCritical,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -210,7 +210,7 @@ export async function rollDice(
 		charOptions,
 		infoRoll,
 		hideResult,
-		filterCustomCritical(
+		skillCustomCritical(
 			userStatistique.template.customCritical,
 			userStatistique.stats,
 			dollarValue
