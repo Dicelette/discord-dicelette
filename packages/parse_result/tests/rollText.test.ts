@@ -1,7 +1,7 @@
 import type { CustomCritical, Resultat } from "@dicelette/core";
 import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
-import { convertCustomCriticalValue } from "../src/custom_critical";
+import { rollCustomCritical } from "../src/custom_critical";
 import type { Server } from "../src/interfaces";
 import { ResultAsText } from "../src/result_as_text";
 import { getRoll } from "../src/utils";
@@ -46,7 +46,7 @@ describe("custom critical roll", () => {
 		sign: "<=",
 	};
 	it("replace the value with the stats", () => {
-		const result = convertCustomCriticalValue({ test: customCritical }, 6);
+		const result = rollCustomCritical({ test: customCritical }, 6);
 		expect(result.test.dice?.originalDice).toBe("round(6/2)+1d8");
 	});
 	it("replace the value with the stats with name");
@@ -58,11 +58,7 @@ describe("custom critical roll", () => {
 			value: "round($/2)+test",
 			sign: "<",
 		};
-		const result = convertCustomCriticalValue(
-			{ test: customCritical },
-			statValue,
-			userStats
-		);
+		const result = rollCustomCritical({ test: customCritical }, statValue, userStats);
 		expect(result.test.dice?.originalDice).toBe("round(5/2)+6");
 	}
 	it("should display the name of critical roll", () => {
@@ -75,7 +71,7 @@ describe("custom critical roll", () => {
 			result: "1d20: [1] = 1",
 			total: 1,
 		};
-		const critical = convertCustomCriticalValue({ test: customCritical }, 6);
+		const critical = rollCustomCritical({ test: customCritical }, 6);
 		const res = new ResultAsText(
 			result,
 			data,

@@ -7,12 +7,12 @@ import { ln, t } from "@dicelette/localization";
 import {
 	ResultAsText,
 	type Server,
-	convertCustomCriticalValue,
 	convertNameToValue,
 	filterCustomCritical,
 	getModif,
 	getRoll,
 	replaceValue,
+	rollCustomCritical,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -284,7 +284,7 @@ export async function rollStatistique(
 	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${replaceValue(comparator, userStatistique.stats, userStat)} ${comments}`;
 	logger.trace(`Rolling: ${roll}`);
 	const customCritical = template.customCritical
-		? convertCustomCriticalValue(template.customCritical, userStat, userStatistique.stats)
+		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
 	await rollWithInteraction(
 		interaction,
