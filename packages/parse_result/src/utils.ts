@@ -59,12 +59,19 @@ export function replaceValue(
 export function convertNameToValue(
 	diceName: string,
 	statistics?: Record<string, number>
-) {
-	if (!statistics) return diceName;
+): Partial<{ total: string; diceResult: string }> | undefined {
+	if (!statistics) return undefined;
 	const formule = /\((?<formula>.+)\)/gm;
 	const match = formule.exec(diceName);
 	if (!match) return undefined;
 	const { formula } = match.groups || {};
 	if (!formula) return undefined;
-	return replaceValue(formula, statistics);
+	const result = replaceValue(formula, statistics);
+	const isRoll = getRoll(result);
+	if (isRoll?.total)
+		return {
+			total: isRoll.total.toString(),
+			diceResult: isRoll.result,
+		};
+	return { total: result };
 }
