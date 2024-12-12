@@ -121,7 +121,6 @@ export class ResultAsText {
 				if (tot) {
 					total = Number.parseInt(tot[1], 10);
 				}
-
 				successOrFailure = evaluate(
 					`${total} ${this.resultat.compare.sign} ${this.resultat.compare.value}`
 				)
@@ -215,7 +214,9 @@ export class ResultAsText {
 
 	private compareValue(compare?: Compare, lastChar?: string) {
 		const char = lastChar ? lastChar : "";
-		if (compare?.rollValue) return `${char}${compare.rollValue}`;
+		if (compare?.rollValue && !compare.originalDice)
+			return `${compare.rollValue} ═ ${compare.value}${char}`;
+		if (compare?.rollValue) return `${compare.rollValue.replaceAll("=", "═")}${char}`;
 		if (compare?.value) return `${compare.value}${char}`;
 		return `${this.resultat?.compare?.value}${char}`;
 	}
