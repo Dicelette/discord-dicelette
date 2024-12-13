@@ -71,6 +71,7 @@ export interface GuildData {
 		channelId: string;
 		messageId: string;
 		statsName: string[];
+		excludedStats: string[];
 		damageName: string[];
 		valid?: boolean;
 	};

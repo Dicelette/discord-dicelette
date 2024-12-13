@@ -374,6 +374,11 @@ export const registerTemplate = {
 		const statsName = templateData.statistics
 			? Object.keys(templateData.statistics)
 			: undefined;
+		const excludedStats = templateData.statistics
+			? Object.keys(
+					Object.entries(templateData.statistics).filter(([_, value]) => !value.exclude)
+				)
+			: undefined;
 		const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;
 		if (json) {
 			if (json?.templateID?.messageId && json.templateID?.channelId) {
@@ -394,6 +399,7 @@ export const registerTemplate = {
 				messageId: msg.id,
 				statsName: statsName ?? [],
 				damageName: damageName ?? [],
+				excludedStats: excludedStats ?? [],
 				valid: true,
 			};
 			json.managerId = publicChannel.id;
@@ -410,6 +416,7 @@ export const registerTemplate = {
 					statsName: statsName ?? [],
 					damageName: damageName ?? [],
 					valid: true,
+					excludedStats: excludedStats ?? [],
 				},
 				user: {},
 			};

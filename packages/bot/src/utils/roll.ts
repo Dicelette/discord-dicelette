@@ -232,6 +232,14 @@ export async function rollStatistique(
 ) {
 	let statistic = options.getString(t("common.statistic"), true);
 	let standardizedStatistic = statistic.standardize(true);
+	//return if the standardizedStatistic is excluded from the list
+	const excludedStats = client.settings
+		.get(interaction.guild!.id, "templateID.excludedStats")
+		?.map((stat) => stat.standardize());
+	if (excludedStats?.includes(standardizedStatistic)) {
+		await reply(interaction, { content: ul("error.excludedStat"), ephemeral: true });
+		return;
+	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
 	const comments = options.getString(t("dbRoll.options.comments.name")) ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));

@@ -570,7 +570,8 @@ async function display(
 	let templateEmbed: undefined | Djs.EmbedBuilder = undefined;
 	if (guildSettings.templateID) {
 		const templateID = guildSettings.templateID;
-		const { channelId, messageId, statsName, damageName } = templateID ?? {};
+		const { channelId, messageId, statsName, damageName, excludedStats } =
+			templateID ?? {};
 		if (messageId && messageId.length > 0 && channelId && channelId.length > 0) {
 			templateEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("config.template"))
@@ -582,11 +583,19 @@ async function display(
 					name: ul("config.templateMessage"),
 					value: `https://discord.com/channels/${interaction.guild!.id}/${channelId}/${messageId}`,
 				});
-
+			const excluded =
+				excludedStats?.length > 0 ? excludedStats.join("\n- ") : ul("common.no");
+			const filteredStats = statsName?.filter((stat) => !excludedStats?.includes(stat));
 			if (statsName && statsName.length > 0) {
 				templateEmbed.addFields({
 					name: ul("config.statsName"),
-					value: `- ${statsName.join("\n- ")}`,
+					value: `- ${filteredStats.join("\n- ")}`,
+				});
+			}
+			if (excludedStats && excludedStats.length > 0) {
+				templateEmbed.addFields({
+					name: ul("config.excludedStats"),
+					value: `- ${excluded}`,
 				});
 			}
 			if (damageName && damageName.length > 0) {
