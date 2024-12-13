@@ -1,9 +1,4 @@
-import {
-	type Resultat,
-	generateStatsDice,
-	replaceFormulaInDice,
-	roll,
-} from "@dicelette/core";
+import { type Resultat, generateStatsDice, roll } from "@dicelette/core";
 import { isNumber } from "@dicelette/utils";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
@@ -41,19 +36,9 @@ export function getModif(
 		if (res < 0) return `${res}`;
 		return "";
 	}
-	modif = replaceValue(modif, statistics, statValue);
+	modif = generateStatsDice(modif, statistics, statValue?.toString());
 	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
 	return modif;
-}
-
-export function replaceValue(
-	modif: string,
-	statistics?: Record<string, number>,
-	statValue?: number | string
-) {
-	if (statValue) modif = modif.replaceAll("$", statValue.toString());
-	if (statistics) modif = generateStatsDice(modif, statistics);
-	return replaceFormulaInDice(modif);
 }
 
 export function convertNameToValue(
@@ -66,7 +51,7 @@ export function convertNameToValue(
 	if (!match) return undefined;
 	const { formula } = match.groups || {};
 	if (!formula) return undefined;
-	const result = replaceValue(formula, statistics);
+	const result = generateStatsDice(formula, statistics);
 	const isRoll = getRoll(result);
 	if (isRoll?.total)
 		return {

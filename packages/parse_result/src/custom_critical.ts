@@ -1,7 +1,7 @@
-import type { CustomCritical } from "@dicelette/core";
+import { type CustomCritical, generateStatsDice } from "@dicelette/core";
 import type { CustomCriticalRoll } from "@dicelette/types";
 import { evaluate } from "mathjs";
-import { getRoll, replaceValue } from "./utils";
+import { getRoll } from "./utils";
 
 /**
  * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`
@@ -57,7 +57,7 @@ export function rollCustomCritical(
 ) {
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
-		value.value = replaceValue(value.value, statistics, statValue);
+		value.value = generateStatsDice(value.value, statistics, statValue?.toString());
 		customCritical[name] = rollOneCustomCritical(value);
 	}
 	return customCritical;
@@ -73,7 +73,7 @@ export function skillCustomCritical(
 	for (const [name, value] of Object.entries(customCritical)) {
 		if (!dollarsValue && !value.value.includes("$")) continue;
 		if (value.affectSkill) {
-			value.value = replaceValue(value.value, statistics, dollarsValue);
+			value.value = generateStatsDice(value.value, statistics, dollarsValue?.toString());
 			customCriticalFiltered[name] = rollOneCustomCritical(value);
 		}
 	}
