@@ -41,16 +41,57 @@ export function getModif(
 	return modif;
 }
 
+export function replaceStatInDice(
+	diceName: string,
+	statistics?: Record<string, number>,
+	customReplacement?: string
+) {
+	const originalDice = diceName;
+	const statName = Object.keys(statistics ?? {})
+		.map((key) => key.removeAccents().toLowerCase())
+		.join("|");
+	if (!statName) return originalDice;
+
+	// Regex pour détecter les parenthèses avec un contenu matchant un des noms dans "statName"
+	const regex = new RegExp(`\\((${statName})\\)`, "gi");
+
+	// Standardiser le texte du dé pour trouver l'emplacement du match
+	const standardizedDice = originalDice.standardize();
+	const match = regex.exec(standardizedDice);
+	if (!match) return originalDice;
+
+	// Calculer l'emplacement du match dans le texte original
+	const startIndex = standardizedDice.indexOf(match[0]);
+	const endIndex = startIndex + match[0].length;
+
+	// Utiliser le remplacement personnalisé ou la valeur statistique
+	const statKey = match[1].removeAccents().toLowerCase().trim();
+	const replacementValue = customReplacement ?? statistics?.[statKey];
+
+	if (replacementValue === undefined) return originalDice;
+
+	// Remplacer uniquement l'emplacement correspondant dans le texte original
+	let result = "";
+	if (replacementValue?.toString().length === 0)
+		result = originalDice.slice(0, startIndex) + originalDice.slice(endIndex);
+	else
+		result = `${originalDice.slice(0, startIndex)}(${replacementValue})${originalDice.slice(endIndex)}`;
+
+	return result.trim(); // Nettoyer les espaces résiduels
+}
+
 export function convertNameToValue(
 	diceName: string,
 	statistics?: Record<string, number>
 ): Partial<{ total: string; diceResult: string }> | undefined {
 	if (!statistics) return undefined;
-	const formule = /\((?<formula>.+)\)/gm;
-	const match = formule.exec(diceName);
+	const statName = Object.keys(statistics).join("|");
+	const formule = new RegExp(`\\((?<formula>${statName})\\)`, "i");
+	const match = formule.exec(diceName.standardize());
 	if (!match) return undefined;
 	const { formula } = match.groups || {};
 	if (!formula) return undefined;
+
 	const result = generateStatsDice(formula, statistics);
 	const isRoll = getRoll(result);
 	if (isRoll?.total)
