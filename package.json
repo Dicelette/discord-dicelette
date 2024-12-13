@@ -41,7 +41,7 @@
 		"vitest": "^2.1.8"
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.9.0",
+		"@dicelette/core": "^1.9.1",
 		"@types/node": "^22.10.1",
 		"dedent": "^1.5.3",
 		"discord.js": "^14.16.3",
