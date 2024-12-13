@@ -96,13 +96,6 @@ export function getCharaInMemory(
 	const getChara = characters.get(guildID, userID);
 	const found = getChara?.find((char) => char.userName?.subText(charName, true));
 	logger.trace(`Found ${charName} in memory`, found);
-	//set all statname in stats uniformized
-	if (found?.stats)
-		found.stats = uniformizeRecords(found.stats) as Record<string, number>;
-
-	if (found?.damage)
-		found.damage = uniformizeRecords(found.damage) as Record<string, string>;
-
 	return found;
 }
 
@@ -339,6 +332,10 @@ export async function updateCharactersDb(
 		else return;
 		if (!userData) return;
 	}
+	if (userData.damage)
+		userData.damage = uniformizeRecords(userData.damage) as Record<string, string>;
+	if (userData.stats)
+		userData.stats = uniformizeRecords(userData.stats) as Record<string, number>;
 	const userChar = characters.get(guildId, userID);
 	if (userChar) {
 		const findChar = userChar.find((char) =>
