@@ -1,6 +1,7 @@
 import {
 	COMMENT_REGEX,
 	type Compare,
+	type ComparedValue,
 	type CustomCritical,
 	type Resultat,
 } from "@dicelette/core";
@@ -20,22 +21,20 @@ export class ResultAsText {
 	private readonly charName?: string;
 	private readonly infoRoll?: { name: string; standardized: string };
 	private readonly resultat?: Resultat;
-	private readonly modificator?: string | number = 0;
+
 	constructor(
 		result: Resultat | undefined,
 		data: Server,
 		critical?: { failure?: number; success?: number },
 		charName?: string,
 		infoRoll?: { name: string; standardized: string },
-		customCritical?: Record<string, CustomCritical>,
-		modificator?: string | number
+		customCritical?: Record<string, CustomCritical>
 	) {
 		this.data = data;
 		this.infoRoll = infoRoll;
 		this.ul = ln(data.lang);
 		this.resultat = result;
 		let parser = "";
-		this.modificator = modificator ?? 0;
 		if (!result) {
 			this.error = true;
 			this.output = this.ul("roll.error");
@@ -212,7 +211,7 @@ export class ResultAsText {
 		return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
 	}
 
-	private compareValue(compare?: Compare, lastChar?: string) {
+	private compareValue(compare?: ComparedValue, lastChar?: string) {
 		const char = lastChar ? lastChar : "";
 		if (compare?.rollValue && !compare.originalDice)
 			return `${compare.rollValue} ═ ${compare.value}${char}`;
@@ -287,8 +286,8 @@ export class ResultAsText {
 		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
 	}
 
-	private convertCustomCriticalToCompare(custom: CustomCriticalRoll) {
-		const compare: Compare = {
+	private convertCustomCriticalToCompare(custom: CustomCriticalRoll): ComparedValue {
+		const compare: ComparedValue = {
 			sign: custom.sign,
 			value: Number.parseInt(custom.value, 10),
 		};
