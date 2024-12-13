@@ -376,7 +376,9 @@ export const registerTemplate = {
 			: undefined;
 		const excludedStats = templateData.statistics
 			? Object.keys(
-					Object.entries(templateData.statistics).filter(([_, value]) => !value.exclude)
+					Object.fromEntries(
+						Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
+					)
 				)
 			: undefined;
 		const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;

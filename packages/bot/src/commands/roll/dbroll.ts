@@ -63,8 +63,8 @@ export const dbRoll = {
 		let choices: string[] = [];
 
 		if (focused.name === t("common.statistic")) {
-			choices = guildData.templateID.statsName.filter((item) =>
-				guildData.templateID.excludedStats?.includes(item)
+			choices = guildData.templateID.statsName.filter(
+				(item) => !guildData.templateID.excludedStats?.includes(item)
 			);
 		} else if (focused.name === t("common.character")) {
 			//get user characters
