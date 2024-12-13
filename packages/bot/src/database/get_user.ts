@@ -4,6 +4,7 @@ import {
 	parseEmbedFields,
 	parseEmbedToStats,
 	parseTemplateField,
+	uniformizeRecords,
 } from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
@@ -95,6 +96,13 @@ export function getCharaInMemory(
 	const getChara = characters.get(guildID, userID);
 	const found = getChara?.find((char) => char.userName?.subText(charName, true));
 	logger.trace(`Found ${charName} in memory`, found);
+	//set all statname in stats uniformized
+	if (found?.stats)
+		found.stats = uniformizeRecords(found.stats) as Record<string, number>;
+
+	if (found?.damage)
+		found.damage = uniformizeRecords(found.damage) as Record<string, string>;
+
 	return found;
 }
 
