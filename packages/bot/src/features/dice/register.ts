@@ -2,7 +2,7 @@ import { evalStatsDice } from "@dicelette/core";
 import { findln, ln } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed } from "@dicelette/utils";
+import { NoEmbed, capitalizeParenthesis } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	getTemplateWithDB,
@@ -111,13 +111,18 @@ export async function registerDamageDice(
 		: createDiceEmbed(ul);
 	if (oldDiceEmbeds?.fields)
 		for (const field of oldDiceEmbeds.fields) {
+			const newField = {
+				name: capitalizeParenthesis(field.name),
+				value: field.value,
+				inline: field.inline,
+			};
 			//add fields only if not already in the diceEmbed
 			if (
 				diceEmbed
 					.toJSON()
 					.fields?.findIndex((f) => f.name.unidecode() === field.name.unidecode()) === -1
 			) {
-				diceEmbed.addFields(field);
+				diceEmbed.addFields(newField);
 			}
 		}
 	const user = getUserByEmbed({ message: interaction.message }, ul, first);
@@ -131,7 +136,7 @@ export async function registerDamageDice(
 		!diceEmbed.toJSON().fields
 	) {
 		diceEmbed.addFields({
-			name: name.capitalize(),
+			name: capitalizeParenthesis(name),
 			value: `\`${value}\``,
 			inline: true,
 		});
@@ -163,6 +168,7 @@ export async function registerDamageDice(
 	allEmbeds = [userEmbed];
 	if (statsEmbed) allEmbeds.push(statsEmbed);
 	allEmbeds.push(diceEmbed);
+	console.log(diceEmbed.toJSON().fields);
 	if (!first) {
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);

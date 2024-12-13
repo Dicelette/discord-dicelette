@@ -2,6 +2,7 @@ import { evalStatsDice, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
+import { capitalizeParenthesis } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateCharactersDb } from "database";
 import * as Djs from "discord.js";
@@ -104,7 +105,11 @@ export async function validateDiceEdit(
 			dice === "0"
 		)
 			continue;
-		fieldsToAppend.push(field);
+		fieldsToAppend.push({
+			name: capitalizeParenthesis(name.capitalize()),
+			value: dice,
+			inline: true,
+		});
 	}
 	const diceEmbed = createDiceEmbed(ul).addFields(fieldsToAppend);
 	const { userID, userName } = await getUserNameAndChar(interaction, ul);
