@@ -182,7 +182,8 @@ export async function rollDice(
 		});
 		return;
 	}
-	dice = generateStatsDice(dice, userStatistique.stats);
+	const dollarValue = convertNameToValue(atq, userStatistique.stats);
+	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
 	const modificator = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 	const modificatorString = getModif(modificator, userStatistique.stats);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
@@ -192,7 +193,6 @@ export async function rollDice(
 		comparator = comparatorMatch[0];
 	}
 
-	const dollarValue = convertNameToValue(atq, userStatistique.stats);
 	if (dollarValue) {
 		if (dollarValue.diceResult)
 			infoRoll.name = infoRoll.name
