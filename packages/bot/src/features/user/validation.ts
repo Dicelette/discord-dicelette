@@ -154,7 +154,7 @@ export async function validateUser(
 	const stats: Record<string, number> = {};
 	for (const [name, value] of Object.entries(parsedStats ?? {})) {
 		let statValue = Number.parseInt(value, 10);
-		if (isNumber(statValue)) {
+		if (!isNumber(value)) {
 			statValue = Number.parseInt(
 				value.removeBacktick().split("=")[1].trim().removeBacktick().standardize(),
 				10
