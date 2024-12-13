@@ -10,11 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Connect to vps
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST }}
           username: lili
-          password: ${{ secrets.PASSWORD }}
+          port: ${{secrets.PORT}}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             set PATH $PATH:/home/.local/share/nvm/v20.14.0/bin
             nvm use v20.14.0
