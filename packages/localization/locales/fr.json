@@ -97,7 +97,7 @@
       "name": "afficher"
     },
     "displayResult": "Affichage des résultats",
-    "excludedstats": "Statistiques exclues",
+    "excludedStats": "Statistiques exclues",
     "hiddenRoll": {
       "desc": "Permet de cacher les résultats des dés des MJ et de l'envoyé dans un channel spécifique ou par message éphémère.",
       "title": "[MJ] Jets invisibles"
@@ -549,6 +549,7 @@
       "comparator": "Comparateur :",
       "damage": "Dés de dégâts",
       "description": "Clickez sur le bouton pour enregistrer un personnage",
+      "exclude": "Exclue",
       "noValue": "Aucune valeur",
       "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont désactivés par défaut. \nPour autoriser vos joueurs à les utiliser, veuiller suivre le tutoriel suivant :",
       "title": "Modèle"

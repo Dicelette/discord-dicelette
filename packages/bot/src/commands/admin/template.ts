@@ -8,7 +8,7 @@ import {
 } from "@dicelette/core";
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { type GuildData, TUTORIAL_IMAGES } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { capitalizeParenthesis, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
@@ -299,15 +299,15 @@ export const registerTemplate = {
 					"https://github.com/dicelette/discord-dicelette/blob/main/assets/player.png?raw=true"
 				);
 			for (const [stat, value] of Object.entries(templateData.statistics)) {
-				const min = value.min;
-				const max = value.max;
-				const combinaison = value.combinaison;
+				const { min, max, combinaison, exclude } = value;
 				let msg = "";
 				if (combinaison)
 					msg += `- Combinaison${ul("common.space")}: \`${combinaison}\`\n`;
 				if (min) msg += `- Min${ul("common.space")}: \`${min}\`\n`;
 				if (max) msg += `- Max${ul("common.space")}: \`${max}\`\n`;
+				if (exclude) msg += `- ${ul("register.embed.exclude")}\n`;
 				if (msg.length === 0) msg = ul("register.embed.noValue");
+
 				statisticsEmbed.addFields({
 					name: stat.capitalize(),
 					value: msg,
@@ -318,7 +318,7 @@ export const registerTemplate = {
 		if (templateData.diceType)
 			embedTemplate.addFields({
 				name: ul("common.dice").capitalize(),
-				value: `\`${templateData.diceType}\``,
+				value: `\`${capitalizeParenthesis(templateData.diceType)}\``,
 			});
 		if (templateData.critical) {
 			let msgComparator = "";

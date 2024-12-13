@@ -2,6 +2,7 @@
 
 import { LocalePrimary, cmdLn, ln, t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
+import { capitalizeParenthesis } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
@@ -601,7 +602,7 @@ async function display(
 			if (damageName && damageName.length > 0) {
 				templateEmbed.addFields({
 					name: ul("config.damageName"),
-					value: `- ${damageName.join("\n- ")}`,
+					value: `- ${damageName.map((value) => capitalizeParenthesis(value)).join("\n- ")}`,
 				});
 			}
 		}

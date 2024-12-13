@@ -57,4 +57,12 @@ export const isNumber = (value: unknown): boolean =>
 			typeof value === "string" &&
 			value.trim().length > 0));
 
+export function capitalizeParenthesis(input: string) {
+	return input
+		.replace(/\(([^)]+)\)/g, (match, content) => {
+			return `(${content.capitalize()})`;
+		})
+		.capitalize();
+}
+
 export * from "./src/errors";

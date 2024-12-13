@@ -97,7 +97,7 @@
       "name": "display"
     },
     "displayResult": "Displaying results",
-    "excludedstats": "Excluded statistics",
+    "excludedStats": "Excluded statistics",
     "hiddenRoll": {
       "desc": "Allows you to hide the dice results from GMs and send them to a specific channel or in a ephemeral message.",
       "title": "[GM] Roll display"
@@ -549,6 +549,7 @@
       "comparator": "Comparator:",
       "damage": "Damage dice",
       "description": "Click the button to register a character",
+      "exclude": "Excluded",
       "noValue": "No value",
       "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are disabled by default.\n\nTo authorize your players to use them, please follow the following tutorial:\n",
       "title": "Model"
