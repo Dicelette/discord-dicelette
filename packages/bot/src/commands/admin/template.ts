@@ -305,9 +305,8 @@ export const registerTemplate = {
 					msg += `- Combinaison${ul("common.space")}: \`${combinaison}\`\n`;
 				if (min) msg += `- Min${ul("common.space")}: \`${min}\`\n`;
 				if (max) msg += `- Max${ul("common.space")}: \`${max}\`\n`;
-				if (exclude) msg += `- ${ul("register.embed.exclude")}\n`;
+				msg += `- __${ul("register.embed.exclude")}__${ul("")}: ${exclude ? ul("common.yes") : ul("common.no")}\n`;
 				if (msg.length === 0) msg = ul("register.embed.noValue");
-
 				statisticsEmbed.addFields({
 					name: stat.capitalize(),
 					value: msg,
