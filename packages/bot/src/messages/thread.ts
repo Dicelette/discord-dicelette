@@ -141,10 +141,10 @@ export async function repostInThread(
 		damage: damageName,
 		msgId: [msg.id, thread.id],
 	};
-	logger.trace("User Data", userTemplate);
-	await updateMemory(characters, interaction.guild!.id, userId, ul, {
+	const userData = await updateMemory(characters, interaction.guild!.id, userId, ul, {
 		userData: userTemplate,
 	});
+	logger.trace("User data updated", userData);
 	await registerUser(userRegister, interaction, guildData);
 }
 

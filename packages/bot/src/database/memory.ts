@@ -45,6 +45,7 @@ export async function updateMemory(
 		} else userChar.push(userData);
 		characters.set(guildId, userChar, userID);
 	} else characters.set(guildId, [userData], userID);
+	return userData;
 }
 
 export function deleteUserInChar(
