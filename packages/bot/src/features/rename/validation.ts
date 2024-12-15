@@ -31,7 +31,7 @@ export async function validateRename(
 		messageId: interaction.message.id,
 	};
 	const charData = getUserByEmbed({ message: interaction.message }, ul);
-	if (!charData) throw new Error(ul("error.notFound"));
+	if (!charData) throw new Error(ul("error.notRegistered"));
 	const oldData: {
 		charName?: string | null;
 		messageId: UserMessageId;
