@@ -11,7 +11,6 @@
 		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
 		"prerelease": "pnpm run --recursive tsc",
 		"release": "commit-and-tag-version",
-		"postrelease": "node sync-version.js && git commit . --amend --no-edit",
 		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
 		"pm2:restart": "pnpm run build && pm2 restart dicelette",
 		"pm2:stop": "pm2 stop dicelette",
@@ -22,7 +21,13 @@
 		"node": "^20.0.0"
 	},
 	"commit-and-tag-version": {
-		"t": ""
+		"t": "",
+		"bumpFiles": [
+			{
+				"filename": "packages/bot/package.json",
+				"type": "json"
+			}
+		]
 	},
 	"keywords": [],
 	"author": "",
