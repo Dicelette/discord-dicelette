@@ -194,7 +194,7 @@ export async function rollDice(
 		comparator = comparatorMatch[0];
 	}
 
-	if (dollarValue) {
+	if (dollarValue && comparator.length > 0) {
 		const originalName = infoRoll.name;
 		if (dollarValue.diceResult)
 			infoRoll.name = replaceStatInDice(
