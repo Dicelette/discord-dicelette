@@ -195,7 +195,6 @@ export async function rollDice(
 	}
 
 	if (dollarValue) {
-		const statName = Object.keys(userStatistique.stats ?? {}).join("|");
 		const originalName = infoRoll.name;
 		if (dollarValue.diceResult)
 			infoRoll.name = replaceStatInDice(
