@@ -1,2 +1,2 @@
-export * from "./buttons";
+export * from "./show_modals";
 export * from "./modals";

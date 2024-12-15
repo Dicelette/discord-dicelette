@@ -1,3 +1,3 @@
-export * from "./buttons";
+export * from "./show_modals";
 export * from "./validation";
-export * from "./register";
+export * from "./record";
