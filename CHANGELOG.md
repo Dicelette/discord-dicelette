@@ -18,22 +18,6 @@ All notable changes to this project will be documented in this file. See [commit
 * **template:** add missing space in embed message ([d3aab8f](https://github.com/Dicelette/discord-dicelette/commit/d3aab8f3f74ecd71020d0c9ba83547274805d19d))
 * **utils:** enhance `capitalizeBetweenPunct` function ([59e3c5e](https://github.com/Dicelette/discord-dicelette/commit/59e3c5e39299a5911774a95036207905612d67b8))
 
-## [1.31.0](https://github.com/Dicelette/discord-dicelette/compare/1.29.0...1.31.0) (2024-12-15)
-
-
-### Features
-
-* **utils:** integrate capitalizeParenthesis for enhanced text formatting ([96a1586](https://github.com/Dicelette/discord-dicelette/commit/96a1586555ccce3584e398fd8dbffe4cae4f2c4c))
-
-
-### Bug Fixes
-
-* **bot:** enhance dice roll with stat replacement ([1b82161](https://github.com/Dicelette/discord-dicelette/commit/1b8216109a9910fb1217672ac5bbd9a66bb16c5d))
-* **db:** move uniformization of user records to correct location ([a9f2edc](https://github.com/Dicelette/discord-dicelette/commit/a9f2edc0473612ef991adcbd20ea3d7c636ac2d0))
-* **roll:** ensure comparator is checked before processing dollarValue ([5a64c7d](https://github.com/Dicelette/discord-dicelette/commit/5a64c7d0419bb090d5649c68808a648491c650b4))
-* **template:** add missing space in embed message ([d3aab8f](https://github.com/Dicelette/discord-dicelette/commit/d3aab8f3f74ecd71020d0c9ba83547274805d19d))
-* **utils:** enhance `capitalizeBetweenPunct` function ([59e3c5e](https://github.com/Dicelette/discord-dicelette/commit/59e3c5e39299a5911774a95036207905612d67b8))
-
 ## [1.30.0](https://github.com/Dicelette/discord-dicelette/compare/1.24.0...1.30.0) (2024-12-13)
 
 
