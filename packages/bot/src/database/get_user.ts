@@ -18,14 +18,13 @@ import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, updateMemory } from "database";
 import * as Djs from "discord.js";
-import { CategoryChannel, type EmbedBuilder } from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import { haveAccess, searchUserChannel } from "utils";
 
 export function getUserByEmbed(
 	data: {
 		message?: Djs.Message;
-		embeds?: EmbedBuilder[];
+		embeds?: Djs.EmbedBuilder[];
 	},
 	ul: Translation,
 	first: boolean | undefined = false,
@@ -97,14 +96,15 @@ export async function getUser(
 		messageId: messageId[0],
 	};
 	let channel = client.channels.cache.get(sheetLocation.channelId);
-	if (channel instanceof CategoryChannel) {
+	if (channel instanceof Djs.CategoryChannel) {
 		logger.warn(`Channel ${sheetLocation.channelId} not found`);
 		return;
 	}
 	if (!channel) {
 		//get the channel from the guild
 		const fetchChannel = await guild.channels.fetch(sheetLocation.channelId);
-		if (!fetchChannel || fetchChannel instanceof CategoryChannel) {
+		// noinspection SuspiciousTypeOfGuard
+		if (!fetchChannel || fetchChannel instanceof Djs.CategoryChannel) {
 			logger.warn(`Channel ${sheetLocation.channelId} not found`);
 			return;
 		}
