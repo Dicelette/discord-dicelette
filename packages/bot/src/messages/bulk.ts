@@ -3,7 +3,7 @@ import type { PersonnageIds } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { updateCharactersDb } from "database";
+import { updateMemory } from "database";
 import * as Djs from "discord.js";
 import {
 	createCustomCritical,
@@ -74,7 +74,7 @@ export async function bulkEditTemplateUser(
 					userMessages
 				);
 				await userMessages.edit({ embeds: listEmbed.list });
-				await updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+				await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 					embeds: listEmbed.list,
 				});
 			} catch {

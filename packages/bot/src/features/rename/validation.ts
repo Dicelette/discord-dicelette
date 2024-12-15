@@ -4,7 +4,7 @@ import type { PersonnageIds, UserMessageId } from "@dicelette/types";
 import type { DiscordChannel } from "@dicelette/types";
 import type { EClient } from "client";
 import { rename } from "commands";
-import { getUserByEmbed, updateCharactersDb } from "database";
+import { getUserByEmbed, updateMemory } from "database";
 import type * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 
@@ -47,7 +47,7 @@ export async function validateRename(
 	if (!guildData) return;
 	//update the characters database
 	//remove the old chara
-	await updateCharactersDb(client.characters, interaction.guild!.id, userId, ul, {
+	await updateMemory(client.characters, interaction.guild!.id, userId, ul, {
 		userData: charData,
 	});
 	await rename(

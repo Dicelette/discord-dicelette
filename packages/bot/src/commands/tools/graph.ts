@@ -7,10 +7,10 @@ import type { EClient } from "client";
 import {
 	findChara,
 	getCharaInMemory,
-	getDatabaseChar,
+	getRecordChar,
 	getTemplateWithDB,
 	getUserByEmbed,
-	updateCharactersDb,
+	updateMemory,
 } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
@@ -210,7 +210,7 @@ export const graph = {
 			return;
 		}
 		const user = options.getUser(t("display.userLowercase"));
-		const charData = await getDatabaseChar(interaction, client, t);
+		const charData = await getRecordChar(interaction, client, t);
 		const charName = options.getString(t("common.character"))?.toLowerCase();
 		let userName = `<@${user?.id ?? interaction.user.id}>`;
 		if (charName) userName += ` (${charName})`;
@@ -264,7 +264,7 @@ export const graph = {
 					await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
 					return;
 				}
-				await updateCharactersDb(client.characters, interaction.guild.id, userId, ul, {
+				await updateMemory(client.characters, interaction.guild.id, userId, ul, {
 					message,
 				});
 			}

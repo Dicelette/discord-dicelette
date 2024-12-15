@@ -1,7 +1,8 @@
-import type { Characters, GuildData } from "@dicelette/types";
+import type { GuildData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
+import { deleteUserInChar } from "./memory";
 
 export function deleteUser(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -20,20 +21,6 @@ export function deleteUser(
 	}
 	guildData.user[user?.id ?? interaction.user.id].splice(userCharIndex, 1);
 	return guildData;
-}
-
-export function deleteUserInChar(
-	characters: Characters,
-	userId: string,
-	guildId: string,
-	charName?: string | null
-) {
-	const userData = characters.get(guildId, userId);
-	if (userData) {
-		const filter = userData.filter((char) => !char.userName?.subText(charName, true));
-		if (filter.length === 0) characters.delete(guildId, userId);
-		else characters.set(guildId, filter, userId);
-	}
 }
 
 export function deleteIfChannelOrThread(

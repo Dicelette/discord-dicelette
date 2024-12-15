@@ -78,7 +78,7 @@ export interface GuildData {
 	user: Record<string, UserGuildData[]>;
 }
 
-type UserGuildData = {
+export type UserGuildData = {
 	charName?: string | null;
 	messageId: UserMessageId;
 	damageName?: string[];

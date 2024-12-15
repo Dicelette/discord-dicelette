@@ -3,7 +3,7 @@ import { cmdLn, findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { findChara, getDatabaseChar } from "database";
+import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -66,7 +66,7 @@ export const displayUser = {
 		const int = await optionInteractions(interaction, client);
 		if (!int) return;
 		const { options, user, ul } = int;
-		const charData = await getDatabaseChar(interaction, client, t, false);
+		const charData = await getRecordChar(interaction, client, t, false);
 		const charName = options.getString(t("common.character"))?.toLowerCase();
 		if (!charData) {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;

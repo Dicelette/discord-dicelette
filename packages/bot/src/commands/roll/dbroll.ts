@@ -1,7 +1,7 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstRegisteredChar, getUserFromMessage } from "database";
+import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { rollStatistique, serializeName } from "utils";
@@ -114,7 +114,7 @@ export const dbRoll = {
 		optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
 		if (!userStatistique && !charName) {
 			//find the first character registered
-			const char = await getFirstRegisteredChar(client, interaction, ul);
+			const char = await getFirstChar(client, interaction, ul);
 			userStatistique = char?.userStatistique;
 			optionChar = char?.optionChar;
 		}

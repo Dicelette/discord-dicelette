@@ -2,7 +2,7 @@ import { cmdLn, ln, t } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstRegisteredChar, getUserFromMessage } from "database";
+import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { serializeName } from "utils";
@@ -231,7 +231,7 @@ export const mjRoll = {
 		}
 		optionChar = charData?.userName ?? undefined;
 		if (!charData && !charName) {
-			const char = await getFirstRegisteredChar(client, interaction, ul);
+			const char = await getFirstChar(client, interaction, ul);
 			charData = char?.userStatistique;
 			optionChar = char?.optionChar;
 		}

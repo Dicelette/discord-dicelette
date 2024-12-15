@@ -10,7 +10,7 @@ import type {
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { registerUser, setDefaultManagerId, updateCharactersDb } from "database";
+import { registerUser, setDefaultManagerId, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { deleteAfter, embedError, reply, sendLogs } from "messages";
 import { editUserButtons, haveAccess, searchUserChannel, selectEditMenu } from "utils";
@@ -142,7 +142,7 @@ export async function repostInThread(
 		msgId: [msg.id, thread.id],
 	};
 	logger.trace("User Data", userTemplate);
-	await updateCharactersDb(characters, interaction.guild!.id, userId, ul, {
+	await updateMemory(characters, interaction.guild!.id, userId, ul, {
 		userData: userTemplate,
 	});
 	await registerUser(userRegister, interaction, guildData);

@@ -7,7 +7,7 @@ import {
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
-import { getTemplateWithDB, getUserNameAndChar, updateCharactersDb } from "database";
+import { getTemplateWithDB, getUserNameAndChar, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
 import {
@@ -228,7 +228,7 @@ export async function editStats(
 		interaction.message
 	);
 	await interaction.message.edit({ embeds: list });
-	await updateCharactersDb(characters, interaction.guild!.id, userID, ul, {
+	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
 	});
 	await reply(interaction, { content: ul("embed.edit.stats"), ephemeral: true });

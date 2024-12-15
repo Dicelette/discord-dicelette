@@ -4,19 +4,19 @@ import {
 	parseEmbedFields,
 	parseEmbedToStats,
 	parseTemplateField,
-	uniformizeRecords,
 } from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
-	Characters,
 	PersonnageIds,
 	Settings,
 	Translation,
 	UserData,
+	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
+import { getCharaInMemory, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { CategoryChannel, type EmbedBuilder } from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
@@ -59,7 +59,7 @@ export function getUserByEmbed(
 	return user as UserData;
 }
 
-export async function getFirstRegisteredChar(
+export async function getFirstChar(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
 	ul: Translation
@@ -85,18 +85,6 @@ export async function getFirstRegisteredChar(
 	);
 
 	return { optionChar, userStatistique };
-}
-
-export function getCharaInMemory(
-	characters: Characters,
-	userID: string,
-	guildID: string,
-	charName?: string | null
-) {
-	const getChara = characters.get(guildID, userID);
-	const found = getChara?.find((char) => char.userName?.subText(charName, true));
-	logger.trace(`Found ${charName} in memory`, found);
-	return found;
 }
 
 export async function getUser(
@@ -191,7 +179,7 @@ export async function getUserFromMessage(
 			options.fetchChannel
 		);
 		//set chara in memory
-		await updateCharactersDb(characters, guild!.id, userId, ul, {
+		await updateMemory(characters, guild!.id, userId, ul, {
 			userData,
 		});
 		return userData;
@@ -200,12 +188,12 @@ export async function getUserFromMessage(
 	}
 }
 
-export async function getDatabaseChar(
+export async function getRecordChar(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	t: Translation,
 	strict = true
-) {
+): Promise<Record<string, UserGuildData> | undefined> {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const guildData = client.settings.get(interaction.guildId as string);
 	const ul = ln(interaction.locale as Djs.Locale);
@@ -239,12 +227,10 @@ export async function getDatabaseChar(
 	const findChara = userData?.find((char) => {
 		if (charName) return char.charName?.subText(charName, strict);
 	});
-	if (!findChara && charName) {
-		return undefined;
-	}
+	if (!findChara && charName) return undefined;
+
 	if (!findChara) {
 		const char = userData?.[0];
-
 		return char ? { [user?.id ?? interaction.user.id]: char } : undefined;
 	}
 	return {
@@ -254,9 +240,8 @@ export async function getDatabaseChar(
 
 export async function findChara(charData: CharDataWithName, charName?: string) {
 	return Object.values(charData).find((data) => {
-		if (data.charName && charName) {
-			return data.charName.subText(charName);
-		}
+		if (data.charName && charName) return data.charName.subText(charName);
+
 		return data.charName === charName;
 	});
 }
@@ -316,35 +301,4 @@ export async function getUserNameAndChar(
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
 	return { userID, userName, thread: interaction.channel };
-}
-
-export async function updateCharactersDb(
-	characters: Characters,
-	guildId: string,
-	userID: string,
-	ul: Translation,
-	data: Partial<{ userData: UserData; message: Djs.Message; embeds: EmbedBuilder[] }>
-) {
-	let { userData, message, embeds } = data;
-	if (!userData) {
-		if (embeds) userData = getUserByEmbed({ embeds }, ul);
-		else if (message) userData = getUserByEmbed({ message }, ul);
-		else return;
-		if (!userData) return;
-	}
-	if (userData.damage)
-		userData.damage = uniformizeRecords(userData.damage) as Record<string, string>;
-	if (userData.stats)
-		userData.stats = uniformizeRecords(userData.stats) as Record<string, number>;
-	const userChar = characters.get(guildId, userID);
-	if (userChar) {
-		const findChar = userChar.find((char) =>
-			char.userName?.subText(userData.userName, true)
-		);
-		if (findChar) {
-			const index = userChar.indexOf(findChar);
-			userChar[index] = userData;
-		} else userChar.push(userData);
-		characters.set(guildId, userChar, userID);
-	} else characters.set(guildId, [userData], userID);
 }

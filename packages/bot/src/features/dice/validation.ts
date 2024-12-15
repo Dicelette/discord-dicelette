@@ -4,7 +4,7 @@ import type { UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
 import { capitalizeParenthesis } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getUserNameAndChar, registerUser, updateCharactersDb } from "database";
+import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -127,7 +127,7 @@ export async function validateDiceEdit(
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
 		await interaction.message.edit({ embeds: toAdd, components: [components] });
-		await updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+		await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 			embeds: toAdd,
 		});
 		await reply(interaction, { content: ul("modals.removed.dice"), ephemeral: true });
@@ -179,7 +179,7 @@ export async function validateDiceEdit(
 		fiche: interaction.message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
-	await updateCharactersDb(client.characters, interaction.guild!.id, userID, ul, {
+	await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 		embeds: embedsList.list,
 	});
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);

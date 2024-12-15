@@ -6,7 +6,7 @@ import { filterChoices, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	deleteUser,
-	getDatabaseChar,
+	getRecordChar,
 	getUserByEmbed,
 	moveUserInDatabase,
 	registerUser,
@@ -144,7 +144,7 @@ export const editAvatar = {
 			return;
 		}
 		const charName = options.getString(t("common.character"))?.toLowerCase();
-		const charData = await getDatabaseChar(interaction, client, t);
+		const charData = await getRecordChar(interaction, client, t);
 		if (!charData) {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;

@@ -9,7 +9,7 @@ import {
 	getUserByEmbed,
 	getUserNameAndChar,
 	registerUser,
-	updateCharactersDb,
+	updateMemory,
 } from "database";
 import * as Djs from "discord.js";
 import {
@@ -185,7 +185,7 @@ export async function registerDamageDice(
 			msgId: [interaction.message.id, interaction.message.channel.id],
 		};
 		await registerUser(userRegister, interaction, db, false);
-		await updateCharactersDb(client.characters, interaction.guild.id, userID, ul, {
+		await updateMemory(client.characters, interaction.guild.id, userID, ul, {
 			embeds: allEmbeds,
 		});
 	} else {

@@ -8,7 +8,7 @@ import type {
 import type { Translation } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { deleteUser, deleteUserInChar, getDatabaseChar } from "database";
+import { deleteUser, deleteUserInChar, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
@@ -69,7 +69,7 @@ export const deleteChar = {
 		if (!int) return;
 		const { options, guildData, ul, user } = int;
 		let charName = options.getString(t("common.character"))?.toLowerCase();
-		const charData = await getDatabaseChar(interaction, client, t);
+		const charData = await getRecordChar(interaction, client, t);
 		const mention = Djs.userMention(user?.id ?? interaction.user.id);
 
 		if (!charName) {
