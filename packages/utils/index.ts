@@ -58,13 +58,21 @@ export const isNumber = (value: unknown): boolean =>
 			value.trim().length > 0));
 
 export function capitalizeBetweenPunct(input: string) {
-	const regex = /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})(?<spaces>\s+)(?<rest>.*)/u;
-
-	const match = input.match(regex);
-	if (!match || !match.groups) return input.capitalize();
-
-	const { open, enclosed, close, spaces, rest } = match.groups;
-	return `${open}${enclosed.capitalize()}${close}${spaces}${rest.trim().toTitle()}`.capitalize();
+	// Regex to find sections enclosed by punctuation marks
+	const regex = /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu;
+	let remainingText = input;
+	let result = input;
+	for (const match of input.matchAll(regex)) {
+		const { open, enclosed, close } = match.groups ?? {};
+		if (open && enclosed && close) {
+			const capitalized = enclosed.capitalize();
+			result = result.replace(match[0], `${open}${capitalized}${close}`);
+			remainingText = remainingText.replace(match[0], "").trim(); // Remove processed section
+		}
+	}
+	remainingText = remainingText.toTitle();
+	result = result.replace(new RegExp(`\\b${remainingText}\\b`, "gi"), remainingText);
+	return result;
 }
 
 export * from "./src/errors";
