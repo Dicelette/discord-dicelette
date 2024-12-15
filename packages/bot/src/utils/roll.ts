@@ -15,7 +15,7 @@ import {
 	skillCustomCritical,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
-import { capitalizeParenthesis } from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import {
@@ -204,7 +204,7 @@ export async function rollDice(
 				dollarValue.diceResult
 			).trimEnd();
 		else infoRoll.name = replaceStatInDice(infoRoll.name, userStatistique.stats, "");
-		if (infoRoll.name.length === 0) infoRoll.name = capitalizeParenthesis(originalName);
+		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
 	const roll = `${dice.trimAll()}${modificatorString}${comparator} ${comments}`;

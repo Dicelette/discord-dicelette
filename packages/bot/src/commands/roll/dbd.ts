@@ -1,5 +1,5 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
-import { capitalizeParenthesis, filterChoices, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
@@ -111,7 +111,7 @@ export default {
 		const filter = filterChoices(choices, interaction.options.getFocused());
 		await interaction.respond(
 			filter.map((result) => ({
-				name: capitalizeParenthesis(result.capitalize()),
+				name: capitalizeBetweenPunct(result.capitalize()),
 				value: result,
 			}))
 		);

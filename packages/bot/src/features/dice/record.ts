@@ -2,7 +2,7 @@ import { evalStatsDice } from "@dicelette/core";
 import { findln, ln } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed, capitalizeParenthesis } from "@dicelette/utils";
+import { NoEmbed, capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	getTemplateWithDB,
@@ -112,7 +112,7 @@ export async function registerDamageDice(
 	if (oldDiceEmbeds?.fields)
 		for (const field of oldDiceEmbeds.fields) {
 			const newField = {
-				name: capitalizeParenthesis(field.name),
+				name: capitalizeBetweenPunct(field.name),
 				value: field.value,
 				inline: field.inline,
 			};
@@ -136,7 +136,7 @@ export async function registerDamageDice(
 		!diceEmbed.toJSON().fields
 	) {
 		diceEmbed.addFields({
-			name: capitalizeParenthesis(name),
+			name: capitalizeBetweenPunct(name),
 			value: `\`${value}\``,
 			inline: true,
 		});
@@ -168,7 +168,6 @@ export async function registerDamageDice(
 	allEmbeds = [userEmbed];
 	if (statsEmbed) allEmbeds.push(statsEmbed);
 	allEmbeds.push(diceEmbed);
-	console.log(diceEmbed.toJSON().fields);
 	if (!first) {
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);

@@ -8,7 +8,7 @@ import {
 } from "@dicelette/core";
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { type GuildData, TUTORIAL_IMAGES } from "@dicelette/types";
-import { capitalizeParenthesis, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
@@ -317,7 +317,7 @@ export const registerTemplate = {
 		if (templateData.diceType)
 			embedTemplate.addFields({
 				name: ul("common.dice").capitalize(),
-				value: `\`${capitalizeParenthesis(templateData.diceType)}\``,
+				value: `\`${capitalizeBetweenPunct(templateData.diceType)}\``,
 			});
 		if (templateData.critical) {
 			let msgComparator = "";

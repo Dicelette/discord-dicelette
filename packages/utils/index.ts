@@ -57,12 +57,14 @@ export const isNumber = (value: unknown): boolean =>
 			typeof value === "string" &&
 			value.trim().length > 0));
 
-export function capitalizeParenthesis(input: string) {
-	return input
-		.replace(/\(([^)]+)\)/g, (match, content) => {
-			return `(${content.capitalize()})`;
-		})
-		.capitalize();
+export function capitalizeBetweenPunct(input: string) {
+	const regex = /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})(?<spaces>\s+)(?<rest>.*)/u;
+
+	const match = input.match(regex);
+	if (!match || !match.groups) return input.capitalize();
+
+	const { open, enclosed, close, spaces, rest } = match.groups;
+	return `${open}${enclosed.capitalize()}${close}${spaces}${rest.trim().toTitle()}`.capitalize();
 }
 
 export * from "./src/errors";
