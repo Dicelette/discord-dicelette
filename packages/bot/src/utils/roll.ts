@@ -151,7 +151,10 @@ export async function rollDice(
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
-	const comments = options.getString(t("dbRoll.options.comments.name")) ?? "";
+	const comm = options.getString(t("dbRoll.options.comments.name"))
+		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
+		: undefined;
+	const comments = comm ?? "";
 	//search dice
 
 	let dice = userStatistique.damage?.[atq];
@@ -246,7 +249,10 @@ export async function rollStatistique(
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
-	const comments = options.getString(t("dbRoll.options.comments.name")) ?? "";
+	const comm = options.getString(t("dbRoll.options.comments.name"))
+		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
+		: undefined;
+	const comments = comm ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
 	const modification = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 
