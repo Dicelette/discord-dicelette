@@ -102,7 +102,7 @@ export class ResultAsText {
 		customCritical?: Record<string, CustomCritical>
 	) {
 		if (!this.resultat) return "";
-		const regexForFormulesDices = /^[✕◈✓]/;
+		const regexForFormulesDices = /^[✕✓]/;
 		let msgSuccess: string;
 		const messageResult = this.resultat.result.split(";");
 		let successOrFailure = "";
@@ -189,15 +189,9 @@ export class ResultAsText {
 				}
 			}
 			if (isCritical === "failure") {
-				res = res.replace(
-					regexForFormulesDices,
-					`**${this.ul("roll.critical.failure")}** —`
-				);
+				res = res.replace("✕", `**${this.ul("roll.critical.failure")}** —`);
 			} else if (isCritical === "success") {
-				res = res.replace(
-					regexForFormulesDices,
-					`**${this.ul("roll.critical.success")}** —`
-				);
+				res = res.replace("✓", `**${this.ul("roll.critical.success")}** —`);
 			} else if (isCritical === "custom") {
 				res = res.replace(regexForFormulesDices, `${successOrFailure} —`);
 			} else {
@@ -205,7 +199,6 @@ export class ResultAsText {
 					.replace("✕", `**${this.ul("roll.failure")}** —`)
 					.replace("✓", `**${this.ul("roll.success")}** —`);
 			}
-
 			finalRes.push(res.trimStart());
 		}
 		return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
