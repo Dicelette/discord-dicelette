@@ -120,7 +120,7 @@ export function uniformizeRecords(input: Record<string, string | number>) {
 	return Object.fromEntries(
 		Object.entries(input).map(([key, value]) => [
 			key.standardize(),
-			typeof value === "string" ? value.standardize() : value,
+			typeof value === "string" ? standardizeDice(value) : value,
 		])
 	) as Record<string, string | number>;
 }

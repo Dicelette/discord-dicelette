@@ -1,4 +1,4 @@
-import type { Critical, CustomCritical } from "@dicelette/core";
+import { type Critical, type CustomCritical, standardizeDice } from "@dicelette/core";
 
 import { findln } from "@dicelette/localization";
 import { isNumber } from "@dicelette/utils";
@@ -83,7 +83,8 @@ export function parseDamageFields(embed: Djs.Embed): Record<string, string> {
 	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
 		const { name, value } = field;
-		parsedFields[name.standardize()] = value.standardize().removeBacktick();
+		const standardizedValue = standardizeDice(value);
+		parsedFields[name.standardize()] = standardizedValue.removeBacktick();
 	}
 	return parsedFields;
 }
