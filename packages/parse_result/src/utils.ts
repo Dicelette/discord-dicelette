@@ -1,4 +1,4 @@
-import { type Resultat, generateStatsDice, roll } from "@dicelette/core";
+import { type Resultat, generateStatsDice, roll, standardizeDice } from "@dicelette/core";
 import { isNumber } from "@dicelette/utils";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
@@ -8,13 +8,27 @@ export function timestamp(time?: boolean) {
 	return "";
 }
 
+function getRollInShared(dice: string) {
+	const mainComments = /# ?(?<comment>.*)/i;
+	const main = mainComments.exec(dice)?.groups?.comment;
+	dice = dice.replace(mainComments, "");
+	const rollDice = roll(dice);
+	if (!rollDice) {
+		return undefined;
+	}
+	rollDice.dice = dice;
+	if (main) rollDice.comment = main;
+	return rollDice;
+}
+
 export function getRoll(dice: string): Resultat | undefined {
+	if (dice.includes(";")) return getRollInShared(dice);
 	const comments = dice.match(DETECT_DICE_MESSAGE)?.[3].replaceAll("*", "\\*");
 	if (comments) {
 		dice = dice.replace(DETECT_DICE_MESSAGE, "$1");
 	}
 	dice = dice.trim();
-	const rollDice = roll(dice.trim().toLowerCase());
+	const rollDice = roll(dice);
 	if (!rollDice) {
 		return undefined;
 	}
@@ -109,4 +123,16 @@ export function uniformizeRecords(input: Record<string, string | number>) {
 			typeof value === "string" ? value.standardize() : value,
 		])
 	) as Record<string, string | number>;
+}
+
+export function trimAll(dice: string) {
+	const commentsReg = /\[(?<comment>.*)\]/;
+	const dices = dice.split(";");
+	const result = dices.map((d) => {
+		const comment = d.match(commentsReg)?.groups?.comment
+			? `[${d.match(commentsReg)?.groups?.comment}]`
+			: "";
+		return `${d.replace(commentsReg, "").trimAll()}${comment}`;
+	});
+	return result.join(";");
 }

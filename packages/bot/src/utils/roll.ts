@@ -13,6 +13,7 @@ import {
 	replaceStatInDice,
 	rollCustomCritical,
 	skillCustomCritical,
+	trimAll,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
@@ -209,7 +210,7 @@ export async function rollDice(
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
-	const roll = `${dice.trimAll()}${modificatorString}${comparator} ${comments}`;
+	const roll = `${trimAll(dice)}${modificatorString}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
 		roll,
@@ -303,7 +304,7 @@ export async function rollStatistique(
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${replaceFormulaInDice(dice).trimAll()}${modificationString}${generateStatsDice(comparator, userStatistique.stats, userStat.toString())} ${comments}`;
+	const roll = `${trimAll(replaceFormulaInDice(dice))}${modificationString}${generateStatsDice(comparator, userStatistique.stats, userStat.toString())} ${comments}`;
 	const customCritical = template.customCritical
 		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
