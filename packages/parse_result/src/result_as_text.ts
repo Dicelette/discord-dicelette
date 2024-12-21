@@ -181,11 +181,11 @@ export class ResultAsText {
 				const { entry, calc } = matches.groups || {};
 				if (entry) {
 					const entryStr = entry.replaceAll("\\*", "×");
-					res = res.replace(entry, `\`${entryStr}\``);
+					res = res.replace(entry, `\`${entryStr.trim()}\``);
 				}
 				if (calc) {
 					const calcStr = calc.replaceAll("\\*", "×");
-					res = res.replace(calc, `\`${calcStr}\``);
+					res = res.replace(calc, `\`${calcStr.trim()}\``);
 				}
 			}
 			if (isCritical === "failure") {
@@ -275,7 +275,7 @@ export class ResultAsText {
 			? `${this.resultat.compare.sign} ${this.compareValue()}`
 			: "";
 		const mention = authorId ? `*<@${authorId}>* ` : "";
-		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "")}${signMessage ? ` ${signMessage}` : ""}\`)`;
+		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "").trim()}${signMessage ? ` ${signMessage}` : ""}\`)`;
 		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
 	}
 
