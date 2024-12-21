@@ -89,6 +89,7 @@ export class ResultAsText {
 	}
 
 	private messageResult(result: string, tot?: string | number) {
+		if (result.includes("◈")) tot = undefined;
 		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
 		if (!tot) resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, " = ` $1 `")}`;
 		else resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, `${tot}`)}`;
