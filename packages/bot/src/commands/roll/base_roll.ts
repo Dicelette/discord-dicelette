@@ -1,4 +1,5 @@
 import { cmdLn, t } from "@dicelette/localization";
+import { trimAll } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
@@ -34,7 +35,7 @@ export const diceRoll = {
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));
 		await rollWithInteraction(
 			interaction,
-			dice,
+			trimAll(dice),
 			channel,
 			client.settings,
 			undefined,
