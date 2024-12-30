@@ -188,6 +188,7 @@ export async function calculate(
 		formulaWithStats = isRoll.total.toString();
 		originalFormula = `${statInfo.value}${sign}(${formula}) → ${statInfo.value}${sign}(${isRoll.result})`;
 	}
+	formulaWithStats = evaluate(formulaWithStats);
 	const comments = options.getString(t("dbRoll.options.comments.name")) ?? undefined;
 	let totalFormula = `${statInfo.value}${sign}(${formulaWithStats})`;
 	if (isNumber(formulaWithStats))
