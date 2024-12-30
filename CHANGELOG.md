@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.31.0](https://github.com/Dicelette/discord-dicelette/compare/1.29.0...1.31.0) (2024-12-30)
+
+
+### Features
+
+* **calc:** add calc commands based on statistics ([6260c34](https://github.com/Dicelette/discord-dicelette/commit/6260c34aa1e30e2eb26cf27e15482f2743c230fb))
+* **utils:** integrate capitalizeParenthesis for enhanced text formatting ([96a1586](https://github.com/Dicelette/discord-dicelette/commit/96a1586555ccce3584e398fd8dbffe4cae4f2c4c))
+
+
+### Bug Fixes
+
+* **bot:** enhance dice roll with stat replacement ([1b82161](https://github.com/Dicelette/discord-dicelette/commit/1b8216109a9910fb1217672ac5bbd9a66bb16c5d))
+* **db:** move uniformization of user records to correct location ([a9f2edc](https://github.com/Dicelette/discord-dicelette/commit/a9f2edc0473612ef991adcbd20ea3d7c636ac2d0))
+* **diceRoll:** affectskill should only works if dollarsValue is defined ([da22ba1](https://github.com/Dicelette/discord-dicelette/commit/da22ba1f3cec6cecf2840eef6b2aee817f308ba3))
+* **diceRoll:** comments for dice allowing "&" and main comments ([c970115](https://github.com/Dicelette/discord-dicelette/commit/c970115ddac64beb45b3943e39187ed7d76d857a))
+* **parse-result:** do not add the comparator if the symbol for not is here ([c83226f](https://github.com/Dicelette/discord-dicelette/commit/c83226ff6f3d8cafe70a2dc795a97ef6476d1f29))
+* **parse-result:** enhanced the comments handling of shared rolls ([eb90736](https://github.com/Dicelette/discord-dicelette/commit/eb907362ded6edda643c270c82d0ca151c50a2ad))
+* **parse-result:** finally i fixed these too much space in res ([dc99507](https://github.com/Dicelette/discord-dicelette/commit/dc9950758944e7a14ca4684514cdc42794e50f2c))
+* **parse-result:** message for success should only be used on "exact" result ([5f257e8](https://github.com/Dicelette/discord-dicelette/commit/5f257e8bfb45d953326123331088b8c8bc6ec54d))
+* **parse-result:** modify the message formatting in `result_as_text.ts` to ensure `successOrFailure` is prepended correctly ([5dffb86](https://github.com/Dicelette/discord-dicelette/commit/5dffb8655715415b9b805755dcb5028dd27fbc8d))
+* **parse-result:** should keeps the comments between [] as if ([69d1ef5](https://github.com/Dicelette/discord-dicelette/commit/69d1ef5db1eec22ca80fe4029dcd4232d6adac4f))
+* **parse-result:** trimAll on roll commands ([49a8166](https://github.com/Dicelette/discord-dicelette/commit/49a8166ef56fe3f5234821d92f9bdac18abe383f))
+* **roll:** ensure comparator is checked before processing dollarValue ([5a64c7d](https://github.com/Dicelette/discord-dicelette/commit/5a64c7d0419bb090d5649c68808a648491c650b4))
+* **template:** add missing space in embed message ([d3aab8f](https://github.com/Dicelette/discord-dicelette/commit/d3aab8f3f74ecd71020d0c9ba83547274805d19d))
+* **utils:** enhance `capitalizeBetweenPunct` function ([59e3c5e](https://github.com/Dicelette/discord-dicelette/commit/59e3c5e39299a5911774a95036207905612d67b8))
+
 ## [1.30.1](https://github.com/Dicelette/discord-dicelette/compare/1.29.0...1.30.1) (2024-12-15)
 
 
