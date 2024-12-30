@@ -26,6 +26,7 @@ import {
 	reply,
 	threadToSend,
 } from "messages";
+import { getRightValue } from "../database";
 
 /**
  * create the roll dice, parse interaction etc... When the slash-commands is used for dice
@@ -257,28 +258,19 @@ export async function rollStatistique(
 	const override = options.getString(t("dbRoll.options.override.name"));
 	const modification = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 
-	let userStat = userStatistique.stats?.[standardizedStatistic];
-	// noinspection LoopStatementThatDoesntLoopJS
-	while (!userStat) {
-		const guildData = client.settings.get(interaction.guild!.id, "templateID.statsName");
-		if (userStatistique.stats && guildData) {
-			const findStatInList = guildData.find((stat) =>
-				stat.subText(standardizedStatistic)
-			);
-			if (findStatInList) {
-				standardizedStatistic = findStatInList.standardize(true);
-				statistic = findStatInList;
-				userStat = userStatistique.stats[findStatInList.standardize(true)];
-			}
-		}
-		if (userStat) break;
-		throw new Error(
-			ul("error.noStat", {
-				stat: standardizedStatistic.capitalize(),
-				char: optionChar ? ` ${optionChar.capitalize()}` : "",
-			})
-		);
-	}
+	const res = getRightValue(
+		userStatistique,
+		standardizedStatistic,
+		ul,
+		client,
+		interaction,
+		optionChar,
+		statistic
+	);
+	if (!res) return;
+	statistic = res.statistic;
+	standardizedStatistic = res.standardizedStatistic;
+	const userStat = res.userStat;
 	const template = userStatistique.template;
 	let dice = template.diceType?.replaceAll("$", userStat.toString());
 	if (!dice) {

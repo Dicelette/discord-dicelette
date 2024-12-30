@@ -1,10 +1,9 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
-import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
+import { cmdLn, t } from "@dicelette/localization";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getUserFromMessage } from "database";
+import { getStatistics } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply } from "messages";
-import { rollStatistique, serializeName } from "utils";
+import { autoCompleteCharacters, rollStatistique } from "utils";
 
 export const dbRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -56,29 +55,7 @@ export const dbRoll = {
 				.setRequired(false)
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const focused = options.getFocused(true);
-		const guildData = client.settings.get(interaction.guild!.id);
-		if (!guildData || !guildData.templateID) return;
-		let choices: string[] = [];
-
-		if (focused.name === t("common.statistic")) {
-			choices = guildData.templateID.statsName.filter(
-				(item) => !guildData.templateID.excludedStats?.includes(item)
-			);
-		} else if (focused.name === t("common.character")) {
-			//get user characters
-			const userData = client.settings.get(
-				interaction.guild!.id,
-				`user.${interaction.user.id}`
-			);
-			if (!userData) return;
-			choices = userData
-				.map((data) => data.charName ?? "")
-				.filter((data) => data.length > 0);
-		}
-		if (!choices || choices.length === 0) return;
-		const filter = filterChoices(choices, interaction.options.getFocused());
+		const filter = autoCompleteCharacters(interaction, client) ?? [];
 		await interaction.respond(
 			filter.map((result) => ({
 				name: capitalizeBetweenPunct(result.capitalize()),
@@ -87,55 +64,9 @@ export const dbRoll = {
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
-		if (!interaction.guild || !interaction.channel) return;
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const guildData = client.settings.get(interaction.guild.id);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
-		if (!guildData) return;
-		let optionChar = options.getString(t("common.character")) ?? undefined;
-		const charName = optionChar?.standardize();
-
-		let userStatistique = await getUserFromMessage(
-			client,
-			interaction.user.id,
-			interaction,
-			charName,
-			{ skipNotFound: true }
-		);
-		const selectedCharByQueries = serializeName(userStatistique, charName);
-
-		if (optionChar && !selectedCharByQueries) {
-			await reply(interaction, {
-				embeds: [
-					embedError(ul("error.charName", { charName: optionChar.capitalize() }), ul),
-				],
-				ephemeral: true,
-			});
-			return;
-		}
-		optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
-		if (!userStatistique && !charName) {
-			//find the first character registered
-			const char = await getFirstChar(client, interaction, ul);
-			userStatistique = char?.userStatistique;
-			optionChar = char?.optionChar;
-		}
-		if (!userStatistique) {
-			await reply(interaction, {
-				embeds: [embedError(ul("error.notRegistered"), ul)],
-				ephemeral: true,
-			});
-			return;
-		}
-
-		if (!userStatistique.stats) {
-			await reply(interaction, {
-				embeds: [embedError(ul("error.noStats"), ul)],
-				ephemeral: true,
-			});
-			return;
-		}
+		const { userStatistique, options, ul, optionChar } =
+			(await getStatistics(interaction, client)) ?? {};
+		if (!userStatistique || !options || !ul || !optionChar) return;
 		return await rollStatistique(
 			interaction,
 			client,

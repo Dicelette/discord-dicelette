@@ -4,14 +4,7 @@ import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import type { EClient } from "client";
-import {
-	findChara,
-	getCharaInMemory,
-	getRecordChar,
-	getTemplateWithDB,
-	getUserByEmbed,
-	updateMemory,
-} from "database";
+import { findChara, getRecordChar, getTemplateWithDB, getUserByEmbed } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
@@ -251,22 +244,12 @@ export const graph = {
 				await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
 				return;
 			}
-			let userStatistique = getCharaInMemory(
-				client.characters,
-				userId,
-				interaction.guild.id,
-				charName
-			);
+
+			const message = await thread.messages.fetch(sheetLocation.messageId);
+			const userStatistique = getUserByEmbed({ message }, ul, undefined, false);
 			if (!userStatistique) {
-				const message = await thread.messages.fetch(sheetLocation.messageId);
-				userStatistique = getUserByEmbed({ message }, ul, undefined, false);
-				if (!userStatistique) {
-					await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
-					return;
-				}
-				await updateMemory(client.characters, interaction.guild.id, userId, ul, {
-					message,
-				});
+				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+				return;
 			}
 			if (!userStatistique.stats) {
 				await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
@@ -286,6 +269,7 @@ export const graph = {
 			const filteredLabels = labels.filter((label) =>
 				userStatKeys.includes(label.unidecode())
 			);
+			//remove combined stats
 			const lineColor = options.getString(t("graph.line.name"));
 			const fillColor = options.getString(t("graph.bg.name"));
 			const color = generateColor(lineColor, fillColor);

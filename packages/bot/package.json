@@ -27,6 +27,7 @@
 		"discord-api-types": "^0.37.104",
 		"discord.js": "^14.16.3",
 		"enmap": "^6.0.3",
+		"mathjs": "^14.0.0",
 		"parse-color": "^1.0.0"
 	},
 	"devDependencies": {

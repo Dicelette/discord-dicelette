@@ -161,7 +161,10 @@ export class ResultAsText {
 				const totalSuccess = testValue
 					? ` = \`[${total}] ${goodSign} ${this.compareValue(testValue, "`")}`
 					: `= \`[${total}]\``;
-				msgSuccess += `${this.messageResult(r, totalSuccess).replace(/^[✕✓※]/, `${successOrFailure} — `)}\n`;
+				const resMsg = this.messageResult(r, totalSuccess);
+				if (resMsg.match(/^[✕✓※]/))
+					msgSuccess += `${this.messageResult(r, totalSuccess).replace(/^[✕✓※]/, `${successOrFailure} — `)}\n`;
+				else msgSuccess += `${successOrFailure} — ${resMsg}\n`;
 				total = 0;
 			}
 		} else msgSuccess = `${this.messageResult(this.resultat.result, " = ` [$1] `")}`;

@@ -1,4 +1,4 @@
-import { findln, ln } from "@dicelette/localization";
+import { findln, ln, t } from "@dicelette/localization";
 import {
 	parseDamageFields,
 	parseEmbedFields,
@@ -19,7 +19,7 @@ import type { EClient } from "client";
 import { getCharaInMemory, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
-import { haveAccess, searchUserChannel } from "utils";
+import { haveAccess, searchUserChannel, serializeName } from "utils";
 
 export function getUserByEmbed(
 	data: {
@@ -301,4 +301,94 @@ export async function getUserNameAndChar(
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
 	return { userID, userName, thread: interaction.channel };
+}
+
+export async function getStatistics(
+	interaction: Djs.CommandInteraction,
+	client: EClient
+) {
+	if (!interaction.guild || !interaction.channel) return undefined;
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const guildData = client.settings.get(interaction.guild.id);
+	const lang = guildData?.lang ?? interaction.locale;
+	const ul = ln(lang);
+	if (!guildData) return;
+	let optionChar = options.getString(t("common.character")) ?? undefined;
+	const charName = optionChar?.standardize();
+
+	let userStatistique = await getUserFromMessage(
+		client,
+		interaction.user.id,
+		interaction,
+		charName,
+		{ skipNotFound: true }
+	);
+	const selectedCharByQueries = serializeName(userStatistique, charName);
+
+	if (optionChar && !selectedCharByQueries) {
+		await reply(interaction, {
+			embeds: [
+				embedError(ul("error.charName", { charName: optionChar.capitalize() }), ul),
+			],
+			ephemeral: true,
+		});
+		return;
+	}
+	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
+	if (!userStatistique && !charName) {
+		//find the first character registered
+		const char = await getFirstChar(client, interaction, ul);
+		userStatistique = char?.userStatistique;
+		optionChar = char?.optionChar;
+	}
+	if (!userStatistique) {
+		await reply(interaction, {
+			embeds: [embedError(ul("error.notRegistered"), ul)],
+			ephemeral: true,
+		});
+		return;
+	}
+
+	if (!userStatistique.stats) {
+		await reply(interaction, {
+			embeds: [embedError(ul("error.noStats"), ul)],
+			ephemeral: true,
+		});
+		return;
+	}
+	return { userStatistique, ul, optionChar, options };
+}
+
+export function getRightValue(
+	userStatistique: UserData,
+	standardizedStatistic: string,
+	ul: Translation,
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	optionChar: string | undefined,
+	statistic: string
+) {
+	let userStat = userStatistique.stats?.[standardizedStatistic];
+	// noinspection LoopStatementThatDoesntLoopJS
+	while (!userStat) {
+		const guildData = client.settings.get(interaction.guild!.id, "templateID.statsName");
+		if (userStatistique.stats && guildData) {
+			const findStatInList = guildData.find((stat) =>
+				stat.subText(standardizedStatistic)
+			);
+			if (findStatInList) {
+				standardizedStatistic = findStatInList.standardize(true);
+				statistic = findStatInList;
+				userStat = userStatistique.stats[findStatInList.standardize(true)];
+			}
+		}
+		if (userStat) break;
+		throw new Error(
+			ul("error.noStat", {
+				stat: standardizedStatistic.capitalize(),
+				char: optionChar ? ` ${optionChar.capitalize()}` : "",
+			})
+		);
+	}
+	return { userStat, standardizedStatistic, statistic };
 }
