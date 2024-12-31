@@ -67,7 +67,7 @@ export const calc = {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const focused = options.getFocused(true);
 		if (focused.name === t("calc.sign.title")) {
-			const signs = ["<", ">", "⩽", "⩾", "=", "≠", "+", "-", "*", "/", "%", "^"];
+			const signs = ["+", "-", "*", "/", "%", "^", "<", ">", "⩽", "⩾", "=", "≠"];
 			return await interaction.respond(
 				signs.map((sign) => ({
 					name: sign,
@@ -91,7 +91,21 @@ export const calc = {
 	},
 };
 
+export function autoFocuseSign(interaction: Djs.AutocompleteInteraction) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const focused = options.getFocused(true);
+	if (focused.name === t("calc.sign.title")) {
+		const signs = ["<", ">", "⩽", "⩾", "=", "≠", "+", "-", "*", "/", "%", "^"];
+		return signs.map((sign) => ({
+			name: sign,
+			value: reverseSign(sign),
+		}));
+	}
+	return;
+}
+
 function reverseSign(sign: string) {
+	console.log(sign);
 	switch (sign) {
 		case "⩽":
 			return "<=";
@@ -100,6 +114,7 @@ function reverseSign(sign: string) {
 		case "≠":
 			return "!=";
 		case "=":
+			console.log("equal");
 			return "==";
 		default:
 			return sign;

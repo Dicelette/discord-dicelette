@@ -226,11 +226,11 @@ export const mjRoll = {
 								},
 								{
 									value: ">=",
-									name: "≥",
+									name: "⩾",
 								},
 								{
 									value: "<=",
-									name: "≤",
+									name: "⩽",
 								}
 							)
 					)

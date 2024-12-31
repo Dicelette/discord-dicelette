@@ -226,16 +226,16 @@ export class ResultAsText {
 	private goodCompareSign(
 		compare: Compare,
 		total: number
-	): "<" | ">" | "≥" | "≤" | "=" | "!=" | "==" | "" {
+	): "<" | ">" | "⩾" | "⩽" | "=" | "!=" | "==" | "" {
 		//as the comparaison value is AFTER the total, we need to invert the sign to have a good comparaison string
 		const { sign, value } = compare;
 		const success = evaluate(`${total} ${sign} ${value}`);
 		if (success) {
-			return sign.replace(">=", "≥").replace("<=", "≤") as
+			return sign.replace(">=", "⩾").replace("<=", "⩽") as
 				| "<"
 				| ">"
-				| "≥"
-				| "≤"
+				| "⩾"
+				| "⩽"
 				| "="
 				| ""
 				| "!="
@@ -247,9 +247,9 @@ export class ResultAsText {
 			case ">":
 				return "<";
 			case ">=":
-				return "≤";
+				return "⩽";
 			case "<=":
-				return "≥";
+				return "⩾";
 			case "=":
 				return "=";
 			case "!=":
