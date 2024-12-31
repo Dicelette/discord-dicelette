@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.31.0](https://github.com/Dicelette/discord-dicelette/compare/1.30.2...1.31.0) (2024-12-31)
+
+
+### Features
+
+* **calc:** enhance calc sign with allowing >= and ⩾ ascii ([37cc9a1](https://github.com/Dicelette/discord-dicelette/commit/37cc9a1a4b3dec855541e65fd6892e600ed8b32a))
+
+
+### Bug Fixes
+
+* **calc:** uniformize when rolling the expression ([d91f5a1](https://github.com/Dicelette/discord-dicelette/commit/d91f5a18adc58b107bfb269908d4ed3c3e022a03))
+
 ## [1.30.2](https://github.com/Dicelette/discord-dicelette/compare/1.31.0...1.30.2) (2024-12-30)
 
 
