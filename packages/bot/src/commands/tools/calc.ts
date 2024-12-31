@@ -44,7 +44,15 @@ export const calc = {
 				.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
 				.setRequired(true)
 		)
-
+		.addStringOption((option) =>
+			option
+				.setName(t("calc.transform.title"))
+				.setDescription(t("calc.transform.desc"))
+				.setRequired(false)
+				.setNameLocalizations(cmdLn("calc.transform.title"))
+				.setDescriptionLocalizations(cmdLn("calc.transform.desc"))
+				.setAutocomplete(true)
+		)
 		.addStringOption((option) =>
 			option
 				.setName(t("common.character"))
@@ -66,6 +74,8 @@ export const calc = {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
+		const transform = autofocusTransform(interaction);
+		if (transform) return await interaction.respond(transform);
 		return await interaction.respond(
 			filter.map((result) => ({
 				name: capitalizeBetweenPunct(result.capitalize()),
@@ -81,6 +91,21 @@ export const calc = {
 		return await calculate(options, userStatistique, ul, interaction, client, optionChar);
 	},
 };
+
+export function autofocusTransform(interaction: Djs.AutocompleteInteraction) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const focused = options.getFocused(true);
+	if (focused.name === t("calc.transform.title")) {
+		const transforms = ["abs", "ceil", "floor", "round", "sqrt", "square"].filter(
+			(transform) => transform.includes(focused.value)
+		);
+		return transforms.map((transform) => ({
+			name: transform,
+			value: transform,
+		}));
+	}
+	return;
+}
 
 export function autoFocuseSign(interaction: Djs.AutocompleteInteraction) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -132,11 +157,11 @@ export async function calculate(
 	optionChar?: string,
 	hide?: boolean
 ) {
-	const formula = options
+	let formula = options
 		.getString(t("calc.formula.title"), true)
-		.replace(/^([><]=?|==|!=|[+\-*/%^])/, "");
+		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
 	const sign = options.getString(t("calc.sign.title"), true);
-	console.log(sign);
+	if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
 	if (!sign.match(/^([><]=?|==|!=|[+\-*\/%^])$/)) {
 		const embed = embedError(ul("error.sign", { sign }), ul);
 		return await interaction.reply({ embeds: [embed] });
@@ -184,6 +209,7 @@ export async function calculate(
 		totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	try {
 		const result = evaluate(totalFormula);
+		const transform = options.getString(t("calc.transform.title")) ?? undefined;
 		const header = infoUserCalc(
 			client.settings.get(interaction.guildId!, "timestamp") ?? false,
 			{
@@ -195,7 +221,7 @@ export async function calculate(
 			comments,
 			optionChar
 		);
-		const msg = formatFormula(ul, totalFormula, `${result}`, originalFormula);
+		const msg = formatFormula(ul, totalFormula, `${result}`, originalFormula, transform);
 		await reply(interaction, { content: `${header}\n${msg}`, ephemeral: hide });
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
@@ -254,11 +280,23 @@ function goodSign(sign: string) {
 	}
 }
 
+function multipleTransform(transform: string, res: string) {
+	const regex = /(?<exp1>\w+)\(?(?<exp2>\w+)?\(?\)?\)?/;
+	const match = regex.exec(transform);
+	if (!match) return `${transform}(${res})`;
+	const exp1 = match.groups?.exp1;
+	const exp2 = match.groups?.exp2;
+	if (exp1 && !exp2) return `${exp1}(${res})`;
+	if (exp1 && exp2) return `${exp1}(${exp2}(${res}))`;
+	return `${transform}(${res})`;
+}
+
 function formatFormula(
 	ul: Translation,
 	formula: string,
 	resultat: string,
-	originalFormula: string
+	originalFormula: string,
+	transform?: string
 ) {
 	const sign = originalFormula.match(/(!=|==|>=|<=)/g);
 	if (sign) {
@@ -268,7 +306,13 @@ function formatFormula(
 
 	let res = `\t  \`${originalFormula}\` → \`${formula}\``;
 	if (originalFormula === formula) res = `\t  \`${formula}\``;
-	if (isNumber(resultat)) return `${res} = \`${resultat}\``;
+	if (isNumber(resultat)) {
+		if (transform) {
+			const transformValue = evaluate(multipleTransform(transform, resultat));
+			return `${res} → \`${transform}(${resultat})\` = \`${transformValue}\``;
+		}
+		return `${res} = \`${resultat}\``;
+	}
 	if (resultat.toLowerCase() === "false") {
 		if (sign) formula = formula.replace(asciiSign(sign[0]), goodSign(sign[0]));
 		return `\t  ${ul("common.false")}${ul("common.space")}: \`${originalFormula}\` → \`${formula}\``;

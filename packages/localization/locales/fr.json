@@ -53,7 +53,17 @@
       "title": "signe"
     },
     "statistic": "Statistiques à utiliser",
-    "title": "calc"
+    "title": "calc",
+    "transform": {
+      "abs": "absolu",
+      "ceil": "arrondir (entier supérieur)",
+      "desc": "Arrondir, plafonner, plancher ou élever au cube le résultat.",
+      "floor": "arrondir (entier inférieur)",
+      "round": "arrondir",
+      "sqrt": "sqrt",
+      "square": "élevé au carré",
+      "title": "transformer"
+    }
   },
   "changeThread": {
     "delete": "Les résultats des dés ne seront plus envoyés",

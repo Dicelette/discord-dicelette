@@ -194,7 +194,40 @@ export const mjRoll = {
 							.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
 							.setRequired(true)
 					)
-
+					.addStringOption((option) =>
+						option
+							.setName(t("calc.transform.title"))
+							.setDescription(t("calc.transform.desc"))
+							.setRequired(false)
+							.setNameLocalizations(cmdLn("calc.transform.title"))
+							.setDescriptionLocalizations(cmdLn("calc.transform.desc"))
+							.addChoices(
+								{
+									name: t("calc.transform.floor"),
+									value: "floor",
+								},
+								{
+									name: t("calc.transform.ceil"),
+									value: "ceil",
+								},
+								{
+									name: t("calc.transform.round"),
+									value: "round",
+								},
+								{
+									name: t("calc.transform.abs"),
+									value: "abs",
+								},
+								{
+									name: t("calc.transform.sqrt"),
+									value: "sqrt",
+								},
+								{
+									name: t("calc.transform.square"),
+									value: "square",
+								}
+							)
+					)
 					.addStringOption((option) =>
 						option
 							.setName(t("common.character"))

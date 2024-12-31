@@ -53,7 +53,17 @@
       "title": "sign"
     },
     "statistic": "Statistic to use",
-    "title": "calc"
+    "title": "calc",
+    "transform": {
+      "abs": "absolute",
+      "ceil": "ceil",
+      "desc": "round, ceil, floor or cube the result",
+      "floor": "floor",
+      "round": "round",
+      "sqrt": "sqrt",
+      "square": "square",
+      "title": "transform"
+    }
   },
   "changeThread": {
     "delete": "Dice results will no longer be sent",
