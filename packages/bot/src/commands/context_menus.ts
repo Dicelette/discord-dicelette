@@ -26,7 +26,14 @@ export async function commandMenu(
 	const message = interaction.targetMessage.content;
 	const messageUrl = interaction.targetMessage.url;
 
-	const link = await finalLink(interaction, message, messageUrl, ul);
+	const link = await finalLink(message, messageUrl, ul);
+	if (!link) {
+		await interaction.reply({
+			content: ul("copyRollResult.error.noResult"),
+			ephemeral: true,
+		});
+		return;
+	}
 	await interaction.reply({
 		content: `${ul("copyRollResult.info")}\n\n\`\`${link}\`\``,
 		ephemeral: true,
@@ -38,34 +45,21 @@ export async function commandMenu(
 	});
 }
 
-async function finalLink(
-	interaction: Djs.MessageContextMenuCommandInteraction | Djs.ButtonInteraction,
-	message: string,
-	messageUrl: string,
-	ul: Translation
-) {
+async function finalLink(message: string, messageUrl: string, ul: Translation) {
 	const regexResultForRoll = /= `(?<result>.*)`/gi;
 	const successFail = / {2}(?<compare>.*) — /gi;
 
 	const list = message.split("\n");
 	const res: string[] = [];
 	for (const line of list) {
-		if (!line.startsWith("  ")) continue;
+		if (!line.match(/^\s+/)) continue;
 		const match = regexResultForRoll.exec(line)?.groups?.result;
 		const compare = successFail.exec(line)?.groups?.compare;
-		if (match && compare) {
-			res.push(`${compare.trim()} — \`${match.trim()}\``);
-		} else if (match) {
-			res.push(`\`${match.trim()}\``);
-		}
+		if (match && compare) res.push(`${compare.trim()} — \`${match.trim()}\``);
+		else if (match) res.push(`\`${match.trim()}\``);
 	}
 
-	if (res.length === 0) {
-		await interaction.reply({
-			content: ul("copyRollResult.error.noResult"),
-		});
-		return;
-	}
+	if (res.length === 0) return undefined;
 
 	const statsReg = /\[__(?<stats>.*)__]/gi;
 	const stats = statsReg.exec(message)?.groups?.stats;
@@ -82,7 +76,14 @@ export async function mobileLink(interaction: Djs.ButtonInteraction, ul: Transla
 	const message = interaction.message.content;
 	const messageUrl = interaction.message.url;
 	//check user mobile or desktop
-	const link = await finalLink(interaction, message, messageUrl, ul);
+	const link = await finalLink(message, messageUrl, ul);
+	if (!link) {
+		await interaction.reply({
+			content: ul("copyRollResult.error.noResult"),
+			ephemeral: true,
+		});
+		return;
+	}
 	await interaction.reply({
 		content: link,
 		ephemeral: true,
@@ -92,7 +93,14 @@ export async function mobileLink(interaction: Djs.ButtonInteraction, ul: Transla
 export async function desktopLink(interaction: Djs.ButtonInteraction, ul: Translation) {
 	const message = interaction.message.content;
 	const messageUrl = interaction.message.url;
-	const link = await finalLink(interaction, message, messageUrl, ul);
+	const link = await finalLink(message, messageUrl, ul);
+	if (!link) {
+		await interaction.reply({
+			content: ul("copyRollResult.error.noResult"),
+			ephemeral: true,
+		});
+		return;
+	}
 	await interaction.reply({
 		content: `\`\`${link}\`\``,
 		ephemeral: true,
