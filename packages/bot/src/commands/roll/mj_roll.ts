@@ -7,7 +7,7 @@ import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { serializeName } from "utils";
 import { rollDice, rollStatistique } from "utils";
-import { calculate } from "../tools";
+import { autoFocuseSign, calculate } from "../tools";
 
 export const mjRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -183,56 +183,7 @@ export const mjRoll = {
 							.setRequired(true)
 							.setNameLocalizations(cmdLn("calc.sign.title"))
 							.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
-							.addChoices(
-								{
-									name: "+",
-									value: "+",
-								},
-								{
-									name: "-",
-									value: "-",
-								},
-								{
-									name: "*",
-									value: "*",
-								},
-								{
-									name: "/",
-									value: "/",
-								},
-								{
-									name: "%",
-									value: "%",
-								},
-								{
-									name: "^",
-									value: "^",
-								},
-								{
-									value: "!=",
-									name: "≠",
-								},
-								{
-									value: "==",
-									name: "=",
-								},
-								{
-									value: ">",
-									name: ">",
-								},
-								{
-									value: "<",
-									name: "<",
-								},
-								{
-									value: ">=",
-									name: "⩾",
-								},
-								{
-									value: "<=",
-									name: "⩽",
-								}
-							)
+							.setAutocomplete(true)
 					)
 					.addStringOption((option) =>
 						option
@@ -271,6 +222,8 @@ export const mjRoll = {
 					)
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+		const sign = autoFocuseSign(interaction);
+		if (sign) return await interaction.respond(sign);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
 		const guildData = client.settings.get(interaction.guild!.id);

@@ -332,6 +332,7 @@
     "private": "This character sheet is private! \nYou do not have permission to read it.",
     "public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
     "rollChannelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration.",
+    "sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
     "statNotFound": "Statistics not found! Did you make a typing error?",
     "template": "You must provide a JSON file.",
     "tooMuchDice": "Too many dice have been saved! You cannot have more than 25 dice saved.",

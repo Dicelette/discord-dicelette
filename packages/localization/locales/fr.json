@@ -332,6 +332,7 @@
     "private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
     "public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
     "rollChannelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut.",
+    "sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
     "statNotFound": "Statistiques introuvable ! Avez vous fait une erreur de frappe ?",
     "template": "Vous devez fournir un fichier JSON.",
     "tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",

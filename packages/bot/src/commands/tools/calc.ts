@@ -64,18 +64,9 @@ export const calc = {
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const focused = options.getFocused(true);
-		if (focused.name === t("calc.sign.title")) {
-			const signs = ["+", "-", "*", "/", "%", "^", "<", ">", "⩽", "⩾", "=", "≠"];
-			return await interaction.respond(
-				signs.map((sign) => ({
-					name: sign,
-					value: reverseSign(sign),
-				}))
-			);
-		}
-		await interaction.respond(
+		const sign = autoFocuseSign(interaction);
+		if (sign) return await interaction.respond(sign);
+		return await interaction.respond(
 			filter.map((result) => ({
 				name: capitalizeBetweenPunct(result.capitalize()),
 				value: result,
@@ -95,7 +86,20 @@ export function autoFocuseSign(interaction: Djs.AutocompleteInteraction) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
 	if (focused.name === t("calc.sign.title")) {
-		const signs = ["<", ">", "⩽", "⩾", "=", "≠", "+", "-", "*", "/", "%", "^"];
+		const signs = [
+			"+",
+			"-",
+			"*",
+			"/",
+			"%",
+			"^",
+			"<",
+			">",
+			"⩽ (<=)",
+			"⩾ (>=)",
+			"= (==)",
+			"≠ (!=)",
+		].filter((sign) => sign.includes(focused.value));
 		return signs.map((sign) => ({
 			name: sign,
 			value: reverseSign(sign),
@@ -105,16 +109,14 @@ export function autoFocuseSign(interaction: Djs.AutocompleteInteraction) {
 }
 
 function reverseSign(sign: string) {
-	console.log(sign);
 	switch (sign) {
-		case "⩽":
+		case "⩽ (<=)":
 			return "<=";
-		case "⩾":
+		case "⩾ (>=)":
 			return ">=";
-		case "≠":
+		case "≠ (!=)":
 			return "!=";
-		case "=":
-			console.log("equal");
+		case "= (==)":
 			return "==";
 		default:
 			return sign;
@@ -133,19 +135,13 @@ export async function calculate(
 	const formula = options
 		.getString(t("calc.formula.title"), true)
 		.replace(/^([><]=?|==|!=|[+\-*/%^])/, "");
-	const sign = options.getString(t("calc.sign.title")) as
-		| ">"
-		| "<"
-		| ">="
-		| "<="
-		| "=="
-		| "!="
-		| "+"
-		| "-"
-		| "*"
-		| "/"
-		| "%"
-		| "^";
+	const sign = options.getString(t("calc.sign.title"), true);
+	console.log(sign);
+	if (!sign.match(/^([><]=?|==|!=|[+\-*\/%^])$/)) {
+		const embed = embedError(ul("error.sign", { sign }), ul);
+		return await interaction.reply({ embeds: [embed] });
+	}
+
 	const statInfo: {
 		value: number | undefined;
 		stat: string;
@@ -223,7 +219,7 @@ function infoUserCalc(
 	return `${user}\\🔢[__${stat.capitalize()}__]${comments ? ` *${comments}*` : ""}`;
 }
 
-function replaceSign(sign: string) {
+function asciiSign(sign: string) {
 	if (sign === "!=") return " ≠ ";
 	if (sign === "==") return " = ";
 	if (sign === ">=") return " ⩾ ";
@@ -266,15 +262,15 @@ function formatFormula(
 ) {
 	const sign = originalFormula.match(/(!=|==|>=|<=)/g);
 	if (sign) {
-		originalFormula = originalFormula.replace(sign[0], replaceSign(sign[0]));
-		formula = formula.replace(sign[0], replaceSign(sign[0]));
+		originalFormula = originalFormula.replace(sign[0], asciiSign(sign[0]));
+		formula = formula.replace(sign[0], asciiSign(sign[0]));
 	}
 
 	let res = `\t  \`${originalFormula}\` → \`${formula}\``;
 	if (originalFormula === formula) res = `\t  \`${formula}\``;
 	if (isNumber(resultat)) return `${res} = \`${resultat}\``;
 	if (resultat.toLowerCase() === "false") {
-		if (sign) formula = formula.replace(replaceSign(sign[0]), goodSign(sign[0]));
+		if (sign) formula = formula.replace(asciiSign(sign[0]), goodSign(sign[0]));
 		return `\t  ${ul("common.false")}${ul("common.space")}: \`${originalFormula}\` → \`${formula}\``;
 	}
 	if (resultat.toLowerCase() === "true")
