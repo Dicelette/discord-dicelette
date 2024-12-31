@@ -2,7 +2,7 @@ import { generateStatsDice } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, isNumber } from "@dicelette/utils";
+import { capitalizeBetweenPunct, isNumber, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
@@ -181,6 +181,7 @@ export async function calculate(
 		userStatistique.stats,
 		`${statInfo.value}`
 	);
+	logger.trace(`Calculation: ${formulaWithStats}`);
 	const isRoll = getRoll(formulaWithStats);
 	let originalFormula = `${statInfo.value}${sign}(${formula})`;
 	if (isNumber(formula)) originalFormula = `${statInfo.value}${sign}${formula}`;
