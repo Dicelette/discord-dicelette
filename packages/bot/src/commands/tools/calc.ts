@@ -33,56 +33,7 @@ export const calc = {
 				.setRequired(true)
 				.setNameLocalizations(cmdLn("calc.sign.title"))
 				.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
-				.addChoices(
-					{
-						name: "+",
-						value: "+",
-					},
-					{
-						name: "-",
-						value: "-",
-					},
-					{
-						name: "*",
-						value: "*",
-					},
-					{
-						name: "/",
-						value: "/",
-					},
-					{
-						name: "%",
-						value: "%",
-					},
-					{
-						name: "^",
-						value: "^",
-					},
-					{
-						value: "!=",
-						name: "≠",
-					},
-					{
-						value: "==",
-						name: "=",
-					},
-					{
-						value: ">",
-						name: ">",
-					},
-					{
-						value: "<",
-						name: "<",
-					},
-					{
-						value: ">=",
-						name: "≥",
-					},
-					{
-						value: "<=",
-						name: "≤",
-					}
-				)
+				.setAutocomplete(true)
 		)
 		.addStringOption((option) =>
 			option
@@ -113,6 +64,17 @@ export const calc = {
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
+		const options = interaction.options as Djs.CommandInteractionOptionResolver;
+		const focused = options.getFocused(true);
+		if (focused.name === t("calc.sign.title")) {
+			const signs = ["<", ">", "⩽", "⩾", "=", "≠", "+", "-", "*", "/", "%", "^"];
+			return await interaction.respond(
+				signs.map((sign) => ({
+					name: sign,
+					value: reverseSign(sign),
+				}))
+			);
+		}
 		await interaction.respond(
 			filter.map((result) => ({
 				name: capitalizeBetweenPunct(result.capitalize()),
@@ -128,6 +90,21 @@ export const calc = {
 		return await calculate(options, userStatistique, ul, interaction, client, optionChar);
 	},
 };
+
+function reverseSign(sign: string) {
+	switch (sign) {
+		case "⩽":
+			return "<=";
+		case "⩾":
+			return ">=";
+		case "≠":
+			return "!=";
+		case "=":
+			return "==";
+		default:
+			return sign;
+	}
+}
 
 export async function calculate(
 	options: Djs.CommandInteractionOptionResolver,
@@ -232,11 +209,38 @@ function infoUserCalc(
 }
 
 function replaceSign(sign: string) {
-	if (sign === "!=") return "≠";
-	if (sign === "==") return "=";
-	if (sign === ">=") return "≥";
-	if (sign === "<=") return "≤";
+	if (sign === "!=") return " ≠ ";
+	if (sign === "==") return " = ";
+	if (sign === ">=") return " ⩾ ";
+	if (sign === "<=") return " ⩽ ";
 	return sign;
+}
+
+function goodSign(sign: string) {
+	switch (sign) {
+		case "≠":
+			return " = ";
+		case "!=":
+			return " = ";
+		case "⩾":
+			return " ⩽ ";
+		case ">=":
+			return " ⩽ ";
+		case "⩽":
+			return " ⩾ ";
+		case "<=":
+			return " ⩾ ";
+		case "=":
+			return " ≠ ";
+		case "==":
+			return " ≠ ";
+		case ">":
+			return " < ";
+		case " < ":
+			return " > ";
+		default:
+			return sign;
+	}
 }
 
 function formatFormula(
@@ -246,12 +250,18 @@ function formatFormula(
 	originalFormula: string
 ) {
 	const sign = originalFormula.match(/(!=|==|>=|<=)/g);
-	if (sign) originalFormula = originalFormula.replace(sign[0], replaceSign(sign[0]));
+	if (sign) {
+		originalFormula = originalFormula.replace(sign[0], replaceSign(sign[0]));
+		formula = formula.replace(sign[0], replaceSign(sign[0]));
+	}
+
 	let res = `\t  \`${originalFormula}\` → \`${formula}\``;
 	if (originalFormula === formula) res = `\t  \`${formula}\``;
 	if (isNumber(resultat)) return `${res} = \`${resultat}\``;
-	if (resultat.toLowerCase() === "false")
-		return `\t  ${ul("common.false")}${ul("common.space")}: ${res.trimStart()}`;
+	if (resultat.toLowerCase() === "false") {
+		if (sign) formula = formula.replace(replaceSign(sign[0]), goodSign(sign[0]));
+		return `\t  ${ul("common.false")}${ul("common.space")}: \`${originalFormula}\` → \`${formula}\``;
+	}
 	if (resultat.toLowerCase() === "true")
 		return `\t  ${ul("common.true")}${ul("common.space")}: ${res.trimStart()}`;
 }
