@@ -308,8 +308,9 @@ function formatFormula(
 	if (originalFormula === formula) res = `\t  \`${formula}\``;
 	if (isNumber(resultat)) {
 		if (transform) {
-			const transformValue = evaluate(multipleTransform(transform, resultat));
-			return `${res} → \`${transform}(${resultat})\` = \`${transformValue}\``;
+			const formatted = multipleTransform(transform, resultat);
+			const transformValue = evaluate(formatted);
+			return `${res} → \`${formatted}\` = \`${transformValue}\``;
 		}
 		return `${res} = \`${resultat}\``;
 	}
