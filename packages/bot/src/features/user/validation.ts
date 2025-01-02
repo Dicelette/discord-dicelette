@@ -33,7 +33,10 @@ export async function continuePage(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (!isModerator) {
-		await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	const page = Number.isNaN(Number.parseInt(interaction.customId.replace("page", ""), 10))
@@ -50,7 +53,10 @@ export async function continuePage(
 		.filter((stat) => allTemplateStat.includes(stat.unidecode()))
 		.map((stat) => stat.unidecode());
 	if (statsAlreadySet.length === allTemplateStat.length) {
-		await reply(interaction, { content: ul("modals.alreadySet"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("modals.alreadySet"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	await showStatistiqueModal(interaction, dbTemplate, statsAlreadySet, page + 1);
@@ -72,7 +78,11 @@ export async function validateUserButton(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (isModerator) await validateUser(interaction, template, db, characters);
-	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
+	else
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 /**
@@ -101,7 +111,7 @@ export async function validateUser(
 		if (!channel) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.channel", { channel: channelToPost }), ul)],
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -110,7 +120,7 @@ export async function validateUser(
 	if (!userID) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.user"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -241,6 +251,9 @@ export async function validateUser(
 		logger.warn(e, "validateUser: can't delete the message");
 	}
 	await addAutoRole(interaction, userID, !!statsEmbed, !!diceEmbed, db);
-	await reply(interaction, { content: ul("modals.finished"), ephemeral: true });
+	await reply(interaction, {
+		content: ul("modals.finished"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 	return;
 }

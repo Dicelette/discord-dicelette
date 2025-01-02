@@ -38,13 +38,19 @@ export default {
 		const lang = client.settings.get(interaction.guild.id, "lang") ?? interaction.locale;
 		const ul = ln(lang);
 		if (!scene && !bubble) {
-			await reply(interaction, { content: ul("scene.noScene"), ephemeral: true });
+			await reply(interaction, {
+				content: ul("scene.noScene"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
 			return;
 		}
 		//archive old threads
 		// noinspection SuspiciousTypeOfGuard
 		const isTextChannel = channel instanceof Djs.TextChannel;
-		if (channel.parent instanceof Djs.ForumChannel || !channel.name.startsWith("🎲")) {
+		if (
+			(channel.parent && channel.parent.type === Djs.ChannelType.GuildForum) ||
+			!channel.name.startsWith("🎲")
+		) {
 			const threads = isTextChannel
 				? channel.threads.cache.filter(
 						(thread) => thread.name.startsWith("🎲") && !thread.archived

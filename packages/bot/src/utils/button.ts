@@ -85,7 +85,11 @@ export async function cancel(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (user || isModerator) await interaction.message.delete();
-	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
+	else
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 /**

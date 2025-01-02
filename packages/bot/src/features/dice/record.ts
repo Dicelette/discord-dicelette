@@ -53,7 +53,11 @@ export async function storeDamageDice(
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (user || isModerator)
 		await registerDamageDice(interaction, client, interaction.customId.includes("first"));
-	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
+	else
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 /**
@@ -149,7 +153,10 @@ export async function registerDamageDice(
 		{} as Record<string, string>
 	);
 	if (damageName && Object.keys(damageName).length > 25) {
-		await reply(interaction, { content: ul("modals.dice.max"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("modals.dice.max"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	const { userID, userName } = await getUserNameAndChar(interaction, ul, first);
@@ -204,7 +211,10 @@ async function edit(
 	userName?: string
 ) {
 	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
-	await reply(interaction, { content: ul("modals.added.dice"), ephemeral: true });
+	await reply(interaction, {
+		content: ul("modals.added.dice"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 	await sendLogs(
 		ul("logs.dice.add", {
 			user: Djs.userMention(interaction.user.id),

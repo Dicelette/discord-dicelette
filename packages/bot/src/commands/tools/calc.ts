@@ -155,7 +155,7 @@ export async function calculate(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	optionChar?: string,
-	hide?: boolean
+	hide?: boolean | null
 ) {
 	let formula = options
 		.getString(t("calc.formula.title"), true)
@@ -222,7 +222,10 @@ export async function calculate(
 			optionChar
 		);
 		const msg = formatFormula(ul, totalFormula, `${result}`, originalFormula, transform);
-		await reply(interaction, { content: `${header}\n${msg}`, ephemeral: hide });
+		await reply(interaction, {
+			content: `${header}\n${msg}`,
+			flags: hide ? Djs.MessageFlags.Ephemeral : undefined,
+		});
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });

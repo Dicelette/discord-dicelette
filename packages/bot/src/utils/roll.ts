@@ -18,7 +18,7 @@ import {
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
-import type * as Djs from "discord.js";
+import * as Djs from "discord.js";
 import {
 	deleteAfter,
 	embedError,
@@ -43,7 +43,16 @@ export async function rollWithInteraction(
 	hideResult?: boolean | null,
 	customCritical?: Record<string, CustomCritical> | undefined
 ) {
-	if (!channel || channel.isDMBased() || !channel.isTextBased() || !interaction.guild)
+	//exclude announcement channel
+	if (
+		!channel ||
+		channel.type === Djs.ChannelType.GuildAnnouncement ||
+		channel.type === Djs.ChannelType.AnnouncementThread ||
+		channel.isVoiceBased() ||
+		channel.isDMBased() ||
+		!channel.isTextBased() ||
+		!interaction.guild
+	)
 		return;
 	const langToUser =
 		db.get(interaction.guild.id, "lang") ??
@@ -68,7 +77,7 @@ export async function rollWithInteraction(
 	if (defaultMsg.error) {
 		await reply(interaction, {
 			embeds: [embedError(output, ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -90,7 +99,7 @@ export async function rollWithInteraction(
 			await reply(interaction, {
 				content: output,
 				allowedMentions: { users: [data!.userId as string] },
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -99,7 +108,7 @@ export async function rollWithInteraction(
 		await reply(interaction, {
 			content: output,
 			allowedMentions: { users: [data!.userId as string] },
-			ephemeral: !!hidden,
+			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
 		});
 		return;
 	}
@@ -114,7 +123,7 @@ export async function rollWithInteraction(
 	const inter = await reply(interaction, {
 		content: rollTextUrl,
 		allowedMentions: { users: [data!.userId as string] },
-		ephemeral: !!hidden,
+		flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
 	});
 	const anchor = db.get(interaction.guild.id, "context");
 	const dbTime = db.get(interaction.guild.id, "deleteAfter");
@@ -184,7 +193,7 @@ export async function rollDice(
 					ul
 				),
 			],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -247,7 +256,10 @@ export async function rollStatistique(
 		.get(interaction.guild!.id, "templateID.excludedStats")
 		?.map((stat) => stat.standardize());
 	if (excludedStats?.includes(standardizedStatistic)) {
-		await reply(interaction, { content: ul("error.excludedStat"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("error.excludedStat"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
@@ -274,7 +286,10 @@ export async function rollStatistique(
 	const template = userStatistique.template;
 	let dice = template.diceType?.replaceAll("$", userStat.toString());
 	if (!dice) {
-		await reply(interaction, { content: ul("error.noDice"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("error.noDice"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	if (override) {

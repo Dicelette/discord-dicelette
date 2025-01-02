@@ -323,7 +323,7 @@ export const mjRoll = {
 				embeds: [
 					embedError(ul("error.charName", { charName: charName.capitalize() }), ul),
 				],
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -366,6 +366,14 @@ export const mjRoll = {
 				hide
 			);
 		if (subcommand === ul("calc.title"))
-			return await calculate(options, charData, ul, interaction, client, optionChar);
+			return await calculate(
+				options,
+				charData,
+				ul,
+				interaction,
+				client,
+				optionChar,
+				hide
+			);
 	},
 };

@@ -8,7 +8,7 @@ import type {
 import type { EClient } from "client";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
-import type * as Djs from "discord.js";
+import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
 
@@ -27,7 +27,7 @@ export async function validateMove(
 	if (!user) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.user"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(interaction.message, ul);
 	}
@@ -39,7 +39,7 @@ export async function validateMove(
 	if (!oldUserId) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.user"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(interaction.message, ul);
 	}
@@ -47,7 +47,7 @@ export async function validateMove(
 	if (!oldUser) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.user"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(interaction.message, ul);
 	}
@@ -60,7 +60,7 @@ export async function validateMove(
 	if (!charData) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.notFound"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(interaction.message, ul);
 	}

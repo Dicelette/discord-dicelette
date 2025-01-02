@@ -170,7 +170,10 @@ async function buttonSubmit(
 		await features.initiateDiceEdit(interaction, ul, interactionUser, db);
 	else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);
-		await interaction.reply({ content: ul("refresh"), ephemeral: true });
+		await interaction.reply({
+			content: ul("refresh"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	} else if (interaction.customId.includes("copyResult")) {
 		const isMobile = interaction.customId.includes("mobile");
 		//remove button from the message

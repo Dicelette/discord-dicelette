@@ -7,8 +7,7 @@ export const contextMenus = [
 	new Djs.ContextMenuCommandBuilder()
 		.setName(t("copyRollResult.name"))
 		.setNameLocalizations(cmdLn("copyRollResult.name"))
-		.setDMPermission(false)
-		//@ts-ignore
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setType(Djs.ApplicationCommandType.Message),
 ];
 export async function commandMenu(
@@ -30,18 +29,18 @@ export async function commandMenu(
 	if (!link) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.noResult"),
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	await interaction.reply({
 		content: `${ul("copyRollResult.info")}\n\n\`\`${link}\`\``,
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 
 	await interaction.followUp({
 		content: `${link}`,
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -80,13 +79,13 @@ export async function mobileLink(interaction: Djs.ButtonInteraction, ul: Transla
 	if (!link) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.noResult"),
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	await interaction.reply({
 		content: link,
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -97,12 +96,12 @@ export async function desktopLink(interaction: Djs.ButtonInteraction, ul: Transl
 	if (!link) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.noResult"),
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	await interaction.reply({
 		content: `\`\`${link}\`\``,
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }

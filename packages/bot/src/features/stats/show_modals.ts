@@ -38,7 +38,10 @@ export async function showStatistiqueModal(
 		if (statToDisplay.length === 0) {
 			//remove button
 			const button = registerDmgButton(ul);
-			await reply(interaction, { content: ul("modals.alreadySet"), ephemeral: true });
+			await reply(interaction, {
+				content: ul("modals.alreadySet"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
 			await interaction.message.edit({ components: [button] });
 		}
 	}

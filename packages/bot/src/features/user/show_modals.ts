@@ -14,7 +14,11 @@ export async function startRegisterUser(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (isModerator) await showFirstPageModal(interaction, template, ul, havePrivate);
-	else await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
+	else
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 /**

@@ -140,7 +140,7 @@ export default {
 					embeds: [
 						embedError(ul("error.charName", { charName: charOptions.capitalize() }), ul),
 					],
-					ephemeral: true,
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 				return;
 			}
@@ -153,14 +153,14 @@ export default {
 			if (!userStatistique) {
 				await reply(interaction, {
 					embeds: [embedError(ul("error.notRegistered"), ul)],
-					ephemeral: true,
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 				return;
 			}
 			if (!userStatistique.damage) {
 				await reply(interaction, {
 					embeds: [embedError(ul("error.emptyDamage"), ul)],
-					ephemeral: true,
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 				return;
 			}
@@ -176,7 +176,7 @@ export default {
 			logger.fatal(e);
 			await reply(interaction, {
 				content: t("error.generic.e", { e: e as Error }),
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}

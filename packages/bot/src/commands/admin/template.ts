@@ -218,7 +218,7 @@ export const registerTemplate = {
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		if (!interaction.guild) return;
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const langToUse =
 			client.settings.get(interaction.guild!.id, "lang") ??
@@ -231,7 +231,7 @@ export const registerTemplate = {
 		if (!template.contentType?.includes("json")) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.template"), ul)],
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -261,7 +261,7 @@ export const registerTemplate = {
 				embeds: [
 					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 				],
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -270,7 +270,7 @@ export const registerTemplate = {
 				embeds: [
 					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 				],
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}

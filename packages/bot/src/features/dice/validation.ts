@@ -130,7 +130,10 @@ export async function validateDiceEdit(
 		await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 			embeds: toAdd,
 		});
-		await reply(interaction, { content: ul("modals.removed.dice"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("modals.removed.dice"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 
 		const userRegister: UserRegistration = {
 			userID,
@@ -172,7 +175,10 @@ export async function validateDiceEdit(
 		interaction.message
 	);
 	await interaction.message.edit({ embeds: embedsList.list });
-	await reply(interaction, { content: ul("embed.edit.dice"), ephemeral: true });
+	await reply(interaction, {
+		content: ul("embed.edit.dice"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 	const compare = displayOldAndNewStats(diceEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.dice.edit", {
 		user: Djs.userMention(interaction.user.id),

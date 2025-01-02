@@ -85,7 +85,7 @@ export function replaceStatInDice(
 	if (replacementValue === undefined) return originalDice;
 
 	// Remplacer uniquement l'emplacement correspondant dans le texte original
-	let result = "";
+	let result: string;
 	if (replacementValue?.toString().length === 0)
 		result = originalDice.slice(0, startIndex) + originalDice.slice(endIndex);
 	else

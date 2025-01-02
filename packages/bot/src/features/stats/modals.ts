@@ -86,14 +86,20 @@ export async function registerStatistics(
 			embeds: [userEmbed, statEmbeds],
 			components: [registerDmgButton(ul)],
 		});
-		await reply(interaction, { content: ul("modals.added.stats"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("modals.added.stats"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	await interaction.message.edit({
 		embeds: [userEmbed, statEmbeds],
 		components: [continueCancelButtons(ul)],
 	});
-	await reply(interaction, { content: ul("modals.added.stats"), ephemeral: true });
+	await reply(interaction, {
+		content: ul("modals.added.stats"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 	return;
 }
 
@@ -210,7 +216,10 @@ export async function editStats(
 		const toAdd = removeEmbedsFromList(list, "stats");
 		const components = editUserButtons(ul, false, exists.damage);
 		await interaction.message.edit({ embeds: toAdd, components: [components] });
-		await reply(interaction, { content: ul("modals.removed.stats"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("modals.removed.stats"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		await sendLogs(
 			ul("logs.stats.removed", {
 				user: Djs.userMention(interaction.user.id),
@@ -231,7 +240,10 @@ export async function editStats(
 	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
 	});
-	await reply(interaction, { content: ul("embed.edit.stats"), ephemeral: true });
+	await reply(interaction, {
+		content: ul("embed.edit.stats"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
 		user: Djs.userMention(interaction.user.id),

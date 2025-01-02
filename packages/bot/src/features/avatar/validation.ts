@@ -1,7 +1,7 @@
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { verifyAvatarUrl } from "@dicelette/utils";
-import type * as Djs from "discord.js";
+import * as Djs from "discord.js";
 import { embedError, getEmbeds, getEmbedsList, reply } from "messages";
 
 export async function validateAvatarEdit(
@@ -33,6 +33,6 @@ export async function validateAvatarEdit(
 	const msgLink = interaction.message.url;
 	await reply(interaction, {
 		content: ul("edit_avatar.success", { name: nameMention, link: msgLink }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }

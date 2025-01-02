@@ -301,7 +301,7 @@ function changeLanguage(
 	const nameOfLang = findLocale(lang);
 	return reply(interaction, {
 		content: ul("config.lang.set", { lang: nameOfLang }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -315,12 +315,15 @@ function stats(
 	if (!role) {
 		//remove the role from the db
 		client.settings.delete(interaction.guild!.id, "autoRole.stats");
-		return reply(interaction, { content: ul("autoRole.stat.remove"), ephemeral: true });
+		return reply(interaction, {
+			content: ul("autoRole.stat.remove"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	}
 	client.settings.set(interaction.guild!.id, role.id, "autoRole.stats");
 	return reply(interaction, {
 		content: ul("autoRole.stat.set", { role: Djs.roleMention(role.id) }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -334,12 +337,15 @@ function dice(
 	if (!role) {
 		//remove the role from the db
 		client.settings.delete(interaction.guild!.id, "autoRole.dice");
-		return reply(interaction, { content: ul("autoRole.dice.remove"), ephemeral: true });
+		return reply(interaction, {
+			content: ul("autoRole.dice.remove"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	}
 	client.settings.set(interaction.guild!.id, role.id, "autoRole.dice");
 	return reply(interaction, {
 		content: ul("autoRole.dice.set", { role: Djs.roleMention(role.id) }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -360,13 +366,16 @@ async function logs(
 		const msg = oldChan
 			? ` ${ul("logs.inChan", { chan: Djs.channelMention(oldChan) })}`
 			: ".";
-		await reply(interaction, { content: `${ul("logs.delete")}${msg}`, ephemeral: true });
+		await reply(interaction, {
+			content: `${ul("logs.delete")}${msg}`,
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "logs");
 	await reply(interaction, {
 		content: ul("logs.set", { channel: channel.name }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -379,7 +388,10 @@ async function changeThread(
 	const channel = options.getChannel("channel");
 	const oldChan = client.settings.get(interaction.guild!.id, "rollChannel");
 	if (!channel && !oldChan) {
-		await reply(interaction, { content: ul("changeThread.noChan"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("changeThread.noChan"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	if (!interaction.guild) return;
@@ -393,7 +405,7 @@ async function changeThread(
 		client.settings.delete(interaction.guild.id, "rollChannel");
 		await reply(interaction, {
 			content: `${ul("changeThread.delete")}${msg}`,
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -454,18 +466,24 @@ async function hiddenRoll(
 	if (!toggle) {
 		//disable
 		client.settings.delete(interaction.guild!.id, "hiddenRoll");
-		await reply(interaction, { content: ul("hidden.disabled"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("hidden.disabled"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	if (!channel) {
 		client.settings.set(interaction.guild!.id, true, "hiddenRoll");
-		await reply(interaction, { content: ul("hidden.enabled"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("hidden.enabled"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "hiddenRoll");
 	await reply(interaction, {
 		content: ul("hidden.enabledChan", { channel: Djs.channelMention(channel.id) }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 	return;
 }
@@ -621,9 +639,15 @@ async function timestamp(
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	client.settings.set(interaction.guild!.id, toggle, "timestamp");
 	if (toggle) {
-		await reply(interaction, { content: ul("timestamp.enabled"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("timestamp.enabled"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	} else {
-		await reply(interaction, { content: ul("timestamp.disabled"), ephemeral: true });
+		await reply(interaction, {
+			content: ul("timestamp.disabled"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	}
 }
 
@@ -640,14 +664,17 @@ async function anchor(
 		if (deleteLogs)
 			return await reply(interaction, {
 				content: ul("anchor.enabled.noDelete"),
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 		return await reply(interaction, {
 			content: ul("anchor.enabled.logs"),
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
-	return await reply(interaction, { content: ul("context.disabled"), ephemeral: true });
+	return await reply(interaction, {
+		content: ul("context.disabled"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 }
 
 async function linkToLog(
@@ -661,8 +688,11 @@ async function linkToLog(
 	if (toggle) {
 		return await reply(interaction, {
 			content: ul("linkToLog.enabled"),
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
-	return await reply(interaction, { content: ul("linkToLog.disabled"), ephemeral: true });
+	return await reply(interaction, {
+		content: ul("linkToLog.disabled"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 }

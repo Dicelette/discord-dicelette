@@ -70,7 +70,7 @@ export async function getFirstChar(
 	if (!userData) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.notRegistered"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -330,7 +330,7 @@ export async function getStatistics(
 			embeds: [
 				embedError(ul("error.charName", { charName: optionChar.capitalize() }), ul),
 			],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -344,7 +344,7 @@ export async function getStatistics(
 	if (!userStatistique) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.notRegistered"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -352,7 +352,7 @@ export async function getStatistics(
 	if (!userStatistique.stats) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.noStats"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}

@@ -38,7 +38,7 @@ export async function allowEdit(
 			const urlNew = `https://discord.com/channels/${interaction.guild!.id}/${coord?.channelId}/${coord?.messageId}`;
 			await reply(interaction, {
 				embeds: [embedError(ul("error.oldEmbed", { fiche: urlNew }), ul)],
-				ephemeral: true,
+				flags: Djs.MessageFlags.Ephemeral,
 			});
 			//delete the message
 			try {
@@ -50,7 +50,10 @@ export async function allowEdit(
 		}
 	}
 	if (isSameUser || isModerator) return true;
-	await reply(interaction, { content: ul("modals.noPermission"), ephemeral: true });
+	await reply(interaction, {
+		content: ul("modals.noPermission"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 	return false;
 }
 

@@ -47,9 +47,9 @@
 	},
 	"dependencies": {
 		"@dicelette/core": "^1.11.5",
-		"@types/node": "^22.10.2",
+		"@types/node": "^22.10.3",
 		"dedent": "^1.5.3",
-		"discord.js": "^14.16.3",
+		"discord.js": "^14.17.2",
 		"dotenv": "^16.4.7",
 		"tslog": "^4.9.3",
 		"tsx": "^4.19.2",

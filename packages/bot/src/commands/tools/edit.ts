@@ -221,7 +221,7 @@ async function avatar(
 		const msgLink = message.url;
 		await reply(interaction, {
 			content: ul("edit_avatar.success", { name: nameMention, link: msgLink }),
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
 		await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
@@ -324,7 +324,7 @@ export async function rename(
 	await generateButton(message, ul, embedsList.list);
 	await reply(interaction, {
 		content: ul("edit_name.success", { url: message.url }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -388,7 +388,7 @@ export async function move(
 	await generateButton(message, ul, embedsList.list);
 	await reply(interaction, {
 		content: ul("edit.user.success", { url: message.url }),
-		ephemeral: true,
+		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 

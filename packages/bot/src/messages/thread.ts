@@ -274,8 +274,9 @@ export async function findForumChannel(
 		try {
 			const rollChannel = await forum.guild.channels.fetch(rollChannelId);
 			if (
-				rollChannel instanceof Djs.ThreadChannel ||
-				rollChannel instanceof Djs.TextChannel
+				rollChannel?.type === Djs.ChannelType.PrivateThread ||
+				rollChannel?.type === Djs.ChannelType.PublicThread ||
+				rollChannel?.type === Djs.ChannelType.GuildText
 			) {
 				return rollChannel;
 			}

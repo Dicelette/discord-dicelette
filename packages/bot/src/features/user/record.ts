@@ -67,7 +67,7 @@ export async function createEmbedFirstPage(
 	if (!user) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.user"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -89,7 +89,7 @@ export async function createEmbedFirstPage(
 	if (!existChannel) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.noThread"), ul)],
-			ephemeral: true,
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}

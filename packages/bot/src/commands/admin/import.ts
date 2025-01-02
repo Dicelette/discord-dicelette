@@ -39,7 +39,7 @@ export const bulkAdd = {
 			interaction.guild?.preferredLocale ??
 			interaction.locale;
 		const ul = ln(langToUse);
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const ext = csvFile.name.split(".").pop()?.toLowerCase() ?? "";
 		if (!ext || ext !== "csv") {
 			return reply(interaction, { content: ul("import.errors.invalid_file", { ext }) });
