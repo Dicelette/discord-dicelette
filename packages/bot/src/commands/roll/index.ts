@@ -5,3 +5,4 @@ import { mjRoll } from "./mj_roll";
 
 export const ROLL_AUTO = [dbRoll, dbd, mjRoll];
 export const ROLL_CMDLIST = [diceRoll];
+export const ROLL_DB = [dbd, dbRoll];

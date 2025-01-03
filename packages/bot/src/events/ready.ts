@@ -4,7 +4,7 @@ import process from "node:process";
 import type { Settings, UserData } from "@dicelette/types";
 import { important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { commandsList, contextMenus } from "commands";
+import { commandsList, contextMenus, dbCmd } from "commands";
 import { getUser } from "database";
 import * as Djs from "discord.js";
 import type { Guild } from "discord.js";
@@ -20,12 +20,28 @@ export default (client: EClient): void => {
 
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
 		let serializedCommands = commandsList.map((command) => command.data.toJSON());
-		client.user.setActivity("Roll Dices 🎲 !", { type: Djs.ActivityType.Competing });
+		const serializedDbCmds = dbCmd.map((command) => command.data.toJSON());
+
+		client.user.setActivity("Roll Dices 🎲 !", {
+			type: Djs.ActivityType.Competing,
+		});
 		serializedCommands = serializedCommands.concat(
 			//@ts-ignore
 			contextMenus.map((cmd) => cmd.toJSON())
 		);
+
 		for (const guild of client.guilds.cache.values()) {
+			const enabled = client.settings.get(guild.id, "templateID.messageId");
+			if (enabled) {
+				for (const cmd of serializedDbCmds) {
+					cmd.default_member_permissions = undefined;
+				}
+				//replace in serializedCommands the db commands
+				serializedCommands = serializedCommands.filter(
+					(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name)
+				);
+				serializedCommands = serializedCommands.concat(serializedDbCmds);
+			}
 			logger.trace(`Registering commands for \`${guild.name}\``);
 			const cmds = await guild.client.application.commands.fetch({ guildId: guild.id });
 			//filter the list of the commands that are deleted
