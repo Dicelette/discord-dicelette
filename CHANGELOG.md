@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.35.0](https://github.com/Dicelette/discord-dicelette/compare/1.34.0...1.35.0) (2025-01-03)
+
+
+### Features
+
+* **calc:** set calc result as other roll, allowing better "forwarding" with anchor and logUrl ([499d5dd](https://github.com/Dicelette/discord-dicelette/commit/499d5ddaaf937021837fee45bf8d37ddb9d21070))
+* if the server have a template ⇒ enable by default the commands ID when the bot is ready ([73748eb](https://github.com/Dicelette/discord-dicelette/commit/73748ebb7a8cb0021166033b492a8f40d4243c2d))
+
 ## [1.33.0](https://github.com/Dicelette/discord-dicelette/compare/1.32.0...1.33.0) (2024-12-31)
 
 
