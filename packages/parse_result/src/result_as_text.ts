@@ -8,7 +8,7 @@ import {
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import type { Server } from "./interfaces";
-import { timestamp } from "./utils.js";
+import { createUrl, timestamp } from "./utils.js";
 import "uniformize";
 import { ln } from "@dicelette/localization";
 
@@ -82,10 +82,7 @@ export class ResultAsText {
 		context?: { guildId: string; channelId: string; messageId: string },
 		logUrl?: string
 	) {
-		if (logUrl) return `\n\n-# ↪ ${logUrl}`;
-		if (!context) return "";
-		const { guildId, channelId, messageId } = context;
-		return `\n\n-# ↪ [${this.ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
+		return createUrl(this.ul, context, logUrl);
 	}
 
 	private messageResult(result: string, tot?: string | number) {

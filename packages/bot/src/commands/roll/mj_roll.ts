@@ -373,7 +373,8 @@ export const mjRoll = {
 				interaction,
 				client,
 				optionChar,
-				hide
+				hide,
+				user
 			);
 	},
 };

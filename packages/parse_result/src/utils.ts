@@ -1,4 +1,5 @@
 import { type Resultat, generateStatsDice, roll, standardizeDice } from "@dicelette/core";
+import type { Translation } from "@dicelette/types";
 import { isNumber } from "@dicelette/utils";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
@@ -135,4 +136,15 @@ export function trimAll(dice: string) {
 		return `${d.replace(commentsReg, "").trimAll()}${comment}`;
 	});
 	return result.join(";");
+}
+
+export function createUrl(
+	ul: Translation,
+	context?: { guildId: string; channelId: string; messageId: string },
+	logUrl?: string
+) {
+	if (logUrl) return `\n\n-# ↪ ${logUrl}`;
+	if (!context) return "";
+	const { guildId, channelId, messageId } = context;
+	return `\n\n-# ↪ [${ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
 }
