@@ -12,9 +12,10 @@ import {
 	embedError,
 	findMessageBefore,
 	reply,
+	sendResult,
 	threadToSend,
 } from "messages";
-import { autoCompleteCharacters } from "utils";
+import { autoCompleteCharacters, isValidChannel } from "utils";
 
 export const calc = {
 	data: new Djs.SlashCommandBuilder()
@@ -164,18 +165,7 @@ export async function calculate(
 	hide?: boolean | null,
 	user: Djs.User = interaction.user
 ) {
-	const channel = interaction.channel as Djs.TextBasedChannel;
-
-	if (
-		!channel ||
-		channel.type === Djs.ChannelType.GuildAnnouncement ||
-		channel.type === Djs.ChannelType.AnnouncementThread ||
-		channel.isVoiceBased() ||
-		channel.isDMBased() ||
-		!channel.isTextBased() ||
-		!interaction.guild
-	)
-		return;
+	
 	let formula = options
 		.getString(t("calc.formula.title"), true)
 		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
@@ -240,64 +230,10 @@ export async function calculate(
 			comments,
 			optionChar
 		);
-		const disableThread = client.settings.get(interaction.guild!.id, "disableThread");
-		let rollChannel = client.settings.get(interaction.guild!.id, "rollChannel");
-		const hideResultConfig = client.settings.get(interaction.guild!.id, "hiddenRoll") as
-			| string
-			| boolean
-			| undefined;
-		const hidden = hide && hideResultConfig;
-		let isHidden: undefined | string = undefined;
+
 		const msg = formatFormula(ul, totalFormula, `${result}`, originalFormula, transform);
 		const toSend = `${header}\n${msg}`;
-		if (hidden) {
-			if (typeof hideResultConfig === "string") {
-				//send to another channel ;
-				rollChannel = hideResultConfig;
-				isHidden = hideResultConfig;
-			} else if (typeof hideResultConfig === "boolean") {
-				return await reply(interaction, {
-					content: toSend,
-					flags: Djs.MessageFlags.Ephemeral,
-				});
-			}
-		}
-		if (channel.name.startsWith("🎲") || disableThread || rollChannel === channel.id) {
-			return await reply(interaction, {
-				content: toSend,
-				flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
-			});
-		}
-		const thread = await threadToSend(client.settings, channel, ul, isHidden);
-		const forwarded = await thread.send("_ _");
-		const rollLogEnabled = client.settings.get(interaction.guild.id, "linkToLogs");
-		const rolLogUrl = rollLogEnabled ? forwarded.url : undefined;
-		const url = createUrl(ul, undefined, rolLogUrl);
-		const replyInter = await reply(interaction, {
-			content: `${toSend}${url}`,
-			allowedMentions: { users: [user.id] },
-			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
-		});
-		const anchor = client.settings.get(interaction.guild.id, "context");
-		const dbTime = client.settings.get(interaction.guild.id, "deleteAfter");
-		const timer = dbTime ? dbTime : 180000;
-		let messageId = undefined;
-		if (anchor) {
-			messageId = replyInter.id;
-			if (timer && timer > 0) {
-				const messageBefore = await findMessageBefore(
-					channel,
-					replyInter,
-					interaction.client
-				);
-				if (messageBefore) messageId = messageBefore.id;
-			}
-
-			const ctx = { guildId: interaction.guild!.id, channelId: channel.id, messageId };
-			const contextUrl = createUrl(ul, ctx, undefined);
-			await forwarded.edit(`${toSend}${contextUrl}`);
-		} else await forwarded.edit(`${toSend}`);
-		if (!disableThread) await deleteAfter(replyInter, timer);
+		return await sendResult(interaction, {expression: toSend}, client.settings, ul, user, hide);
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });

@@ -1,5 +1,8 @@
-import type { Settings } from "@dicelette/types";
-import type * as Djs from "discord.js";
+import { type ResultAsText, createUrl } from "@dicelette/parse_result";
+import type { Settings, Translation } from "@dicelette/types";
+import * as Djs from "discord.js";
+import { findMessageBefore, threadToSend } from "messages";
+import { isValidChannel } from "utils";
 
 export async function sendLogs(message: string, guild: Djs.Guild, db: Settings) {
 	const guildData = db.get(guild.id);
@@ -72,4 +75,92 @@ export function displayOldAndNewStats(
 		}
 	}
 	return stats;
+}
+
+export async function sendResult(
+	interaction: Djs.CommandInteraction,
+	result: Partial<{
+		roll: ResultAsText;
+		expression: string;
+	}>,
+	settings: Settings,
+	ul: Translation,
+	user: Djs.User = interaction.user,
+	hide?: boolean | null
+) {
+	let channel = interaction.channel;
+	if (!isValidChannel(channel, interaction)) return;
+	channel = channel as
+		| Djs.TextChannel
+		| Djs.PrivateThreadChannel
+		| Djs.PublicThreadChannel<boolean>;
+
+	const disableThread = settings.get(interaction.guild!.id, "disableThread");
+	let rollChannel = settings.get(interaction.guild!.id, "rollChannel");
+	const hideResultConfig = settings.get(interaction.guild!.id, "hiddenRoll") as
+		| string
+		| boolean
+		| undefined;
+	const hidden = hide && hideResultConfig;
+	let isHidden: undefined | string = undefined;
+	const allowedMentions = { users: user ? [user.id] : [] };
+	const output = result.roll?.defaultMessage() ?? result.expression;
+	if (hidden) {
+		if (typeof hideResultConfig === "string") {
+			//send to another channel ;
+			rollChannel = hideResultConfig;
+			isHidden = hideResultConfig;
+		} else if (typeof hideResultConfig === "boolean") {
+			return await reply(interaction, {
+				content: output,
+				flags: Djs.MessageFlags.Ephemeral,
+				allowedMentions,
+			});
+		}
+	}
+	if (channel.name.startsWith("🎲") || disableThread || rollChannel === channel.id) {
+		return await reply(interaction, {
+			content: output,
+			allowedMentions,
+			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
+		});
+	}
+
+	const thread = await threadToSend(
+		settings,
+		interaction.channel as Djs.TextChannel,
+		ul,
+		isHidden
+	);
+	const forwarded = await thread.send("_ _");
+	const linkToLog = settings.get(interaction.guild!.id, "linkToLogs");
+	const logUrl = linkToLog ? forwarded.url : undefined;
+	const outputWithUrl =
+		result.roll?.logUrl(logUrl)?.result ??
+		`${result.expression}${createUrl(ul, undefined, logUrl)}`;
+	const replyInteraction = await reply(interaction, {
+		content: outputWithUrl,
+		allowedMentions,
+		flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
+	});
+	const anchor = settings.get(interaction.guild!.id, "context");
+	const dbTime = settings.get(interaction.guild!.id, "deleteAfter");
+	const timer = dbTime ? dbTime : 180000;
+	let messageId = undefined;
+	if (anchor) {
+		messageId = replyInteraction.id;
+		if (timer && timer > 0) {
+			const messageBefore = await findMessageBefore(
+				channel,
+				replyInteraction,
+				interaction.client
+			);
+			if (messageBefore) messageId = messageBefore.id;
+		}
+		const ctx = { guildId: interaction.guild!.id, channelId: channel.id, messageId };
+		const res =
+			result.roll?.context(ctx).result ?? `${result.expression}${createUrl(ul, ctx)}`;
+		await forwarded.edit(res);
+	} else forwarded.edit(output as string);
+	if (!disableThread) await deleteAfter(forwarded, timer);
 }

@@ -3,7 +3,7 @@ import {
 	generateStatsDice,
 	replaceFormulaInDice,
 } from "@dicelette/core";
-import { ln, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import {
 	ResultAsText,
 	type Server,
@@ -18,15 +18,10 @@ import {
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
+import { getRightValue } from "database";
 import * as Djs from "discord.js";
-import {
-	deleteAfter,
-	embedError,
-	findMessageBefore,
-	reply,
-	threadToSend,
-} from "messages";
-import { getRightValue } from "../database";
+import { embedError, reply, sendResult } from "messages";
+import { getLangAndConfig } from "utils";
 
 /**
  * create the roll dice, parse interaction etc... When the slash-commands is used for dice
@@ -34,7 +29,6 @@ import { getRightValue } from "../database";
 export async function rollWithInteraction(
 	interaction: Djs.CommandInteraction,
 	dice: string,
-	channel: Djs.TextBasedChannel,
 	db: Settings,
 	critical?: { failure?: number; success?: number },
 	user?: Djs.User,
@@ -44,25 +38,11 @@ export async function rollWithInteraction(
 	customCritical?: Record<string, CustomCritical> | undefined
 ) {
 	//exclude announcement channel
-	if (
-		!channel ||
-		channel.type === Djs.ChannelType.GuildAnnouncement ||
-		channel.type === Djs.ChannelType.AnnouncementThread ||
-		channel.isVoiceBased() ||
-		channel.isDMBased() ||
-		!channel.isTextBased() ||
-		!interaction.guild
-	)
-		return;
-	const langToUser =
-		db.get(interaction.guild.id, "lang") ??
-		interaction.guild.preferredLocale ??
-		interaction.locale;
-	const ul = ln(langToUser);
+	const { langToUser, ul, config } = getLangAndConfig(db, interaction);
 	const data: Server = {
 		lang: langToUser,
 		userId: user?.id ?? interaction.user.id,
-		config: db.get(interaction.guild.id),
+		config,
 	};
 	const result = getRoll(dice);
 	const defaultMsg = new ResultAsText(
@@ -82,68 +62,7 @@ export async function rollWithInteraction(
 		return;
 	}
 
-	const disableThread = db.get(interaction.guild.id, "disableThread");
-	let rollChannel = db.get(interaction.guild.id, "rollChannel");
-	const hideResultConfig = db.get(interaction.guild.id, "hiddenRoll") as
-		| string
-		| boolean
-		| undefined;
-	const hidden = hideResult && hideResultConfig;
-	let isHidden: undefined | string = undefined;
-	if (hidden) {
-		if (typeof hideResultConfig === "string") {
-			//send to another channel ;
-			rollChannel = hideResultConfig;
-			isHidden = hideResultConfig;
-		} else if (typeof hideResultConfig === "boolean") {
-			await reply(interaction, {
-				content: output,
-				allowedMentions: { users: [data!.userId as string] },
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			return;
-		}
-	}
-	if (channel.name.startsWith("🎲") || disableThread || rollChannel === channel.id) {
-		await reply(interaction, {
-			content: output,
-			allowedMentions: { users: [data!.userId as string] },
-			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
-		});
-		return;
-	}
-
-	const thread = await threadToSend(db, channel, ul, isHidden);
-	const rolLog = await thread.send("_ _");
-	const editMessage = defaultMsg.edit().result;
-	await rolLog.edit(editMessage);
-	const rollLogEnabled = db.get(interaction.guild.id, "linkToLogs");
-	const rolLogUrl = rollLogEnabled ? rolLog.url : undefined;
-	const rollTextUrl = defaultMsg.logUrl(rolLogUrl).result;
-	const inter = await reply(interaction, {
-		content: rollTextUrl,
-		allowedMentions: { users: [data!.userId as string] },
-		flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
-	});
-	const anchor = db.get(interaction.guild.id, "context");
-	const dbTime = db.get(interaction.guild.id, "deleteAfter");
-	const timer = dbTime ? dbTime : 180000;
-	let messageId = undefined;
-	if (anchor) {
-		messageId = inter.id;
-		if (timer && timer > 0) {
-			const messageBefore = await findMessageBefore(channel, inter, interaction.client);
-			if (messageBefore) messageId = messageBefore.id;
-		}
-		const res = defaultMsg.context({
-			guildId: interaction.guild.id,
-			channelId: channel.id,
-			messageId,
-		}).result;
-		await rolLog.edit(res);
-	}
-	if (!disableThread) await deleteAfter(inter, timer);
-	return;
+	return await sendResult(interaction, { roll: defaultMsg }, db, ul, user, hideResult);
 }
 
 export async function rollDice(
@@ -224,7 +143,6 @@ export async function rollDice(
 	await rollWithInteraction(
 		interaction,
 		roll,
-		interaction.channel as Djs.TextBasedChannel,
 		client.settings,
 		undefined,
 		user,
@@ -318,7 +236,6 @@ export async function rollStatistique(
 	await rollWithInteraction(
 		interaction,
 		roll,
-		interaction!.channel as Djs.TextBasedChannel,
 		client.settings,
 		template.critical,
 		user,

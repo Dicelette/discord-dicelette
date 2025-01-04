@@ -137,3 +137,22 @@ export async function optionInteractions(
 	const user = options.getUser(t("display.userLowercase"));
 	return { options, guildData, lang, ul, user };
 }
+
+export function isValidChannel(channel: Djs.TextBasedChannel|null, interaction: Djs.CommandInteraction) {
+	return (
+		channel &&
+		!channel.isVoiceBased() &&
+		!channel.isDMBased() &&
+		channel.isTextBased() &&
+		interaction.guild &&
+		channel.type !== Djs.ChannelType.GuildAnnouncement &&
+		channel.type !== Djs.ChannelType.AnnouncementThread
+	);
+}
+
+export function getLangAndConfig(db: Settings, interaction: Djs.CommandInteraction) {
+    const langToUser = db.get(interaction.guild!.id, "lang") ?? interaction.guild!.preferredLocale ?? interaction.locale;
+    const ul = ln(langToUser);
+    const config = db.get(interaction.guild!.id);
+    return { langToUser, ul, config };
+}
