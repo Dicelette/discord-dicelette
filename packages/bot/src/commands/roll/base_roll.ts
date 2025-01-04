@@ -36,7 +36,6 @@ export const diceRoll = {
 		await rollWithInteraction(
 			interaction,
 			trimAll(dice),
-			channel,
 			client.settings,
 			undefined,
 			undefined,
