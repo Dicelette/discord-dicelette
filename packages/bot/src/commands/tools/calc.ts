@@ -1,21 +1,14 @@
 import { generateStatsDice } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
-import { createUrl, getRoll, timestamp } from "@dicelette/parse_result";
+import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, isNumber, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
-import {
-	deleteAfter,
-	embedError,
-	findMessageBefore,
-	reply,
-	sendResult,
-	threadToSend,
-} from "messages";
-import { autoCompleteCharacters, isValidChannel } from "utils";
+import { embedError, sendResult } from "messages";
+import { autoCompleteCharacters } from "utils";
 
 export const calc = {
 	data: new Djs.SlashCommandBuilder()
@@ -165,7 +158,6 @@ export async function calculate(
 	hide?: boolean | null,
 	user: Djs.User = interaction.user
 ) {
-	
 	let formula = options
 		.getString(t("calc.formula.title"), true)
 		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
@@ -233,7 +225,14 @@ export async function calculate(
 
 		const msg = formatFormula(ul, totalFormula, `${result}`, originalFormula, transform);
 		const toSend = `${header}\n${msg}`;
-		return await sendResult(interaction, {expression: toSend}, client.settings, ul, user, hide);
+		return await sendResult(
+			interaction,
+			{ expression: toSend },
+			client.settings,
+			ul,
+			user,
+			hide
+		);
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });

@@ -138,7 +138,10 @@ export async function optionInteractions(
 	return { options, guildData, lang, ul, user };
 }
 
-export function isValidChannel(channel: Djs.TextBasedChannel|null, interaction: Djs.CommandInteraction) {
+export function isValidChannel(
+	channel: Djs.TextBasedChannel | null,
+	interaction: Djs.CommandInteraction
+) {
 	return (
 		channel &&
 		!channel.isVoiceBased() &&
@@ -151,8 +154,11 @@ export function isValidChannel(channel: Djs.TextBasedChannel|null, interaction: 
 }
 
 export function getLangAndConfig(db: Settings, interaction: Djs.CommandInteraction) {
-    const langToUser = db.get(interaction.guild!.id, "lang") ?? interaction.guild!.preferredLocale ?? interaction.locale;
-    const ul = ln(langToUser);
-    const config = db.get(interaction.guild!.id);
-    return { langToUser, ul, config };
+	const langToUser =
+		db.get(interaction.guild!.id, "lang") ??
+		interaction.guild!.preferredLocale ??
+		interaction.locale;
+	const ul = ln(langToUser);
+	const config = db.get(interaction.guild!.id);
+	return { langToUser, ul, config };
 }
