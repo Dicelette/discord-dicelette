@@ -94,8 +94,8 @@ export async function optionInteractions(
 }
 
 export function isValidChannel(
-	channel: Djs.TextBasedChannel | null,
-	interaction: Djs.CommandInteraction
+	channel: Djs.GuildBasedChannel | null | undefined,
+	interaction: Djs.CommandInteraction | Djs.BaseInteraction
 ) {
 	return (
 		channel &&

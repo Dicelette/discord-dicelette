@@ -4,6 +4,7 @@ import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
+import { isValidChannel } from "utils";
 export async function searchUserChannel(
 	guildData: Settings,
 	interaction: Djs.BaseInteraction,
@@ -16,14 +17,7 @@ export async function searchUserChannel(
 	try {
 		const channel = await interaction.guild?.channels.fetch(channelId);
 		if (channel instanceof Djs.ForumChannel && register) return;
-		if (
-			!channel ||
-			channel instanceof Djs.CategoryChannel ||
-			channel instanceof Djs.ForumChannel ||
-			channel instanceof Djs.MediaChannel ||
-			channel instanceof Djs.StageChannel ||
-			channel instanceof Djs.VoiceChannel
-		) {
+		if (!channel || !isValidChannel(channel, interaction)) {
 			if (
 				interaction instanceof Djs.CommandInteraction ||
 				interaction instanceof Djs.ButtonInteraction ||
@@ -55,5 +49,5 @@ export async function searchUserChannel(
 		return;
 	}
 	if (thread.isThread() && thread.archived) thread.setArchived(false);
-	return thread;
+	return thread as DiscordChannel;
 }
