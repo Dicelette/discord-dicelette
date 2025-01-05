@@ -8,68 +8,15 @@ import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
-import { autoCompleteCharacters } from "utils";
+import { autoCompleteCharacters, calcOptions } from "utils";
 
 export const calc = {
-	data: new Djs.SlashCommandBuilder()
+	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setName(t("calc.title"))
 		.setNameLocalizations(cmdLn("calc.title"))
 		.setDescription(t("calc.description"))
 		.setDefaultMemberPermissions(0)
-		.setDescriptionLocalizations(cmdLn("calc.description"))
-		.addStringOption((option) =>
-			option
-				.setName(t("common.statistic"))
-				.setDescription(t("calc.statistic"))
-				.setRequired(true)
-				.setNameLocalizations(cmdLn("common.statistic"))
-				.setDescriptionLocalizations(cmdLn("calc.statistic"))
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("calc.sign.title"))
-				.setDescription(t("calc.sign.desc"))
-				.setRequired(true)
-				.setNameLocalizations(cmdLn("calc.sign.title"))
-				.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("calc.formula.title"))
-				.setDescription(t("calc.formula.desc"))
-				.setRequired(true)
-				.setNameLocalizations(cmdLn("calc.formula.title"))
-				.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
-				.setRequired(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("calc.transform.title"))
-				.setDescription(t("calc.transform.desc"))
-				.setRequired(false)
-				.setNameLocalizations(cmdLn("calc.transform.title"))
-				.setDescriptionLocalizations(cmdLn("calc.transform.desc"))
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("common.character"))
-				.setDescription(t("dbRoll.options.character"))
-				.setNameLocalizations(cmdLn("common.character"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.character"))
-				.setRequired(false)
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("dbRoll.options.comments.name"))
-				.setDescription(t("dbRoll.options.comments.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.comments.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
-				.setRequired(false)
-		),
+		.setDescriptionLocalizations(cmdLn("calc.description")),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);

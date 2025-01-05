@@ -5,7 +5,7 @@ import type { EClient } from "client";
 import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { serializeName } from "utils";
+import { gmCommonOptions, serializeName } from "utils";
 import { rollDice, rollStatistique } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 
@@ -20,214 +20,31 @@ export const mjRoll = {
 			(
 				sub //dbRoll
 			) =>
-				sub
+				gmCommonOptions(sub, "dbroll")
 					.setName(t("dbRoll.name"))
 					.setNameLocalizations(cmdLn("dbRoll.name"))
 					.setDescription(t("dbRoll.description"))
 					.setDescriptionLocalizations(cmdLn("dbRoll.description"))
-					.addUserOption((option) =>
-						option
-							.setName(t("display.userLowercase"))
-							.setNameLocalizations(cmdLn("display.userLowercase"))
-							.setDescription(t("mjRoll.user"))
-							.setDescriptionLocalizations(cmdLn("mjRoll.user"))
-							.setRequired(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("common.statistic"))
-							.setNameLocalizations(cmdLn("common.statistic"))
-							.setDescription(t("dbRoll.options.statistic"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.statistic"))
-							.setRequired(true)
-							.setAutocomplete(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("common.character"))
-							.setNameLocalizations(cmdLn("common.character"))
-							.setDescription(t("display.character"))
-							.setDescriptionLocalizations(cmdLn("display.character"))
-							.setRequired(false)
-							.setAutocomplete(true)
-					)
-
-					.addStringOption((option) =>
-						option
-							.setName(t("dbRoll.options.comments.name"))
-							.setDescription(t("dbRoll.options.comments.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.comments.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
-							.setRequired(false)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("dbRoll.options.override.name"))
-							.setDescription(t("dbRoll.options.override.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.override.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.override.description"))
-							.setRequired(false)
-					)
-					.addNumberOption((option) =>
-						option
-							.setName(t("dbRoll.options.modificator.name"))
-							.setDescription(t("dbRoll.options.modificator.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.modificator.name"))
-							.setDescriptionLocalizations(
-								cmdLn("dbRoll.options.modificator.description")
-							)
-							.setRequired(false)
-					)
-					.addBooleanOption((option) =>
-						option
-							.setName(t("dbRoll.options.hidden.name"))
-							.setDescription(t("dbRoll.options.hidden.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.hidden.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.hidden.description"))
-							.setRequired(false)
-					)
 		)
 		.addSubcommand(
 			(
 				sub //dbd
 			) =>
-				sub
+				gmCommonOptions(sub, "dbd")
 					.setName(t("rAtq.name"))
 					.setDescription(t("rAtq.description"))
 					.setNameLocalizations(cmdLn("rAtq.name"))
 					.setDescriptionLocalizations(cmdLn("rAtq.description"))
-					.addUserOption((option) =>
-						option
-							.setName(t("display.userLowercase"))
-							.setNameLocalizations(cmdLn("display.userLowercase"))
-							.setDescription(t("mjRoll.user"))
-							.setDescriptionLocalizations(cmdLn("mjRoll.user"))
-							.setRequired(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("rAtq.atq_name.name"))
-							.setNameLocalizations(cmdLn("rAtq.atq_name.name"))
-							.setDescription(t("rAtq.atq_name.description"))
-							.setDescriptionLocalizations(cmdLn("rAtq.atq_name.description"))
-							.setRequired(true)
-							.setAutocomplete(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("common.character"))
-							.setNameLocalizations(cmdLn("common.character"))
-							.setDescription(t("display.character"))
-							.setDescriptionLocalizations(cmdLn("display.character"))
-							.setRequired(false)
-							.setAutocomplete(true)
-					)
-					.addNumberOption((option) =>
-						option
-							.setName(t("dbRoll.options.modificator.name"))
-							.setDescription(t("dbRoll.options.modificator.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.modificator.name"))
-							.setDescriptionLocalizations(
-								cmdLn("dbRoll.options.modificator.description")
-							)
-							.setRequired(false)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("dbRoll.options.comments.name"))
-							.setDescription(t("dbRoll.options.comments.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.comments.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
-							.setRequired(false)
-					)
-					.addBooleanOption((option) =>
-						option
-							.setName(t("dbRoll.options.hidden.name"))
-							.setDescription(t("dbRoll.options.hidden.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.hidden.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.hidden.description"))
-							.setRequired(false)
-					)
 		)
 		.addSubcommand(
 			(
 				sub //calc
 			) =>
-				sub
+				gmCommonOptions(sub, "calc")
 					.setName(t("calc.title"))
 					.setDescription(t("calc.description"))
 					.setNameLocalizations(cmdLn("calc.title"))
 					.setDescriptionLocalizations(cmdLn("calc.description"))
-					.addUserOption((option) =>
-						option
-							.setName(t("display.userLowercase"))
-							.setNameLocalizations(cmdLn("display.userLowercase"))
-							.setDescription(t("mjRoll.user"))
-							.setDescriptionLocalizations(cmdLn("mjRoll.user"))
-							.setRequired(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("common.statistic"))
-							.setDescription(t("calc.statistic"))
-							.setRequired(true)
-							.setNameLocalizations(cmdLn("common.statistic"))
-							.setDescriptionLocalizations(cmdLn("calc.statistic"))
-							.setAutocomplete(true)
-					)
-
-					.addStringOption((option) =>
-						option
-							.setName(t("calc.sign.title"))
-							.setDescription(t("calc.sign.desc"))
-							.setRequired(true)
-							.setNameLocalizations(cmdLn("calc.sign.title"))
-							.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
-							.setAutocomplete(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("calc.formula.title"))
-							.setDescription(t("calc.formula.desc"))
-							.setRequired(true)
-							.setNameLocalizations(cmdLn("calc.formula.title"))
-							.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
-							.setRequired(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("calc.transform.title"))
-							.setDescription(t("calc.transform.desc"))
-							.setRequired(false)
-							.setNameLocalizations(cmdLn("calc.transform.title"))
-							.setDescriptionLocalizations(cmdLn("calc.transform.desc"))
-							.setAutocomplete(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("common.character"))
-							.setDescription(t("dbRoll.options.character"))
-							.setNameLocalizations(cmdLn("common.character"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.character"))
-							.setRequired(false)
-							.setAutocomplete(true)
-					)
-					.addStringOption((option) =>
-						option
-							.setName(t("dbRoll.options.comments.name"))
-							.setDescription(t("dbRoll.options.comments.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.comments.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
-							.setRequired(false)
-					)
-					.addBooleanOption((option) =>
-						option
-							.setName(t("dbRoll.options.hidden.name"))
-							.setDescription(t("dbRoll.options.hidden.description"))
-							.setNameLocalizations(cmdLn("dbRoll.options.hidden.name"))
-							.setDescriptionLocalizations(cmdLn("dbRoll.options.hidden.description"))
-							.setRequired(false)
-					)
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const sign = autoFocuseSign(interaction);

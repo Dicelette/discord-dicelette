@@ -8,7 +8,7 @@ import { findChara, getRecordChar, getTemplateWithDB, getUserByEmbed } from "dat
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
-import { haveAccess, searchUserChannel } from "utils";
+import { charUserOptions, haveAccess, searchUserChannel } from "utils";
 
 async function chart(
 	userData: UserData,
@@ -99,29 +99,13 @@ function fontPath(fontName: string) {
 }
 
 export const graph = {
-	data: new Djs.SlashCommandBuilder()
+	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setName(t("graph.name"))
 		.setDefaultMemberPermissions(0)
 		.setNameLocalizations(cmdLn("graph.name"))
 		.setDescription(t("graph.description"))
 		.setDescriptionLocalizations(cmdLn("graph.description"))
-		.addUserOption((option) =>
-			option
-				.setName(t("display.userLowercase"))
-				.setNameLocalizations(cmdLn("display.userLowercase"))
-				.setDescription(t("display.user"))
-				.setDescriptionLocalizations(cmdLn("display.user"))
-				.setRequired(false)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("common.character"))
-				.setNameLocalizations(cmdLn("common.character"))
-				.setDescription(t("display.character"))
-				.setDescriptionLocalizations(cmdLn("display.character"))
-				.setRequired(false)
-				.setAutocomplete(true)
-		)
+
 		.addStringOption((option) =>
 			option
 				.setName(t("graph.line.name"))

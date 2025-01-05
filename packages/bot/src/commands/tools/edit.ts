@@ -14,7 +14,13 @@ import {
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
 import { reply } from "messages";
-import { autoComplete, getButton, haveAccess, optionInteractions } from "utils";
+import {
+	autoComplete,
+	charUserOptions,
+	getButton,
+	haveAccess,
+	optionInteractions,
+} from "utils";
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
@@ -22,93 +28,57 @@ export const editAvatar = {
 		.setDescription(t("edit.desc"))
 		.setDescriptionLocalizations(cmdLn("edit.desc"))
 		.setDefaultMemberPermissions(0)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName(t("edit_avatar.name"))
-				.setNameLocalizations(cmdLn("edit_avatar.name"))
-				.setDescription(t("edit_avatar.desc"))
-				.setDescriptionLocalizations(cmdLn("edit_avatar.desc"))
-				.addStringOption((option) =>
-					option
-						.setName(t("edit_avatar.url.name"))
-						.setNameLocalizations(cmdLn("edit_avatar.url.name"))
-						.setDescription(t("edit_avatar.url.desc"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.url.desc"))
-						.setRequired(true)
-				)
-				.addUserOption((option) =>
-					option
-						.setName(t("display.userLowercase"))
-						.setNameLocalizations(cmdLn("display.userLowercase"))
-						.setDescription(t("edit_avatar.user"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.user"))
-				)
-				.addStringOption((option) =>
-					option
-						.setName(t("common.character"))
-						.setNameLocalizations(cmdLn("common.character"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.character"))
-						.setDescription(t("edit_avatar.character"))
-						.setAutocomplete(true)
-				)
+		.addSubcommand(
+			(subcommand) =>
+				charUserOptions(
+					subcommand
+						.setName(t("edit_avatar.name"))
+						.setNameLocalizations(cmdLn("edit_avatar.name"))
+						.setDescription(t("edit_avatar.desc"))
+						.setDescriptionLocalizations(cmdLn("edit_avatar.desc"))
+						.addStringOption((option) =>
+							option
+								.setName(t("edit_avatar.url.name"))
+								.setNameLocalizations(cmdLn("edit_avatar.url.name"))
+								.setDescription(t("edit_avatar.url.desc"))
+								.setDescriptionLocalizations(cmdLn("edit_avatar.url.desc"))
+								.setRequired(true)
+						)
+				) as Djs.SlashCommandSubcommandBuilder
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName(t("edit.rename.title"))
-				.setDescription(t("edit.rename.desc"))
-				.addStringOption((option) =>
-					option
-						.setName(t("edit.rename.option.title"))
-						.setDescription(t("edit.rename.option.desc"))
-						.setNameLocalizations(cmdLn("edit.rename.option.title"))
-						.setDescriptionLocalizations(cmdLn("edit.rename.option.desc"))
-						.setRequired(true)
-				)
-				.addUserOption((option) =>
-					option
-						.setName(t("display.userLowercase"))
-						.setNameLocalizations(cmdLn("display.userLowercase"))
-						.setDescription(t("edit_avatar.user"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.user"))
-				)
-				.addStringOption((option) =>
-					option
-						.setName(t("common.character"))
-						.setNameLocalizations(cmdLn("common.character"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.character"))
-						.setDescription(t("edit_avatar.character"))
-						.setAutocomplete(true)
-				)
+		.addSubcommand(
+			(subcommand) =>
+				charUserOptions(
+					subcommand
+						.setName(t("edit.rename.title"))
+						.setDescription(t("edit.rename.desc"))
+						.addStringOption((option) =>
+							option
+								.setName(t("edit.rename.option.title"))
+								.setDescription(t("edit.rename.option.desc"))
+								.setNameLocalizations(cmdLn("edit.rename.option.title"))
+								.setDescriptionLocalizations(cmdLn("edit.rename.option.desc"))
+								.setRequired(true)
+						)
+				) as Djs.SlashCommandSubcommandBuilder
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName(t("edit.user.title"))
-				.setDescription(t("edit.user.desc"))
-				.setDescriptionLocalizations(cmdLn("edit.user.desc"))
-				.setNameLocalizations(cmdLn("edit.user.title"))
-				.addUserOption((option) =>
-					option
-						.setName(t("edit.user.option.title"))
-						.setDescription(t("edit.user.option.desc"))
-						.setNameLocalizations(cmdLn("edit.user.option.title"))
-						.setDescriptionLocalizations(cmdLn("edit.user.option.desc"))
-						.setRequired(true)
-				)
-				.addUserOption((option) =>
-					option
-						.setName(t("display.userLowercase"))
-						.setNameLocalizations(cmdLn("display.userLowercase"))
-						.setDescription(t("edit_avatar.user"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.user"))
-				)
-				.addStringOption((option) =>
-					option
-						.setName(t("common.character"))
-						.setNameLocalizations(cmdLn("common.character"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.character"))
-						.setDescription(t("edit_avatar.character"))
-						.setAutocomplete(true)
-				)
+		.addSubcommand(
+			(subcommand) =>
+				charUserOptions(
+					subcommand
+						.setName(t("edit.user.title"))
+						.setDescription(t("edit.user.desc"))
+						.setDescriptionLocalizations(cmdLn("edit.user.desc"))
+						.setNameLocalizations(cmdLn("edit.user.title"))
+						.addUserOption((option) =>
+							option
+								.setName(t("edit.user.option.title"))
+								.setDescription(t("edit.user.option.desc"))
+								.setNameLocalizations(cmdLn("edit.user.option.title"))
+								.setDescriptionLocalizations(cmdLn("edit.user.option.desc"))
+								.setRequired(true)
+						)
+				) as Djs.SlashCommandSubcommandBuilder
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const param = autoComplete(interaction, client);

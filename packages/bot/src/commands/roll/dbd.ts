@@ -4,49 +4,15 @@ import type { EClient } from "client";
 import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { rollDice, serializeName } from "utils";
+import { dbdOptions, rollDice, serializeName } from "utils";
 
 export default {
-	data: new Djs.SlashCommandBuilder()
+	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setName(t("rAtq.name"))
 		.setDescription(t("rAtq.description"))
 		.setNameLocalizations(cmdLn("rAtq.name"))
 		.setDescriptionLocalizations(cmdLn("rAtq.description"))
-		.setDefaultMemberPermissions(0)
-		.addStringOption((option) =>
-			option
-				.setName(t("rAtq.atq_name.name"))
-				.setNameLocalizations(cmdLn("rAtq.atq_name.name"))
-				.setDescription(t("rAtq.atq_name.description"))
-				.setDescriptionLocalizations(cmdLn("rAtq.atq_name.description"))
-				.setRequired(true)
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("common.character"))
-				.setDescription(t("dbRoll.options.character"))
-				.setNameLocalizations(cmdLn("common.character"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.character"))
-				.setRequired(false)
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("dbRoll.options.modificator.name"))
-				.setDescription(t("dbRoll.options.modificator.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.modificator.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.modificator.description"))
-				.setRequired(false)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("dbRoll.options.comments.name"))
-				.setDescription(t("dbRoll.options.comments.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.comments.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
-				.setRequired(false)
-		),
+		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const focused = options.getFocused(true);

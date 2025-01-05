@@ -13,32 +13,15 @@ import {
 	getEmbeds,
 	reply,
 } from "messages";
-import { autoComplete, haveAccess, optionInteractions } from "utils";
+import { autoComplete, charUserOptions, haveAccess, optionInteractions } from "utils";
 
 export const displayUser = {
-	data: new Djs.SlashCommandBuilder()
+	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setName(t("display.title"))
 		.setDescription(t("display.description"))
 		.setNameLocalizations(cmdLn("display.title"))
 		.setDefaultMemberPermissions(0)
-		.setDescriptionLocalizations(cmdLn("display.description"))
-		.addUserOption((option) =>
-			option
-				.setName(t("display.userLowercase"))
-				.setNameLocalizations(cmdLn("display.userLowercase"))
-				.setDescription(t("display.user"))
-				.setDescriptionLocalizations(cmdLn("display.user"))
-				.setRequired(false)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("common.character"))
-				.setNameLocalizations(cmdLn("common.character"))
-				.setDescription(t("display.character"))
-				.setDescriptionLocalizations(cmdLn("display.character"))
-				.setRequired(false)
-				.setAutocomplete(true)
-		),
+		.setDescriptionLocalizations(cmdLn("display.description")),
 	async autocomplete(
 		interaction: Djs.AutocompleteInteraction,
 		client: EClient
