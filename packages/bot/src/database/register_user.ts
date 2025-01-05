@@ -7,9 +7,9 @@ import type {
 } from "@dicelette/types";
 import type { Settings } from "@dicelette/types";
 import type { EClient } from "client";
+import { getUser } from "database";
 import type * as Djs from "discord.js";
 import { searchUserChannel } from "utils";
-import { getUser } from "./get_user";
 
 /**
  * Register the managerId in the database

@@ -94,7 +94,7 @@ export async function optionInteractions(
 }
 
 export function isValidChannel(
-	channel: Djs.GuildBasedChannel | null | undefined,
+	channel: Djs.GuildBasedChannel | null | undefined | Djs.TextBasedChannel,
 	interaction: Djs.CommandInteraction | Djs.BaseInteraction
 ) {
 	return (
@@ -105,6 +105,14 @@ export function isValidChannel(
 		interaction.guild &&
 		channel.type !== Djs.ChannelType.GuildAnnouncement &&
 		channel.type !== Djs.ChannelType.AnnouncementThread
+	);
+}
+
+export function isValidInteraction(interaction: Djs.BaseInteraction) {
+	return (
+		interaction.type === Djs.InteractionType.ApplicationCommand ||
+		interaction.type === Djs.InteractionType.MessageComponent ||
+		interaction.type === Djs.InteractionType.ModalSubmit
 	);
 }
 

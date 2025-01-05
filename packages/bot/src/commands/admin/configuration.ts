@@ -1,5 +1,3 @@
-// noinspection SuspiciousTypeOfGuard
-
 import { LocalePrimary, cmdLn, ln, t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
@@ -397,7 +395,8 @@ async function changeThread(
 	if (!interaction.guild) return;
 	if (
 		!channel ||
-		(!(channel instanceof Djs.TextChannel) && !(channel instanceof Djs.ThreadChannel))
+		(channel.type !== Djs.ChannelType.GuildText &&
+			!(channel instanceof Djs.ThreadChannel))
 	) {
 		const msg = oldChan
 			? ` ${ul("logs.inChan", { chan: Djs.channelMention(oldChan) })}`

@@ -1,5 +1,3 @@
-// noinspection SuspiciousTypeOfGuard
-
 import type { Settings } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
@@ -68,7 +66,7 @@ export async function addAutoRole(
 		const errorMessage = `\`\`\`\n${(e as Error).message}\n\`\`\``;
 		if (dbLogs) {
 			const logs = await interaction.guild!.channels.fetch(dbLogs);
-			if (logs instanceof Djs.TextChannel) {
+			if (logs?.type === Djs.ChannelType.GuildText) {
 				await logs.send(errorMessage);
 			}
 		} else {

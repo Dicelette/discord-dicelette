@@ -1,5 +1,3 @@
-// noinspection SuspiciousTypeOfGuard
-
 import {
 	type Critical,
 	type Statistic,
