@@ -162,5 +162,5 @@ export async function sendResult(
 			result.roll?.context(ctx).result ?? `${result.expression}${createUrl(ul, ctx)}`;
 		await forwarded.edit(res);
 	} else await forwarded.edit(output as string);
-	if (!disableThread) await deleteAfter(forwarded, timer);
+	if (!disableThread) await deleteAfter(replyInteraction, timer);
 }
