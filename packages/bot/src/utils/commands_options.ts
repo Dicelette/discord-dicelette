@@ -1,8 +1,8 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
+import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import type { SlashCommandSubcommandBuilder } from "discord.js";
-import { filterChoices } from "packages/utils";
 
 export function charUserOptions(
 	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder

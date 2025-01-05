@@ -5,4 +5,4 @@ export * from "./check";
 export * from "./import_csv";
 export * from "./search";
 export * from "./roles";
-export * from "./commands";
+export * from "./commands_options";
