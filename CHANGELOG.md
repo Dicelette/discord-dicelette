@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.34.1](https://github.com/Dicelette/discord-dicelette/compare/1.35.0...1.34.1) (2025-01-13)
+
+
+### Bug Fixes
+
+* **diceRoll:** do not trimAll in baseRoll (because it breaks comments!) ([02712e5](https://github.com/Dicelette/discord-dicelette/commit/02712e5446078bd49ed2035caa80f38bca9afa7c))
+* forgot to remove a param in rollWithInteraction ([9f3dd4c](https://github.com/Dicelette/discord-dicelette/commit/9f3dd4c842981655236c776f43a97e0a7f7e32aa))
+* **send:** urgent fix - wrong message deleted ([6ff718b](https://github.com/Dicelette/discord-dicelette/commit/6ff718bdefa1bcda67cb07e0ac661e7329c3c28a))
+
 ## [1.35.0](https://github.com/Dicelette/discord-dicelette/compare/1.34.0...1.35.0) (2025-01-03)
 
 
