@@ -1,6 +1,6 @@
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { verifyAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, verifyAvatarUrl } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, getEmbedsList, reply } from "messages";
 
@@ -9,11 +9,7 @@ export async function validateAvatarEdit(
 	ul: Translation
 ) {
 	if (!interaction.message) return;
-	const avatar = interaction.fields.getTextInputValue("avatar");
-	if (avatar.match(/(cdn|media)\.discordapp\.net/gi))
-		return await reply(interaction, {
-			embeds: [embedError(ul("error.avatar.discord"), ul)],
-		});
+	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 	if (!verifyAvatarUrl(avatar))
 		return await reply(interaction, { embeds: [embedError(ul("error.avatar.url"), ul)] });
 

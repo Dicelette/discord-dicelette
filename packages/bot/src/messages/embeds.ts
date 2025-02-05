@@ -1,7 +1,7 @@
 import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { NoEmbed } from "@dicelette/utils";
+import { NoEmbed, cleanAvatarUrl } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 export function ensureEmbed(message?: Djs.Message) {
@@ -122,7 +122,7 @@ export function createUserEmbed(
 	const userEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("embed.user"))
 		.setColor("Random")
-		.setThumbnail(thumbnail)
+		.setThumbnail(thumbnail ? cleanAvatarUrl(thumbnail) : null)
 		.addFields({
 			name: ul("common.user").capitalize(),
 			value: `<@${user}>`,

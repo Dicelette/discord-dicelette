@@ -1,7 +1,7 @@
 import { generateStatsDice } from "@dicelette/core";
 import { cmdLn, findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
-import { filterChoices, logger } from "@dicelette/utils";
+import { cleanAvatarUrl, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
@@ -92,13 +92,13 @@ export const displayUser = {
 			const jsonDataChar = dataUserEmbeds!
 				.toJSON()
 				.fields!.find((x) => findln(x.name) === findln("common.character"));
+			const thumbnailJson = dataUserEmbeds?.toJSON().thumbnail?.url;
+			const avatar = thumbnailJson
+				? cleanAvatarUrl(thumbnailJson)
+				: (user?.displayAvatarURL() ?? interaction.user.displayAvatarURL());
 			const displayEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("embed.display"))
-				.setThumbnail(
-					dataUserEmbeds?.toJSON().thumbnail?.url ??
-						user?.displayAvatarURL() ??
-						interaction.user.displayAvatarURL()
-				)
+				.setThumbnail(avatar)
 				.setColor("Gold")
 				.addFields({
 					name: ul("common.user"),

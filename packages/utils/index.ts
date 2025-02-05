@@ -37,6 +37,11 @@ export function verifyAvatarUrl(url: string) {
 	return false;
 }
 
+export function cleanAvatarUrl(url: string) {
+	if (url.match(/(cdn|media)\.discordapp\.net/gi)) return url.replace(/\?.*$/g, "");
+	return url;
+}
+
 /**
  * Verify if an array is equal to another
  * @param array1 {string[]|undefined}

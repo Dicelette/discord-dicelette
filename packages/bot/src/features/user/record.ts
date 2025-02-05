@@ -1,7 +1,7 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
 import { getTemplateWithDB } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
@@ -75,8 +75,8 @@ export async function createEmbedFirstPage(
 	const charName = interaction.fields.getTextInputValue("charName");
 	const isPrivate =
 		interaction.fields.getTextInputValue("private")?.toLowerCase() === "x";
-	const avatar = interaction.fields.getTextInputValue("avatar");
-
+	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
+	logger.trace("avatar", avatar);
 	let sheetId = setting.get(interaction.guild!.id, "managerId");
 	const privateChannel = setting.get(interaction.guild!.id, "privateChannel");
 	if (isPrivate && privateChannel) sheetId = privateChannel;

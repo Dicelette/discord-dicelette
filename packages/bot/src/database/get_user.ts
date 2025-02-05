@@ -14,7 +14,7 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, updateMemory } from "database";
 import * as Djs from "discord.js";
@@ -54,6 +54,7 @@ export function getUserByEmbed(
 		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
 	);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
+	if (user.avatar) user.avatar = cleanAvatarUrl(user.avatar);
 	if (fetchChannel && message) user.channel = message.channel.id;
 	return user as UserData;
 }

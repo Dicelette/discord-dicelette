@@ -2,7 +2,7 @@ import { cmdLn, findln, t } from "@dicelette/localization";
 import type { DiscordChannel } from "@dicelette/types";
 import type { PersonnageIds, UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
-import { filterChoices, verifyAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, filterChoices, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	deleteUser,
@@ -171,10 +171,10 @@ async function avatar(
 	thread: DiscordChannel
 ) {
 	try {
-		const imageURL = options.getString(t("edit_avatar.url.name"), true);
-		if (imageURL.match(/(cdn|media)\.discordapp\.net/gi) || !verifyAvatarUrl(imageURL))
+		const imageURL = cleanAvatarUrl(options.getString(t("edit_avatar.url.name"), true));
+		if (!verifyAvatarUrl(imageURL))
 			return await reply(interaction, {
-				embeds: [embedError(ul("error.avatar.discord"), ul)],
+				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
 		const message = await thread!.messages.fetch(sheetLocation.messageId);
 		const embed = getEmbeds(ul, message, "user");

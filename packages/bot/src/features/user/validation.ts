@@ -3,7 +3,7 @@ import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, UserData } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed, isNumber, logger } from "@dicelette/utils";
+import { NoEmbed, cleanAvatarUrl, isNumber, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { showStatistiqueModal } from "features";
 import {
@@ -195,6 +195,7 @@ export async function validateUser(
 			inline: true,
 		});
 	}
+	const jsonThumbnail = userEmbed.toJSON().thumbnail?.url;
 	const userStatistique: UserData = {
 		userName: charName,
 		stats,
@@ -205,7 +206,7 @@ export async function validateUser(
 		},
 		damage: templateDamage,
 		private: isPrivate,
-		avatar: userEmbed.toJSON().thumbnail?.url,
+		avatar: jsonThumbnail ? cleanAvatarUrl(jsonThumbnail) : undefined,
 	};
 	let templateEmbed: Djs.EmbedBuilder | undefined = undefined;
 	if (template.diceType || template.critical || template.customCritical) {
