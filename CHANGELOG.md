@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.34.2](https://github.com/Dicelette/discord-dicelette/compare/1.34.1...1.34.2) (2025-02-05)
+
+
+### Bug Fixes
+
+* disable ping on graph (asked by user) ([44b193e](https://github.com/Dicelette/discord-dicelette/commit/44b193e8f960685b9e4d57053a1aea048123759e))
+
 ## [1.34.1](https://github.com/Dicelette/discord-dicelette/compare/1.35.0...1.34.1) (2025-01-13)
 
 
