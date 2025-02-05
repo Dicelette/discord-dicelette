@@ -38,7 +38,7 @@ export function verifyAvatarUrl(url: string) {
 }
 
 export function cleanAvatarUrl(url: string) {
-	if (url.match(/(cdn|media)\.discordapp\.net/gi)) return url.replace(/\?.*$/g, "");
+	if (url.match(/(cdn|media)\.discordapp\.(net|com)/gi)) return url.replace(/\?.*$/g, "");
 	return url;
 }
 
