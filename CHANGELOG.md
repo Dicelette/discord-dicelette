@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.35.0](https://github.com/Dicelette/discord-dicelette/compare/1.34.2...1.35.0) (2025-02-05)
+
+
+### Features
+
+* **avatar:** allow using cdn image ! ([778b254](https://github.com/Dicelette/discord-dicelette/commit/778b254fcae7ad7e6b98f9db738db6e426a90449))
+
 ## [1.34.2](https://github.com/Dicelette/discord-dicelette/compare/1.34.1...1.34.2) (2025-02-05)
 
 
