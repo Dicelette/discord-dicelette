@@ -307,7 +307,11 @@ export const graph = {
 				await reply(interaction, { embeds: [embedError(ul("error.noMessage"), ul)] });
 				return;
 			}
-			await reply(interaction, { content: titleUser(), files: [image] });
+			await reply(interaction, {
+				content: titleUser(),
+				files: [image],
+				allowedMentions: { repliedUser: true, users: [] },
+			});
 		} catch (error) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.generic.e", { e: error as Error }), ul)],
