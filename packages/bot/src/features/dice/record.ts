@@ -14,6 +14,7 @@ import {
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
+	displayOldAndNewStats,
 	embedError,
 	ensureEmbed,
 	getEmbeds,
@@ -175,6 +176,7 @@ export async function registerDamageDice(
 	allEmbeds = [userEmbed];
 	if (statsEmbed) allEmbeds.push(statsEmbed);
 	allEmbeds.push(diceEmbed);
+	const compare = displayOldAndNewStats(oldDiceEmbeds?.fields, diceEmbed.toJSON().fields);
 	if (!first) {
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);
@@ -198,7 +200,7 @@ export async function registerDamageDice(
 		components = registerDmgButton(ul);
 	}
 
-	await edit(db, interaction, ul, allEmbeds, components, userID, userName);
+	await edit(db, interaction, ul, allEmbeds, components, userID, userName, compare);
 }
 
 async function edit(
@@ -208,7 +210,8 @@ async function edit(
 	allEmbeds: Djs.EmbedBuilder[],
 	components: Djs.ActionRowBuilder<Djs.ButtonBuilder>,
 	userID: string,
-	userName?: string
+	userName?: string,
+	compare?: string
 ) {
 	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
 	await reply(interaction, {
@@ -224,6 +227,6 @@ async function edit(
 		interaction.guild as Djs.Guild,
 		db
 	);
-
+	if (compare) await sendLogs(compare, interaction.guild as Djs.Guild, db);
 	return;
 }
