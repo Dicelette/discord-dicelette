@@ -129,6 +129,7 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 	if (!allUsers) return;
 	for (const [userId, chars] of Object.entries(allUsers)) {
 		const allCharacters: UserData[] = [];
+		if (!Array.isArray(chars)) continue;
 		for (const char of chars) {
 			const userStats = await getUser(char.messageId, guild, client);
 			if (userStats) allCharacters.push(userStats);
