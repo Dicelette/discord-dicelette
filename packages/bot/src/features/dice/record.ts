@@ -14,6 +14,7 @@ import {
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
+	displayOldAndNewStats,
 	embedError,
 	ensureEmbed,
 	getEmbeds,
@@ -175,7 +176,9 @@ export async function registerDamageDice(
 	allEmbeds = [userEmbed];
 	if (statsEmbed) allEmbeds.push(statsEmbed);
 	allEmbeds.push(diceEmbed);
-	const compare = undefined;
+	const compare = first
+		? undefined
+		: displayOldAndNewStats(oldDiceEmbeds?.fields, diceEmbed.toJSON().fields);
 	if (!first) {
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);
