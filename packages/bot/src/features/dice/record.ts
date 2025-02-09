@@ -202,7 +202,17 @@ export async function registerDamageDice(
 		components = registerDmgButton(ul);
 	}
 
-	await edit(db, interaction, ul, allEmbeds, components, userID, userName, compare);
+	await edit(
+		db,
+		interaction,
+		ul,
+		allEmbeds,
+		components,
+		userID,
+		userName,
+		compare,
+		first
+	);
 }
 
 async function edit(
@@ -213,8 +223,10 @@ async function edit(
 	components: Djs.ActionRowBuilder<Djs.ButtonBuilder>,
 	userID: string,
 	userName?: string,
-	compare?: string
+	compare?: string,
+	first?: boolean
 ) {
+	if (first) return;
 	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
 	await reply(interaction, {
 		content: ul("modals.added.dice"),
