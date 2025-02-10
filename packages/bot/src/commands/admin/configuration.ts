@@ -487,6 +487,17 @@ async function hiddenRoll(
 	return;
 }
 
+function formatDuration(seconds: number) {
+	if (seconds < 60) return `${seconds}s`;
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	if (minutes < 60)
+		return remainingSeconds ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+	const hours = Math.floor(minutes / 60);
+	const remainingMinutes = minutes % 60;
+	return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+}
+
 async function timer(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
@@ -494,13 +505,14 @@ async function timer(
 	options: Djs.CommandInteractionOptionResolver
 ) {
 	if (!interaction.guild) return;
+
 	const timer = options.getNumber(t("timer.option.name"), true);
 	client.settings.set(interaction.guild.id, timer * 1000, "deleteAfter");
-	if (timer === 0) {
-		await interaction.reply({ content: ul("timer.delete", { timer }) });
-	} else {
-		await interaction.reply({ content: ul("timer.success", { timer }) });
-	}
+	if (timer === 0) await interaction.reply({ content: ul("timer.delete", { timer }) });
+	else
+		await interaction.reply({
+			content: ul("timer.success", { timer: formatDuration(timer) }),
+		});
 }
 
 async function display(
@@ -523,7 +535,7 @@ async function display(
 		if (typeof settings === "boolean") return ul("common.yes");
 		if (typeof settings === "number") {
 			if (settings === 0 || guildSettings?.disableThread) return ul("common.no");
-			return `\`${settings / 1000}\`s (\`${settings / 60000}\`min)`;
+			return `\`${settings / 1000}s\` (\`${formatDuration(settings / 1000)}\`)`;
 		}
 		if (type === "role") return `<@&${settings}>`;
 		return `<#${settings}>`;
