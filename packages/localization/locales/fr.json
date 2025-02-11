@@ -613,6 +613,7 @@
       "success": "Succès critique"
     },
     "description": "Lancer un dé",
+    "error": "Erreur dans le dé : données invalides.",
     "failure": "Échec",
     "name": "roll",
     "option": {

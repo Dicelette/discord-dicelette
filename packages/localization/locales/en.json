@@ -613,6 +613,7 @@
       "success": "Critical success"
     },
     "description": "Roll a die",
+    "error": "Error during roll: invalide data.",
     "failure": "Failure",
     "name": "roll",
     "option": {

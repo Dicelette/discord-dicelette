@@ -37,7 +37,7 @@ export class ResultAsText {
 		let parser = "";
 		if (!result) {
 			this.error = true;
-			this.output = this.ul("roll.error");
+			this.output = this.ul("error.roll");
 		} else {
 			parser = this.parseResult(!!infoRoll, critical, customCritical);
 		}
