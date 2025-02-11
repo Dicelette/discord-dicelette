@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.38.2](https://github.com/Dicelette/discord-dicelette/compare/1.38.1...1.38.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* **interaction:** make resetButton asynchronous and improve select handling ([d407024](https://github.com/Dicelette/discord-dicelette/commit/d4070241b52fcc59efd8ffa9d5b5e9988595860d))
+
 ## [1.38.1](https://github.com/Dicelette/discord-dicelette/compare/1.38.0...1.38.1) (2025-02-11)
 
 
