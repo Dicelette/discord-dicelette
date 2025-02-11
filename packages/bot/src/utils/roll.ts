@@ -139,9 +139,9 @@ export async function rollDice(
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
-	if (dice.includes("{{exp}}")) {
-		if (modificator === "0") dice = dice.replace("{{exp}}", "1");
-		else dice = dice.replace("{{exp}}", modificator);
+	if (dice.includes("{exp}")) {
+		if (modificator === "0") dice = dice.replace("{exp}", "1");
+		else dice = dice.replace("{exp}", modificator);
 		modificatorString = "";
 	}
 	const roll = `${trimAll(dice)}${modificatorString}${comparator} ${comments}`;
