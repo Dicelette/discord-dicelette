@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.37.0](https://github.com/Dicelette/discord-dicelette/compare/1.36.0...1.37.0) (2025-02-11)
+
+
+### Features
+
+* **channelName:** allow to detect emoji while channel starts with special ascii characters ([57e4f44](https://github.com/Dicelette/discord-dicelette/commit/57e4f44322596dcb432c7bddebe117147bb038a7))
+* **timer:** better displaying time ([ec5f4fe](https://github.com/Dicelette/discord-dicelette/commit/ec5f4fef473209bf42ccb0c60b74ed3a41c258fe))
+
+
+### Bug Fixes
+
+* **avatar:** discord use different domains for media/cdn ([e5173e8](https://github.com/Dicelette/discord-dicelette/commit/e5173e842c0e9273f6833003c789ec3fed5bab77))
+* char is not iterable ([8fc36ea](https://github.com/Dicelette/discord-dicelette/commit/8fc36eaa72572a51251bf946ce23fc0416a7a540))
+
 ## [1.36.0](https://github.com/Dicelette/discord-dicelette/compare/1.34.2...1.36.0) (2025-02-05)
 
 
