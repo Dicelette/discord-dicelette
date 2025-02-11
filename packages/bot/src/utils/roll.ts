@@ -117,7 +117,6 @@ export async function rollDice(
 		return;
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
-	console.log(dice);
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
 	const modificator = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 	let modificatorString = getModif(modificator, userStatistique.stats);
