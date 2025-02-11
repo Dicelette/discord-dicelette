@@ -1,6 +1,6 @@
 {
 	"name": "dicelette",
-	"version": "1.36.0",
+	"version": "1.37.0",
 	"engineStrict": true,
 	"private": true,
 	"scripts": {
@@ -25,6 +25,10 @@
 		"bumpFiles": [
 			{
 				"filename": "packages/bot/package.json",
+				"type": "json"
+			},
+			{
+				"filename": "package.json",
 				"type": "json"
 			}
 		]
