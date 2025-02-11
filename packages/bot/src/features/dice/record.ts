@@ -226,21 +226,22 @@ async function edit(
 	compare?: string,
 	first?: boolean
 ) {
-	if (first) return;
 	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
 	await reply(interaction, {
 		content: ul("modals.added.dice"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	await sendLogs(
-		ul("logs.dice.add", {
-			user: Djs.userMention(interaction.user.id),
-			fiche: interaction.message?.url ?? "no url",
-			char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-		}),
-		interaction.guild as Djs.Guild,
-		db
-	);
-	if (compare) await sendLogs(compare, interaction.guild as Djs.Guild, db);
+	if (!first) {
+		await sendLogs(
+			ul("logs.dice.add", {
+				user: Djs.userMention(interaction.user.id),
+				fiche: interaction.message?.url ?? "no url",
+				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+			}),
+			interaction.guild as Djs.Guild,
+			db
+		);
+		if (compare) await sendLogs(compare, interaction.guild as Djs.Guild, db);
+	}
 	return;
 }
