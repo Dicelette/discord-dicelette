@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.39.0](https://github.com/Dicelette/discord-dicelette/compare/1.38.2...1.39.0) (2025-02-11)
+
+
+### Features
+
+* **dbd:** allow using {{exp}} in dice for replace with the expression ([719d883](https://github.com/Dicelette/discord-dicelette/commit/719d88357712d534f85428110f674790560f5d73))
+
+
+### Bug Fixes
+
+* **buttons:** button disappear when register dice ([7cfdf44](https://github.com/Dicelette/discord-dicelette/commit/7cfdf443a4f8a93ec751755034d38b06671da17c))
+* **i18n:** translation not found ([44bf1e9](https://github.com/Dicelette/discord-dicelette/commit/44bf1e9ed185aaaef5f379246874d97bfdbde0a8))
+* if the select menu disappear, make it appear with the button ([f69a154](https://github.com/Dicelette/discord-dicelette/commit/f69a15457a8e6bd86de81a2cef76dd9edbd715bf))
+
 ## [1.38.2](https://github.com/Dicelette/discord-dicelette/compare/1.38.1...1.38.2) (2025-02-11)
 
 
