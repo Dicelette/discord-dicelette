@@ -117,9 +117,10 @@ export async function rollDice(
 		return;
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
+	console.log(dice);
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
 	const modificator = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
-	const modificatorString = getModif(modificator, userStatistique.stats);
+	let modificatorString = getModif(modificator, userStatistique.stats);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -139,6 +140,11 @@ export async function rollDice(
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
+	if (dice.includes("{{exp}}")) {
+		if (modificator === "0") dice = dice.replace("{{exp}}", "1");
+		else dice = dice.replace("{{exp}}", modificator);
+		modificatorString = "";
+	}
 	const roll = `${trimAll(dice)}${modificatorString}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
