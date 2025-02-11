@@ -30,7 +30,7 @@ export default (client: EClient): void => {
 			const parser = resultAsText.parser;
 			if (!parser) return;
 			if (
-				channel.name.startsWith("🎲") ||
+				channel.name.decode().startsWith("🎲") ||
 				client.settings.get(message.guild.id, "disableThread") === true ||
 				client.settings.get(message.guild.id, "rollChannel") === channel.id
 			) {

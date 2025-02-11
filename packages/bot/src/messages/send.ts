@@ -118,7 +118,11 @@ export async function sendResult(
 			});
 		}
 	}
-	if (channel.name.startsWith("🎲") || disableThread || rollChannel === channel.id) {
+	if (
+		channel.name.decode().startsWith("🎲") ||
+		disableThread ||
+		rollChannel === channel.id
+	) {
 		return await reply(interaction, {
 			content: output,
 			allowedMentions,

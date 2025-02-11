@@ -1,6 +1,6 @@
 {
 	"name": "dicelette",
-	"version": "1.35.1",
+	"version": "1.36.0",
 	"engineStrict": true,
 	"private": true,
 	"scripts": {
@@ -53,6 +53,6 @@
 		"dotenv": "^16.4.7",
 		"tslog": "^4.9.3",
 		"tsx": "^4.19.2",
-		"uniformize": "^2.2.0"
+		"uniformize": "^2.4.0"
 	}
 }

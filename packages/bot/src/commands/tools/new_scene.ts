@@ -49,11 +49,11 @@ export default {
 		const isTextChannel = channel instanceof Djs.TextChannel;
 		if (
 			(channel.parent && channel.parent.type === Djs.ChannelType.GuildForum) ||
-			!channel.name.startsWith("🎲")
+			!channel.name.decode().startsWith("🎲")
 		) {
 			const threads = isTextChannel
 				? channel.threads.cache.filter(
-						(thread) => thread.name.startsWith("🎲") && !thread.archived
+						(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
 					)
 				: (channel.parent as Djs.ForumChannel).threads.cache.filter(
 						(thread) => thread.name === `🎲 ${scene}` && !thread.archived

@@ -228,11 +228,11 @@ export async function findThread(
 	});
 	const threadName = `🎲 ${channel.name.replaceAll("-", " ")}`;
 	const thread = mostRecentThread.find(
-		(thread) => thread.name.startsWith("🎲") && !thread.archived
+		(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
 	);
 	if (thread) {
 		const threadThatMustBeArchived = mostRecentThread.filter(
-			(tr) => tr.name.startsWith("🎲") && !tr.archived && tr.id !== thread.id
+			(tr) => tr.name.decode().startsWith("🎲") && !tr.archived && tr.id !== thread.id
 		);
 		for (const thread of threadThatMustBeArchived) {
 			await thread[1].setArchived(true);
