@@ -1,5 +1,4 @@
 import type { Settings } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 async function fetchDiceRole(diceEmbed: boolean, guild: Djs.Guild, role?: string) {
@@ -59,7 +58,7 @@ export async function addAutoRole(
 
 		if (statsEmbed && statsRole) await guildMember.roles.add(statsRole);
 	} catch (e) {
-		logger.error("Error while adding role", e);
+		console.error("Error while adding role", e);
 		//delete the role from database so it will be skip next time
 		db.delete(interaction.guild!.id, "autoRole");
 		const dbLogs = db.get(interaction.guild!.id, "logs");

@@ -120,7 +120,7 @@ export async function getUser(
 		const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
 		return getUserByEmbed({ message }, ul);
 	} catch (error) {
-		logger.error(`Error while fetching the message ${sheetLocation.messageId}`, error);
+		console.error(`Error while fetching the message ${sheetLocation.messageId}`, error);
 		return;
 	}
 }

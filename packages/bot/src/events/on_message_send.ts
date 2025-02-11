@@ -1,6 +1,5 @@
 import { lError, ln } from "@dicelette/localization";
 import { ResultAsText, isRolling } from "@dicelette/parse_result";
-import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, threadToSend } from "messages";
@@ -73,7 +72,7 @@ export default (client: EClient): void => {
 			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
-			logger.error(e);
+			console.error(e);
 			if (!message.guild) return;
 			const userLang =
 				client.settings.get(message.guild.id, "lang") ??

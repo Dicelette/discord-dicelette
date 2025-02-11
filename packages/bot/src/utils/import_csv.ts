@@ -57,14 +57,14 @@ export async function parseCSV(
 
 		async complete(results) {
 			if (!results.data) {
-				logger.error("Error while parsing CSV", results.errors);
+				console.error("Error while parsing CSV", results.errors);
 				error = "Error while parsing CSV";
 				return;
 			}
 			//throw error if missing header (it shouldn't not throw if a header is added)
 			const dataHeader = results.meta.fields?.map((key) => key.unidecode());
 			if (!dataHeader) {
-				logger.error("Error while parsing CSV, missing header");
+				console.error("Error while parsing CSV, missing header");
 				if (interaction)
 					await reply(interaction, { content: ul("import.errors.missing_header") });
 				error = "Missing header";
@@ -75,7 +75,7 @@ export async function parseCSV(
 				.filter((key) => !dataHeader.includes(key))
 				.filter((key) => key !== "dice" && key !== "avatar" && key !== "channel");
 			if (missingHeader.length > 0) {
-				logger.error("Error while parsing CSV, missing header values", missingHeader);
+				console.error("Error while parsing CSV, missing header values", missingHeader);
 				if (interaction)
 					await reply(interaction, {
 						content: ul("import.errors.headers", { name: missingHeader.join("\n- ") }),

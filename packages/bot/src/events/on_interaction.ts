@@ -1,7 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { lError, ln } from "@dicelette/localization";
 import type { Characters, Settings, Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	autCompleteCmd,
@@ -66,7 +65,7 @@ export default (client: EClient): void => {
 			else if (interaction.isStringSelectMenu())
 				await selectSubmit(interaction, ul, interactionUser, client.settings);
 		} catch (e) {
-			logger.error(e);
+			console.error(e);
 			if (!interaction.guild) return;
 			const msgError = lError(e as Error, interaction, langToUse);
 			if (msgError.length === 0) return;

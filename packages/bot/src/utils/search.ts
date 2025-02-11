@@ -1,5 +1,4 @@
 import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, sendLogs } from "messages";
 import { isValidChannel, isValidInteraction } from "utils";
@@ -33,7 +32,7 @@ export async function searchUserChannel(
 		}
 		thread = channel as DiscordChannel;
 	} catch (error) {
-		logger.error("Error while fetching channel", error);
+		console.error("Error while fetching channel", error);
 		return;
 	}
 	if (!thread) {

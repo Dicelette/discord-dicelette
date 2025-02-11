@@ -1,7 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { PersonnageIds } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { updateMemory } from "database";
 import * as Djs from "discord.js";
@@ -136,7 +135,7 @@ export async function bulkDeleteCharacters(
 			await rep.edit({ components: [] });
 		}
 	} catch (err) {
-		logger.error(err);
+		console.error(err);
 	}
 	return;
 }
@@ -156,7 +155,7 @@ async function deleteMessageChar(
 			try {
 				await thread.messages.delete(messageId);
 			} catch (err) {
-				logger.error(err);
+				console.error(err);
 			}
 		}
 	}
