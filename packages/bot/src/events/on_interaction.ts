@@ -62,8 +62,10 @@ export default (client: EClient): void => {
 				);
 			} else if (interaction.isModalSubmit())
 				await modalSubmit(interaction, ul, interactionUser, client);
-			else if (interaction.isStringSelectMenu())
+			else if (interaction.isStringSelectMenu()) {
 				await selectSubmit(interaction, ul, interactionUser, client.settings);
+				await resetButton(interaction.message, ul);
+			}
 		} catch (e) {
 			console.error(e);
 			if (!interaction.guild) return;
@@ -191,11 +193,16 @@ async function selectSubmit(
 ) {
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
-		if (value === "avatar")
-			await features.initiateAvatarEdit(interaction, ul, interactionUser, db);
-		else if (value === "name")
-			await features.initiateRenaming(interaction, ul, interactionUser, db);
-		else if (value === "user")
-			await features.initiateMove(interaction, ul, interactionUser, db);
+		switch (value) {
+			case "name":
+				await features.initiateRenaming(interaction, ul, interactionUser, db);
+				break;
+			case "avatar":
+				await features.initiateAvatarEdit(interaction, ul, interactionUser, db);
+				break;
+			case "user":
+				await features.initiateMove(interaction, ul, interactionUser, db);
+				break;
+		}
 	}
 }

@@ -362,7 +362,7 @@ export async function move(
 	});
 }
 
-export function resetButton(message: Djs.Message, ul: Translation) {
+export async function resetButton(message: Djs.Message, ul: Translation) {
 	const { buttons, select } = getButton(message, ul);
-	return message.edit({ components: [buttons, select] });
+	return await message.edit({ components: [buttons, select] });
 }
