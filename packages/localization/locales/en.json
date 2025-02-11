@@ -206,6 +206,7 @@
     }
   },
   "deleteChar": {
+    "all": "Are you sure do you want to delete {{- user}} data?",
     "allMany": "Are you sure you want to **delete all** {{-user}} characters?\n__Characters found__:\n- {{- chara}}",
     "allOne": "Are you sure you want to delete {{-user}} character?",
     "allSuccess": "{{- user}}'s data has been deleted.",

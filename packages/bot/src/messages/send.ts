@@ -105,7 +105,7 @@ export async function sendResult(
 	let isHidden: undefined | string = undefined;
 	const allowedMentions = { users: user ? [user.id] : [] };
 	const output = result.roll?.defaultMessage() ?? result.expression;
-	if (hidden) {
+	if (hidden && output) {
 		if (typeof hideResultConfig === "string") {
 			//send to another channel ;
 			rollChannel = hideResultConfig;

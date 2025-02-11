@@ -59,7 +59,7 @@ export async function validateMove(
 	const charData = getUserByEmbed({ message: interaction.message }, ul);
 	if (!charData) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.notFound"), ul)],
+			embeds: [embedError(ul("error.user"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(interaction.message, ul);

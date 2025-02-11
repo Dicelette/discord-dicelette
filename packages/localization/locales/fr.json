@@ -206,6 +206,7 @@
     }
   },
   "deleteChar": {
+    "all": "Êtes vous sûre de vouloir supprimer les données de {{- user}} ?",
     "allMany": "Êtes-vous sûr·e de vouloir **supprimer tous les personnages** de {{- user}} ?\n__Personnages trouvés__ :\n- {{- chara}}",
     "allOne": "Êtes vous sûr·e de vouloir supprimer le personnage {{- user}} ?",
     "allSuccess": "Les données de {{- user}} ont bien été supprimée.",
