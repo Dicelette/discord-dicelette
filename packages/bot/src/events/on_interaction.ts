@@ -152,11 +152,14 @@ async function buttonSubmit(
 		);
 	else if (interaction.customId === "continue")
 		await features.continuePage(interaction, template, ul, interactionUser);
-	else if (interaction.customId.includes("add_dice"))
+	else if (interaction.customId.includes("add_dice")) {
 		await features.executeAddDiceButton(interaction, interactionUser, db);
-	else if (interaction.customId === "edit_stats")
+		if (!interaction.customId.includes("first"))
+			await resetButton(interaction.message, ul);
+	} else if (interaction.customId === "edit_stats") {
 		await features.triggerEditStats(interaction, ul, interactionUser, db);
-	else if (interaction.customId === "validate")
+		await resetButton(interaction.message, ul);
+	} else if (interaction.customId === "validate")
 		await features.validateUserButton(
 			interaction,
 			interactionUser,
@@ -167,9 +170,10 @@ async function buttonSubmit(
 		);
 	else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, interactionUser);
-	else if (interaction.customId === "edit_dice")
+	else if (interaction.customId === "edit_dice") {
 		await features.initiateDiceEdit(interaction, ul, interactionUser, db);
-	else if (interaction.customId === "avatar") {
+		await resetButton(interaction.message, ul);
+	} else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);
 		await interaction.reply({
 			content: ul("refresh"),
