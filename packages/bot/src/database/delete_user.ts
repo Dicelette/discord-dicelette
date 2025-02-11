@@ -1,4 +1,4 @@
-import type { GuildData } from "@dicelette/types";
+import type { GuildData, UserMessageId } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
@@ -21,6 +21,34 @@ export function deleteUser(
 	}
 	guildData.user[user?.id ?? interaction.user.id].splice(userCharIndex, 1);
 	return guildData;
+}
+
+export function deleteByMessageIds(
+	messageId: UserMessageId,
+	guild: Djs.Guild,
+	client: EClient
+) {
+	const db = client.settings;
+	const characters = client.characters;
+	const dbUser = db.get(guild.id, "user");
+	if (!dbUser) return;
+	for (const user of Object.keys(dbUser)) {
+		const userChars = dbUser[user];
+		const char = userChars.findIndex((char) => {
+			return char.messageId === messageId;
+		});
+		if (char) {
+			userChars.splice(char, 1);
+			if (userChars.length === 0) {
+				db.delete(guild.id, `user.${user}`);
+				if (characters.get(guild.id, user)) characters.delete(guild.id, user);
+			} else {
+				db.set(guild.id, userChars, `user.${user}`);
+				deleteUserInChar(characters, user, guild.id);
+			}
+			logger.trace(`Deleted ${messageId} for user ${user}`);
+		}
+	}
 }
 
 export function deleteIfChannelOrThread(

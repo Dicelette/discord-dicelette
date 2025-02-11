@@ -123,7 +123,7 @@ export const displayUser = {
 			await reply(interaction, { embeds: displayEmbeds });
 		} catch (e) {
 			console.error(e);
-			await reply(interaction, { embeds: [embedError(ul("error.noMessage"), ul)] });
+			await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
 			return;
 		}
 	},

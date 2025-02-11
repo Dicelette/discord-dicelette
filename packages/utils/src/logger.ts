@@ -15,7 +15,7 @@ const optionLoggers: ISettingsParam<ILogObj> =
 
 const defaultOptions = {
 	prettyLogTemplate:
-		"{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t[{{filePathWithLine}}] ",
+		"{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} {{logLevelName}} [{{filePathWithLine}}] ",
 	prettyErrorTemplate: "\n{{errorName}} {{errorMessage}}\nerror stack:\n{{errorStack}}",
 	prettyErrorStackTemplate: "  • {{fileName}}\t{{method}}\n\t{{filePathWithLine}}",
 	prettyErrorParentNamesSeparator: ":",
@@ -52,7 +52,7 @@ export const important: Logger<ILogObj> = new Logger({
 	minLevel: 0,
 	hideLogPositionForProduction: true,
 	prettyLogTemplate:
-		"{{dd}}/{{mm}}/{{yyyy}} {{hh}}:{{MM}}:{{ss}}.{{ms}} [{{logLevelName}}] ",
+		"{{dd}}/{{mm}}/{{yyyy}} {{hh}}:{{MM}}:{{ss}}.{{ms}} [{{logLevelName}}]",
 	prettyLogStyles: {
 		dd: "dim",
 		mm: "dim",

@@ -97,18 +97,14 @@ export async function getUser(
 		messageId: messageId[0],
 	};
 	let channel = client.channels.cache.get(sheetLocation.channelId);
-	if (channel instanceof Djs.CategoryChannel) {
-		logger.warn(`Channel ${sheetLocation.channelId} not found`);
-		return;
-	}
+	if (channel instanceof Djs.CategoryChannel) return;
+
 	if (!channel) {
 		//get the channel from the guild
 		const fetchChannel = await guild.channels.fetch(sheetLocation.channelId);
 		// noinspection SuspiciousTypeOfGuard
-		if (!fetchChannel || fetchChannel instanceof Djs.CategoryChannel) {
-			logger.warn(`Channel ${sheetLocation.channelId} not found`);
-			return;
-		}
+		if (!fetchChannel || fetchChannel instanceof Djs.CategoryChannel) return;
+
 		channel = fetchChannel;
 	}
 	try {
@@ -119,8 +115,7 @@ export async function getUser(
 		}
 		const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
 		return getUserByEmbed({ message }, ul);
-	} catch (error) {
-		console.error(`Error while fetching the message ${sheetLocation.messageId}`, error);
+	} catch (_e) {
 		return;
 	}
 }
