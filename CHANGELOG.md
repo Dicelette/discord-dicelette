@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.38.1](https://github.com/Dicelette/discord-dicelette/compare/1.38.0...1.38.1) (2025-02-11)
+
+
+### Bug Fixes
+
+* **dice:records:** in first records, embed was not updated ([a63b84c](https://github.com/Dicelette/discord-dicelette/commit/a63b84c0e55ed3216c232c51e98e33b38a13459e))
+
 ## [1.38.0](https://github.com/Dicelette/discord-dicelette/compare/1.37.0...1.38.0) (2025-02-11)
 
 
