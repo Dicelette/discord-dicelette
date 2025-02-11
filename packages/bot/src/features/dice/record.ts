@@ -21,7 +21,7 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import { addAutoRole, editUserButtons } from "utils";
+import { addAutoRole, editUserButtons, selectEditMenu } from "utils";
 
 /**
  * Interaction to submit the new skill dice
@@ -169,7 +169,10 @@ export async function registerDamageDice(
 		db
 	);
 	let allEmbeds: Djs.EmbedBuilder[] = [];
-	let components: Djs.ActionRowBuilder<Djs.ButtonBuilder>;
+	let components: (
+		| Djs.ActionRowBuilder<Djs.ButtonBuilder>
+		| Djs.ActionRowBuilder<Djs.StringSelectMenuBuilder>
+	)[] = [];
 	const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
 	const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
 	if (!userEmbed) throw new NoEmbed();
@@ -182,7 +185,7 @@ export async function registerDamageDice(
 	if (!first) {
 		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);
-		components = editUserButtons(ul, !!statsEmbed, true);
+		components = [editUserButtons(ul, !!statsEmbed, true), selectEditMenu(ul)];
 		const userRegister: {
 			userID: string;
 			charName: string | undefined;
@@ -199,7 +202,7 @@ export async function registerDamageDice(
 			embeds: allEmbeds,
 		});
 	} else {
-		components = registerDmgButton(ul);
+		components = [registerDmgButton(ul)];
 	}
 
 	await edit(
@@ -220,13 +223,16 @@ async function edit(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	allEmbeds: Djs.EmbedBuilder[],
-	components: Djs.ActionRowBuilder<Djs.ButtonBuilder>,
+	components: (
+		| Djs.ActionRowBuilder<Djs.ButtonBuilder>
+		| Djs.ActionRowBuilder<Djs.StringSelectMenuBuilder>
+	)[],
 	userID: string,
 	userName?: string,
 	compare?: string,
 	first?: boolean
 ) {
-	await interaction?.message?.edit({ embeds: allEmbeds, components: [components] });
+	await interaction?.message?.edit({ embeds: allEmbeds, components });
 	await reply(interaction, {
 		content: ul("modals.added.dice"),
 		flags: Djs.MessageFlags.Ephemeral,

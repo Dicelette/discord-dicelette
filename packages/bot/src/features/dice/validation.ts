@@ -15,7 +15,7 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import { editUserButtons } from "utils";
+import { editUserButtons, selectEditMenu } from "utils";
 
 /**
  * Validate the edit of the dice from the modals
@@ -126,7 +126,10 @@ export async function validateDiceEdit(
 		);
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
-		await interaction.message.edit({ embeds: toAdd, components: [components] });
+		await interaction.message.edit({
+			embeds: toAdd,
+			components: [components, selectEditMenu(ul)],
+		});
 		await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 			embeds: toAdd,
 		});
