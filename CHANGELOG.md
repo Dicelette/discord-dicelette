@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.38.0](https://github.com/Dicelette/discord-dicelette/compare/1.37.0...1.38.0) (2025-02-11)
+
+
+### Features
+
+* **logger:** improve logging format and add deleteByMessageIds function ([513189a](https://github.com/Dicelette/discord-dicelette/commit/513189a84dba18eb8383bbe329cffbea1bd61982))
+* **validation:** update error message for user not found and improve condition for hidden output ([a281943](https://github.com/Dicelette/discord-dicelette/commit/a281943cc990fb0ae7debb4991045909cf430f40))
+
+
+### Bug Fixes
+
+* **avatar:** validate avatar URL ([2fba310](https://github.com/Dicelette/discord-dicelette/commit/2fba3108fe644135658f6ae8978b0494556a2408))
+
 ## [1.37.0](https://github.com/Dicelette/discord-dicelette/compare/1.36.0...1.37.0) (2025-02-11)
 
 
