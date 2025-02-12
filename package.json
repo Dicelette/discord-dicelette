@@ -15,7 +15,8 @@
 		"pm2:restart": "pnpm run build && pm2 restart dicelette",
 		"pm2:stop": "pm2 stop dicelette",
 		"pm2:delete": "pm2 delete dicelette",
-		"prod": "cross-env PROD=true node test.js"
+		"prod": "cross-env PROD=true node test.js",
+		"test": "pnpm --filter @dicelette/parse_result run test"
 	},
 	"engines": {
 		"node": "^20.0.0"
