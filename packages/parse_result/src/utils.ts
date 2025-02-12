@@ -40,7 +40,7 @@ export function getRoll(dice: string): Resultat | undefined {
 	return rollDice;
 }
 
-export function getModif(
+export function convertExpression(
 	modif: string,
 	statistics?: Record<string, number>,
 	statValue?: number
@@ -54,6 +54,15 @@ export function getModif(
 	modif = generateStatsDice(modif, statistics, statValue?.toString());
 	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
 	return modif;
+}
+
+export function convertExpressionNumber(
+	modif: string,
+	statistics?: Record<string, number>
+): number {
+	if (isNumber(modif)) return Number.parseInt(modif, 10);
+	const res = generateStatsDice(modif, statistics);
+	return Number.parseInt(res, 10);
 }
 
 export function replaceStatInDice(

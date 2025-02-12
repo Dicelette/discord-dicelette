@@ -7,8 +7,9 @@ import { t } from "@dicelette/localization";
 import {
 	ResultAsText,
 	type Server,
+	convertExpression,
+	convertExpressionNumber,
 	convertNameToValue,
-	getModif,
 	getRoll,
 	replaceStatInDice,
 	rollCustomCritical,
@@ -119,7 +120,7 @@ export async function rollDice(
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
 	const modificator = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
-	let modificatorString = getModif(modificator, userStatistique.stats);
+	let modificatorString = convertExpression(modificator, userStatistique.stats);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -141,7 +142,7 @@ export async function rollDice(
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
 	if (dice.includes("{exp}")) {
 		if (modificator === "0") dice = dice.replace("{exp}", "1");
-		else dice = dice.replace("{exp}", modificator);
+		else dice = dice.replace("{exp}", `${convertExpressionNumber(modificator)}`);
 		modificatorString = "";
 	}
 	const roll = `${trimAll(dice)}${modificatorString}${comparator} ${comments}`;
@@ -226,7 +227,11 @@ export async function rollStatistique(
 		}
 	}
 
-	const modificationString = getModif(modification, userStatistique.stats, userStat);
+	const modificationString = convertExpression(
+		modification,
+		userStatistique.stats,
+		userStat
+	);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
