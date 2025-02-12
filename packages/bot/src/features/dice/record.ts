@@ -237,8 +237,9 @@ async function edit(
 		content: ul("modals.added.dice"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	if (!first) {
-		await sendLogs(
+	if (first) return;
+	if (!compare)
+		return await sendLogs(
 			ul("logs.dice.add", {
 				user: Djs.userMention(interaction.user.id),
 				fiche: interaction.message?.url ?? "no url",
@@ -247,7 +248,10 @@ async function edit(
 			interaction.guild as Djs.Guild,
 			db
 		);
-		if (compare) await sendLogs(compare, interaction.guild as Djs.Guild, db);
-	}
-	return;
+	const msg = ul("logs.dice.add", {
+		user: Djs.userMention(interaction.user.id),
+		fiche: interaction.message?.url ?? "no url",
+		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+	});
+	return await sendLogs(`${msg}\n${compare}`, interaction.guild as Djs.Guild, db);
 }
