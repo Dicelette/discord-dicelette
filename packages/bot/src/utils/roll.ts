@@ -17,7 +17,7 @@ import {
 	trimAll,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue } from "database";
 import * as Djs from "discord.js";
@@ -119,8 +119,8 @@ export async function rollDice(
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
-	const modificator = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
-	let modificatorString = convertExpression(modificator, userStatistique.stats);
+	const expression = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	let expressionStr = convertExpression(expression, userStatistique.stats);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -140,12 +140,14 @@ export async function rollDice(
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
+	logger.trace("dice", dice);
 	if (dice.includes("{exp}")) {
-		if (modificator === "0") dice = dice.replace("{exp}", "1");
-		else dice = dice.replace("{exp}", `${convertExpressionNumber(modificator)}`);
-		modificatorString = "";
+		if (expression === "0") dice = dice.replace("{exp}", "1");
+		else dice = dice.replace("{exp}", `${convertExpressionNumber(expression)}`);
+		expressionStr = "";
 	}
-	const roll = `${trimAll(dice)}${modificatorString}${comparator} ${comments}`;
+	logger.trace("dice", dice);
+	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
 		roll,

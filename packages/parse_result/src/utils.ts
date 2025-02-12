@@ -1,6 +1,7 @@
 import { type Resultat, generateStatsDice, roll, standardizeDice } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { isNumber } from "@dicelette/utils";
+import { evaluate } from "mathjs";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
 
@@ -52,6 +53,14 @@ export function convertExpression(
 		return "";
 	}
 	modif = generateStatsDice(modif, statistics, statValue?.toString());
+	try {
+		const evaluated = evaluate(modif);
+		if (typeof evaluated === "number")
+			return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
+	} catch (error) {
+		//pass
+	}
+
 	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
 	return modif;
 }
@@ -62,6 +71,12 @@ export function convertExpressionNumber(
 ): number {
 	if (isNumber(modif)) return Number.parseInt(modif, 10);
 	const res = generateStatsDice(modif, statistics);
+	try {
+		const evaluated = evaluate(res);
+		if (typeof evaluated === "number") return evaluated;
+	} catch (error) {
+		//pass
+	}
 	return Number.parseInt(res, 10);
 }
 
