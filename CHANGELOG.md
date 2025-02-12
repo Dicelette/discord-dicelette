@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.40.0](https://github.com/Dicelette/discord-dicelette/compare/1.39.1...1.40.0) (2025-02-12)
+
+
+### Features
+
+* **dice:** support for dollars values in expression ([b2d6b43](https://github.com/Dicelette/discord-dicelette/commit/b2d6b43a0dd0f0065532e803d983d41f35d5fa66))
+
 ## [1.39.1](https://github.com/Dicelette/discord-dicelette/compare/1.39.0...1.39.1) (2025-02-12)
 
 
