@@ -65,21 +65,6 @@ export function convertExpression(
 	return modif;
 }
 
-export function convertExpressionNumber(
-	modif: string,
-	statistics?: Record<string, number>
-): number {
-	if (isNumber(modif)) return Number.parseInt(modif, 10);
-	const res = generateStatsDice(modif, statistics);
-	try {
-		const evaluated = evaluate(res);
-		if (typeof evaluated === "number") return evaluated;
-	} catch (error) {
-		//pass
-	}
-	return Number.parseInt(res, 10);
-}
-
 export function replaceStatInDice(
 	diceName: string,
 	statistics?: Record<string, number>,

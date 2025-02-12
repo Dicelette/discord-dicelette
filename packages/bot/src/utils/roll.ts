@@ -142,7 +142,7 @@ export async function rollDice(
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
 	if (dice.includes("{exp}")) {
 		if (expression === "0") dice = dice.replace("{exp}", "1");
-		else dice = dice.replace("{exp}", `${convertExpressionNumber(expression)}`);
+		else dice = dice.replace("{exp}", `${expressionStr.replace(/^\+/, "")}`);
 		expressionStr = "";
 	}
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
