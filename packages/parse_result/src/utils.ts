@@ -32,9 +32,7 @@ export function getRoll(dice: string): Resultat | undefined {
 	dice = dice.trim();
 	try {
 		const rollDice = roll(dice);
-		if (!rollDice) {
-			return undefined;
-		}
+		if (!rollDice) return undefined;
 		if (comments) {
 			rollDice.comment = comments;
 			rollDice.dice = `${dice} /* ${comments} */`;
@@ -46,26 +44,26 @@ export function getRoll(dice: string): Resultat | undefined {
 }
 
 export function convertExpression(
-	modif: string,
+	dice: string,
 	statistics?: Record<string, number>,
-	statValue?: number
+	dollarValue?: string
 ): string {
-	if (isNumber(modif)) {
-		const res = Number.parseInt(modif, 10);
+	if (isNumber(dice)) {
+		const res = Number.parseInt(dice, 10);
 		if (res > 0) return `+${res}`;
 		if (res < 0) return `${res}`;
 		return "";
 	}
-	modif = generateStatsDice(modif, statistics, statValue?.toString());
+	dice = generateStatsDice(dice, statistics, dollarValue);
 	try {
-		const evaluated = evaluate(modif);
+		const evaluated = evaluate(dice);
 		if (typeof evaluated === "number")
 			return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
 	} catch (error) {
 		//pass
 	}
-	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
-	return modif;
+	if (!dice.startsWith("+") && !dice.startsWith("-")) return `+${dice}`;
+	return dice;
 }
 
 export function replaceStatInDice(
