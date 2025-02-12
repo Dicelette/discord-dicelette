@@ -17,7 +17,7 @@ import {
 	trimAll,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue } from "database";
 import * as Djs from "discord.js";
@@ -140,13 +140,11 @@ export async function rollDice(
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
-	logger.trace("dice", dice);
 	if (dice.includes("{exp}")) {
 		if (expression === "0") dice = dice.replace("{exp}", "1");
 		else dice = dice.replace("{exp}", `${convertExpressionNumber(expression)}`);
 		expressionStr = "";
 	}
-	logger.trace("dice", dice);
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
