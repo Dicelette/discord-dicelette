@@ -81,7 +81,6 @@ describe("custom critical roll", () => {
 			critical
 		);
 		const text = res.defaultMessage();
-		console.log(text);
 		expect(text).toContain("test");
 	});
 });
