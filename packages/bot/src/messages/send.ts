@@ -10,7 +10,7 @@ export async function sendLogs(message: string, guild: Djs.Guild, db: Settings) 
 	const channel = guildData.logs;
 	try {
 		const channelToSend = (await guild.channels.fetch(channel)) as Djs.TextChannel;
-		await channelToSend.send(message);
+		await channelToSend.send({ content: message, allowedMentions: {} });
 	} catch (error) {
 		return;
 	}
