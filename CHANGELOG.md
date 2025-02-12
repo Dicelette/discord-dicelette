@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.39.1](https://github.com/Dicelette/discord-dicelette/compare/1.39.0...1.39.1) (2025-02-12)
+
+
+### Bug Fixes
+
+* **dice:** expression should be also converted even used in {exp} ([9fec858](https://github.com/Dicelette/discord-dicelette/commit/9fec858c0dce36183ecb65f9e87c951b2f24ae35))
+* **dice:** use {exp} to prevent colliding with {{exp}} stats name ([3732260](https://github.com/Dicelette/discord-dicelette/commit/373226062fb91c0e71ab979874ac53167a39e96d))
+* **roll:** evaluate expressions in dice rolls and update modificator handling ([43a9697](https://github.com/Dicelette/discord-dicelette/commit/43a9697eea402f0688638b225c840de807c8a8e2))
+
 ## [1.39.0](https://github.com/Dicelette/discord-dicelette/compare/1.38.2...1.39.0) (2025-02-11)
 
 
