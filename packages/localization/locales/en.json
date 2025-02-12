@@ -317,6 +317,8 @@
     },
     "invalidDice": {
       "embeds": "No die embeds detected",
+      "minus": "Dices cannot be negative !\n\n-# Dice used: `{- dice}}`.",
+      "notFound": "No dice were found in the command!",
       "withDice": "Invalid die: `{{-dice}}`"
     },
     "invalidFormula": "Invalid formula: `{{- formula}}`",
@@ -342,6 +344,9 @@
     "oldEmbed": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}}).",
     "private": "This character sheet is private! \nYou do not have permission to read it.",
     "public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
+    "roll": {
+      "invalid": "Error during roll: invalid data for `{{- dice}}`."
+    },
     "rollChannelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration.",
     "sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
     "statNotFound": "Statistics not found! Did you make a typing error?",
@@ -613,7 +618,6 @@
       "success": "Critical success"
     },
     "description": "Roll a die",
-    "error": "Error during roll: invalide data.",
     "failure": "Failure",
     "name": "roll",
     "option": {

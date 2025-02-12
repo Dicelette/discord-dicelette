@@ -8,7 +8,6 @@ import {
 	ResultAsText,
 	type Server,
 	convertExpression,
-	convertExpressionNumber,
 	convertNameToValue,
 	getRoll,
 	replaceStatInDice,
@@ -44,6 +43,7 @@ export async function rollWithInteraction(
 		lang: langToUser,
 		userId: user?.id ?? interaction.user.id,
 		config,
+		dice,
 	};
 	const result = getRoll(dice);
 	const defaultMsg = new ResultAsText(

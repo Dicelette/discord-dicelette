@@ -6,4 +6,5 @@ export interface Server {
 	lang: Djs.Locale;
 	userId?: string;
 	config?: Partial<GuildData>;
+	dice?: string;
 }

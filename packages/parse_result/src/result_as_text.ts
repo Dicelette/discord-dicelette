@@ -37,7 +37,7 @@ export class ResultAsText {
 		let parser = "";
 		if (!result) {
 			this.error = true;
-			this.output = this.ul("error.roll");
+			this.output = this.errorMessage();
 		} else {
 			parser = this.parseResult(!!infoRoll, critical, customCritical);
 		}
@@ -46,10 +46,17 @@ export class ResultAsText {
 		this.charName = charName;
 	}
 
+	private errorMessage() {
+		const { dice } = this.data;
+		if (!dice) return this.ul("error.invalidDice.notFound");
+		if (dice?.startsWith("-")) return this.ul("error.invalidDice.minus", { dice });
+		return this.ul("error.invalidDice.withDice", { dice });
+	}
+
 	defaultMessage() {
 		return !this.error
 			? `${this.infoRollTotal(true)}${this.parser}`
-			: this.ul("roll.error");
+			: this.errorMessage();
 	}
 
 	private infoRollTotal(mention?: boolean, time?: boolean) {

@@ -30,15 +30,19 @@ export function getRoll(dice: string): Resultat | undefined {
 		dice = dice.replace(DETECT_DICE_MESSAGE, "$1");
 	}
 	dice = dice.trim();
-	const rollDice = roll(dice);
-	if (!rollDice) {
+	try {
+		const rollDice = roll(dice);
+		if (!rollDice) {
+			return undefined;
+		}
+		if (comments) {
+			rollDice.comment = comments;
+			rollDice.dice = `${dice} /* ${comments} */`;
+		}
+		return rollDice;
+	} catch (error) {
 		return undefined;
 	}
-	if (comments) {
-		rollDice.comment = comments;
-		rollDice.dice = `${dice} /* ${comments} */`;
-	}
-	return rollDice;
 }
 
 export function convertExpression(
@@ -60,7 +64,6 @@ export function convertExpression(
 	} catch (error) {
 		//pass
 	}
-
 	if (!modif.startsWith("+") && !modif.startsWith("-")) return `+${modif}`;
 	return modif;
 }

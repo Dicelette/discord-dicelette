@@ -317,6 +317,8 @@
     },
     "invalidDice": {
       "embeds": "Aucun embed de dé détecté",
+      "minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
+      "notFound": "Aucun dé n'a été retrouvé dans la commande !",
       "withDice": "Dé invalide : `{{- dice}}`"
     },
     "invalidFormula": "Formule invalide : `{{- formula}}`",
@@ -342,6 +344,9 @@
     "oldEmbed": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>).",
     "private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
     "public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
+    "roll": {
+      "invalid": "Erreur dans le dé : données invalides pour le dé `{{- dice}}`."
+    },
     "rollChannelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut.",
     "sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
     "statNotFound": "Statistiques introuvable ! Avez vous fait une erreur de frappe ?",
@@ -613,7 +618,6 @@
       "success": "Succès critique"
     },
     "description": "Lancer un dé",
-    "error": "Erreur dans le dé : données invalides.",
     "failure": "Échec",
     "name": "roll",
     "option": {
