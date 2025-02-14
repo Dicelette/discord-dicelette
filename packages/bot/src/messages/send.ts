@@ -22,10 +22,15 @@ export async function reply(
 		| Djs.ButtonInteraction
 		| Djs.StringSelectMenuInteraction,
 	options: string | Djs.InteractionReplyOptions | Djs.MessagePayload
-) {
-	return interaction.replied || interaction.deferred
-		? await interaction.editReply(options)
-		: await interaction.reply(options);
+): Promise<Djs.Message | Djs.InteractionResponse> {
+	try {
+		return interaction.replied || interaction.deferred
+			? await interaction.editReply(options)
+			: await interaction.reply(options);
+	} catch (e) {
+		console.error(e);
+		return await interaction.followUp(options);
+	}
 }
 
 /**
