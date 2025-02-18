@@ -2,7 +2,7 @@ import { evalStatsDice, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { UserMessageId, UserRegistration } from "@dicelette/types";
 import type { Translation } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import {capitalizeBetweenPunct, isNumber} from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import * as Djs from "discord.js";
@@ -202,7 +202,7 @@ function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
 	const parsedStats: Record<string, number> = {};
 	for (const [name, value] of Object.entries(stats)) {
 		let number = Number.parseInt(value, 10);
-		if (Number.isNaN(number)) {
+		if (!isNumber(value)) {
 			const combinaison = value.replace(/`(.*)` =/, "").trim();
 			number = Number.parseInt(combinaison, 10);
 		}

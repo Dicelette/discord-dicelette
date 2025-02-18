@@ -39,9 +39,10 @@ export async function continuePage(
 		});
 		return;
 	}
-	const page = Number.isNaN(Number.parseInt(interaction.customId.replace("page", ""), 10))
+	const pageNumber = interaction.customId.replace("page", "")
+	const page = !isNumber(pageNumber)
 		? 1
-		: Number.parseInt(interaction.customId.replace("page", ""), 10);
+		: Number.parseInt(pageNumber, 10);
 	const embed = getEmbeds(ul, interaction.message, "user");
 	if (!embed || !dbTemplate.statistics) return;
 	const statsEmbed = getEmbeds(ul, interaction.message, "stats") ?? createStatsEmbed(ul);

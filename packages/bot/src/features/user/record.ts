@@ -1,7 +1,7 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
+import {NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl, isNumber} from "@dicelette/utils";
 import { getTemplateWithDB } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
@@ -17,8 +17,8 @@ export async function pageNumber(
 	ul: Translation,
 	db: Settings
 ) {
-	const pageNumber = Number.parseInt(interaction.customId.replace("page", ""), 10);
-	if (Number.isNaN(pageNumber)) return;
+	const pageNumber = interaction.customId.replace("page", "")
+	if (!isNumber(pageNumber)) return;
 	const template = await getTemplateWithDB(interaction, db);
 	if (!template) {
 		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
@@ -27,7 +27,7 @@ export async function pageNumber(
 	await registerStatistics(
 		interaction,
 		template,
-		pageNumber,
+		Number.parseInt(pageNumber, 10),
 		db.get(interaction.guild!.id, "lang") ?? interaction.locale
 	);
 }

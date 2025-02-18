@@ -21,6 +21,7 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
+import {isNumber} from "@dicelette/utils";
 
 /**
  * Embed to display the statistics when adding a new user
@@ -150,15 +151,15 @@ export async function editStats(
 			embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
 		)
 			continue;
-		if (!stat) {
+		if (!stat)
 			throw new Error(ul("error.statNotFound", { value: name }));
-		}
-		const num = Number.parseInt(value, 10);
-		if (Number.isNaN(num)) {
+		
+		if (!isNumber(value)) {
 			//it's a combinaison OR an error
 			//we need to get the result of the combinaison
+			
 			const combinaison = Number.parseInt(evalOneCombinaison(value, stats), 10);
-			if (Number.isNaN(combinaison)) {
+			if (!isNumber(combinaison)) {
 				throw new FormulaError(value);
 			}
 			embedsStatsFields.push({
@@ -168,6 +169,7 @@ export async function editStats(
 			});
 			continue;
 		}
+		const num = Number.parseInt(value, 10);
 		if (stat.min && num < stat.min) {
 			throw new Error(ul("error.mustBeGreater", { value: name, min: stat.min }));
 		} //skip register total + max because leveling can be done here

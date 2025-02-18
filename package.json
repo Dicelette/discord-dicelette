@@ -59,5 +59,13 @@
 		"tslog": "^4.9.3",
 		"tsx": "^4.19.2",
 		"uniformize": "^2.4.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"better-sqlite3",
+			"canvas",
+			"esbuild"
+		]
 	}
 }
