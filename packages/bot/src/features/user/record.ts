@@ -1,7 +1,7 @@
-import type { StatisticalTemplate } from "@dicelette/core";
+import { type StatisticalTemplate, isNumber } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
-import {NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl, isNumber} from "@dicelette/utils";
+import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
 import { getTemplateWithDB } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
@@ -17,7 +17,7 @@ export async function pageNumber(
 	ul: Translation,
 	db: Settings
 ) {
-	const pageNumber = interaction.customId.replace("page", "")
+	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
 	const template = await getTemplateWithDB(interaction, db);
 	if (!template) {

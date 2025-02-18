@@ -55,14 +55,6 @@ export function isArrayEqual(array1: string[] | undefined, array2: string[] | un
 		array1.every((value, index) => value === array2[index])
 	);
 }
-
-export const isNumber = (value: unknown): boolean =>
-	value !== undefined &&
-	(typeof value === "number" ||
-		(!Number.isNaN(Number(value)) &&
-			typeof value === "string" &&
-			value.trim().length > 0));
-
 export function capitalizeBetweenPunct(input: string) {
 	// Regex to find sections enclosed by punctuation marks
 	const regex = /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu;

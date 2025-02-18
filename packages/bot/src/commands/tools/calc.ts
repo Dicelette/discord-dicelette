@@ -1,8 +1,8 @@
-import { generateStatsDice } from "@dicelette/core";
+import { generateStatsDice, isNumber } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, isNumber, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";

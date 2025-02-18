@@ -1,6 +1,11 @@
-import { type Resultat, generateStatsDice, roll, standardizeDice } from "@dicelette/core";
+import {
+	type Resultat,
+	generateStatsDice,
+	isNumber,
+	roll,
+	standardizeDice,
+} from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { isNumber } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";

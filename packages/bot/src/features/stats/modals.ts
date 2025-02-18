@@ -4,6 +4,7 @@ import {
 	evalCombinaison,
 	evalOneCombinaison,
 } from "@dicelette/core";
+import { isNumber } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
@@ -21,7 +22,6 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
-import {isNumber} from "@dicelette/utils";
 
 /**
  * Embed to display the statistics when adding a new user
@@ -151,13 +151,12 @@ export async function editStats(
 			embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
 		)
 			continue;
-		if (!stat)
-			throw new Error(ul("error.statNotFound", { value: name }));
-		
+		if (!stat) throw new Error(ul("error.statNotFound", { value: name }));
+
 		if (!isNumber(value)) {
 			//it's a combinaison OR an error
 			//we need to get the result of the combinaison
-			
+
 			const combinaison = Number.parseInt(evalOneCombinaison(value, stats), 10);
 			if (!isNumber(combinaison)) {
 				throw new FormulaError(value);

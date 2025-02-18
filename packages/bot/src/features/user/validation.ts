@@ -1,9 +1,8 @@
-import type { StatisticalTemplate } from "@dicelette/core";
+import { type StatisticalTemplate, isNumber } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type { Characters, UserData } from "@dicelette/types";
-import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed, cleanAvatarUrl, isNumber, logger } from "@dicelette/utils";
+import type { Characters, Settings, Translation, UserData } from "@dicelette/types";
+import { NoEmbed, cleanAvatarUrl, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { showStatistiqueModal } from "features";
 import {
@@ -39,10 +38,8 @@ export async function continuePage(
 		});
 		return;
 	}
-	const pageNumber = interaction.customId.replace("page", "")
-	const page = !isNumber(pageNumber)
-		? 1
-		: Number.parseInt(pageNumber, 10);
+	const pageNumber = interaction.customId.replace("page", "");
+	const page = !isNumber(pageNumber) ? 1 : Number.parseInt(pageNumber, 10);
 	const embed = getEmbeds(ul, interaction.message, "user");
 	if (!embed || !dbTemplate.statistics) return;
 	const statsEmbed = getEmbeds(ul, interaction.message, "stats") ?? createStatsEmbed(ul);

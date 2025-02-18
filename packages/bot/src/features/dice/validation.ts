@@ -1,8 +1,7 @@
-import { evalStatsDice, roll } from "@dicelette/core";
+import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type { UserMessageId, UserRegistration } from "@dicelette/types";
-import type { Translation } from "@dicelette/types";
-import {capitalizeBetweenPunct, isNumber} from "@dicelette/utils";
+import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import * as Djs from "discord.js";

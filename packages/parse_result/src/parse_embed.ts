@@ -1,7 +1,11 @@
-import { type Critical, type CustomCritical, standardizeDice } from "@dicelette/core";
+import {
+	type Critical,
+	type CustomCritical,
+	isNumber,
+	standardizeDice,
+} from "@dicelette/core";
 
 import { findln } from "@dicelette/localization";
-import { isNumber } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { parseCustomCritical } from "./custom_critical";
 

@@ -51,7 +51,7 @@
 		"vitest": "^2.1.8"
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.12.2",
+		"@dicelette/core": "link:../core",
 		"@types/node": "^22.10.3",
 		"dedent": "^1.5.3",
 		"discord.js": "^14.17.2",
@@ -61,11 +61,6 @@
 		"uniformize": "^2.4.0"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"better-sqlite3",
-			"canvas",
-			"esbuild"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "better-sqlite3", "canvas", "esbuild"]
 	}
 }
