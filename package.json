@@ -1,6 +1,6 @@
 {
 	"name": "dicelette",
-	"version": "1.41.0",
+	"version": "1.41.1",
 	"engineStrict": true,
 	"private": true,
 	"scripts": {
@@ -51,7 +51,7 @@
 		"vitest": "^2.1.8"
 	},
 	"dependencies": {
-		"@dicelette/core": "link:../core",
+		"@dicelette/core": "^1.12.3",
 		"@types/node": "^22.10.3",
 		"dedent": "^1.5.3",
 		"discord.js": "^14.17.2",
@@ -61,6 +61,11 @@
 		"uniformize": "^2.4.0"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": ["@biomejs/biome", "better-sqlite3", "canvas", "esbuild"]
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"better-sqlite3",
+			"canvas",
+			"esbuild"
+		]
 	}
 }
