@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.41.0](https://github.com/Dicelette/discord-dicelette/compare/1.40.0...1.41.0) (2025-02-18)
+
+
+### Features
+
+* **error-handling:** improve error reporting with detailed messages ([08f698a](https://github.com/Dicelette/discord-dicelette/commit/08f698a18904712aade1bd270b0ae6540d235690))
+
+
+### Bug Fixes
+
+* **stats:edit:** combination starting with number is not a NaN ([233374a](https://github.com/Dicelette/discord-dicelette/commit/233374a3b08069c64a9dd4b4486225cae10fff9c))
+
 ## [1.40.0](https://github.com/Dicelette/discord-dicelette/compare/1.39.1...1.40.0) (2025-02-12)
 
 
