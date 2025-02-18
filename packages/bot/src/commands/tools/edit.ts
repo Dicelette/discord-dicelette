@@ -1,7 +1,11 @@
 import { cmdLn, findln, t } from "@dicelette/localization";
 import type { DiscordChannel } from "@dicelette/types";
-import type { PersonnageIds, UserMessageId, UserRegistration } from "@dicelette/types";
-import type { Translation } from "@dicelette/types";
+import type {
+	PersonnageIds,
+	Translation,
+	UserMessageId,
+	UserRegistration,
+} from "@dicelette/types";
 import { cleanAvatarUrl, filterChoices, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
