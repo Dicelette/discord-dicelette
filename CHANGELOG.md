@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.41.2](https://github.com/Dicelette/discord-dicelette/compare/1.41.1...1.41.2) (2025-02-22)
+
+
+### Bug Fixes
+
+* **configuration:** add option to disable thread creation and refactor related functions ([a37dc02](https://github.com/Dicelette/discord-dicelette/commit/a37dc02e8f8587ccb2378714b5f50e8b42407a1a))
+
 ## [1.41.1](https://github.com/Dicelette/discord-dicelette/compare/1.41.0...1.41.1) (2025-02-18)
 
 ## [1.41.0](https://github.com/Dicelette/discord-dicelette/compare/1.40.0...1.41.0) (2025-02-18)
