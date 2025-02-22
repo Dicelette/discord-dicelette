@@ -73,6 +73,14 @@ export const configuration = {
 				.setNameLocalizations(cmdLn("changeThread.name"))
 				.setDescription(t("changeThread.description"))
 				.setDescriptionLocalizations(cmdLn("changeThread.description"))
+				.addBooleanOption((option) =>
+					option
+						.setName(t("disableThread.name"))
+						.setDescription(t("disableThread.description"))
+						.setDescriptionLocalizations(cmdLn("disableThread.description"))
+						.setNameLocalizations(cmdLn("disableThread.name"))
+						.setRequired(false)
+				)
 				.addChannelOption((option) =>
 					option
 						.setName(t("common.channel"))
@@ -104,23 +112,6 @@ export const configuration = {
 						.setRequired(true)
 						.setMinValue(0)
 						.setMaxValue(3600)
-				)
-		)
-
-		/* DISABLE THREAD */
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName(t("disableThread.name"))
-				.setNameLocalizations(cmdLn("disableThread.name"))
-				.setDescription(t("disableThread.description"))
-				.setDescriptionLocalizations(cmdLn("disableThread.description"))
-				.addBooleanOption((option) =>
-					option
-						.setName(t("disableThread.options.name"))
-						.setNameLocalizations(cmdLn("disableThread.options.name"))
-						.setDescription(t("disableThread.options.desc"))
-						.setDescriptionLocalizations(cmdLn("disableThread.options.desc"))
-						.setRequired(true)
 				)
 		)
 
@@ -265,19 +256,17 @@ export const configuration = {
 		}
 		switch (subcommand) {
 			case t("logs.name"):
-				return await logs(interaction, client, ul, options);
+				return await setErrorLogs(interaction, client, ul, options);
 			case t("changeThread.name"):
-				return await changeThread(interaction, client, ul, options);
-			case t("disableThread.name"):
-				return await disableThread(interaction, client, ul, options);
+				return await resultChannel(interaction, client, ul, options);
 			case t("timer.name"):
-				return await timer(interaction, client, ul, options);
+				return await deleteAfter(interaction, client, ul, options);
 			case t("config.display.name"):
 				return await display(interaction, client, ul);
 			case t("timestamp.name"):
 				return await timestamp(interaction, client, ul, options);
 			case t("anchor.name"):
-				return await anchor(interaction, client, ul);
+				return await setContextLink(interaction, client, ul);
 			case t("config.logLink.name"):
 				return await linkToLog(interaction, client, ul);
 			case t("hidden.title"):
@@ -299,7 +288,6 @@ function changeLanguage(
 	const nameOfLang = findLocale(lang);
 	return reply(interaction, {
 		content: ul("config.lang.set", { lang: nameOfLang }),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -315,13 +303,11 @@ function stats(
 		client.settings.delete(interaction.guild!.id, "autoRole.stats");
 		return reply(interaction, {
 			content: ul("autoRole.stat.remove"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
 	client.settings.set(interaction.guild!.id, role.id, "autoRole.stats");
 	return reply(interaction, {
 		content: ul("autoRole.stat.set", { role: Djs.roleMention(role.id) }),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -337,17 +323,15 @@ function dice(
 		client.settings.delete(interaction.guild!.id, "autoRole.dice");
 		return reply(interaction, {
 			content: ul("autoRole.dice.remove"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
 	client.settings.set(interaction.guild!.id, role.id, "autoRole.dice");
 	return reply(interaction, {
 		content: ul("autoRole.dice.set", { role: Djs.roleMention(role.id) }),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
-async function logs(
+async function setErrorLogs(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	ul: Translation,
@@ -366,91 +350,99 @@ async function logs(
 			: ".";
 		await reply(interaction, {
 			content: `${ul("logs.delete")}${msg}`,
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "logs");
 	await reply(interaction, {
 		content: ul("logs.set", { channel: channel.name }),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
-async function changeThread(
+async function resultChannel(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	ul: Translation,
 	options: Djs.CommandInteractionOptionResolver
 ) {
-	const channel = options.getChannel("channel");
-	const oldChan = client.settings.get(interaction.guild!.id, "rollChannel");
-	if (!channel && !oldChan) {
-		await reply(interaction, {
-			content: ul("changeThread.noChan"),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		return;
-	}
 	if (!interaction.guild) return;
+	await interaction.deferReply();
+	const channel = options.getChannel(t("common.channel"));
+	const oldChan = client.settings.get(interaction.guild!.id, "rollChannel");
+	const disable = options.getBoolean(t("disableThread.name"));
+	if (!channel && !oldChan && disable === null) {
+		return await interaction.followUp({
+			content: ul("changeThread.noChan"),
+		});
+	}
+	if (disable === true) return await disableThread(interaction, client, ul, true);
 	if (
 		!channel ||
 		(channel.type !== Djs.ChannelType.GuildText &&
 			!(channel instanceof Djs.ThreadChannel))
 	) {
-		const msg = oldChan
-			? ` ${ul("logs.inChan", { chan: Djs.channelMention(oldChan) })}`
-			: ".";
 		client.settings.delete(interaction.guild.id, "rollChannel");
-		await reply(interaction, {
-			content: `${ul("changeThread.delete")}${msg}`,
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		return;
+		if (oldChan)
+			await interaction.followUp({
+				content: `${ul("changeThread.delete")} ${ul("logs.inChan", { chan: oldChan })}`,
+			});
+		if (disable === false) return await disableThread(interaction, client, ul, false);
+		return await disableThread(interaction, client, ul, true);
 	}
 	client.settings.set(interaction.guild.id, channel.id, "rollChannel");
-	await reply(
-		interaction,
-		ul("changeThread.set", { channel: Djs.channelMention(channel.id) })
+	await interaction.followUp(
+		dedent(`
+		- ${ul("changeThread.set", { channel: Djs.channelMention(channel.id) })}
+		- ${ul("disableThread.enable.autoDelete")}
+		`)
 	);
-	return;
+	return await disableThread(interaction, client, ul, false, true);
 }
 
 async function disableThread(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	ul: Translation,
-	options: Djs.CommandInteractionOptionResolver
+	toggle: boolean,
+	silent?: boolean
 ) {
-	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	//toggle TRUE = disable thread creation
 	//toggle FALSE = enable thread creation
 	const rollChannel = client.settings.get(interaction.guild!.id, "rollChannel");
 	if (toggle) {
 		client.settings.set(interaction.guild!.id, true, "disableThread");
-		if (rollChannel) {
+		if (rollChannel && !silent) {
 			const mention = `<#${rollChannel}>`;
-			const msg =
-				ul("disableThread.disable.reply") +
-				ul(
-					"disableThread.disable.mention",
-					{ mention } + ul("disableThread.disable.autoDelete")
-				);
-			await reply(interaction, msg);
+			const msg = `${ul("disableThread.disable.reply")}
+			- ${ul("disableThread.disable.mention", { mention })}
+			- ${ul("disableThread.disable.prefix")}
+			- ${ul("disableThread.disable.autoDelete")}`;
+			await interaction.followUp(dedent(msg));
 			return;
 		}
-		await reply(interaction, ul("disableThread.disable.reply"));
+		if (!silent)
+			await interaction.followUp(
+				dedent(`${ul("disableThread.disable.reply")}
+					- ${ul("disableThread.disable.prefix")}
+					- ${ul("disableThread.disable.autoDelete")}`)
+			);
 		return;
 	}
 	client.settings.delete(interaction.guild!.id, "disableThread");
-	if (rollChannel) {
+	if (rollChannel && !silent) {
 		const mention = `<#${rollChannel}>`;
-		const msg =
-			ul("disableThread.enable.reply") + ul("disableThread.enable.mention", { mention });
-		await reply(interaction, msg);
+		const msg = `${ul("disableThread.enable.mention", { mention })}
+		${ul("disableThread.enable.autoDelete")}`;
+		await interaction.followUp(dedent(msg));
 		return;
 	}
-	await reply(interaction, ul("disableThread.enable.reply"));
+	if (!silent)
+		await interaction.followUp(
+			dedent(`
+		${ul("disableThread.enable.reply")}
+	- ${ul("disableThread.enable.prefix")}
+	- ${ul("disableThread.enable.autoDelete")}`)
+		);
 	return;
 }
 
@@ -467,7 +459,6 @@ async function hiddenRoll(
 		client.settings.delete(interaction.guild!.id, "hiddenRoll");
 		await reply(interaction, {
 			content: ul("hidden.disabled"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
@@ -475,14 +466,12 @@ async function hiddenRoll(
 		client.settings.set(interaction.guild!.id, true, "hiddenRoll");
 		await reply(interaction, {
 			content: ul("hidden.enabled"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "hiddenRoll");
 	await reply(interaction, {
 		content: ul("hidden.enabledChan", { channel: Djs.channelMention(channel.id) }),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 	return;
 }
@@ -498,13 +487,17 @@ function formatDuration(seconds: number) {
 	return remainingMinutes ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
 }
 
-async function timer(
+async function deleteAfter(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	ul: Translation,
 	options: Djs.CommandInteractionOptionResolver
 ) {
 	if (!interaction.guild) return;
+	if (client.settings.get(interaction.guild.id, "disableThread"))
+		return await reply(interaction, {
+			content: ul("timer.error"),
+		});
 
 	const timer = options.getNumber(t("timer.option.name"), true);
 	client.settings.set(interaction.guild.id, timer * 1000, "deleteAfter");
@@ -652,21 +645,21 @@ async function timestamp(
 	if (toggle) {
 		await reply(interaction, {
 			content: ul("timestamp.enabled"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} else {
 		await reply(interaction, {
 			content: ul("timestamp.disabled"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
 }
 
-async function anchor(
+async function setContextLink(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	ul: Translation
 ) {
+	const disabledLogs = client.settings.get(interaction.guild!.id, "rollChannel");
+
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	client.settings.set(interaction.guild!.id, toggle, "context");
@@ -675,16 +668,13 @@ async function anchor(
 		if (deleteLogs)
 			return await reply(interaction, {
 				content: ul("anchor.enabled.noDelete"),
-				flags: Djs.MessageFlags.Ephemeral,
 			});
 		return await reply(interaction, {
 			content: ul("anchor.enabled.logs"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
 	return await reply(interaction, {
 		content: ul("context.disabled"),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
 
@@ -699,11 +689,9 @@ async function linkToLog(
 	if (toggle) {
 		return await reply(interaction, {
 			content: ul("linkToLog.enabled"),
-			flags: Djs.MessageFlags.Ephemeral,
 		});
 	}
 	return await reply(interaction, {
 		content: ul("linkToLog.disabled"),
-		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
