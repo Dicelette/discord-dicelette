@@ -4,6 +4,7 @@ import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
+import { getLangAndConfig } from "../../utils";
 
 export const help = {
 	data: new Djs.SlashCommandBuilder()
@@ -49,9 +50,7 @@ export const help = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
-		const lang =
-			client.settings.get(interaction.guildId as string, "lang") ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		const link = interaction.locale === "fr" ? LINKS.fr : LINKS.en;
 		const commandsID = await interaction.guild?.commands.fetch();
 		if (!commandsID) return;
@@ -175,9 +174,8 @@ function getIDForAdminNoDB(
 ) {
 	const ids: Record<string, string | undefined> = {};
 	const idConfig = commandsID.findKey((command) => command.name === t("config.name"));
-	if (!idConfig) {
-		return;
-	}
+	if (!idConfig) return;
+
 	ids[t("logs.name")] = idConfig;
 	ids[t("changeThread.name")] = idConfig;
 	ids[t("timer.name")] = idConfig;
@@ -214,9 +212,23 @@ function getIDForAdminDB(
 				ids["auto_role statistic"] = id;
 				ids["auto_role dice"] = id;
 			}
-		} else {
-			ids[cmd] = commandsID.findKey((command) => command.name === cmd);
-		}
+		} else ids[cmd] = commandsID.findKey((command) => command.name === cmd);
 	}
 	return ids;
+}
+
+export async function helpAtInvit(guild: Djs.Guild) {
+	const commandsId = await guild.commands.fetch();
+	const lang = guild.preferredLocale;
+	const ul = ln(lang);
+	const docLinkExt = lang === "fr" ? "" : "/en/";
+	const docLink = `dicelette.github.io/${docLinkExt}`;
+	//fetch channel cache
+	await guild.channels.fetch();
+	//get system channel
+	const systemChannel = guild.systemChannel ?? "dm";
+	const msg = dedent(`
+	${ul("help.invit.serv")}
+	${ul("help.invit.change_language")}
+	`);
 }

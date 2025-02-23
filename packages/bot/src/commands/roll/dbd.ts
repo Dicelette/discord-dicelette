@@ -1,10 +1,10 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { dbdOptions, rollDice, serializeName } from "utils";
+import { dbdOptions, getLangAndConfig, rollDice, serializeName } from "utils";
 
 export default {
 	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
@@ -90,8 +90,7 @@ export default {
 		if (!user) return;
 		let charOptions = options.getString(t("common.character")) ?? undefined;
 		const charName = charOptions?.normalize();
-		const lang = client.settings.get(interaction.guild.id, "lang") ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		try {
 			let userStatistique = await getUserFromMessage(
 				client,

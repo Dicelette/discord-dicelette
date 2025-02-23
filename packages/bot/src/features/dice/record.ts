@@ -1,5 +1,5 @@
 import { evalStatsDice } from "@dicelette/core";
-import { findln, ln } from "@dicelette/localization";
+import { findln } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed, capitalizeBetweenPunct } from "@dicelette/utils";
@@ -21,7 +21,7 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import { addAutoRole, editUserButtons, selectEditMenu } from "utils";
+import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "utils";
 
 /**
  * Interaction to submit the new skill dice
@@ -99,8 +99,7 @@ export async function registerDamageDice(
 	first?: boolean
 ) {
 	const db = client.settings;
-	const lang = db.get(interaction.guild!.id, "lang") ?? interaction.locale;
-	const ul = ln(lang);
+	const { ul } = getLangAndConfig(db, interaction);
 	const name = interaction.fields.getTextInputValue("damageName");
 	let value = interaction.fields.getTextInputValue("damageValue");
 	if (!interaction.guild) throw new Error(ul("error.noGuild"));

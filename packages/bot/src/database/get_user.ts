@@ -19,7 +19,7 @@ import type { EClient } from "client";
 import { getCharaInMemory, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
-import { haveAccess, searchUserChannel, serializeName } from "utils";
+import { getLangAndConfig, haveAccess, searchUserChannel, serializeName } from "utils";
 
 export function getUserByEmbed(
 	data: {
@@ -305,9 +305,7 @@ export async function getStatistics(
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
-	const guildData = client.settings.get(interaction.guild.id);
-	const lang = guildData?.lang ?? interaction.locale;
-	const ul = ln(lang);
+	const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
 	if (!guildData) return;
 	let optionChar = options.getString(t("common.character")) ?? undefined;
 	const charName = optionChar?.standardize();

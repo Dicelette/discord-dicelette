@@ -6,6 +6,7 @@ import dedent from "dedent";
 import * as Djs from "discord.js";
 import { localeList } from "locales";
 import { reply } from "messages";
+import { getLangAndConfig } from "../../utils";
 
 const findLocale = (locale?: Djs.Locale) => {
 	if (locale === Djs.Locale.EnglishUS || locale === Djs.Locale.EnglishGB)
@@ -242,10 +243,7 @@ export const configuration = {
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
-		const lang =
-			client.settings.get(interaction.guild.id, "lang") ??
-			interaction.guild.preferredLocale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		const subcommandGroup = options.getSubcommandGroup();

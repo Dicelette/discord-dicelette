@@ -1,8 +1,9 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, reply, setTagsForRoll } from "messages";
 import moment from "moment";
+import { getLangAndConfig } from "../../utils";
 
 export default {
 	data: new Djs.SlashCommandBuilder()
@@ -35,8 +36,7 @@ export default {
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		const scene = option.getString(t("scene.option.name"));
 		const bubble = option.getBoolean(t("scene.time.name"));
-		const lang = client.settings.get(interaction.guild.id, "lang") ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		if (!scene && !bubble) {
 			await reply(interaction, {
 				content: ul("scene.noScene"),

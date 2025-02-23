@@ -1,8 +1,9 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import type { SlashCommandSubcommandBuilder } from "discord.js";
+import { getLangAndConfig } from "./check";
 
 export function charUserOptions(
 	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
@@ -184,11 +185,9 @@ export function gmCommonOptions(
 export function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const fixed = options.getFocused(true);
-	const guildData = client.settings.get(interaction.guildId as string);
+	const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
 	if (!guildData) return;
 	const choices: string[] = [];
-	const lang = guildData.lang ?? interaction.locale;
-	const ul = ln(lang);
 	let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
 	if (typeof userID !== "string") userID = interaction.user.id;
 	return { fixed, guildData, choices, ul, userID };

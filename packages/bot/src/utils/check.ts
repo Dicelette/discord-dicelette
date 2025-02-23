@@ -82,9 +82,11 @@ export async function optionInteractions(
 	client: EClient
 ) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
-	const guildData = client.settings.get(interaction.guildId as string);
-	const lang = guildData?.lang ?? interaction.locale;
-	const ul = ln(lang);
+	const {
+		langToUse: lang,
+		config: guildData,
+		ul,
+	} = getLangAndConfig(client.settings, interaction);
 	if (!guildData) {
 		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
 		return;
@@ -116,12 +118,17 @@ export function isValidInteraction(interaction: Djs.BaseInteraction) {
 	);
 }
 
-export function getLangAndConfig(db: Settings, interaction: Djs.CommandInteraction) {
-	const langToUser =
-		db.get(interaction.guild!.id, "lang") ??
-		interaction.guild!.preferredLocale ??
-		interaction.locale;
-	const ul = ln(langToUser);
+export function getLangAndConfig(db: Settings, interaction: Djs.BaseInteraction) {
+	const langToUse = getLang(interaction, db);
+	const ul = ln(langToUse);
 	const config = db.get(interaction.guild!.id);
-	return { langToUser, ul, config };
+	return { langToUse, ul, config };
+}
+
+export function getLang(interaction: Djs.BaseInteraction, db: Settings) {
+	return (
+		db.get(interaction.guild!.id, "lang") ??
+		interaction.guild?.preferredLocale ??
+		interaction.locale
+	);
 }

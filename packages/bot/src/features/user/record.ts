@@ -1,12 +1,11 @@
 import { type StatisticalTemplate, isNumber } from "@dicelette/core";
-import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
 import { getTemplateWithDB } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
 import { embedError, reply } from "messages";
-import { continueCancelButtons, isUserNameOrId } from "utils";
+import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
 
 /**
  * Register the statistic in the embed when registering a new user and validate the modal
@@ -56,8 +55,7 @@ export async function createEmbedFirstPage(
 	template: StatisticalTemplate,
 	setting: Settings
 ) {
-	const lang = setting.get(interaction.guild!.id, "lang") ?? interaction.locale;
-	const ul = ln(lang);
+	const { ul } = getLangAndConfig(setting, interaction);
 	const channel = interaction.channel;
 	if (!channel) {
 		throw new NoChannel();

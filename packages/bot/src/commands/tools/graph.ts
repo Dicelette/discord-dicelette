@@ -1,5 +1,5 @@
 import path from "node:path";
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
@@ -8,7 +8,7 @@ import { findChara, getRecordChar, getTemplateWithDB, getUserByEmbed } from "dat
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
-import { charUserOptions, haveAccess, searchUserChannel } from "utils";
+import { charUserOptions, getLangAndConfig, haveAccess, searchUserChannel } from "utils";
 
 async function chart(
 	userData: UserData,
@@ -145,8 +145,7 @@ export const graph = {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
 		const guildData = client.settings.get(interaction.guild!.id);
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		if (!guildData) return;
 		const choices: string[] = [];
 		let user = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
@@ -172,11 +171,9 @@ export const graph = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		if (!interaction.guild) return;
-		const guildData = client.settings.get(interaction.guild!.id);
 		let min = options.getNumber(t("graph.min.name")) ?? undefined;
 		let max = options.getNumber(t("graph.max.name")) ?? undefined;
-		const lang = guildData?.lang ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
 		if (!guildData) {
 			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
 			return;

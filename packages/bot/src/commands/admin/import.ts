@@ -1,4 +1,4 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
 import { getTemplateWithDB } from "database";
 import * as Djs from "discord.js";
@@ -10,7 +10,7 @@ import {
 	reply,
 	repostInThread,
 } from "messages";
-import { addAutoRole, parseCSV } from "utils";
+import { addAutoRole, getLangAndConfig, parseCSV } from "utils";
 
 /**
  * ! Note: Bulk data doesn't allow to register dice-per-user, as each user can have different dice
@@ -34,11 +34,7 @@ export const bulkAdd = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const csvFile = options.getAttachment(t("import.options.name"), true);
-		const langToUse =
-			client.settings.get(interaction.guild!.id, "lang") ??
-			interaction.guild?.preferredLocale ??
-			interaction.locale;
-		const ul = ln(langToUse);
+		const { langToUse, ul } = getLangAndConfig(client.settings, interaction);
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const ext = csvFile.name.split(".").pop()?.toLowerCase() ?? "";
 		if (!ext || ext !== "csv") {
@@ -183,11 +179,7 @@ export const bulkAddTemplate = {
 		.setDescriptionLocalizations(cmdLn("csv_generation.description")),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
-		const lang =
-			client.settings.get(interaction.guild.id, "lang") ??
-			interaction.guild.preferredLocale ??
-			interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		const guildTemplate = await getTemplateWithDB(interaction, client.settings);
 		if (!guildTemplate) {
 			return reply(interaction, { content: ul("error.noTemplate") });

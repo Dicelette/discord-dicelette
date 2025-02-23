@@ -38,9 +38,9 @@ export async function rollWithInteraction(
 	customCritical?: Record<string, CustomCritical> | undefined
 ) {
 	//exclude announcement channel
-	const { langToUser, ul, config } = getLangAndConfig(db, interaction);
+	const { langToUse, ul, config } = getLangAndConfig(db, interaction);
 	const data: Server = {
-		lang: langToUser,
+		lang: langToUse,
 		userId: user?.id ?? interaction.user.id,
 		config,
 		dice,

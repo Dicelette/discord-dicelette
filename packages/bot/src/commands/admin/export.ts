@@ -2,12 +2,12 @@
  * Allow to export all characters from the database to a CSV file
  */
 
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
 import { getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
-import type { CSVRow } from "utils";
+import { type CSVRow, getLangAndConfig } from "utils";
 
 export const exportData = {
 	data: new Djs.SlashCommandBuilder()
@@ -38,8 +38,7 @@ export const exportData = {
 			await interaction.reply(t("export.error.noData"));
 			return;
 		}
-		const lang = guildData.lang ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		const csv: CSVRow[] = [];
 		const statsName = client.settings.get(interaction.guild.id, "templateID.statsName");
 		const isPrivateAllowed = client.settings.get(interaction.guild.id, "privateChannel");

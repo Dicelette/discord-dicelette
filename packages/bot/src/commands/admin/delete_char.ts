@@ -1,4 +1,4 @@
-import { cmdLn, ln } from "@dicelette/localization";
+import { cmdLn } from "@dicelette/localization";
 import type {
 	DiscordChannel,
 	GuildData,
@@ -12,7 +12,7 @@ import { deleteUser, deleteUserInChar, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
-import { optionInteractions, searchUserChannel } from "utils";
+import { getLangAndConfig, optionInteractions, searchUserChannel } from "utils";
 export const t = i18next.getFixedT("en");
 
 export const deleteChar = {
@@ -25,8 +25,7 @@ export const deleteChar = {
 		const guildData = client.settings.get(interaction.guildId as string);
 		if (!guildData) return;
 		const choices: string[] = [];
-		const lang = guildData.lang ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		let user = options.get(t("display.userLowercase"))?.value;
 		if (typeof user !== "string") user = interaction.user.id;
 		if (fixed.name === t("common.character")) {

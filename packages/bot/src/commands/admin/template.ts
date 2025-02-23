@@ -4,7 +4,7 @@ import {
 	type StatisticalTemplate,
 	verifyTemplateValue,
 } from "@dicelette/core";
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import { type GuildData, TUTORIAL_IMAGES } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -18,6 +18,7 @@ import {
 	embedError,
 	reply,
 } from "messages";
+import { getLangAndConfig } from "../../utils";
 
 export const generateTemplate = {
 	data: new Djs.SlashCommandBuilder()
@@ -89,8 +90,7 @@ export const generateTemplate = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		if (!interaction.guild) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const lang = client.settings.get(interaction.guild.id, "lang") ?? interaction.locale;
-		const ul = ln(lang);
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		const name = options.getString(t("generate.options.stats.name")) ?? undefined;
 		let statServer: Statistic | undefined = undefined;
 		if (name) {
@@ -218,12 +218,7 @@ export const registerTemplate = {
 		if (!interaction.guild) return;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const langToUse =
-			client.settings.get(interaction.guild!.id, "lang") ??
-			interaction.guild?.preferredLocale ??
-			interaction.locale;
-		const ul = ln(langToUse);
-
+		const { ul } = getLangAndConfig(client.settings, interaction);
 		const template = options.getAttachment(t("register.options.template.name"), true);
 		//fetch the template
 		if (!template.contentType?.includes("json")) {

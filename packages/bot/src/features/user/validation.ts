@@ -1,5 +1,4 @@
 import { type StatisticalTemplate, isNumber } from "@dicelette/core";
-import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Settings, Translation, UserData } from "@dicelette/types";
 import { NoEmbed, cleanAvatarUrl, logger } from "@dicelette/utils";
@@ -17,7 +16,7 @@ import {
 	reply,
 	repostInThread,
 } from "messages";
-import { addAutoRole } from "utils";
+import { addAutoRole, getLangAndConfig } from "utils";
 
 /**
  * Interaction to continue to the next page of the statistics when registering a new user
@@ -93,8 +92,7 @@ export async function validateUser(
 	db: Settings,
 	characters: Characters
 ) {
-	const lang = db.get(interaction.guild!.id, "lang") ?? interaction.locale;
-	const ul = ln(lang);
+	const { ul } = getLangAndConfig(db, interaction);
 	const userEmbed = getEmbeds(ul, interaction.message, "user");
 	if (!userEmbed) throw new NoEmbed();
 	const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);

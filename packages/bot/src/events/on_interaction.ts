@@ -1,5 +1,5 @@
 import type { StatisticalTemplate } from "@dicelette/core";
-import { lError, ln } from "@dicelette/localization";
+import { lError } from "@dicelette/localization";
 import type { Characters, Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import {
@@ -14,15 +14,12 @@ import { getTemplate, getTemplateWithDB } from "database";
 import * as Djs from "discord.js";
 import * as features from "features";
 import { embedError, reply } from "messages";
-import { cancel } from "utils";
+import { cancel, getLangAndConfig } from "utils";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
-		const langToUse =
-			client.settings.get(interaction.guild!.id, "lang") ??
-			interaction.guild?.preferredLocale ??
-			interaction.locale;
-		const ul = ln(langToUse);
+		const cfg = getLangAndConfig(client.settings, interaction);
+		const { ul, langToUse } = cfg;
 		const interactionUser = interaction.user;
 		try {
 			if (interaction.isMessageContextMenuCommand()) {

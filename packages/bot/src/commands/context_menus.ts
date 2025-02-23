@@ -1,7 +1,8 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
+import { getLangAndConfig } from "../utils";
 
 export const contextMenus = [
 	new Djs.ContextMenuCommandBuilder()
@@ -14,8 +15,7 @@ export async function commandMenu(
 	interaction: Djs.MessageContextMenuCommandInteraction,
 	client: EClient
 ) {
-	const lang = client.settings.get(interaction!.guild!.id, "lang") ?? interaction.locale;
-	const ul = ln(lang);
+	const { ul } = getLangAndConfig(client.settings, interaction);
 	if (interaction.targetMessage.author.id !== client.user?.id) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.notBot"),
