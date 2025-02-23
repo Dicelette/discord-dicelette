@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.42.0](https://github.com/Dicelette/discord-dicelette/compare/1.41.2...1.42.0) (2025-02-23)
+
+
+### Features
+
+* **help:** enhance help message with new configuration options and commands ([c8b17b3](https://github.com/Dicelette/discord-dicelette/commit/c8b17b30b1aa439db8ee2f3758d23bf95e084aec))
+
 ## [1.41.2](https://github.com/Dicelette/discord-dicelette/compare/1.41.1...1.41.2) (2025-02-22)
 
 
