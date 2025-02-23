@@ -450,8 +450,14 @@
       "name": "info"
     },
     "invit": {
-      "change_language": "",
-      "serv": "Hello ! I'm Dicelette !\nThank you for adding me to {{- serv}}."
+      "change_language": "__By default__, I'll respond in {{- lang}}, but this can be changed with </config change_language:{{- id.lang}}>.\nFor the moment, however, only French and English are available!",
+      "channel": "With **`channel`** = **`#channel`** → Instead of creating threads automatically, the results will be copied into this channel!",
+      "copy": "In addition, I'm configured to __copy__ the results of dice rolls into threads starting with `🎲`, which will be created automatically when a roll is made.\nThis can be modified by the command </config result_channel:{{-id.result}}>.",
+      "default": "Simply set to `0` to disable auto-delete.",
+      "disable": "With **`disable_thread`** = **`True`** → Results will be kept where the command was made, without auto-deletion after 3 minutes.",
+      "link": "You can find [the documentation here]({{- docLink}}), as I still have lots of customization options!",
+      "serv": "Hello ! I'm Dicelette !\nThank you for adding me to {{- serv}}.",
+      "timer": "If you want to change the time before results are deleted, just use </config delete_after:{{-id.delete}}>. I'm set to delete after 3 minutes!"
     },
     "message": ":game_die: **Dicelette** :game_die:\n→ Find the *bot* on [GitHub](<https://github.com/Dicelette/discord-dicelette/blob/main/README.md>)\n→ [Documentation](<https://dicelette.github.io/en>)\n\n## Usage\n- </roll:{{- rollId}}> : Roll a die\n- </scene:{{- sceneId}}> : Creates a new thread for dice. This will archive all previous threads.\n\nYou can also create a \"time bubble\" with the parameters `/scene tempo:True`. By default, the thread name will be the current date.\n\nYou can use the bot directly in a message (**without using slash commands**), with :\n- __A direct die__ : `des`, like `d6` or `2d6`.\n- __An indirect die__ : `my message [dice]`, like `*Phibi jumps on Wumpus and inflicts [2d6] damage*`.\n- __A semi-direct die__: `1d100 my message`, as `1d100 Phibi jumps on Wumpus and inflicts damage`.\n\n{{- dbCMD}}",
     "messageDB": "## Commands linked to character sheet\n\n- </dbroll:{{- dbroll}}>: Rolls a statistics dice, from a character sheet.\n- </dbd:{{- dbd}}>: Rolls a die recorded in your character sheet.\n- </graph:{{- graph}}>: Allows you to generate a graph from a character's statistics.\n- </display:{{- display}}>: Allows you to consult the statistics and dice of a character.",

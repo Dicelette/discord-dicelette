@@ -1,6 +1,6 @@
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { commandsList, contextMenus } from "commands";
+import { commandsList, contextMenus, helpAtInvit } from "commands";
 
 export default (client: EClient): void => {
 	client.on("guildCreate", async (guild) => {
@@ -17,5 +17,6 @@ export default (client: EClient): void => {
 		} catch (e) {
 			logger.fatal(e);
 		}
+		await helpAtInvit(guild);
 	});
 };

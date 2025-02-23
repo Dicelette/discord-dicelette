@@ -450,8 +450,14 @@
       "name": "info"
     },
     "invit": {
-      "change_language": "__Par défaut__, je répondrai en {{- lang}}, mais cela peut être modifié avec `</config change_langue",
-      "serv": "Salut ! Je suis Dicelette !\nMerci de m'avoir ajouté sur {{- serv}}."
+      "change_language": "__Par défaut__, je répondrai en {{- lang}}, mais cela peut être modifié avec </config change_language:{{- id.lang}}>.\nPour le moment, cependant, seul le français et l'anglais sont disponibles !",
+      "channel": "Avec **`channel`** = **`#channel`** → Au lieu de créer des fils automatiquement, les résultats seront copiés dans ce salon !",
+      "copy": "De plus, je suis configuré pour __copier__ les résultats des jets de dés dans des fils commençant par `🎲`, qui seront créés automatiquement lorsqu'un lancé est fait.\nCela peut être modifié par la commande </config result_channel:{{-id.result}}>.",
+      "default": "Il suffit de mettre sur `0` pour désactiver l'auto-suppression.",
+      "disable": "Avec **`désactiver_thread`** = **`True`** → Les résultats seront conservés là où la commande a été faite, sans auto-suppression au bout de 3 minutes.",
+      "link": "Vous pouvez retrouver [la documentation ici]({{- docLink}}), car j'ai encore de nombreuses options de personnalisation !",
+      "serv": "Salut ! Je suis Dicelette !\nMerci de m'avoir ajouté sur {{- serv}}.",
+      "timer": "Si vous souhaitez modifier le temps avant la suppression des résultats, il suffit d'utiliser </config delete_after:{{-id.delete}}>. Je suis paramétré pour supprimer après 3 minutes !"
     },
     "message": ":game_die: **Dice Roller** :game_die:\n→ Retrouvez le *bot* sur [GitHub](<https://github.com/Dicelette/discord-dicelette/blob/main/README.fr.md>)\n→ [Documentation](<https://dicelette.github.io>)\n\n## Usage\n- </roll:{{- rollId}}> : Lance un dé\n- </scene:{{- sceneId}}> : Crée un nouveau thread pour les dés. Cela archivera tous les threads précédents.\n\nVous pouvez aussi créer une \"bulle temporelle\" avec les paramètres `/scene tempo:True`. Par défaut, le nom du thread sera la date du jour.\n\nVous pouvez utiliser le bot directement dans un message (**sans utiliser de slash commands**), avec :\n- __Un dé direct__ : `dés`, comme `d6` ou `2d6`\n- __Un dé indirect__ : `mon message [dés]`, comme `*Phibi saute sur Wumpus et lui inflige [2d6] dégâts*`.\n- __Un dé semi-direct__ : `1d100 mon message`, comme `1d100 Phibi saute sur Wumpus et lui inflige des dégâts`.\n\n{{- dbCMD}}\n\n",
     "messageDB": "## Commandes liées aux fiches de personnages\n\n- </dbroll:{{- dbroll}}> : Lance un dés de statistiques, à partir d'une fiche de personnage.\n- </dbd:{{- dbd}}> : Lance un dé enregistré dans votre fiche de personnage.\n- </graph:{{- graph}}> : Permet de générer un graphique à partir des statistiques d'un personnage.\n- </display:{{- display}}> : Permet de consulter les statistiques et les dés d'un personnage.",

@@ -97,7 +97,7 @@ export const help = {
 				break;
 			}
 			case t("help.admin.name"): {
-				const idsAdmin = getIDForAdminNoDB(commandsID);
+				const idsAdmin = getConfigIds(commandsID);
 				await reply(interaction, {
 					content: dedent(
 						ul("help.admin.messageNoDB", {
@@ -169,7 +169,7 @@ function createHelpMessageDB(
 	});
 }
 
-function getIDForAdminNoDB(
+function getConfigIds(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
 	const ids: Record<string, string | undefined> = {};
@@ -179,9 +179,9 @@ function getIDForAdminNoDB(
 	ids[t("logs.name")] = idConfig;
 	ids[t("changeThread.name")] = idConfig;
 	ids[t("timer.name")] = idConfig;
-	ids[t("disableThread.name")] = idConfig;
 	ids[t("config.display.name")] = idConfig;
 	ids[t("timestamp.name")] = idConfig;
+	ids[t("config.lang.name")] = idConfig;
 	return ids;
 }
 
@@ -221,14 +221,35 @@ export async function helpAtInvit(guild: Djs.Guild) {
 	const commandsId = await guild.commands.fetch();
 	const lang = guild.preferredLocale;
 	const ul = ln(lang);
-	const docLinkExt = lang === "fr" ? "" : "/en/";
-	const docLink = `dicelette.github.io/${docLinkExt}`;
+	const docLinkExt = lang === "fr" ? "" : "en/";
+	const docLink = `https://dicelette.github.io/${docLinkExt}`;
 	//fetch channel cache
 	await guild.channels.fetch();
 	//get system channel
 	const systemChannel = guild.systemChannel ?? "dm";
+	const ids = getConfigIds(commandsId);
+	const commandId = {
+		lang: ids?.[t("config.lang.name")],
+		result: ids?.[t("changeThread.name")],
+		delete: ids?.[t("timer.name")],
+	};
+	if (!ids) return;
 	const msg = dedent(`
-	${ul("help.invit.serv")}
-	${ul("help.invit.change_language")}
-	`);
+	${ul("help.invit.serv", { serv: guild.name })}
+	
+	${ul("help.invit.change_language", { id: commandId, lang })}
+	
+	${ul("help.invit.copy", { id: commandId })}
+	- ${ul("help.invit.disable", { id: commandId })}
+	- ${ul("help.invit.channel", { id: commandId })}
+	
+	${ul("help.invit.timer", { id: commandId })}
+	${ul("help.invit.default")}
+	
+	${ul("help.invit.link", { docLink })}`);
+
+	if (systemChannel === "dm") {
+		const owner = await guild.fetchOwner();
+		await owner.send(msg);
+	} else await systemChannel.send(msg);
 }
