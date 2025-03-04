@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.42.1](https://github.com/Dicelette/discord-dicelette/compare/1.42.0...1.42.1) (2025-03-04)
+
+
+### Bug Fixes
+
+* **whitespace:** starting with the space for align ([ccb8aa3](https://github.com/Dicelette/discord-dicelette/commit/ccb8aa32a75360309f9af3ca0f81e77c3b63f02b))
+
 ## [1.42.0](https://github.com/Dicelette/discord-dicelette/compare/1.41.2...1.42.0) (2025-02-23)
 
 
