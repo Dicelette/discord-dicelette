@@ -176,10 +176,10 @@ export class ResultAsText {
 			? `*${this.resultat.comment
 					.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
 					.replaceAll("×", "*")
-					.trim()}*\n`
+					.trim()}*\n `
 			: interaction
-				? "\n"
-				: "";
+				? "\n "
+				: "_ _";
 		const dicesResult = /(?<entry>\S+) ⟶ (?<calc>.*) =/;
 		const splitted = msgSuccess.split("\n");
 		const finalRes = [];
@@ -209,7 +209,8 @@ export class ResultAsText {
 			}
 			finalRes.push(res.trimStart());
 		}
-		return `${comment}  ${finalRes.join("\n  ").trimEnd()}`;
+		console.log("parser results: ", finalRes, " and comments: ", comment);
+		return `${comment} ${finalRes.join("\n  ").trimEnd()}`;
 	}
 
 	private compareValue(compare?: ComparedValue, lastChar?: string) {
