@@ -209,7 +209,6 @@ export class ResultAsText {
 			}
 			finalRes.push(res.trimStart());
 		}
-		console.log("parser results: ", finalRes, " and comments: ", comment);
 		return `${comment} ${finalRes.join("\n  ").trimEnd()}`;
 	}
 
