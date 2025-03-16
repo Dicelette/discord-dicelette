@@ -656,7 +656,6 @@ async function setContextLink(
 	client: EClient,
 	ul: Translation
 ) {
-	const disabledLogs = client.settings.get(interaction.guild!.id, "rollChannel");
 
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
