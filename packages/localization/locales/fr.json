@@ -305,6 +305,7 @@
       "discord": "Il n'est pas possible d'utiliser une image discord, car les liens sont actualisés régulièrement.",
       "url": "L'image fournie est invalide : elle doit contenir le format de l'image (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) et être un lien en `https`."
     },
+    "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
     "calc": "Une erreur est survenue avec la formule utilisée.",
     "channel": "Le channel `{{-channel}}` n'existe pas sur ce serveur.",
     "charName": "Le personnage {{- charName}} n'est pas enregistré.",

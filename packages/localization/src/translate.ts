@@ -61,6 +61,7 @@ export function lError(
 			return "";
 		}
 		if (e.code === 50001) return ul("error.missingPermission");
+		if (e.code === 50013) return ul("error.botMissingPermission");
 		return ul("error.discord", { code: e.code, stack: e.stack });
 	}
 	if (e.message.includes(":warning:")) return ul("error.generic.e", { e });

@@ -305,6 +305,7 @@
       "discord": "It is not possible to use a discord image, as the links are updated regularly.",
       "url": "The image provided is invalid: it must contain the image format (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) and be an `https` link."
     },
+    "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
     "calc": "An error occured with the formula used.",
     "channel": "The channel `{{-channel}}` does not exist on this server.",
     "charName": "The character {{- charName}} is not registered.",
