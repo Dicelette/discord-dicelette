@@ -23,7 +23,7 @@ import { getLangAndConfig, haveAccess, searchUserChannel, serializeName } from "
 
 export function getUserByEmbed(
 	data: {
-		message?: Djs.Message;
+		message?: Djs.Message<boolean>;
 		embeds?: Djs.EmbedBuilder[];
 	},
 	ul: Translation,
@@ -103,18 +103,26 @@ export async function getUser(
 		//get the channel from the guild
 		const fetchChannel = await guild.channels.fetch(sheetLocation.channelId);
 		// noinspection SuspiciousTypeOfGuard
-		if (!fetchChannel || fetchChannel instanceof Djs.CategoryChannel) return;
+		if (
+			!fetchChannel ||
+			fetchChannel instanceof Djs.CategoryChannel ||
+			fetchChannel instanceof Djs.ForumChannel ||
+			fetchChannel instanceof Djs.MediaChannel
+		)
+			return;
 
 		channel = fetchChannel;
 	}
 	try {
-		const message = await channel.messages.fetch(sheetLocation.messageId);
-		if (!message) {
-			logger.warn(`Message ${sheetLocation.messageId} not found`);
-			return;
+		if ("messages" in channel) {
+			const message = await channel.messages.fetch(sheetLocation.messageId);
+			if (!message) {
+				logger.warn(`Message ${sheetLocation.messageId} not found`);
+				return;
+			}
+			const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
+			return getUserByEmbed({ message }, ul);
 		}
-		const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
-		return getUserByEmbed({ message }, ul);
 	} catch (_e) {
 		return;
 	}

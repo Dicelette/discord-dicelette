@@ -46,7 +46,7 @@ export function getEmbedsList(
 		which: "user" | "stats" | "damage" | "template";
 		embed: Djs.EmbedBuilder;
 	},
-	message?: Djs.Message
+	message?: Djs.Message<boolean>
 ) {
 	const userDataEmbed =
 		embedToReplace.which === "user"
@@ -81,7 +81,7 @@ export function getEmbedsList(
  */
 export function getEmbeds(
 	ul: Translation,
-	message?: Djs.Message,
+	message?: Djs.Message<boolean>,
 	which?: "user" | "stats" | "damage" | "template",
 	allEmbeds?: Djs.EmbedBuilder[] | Djs.Embed[]
 ) {
