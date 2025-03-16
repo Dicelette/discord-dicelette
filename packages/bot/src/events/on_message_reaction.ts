@@ -91,7 +91,14 @@ async function getSavedMessage(
 	const channelID = match.groups.channelID;
 	const messageID = match.groups.messageID;
 	const channel = await reaction.message.guild?.channels.fetch(channelID);
-	if (!channel || !channel.isTextBased || channel instanceof Djs.CategoryChannel) return;
+	if (
+		!channel ||
+		!channel.isTextBased ||
+		channel instanceof Djs.CategoryChannel ||
+		channel instanceof Djs.MediaChannel ||
+		channel instanceof Djs.ForumChannel
+	)
+		return;
 	return await channel.messages.fetch(messageID);
 }
 

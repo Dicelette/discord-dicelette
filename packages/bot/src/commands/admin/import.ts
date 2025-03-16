@@ -49,7 +49,7 @@ export const bulkAdd = {
 			csvFile.url,
 			guildTemplate,
 			interaction,
-			client.settings.has(interaction.guild!.id, "privateChannel"),
+			!!client.settings.get(interaction.guild!.id, "privateChannel"),
 			langToUse
 		);
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");

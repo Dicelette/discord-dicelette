@@ -27,7 +27,13 @@ export async function getTemplateWithDB(
 
 	const { channelId, messageId } = templateID;
 	const channel = await guild.channels.fetch(channelId);
-	if (!channel || channel instanceof Djs.CategoryChannel) return;
+	if (
+		!channel ||
+		channel instanceof Djs.CategoryChannel ||
+		channel instanceof Djs.ForumChannel ||
+		channel instanceof Djs.MediaChannel
+	)
+		return;
 	try {
 		const message = await channel.messages.fetch(messageId);
 		return getTemplate(message, enmap);
