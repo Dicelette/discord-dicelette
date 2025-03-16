@@ -21,12 +21,18 @@ export async function reply(
 		| Djs.ModalSubmitInteraction
 		| Djs.ButtonInteraction
 		| Djs.StringSelectMenuInteraction,
-	options: string | Djs.InteractionReplyOptions | Djs.MessagePayload
+	options: string | Djs.MessagePayload | Djs.InteractionReplyOptions
 ): Promise<Djs.Message | Djs.InteractionResponse> {
 	try {
-		return interaction.replied || interaction.deferred
-			? await interaction.editReply(options)
-			: await interaction.reply(options);
+		if (interaction.replied || interaction.deferred) {
+			// Convert to EditReplyOptions if needed
+			const editOptions =
+				typeof options === "string" || options instanceof Djs.MessagePayload
+					? options
+					: ({ ...options } as Djs.InteractionEditReplyOptions);
+			return await interaction.editReply(editOptions);
+		}
+		return await interaction.reply(options);
 	} catch (e) {
 		console.error(e);
 		return await interaction.followUp(options);
