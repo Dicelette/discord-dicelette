@@ -84,6 +84,11 @@ export async function triggerEditStats(
 ) {
 	if (await allowEdit(interaction, db, interactionUser))
 		await showEditorStats(interaction, ul, db);
+	else
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 /**

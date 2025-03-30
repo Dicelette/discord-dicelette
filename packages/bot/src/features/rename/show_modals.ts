@@ -10,6 +10,11 @@ export async function initiateRenaming(
 ) {
 	if (await allowEdit(interaction, db, interactionUser))
 		await showRename(interaction, ul);
+	else
+		await interaction.reply({
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 export async function showRename(

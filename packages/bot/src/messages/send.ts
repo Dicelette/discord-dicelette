@@ -23,18 +23,40 @@ export async function reply(
 		| Djs.StringSelectMenuInteraction,
 	options: string | Djs.MessagePayload | Djs.InteractionReplyOptions
 ): Promise<Djs.Message | Djs.InteractionResponse> {
+	const editOptions =
+		typeof options === "string" || options instanceof Djs.MessagePayload
+			? options
+			: ({ ...options } as Djs.InteractionEditReplyOptions);
+
 	try {
 		if (interaction.replied || interaction.deferred) {
-			// Convert to EditReplyOptions if needed
-			const editOptions =
-				typeof options === "string" || options instanceof Djs.MessagePayload
-					? options
-					: ({ ...options } as Djs.InteractionEditReplyOptions);
 			return await interaction.editReply(editOptions);
 		}
 		return await interaction.reply(options);
 	} catch (e) {
-		console.error(e);
+		if (e instanceof Djs.DiscordAPIError && e.code === 10062) {
+			console.warn("⏱ Interaction expirée, envoi direct dans le salon.");
+
+			const channel = interaction.channel;
+			const contentToSend =
+				typeof options === "string"
+					? options
+					: (options as Djs.InteractionReplyOptions).content;
+
+			if (channel?.isTextBased() && !channel.isDMBased() && contentToSend) {
+				return await channel.send({
+					content: contentToSend,
+					allowedMentions: { parse: [] },
+				});
+			}
+
+			// 🚨 Si on ne peut pas fallback proprement, on lève une erreur
+			throw new Error(
+				"Interaction expirée et aucun fallback possible (pas de salon textuel ou pas de contenu)."
+			);
+		}
+
+		console.error("Error while replying to interaction", e);
 		return await interaction.followUp(options);
 	}
 }
