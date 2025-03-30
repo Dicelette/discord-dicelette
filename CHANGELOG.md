@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.42.3](https://github.com/Dicelette/discord-dicelette/compare/1.42.2...1.42.3) (2025-03-30)
+
+
+### Bug Fixes
+
+* **interactions:** handle expired interactions and add permission checks for modal replies ([4dced5a](https://github.com/Dicelette/discord-dicelette/commit/4dced5a7475eeaa51e7d68615eb0ae92d796ea94))
+* **logging:** improve error logging format and add ephemeral replies for user feedback ([51f1a10](https://github.com/Dicelette/discord-dicelette/commit/51f1a105139ff6be1edb43667ae4b02bb0c1e141))
+
 ## [1.42.2](https://github.com/Dicelette/discord-dicelette/compare/1.42.1...1.42.2) (2025-03-16)
 
 

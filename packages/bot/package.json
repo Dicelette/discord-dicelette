@@ -1,6 +1,6 @@
 {
 	"name": "@dicelette/bot",
-	"version": "1.42.2",
+	"version": "1.42.3",
 	"description": "",
 	"main": "dist/index.js",
 	"type": "module",
