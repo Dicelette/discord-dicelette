@@ -9,11 +9,6 @@ export async function initiateMove(
 	db: Settings
 ) {
 	if (await allowEdit(interaction, db, interactionUser)) await showMove(interaction, ul);
-	else
-		await interaction.reply({
-			content: ul("modals.noPermission"),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
 }
 
 async function showMove(interaction: Djs.StringSelectMenuInteraction, ul: Translation) {
