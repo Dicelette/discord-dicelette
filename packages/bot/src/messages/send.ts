@@ -34,7 +34,7 @@ export async function reply(
 		}
 		return await interaction.reply(options);
 	} catch (e) {
-		console.error(e);
+		console.error("\n", e);
 		return await interaction.followUp(options);
 	}
 }

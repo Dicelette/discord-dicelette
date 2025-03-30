@@ -9,7 +9,7 @@ export const onReactionAdd = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				console.error("Something went wrong when fetching the message: ", error);
+				console.error("\nSomething went wrong when fetching the message: ", error);
 				return;
 			}
 		}
@@ -118,7 +118,7 @@ export const onReactionRemove = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				console.error("Something went wrong when fetching the message: ", error);
+				console.error("\nSomething went wrong when fetching the message: ", error);
 				return;
 			}
 		}

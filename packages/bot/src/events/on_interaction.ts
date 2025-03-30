@@ -64,7 +64,7 @@ export default (client: EClient): void => {
 				await resetButton(interaction.message, ul);
 			}
 		} catch (e) {
-			console.error(e);
+			console.error("\n", e);
 			if (!interaction.guild) return;
 			const msgError = lError(e as Error, interaction, langToUse);
 			if (msgError.length === 0) return;
@@ -75,7 +75,7 @@ export default (client: EClient): void => {
 				interaction.isModalSubmit() ||
 				interaction.isCommand()
 			)
-				await reply(interaction, { embeds: [embed] });
+				await reply(interaction, { embeds: [embed], flags: Djs.MessageFlags.Ephemeral });
 			if (client.settings.has(interaction.guild.id)) {
 				const db = client.settings.get(interaction.guild.id, "logs");
 				if (!db) return;
@@ -104,6 +104,7 @@ async function modalSubmit(
 	client: EClient
 ) {
 	const db = client.settings;
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	if (interaction.customId.includes("damageDice"))
 		await features.storeDamageDice(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))

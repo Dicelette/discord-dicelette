@@ -321,9 +321,10 @@
     },
     "invalidDice": {
       "embeds": "Aucun embed de dé détecté",
+      "eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
       "minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
       "notFound": "Aucun dé n'a été retrouvé dans la commande !",
-      "withDice": "Dé invalide : `{{- dice}}`"
+      "withDice": "Dé invalide : `{{- dice}}` durant le jet de validation."
     },
     "invalidFormula": "Formule invalide : `{{- formula}}`",
     "missingPermission": "## [DISCORD] :warning: __Erreur__ : **PERMISSIONS MANQUANTES**\nLe bot n'a pas les permissions pour faire l'action demandées. Vérifié qu'il a bien accès au channel/thread demandé !\n",

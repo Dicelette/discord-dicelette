@@ -135,7 +135,7 @@ export async function bulkDeleteCharacters(
 			await rep.edit({ components: [] });
 		}
 	} catch (err) {
-		console.error(err);
+		console.error("\n", err);
 	}
 	return;
 }

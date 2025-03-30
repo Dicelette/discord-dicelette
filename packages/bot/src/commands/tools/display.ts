@@ -122,8 +122,11 @@ export const displayUser = {
 			if (newDiceEmbed) displayEmbeds.push(newDiceEmbed);
 			await reply(interaction, { embeds: displayEmbeds });
 		} catch (e) {
-			console.error(e);
-			await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+			console.error("\n", e);
+			await reply(interaction, {
+				embeds: [embedError(ul("error.user"), ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
 			return;
 		}
 	},

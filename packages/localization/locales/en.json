@@ -321,9 +321,10 @@
     },
     "invalidDice": {
       "embeds": "No die embeds detected",
+      "eval": "Invalid die: `{{-dice}}` during evaluation validation.",
       "minus": "Dices cannot be negative !\n\n-# Dice used: `{- dice}}`.",
       "notFound": "No dice were found in the command!",
-      "withDice": "Invalid die: `{{-dice}}`"
+      "withDice": "Invalid die: `{{- dice}}` during the validation roll."
     },
     "invalidFormula": "Invalid formula: `{{- formula}}`",
     "missingPermission": "## [DISCORD] **MISSING PERMISSIONS**\nThe bot does not have the permissions to perform the requested action. Check that it has access to the requested channel/thread!",

@@ -11,7 +11,7 @@ export const onDeleteChannel = (client: EClient): void => {
 			const guildID = channel.guild.id;
 			deleteIfChannelOrThread(client, guildID, channel);
 		} catch (error) {
-			console.error(error);
+			console.error("\n", error);
 			if (channel.isDMBased()) return;
 			await sendLogs((error as Error).message, channel.guild, client.settings);
 		}
@@ -24,7 +24,7 @@ export const onKick = (client: EClient): void => {
 			client.settings.delete(guild.id);
 			client.characters.delete(guild.id);
 		} catch (error) {
-			console.error(error);
+			console.error("\n", error);
 		}
 	});
 };
@@ -37,7 +37,7 @@ export const onDeleteThread = (client: EClient): void => {
 			//verify if the user message was in the thread
 			deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
-			console.error(error);
+			console.error("\n", error);
 			if (thread.isDMBased()) return;
 			await sendLogs((error as Error).message, thread.guild, client.settings);
 		}

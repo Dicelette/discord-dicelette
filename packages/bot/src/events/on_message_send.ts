@@ -72,7 +72,7 @@ export default (client: EClient): void => {
 			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
-			console.error(e);
+			console.error("\n", e);
 			if (!message.guild) return;
 			const userLang =
 				client.settings.get(message.guild.id, "lang") ??

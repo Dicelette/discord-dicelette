@@ -30,7 +30,7 @@ export default (client: EClient): void => {
 		if (error instanceof DiscordAPIError && ignoreCode.includes(<number>error.code))
 			return;
 
-		console.error(error);
+		console.warn("\n", error);
 		if (!process.env.OWNER_ID) return;
 		const dm = await client.users.createDM(process.env.OWNER_ID);
 		await dm.send({ content: formatErrorMessage(error) });

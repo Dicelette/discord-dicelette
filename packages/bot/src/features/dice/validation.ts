@@ -70,7 +70,7 @@ export async function validateDiceEdit(
 		try {
 			evalStatsDice(dice, statsValues);
 		} catch (error) {
-			throw new Error(ul("error.invalidDice.withDice", { dice }));
+			throw new Error(ul("error.invalidDice.eval", { dice }));
 		}
 		newEmbedDice.push({
 			name: skill.capitalize(),
