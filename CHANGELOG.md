@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.42.4](https://github.com/Dicelette/discord-dicelette/compare/1.42.3...1.42.4) (2025-04-12)
+
+
+### Bug Fixes
+
+* unknow message while creating a new user (and probably other modal / button interaction) ([86619c6](https://github.com/Dicelette/discord-dicelette/commit/86619c6a0b5bd5903d4f9e3b3b5398fd5778679b))
+* unknown message while creating a new user (and probably other modal / button interaction) ([4a7e9f0](https://github.com/Dicelette/discord-dicelette/commit/4a7e9f04a8177d426e036fe774ad8512490e77d7))
+
 ## [1.42.3](https://github.com/Dicelette/discord-dicelette/compare/1.42.2...1.42.3) (2025-03-30)
 
 
