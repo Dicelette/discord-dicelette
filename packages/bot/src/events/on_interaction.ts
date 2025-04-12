@@ -104,7 +104,7 @@ async function modalSubmit(
 	client: EClient
 ) {
 	const db = client.settings;
-	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+
 	if (interaction.customId.includes("damageDice"))
 		await features.storeDamageDice(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
