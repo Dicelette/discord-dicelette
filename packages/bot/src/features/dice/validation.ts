@@ -15,6 +15,7 @@ import {
 	sendLogs,
 } from "messages";
 import { editUserButtons, selectEditMenu } from "utils";
+import type { TextChannel } from "discord.js";
 
 /**
  * Validate the edit of the dice from the modals
@@ -33,7 +34,11 @@ export async function validateDiceEdit(
 		a.unidecode().standardize() === b.unidecode().standardize();
 	const db = client.settings;
 	if (!interaction.message) return;
-	const diceEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "damage");
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+	const diceEmbeds = getEmbeds(ul, message ?? undefined, "damage");
 	if (!diceEmbeds) return;
 	const values = interaction.fields.getTextInputValue("allDice");
 	const valuesAsDice = values.split("\n- ").map((dice) => {
@@ -59,7 +64,7 @@ export async function validateDiceEdit(
 			});
 			continue;
 		}
-		const statsEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "stats");
+		const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
 		if (!statsEmbeds) {
 			if (!roll(dice)) {
 				throw new Error(ul("error.invalidDice.withDice", { dice }));
@@ -112,20 +117,13 @@ export async function validateDiceEdit(
 	}
 	const diceEmbed = createDiceEmbed(ul).addFields(fieldsToAppend);
 	const { userID, userName } = await getUserNameAndChar(interaction, ul);
-	const messageID = [
-		interaction.message.id,
-		interaction.message.channelId,
-	] as UserMessageId;
+	const messageID = [message.id, message.channelId] as UserMessageId;
 	if (!fieldsToAppend || fieldsToAppend.length === 0) {
 		//dice was removed
-		const embedsList = getEmbedsList(
-			ul,
-			{ which: "damage", embed: diceEmbed },
-			interaction.message
-		);
+		const embedsList = getEmbedsList(ul, { which: "damage", embed: diceEmbed }, message);
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
-		await interaction.message.edit({
+		await message.edit({
 			embeds: toAdd,
 			components: [components, selectEditMenu(ul)],
 		});
@@ -147,7 +145,7 @@ export async function validateDiceEdit(
 		await sendLogs(
 			ul("logs.dice.remove", {
 				user: Djs.userMention(interaction.user.id),
-				fiche: interaction.message.url,
+				fiche: message.url,
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 			}),
 			interaction.guild as Djs.Guild,
@@ -171,12 +169,8 @@ export async function validateDiceEdit(
 		msgId: messageID,
 	};
 	await registerUser(userRegister, interaction, db, false);
-	const embedsList = getEmbedsList(
-		ul,
-		{ which: "damage", embed: diceEmbed },
-		interaction.message
-	);
-	await interaction.message.edit({ embeds: embedsList.list });
+	const embedsList = getEmbedsList(ul, { which: "damage", embed: diceEmbed }, message);
+	await message.edit({ embeds: embedsList.list });
 	await reply(interaction, {
 		content: ul("embed.edit.dice"),
 		flags: Djs.MessageFlags.Ephemeral,
@@ -184,7 +178,7 @@ export async function validateDiceEdit(
 	const compare = displayOldAndNewStats(diceEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.dice.edit", {
 		user: Djs.userMention(interaction.user.id),
-		fiche: interaction.message.url,
+		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
 	await updateMemory(client.characters, interaction.guild!.id, userID, ul, {

@@ -11,6 +11,7 @@ import { getUserByEmbed } from "database";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
+import type { TextChannel } from "discord.js";
 
 export async function validateMove(
 	interaction: Djs.ModalSubmitInteraction,
@@ -18,9 +19,13 @@ export async function validateMove(
 	client: EClient
 ) {
 	if (!interaction.message || !interaction.channel || !interaction.guild) return;
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const userId = interaction.fields.getTextInputValue("user");
 	if (!userId) return;
-	const embed = getEmbeds(ul, interaction.message, "user");
+	const embed = getEmbeds(ul, message, "user");
 	if (!embed) throw new Error(ul("error.noEmbed"));
 	const user = await isUserNameOrId(userId, interaction);
 
@@ -29,7 +34,7 @@ export async function validateMove(
 			embeds: [embedError(ul("error.user"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		return await resetButton(interaction.message, ul);
+		return await resetButton(message, ul);
 	}
 	const oldUserId = embed
 		.toJSON()
@@ -41,7 +46,7 @@ export async function validateMove(
 			embeds: [embedError(ul("error.user"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		return await resetButton(interaction.message, ul);
+		return await resetButton(message, ul);
 	}
 	const oldUser = await isUserNameOrId(oldUserId, interaction);
 	if (!oldUser) {
@@ -49,20 +54,20 @@ export async function validateMove(
 			embeds: [embedError(ul("error.user"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		return await resetButton(interaction.message, ul);
+		return await resetButton(message, ul);
 	}
 
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel!.id,
-		messageId: interaction.message.id,
+		messageId: message.id,
 	};
-	const charData = getUserByEmbed({ message: interaction.message }, ul);
+	const charData = getUserByEmbed({ message: message }, ul);
 	if (!charData) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.user"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		return await resetButton(interaction.message, ul);
+		return await resetButton(message, ul);
 	}
 	//update the characters in the database characters
 	const allCharsNewUser = client.characters.get(interaction.guild!.id, userId);
@@ -91,7 +96,7 @@ export async function validateMove(
 		isPrivate?: boolean;
 	} = {
 		charName: charData.userName,
-		messageId: [interaction.message.id, interaction.channel.id],
+		messageId: [message.id, interaction.channel.id],
 		damageName: Object.keys(charData.damage ?? {}),
 		isPrivate: charData.private,
 	};

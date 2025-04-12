@@ -1,5 +1,6 @@
 import type { DiscordTextChannel } from "@dicelette/types";
 import type * as Djs from "discord.js";
+
 export async function findMessageBefore(
 	channel: DiscordTextChannel,
 	inter: Djs.Message | Djs.InteractionResponse,

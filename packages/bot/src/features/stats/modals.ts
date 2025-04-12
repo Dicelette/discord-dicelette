@@ -22,6 +22,7 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
+import type { TextChannel } from "discord.js";
 
 /**
  * Embed to display the statistics when adding a new user
@@ -37,10 +38,14 @@ export async function registerStatistics(
 	lang: Djs.Locale = Djs.Locale.EnglishGB
 ) {
 	if (!interaction.message) return;
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const ul = ln(lang);
-	const userEmbed = getEmbeds(ul, interaction.message, "user");
+	const userEmbed = getEmbeds(ul, message, "user");
 	if (!userEmbed) return;
-	const statsEmbed = getEmbeds(ul, interaction.message, "stats");
+	const statsEmbed = getEmbeds(ul, message, "stats");
 	const { combinaisonFields, stats } = getStatistiqueFields(interaction, template, ul);
 	//combine all embeds as one
 	userEmbed.setFooter({ text: ul("common.page", { nb: page }) });
@@ -83,7 +88,7 @@ export async function registerStatistics(
 			});
 		}
 
-		await interaction.message.edit({
+		await message.edit({
 			embeds: [userEmbed, statEmbeds],
 			components: [registerDmgButton(ul)],
 		});
@@ -93,7 +98,7 @@ export async function registerStatistics(
 		});
 		return;
 	}
-	await interaction.message.edit({
+	await message.edit({
 		embeds: [userEmbed, statEmbeds],
 		components: [continueCancelButtons(ul)],
 	});
@@ -118,7 +123,11 @@ export async function editStats(
 	const db = client.settings;
 	const characters = client.characters;
 	if (!interaction.message) return;
-	const statsEmbeds = getEmbeds(ul, interaction?.message ?? undefined, "stats");
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
 	if (!statsEmbeds) return;
 	const values = interaction.fields.getTextInputValue("allStats");
 	const templateStats = await getTemplateWithDB(interaction, db);
@@ -212,11 +221,11 @@ export async function editStats(
 		const { list, exists } = getEmbedsList(
 			ul,
 			{ which: "stats", embed: newEmbedStats },
-			interaction.message
+			message
 		);
 		const toAdd = removeEmbedsFromList(list, "stats");
 		const components = editUserButtons(ul, false, exists.damage);
-		await interaction.message.edit({ embeds: toAdd, components: [components] });
+		await message.edit({ embeds: toAdd, components: [components] });
 		await reply(interaction, {
 			content: ul("modals.removed.stats"),
 			flags: Djs.MessageFlags.Ephemeral,
@@ -224,7 +233,7 @@ export async function editStats(
 		await sendLogs(
 			ul("logs.stats.removed", {
 				user: Djs.userMention(interaction.user.id),
-				fiche: interaction.message.url,
+				fiche: message.url,
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 			}),
 			interaction.guild as Djs.Guild,
@@ -232,12 +241,8 @@ export async function editStats(
 		);
 	}
 	//get the other embeds
-	const { list } = getEmbedsList(
-		ul,
-		{ which: "stats", embed: newEmbedStats },
-		interaction.message
-	);
-	await interaction.message.edit({ embeds: list });
+	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
+	await message.edit({ embeds: list });
 	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
 	});
@@ -248,7 +253,7 @@ export async function editStats(
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
 		user: Djs.userMention(interaction.user.id),
-		fiche: interaction.message.url,
+		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
 	//update the characters in the memory ;

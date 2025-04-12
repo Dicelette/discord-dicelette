@@ -5,8 +5,9 @@ import type { DiscordChannel } from "@dicelette/types";
 import type { EClient } from "client";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
-import type * as Djs from "discord.js";
+import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
+import type { TextChannel } from "discord.js";
 
 export async function validateRename(
 	interaction: Djs.ModalSubmitInteraction,
@@ -14,9 +15,13 @@ export async function validateRename(
 	client: EClient
 ) {
 	if (!interaction.message) return;
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const newName = interaction.fields.getTextInputValue("newName");
 	if (!newName || !interaction.channel) return;
-	const embed = getEmbeds(ul, interaction.message, "user");
+	const embed = getEmbeds(ul, message, "user");
 	if (!embed) throw new Error(ul("error.noEmbed"));
 	const userId = embed
 		.toJSON()
@@ -28,9 +33,9 @@ export async function validateRename(
 	if (!user) throw new Error(ul("error.user"));
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel.id,
-		messageId: interaction.message.id,
+		messageId: message.id,
 	};
-	const charData = getUserByEmbed({ message: interaction.message }, ul);
+	const charData = getUserByEmbed({ message: message }, ul);
 	if (!charData) throw new Error(ul("error.notRegistered"));
 	const oldData: {
 		charName?: string | null;
