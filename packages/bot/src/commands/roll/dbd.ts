@@ -1,7 +1,7 @@
 import { cmdLn, t } from "@dicelette/localization";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateWithDB, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { dbdOptions, getLangAndConfig, rollDice, serializeName } from "utils";
@@ -115,19 +115,44 @@ export default {
 				userStatistique = char?.userStatistique;
 				charOptions = char?.optionChar ?? undefined;
 			}
-			if (!userStatistique) {
-				await reply(interaction, {
-					embeds: [embedError(ul("error.notRegistered"), ul)],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
-				return;
-			}
-			if (!userStatistique.damage) {
-				await reply(interaction, {
-					embeds: [embedError(ul("error.emptyDamage"), ul)],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
-				return;
+			if (!db.templateID.damageName) {
+				if (!userStatistique) {
+					await reply(interaction, {
+						embeds: [embedError(ul("error.notRegistered"), ul)],
+						flags: Djs.MessageFlags.Ephemeral,
+					});
+					return;
+				}
+				if (!userStatistique.damage) {
+					await reply(interaction, {
+						embeds: [embedError(ul("error.emptyDamage"), ul)],
+						flags: Djs.MessageFlags.Ephemeral,
+					});
+					return;
+				}
+			} else if (!userStatistique || !userStatistique.damage) {
+				//allow global damage with constructing a new userStatistique with only the damageName and their value
+				//get the damageName from the global template
+				const template = await getTemplateWithDB(interaction, client.settings);
+				if (!template) {
+					await reply(interaction, {
+						embeds: [embedError(ul("error.noTemplate"), ul)],
+						flags: Djs.MessageFlags.Ephemeral,
+					});
+					return;
+				}
+				const damage = template.damage;
+
+				//create the userStatistique with the value got from the template & the commands
+				userStatistique = {
+					userName: charName,
+					template: {
+						diceType: template.diceType,
+						critical: template.critical,
+						customCritical: template.customCritical,
+					},
+					damage,
+				};
 			}
 			return await rollDice(
 				interaction,
