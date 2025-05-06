@@ -145,8 +145,8 @@ export async function rollDice(
 		dollarValue?.total
 	);
 	if (dice.includes("{exp}")) {
-		if (expression === "0") dice = dice.replace("{exp}", "1");
-		else dice = dice.replace("{exp}", `${expressionStr.replace(/^\+/, "")}`);
+		if (expression === "0") dice = dice.replaceAll("{exp}", "1");
+		else dice = dice.replaceAll("{exp}", `${expressionStr.replace(/^\+/, "")}`);
 		expressionStr = "";
 	}
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
