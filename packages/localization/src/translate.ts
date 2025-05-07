@@ -45,9 +45,9 @@ export function lError(
 
 	if (e.message.includes("TooManyDice")) return ul("error.tooMuchDice");
 
-	if (e instanceof NoStatisticsError) return ul("error.emptyStats");
+	if (e instanceof NoStatisticsError) return ul("error.stats.empty");
 
-	if (e.message.includes("TooManyStats")) return ul("error.tooMuchStats");
+	if (e.message.includes("TooManyStats")) return ul("error.stats.tooMuch");
 
 	if (e instanceof NoEmbed) return ul("error.noEmbed");
 
