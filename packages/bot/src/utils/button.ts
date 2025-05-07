@@ -66,9 +66,6 @@ export function selectEditMenu(ul: Translation) {
 /**
  * Interaction when the cancel button is pressed
  * Also prevent to cancel by user not authorized
- * @param interaction {Djs.ButtonInteraction}
- * @param ul {Translation}
- * @param interactionUser {User}
  */
 export async function cancel(
 	interaction: Djs.ButtonInteraction,
@@ -112,12 +109,14 @@ export function continueCancelButtons(ul: Translation) {
 }
 
 export function getButton(message: Djs.Message, ul: Translation) {
-	const oldsButtons = message.components;
+	const oldsButtons =
+		message.components as Djs.ActionRow<Djs.MessageActionRowComponent>[];
 
-	const haveStats = oldsButtons.some((row) =>
-		row.components.some((button) => button.customId === "edit_stats")
+	const haveStats = oldsButtons.some(
+		(row: Djs.ActionRow<Djs.MessageActionRowComponent>) =>
+			row.components.some((button) => button.customId === "edit_stats")
 	);
-	const haveDice = oldsButtons.some((row) =>
+	const haveDice = oldsButtons.some((row: Djs.ActionRow<Djs.MessageActionRowComponent>) =>
 		row.components.some((button) => button.customId === "edit_dice")
 	);
 	const buttons = editUserButtons(ul, haveStats, haveDice);

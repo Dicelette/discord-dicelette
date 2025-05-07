@@ -23,6 +23,7 @@ export const onKick = (client: EClient): void => {
 		try {
 			client.settings.delete(guild.id);
 			client.characters.delete(guild.id);
+			client.template.delete(guild.id);
 		} catch (error) {
 			console.error("\n", error);
 		}
@@ -52,8 +53,10 @@ export const onDeleteMessage = (client: EClient): void => {
 			const guildID = message.guild.id;
 			const channel = message.channel;
 			if (channel.isDMBased()) return;
-			if (client.settings.get(guildID, "templateID.messageId") === messageId)
+			if (client.settings.get(guildID, "templateID.messageId") === messageId) {
 				client.settings.delete(guildID, "templateID");
+				client.template.delete(guildID); //template is deleted
+			}
 
 			const dbUser = client.settings.get(guildID, "user");
 			if (dbUser && Object.keys(dbUser).length > 0) {

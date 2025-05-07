@@ -1,32 +1,21 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.0-beta.2/schema.json",
 	"files": {
-		"ignore": ["node_modules", "dist"]
+		"includes": ["**", "!**/node_modules", "!**/dist"]
 	},
-	"organizeImports": {
-		"enabled": true
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
 	},
 	"linter": {
 		"rules": {
 			"recommended": true,
-			"style": {
-				"noVar": "error",
-				"useFilenamingConvention": "error",
-				"useImportType": "error",
-				"noParameterAssign": "off",
-				"useNamingConvention": {
-					"level": "warn",
-					"options": {
-						"strictCase": false
-					}
-				},
-				"useTemplate": "warn",
-				"useConst": "error",
-				"noNonNullAssertion": "off"
-			},
 			"complexity": {
 				"noExtraBooleanCast": "error",
-				"noMultipleSpacesInRegularExpressionLiterals": "error",
+				"noAdjacentSpacesInRegex": "error",
 				"noUselessCatch": "error",
 				"noWith": "error"
 			},
@@ -38,7 +27,9 @@
 				"noGlobalObjectCalls": "error",
 				"noInnerDeclarations": "error",
 				"noInvalidConstructorSuper": "error",
-				"noNewSymbol": "error",
+				"noInvalidBuiltinInstantiation": {
+					"level": "error"
+				},
 				"noNonoctalDecimalEscape": "error",
 				"noPrecisionLoss": "error",
 				"noSelfAssign": "error",
@@ -79,16 +70,48 @@
 				"noShadowRestrictedNames": "error",
 				"noUnsafeNegation": "error",
 				"useGetterReturn": "error",
-				"useValidTypeof": "error"
+				"useValidTypeof": "error",
+				"noVar": "error"
+			},
+			"style": {
+				"useFilenamingConvention": "error",
+				"useImportType": "error",
+				"noParameterAssign": "off",
+				"useNamingConvention": {
+					"level": "warn",
+					"options": {
+						"strictCase": false
+					}
+				},
+				"useTemplate": "warn",
+				"useConst": "error",
+				"noNonNullAssertion": "off",
+				"useLiteralEnumMembers": "error",
+				"noCommaOperator": "error",
+				"useNodejsImportProtocol": "error",
+				"useAsConstAssertion": "error",
+				"useNumericLiterals": "error",
+				"useEnumInitializers": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error",
+				"useExponentiationOperator": "error",
+				"useDefaultParameterLast": "error",
+				"noArguments": "error",
+				"useExportType": "error",
+				"noUselessElse": "error",
+				"useShorthandFunctionType": "error"
 			}
 		}
 	},
 	"overrides": [
-		{ "ignore": ["**/*.js"], "include": ["**/*.ts", "**/*.tsx"] },
-		{ "include": ["**/*.js"] },
-		{ "include": ["*.json"] },
+		{ "includes": ["**/*.ts", "**/*.tsx", "!**/*.js", "!**/node_modules/**"] },
+		{ "includes": ["**/*.js", "!**/node_modules/**"] },
+		{ "includes": ["**/*.json", "!**/node_modules/**"] },
 		{
-			"include": ["packages/src/bot/commands/tools/graph.ts"],
+			"includes": ["**/packages/src/bot/commands/tools/graph.ts", "!**/node_modules/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -98,7 +121,7 @@
 			}
 		},
 		{
-			"include": ["tests/constant.ts"],
+			"includes": ["**/tests/constant.ts", "!**/node_modules/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -111,7 +134,7 @@
 	"formatter": {
 		"enabled": true,
 		"formatWithErrors": true,
-		"ignore": [],
+		"includes": ["**", "!**/node_modules/**"],
 		"indentStyle": "tab",
 		"indentWidth": 2,
 		"lineEnding": "lf",

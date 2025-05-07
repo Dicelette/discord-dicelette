@@ -1,7 +1,7 @@
 import { resources } from "./types";
 
 interface JsonObject {
-	//biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	//biome-ignore lint/suspicious/noExplicitAny: we need to allow any type of value
 	[key: string]: any;
 }
 
@@ -11,7 +11,7 @@ export function flattenJson(
 	result: JsonObject = {}
 ): JsonObject {
 	for (const key in obj) {
-		// biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
+		// biome-ignore lint/suspicious/noPrototypeBuiltins: we need to check for own properties
 		if (obj.hasOwnProperty(key)) {
 			const newKey = parentKey ? `${parentKey}.${key}` : key;
 			if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {

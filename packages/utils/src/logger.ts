@@ -1,6 +1,8 @@
+/** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
 import dotenv from "dotenv";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
+
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const optionLoggers: ISettingsParam<ILogObj> =
@@ -58,7 +60,6 @@ export const important: Logger<ILogObj> = new Logger({
 		mm: "dim",
 		yyyy: "dim",
 		hh: "dim",
-		// biome-ignore lint/style/useNamingConvention: <explanation>
 		MM: "dim",
 		ss: "dim",
 		ms: "dim",

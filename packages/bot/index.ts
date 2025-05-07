@@ -17,10 +17,9 @@ import {
 	onReactionRemove,
 	ready,
 } from "event";
-import packageJson from "./package.json" assert { type: "json" };
+import packageJson from "./package.json" with { type: "json" };
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
-console.log(`TOKEN: ${process.env.DISCORD_TOKEN}`);
 important.info("Starting bot...");
 //@ts-ignore
 export const VERSION = packageJson.version ?? "/";

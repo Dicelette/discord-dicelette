@@ -1,7 +1,7 @@
 import { cmdLn, t } from "@dicelette/localization";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateWithDB, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateWithInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { dbdOptions, getLangAndConfig, rollDice, serializeName } from "utils";
@@ -73,6 +73,7 @@ export default {
 				choices = allCharactersFromUser;
 			}
 		}
+		console.debug(`choices: ${choices}`);
 		if (!choices || choices.length === 0) return;
 		const filter = filterChoices(choices, interaction.options.getFocused());
 		await interaction.respond(
@@ -133,7 +134,7 @@ export default {
 			} else if (!userStatistique || !userStatistique.damage) {
 				//allow global damage with constructing a new userStatistique with only the damageName and their value
 				//get the damageName from the global template
-				const template = await getTemplateWithDB(interaction, client.settings);
+				const template = await getTemplateWithInteraction(interaction, client);
 				if (!template) {
 					await reply(interaction, {
 						embeds: [embedError(ul("error.noTemplate"), ul)],

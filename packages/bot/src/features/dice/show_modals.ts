@@ -7,9 +7,6 @@ import { allowEdit } from "utils";
 
 /**
  * Interaction to add a new skill dice
- * @param interaction {Djs.ButtonInteraction}
- * @param interactionUser {User}
- * @param db
  */
 export async function executeAddDiceButton(
 	interaction: Djs.ButtonInteraction,
@@ -27,10 +24,10 @@ export async function executeAddDiceButton(
 
 /**
  * Modal to add a new skill dice
- * @param interaction {Djs.ButtonInteraction}
- * @param first {boolean}
  * - true: It's the modal when the user is registered
  * - false: It's the modal when the user is already registered and a new dice is added to edit the user
+ * @param interaction
+ * @param first
  * @param lang
  */
 export async function showDamageDiceModals(
@@ -71,10 +68,6 @@ export async function showDamageDiceModals(
 /**
  * Start the showEditDice when the button is interacted
  * It will also verify if the user can edit their dice
- * @param interaction {Djs.ButtonInteraction}
- * @param ul {Translation}
- * @param interactionUser {Djs.User}
- * @param db {Settings}
  */
 export async function initiateDiceEdit(
 	interaction: Djs.ButtonInteraction,
@@ -89,8 +82,6 @@ export async function initiateDiceEdit(
 /**
  * Show the modal to **edit** the registered dice
  * Will parse registered dice and show them in the modal as `- Skill : Dice`
- * @param interaction {Djs.ButtonInteraction}
- * @param ul {Translation}
  */
 export async function showEditDice(interaction: Djs.ButtonInteraction, ul: Translation) {
 	const diceEmbed = getEmbeds(ul, interaction.message, "damage");

@@ -1,6 +1,6 @@
 import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
-import { getTemplateWithDB } from "database";
+import { getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -41,7 +41,7 @@ export const bulkAdd = {
 			return reply(interaction, { content: ul("import.errors.invalid_file", { ext }) });
 		}
 		/** download the file using paparse */
-		const guildTemplate = await getTemplateWithDB(interaction, client.settings);
+		const guildTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildTemplate) {
 			return reply(interaction, { content: ul("error.noTemplate") });
 		}
@@ -180,7 +180,7 @@ export const bulkAddTemplate = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
 		const { ul } = getLangAndConfig(client.settings, interaction);
-		const guildTemplate = await getTemplateWithDB(interaction, client.settings);
+		const guildTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildTemplate) {
 			return reply(interaction, { content: ul("error.noTemplate") });
 		}

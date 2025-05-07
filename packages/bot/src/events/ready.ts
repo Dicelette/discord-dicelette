@@ -5,11 +5,11 @@ import type { Settings, UserData } from "@dicelette/types";
 import { important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { commandsList, contextMenus, dbCmd } from "commands";
-import { getUser } from "database";
+import { getTemplate, getUser } from "database";
 import * as Djs from "discord.js";
-import type { Guild } from "discord.js";
 import dotenv from "dotenv";
-import { VERSION } from "../../index.js";
+import { VERSION } from "../../index";
+import { ln } from "@dicelette/localization";
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const rest = new Djs.REST().setToken(process.env.DISCORD_TOKEN ?? "0");
@@ -45,7 +45,6 @@ export default (client: EClient): void => {
 			logger.trace(`Registering commands for \`${guild.name}\``);
 			const cmds = await guild.client.application.commands.fetch({ guildId: guild.id });
 			//filter the list of the commands that are deleted
-			// biome-ignore lint/complexity/noForEach: <explanation
 			cmds.forEach(async (command) => {
 				if (serializedCommands.find((c) => c.name === command.name)) return;
 				try {
@@ -65,13 +64,15 @@ export default (client: EClient): void => {
 			convertDatabaseUser(client.settings, guild);
 			logger.info(`User saved in memory for ${guild.name}`);
 			await fetchAllCharacter(client, guild);
+			await cacheStatisticalTemplate(client, guild);
+			logger.info(`Template saved in memory for ${guild.name}`);
 		}
 		important.info("Bot is ready");
 		cleanData(client);
 	});
 };
 
-function convertDatabaseUser(db: Settings, guild: Guild) {
+function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 	if (db.get(guild.id, "converted")) return;
 	const users = db.get(guild.id, "user");
 	if (!users) {
@@ -109,6 +110,12 @@ function convertDatabaseUser(db: Settings, guild: Guild) {
 	db.set(guild.id, true, "converted");
 }
 
+async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
+	const lang = client.settings.get(guild.id, "lang") ?? Djs.Locale.EnglishUS;
+	const ul = ln(lang);
+	const template = await getTemplate(guild, client.settings, ul);
+	if (template) client.template.set(guild.id, template);
+}
 function cleanData(client: EClient) {
 	const guilds = client.guilds.cache;
 	const settings = client.settings;

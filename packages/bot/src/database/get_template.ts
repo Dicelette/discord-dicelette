@@ -4,26 +4,33 @@ import {
 	verifyTemplateValue,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Settings } from "@dicelette/types";
+import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import type { Message } from "discord.js";
+import type { EClient } from "client";
 
 /**
  * Get the statistical Template using the database templateID information
  */
-export async function getTemplateWithDB(
+export async function getTemplateWithInteraction(
 	interaction:
 		| Djs.ButtonInteraction
 		| Djs.ModalSubmitInteraction
 		| Djs.CommandInteraction,
-	enmap: Settings
+	client: EClient
 ) {
 	if (!interaction.guild) return;
 	const guild = interaction.guild;
-	const templateID = enmap.get(interaction.guild.id, "templateID");
 	const ul = ln(interaction.locale);
-	if (!enmap.has(interaction.guild.id) || !templateID)
-		throw new Error(ul("error.noGuildData", { server: interaction.guild.name }));
+	const hasCache = client.template.get(guild.id);
+	if (!hasCache) return await getTemplate(guild, client.settings, ul);
+	return hasCache;
+}
+
+export async function getTemplate(guild: Djs.Guild, enmap: Settings, ul: Translation) {
+	const templateID = enmap.get(guild.id, "templateID");
+	if (!enmap.has(guild.id) || !templateID)
+		throw new Error(ul("error.noGuildData", { server: guild.name }));
 
 	const { channelId, messageId } = templateID;
 	const channel = await guild.channels.fetch(channelId);
@@ -36,7 +43,7 @@ export async function getTemplateWithDB(
 		return;
 	try {
 		const message = await channel.messages.fetch(messageId);
-		return getTemplate(message, enmap);
+		return fetchTemplate(message, enmap);
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
 			throw new Error(ul("error.noTemplateId", { channelId, messageId }));
@@ -47,7 +54,7 @@ export async function getTemplateWithDB(
 /**
  * Get the guild template when clicking on the "registering user" button or when submitting
  */
-export async function getTemplate(
+export async function fetchTemplate(
 	message: Message,
 	enmap: Settings
 ): Promise<StatisticalTemplate | undefined> {

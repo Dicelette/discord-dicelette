@@ -4,7 +4,12 @@ import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import type { EClient } from "client";
-import { findChara, getRecordChar, getTemplateWithDB, getUserByEmbed } from "database";
+import {
+	findChara,
+	getRecordChar,
+	getTemplateWithInteraction,
+	getUserByEmbed,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
@@ -178,7 +183,7 @@ export const graph = {
 			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
 			return;
 		}
-		const serverTemplate = await getTemplateWithDB(interaction, client.settings);
+		const serverTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildData.templateID.statsName || !serverTemplate?.statistics) {
 			await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
 			return;

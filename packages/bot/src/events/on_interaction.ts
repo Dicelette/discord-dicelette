@@ -10,7 +10,7 @@ import {
 	mobileLink,
 } from "commands";
 import { resetButton } from "commands";
-import { getTemplate, getTemplateWithDB } from "database";
+import { fetchTemplate, getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import * as features from "features";
 import { embedError, reply } from "messages";
@@ -38,10 +38,10 @@ export default (client: EClient): void => {
 				if (!command) return;
 				await command.autocomplete(autocompleteInteraction, client);
 			} else if (interaction.isButton()) {
-				let template = await getTemplate(interaction.message, client.settings);
+				let template = await fetchTemplate(interaction.message, client.settings);
 				template = template
 					? template
-					: await getTemplateWithDB(interaction, client.settings);
+					: await getTemplateWithInteraction(interaction, client);
 				if (!template) {
 					if (!interaction.channel || interaction.channel.isDMBased()) return;
 					await (interaction.channel as Djs.TextChannel).send({
@@ -92,10 +92,6 @@ export default (client: EClient): void => {
 
 /**
  * Switch for modal submission
- * @param {Djs.ModalSubmitInteraction} interaction
- * @param ul {Translation}
- * @param interactionUser {User}
- * @param client
  */
 async function modalSubmit(
 	interaction: Djs.ModalSubmitInteraction,
@@ -103,16 +99,14 @@ async function modalSubmit(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	const db = client.settings;
-
 	if (interaction.customId.includes("damageDice"))
 		await features.storeDamageDice(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
-		await features.pageNumber(interaction, ul, db);
+		await features.pageNumber(interaction, ul, client);
 	else if (interaction.customId === "editStats")
 		await features.editStats(interaction, ul, client);
 	else if (interaction.customId === "firstPage")
-		await features.recordFirstPage(interaction, db);
+		await features.recordFirstPage(interaction, client);
 	else if (interaction.customId === "editDice")
 		await features.validateDiceEdit(interaction, ul, client);
 	else if (interaction.customId === "editAvatar")
@@ -125,10 +119,10 @@ async function modalSubmit(
 
 /**
  * Switch for button interaction
- * @param interaction {Djs.ButtonInteraction}
- * @param ul {Translation}
- * @param interactionUser {User}
- * @param template {StatisticalTemplate}
+ * @param interaction
+ * @param ul
+ * @param interactionUser
+ * @param template
  * @param db
  * @param characters
  */
@@ -183,7 +177,7 @@ async function buttonSubmit(
 		const message = await interaction.message.fetch();
 		if (isMobile) await mobileLink(interaction, ul);
 		else await desktopLink(interaction, ul);
-		await message.edit({ components: [] });
+		message.edit({ components: [] });
 	}
 }
 

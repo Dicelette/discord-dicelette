@@ -1,11 +1,12 @@
 import { type StatisticalTemplate, isNumber } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
-import { getTemplateWithDB } from "database";
+import { getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
 import { embedError, reply } from "messages";
 import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
+import type { EClient } from "client";
 
 /**
  * Register the statistic in the embed when registering a new user and validate the modal
@@ -14,11 +15,11 @@ import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
 export async function pageNumber(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	db: Settings
+	client: EClient
 ) {
 	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
-	const template = await getTemplateWithDB(interaction, db);
+	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) {
 		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
 		return;
@@ -27,7 +28,7 @@ export async function pageNumber(
 		interaction,
 		template,
 		Number.parseInt(pageNumber, 10),
-		db.get(interaction.guild!.id, "lang") ?? interaction.locale
+		client.settings.get(interaction.guild!.id, "lang") ?? interaction.locale
 	);
 }
 
@@ -36,13 +37,13 @@ export async function pageNumber(
  */
 export async function recordFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
-	db: Settings
+	client: EClient
 ) {
 	if (!interaction.guild || !interaction.channel || interaction.channel.isDMBased())
 		return;
-	const template = await getTemplateWithDB(interaction, db);
+	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) return;
-	await createEmbedFirstPage(interaction, template, db);
+	await createEmbedFirstPage(interaction, template, client.settings);
 }
 
 /**

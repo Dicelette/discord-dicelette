@@ -42,7 +42,7 @@ export async function showStatistiqueModal(
 				content: ul("modals.alreadySet"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			await interaction.message.edit({ components: [button] });
+			interaction.message.edit({ components: [button] });
 		}
 	}
 	const statsToDisplay = statToDisplay.slice(0, 4);

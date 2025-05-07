@@ -19,11 +19,6 @@ export type CSVRow = {
 
 /**
  * Export a function to parse a CSV file and return the data, using PapaParse
- * @param url {string} The URL of the CSV file, or the content of the file as string
- * @param guildTemplate {StatisticalTemplate} The template of the guild
- * @param interaction {Djs.CommandInteraction | undefined} The interaction to reply to, if any (undefined if used in test)
- * @param allowPrivate
- * @param lang
  */
 export async function parseCSV(
 	url: string,
@@ -110,11 +105,7 @@ async function readCSV(url: string): Promise<string> {
 
 /**
  * Parse the csv file and return the data in the correct format
- * @param csv {CSVRow[]} The data parsed from the CSV file
- * @param guildTemplate {StatisticalTemplate} The template of the guild
- * @param interaction {Djs.CommandInteraction | undefined} The interaction to reply to, if any (undefined if used in test)
- * @param allowPrivate
- * @param lang
+
  */
 async function step(
 	csv: CSVRow[],

@@ -90,7 +90,7 @@ export default {
 			const rollID = allCommands.findKey((command) => command.name === "roll");
 			const msgToEdit = await newThread.send("_ _");
 			const msg = `${Djs.userMention(interaction.user.id)} - <t:${moment().unix()}:R>\n${ul("scene.underscore")} ${scene}\n*roll: </roll:${rollID}>*`;
-			await msgToEdit.edit(msg);
+			msgToEdit.edit(msg);
 		}
 		return;
 	},

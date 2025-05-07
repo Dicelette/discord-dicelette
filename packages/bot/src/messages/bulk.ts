@@ -14,10 +14,6 @@ import { searchUserChannel } from "utils";
 
 /**
  * Update the template of existing user when the template is edited by moderation
- * @param client
- * @param interaction {Djs.CommandInteraction}
- * @param ul {Translation}
- * @param template {StatisticalTemplate}
  */
 export async function bulkEditTemplateUser(
 	client: EClient,
@@ -72,7 +68,7 @@ export async function bulkEditTemplateUser(
 					{ which: "template", embed: newEmbed },
 					userMessages
 				);
-				await userMessages.edit({ embeds: listEmbed.list });
+				userMessages.edit({ embeds: listEmbed.list });
 				await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 					embeds: listEmbed.list,
 				});
@@ -85,9 +81,6 @@ export async function bulkEditTemplateUser(
 
 /**
  * Delete all characters from the guild
- * @param client
- * @param interaction {Djs.CommandInteraction}
- * @param ul {Translation}
  */
 export async function bulkDeleteCharacters(
 	client: EClient,
@@ -126,13 +119,13 @@ export async function bulkDeleteCharacters(
 			await deleteMessageChar(client, interaction, ul);
 			guildData.delete(interaction.guild!.id, "user");
 			client.characters.delete(interaction.guild!.id);
-			await rep.edit({
+			rep.edit({
 				components: [],
 				content: ul("register.delete.done"),
 				embeds: [],
 			});
 		} else {
-			await rep.edit({ components: [] });
+			rep.edit({ components: [] });
 		}
 	} catch (err) {
 		console.error("\n", err);

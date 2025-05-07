@@ -59,8 +59,10 @@ export function deleteIfChannelOrThread(
 	const db = client.settings;
 	const channelID = channel.id;
 	cleanUserDB(client, channel);
-	if (db.get(guildID, "templateID.channelId") === channelID)
+	if (db.get(guildID, "templateID.channelId") === channelID) {
 		db.delete(guildID, "templateID");
+		client.template.delete(guildID);
+	}
 	if (db.get(guildID, "logs") === channelID) db.delete(guildID, "logs");
 	if (db.get(guildID, "managerId") === channelID) db.delete(guildID, "managerId");
 	if (db.get(guildID, "privateChannel") === channelID)

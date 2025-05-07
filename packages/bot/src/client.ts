@@ -3,10 +3,12 @@ import type { GuildData, UserDatabase } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
+import type { StatisticalTemplate } from "@dicelette/core";
 
 export class EClient extends Djs.Client {
 	public settings: Enmap<string, GuildData, unknown>;
 	public characters: Enmap<string, UserDatabase, unknown>;
+	public template: Enmap<string, StatisticalTemplate, unknown>;
 
 	constructor(options: Djs.ClientOptions) {
 		super(options);
@@ -25,6 +27,8 @@ export class EClient extends Djs.Client {
 
 		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
 		this.characters = new Enmap({ inMemory: true });
+		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
+		this.template = new Enmap({ inMemory: true });
 	}
 }
 

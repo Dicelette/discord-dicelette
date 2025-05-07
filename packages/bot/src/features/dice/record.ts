@@ -1,11 +1,12 @@
-import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import type { Settings, Translation } from "@dicelette/types";
 import { NoEmbed, capitalizeBetweenPunct } from "@dicelette/utils";
+import { evalStatsDice } from "@dicelette/core";
+
 import type { EClient } from "client";
 import {
-	getTemplateWithDB,
+	getTemplateWithInteraction,
 	getUserByEmbed,
 	getUserNameAndChar,
 	registerUser,
@@ -26,10 +27,6 @@ import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "
 /**
  * Interaction to submit the new skill dice
  * Only works if the user is the owner of the user registered in the embed or if the user is a moderator
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param ul {Translation}
- * @param interactionUser {User}
- * @param client
  */
 export async function storeDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
@@ -37,8 +34,7 @@ export async function storeDamageDice(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	const db = client.settings;
-	const template = await getTemplateWithDB(interaction, db);
+	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) {
 		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
 		return;
@@ -87,9 +83,6 @@ export function registerDmgButton(ul: Translation) {
 
 /**
  * Register the new skill dice in the embed and database
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param client
- * @param first {boolean}
  * - true: It's the modal when the user is registered
  * - false: It's the modal when the user is already registered and a new dice is added to edit the user
  */
