@@ -22,21 +22,21 @@ export async function validateRename(
 	const newName = interaction.fields.getTextInputValue("newName");
 	if (!newName || !interaction.channel) return;
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const userId = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
-	if (!userId) throw new Error(ul("error.user"));
+	if (!userId) throw new Error(ul("error.user.notFound"));
 	const user = interaction.client.users.cache.get(userId);
-	if (!user) throw new Error(ul("error.user"));
+	if (!user) throw new Error(ul("error.user.notFound"));
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel.id,
 		messageId: message.id,
 	};
 	const charData = getUserByEmbed({ message: message }, ul);
-	if (!charData) throw new Error(ul("error.notRegistered"));
+	if (!charData) throw new Error(ul("error.user.youRegistered"));
 	const oldData: {
 		charName?: string | null;
 		messageId: UserMessageId;

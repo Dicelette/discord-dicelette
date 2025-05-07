@@ -46,8 +46,8 @@ export async function getTemplate(guild: Djs.Guild, enmap: Settings, ul: Transla
 		return fetchTemplate(message, enmap);
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
-			throw new Error(ul("error.noTemplateId", { channelId, messageId }));
-		throw new Error(ul("error.noTemplate"));
+			throw new Error(ul("error.template.notFoundId", { channelId, messageId }));
+		throw new Error(ul("error.template.notFound"));
 	}
 }
 

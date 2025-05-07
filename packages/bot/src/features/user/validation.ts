@@ -115,7 +115,7 @@ export async function validateUser(
 	if (charName && charName === "common.noSet") charName = undefined;
 	if (!userID) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

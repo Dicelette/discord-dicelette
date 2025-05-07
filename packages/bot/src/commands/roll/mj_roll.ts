@@ -138,7 +138,7 @@ export const mjRoll = {
 		if (charName && !serializedNameQueries) {
 			await reply(interaction, {
 				embeds: [
-					embedError(ul("error.charName", { charName: charName.capitalize() }), ul),
+					embedError(ul("error.user.charName", { charName: charName.capitalize() }), ul),
 				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -154,7 +154,7 @@ export const mjRoll = {
 			let userName = `<@${user.id}>`;
 			if (charName) userName += ` (${charName})`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}

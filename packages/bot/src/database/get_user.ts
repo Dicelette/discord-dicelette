@@ -72,7 +72,7 @@ export async function getFirstChar(
 	if (!userData) {
 		if (skipNotFound) return;
 		await reply(interaction, {
-			embeds: [embedError(ul("error.notRegistered"), ul)],
+			embeds: [embedError(ul("error.user.youRegistered"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
@@ -191,7 +191,7 @@ export async function getUserFromMessage(
 		});
 		return userData;
 	} catch (error) {
-		if (!skipNotFound) throw new Error(ul("error.user"), { cause: "404 not found" });
+		if (!skipNotFound) throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
 	}
 }
 
@@ -205,7 +205,7 @@ export async function getRecordChar(
 	const guildData = client.settings.get(interaction.guildId as string);
 	const ul = ln(interaction.locale as Djs.Locale);
 	if (!guildData) {
-		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return undefined;
 	}
 	const user = options.getUser(t("display.userLowercase"));
@@ -290,13 +290,13 @@ export async function getUserNameAndChar(
 		const firstEmbed = ensureEmbed(interaction?.message ?? undefined);
 		if (firstEmbed) userEmbed = new Djs.EmbedBuilder(firstEmbed.toJSON());
 	}
-	if (!userEmbed) throw new Error(ul("error.noEmbed"));
+	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
 	const userID = userEmbed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
-	if (!userID) throw new Error(ul("error.user"));
+	if (!userID) throw new Error(ul("error.user.notFound"));
 	if (
 		!interaction.channel ||
 		(!(interaction.channel instanceof Djs.ThreadChannel) &&
@@ -333,7 +333,7 @@ export async function getStatistics(
 	if (optionChar && !selectedCharByQueries) {
 		await reply(interaction, {
 			embeds: [
-				embedError(ul("error.charName", { charName: optionChar.capitalize() }), ul),
+				embedError(ul("error.user.charName", { charName: optionChar.capitalize() }), ul),
 			],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -362,7 +362,7 @@ export async function getStatistics(
 	}
 	if (!userStatistique) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.notRegistered"), ul)],
+			embeds: [embedError(ul("error.user.youRegistered"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

@@ -43,7 +43,7 @@ export const bulkAdd = {
 		/** download the file using paparse */
 		const guildTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, { content: ul("error.noTemplate") });
+			return reply(interaction, { content: ul("error.template.notFound") });
 		}
 		const { members, errors } = await parseCSV(
 			csvFile.url,
@@ -55,7 +55,7 @@ export const bulkAdd = {
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
 		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 		if (!defaultChannel) {
-			return reply(interaction, { content: ul("error.noDefaultChannel") });
+			return reply(interaction, { content: ul("error.channel.defaultChannel") });
 		}
 		const guildMembers = await interaction.guild?.members.fetch();
 		for (const [user, data] of Object.entries(members)) {
@@ -144,7 +144,7 @@ export const bulkAdd = {
 					{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
 					client.settings,
 					char.channel ??
-						(char.private && privateChannel ? privateChannel : defaultChannel),
+					(char.private && privateChannel ? privateChannel : defaultChannel),
 					client.characters
 				);
 				await addAutoRole(
@@ -182,7 +182,7 @@ export const bulkAddTemplate = {
 		const { ul } = getLangAndConfig(client.settings, interaction);
 		const guildTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, { content: ul("error.noTemplate") });
+			return reply(interaction, { content: ul("error.template.notFound") });
 		}
 		const header = ["user", "charName", "avatar", "channel"];
 		if (guildTemplate.statistics) {

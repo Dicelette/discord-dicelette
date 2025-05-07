@@ -19,7 +19,7 @@ export async function showAvatarEdit(
 	ul: Translation
 ) {
 	const embed = getEmbeds(ul, interaction.message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const jsonEmbed = embed.toJSON().thumbnail?.url;
 	const thumbnail = jsonEmbed
 		? cleanAvatarUrl(jsonEmbed)

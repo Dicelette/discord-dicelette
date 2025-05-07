@@ -123,7 +123,7 @@ export const editAvatar = {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}
@@ -184,7 +184,7 @@ async function avatar(
 		const embed = getEmbeds(ul, message, "user");
 		if (!embed) {
 			// noinspection ExceptionCaughtLocallyJS
-			throw new Error(ul("error.noEmbed"));
+			throw new Error(ul("error.embed.notFound"));
 		}
 		embed.setThumbnail(imageURL);
 		const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
@@ -198,7 +198,7 @@ async function avatar(
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
-		await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 	}
 }
 
@@ -228,11 +228,11 @@ export async function rename(
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character");
-	if (!n) throw new Error(ul("error.noCharacter"));
+	if (!n) throw new Error(ul("error.user.rename"));
 	n.value = name;
 	//update the embed
 	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
@@ -319,7 +319,7 @@ export async function move(
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed.toJSON().fields?.find((field) => findln(field.name) === "common.user");
 
 	if (!n) throw new Error(ul("error.oldEmbed"));

@@ -306,15 +306,29 @@
     },
     "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
     "calc": "An error occured with the formula used.",
-    "channel": "The channel `{{-channel}}` does not exist on this server.",
-    "charName": "The character {{- charName}} is not registered.",
+    "channel": {
+      "defaultChannel": "You must provide at least one default channel to save the records.",
+      "notFound": "The channel `{{-channel}}` does not exist on this server.",
+      "thread": "No valid channel found - Please re-register the template if the channel was deleted"
+    },
     "csvContent": "The content of {{- fichier}} is invalid.",
+    "damage": {
+      "empty": "You have no ability dice saved.",
+      "notFound": "`{{- atq}}` is not saved in `{{- charName}}`."
+    },
     "discord": "## [DISCORD] :warning: __Error__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nPlease report the bug on [the official server](https://discord.gg/2PUqwWeQYZ).",
     "duplicate": "The name is already used for another character! \nSo you can't use it here. \nEach name must be unique!",
-    "emptyDamage": "You have no ability dice saved.",
+    "embed": {
+      "notFound": "No embeds found",
+      "old": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}})."
+    },
     "generic": {
       "e": "{{- e.message}}",
       "withWarning": "## [{{- e.name}}]\n{{- e.message}}"
+    },
+    "guild": {
+      "data": "No data found for server {{-server}}.",
+      "empty": "No guilds found"
     },
     "invalidDice": {
       "embeds": "No die embeds detected",
@@ -328,27 +342,15 @@
     "mustBeGreater": "\nThe {{- value}} value must be greater than {{- min}}",
     "mustBeLower": "The `{{- value}}` value must be smaller than `{{- max}}`",
     "noBulkRoll": "Bulk roll are not allowed in shared rolls.",
-    "noCharacter": "Your character does not have a name: it cannot therefore be renamed!",
-    "noDamage": "`{{- atq}}` is not saved in `{{- charName}}`.",
-    "noDefaultChannel": "You must provide at least one default channel to save the records.",
-    "noDice": "You cannot issue this command without having a registered die type!",
-    "noEmbed": "No embeds found",
-    "noGuild": "No guilds found",
-    "noGuildData": "No data found for server {{-server}}.",
+    "noDice": "You cannot use this command without having a registered die type!",
     "noMessage": "No messages found.",
     "noPermission": "You do not have permissions to change another user's image. \nOnly people with \"MANAGE ROLES\" permissions can use this command for other players.",
-    "noTemplate": "No template or channel configured",
-    "noTemplateId": "No messages found with data saved in database:\n- Channel: `{{-channelId}}`\n- Message ID: `{{- messageId}}`",
-    "noThread": "No valid channel found - Please re-register the template if the channel was deleted",
-    "noUserData": "No user data nor template dice found.",
-    "notRegistered": "You are not registered",
-    "oldEmbed": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}}).",
     "private": "This character sheet is private! \nYou do not have permission to read it.",
     "public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
     "roll": {
+      "channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration.",
       "invalid": "Error during roll: invalid data for `{{- dice}}`."
     },
-    "rollChannelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration.",
     "sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
     "stats": {
       "empty": "This combination is invalid: no statistics exist!",
@@ -359,11 +361,21 @@
       "shouldSelect": "You need to select a statistic to roll a dice.",
       "tooMuch": "Too many statistics have been saved! You cannot have more than 25 statistics"
     },
-    "template": "You must provide a JSON file.",
+    "template": {
+      "id": "No messages found with data saved in database:\n- Channel: `{{-channelId}}`\n- Message ID: `{{- messageId}}`",
+      "json": "You must provide a JSON file.",
+      "notFound": "No template or channel configured"
+    },
     "tooMuchDice": "Too many dice have been saved! You cannot have more than 25 dice saved.",
     "totalExceededBy": "The total of {{- value}} is exceeded by {{- max}}",
-    "user": "User not found. \n- This may be a temporary error caused by updating the cache,\n- The record cannot be found because it has been deleted (or its channel) but the data has not been deleted from the database. \nIf so, you need to use the `/delete_char` command.",
-    "userNotRegistered": "{{- user}} is not registered."
+    "user": {
+      "charName": "The character {{- charName}} is not registered.",
+      "data": "No user data nor template dice found.",
+      "notFound": "User not found. \n- This may be a temporary error caused by updating the cache,\n- The record cannot be found because it has been deleted (or its channel) but the data has not been deleted from the database. \nIf so, you need to use the `/delete_char` command.",
+      "registered": "{{- user}} is not registered.",
+      "rename": "Your character does not have a name: it cannot therefore be renamed!",
+      "youRegistered": "You are not registered"
+    }
   },
   "export": {
     "description": "Export all saved characters to a csv file",

@@ -88,7 +88,7 @@ export async function optionInteractions(
 		ul,
 	} = getLangAndConfig(client.settings, interaction);
 	if (!guildData) {
-		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
 	const user = options.getUser(t("display.userLowercase"));

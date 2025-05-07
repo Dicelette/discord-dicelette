@@ -21,7 +21,7 @@ export async function pageNumber(
 	if (!isNumber(pageNumber)) return;
 	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) {
-		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
 	await registerStatistics(
@@ -65,7 +65,7 @@ export async function createEmbedFirstPage(
 	const user = await isUserNameOrId(userFromField, interaction);
 	if (!user) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

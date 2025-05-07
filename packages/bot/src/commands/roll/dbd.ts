@@ -91,7 +91,7 @@ export default {
 		const { ul } = getLangAndConfig(client.settings, interaction);
 		if (!user && !db.templateID) {
 			await reply(interaction, {
-				embeds: [embedError(t("error.noUserData"), ul)],
+				embeds: [embedError(t("error.user.data"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -110,7 +110,7 @@ export default {
 			if (charOptions && !selectedCharByQueries) {
 				await reply(interaction, {
 					embeds: [
-						embedError(ul("error.charName", { charName: charOptions.capitalize() }), ul),
+						embedError(ul("error.user.charName", { charName: charOptions.capitalize() }), ul),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -125,14 +125,14 @@ export default {
 			if (!db.templateID.damageName) {
 				if (!userStatistique) {
 					await reply(interaction, {
-						embeds: [embedError(ul("error.notRegistered"), ul)],
+						embeds: [embedError(ul("error.user.youRegistered"), ul)],
 						flags: Djs.MessageFlags.Ephemeral,
 					});
 					return;
 				}
 				if (!userStatistique.damage) {
 					await reply(interaction, {
-						embeds: [embedError(ul("error.emptyDamage"), ul)],
+						embeds: [embedError(ul("error.damage.empty"), ul)],
 						flags: Djs.MessageFlags.Ephemeral,
 					});
 					return;
@@ -143,7 +143,7 @@ export default {
 				const template = await getTemplateWithInteraction(interaction, client);
 				if (!template) {
 					await reply(interaction, {
-						embeds: [embedError(ul("error.noTemplate"), ul)],
+						embeds: [embedError(ul("error.template.notFound"), ul)],
 						flags: Djs.MessageFlags.Ephemeral,
 					});
 					return;

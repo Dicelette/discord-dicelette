@@ -45,7 +45,7 @@ export default (client: EClient): void => {
 				if (!template) {
 					if (!interaction.channel || interaction.channel.isDMBased()) return;
 					await (interaction.channel as Djs.TextChannel).send({
-						embeds: [embedError(ul("error.noTemplate"), ul)],
+						embeds: [embedError(ul("error.template.notFound"), ul)],
 					});
 					return;
 				}

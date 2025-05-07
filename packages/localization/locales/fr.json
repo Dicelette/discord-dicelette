@@ -306,15 +306,29 @@
     },
     "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
     "calc": "Une erreur est survenue avec la formule utilisée.",
-    "channel": "Le channel `{{-channel}}` n'existe pas sur ce serveur.",
-    "charName": "Le personnage {{- charName}} n'est pas enregistré.",
+    "channel": {
+      "defaultChannel": "Vous devez fournir au moins un channel par défaut pour sauvegarder les fiches.",
+      "notFound": "Le channel `{{-channel}}` n'existe pas sur ce serveur.",
+      "thread": "Aucun channel valide trouvé — Veuillez réenregistrer le modèle si le channel a été supprimé"
+    },
     "csvContent": "Le contenu du {{- fichier}} est invalide.",
+    "damage": {
+      "empty": "Vous n'avez pas de dés de capacités enregistrés.",
+      "notFound": "`{{- atq}}` n'est pas enregistré pour {{- charName}}."
+    },
     "discord": "## [DISCORD] :warning: __Erreur__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nMerci de signaler le bug sur [le serveur officiel](https://discord.gg/2PUqwWeQYZ).",
     "duplicate": "Le nom est déjà utilisé pour un autre personnage ! Vous ne pouvez donc pas l'utiliser ici. Chaque nom doit être unique !",
-    "emptyDamage": "Vous n'avez pas de dés de capacités enregistrés.",
+    "embed": {
+      "notFound": "Aucun embed trouvé",
+      "old": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>)."
+    },
     "generic": {
       "e": "{{- e.message}}",
       "withWarning": "## [{{- e.name}}] :warning: __Erreur__ :\n{{- e.message}}"
+    },
+    "guild": {
+      "data": "Aucune donnée trouvée pour le serveur {{- server }}.",
+      "empty": " Aucun serveur n'a été trouvé."
     },
     "invalidDice": {
       "embeds": "Aucun embed de dé détecté",
@@ -328,27 +342,15 @@
     "mustBeGreater": "## :warning: **Une erreur est survenue**\nLa valeur `{{- value}}` doit être plus grande que `{{- min}}`.",
     "mustBeLower": "La valeur `{{- value}}` doit être plus petite que `{{- max}}`",
     "noBulkRoll": "Les jets en \"masse\" ne sont pas autorisés dans les dés partagés.",
-    "noCharacter": "Votre personnage n'a pas de nom : il ne peut donc pas être renommé !",
-    "noDamage": "`{{- atq}}` n'est pas enregistré pour {{- charName}}.",
-    "noDefaultChannel": "Vous devez fournir au moins un channel par défaut pour sauvegarder les fiches.",
     "noDice": "Vous ne pouvez pas lancer cette commande sans avoir un dé type enregistré !",
-    "noEmbed": "Aucun embed trouvé",
-    "noGuild": " Aucun serveur n'a été trouvé.",
-    "noGuildData": "Aucune donnée trouvée pour le serveur {{- server }}.",
     "noMessage": "Aucun message trouvé.",
     "noPermission": "Vous n'avez pas les permissions pour changer l'image d'un autre utilisateur. Seuls les personnes ayant les autorisations \"GÉRER LES RÔLES\" peuvent utiliser cette commande pour d'autres joueurs.",
-    "noTemplate": "Aucun modèle ou channel configuré",
-    "noTemplateId": "Aucun message trouvé avec les données sauvegardée dans la base de données:\n- Channel : `{{- channelId}}`\n- ID du message : `{{- messageId}}`",
-    "noThread": "Aucun channel valide trouvé — Veuillez réenregistrer le modèle si le channel a été supprimé",
-    "noUserData": "Aucunes données d'utilisateurs ou de modèles n'ont été trouvées.",
-    "notRegistered": "Vous n'êtes pas enregistré !",
-    "oldEmbed": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>).",
     "private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
     "public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
     "roll": {
+      "channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut.",
       "invalid": "Erreur dans le dé : données invalides pour le dé `{{- dice}}`."
     },
-    "rollChannelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut.",
     "sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
     "stats": {
       "empty": "Cette combination est invalide : aucune statistiques n'existent !",
@@ -359,11 +361,21 @@
       "shouldSelect": "Vous avez besoin de sélectionner une statistique pour lancer un dé.",
       "tooMuch": "Trop de statistiques ont été fournies ! Vous ne pouvez pas avoir plus de 25 statistiques."
     },
-    "template": "Vous devez fournir un fichier JSON.",
+    "template": {
+      "id": "Aucun message trouvé avec les données sauvegardée dans la base de données:\n- Channel : `{{- channelId}}`\n- ID du message : `{{- messageId}}`",
+      "json": "Vous devez fournir un fichier JSON valide.",
+      "notFound": "Aucun modèle ou channel configuré"
+    },
     "tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",
     "totalExceededBy": "Le total de `{{- value}}` est dépassé de `{{- max}}`.",
-    "user": "Utilisateur introuvable.\n- Il peut s'agir d'une erreur temporaire causé par la mise à jour du cache,\n- La fiche est introuvable car elle a été supprimé (ou son channel) mais les données n'ont pas été supprimé de la base de données. Si tel est le cas, vous devez utiliser la commande `/supprimer_char`.",
-    "userNotRegistered": "{{- user}} n'est pas enregistré."
+    "user": {
+      "charName": "Le personnage {{- charName}} n'est pas enregistré.",
+      "data": "Aucunes données d'utilisateurs ou de modèles n'ont été trouvées.",
+      "notFound": "Utilisateur introuvable.\n- Il peut s'agir d'une erreur temporaire causé par la mise à jour du cache,\n- La fiche est introuvable car elle a été supprimé (ou son channel) mais les données n'ont pas été supprimé de la base de données. Si tel est le cas, vous devez utiliser la commande `/supprimer_char`.",
+      "registered": "{{- user}} n'est pas enregistré.",
+      "rename": "Votre personnage n'a pas de nom : il ne peut donc pas être renommé !",
+      "youRegistered": "Vous n'êtes pas enregistré !"
+    }
   },
   "export": {
     "description": "Export tous les personnages sauvegardés dans un fichier csv",

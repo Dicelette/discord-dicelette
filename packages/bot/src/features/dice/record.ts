@@ -36,7 +36,7 @@ export async function storeDamageDice(
 ) {
 	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) {
-		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
 	const embed = ensureEmbed(interaction.message ?? undefined);
@@ -123,7 +123,7 @@ export async function registerDamageDice(
 			}
 		}
 	const user = getUserByEmbed({ message: interaction.message }, ul, first);
-	if (!user) throw new Error(ul("error.user")); //mean that there is no embed
+	if (!user) throw new Error(ul("error.user.notFound")); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
 	if (

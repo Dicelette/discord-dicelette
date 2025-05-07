@@ -19,7 +19,7 @@ export async function validateAvatarEdit(
 		return await reply(interaction, { embeds: [embedError(ul("error.avatar.url"), ul)] });
 
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	embed.setThumbnail(avatar);
 	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
 	message.edit({ embeds: embedsList.list });

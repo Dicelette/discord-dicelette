@@ -26,12 +26,12 @@ export async function validateMove(
 	const userId = interaction.fields.getTextInputValue("user");
 	if (!userId) return;
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const user = await isUserNameOrId(userId, interaction);
 
 	if (!user) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);
@@ -43,7 +43,7 @@ export async function validateMove(
 		.replace(">", "");
 	if (!oldUserId) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);
@@ -51,7 +51,7 @@ export async function validateMove(
 	const oldUser = await isUserNameOrId(oldUserId, interaction);
 	if (!oldUser) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);
@@ -64,7 +64,7 @@ export async function validateMove(
 	const charData = getUserByEmbed({ message: message }, ul);
 	if (!charData) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);

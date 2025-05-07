@@ -41,7 +41,7 @@ export function lError(
 		return ul("error.mustBeGreater", { max: max, value: min });
 	}
 
-	if (e instanceof EmptyObjectError) return ul("error.emptyDamage");
+	if (e instanceof EmptyObjectError) return ul("error.damage.empty");
 
 	if (e.message.includes("TooManyDice")) return ul("error.tooMuchDice");
 
@@ -49,7 +49,7 @@ export function lError(
 
 	if (e.message.includes("TooManyStats")) return ul("error.stats.tooMuch");
 
-	if (e instanceof NoEmbed) return ul("error.noEmbed");
+	if (e instanceof NoEmbed) return ul("error.embed.notFound");
 
 	if (e instanceof InvalidCsvContent) return ul("error.csvContent", { fichier: e.file });
 

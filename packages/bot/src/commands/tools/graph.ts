@@ -180,7 +180,7 @@ export const graph = {
 		let max = options.getNumber(t("graph.max.name")) ?? undefined;
 		const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
 		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+			await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 			return;
 		}
 		const serverTemplate = await getTemplateWithInteraction(interaction, client);
@@ -197,7 +197,7 @@ export const graph = {
 		if (charName) userName += ` (${charName})`;
 		if (!charData) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}
@@ -236,7 +236,7 @@ export const graph = {
 			const message = await thread.messages.fetch(sheetLocation.messageId);
 			const userStatistique = getUserByEmbed({ message }, ul, undefined, false);
 			if (!userStatistique) {
-				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 				return;
 			}
 			if (!userStatistique.stats) {

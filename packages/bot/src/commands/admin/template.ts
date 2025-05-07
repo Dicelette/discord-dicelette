@@ -223,7 +223,7 @@ export const registerTemplate = {
 		//fetch the template
 		if (!template.contentType?.includes("json")) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.template"), ul)],
+				embeds: [embedError(ul("error.template.json"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -370,10 +370,10 @@ export const registerTemplate = {
 			: undefined;
 		const excludedStats = templateData.statistics
 			? Object.keys(
-					Object.fromEntries(
-						Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
-					)
+				Object.fromEntries(
+					Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
 				)
+			)
 			: undefined;
 		const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;
 		if (json) {

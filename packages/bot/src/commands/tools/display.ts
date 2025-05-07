@@ -55,7 +55,7 @@ export const displayUser = {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}
@@ -63,7 +63,7 @@ export const displayUser = {
 		let userData: CharacterData | undefined = charData?.[user?.id ?? interaction.user.id];
 		if (!userData) userData = await findChara(charData, charName);
 		if (!userData) {
-			await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+			await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 			return;
 		}
 		const { thread, sheetLocation } = await findLocation(
@@ -83,7 +83,7 @@ export const displayUser = {
 			const diceFields = generateDice(diceEmbed?.toJSON().fields, statsFields);
 			const dataUserEmbeds = getEmbeds(ul, userMessage, "user");
 			if (!statisticEmbed && !diceEmbed && !diceFields && !statsFields) {
-				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 				return;
 			}
 			const jsonDataUser = dataUserEmbeds!
@@ -124,7 +124,7 @@ export const displayUser = {
 		} catch (e) {
 			console.error("\n", e);
 			await reply(interaction, {
-				embeds: [embedError(ul("error.user"), ul)],
+				embeds: [embedError(ul("error.user.notFound"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
