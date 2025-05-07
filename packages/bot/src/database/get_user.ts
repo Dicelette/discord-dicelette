@@ -16,7 +16,7 @@ import type {
 } from "@dicelette/types";
 import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getCharaInMemory, updateMemory } from "database";
+import { getCharaInMemory, getTemplateWithInteraction, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import { getLangAndConfig, haveAccess, searchUserChannel, serializeName } from "utils";
@@ -62,19 +62,22 @@ export function getUserByEmbed(
 export async function getFirstChar(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
-	ul: Translation
+	ul: Translation,
+	skipNotFound = false
 ) {
 	const userData = client.settings.get(
 		interaction.guild!.id,
 		`user.${interaction.user.id}`
 	);
 	if (!userData) {
+		if (skipNotFound) return;
 		await reply(interaction, {
 			embeds: [embedError(ul("error.notRegistered"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
+
 	const firstChar = userData[0];
 	const optionChar = firstChar.charName?.capitalize();
 	const userStatistique = await getUserFromMessage(
@@ -337,11 +340,25 @@ export async function getStatistics(
 		return;
 	}
 	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
-	if (!userStatistique && !charName) {
+	const template = await getTemplateWithInteraction(interaction, client);
+	const needStats = template?.diceType?.includes("$");
+	if (!userStatistique && !charName && needStats) {
 		//find the first character registered
 		const char = await getFirstChar(client, interaction, ul);
 		userStatistique = char?.userStatistique;
 		optionChar = char?.optionChar;
+	}
+
+	if (!needStats && !userStatistique) {
+		//we can use the dice without an user i guess
+		userStatistique = {
+			template: {
+				diceType: template?.diceType,
+				critical: template?.critical,
+				customCritical: template?.customCritical,
+			},
+			damage: template?.damage,
+		};
 	}
 	if (!userStatistique) {
 		await reply(interaction, {
@@ -351,7 +368,7 @@ export async function getStatistics(
 		return;
 	}
 
-	if (!userStatistique.stats) {
+	if (!userStatistique.stats && !template?.statistics && needStats) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.noStats"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
@@ -386,7 +403,7 @@ export function getRightValue(
 		}
 		if (userStat) break;
 		throw new Error(
-			ul("error.noStat", {
+			ul("error.stats.notFound_singular", {
 				stat: standardizedStatistic.capitalize(),
 				char: optionChar ? ` ${optionChar.capitalize()}` : "",
 			})

@@ -71,8 +71,9 @@ export function skillCustomCritical(
 	if (!customCritical) return undefined;
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(customCritical)) {
-		if (!dollarsValue && !value.value.includes("$")) continue;
-		if (value.affectSkill && dollarsValue) {
+		if (!value.affectSkill) continue;
+		if (!dollarsValue && !value.value.includes("$")) customCriticalFiltered[name] = value;
+		else if (value.affectSkill && dollarsValue) {
 			value.value = generateStatsDice(value.value, statistics, dollarsValue?.toString());
 			customCriticalFiltered[name] = rollOneCustomCritical(value);
 		}

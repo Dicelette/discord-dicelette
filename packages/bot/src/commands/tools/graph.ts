@@ -185,7 +185,9 @@ export const graph = {
 		}
 		const serverTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildData.templateID.statsName || !serverTemplate?.statistics) {
-			await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
+			await reply(interaction, {
+				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
+			});
 			return;
 		}
 		const user = options.getUser(t("display.userLowercase"));

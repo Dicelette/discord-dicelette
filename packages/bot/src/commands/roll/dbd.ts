@@ -1,4 +1,5 @@
 import { cmdLn, t } from "@dicelette/localization";
+import { uniformizeRecords } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateWithInteraction, getUserFromMessage } from "database";
@@ -22,17 +23,17 @@ export default {
 			interaction.guild!.id,
 			`user.${interaction.user.id}`
 		);
-		if (!user) return;
+		if (!user && !db.templateID.damageName) return;
 		let choices: string[] = [];
 		if (focused.name === t("rAtq.atq_name.name")) {
 			const char = options.getString(t("common.character"));
 
-			if (char) {
+			if (char && user) {
 				const values = user.find((data) => {
 					return data.charName?.subText(char);
 				});
 				if (values?.damageName) choices = values.damageName;
-			} else {
+			} else if (user) {
 				for (const [, value] of Object.entries(user)) {
 					if (value.damageName) choices = choices.concat(value.damageName);
 				}
@@ -43,7 +44,7 @@ export default {
 				choices.length === 0
 			)
 				choices = choices.concat(db.templateID.damageName);
-		} else if (focused.name === t("common.character")) {
+		} else if (focused.name === t("common.character") && user) {
 			//if dice is set, get all characters that have this dice
 			const skill = options.getString(t("rAtq.atq_name.name"));
 			const allCharactersFromUser = user
@@ -73,7 +74,6 @@ export default {
 				choices = allCharactersFromUser;
 			}
 		}
-		console.debug(`choices: ${choices}`);
 		if (!choices || choices.length === 0) return;
 		const filter = filterChoices(choices, interaction.options.getFocused());
 		await interaction.respond(
@@ -88,10 +88,16 @@ export default {
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !interaction.guild || !interaction.channel) return;
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
-		if (!user) return;
+		const { ul } = getLangAndConfig(client.settings, interaction);
+		if (!user && !db.templateID) {
+			await reply(interaction, {
+				embeds: [embedError(t("error.noUserData"), ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
 		let charOptions = options.getString(t("common.character")) ?? undefined;
 		const charName = charOptions?.normalize();
-		const { ul } = getLangAndConfig(client.settings, interaction);
 		try {
 			let userStatistique = await getUserFromMessage(
 				client,
@@ -112,7 +118,7 @@ export default {
 			}
 			charOptions = userStatistique?.userName ? userStatistique.userName : undefined;
 			if (!userStatistique && !charName) {
-				const char = await getFirstChar(client, interaction, ul);
+				const char = await getFirstChar(client, interaction, ul, true);
 				userStatistique = char?.userStatistique;
 				charOptions = char?.optionChar ?? undefined;
 			}
@@ -142,7 +148,10 @@ export default {
 					});
 					return;
 				}
-				const damage = template.damage;
+				const damage = template.damage
+					? (uniformizeRecords(template.damage) as Record<string, string>)
+					: undefined;
+				logger.trace("The template use:", damage);
 
 				//create the userStatistique with the value got from the template & the commands
 				userStatistique = {

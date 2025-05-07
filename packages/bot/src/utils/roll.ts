@@ -5,18 +5,18 @@ import {
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
-	ResultAsText,
-	type Server,
 	convertExpression,
 	convertNameToValue,
 	getRoll,
+	ResultAsText,
 	replaceStatInDice,
 	rollCustomCritical,
+	type Server,
 	skillCustomCritical,
 	trimAll,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue } from "database";
 import * as Djs from "discord.js";
@@ -82,6 +82,8 @@ export async function rollDice(
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
+	const expression = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	logger.trace("ATQ USED", atq);
 	const comm = options.getString(t("dbRoll.options.comments.name"))
 		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
 		: undefined;
@@ -118,8 +120,17 @@ export async function rollDice(
 		return;
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
+	let expressionStr = convertExpression(
+		expression,
+		userStatistique.stats,
+		dollarValue?.total
+	);
+	if (dice.includes("{exp}")) {
+		if (expression === "0") dice = dice.replaceAll("{exp}", "1");
+		else dice = dice.replaceAll("{exp}", `${expressionStr.replace(/^\+/, "")}`);
+		expressionStr = "";
+	}
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
-	const expression = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -138,17 +149,9 @@ export async function rollDice(
 		else infoRoll.name = replaceStatInDice(infoRoll.name, userStatistique.stats, "");
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
+
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
-	let expressionStr = convertExpression(
-		expression,
-		userStatistique.stats,
-		dollarValue?.total
-	);
-	if (dice.includes("{exp}")) {
-		if (expression === "0") dice = dice.replaceAll("{exp}", "1");
-		else dice = dice.replaceAll("{exp}", `${expressionStr.replace(/^\+/, "")}`);
-		expressionStr = "";
-	}
+
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
@@ -177,15 +180,24 @@ export async function rollStatistique(
 	user?: Djs.User,
 	hideResult?: boolean | null
 ) {
-	let statistic = options.getString(t("common.statistic"), true);
-	let standardizedStatistic = statistic.standardize(true);
+	let statistic = options.getString(t("common.statistic"), false);
+	const template = userStatistique.template;
+	let dice = template.diceType;
+	let standardizedStatistic = statistic?.standardize(true);
 	//return if the standardizedStatistic is excluded from the list
 	const excludedStats = client.settings
 		.get(interaction.guild!.id, "templateID.excludedStats")
 		?.map((stat) => stat.standardize());
-	if (excludedStats?.includes(standardizedStatistic)) {
+	if (standardizedStatistic && excludedStats?.includes(standardizedStatistic)) {
 		await reply(interaction, {
-			content: ul("error.excludedStat"),
+			content: ul("error.stats.excluded"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	if (template.diceType?.includes("$") && !statistic) {
+		await reply(interaction, {
+			content: ul("error.stats.shouldSelect"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
@@ -196,23 +208,25 @@ export async function rollStatistique(
 		: undefined;
 	const comments = comm ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
+	let userStat: undefined | number = undefined;
 	const modification = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	if (statistic && standardizedStatistic && dice?.includes("$")) {
+		const res = getRightValue(
+			userStatistique,
+			standardizedStatistic,
+			ul,
+			client,
+			interaction,
+			optionChar,
+			statistic
+		);
+		if (!res) return;
+		statistic = res.statistic;
+		standardizedStatistic = res.standardizedStatistic;
+		userStat = res.userStat;
 
-	const res = getRightValue(
-		userStatistique,
-		standardizedStatistic,
-		ul,
-		client,
-		interaction,
-		optionChar,
-		statistic
-	);
-	if (!res) return;
-	statistic = res.statistic;
-	standardizedStatistic = res.standardizedStatistic;
-	const userStat = res.userStat;
-	const template = userStatistique.template;
-	let dice = template.diceType?.replaceAll("$", userStat.toString());
+		dice = dice.replaceAll("$", userStat.toString());
+	}
 	if (!dice) {
 		await reply(interaction, {
 			content: ul("error.noDice"),
@@ -234,7 +248,7 @@ export async function rollStatistique(
 	const modificationString = convertExpression(
 		modification,
 		userStatistique.stats,
-		userStat.toString()
+		userStat?.toString()
 	);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
@@ -243,10 +257,14 @@ export async function rollStatistique(
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${trimAll(replaceFormulaInDice(dice))}${modificationString}${generateStatsDice(comparator, userStatistique.stats, userStat.toString())} ${comments}`;
+	const roll = `${trimAll(replaceFormulaInDice(dice))}${modificationString}${generateStatsDice(comparator, userStatistique.stats, userStat?.toString())} ${comments}`;
 	const customCritical = template.customCritical
 		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
+	const infoRoll =
+		statistic && standardizedStatistic
+			? { name: statistic, standardized: standardizedStatistic }
+			: undefined;
 	await rollWithInteraction(
 		interaction,
 		roll,
@@ -254,7 +272,7 @@ export async function rollStatistique(
 		template.critical,
 		user,
 		optionChar,
-		{ name: statistic, standardized: standardizedStatistic },
+		infoRoll,
 		hideResult,
 		customCritical
 	);

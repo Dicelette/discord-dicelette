@@ -97,7 +97,7 @@ export function dbRollOptions(
 			.setNameLocalizations(cmdLn("common.statistic"))
 			.setDescription(t("dbRoll.options.statistic"))
 			.setDescriptionLocalizations(cmdLn("dbRoll.options.statistic"))
-			.setRequired(true)
+			.setRequired(false)
 			.setAutocomplete(true)
 	);
 	return commonOptions(builder, { expression: true, threshold: true });

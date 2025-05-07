@@ -153,7 +153,7 @@ export async function editStats(
 			embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
 		)
 			continue;
-		if (!stat) throw new Error(ul("error.statNotFound", { value: name }));
+		if (!stat) throw new Error(ul("error.stats.notFound", { value: name }));
 
 		if (!isNumber(value)) {
 			//it's a combinaison OR an error
