@@ -71,9 +71,14 @@ export async function rollWithInteraction(
  *
  * If the specified attack or damage is not found in the user's data, replies with an ephemeral error message.
  *
- * @param options - Command options containing the attack name, expression, and optional comments.
- * @param charOptions - Optional character name or identifier to select the relevant character data.
- * @param hideResult - If true, the roll result is hidden from other users.
+ * @param {Djs.CommandInteraction} interaction
+ * @param {EClient} client
+ * @param {UserData} userStatistique
+ * @param {Djs.CommandInteractionOptionResolver} options - Command options containing the attack name, expression, and optional comments.
+ * @param {Translation} ul
+ * @param {string|undefined} charOptions - Optional character name or identifier to select the relevant character data.
+ * @param {Djs.User|undefined} user
+ * @param {boolean|null|undefined} hideResult - If true, the roll result is hidden from other users.
  */
 export async function rollDice(
 	interaction: Djs.CommandInteraction,
@@ -174,9 +179,14 @@ export async function rollDice(
  *
  * If the selected statistic is excluded or required information is missing, replies with an ephemeral error message.
  *
- * @param optionChar - Optional character name to associate with the roll.
- * @param user - Optional user to attribute the roll to.
- * @param hideResult - If true, hides the roll result from other users.
+ * @param {Djs.CommandInteraction} interaction
+ * @param {EClient} client
+ * @param {UserData} userStatistique
+ * @param {Djs.CommandInteractionOptionResolver} options
+ * @param {Translation} ul
+ * @param {string|undefined} optionChar - Optional character name to associate with the roll.
+ * @param {Djs.User|undefined} user - Optional user to attribute the roll to.
+ * @param {boolean|null|undefined} hideResult - If true, hides the roll result from other users.
  */
 export async function rollStatistique(
 	interaction: Djs.CommandInteraction,

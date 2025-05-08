@@ -5,16 +5,17 @@ import {
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
-import * as Djs from "discord.js";
-import type { Message } from "discord.js";
 import type { EClient } from "client";
+import type { Message } from "discord.js";
+import * as Djs from "discord.js";
 
 /**
  * Retrieves the statistical template for a guild based on the interaction context.
  *
  * If a cached template exists for the guild, it is returned; otherwise, the template is fetched using the guild's settings and localization.
  *
- * @param interaction - The Discord interaction within a guild context.
+ * @param {Djs.ButtonInteraction|Djs.ModalSubmitInteraction| Djs.CommandInteraction} interaction - The Discord interaction within a guild context.
+ * @param {EClient} client
  * @returns The statistical template for the guild, or undefined if the interaction is not in a guild.
  */
 export async function getTemplateWithInteraction(

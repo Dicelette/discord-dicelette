@@ -1,6 +1,6 @@
 import { cmdLn, findln, t } from "@dicelette/localization";
-import type { DiscordChannel } from "@dicelette/types";
 import type {
+	DiscordChannel,
 	PersonnageIds,
 	Translation,
 	UserMessageId,
@@ -16,8 +16,7 @@ import {
 	registerUser,
 } from "database";
 import * as Djs from "discord.js";
-import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
-import { reply } from "messages";
+import { embedError, findLocation, getEmbeds, getEmbedsList, reply } from "messages";
 import {
 	autoComplete,
 	charUserOptions,

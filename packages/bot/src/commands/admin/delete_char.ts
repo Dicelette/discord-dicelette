@@ -3,9 +3,9 @@ import type {
 	DiscordChannel,
 	GuildData,
 	PersonnageIds,
+	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import type { Translation } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { deleteUser, deleteUserInChar, getRecordChar } from "database";

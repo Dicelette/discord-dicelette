@@ -1,7 +1,7 @@
-import { type StatisticalTemplate, isNumber } from "@dicelette/core";
+import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Settings, Translation, UserData } from "@dicelette/types";
-import { NoEmbed, cleanAvatarUrl, logger } from "@dicelette/utils";
+import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { showStatistiqueModal } from "features";
 import {

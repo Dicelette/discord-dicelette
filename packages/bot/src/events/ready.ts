@@ -1,6 +1,7 @@
 // noinspection ES6MissingAwait
 
 import process from "node:process";
+import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -9,7 +10,7 @@ import { getTemplate, getUser } from "database";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
 import { VERSION } from "../../index";
-import { ln } from "@dicelette/localization";
+
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const rest = new Djs.REST().setToken(process.env.DISCORD_TOKEN ?? "0");

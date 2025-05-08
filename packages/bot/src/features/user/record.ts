@@ -1,12 +1,12 @@
-import { type StatisticalTemplate, isNumber } from "@dicelette/core";
+import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import type { EClient } from "client";
 import { getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
 import { embedError, reply } from "messages";
 import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
-import type { EClient } from "client";
 
 /**
  * Handles a modal submission to register user statistics for a specific page, validating the page number and template existence.

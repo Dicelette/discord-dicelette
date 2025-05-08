@@ -243,9 +243,7 @@ async function step(
 			channel,
 		};
 		logger.trace("Adding character", newChar);
-		// biome-ignore lint/performance/noDelete: I need this because the file will be rewritten and the undefined value can broke object
 		if (!newChar.private) delete newChar.private;
-		// biome-ignore lint/performance/noDelete: I need this because the file will be rewritten and the undefined value can broke object
 		if (!newChar.avatar) delete newChar.avatar;
 		members[userID].push(newChar);
 	}

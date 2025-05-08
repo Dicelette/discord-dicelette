@@ -104,6 +104,7 @@ function reverseSign(sign: string) {
  * @param userStatistique - The user's statistics used for variable substitution in the formula.
  * @param ul - The translation utility for localization.
  * @param interaction - The Discord command interaction context.
+ * @param client
  * @param optionChar - Optional character name for display in the result.
  * @param hide - Whether to hide the result from other users.
  * @param user - The Discord user to mention in the result; defaults to the interaction user.

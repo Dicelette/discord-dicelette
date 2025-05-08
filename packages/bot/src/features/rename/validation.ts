@@ -1,13 +1,16 @@
 import { findln } from "@dicelette/localization";
-import type { Translation } from "@dicelette/types";
-import type { PersonnageIds, UserMessageId } from "@dicelette/types";
-import type { DiscordChannel } from "@dicelette/types";
+import type {
+	DiscordChannel,
+	PersonnageIds,
+	Translation,
+	UserMessageId,
+} from "@dicelette/types";
 import type { EClient } from "client";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
+import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
-import type { TextChannel } from "discord.js";
 
 /**
  * Handles validation and execution of a character rename operation from a Discord modal submission.

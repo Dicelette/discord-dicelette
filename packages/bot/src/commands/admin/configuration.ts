@@ -1,4 +1,4 @@
-import { LocalePrimary, cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, LocalePrimary, ln, t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";

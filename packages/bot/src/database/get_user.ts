@@ -64,7 +64,10 @@ export function getUserByEmbed(
  *
  * If no user data is found and {@link skipNotFound} is false, replies to the interaction with an error embed.
  *
- * @param skipNotFound - If true, suppresses error replies and returns early when no user data is found.
+ * @param {EClient} client
+ * @param {Djs.CommandInteraction} interaction
+ * @param {Translation} ul
+ * @param {boolean} skipNotFound - If true, suppresses error replies and returns early when no user data is found.
  * @returns An object containing the capitalized character name and user statistics, or `undefined` if not found and {@link skipNotFound} is true.
  */
 export async function getFirstChar(
@@ -144,8 +147,10 @@ export async function getUser(
  *
  * Searches in-memory cache first, then fetches the relevant message from the user's character thread if necessary. Validates access permissions for private characters and supports optional behaviors such as skipping errors or fetching additional data.
  *
- * @param userId - The Discord user ID whose character data is being retrieved.
- * @param charName - The character name to search for, if applicable.
+ * @param {EClient} client
+ * @param {string} userId - The Discord user ID whose character data is being retrieved.
+ * @param {Djs.BaseInteraction} interaction
+ * @param {string|null|undefined} charName - The character name to search for, if applicable.
  * @param options - Optional settings to control data integration, access checks, error handling, and additional data fetching.
  * @returns The user's character data, or `undefined` if not found and `skipNotFound` is enabled.
  *
@@ -218,6 +223,9 @@ export async function getUserFromMessage(
  *
  * Searches for a character by user or character name within the guild's stored user data. If a character name is provided without a user, searches all users for a matching character. If no character is found and strict mode is enabled, returns `undefined`. Replies with an error embed if guild data is missing.
  *
+ * @param interaction
+ * @param client
+ * @param t
  * @param strict - If true, uses strict substring matching for character names.
  * @returns A record of user IDs to their corresponding character data, or `undefined` if not found.
  */
@@ -308,6 +316,8 @@ export function verifyIfEmbedInDB(
  *
  * Throws an error if the embed, user ID, or a valid thread or text channel is not found.
  *
+ * @param interaction
+ * @param ul
  * @param first - If true, selects the first embed from the message.
  * @returns An object containing the user ID, character name (if set), and the interaction channel.
  *
@@ -431,6 +441,7 @@ export async function getStatistics(
  * @param userStatistique - The user's character data containing statistics.
  * @param standardizedStatistic - The primary name of the statistic to retrieve.
  * @param ul - Translation function for error messages.
+ * @param client
  * @param interaction - The Discord command interaction context.
  * @param optionChar - The character name, if specified.
  * @param statistic - The original statistic name requested.

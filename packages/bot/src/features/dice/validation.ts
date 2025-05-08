@@ -4,6 +4,7 @@ import type { Translation, UserMessageId, UserRegistration } from "@dicelette/ty
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
+import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -15,7 +16,6 @@ import {
 	sendLogs,
 } from "messages";
 import { editUserButtons, selectEditMenu } from "utils";
-import type { TextChannel } from "discord.js";
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.

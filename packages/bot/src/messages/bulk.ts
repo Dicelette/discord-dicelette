@@ -1,6 +1,5 @@
 import type { StatisticalTemplate } from "@dicelette/core";
-import type { PersonnageIds } from "@dicelette/types";
-import type { Translation } from "@dicelette/types";
+import type { PersonnageIds, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import { updateMemory } from "database";
 import * as Djs from "discord.js";
@@ -17,7 +16,10 @@ import { searchUserChannel } from "utils";
  *
  * For each character belonging to users in the guild, fetches the corresponding message and replaces its template embed with one reflecting the updated template fields. Also updates the in-memory character data to match the new embed.
  *
- * @param template - The updated statistical template to apply to all user character messages.
+ * @param {EClient} client
+ * @param {Djs.CommandInteraction} interaction
+ * @param {Translation} ul
+ * @param {StatisticalTemplate} template - The updated statistical template to apply to all user character messages.
  */
 export async function bulkEditTemplateUser(
 	client: EClient,

@@ -8,10 +8,10 @@ import type {
 import type { EClient } from "client";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
+import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
-import type { TextChannel } from "discord.js";
 
 /**
  * Handles a Discord modal submission to validate and process the transfer of a character between users within a guild.

@@ -1,4 +1,4 @@
-import { type ResultAsText, createUrl } from "@dicelette/parse_result";
+import { createUrl, type ResultAsText } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { findMessageBefore, threadToSend } from "messages";

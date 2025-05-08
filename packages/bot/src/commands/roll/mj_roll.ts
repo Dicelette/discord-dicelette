@@ -5,8 +5,7 @@ import type { EClient } from "client";
 import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { gmCommonOptions, serializeName } from "utils";
-import { rollDice, rollStatistique } from "utils";
+import { gmCommonOptions, rollDice, rollStatistique, serializeName } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 
 export const mjRoll = {

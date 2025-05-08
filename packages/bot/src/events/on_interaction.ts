@@ -7,9 +7,8 @@ import {
 	commandMenu,
 	commandsList,
 	desktopLink,
-	mobileLink,
+	mobileLink,resetButton
 } from "commands";
-import { resetButton } from "commands";
 import { fetchTemplate, getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import * as features from "features";

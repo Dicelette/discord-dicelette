@@ -1,8 +1,8 @@
 import process from "node:process";
+import { DiscordAPIError } from "@discordjs/rest";
 import type { EClient } from "client";
 import dedent from "dedent";
 import dotenv from "dotenv";
-import { DiscordAPIError } from "@discordjs/rest";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 

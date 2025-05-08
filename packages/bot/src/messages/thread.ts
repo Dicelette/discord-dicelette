@@ -1,7 +1,7 @@
 import type {
-	CharDataWithName,
 	CharacterData,
 	Characters,
+	CharDataWithName,
 	PersonnageIds,
 	Settings,
 	Translation,
@@ -167,10 +167,12 @@ export async function repostInThread(
  *
  * If the thread channel cannot be found, or if the user does not have permission to view a private sheet, an error embed is sent as a reply and only the sheet location is returned.
  *
- * @param userData - Character data containing message and channel IDs.
- * @param interaction - The Discord command interaction context.
- * @param charData - Character data keyed by user ID, used to check privacy settings.
- * @param user - Optional user to check access for; defaults to the interaction user.
+ * @param {CharacterData} userData - Character data containing message and channel IDs.
+ * @param {Djs.CommandInteraction} interaction - The Discord command interaction context.
+ * @param {EClient} client
+ * @param {Translation} ul
+ * @param {CharDataWithName} charData - Character data keyed by user ID, used to check privacy settings.
+ * @param {Djs.User|null} user - Optional user to check access for; defaults to the interaction user.
  * @returns An object containing the thread channel (if accessible) and the sheet location identifiers.
  */
 export async function findLocation(

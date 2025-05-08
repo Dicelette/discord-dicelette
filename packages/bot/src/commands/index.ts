@@ -15,7 +15,7 @@ export const commandsList = [
 	newScene,
 ];
 export const dbCmd = [...GIMMICK, ...ROLL_DB];
-export * from "./context_menus";
 export * from "./admin";
+export * from "./context_menus";
 export * from "./roll";
 export * from "./tools";
