@@ -6,7 +6,6 @@ import {
 	standardizeDice,
 } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
@@ -173,12 +172,11 @@ export function getExpression(
 ) {
 	let expressionStr = convertExpression(expression, stats, total);
 	const diceRegex = /\{exp( ?\|\| ?(?<default>\d+))?}/gi;
-	dice = dice.replace(diceRegex, (match, _p1, _p2, _offset, _string, groups) => {
+	dice = dice.replace(diceRegex, (_match, _p1, _p2, _offset, _string, groups) => {
 		const defaultValue = groups?.default ?? "1";
 		const value = expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
-		expressionStr = ""; // on vide après usage
+		expressionStr = "";
 		return value;
 	});
-	logger.trace("Dice", dice);
 	return { dice, expressionStr };
 }
