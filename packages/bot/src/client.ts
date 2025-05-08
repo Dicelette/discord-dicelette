@@ -1,9 +1,9 @@
 import path from "node:path";
+import type { StatisticalTemplate } from "@dicelette/core";
 import type { GuildData, UserDatabase } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
-import type { StatisticalTemplate } from "@dicelette/core";
 
 export class EClient extends Djs.Client {
 	/**
