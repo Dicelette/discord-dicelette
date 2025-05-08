@@ -34,8 +34,7 @@ export async function storeDamageDice(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	const template = await getTemplateWithInteraction(interaction, client);
-	if (!template) {
+	if (!(await getTemplateWithInteraction(interaction, client))) {
 		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
