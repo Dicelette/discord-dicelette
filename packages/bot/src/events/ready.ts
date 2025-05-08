@@ -127,7 +127,7 @@ function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
 	const lang = client.settings.get(guild.id, "lang") ?? Djs.Locale.EnglishUS;
 	const ul = ln(lang);
-	const template = await getTemplate(guild, client.settings, ul);
+	const template = await getTemplate(guild, client.settings, ul, true);
 	if (template) client.template.set(guild.id, template);
 }
 /**

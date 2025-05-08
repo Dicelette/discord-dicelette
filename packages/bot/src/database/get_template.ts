@@ -41,16 +41,23 @@ export async function getTemplateWithInteraction(
  * @param guild - The Discord guild to retrieve the template for.
  * @param enmap - The settings storage containing template configuration.
  * @param ul - Localization function for error messages.
+ * @param skipNoFound - Optional flag to skip the error if the template is not found. Only used when the bot initializes.
  * @returns The validated statistical template, or undefined if the channel is not a text channel.
  *
  * @throws {Error} If the guild data or template ID is missing in settings.
  * @throws {Error} If the template message is not found or cannot be retrieved.
  */
-export async function getTemplate(guild: Djs.Guild, enmap: Settings, ul: Translation) {
+export async function getTemplate(
+	guild: Djs.Guild,
+	enmap: Settings,
+	ul: Translation,
+	skipNoFound = false
+) {
 	const templateID = enmap.get(guild.id, "templateID");
-	if (!enmap.has(guild.id) || !templateID)
-		throw new Error(ul("error.guild.data", { server: guild.name }));
-
+	if (!enmap.has(guild.id) || !templateID) {
+		if (!skipNoFound) throw new Error(ul("error.guild.data", { server: guild.name }));
+		return undefined;
+	}
 	const { channelId, messageId } = templateID;
 	const channel = await guild.channels.fetch(channelId);
 	if (
