@@ -2,7 +2,7 @@ import { cmdLn, t } from "@dicelette/localization";
 import { uniformizeRecords } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateWithInteraction, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { dbdOptions, getLangAndConfig, rollDice, serializeName } from "utils";
@@ -143,7 +143,7 @@ export default {
 			} else if (!userStatistique || !userStatistique.damage) {
 				//allow global damage with constructing a new userStatistique with only the damageName and their value
 				//get the damageName from the global template
-				const template = await getTemplateWithInteraction(interaction, client);
+				const template = await getTemplateByInteraction(interaction, client);
 				if (!template) {
 					await reply(interaction, {
 						embeds: [embedError(ul("error.template.notFound"), ul)],

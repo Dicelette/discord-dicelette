@@ -2,7 +2,7 @@ import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
 import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getTemplateWithInteraction } from "database";
+import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
 import { embedError, reply } from "messages";
@@ -24,7 +24,7 @@ export async function pageNumber(
 ) {
 	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
-	const template = await getTemplateWithInteraction(interaction, client);
+	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) {
 		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
@@ -48,7 +48,7 @@ export async function recordFirstPage(
 ) {
 	if (!interaction.guild || !interaction.channel || interaction.channel.isDMBased())
 		return;
-	const template = await getTemplateWithInteraction(interaction, client);
+	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) return;
 	await createEmbedFirstPage(interaction, template, client.settings);
 }

@@ -7,9 +7,10 @@ import {
 	commandMenu,
 	commandsList,
 	desktopLink,
-	mobileLink,resetButton
+	mobileLink,
+	resetButton,
 } from "commands";
-import { fetchTemplate, getTemplateWithInteraction } from "database";
+import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import * as features from "features";
 import { embedError, reply } from "messages";
@@ -40,7 +41,7 @@ export default (client: EClient): void => {
 				let template = await fetchTemplate(interaction.message, client.settings);
 				template = template
 					? template
-					: await getTemplateWithInteraction(interaction, client);
+					: await getTemplateByInteraction(interaction, client);
 				if (!template) {
 					if (!interaction.channel || interaction.channel.isDMBased()) return;
 					await (interaction.channel as Djs.TextChannel).send({

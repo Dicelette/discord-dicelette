@@ -7,7 +7,7 @@ import type { EClient } from "client";
 import {
 	findChara,
 	getRecordChar,
-	getTemplateWithInteraction,
+	getTemplateByInteraction,
 	getUserByEmbed,
 } from "database";
 import * as Djs from "discord.js";
@@ -185,7 +185,7 @@ export const graph = {
 			});
 			return;
 		}
-		const serverTemplate = await getTemplateWithInteraction(interaction, client);
+		const serverTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildData.templateID.statsName || !serverTemplate?.statistics) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],

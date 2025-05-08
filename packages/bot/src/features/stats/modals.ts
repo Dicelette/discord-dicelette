@@ -8,7 +8,7 @@ import {
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
-import { getTemplateWithInteraction, getUserNameAndChar, updateMemory } from "database";
+import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
@@ -139,7 +139,7 @@ export async function editStats(
 	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
 	if (!statsEmbeds) return;
 	const values = interaction.fields.getTextInputValue("allStats");
-	const templateStats = await getTemplateWithInteraction(interaction, client);
+	const templateStats = await getTemplateByInteraction(interaction, client);
 	if (!templateStats || !templateStats.statistics) return;
 	const valuesAsStats = values.split("\n- ").map((stat) => {
 		const [name, value] = stat.split(/ ?: ?/);

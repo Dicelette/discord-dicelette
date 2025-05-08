@@ -18,7 +18,7 @@ import * as Djs from "discord.js";
  * @param {EClient} client
  * @returns The statistical template for the guild, or undefined if the interaction is not in a guild.
  */
-export async function getTemplateWithInteraction(
+export async function getTemplateByInteraction(
 	interaction:
 		| Djs.ButtonInteraction
 		| Djs.ModalSubmitInteraction

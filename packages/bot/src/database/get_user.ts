@@ -16,7 +16,7 @@ import type {
 } from "@dicelette/types";
 import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getCharaInMemory, getTemplateWithInteraction, updateMemory } from "database";
+import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import { getLangAndConfig, haveAccess, searchUserChannel, serializeName } from "utils";
@@ -392,7 +392,7 @@ export async function getStatistics(
 		return;
 	}
 	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
-	const template = await getTemplateWithInteraction(interaction, client);
+	const template = await getTemplateByInteraction(interaction, client);
 	const diceType = !userStatistique
 		? template?.diceType
 		: userStatistique.template.diceType;

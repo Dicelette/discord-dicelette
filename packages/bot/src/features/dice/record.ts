@@ -5,7 +5,7 @@ import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
 
 import type { EClient } from "client";
 import {
-	getTemplateWithInteraction,
+	getTemplateByInteraction,
 	getUserByEmbed,
 	getUserNameAndChar,
 	registerUser,
@@ -35,7 +35,7 @@ export async function storeDamageDice(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	if (!(await getTemplateWithInteraction(interaction, client))) {
+	if (!(await getTemplateByInteraction(interaction, client))) {
 		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
