@@ -1,5 +1,5 @@
 import { cmdLn, t } from "@dicelette/localization";
-import { uniformizeRecords } from "@dicelette/parse_result";
+import { filterStatsInDamage, uniformizeRecords } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
@@ -25,7 +25,7 @@ export default {
 		);
 		if (!user && !db.templateID.damageName) return;
 		let choices: string[] = [];
-		if (focused.name === t("rAtq.atq_name.name")) {
+		if (focused.name === t("common.name")) {
 			const char = options.getString(t("common.character"));
 
 			if (char && user) {
@@ -42,8 +42,15 @@ export default {
 				db.templateID.damageName &&
 				db.templateID.damageName.length > 0 &&
 				choices.length === 0
-			)
-				choices = choices.concat(db.templateID.damageName);
+			) {
+				const template = await getTemplateByInteraction(interaction, client);
+				if (!template) choices = choices.concat(db.templateID.damageName);
+				else if (template.damage) {
+					choices = choices.concat(
+						filterStatsInDamage(template.damage, db.templateID.damageName)
+					);
+				}
+			}
 		} else if (focused.name === t("common.character") && user) {
 			//if dice is set, get all characters that have this dice
 			const skill = options.getString(t("rAtq.atq_name.name"));

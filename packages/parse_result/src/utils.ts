@@ -202,3 +202,16 @@ export function getExpression(
 	if (isExp) expressionStr = "";
 	return { dice, expressionStr };
 }
+
+export function filterStatsInDamage(
+	damages: Record<string, string>,
+	statistics?: string[]
+) {
+	if (!statistics || !statistics.length) return Object.keys(damages);
+	const regex = new RegExp(
+		`(${statistics.map((stat) => stat.standardize()).join("|")})`,
+		"gi"
+	);
+	//remove all damage value that match the regex and return the key
+	return Object.keys(damages).filter((key) => !damages[key].standardize().match(regex));
+}

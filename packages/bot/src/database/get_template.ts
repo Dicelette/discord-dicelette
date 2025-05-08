@@ -22,6 +22,7 @@ export async function getTemplateByInteraction(
 	interaction:
 		| Djs.ButtonInteraction
 		| Djs.ModalSubmitInteraction
+		| Djs.AutocompleteInteraction
 		| Djs.CommandInteraction,
 	client: EClient
 ) {
