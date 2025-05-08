@@ -163,3 +163,18 @@ export function createUrl(
 	const { guildId, channelId, messageId } = context;
 	return `\n\n-# ↪ [${ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
 }
+
+export function getExpression(
+	dice: string,
+	expression: string,
+	stats?: Record<string, number>,
+	total?: string
+) {
+	let expressionStr = convertExpression(expression, stats, total);
+	if (dice.includes("{exp}")) {
+		if (expression === "0") dice = dice.replaceAll("{exp}", "1");
+		else dice = dice.replaceAll("{exp}", `${expressionStr.replace(/^\+/, "")}`);
+		expressionStr = "";
+	}
+	return { dice, expressionStr };
+}

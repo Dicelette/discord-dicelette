@@ -45,9 +45,9 @@ export function commonOptions(
 	if (opts.expression) {
 		builder.addStringOption((option) =>
 			option
-				.setName(t("dbRoll.options.modificator.name"))
+				.setName(t("common.expression"))
 				.setDescription(t("dbRoll.options.modificator.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.modificator.name"))
+				.setNameLocalizations(cmdLn("common.expression"))
 				.setDescriptionLocalizations(cmdLn("dbRoll.options.modificator.description"))
 				.setRequired(false)
 		);
@@ -64,9 +64,9 @@ export function commonOptions(
 	}
 	builder.addStringOption((option) =>
 		option
-			.setName(t("dbRoll.options.comments.name"))
+			.setName(t("common.comments"))
 			.setDescription(t("dbRoll.options.comments.description"))
-			.setNameLocalizations(cmdLn("dbRoll.options.comments.name"))
+			.setNameLocalizations(cmdLn("common.comments"))
 			.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
 			.setRequired(false)
 	);
