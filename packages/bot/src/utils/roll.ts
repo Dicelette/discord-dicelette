@@ -235,12 +235,8 @@ export async function rollStatistique(
 		}
 	}
 
-	const expr = getExpression(
-		dice,
-		expression,
-		userStatistique.stats,
-		userStat?.toString()
-	);
+	const userStatStr = userStat?.toString();
+	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
@@ -250,7 +246,7 @@ export async function rollStatistique(
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStat?.toString())} ${comments}`;
+	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
 	const customCritical = template.customCritical
 		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
