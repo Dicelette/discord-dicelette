@@ -127,10 +127,10 @@ export function calcOptions(
 		)
 		.addStringOption((option) =>
 			option
-				.setName(t("calc.formula.title"))
+				.setName(t("common.expression"))
 				.setDescription(t("calc.formula.desc"))
 				.setRequired(true)
-				.setNameLocalizations(cmdLn("calc.formula.title"))
+				.setNameLocalizations(cmdLn("common.expression"))
 				.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
 				.setRequired(true)
 		)

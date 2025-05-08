@@ -106,7 +106,7 @@ export async function calculate(
 	user: Djs.User = interaction.user
 ) {
 	let formula = options
-		.getString(t("calc.formula.title"), true)
+		.getString(t("common.expression"), true)
 		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
 	const sign = options.getString(t("calc.sign.title"), true);
 	if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
