@@ -175,7 +175,7 @@ export async function sendResult(
 		const ctx = { guildId: interaction.guild!.id, channelId: channel.id, messageId };
 		const res =
 			result.roll?.context(ctx).result ?? `${result.expression}${createUrl(ul, ctx)}`;
-		forwarded.edit(res);
-	} else forwarded.edit(output as string);
+		await forwarded.edit(res);
+	} else await forwarded.edit(output as string);
 	if (!disableThread) await deleteAfter(replyInteraction, timer);
 }

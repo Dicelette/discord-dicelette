@@ -218,7 +218,7 @@ export async function editStats(
 		);
 		const toAdd = removeEmbedsFromList(list, "stats");
 		const components = editUserButtons(ul, false, exists.damage);
-		message.edit({ embeds: toAdd, components: [components] });
+		await message.edit({ embeds: toAdd, components: [components] });
 		await reply(interaction, {
 			content: ul("modals.removed.stats"),
 			flags: Djs.MessageFlags.Ephemeral,
@@ -235,7 +235,7 @@ export async function editStats(
 	}
 	//get the other embeds
 	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
-	message.edit({ embeds: list });
+	await message.edit({ embeds: list });
 	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
 	});

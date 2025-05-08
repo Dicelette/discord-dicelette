@@ -208,7 +208,7 @@ async function generateButton(
 	embedsList: Djs.EmbedBuilder[]
 ) {
 	const { buttons, select } = getButton(message, ul);
-	message.edit({ embeds: embedsList, components: [buttons, select] });
+	await message.edit({ embeds: embedsList, components: [buttons, select] });
 }
 
 export async function rename(
@@ -368,5 +368,5 @@ export async function move(
 
 export async function resetButton(message: Djs.Message, ul: Translation) {
 	const { buttons, select } = getButton(message, ul);
-	return message.edit({ components: [buttons, select] });
+	return await message.edit({ components: [buttons, select] });
 }

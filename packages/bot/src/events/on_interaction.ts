@@ -177,7 +177,7 @@ async function buttonSubmit(
 		const message = await interaction.message.fetch();
 		if (isMobile) await mobileLink(interaction, ul);
 		else await desktopLink(interaction, ul);
-		message.edit({ components: [] });
+		await message.edit({ components: [] });
 	}
 }
 

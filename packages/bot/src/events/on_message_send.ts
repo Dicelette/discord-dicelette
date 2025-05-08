@@ -55,7 +55,7 @@ export default (client: EClient): void => {
 			const thread = await threadToSend(client.settings, channel, ul);
 			const msgToEdit = await thread.send("_ _");
 			const msg = resultAsText.onMessageSend(context, message.author.id);
-			msgToEdit.edit(msg);
+			await msgToEdit.edit(msg);
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
 				? msgToEdit.url
 				: undefined;

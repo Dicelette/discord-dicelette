@@ -68,7 +68,7 @@ export async function bulkEditTemplateUser(
 					{ which: "template", embed: newEmbed },
 					userMessages
 				);
-				userMessages.edit({ embeds: listEmbed.list });
+				await userMessages.edit({ embeds: listEmbed.list });
 				await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 					embeds: listEmbed.list,
 				});
@@ -124,9 +124,7 @@ export async function bulkDeleteCharacters(
 				content: ul("register.delete.done"),
 				embeds: [],
 			});
-		} else {
-			rep.edit({ components: [] });
-		}
+		} else await rep.edit({ components: [] });
 	} catch (err) {
 		console.error("\n", err);
 	}

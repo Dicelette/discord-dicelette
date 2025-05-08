@@ -1,15 +1,15 @@
 import {
-	type Resultat,
 	generateStatsDice,
 	isNumber,
+	type Resultat,
 	roll,
 	standardizeDice,
 } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
-import { logger } from "@dicelette/utils";
 
 export function timestamp(time?: boolean) {
 	if (time) return ` • <t:${moment().unix()}:d>-<t:${moment().unix()}:t>`;

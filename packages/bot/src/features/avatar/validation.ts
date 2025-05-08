@@ -22,7 +22,7 @@ export async function validateAvatarEdit(
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	embed.setThumbnail(avatar);
 	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
-	message.edit({ embeds: embedsList.list });
+	await message.edit({ embeds: embedsList.list });
 	const user = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")?.value;

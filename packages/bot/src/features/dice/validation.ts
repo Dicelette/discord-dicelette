@@ -167,7 +167,7 @@ export async function validateDiceEdit(
 	};
 	await registerUser(userRegister, interaction, db, false);
 	const embedsList = getEmbedsList(ul, { which: "damage", embed: diceEmbed }, message);
-	message.edit({ embeds: embedsList.list });
+	await message.edit({ embeds: embedsList.list });
 	await reply(interaction, {
 		content: ul("embed.edit.dice"),
 		flags: Djs.MessageFlags.Ephemeral,
