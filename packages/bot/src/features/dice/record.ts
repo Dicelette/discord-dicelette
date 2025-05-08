@@ -1,8 +1,7 @@
-import { findln } from "@dicelette/localization";
-import type { UserMessageId } from "@dicelette/types";
-import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed, capitalizeBetweenPunct } from "@dicelette/utils";
 import { evalStatsDice } from "@dicelette/core";
+import { findln } from "@dicelette/localization";
+import type { Settings, Translation, UserMessageId } from "@dicelette/types";
+import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
 
 import type { EClient } from "client";
 import {
