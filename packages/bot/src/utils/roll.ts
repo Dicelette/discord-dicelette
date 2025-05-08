@@ -5,7 +5,6 @@ import {
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
-	convertExpression,
 	convertNameToValue,
 	getRoll,
 	ResultAsText,
@@ -14,6 +13,7 @@ import {
 	type Server,
 	skillCustomCritical,
 	trimAll,
+	getExpression,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
@@ -76,16 +76,16 @@ export async function rollDice(
 	user?: Djs.User,
 	hideResult?: boolean | null
 ) {
-	let atq = options.getString(t("rAtq.atq_name.name"), true);
+	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
 		name: atq,
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
-	const expression = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	const expression = options.getString(t("common.expression")) ?? "0";
 	logger.trace("ATQ USED", atq);
-	const comm = options.getString(t("dbRoll.options.comments.name"))
-		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
+	const comm = options.getString(t("common.comments"))
+		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
 	//search dice
@@ -120,16 +120,9 @@ export async function rollDice(
 		return;
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
-	let expressionStr = convertExpression(
-		expression,
-		userStatistique.stats,
-		dollarValue?.total
-	);
-	if (dice.includes("{exp}")) {
-		if (expression === "0") dice = dice.replaceAll("{exp}", "1");
-		else dice = dice.replaceAll("{exp}", `${expressionStr.replace(/^\+/, "")}`);
-		expressionStr = "";
-	}
+	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
+	dice = expr.dice;
+	const expressionStr = expr.expressionStr;
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
@@ -203,13 +196,13 @@ export async function rollStatistique(
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
-	const comm = options.getString(t("dbRoll.options.comments.name"))
-		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
+	const comm = options.getString(t("common.comments"))
+		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
 	let userStat: undefined | number = undefined;
-	const modification = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	const expression = options.getString(t("common.expression")) ?? "0";
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
 		const res = getRightValue(
 			userStatistique,
@@ -245,11 +238,14 @@ export async function rollStatistique(
 		}
 	}
 
-	const modificationString = convertExpression(
-		modification,
+	const expr = getExpression(
+		dice,
+		expression,
 		userStatistique.stats,
 		userStat?.toString()
 	);
+	dice = expr.dice;
+	const expressionStr = expr.expressionStr;
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -257,7 +253,7 @@ export async function rollStatistique(
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${trimAll(replaceFormulaInDice(dice))}${modificationString}${generateStatsDice(comparator, userStatistique.stats, userStat?.toString())} ${comments}`;
+	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStat?.toString())} ${comments}`;
 	const customCritical = template.customCritical
 		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
