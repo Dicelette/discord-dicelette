@@ -112,7 +112,12 @@ export class ResultAsText {
 		const messageResult = this.resultat.result.split(";");
 		let successOrFailure = "";
 		let isCritical: undefined | "failure" | "success" | "custom" = undefined;
-		if (this.resultat.compare || customCritical) {
+		/**
+		 * @warning Do not forget that the compare value is needed **EVEN while using** custom critical.
+		 *
+		 * So a dice with CustomCritical can be set like `1d100>=1` (always true) to enter in the condition & CC loop.
+		 */
+		if (this.resultat.compare) {
 			msgSuccess = "";
 			let total = 0;
 			const natural: number[] = [];
@@ -122,22 +127,15 @@ export class ResultAsText {
 					continue;
 				}
 				const tot = r.match(/ = (\d+)/);
-				let testValue: ComparedValue | undefined = undefined;
-				let goodSign = "";
 				if (tot) {
 					total = Number.parseInt(tot[1], 10);
 				}
-				if (this.resultat.compare) {
-					successOrFailure = evaluate(
-						`${total} ${this.resultat.compare.sign} ${this.resultat.compare.value}`
-					)
-						? `**${this.ul("roll.success")}**`
-						: `**${this.ul("roll.failure")}**`;
-					testValue = this.resultat.compare;
-					goodSign = this.goodCompareSign(testValue, total);
-				}
+				successOrFailure = evaluate(
+					`${total} ${this.resultat.compare.sign} ${this.resultat.compare.value}`
+				)
+					? `**${this.ul("roll.success")}**`
+					: `**${this.ul("roll.failure")}**`;
 				// noinspection RegExpRedundantEscape
-
 				const naturalDice = r.matchAll(/\[(\d+)\]/gi);
 				for (const dice of naturalDice) {
 					natural.push(Number.parseInt(dice[1], 10));
@@ -151,7 +149,8 @@ export class ResultAsText {
 						isCritical = "success";
 					}
 				}
-
+				let testValue = this.resultat.compare;
+				let goodSign = this.goodCompareSign(testValue, total);
 				if (customCritical) {
 					for (const [name, custom] of Object.entries(customCritical)) {
 						const valueToCompare = custom.onNaturalDice ? natural : total;
