@@ -8,11 +8,16 @@ import type {
 import type { EClient } from "client";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
+import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
-import type { TextChannel } from "discord.js";
 
+/**
+ * Handles a Discord modal submission to validate and process the transfer of a character between users within a guild.
+ *
+ * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
+ */
 export async function validateMove(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
@@ -26,12 +31,12 @@ export async function validateMove(
 	const userId = interaction.fields.getTextInputValue("user");
 	if (!userId) return;
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const user = await isUserNameOrId(userId, interaction);
 
 	if (!user) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);
@@ -43,7 +48,7 @@ export async function validateMove(
 		.replace(">", "");
 	if (!oldUserId) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);
@@ -51,7 +56,7 @@ export async function validateMove(
 	const oldUser = await isUserNameOrId(oldUserId, interaction);
 	if (!oldUser) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);
@@ -64,7 +69,7 @@ export async function validateMove(
 	const charData = getUserByEmbed({ message: message }, ul);
 	if (!charData) {
 		await interaction.reply({
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return await resetButton(message, ul);

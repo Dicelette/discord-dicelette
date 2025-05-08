@@ -87,7 +87,11 @@ export async function triggerEditStats(
 }
 
 /**
- * Show the stats editor
+ * Displays a modal allowing the user to edit their statistics.
+ *
+ * Retrieves the user's current statistics from the interaction message, formats them for editing, and includes any missing registered statistics with a default value of 0. Presents all statistics in a multiline text input within a modal dialog.
+ *
+ * @throws {Error} If no statistics embed is found in the interaction message.
  */
 export async function showEditorStats(
 	interaction: Djs.ButtonInteraction,
@@ -95,7 +99,7 @@ export async function showEditorStats(
 	db: Settings
 ) {
 	const statistics = getEmbeds(ul, interaction.message, "stats");
-	if (!statistics) throw new Error(ul("error.statNotFound"));
+	if (!statistics) throw new Error(ul("error.stats.notFound_plural"));
 	const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed);
 	const originalGuildData = db.get(interaction.guild!.id, "templateID.statsName");
 	const registeredStats = originalGuildData?.map((stat) => stat.unidecode());

@@ -1,54 +1,68 @@
-import { type StatisticalTemplate, isNumber } from "@dicelette/core";
+import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
-import { NoChannel, cleanAvatarUrl, logger, verifyAvatarUrl } from "@dicelette/utils";
-import { getTemplateWithDB } from "database";
+import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import type { EClient } from "client";
+import { getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
 import { embedError, reply } from "messages";
 import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
 
 /**
- * Register the statistic in the embed when registering a new user and validate the modal
- * Also verify if the template is registered before embedding the statistics
+ * Handles a modal submission to register user statistics for a specific page, validating the page number and template existence.
+ *
+ * If the template is not found, replies with an error embed.
+ *
+ * @param interaction - The modal interaction containing the page number in its custom ID.
+ * @param ul - The translation utility for localized messages.
+ * @param client - The Discord client instance.
  */
 export async function pageNumber(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	db: Settings
+	client: EClient
 ) {
 	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
-	const template = await getTemplateWithDB(interaction, db);
+	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) {
-		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
 	await registerStatistics(
 		interaction,
 		template,
 		Number.parseInt(pageNumber, 10),
-		db.get(interaction.guild!.id, "lang") ?? interaction.locale
+		client.settings.get(interaction.guild!.id, "lang") ?? interaction.locale
 	);
 }
 
 /**
- * Submit the first page when the modal is validated
+ * Handles the submission of the first page of a statistics registration modal in a Discord guild.
+ *
+ * If the interaction is valid and a corresponding template is found, generates and displays the initial embed for user statistics registration.
  */
 export async function recordFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
-	db: Settings
+	client: EClient
 ) {
 	if (!interaction.guild || !interaction.channel || interaction.channel.isDMBased())
 		return;
-	const template = await getTemplateWithDB(interaction, db);
+	const template = await getTemplateWithInteraction(interaction, client);
 	if (!template) return;
-	await createEmbedFirstPage(interaction, template, db);
+	await createEmbedFirstPage(interaction, template, client.settings);
 }
 
 /**
- * Create the embed after registering the user
- * If the template has statistics, show the continue button
- * Else show the dice button
+ * Creates and sends an embed summarizing user registration details from a modal interaction.
+ *
+ * If the provided template includes statistics, displays a continue/cancel button; otherwise, displays dice-related buttons. Handles user and channel resolution, avatar verification, and privacy settings. Sends error embeds if the user or channel cannot be found.
+ *
+ * @param interaction - The modal interaction containing user input fields.
+ * @param template - The statistical template used to determine embed content and button type.
+ * @param setting - The settings object for retrieving guild-specific configuration.
+ *
+ * @throws {NoChannel} If the interaction channel is missing.
  */
 export async function createEmbedFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
@@ -64,7 +78,7 @@ export async function createEmbedFirstPage(
 	const user = await isUserNameOrId(userFromField, interaction);
 	if (!user) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
@@ -86,7 +100,7 @@ export async function createEmbedFirstPage(
 		: undefined;
 	if (!existChannel) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.noThread"), ul)],
+			embeds: [embedError(ul("error.channel.thread"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

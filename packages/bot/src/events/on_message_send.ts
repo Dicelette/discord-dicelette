@@ -1,5 +1,5 @@
 import { lError, ln } from "@dicelette/localization";
-import { ResultAsText, isRolling } from "@dicelette/parse_result";
+import { isRolling, ResultAsText } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, threadToSend } from "messages";

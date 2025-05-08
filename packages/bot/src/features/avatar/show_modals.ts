@@ -14,12 +14,20 @@ export async function initiateAvatarEdit(
 		await showAvatarEdit(interaction, ul);
 }
 
+/**
+ * Displays a modal for editing a user's avatar, pre-filling the input with the current avatar URL.
+ *
+ * @param interaction - The select menu interaction triggering the avatar edit.
+ * @param ul - The translation function or object for localized strings.
+ *
+ * @throws {Error} If the user embed is not found in the interaction message.
+ */
 export async function showAvatarEdit(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation
 ) {
 	const embed = getEmbeds(ul, interaction.message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const jsonEmbed = embed.toJSON().thumbnail?.url;
 	const thumbnail = jsonEmbed
 		? cleanAvatarUrl(jsonEmbed)

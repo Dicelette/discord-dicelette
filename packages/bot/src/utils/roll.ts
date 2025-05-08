@@ -5,13 +5,13 @@ import {
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
-	ResultAsText,
-	type Server,
-	convertExpression,
 	convertNameToValue,
+	getExpression,
 	getRoll,
+	ResultAsText,
 	replaceStatInDice,
 	rollCustomCritical,
+	type Server,
 	skillCustomCritical,
 	trimAll,
 } from "@dicelette/parse_result";
@@ -66,6 +66,20 @@ export async function rollWithInteraction(
 	return await sendResult(interaction, { roll: defaultMsg }, db, ul, user, hideResult);
 }
 
+/**
+ * Processes a dice roll command based on a user's attack or ability, constructs the appropriate dice formula using user statistics and command options, and sends the roll result to the user.
+ *
+ * If the specified attack or damage is not found in the user's data, replies with an ephemeral error message.
+ *
+ * @param {Djs.CommandInteraction} interaction
+ * @param {EClient} client
+ * @param {UserData} userStatistique
+ * @param {Djs.CommandInteractionOptionResolver} options - Command options containing the attack name, expression, and optional comments.
+ * @param {Translation} ul
+ * @param {string|undefined} charOptions - Optional character name or identifier to select the relevant character data.
+ * @param {Djs.User|undefined} user
+ * @param {boolean|null|undefined} hideResult - If true, the roll result is hidden from other users.
+ */
 export async function rollDice(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
@@ -76,18 +90,17 @@ export async function rollDice(
 	user?: Djs.User,
 	hideResult?: boolean | null
 ) {
-	let atq = options.getString(t("rAtq.atq_name.name"), true);
+	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
 		name: atq,
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
-	const comm = options.getString(t("dbRoll.options.comments.name"))
-		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
+	const expression = options.getString(t("common.expression")) ?? "0";
+	const comm = options.getString(t("common.comments"))
+		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
-	//search dice
-
 	let dice = userStatistique.damage?.[atq];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!dice) {
@@ -106,7 +119,7 @@ export async function rollDice(
 		await reply(interaction, {
 			embeds: [
 				embedError(
-					ul("error.noDamage", {
+					ul("error.damage.notFound", {
 						atq: infoRoll.name.capitalize(),
 						charName: charOptions ?? "",
 					}),
@@ -118,8 +131,10 @@ export async function rollDice(
 		return;
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
+	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
+	dice = expr.dice;
+	const expressionStr = expr.expressionStr;
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
-	const expression = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -138,17 +153,9 @@ export async function rollDice(
 		else infoRoll.name = replaceStatInDice(infoRoll.name, userStatistique.stats, "");
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
+
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
-	let expressionStr = convertExpression(
-		expression,
-		userStatistique.stats,
-		dollarValue?.total
-	);
-	if (dice.includes("{exp}")) {
-		if (expression === "0") dice = dice.replace("{exp}", "1");
-		else dice = dice.replace("{exp}", `${expressionStr.replace(/^\+/, "")}`);
-		expressionStr = "";
-	}
+
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
@@ -167,6 +174,20 @@ export async function rollDice(
 	);
 }
 
+/**
+ * Processes a statistic-based dice roll command, applying user stats, overrides, and custom criticals, and sends the result to the user.
+ *
+ * If the selected statistic is excluded or required information is missing, replies with an ephemeral error message.
+ *
+ * @param {Djs.CommandInteraction} interaction
+ * @param {EClient} client
+ * @param {UserData} userStatistique
+ * @param {Djs.CommandInteractionOptionResolver} options
+ * @param {Translation} ul
+ * @param {string|undefined} optionChar - Optional character name to associate with the roll.
+ * @param {Djs.User|undefined} user - Optional user to attribute the roll to.
+ * @param {boolean|null|undefined} hideResult - If true, hides the roll result from other users.
+ */
 export async function rollStatistique(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
@@ -177,42 +198,53 @@ export async function rollStatistique(
 	user?: Djs.User,
 	hideResult?: boolean | null
 ) {
-	let statistic = options.getString(t("common.statistic"), true);
-	let standardizedStatistic = statistic.standardize(true);
+	let statistic = options.getString(t("common.statistic"), false);
+	const template = userStatistique.template;
+	let dice = template.diceType;
+	let standardizedStatistic = statistic?.standardize(true);
 	//return if the standardizedStatistic is excluded from the list
 	const excludedStats = client.settings
 		.get(interaction.guild!.id, "templateID.excludedStats")
 		?.map((stat) => stat.standardize());
-	if (excludedStats?.includes(standardizedStatistic)) {
+	if (standardizedStatistic && excludedStats?.includes(standardizedStatistic)) {
 		await reply(interaction, {
-			content: ul("error.excludedStat"),
+			content: ul("error.stats.excluded"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	if (template.diceType?.includes("$") && !statistic) {
+		await reply(interaction, {
+			content: ul("error.stats.shouldSelect"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
-	const comm = options.getString(t("dbRoll.options.comments.name"))
-		? `# ${options.getString(t("dbRoll.options.comments.name"))}`
+	const comm = options.getString(t("common.comments"))
+		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
-	const modification = options.getString(t("dbRoll.options.modificator.name")) ?? "0";
+	let userStat: undefined | number = undefined;
+	const expression = options.getString(t("common.expression")) ?? "0";
+	if (statistic && standardizedStatistic && dice?.includes("$")) {
+		const res = getRightValue(
+			userStatistique,
+			standardizedStatistic,
+			ul,
+			client,
+			interaction,
+			optionChar,
+			statistic
+		);
+		if (!res) return;
+		statistic = res.statistic;
+		standardizedStatistic = res.standardizedStatistic;
+		userStat = res.userStat;
 
-	const res = getRightValue(
-		userStatistique,
-		standardizedStatistic,
-		ul,
-		client,
-		interaction,
-		optionChar,
-		statistic
-	);
-	if (!res) return;
-	statistic = res.statistic;
-	standardizedStatistic = res.standardizedStatistic;
-	const userStat = res.userStat;
-	const template = userStatistique.template;
-	let dice = template.diceType?.replaceAll("$", userStat.toString());
+		dice = dice.replaceAll("$", userStat.toString());
+	}
 	if (!dice) {
 		await reply(interaction, {
 			content: ul("error.noDice"),
@@ -231,11 +263,10 @@ export async function rollStatistique(
 		}
 	}
 
-	const modificationString = convertExpression(
-		modification,
-		userStatistique.stats,
-		userStat.toString()
-	);
+	const userStatStr = userStat?.toString();
+	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
+	dice = expr.dice;
+	const expressionStr = expr.expressionStr;
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -243,10 +274,14 @@ export async function rollStatistique(
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${trimAll(replaceFormulaInDice(dice))}${modificationString}${generateStatsDice(comparator, userStatistique.stats, userStat.toString())} ${comments}`;
+	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
 	const customCritical = template.customCritical
 		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
 		: undefined;
+	const infoRoll =
+		statistic && standardizedStatistic
+			? { name: statistic, standardized: standardizedStatistic }
+			: undefined;
 	await rollWithInteraction(
 		interaction,
 		roll,
@@ -254,7 +289,7 @@ export async function rollStatistique(
 		template.critical,
 		user,
 		optionChar,
-		{ name: statistic, standardized: standardizedStatistic },
+		infoRoll,
 		hideResult,
 		customCritical
 	);

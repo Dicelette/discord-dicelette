@@ -1,7 +1,7 @@
-import { type StatisticalTemplate, isNumber } from "@dicelette/core";
+import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Settings, Translation, UserData } from "@dicelette/types";
-import { NoEmbed, cleanAvatarUrl, logger } from "@dicelette/utils";
+import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { showStatistiqueModal } from "features";
 import {
@@ -83,8 +83,11 @@ export async function validateUserButton(
 }
 
 /**
- * Validate the user and create the embeds
- * It will register the final embeds and send it in the thread
+ * Validates a user's registration and compiles their statistics, then posts the finalized embeds and user data to the appropriate Discord thread or channel.
+ *
+ * Retrieves and parses user, stats, and damage embeds from the interaction message, normalizes and merges data with the provided template, and constructs new embeds for user information, statistics, dice, and template details. Handles missing or invalid user/channel data with error responses. Assigns roles as needed and confirms completion to the user.
+ *
+ * @throws {NoEmbed} If the required user embed is missing from the interaction message.
  */
 export async function validateUser(
 	interaction: Djs.ButtonInteraction,
@@ -106,7 +109,9 @@ export async function validateUser(
 		);
 		if (!channel) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.channel", { channel: channelToPost }), ul)],
+				embeds: [
+					embedError(ul("error.channel.notFound", { channel: channelToPost }), ul),
+				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -115,7 +120,7 @@ export async function validateUser(
 	if (charName && charName === "common.noSet") charName = undefined;
 	if (!userID) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.user"), ul)],
+			embeds: [embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

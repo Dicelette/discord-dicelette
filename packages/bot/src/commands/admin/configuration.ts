@@ -1,4 +1,4 @@
-import { LocalePrimary, cmdLn, ln, t } from "@dicelette/localization";
+import { cmdLn, LocalePrimary, ln, t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -651,12 +651,16 @@ async function timestamp(
 	}
 }
 
+/**
+ * Enables or disables the display of context links in dice roll results for the guild.
+ *
+ * Updates the guild's settings to show or hide context links and replies with a localized confirmation message based on the new setting and the current message deletion timer.
+ */
 async function setContextLink(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	ul: Translation
 ) {
-
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	client.settings.set(interaction.guild!.id, toggle, "context");

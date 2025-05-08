@@ -17,7 +17,7 @@ import {
 	onReactionRemove,
 	ready,
 } from "event";
-import packageJson from "./package.json" assert { type: "json" };
+import packageJson from "./package.json" with { type: "json" };
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 important.info("Starting bot...");

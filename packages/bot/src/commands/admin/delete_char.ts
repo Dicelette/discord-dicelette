@@ -3,9 +3,9 @@ import type {
 	DiscordChannel,
 	GuildData,
 	PersonnageIds,
+	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import type { Translation } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { deleteUser, deleteUserInChar, getRecordChar } from "database";
@@ -138,7 +138,7 @@ export const deleteChar = {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}

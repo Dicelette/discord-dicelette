@@ -4,26 +4,52 @@ import {
 	verifyTemplateValue,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Settings } from "@dicelette/types";
-import * as Djs from "discord.js";
+import type { Settings, Translation } from "@dicelette/types";
+import type { EClient } from "client";
 import type { Message } from "discord.js";
+import * as Djs from "discord.js";
 
 /**
- * Get the statistical Template using the database templateID information
+ * Retrieves the statistical template for a guild based on the interaction context.
+ *
+ * If a cached template exists for the guild, it is returned; otherwise, the template is fetched using the guild's settings and localization.
+ *
+ * @param {Djs.ButtonInteraction|Djs.ModalSubmitInteraction| Djs.CommandInteraction} interaction - The Discord interaction within a guild context.
+ * @param {EClient} client
+ * @returns The statistical template for the guild, or undefined if the interaction is not in a guild.
  */
-export async function getTemplateWithDB(
+export async function getTemplateWithInteraction(
 	interaction:
 		| Djs.ButtonInteraction
 		| Djs.ModalSubmitInteraction
 		| Djs.CommandInteraction,
-	enmap: Settings
+	client: EClient
 ) {
 	if (!interaction.guild) return;
 	const guild = interaction.guild;
-	const templateID = enmap.get(interaction.guild.id, "templateID");
 	const ul = ln(interaction.locale);
-	if (!enmap.has(interaction.guild.id) || !templateID)
-		throw new Error(ul("error.noGuildData", { server: interaction.guild.name }));
+	const hasCache = client.template.get(guild.id);
+	if (!hasCache) return await getTemplate(guild, client.settings, ul);
+	return hasCache;
+}
+
+/**
+ * Retrieves and validates a statistical template for a guild from stored settings.
+ *
+ * Attempts to fetch the template message from the configured channel and message ID in the guild's settings. Returns the parsed template if found and valid, or throws a localized error if the template or required data is missing.
+ *
+ * @param guild - The Discord guild to retrieve the template for.
+ * @param enmap - The settings storage containing template configuration.
+ * @param ul - Localization function for error messages.
+ * @returns The validated statistical template, or undefined if the channel is not a text channel.
+ *
+ * @throws {Error} If the guild data or template ID is missing in settings.
+ * @throws {Error} If the template message is not found or cannot be retrieved.
+ */
+export async function getTemplate(guild: Djs.Guild, enmap: Settings, ul: Translation) {
+	const templateID = enmap.get(guild.id, "templateID");
+	if (!enmap.has(guild.id) || !templateID)
+		throw new Error(ul("error.guild.data", { server: guild.name }));
 
 	const { channelId, messageId } = templateID;
 	const channel = await guild.channels.fetch(channelId);
@@ -36,18 +62,24 @@ export async function getTemplateWithDB(
 		return;
 	try {
 		const message = await channel.messages.fetch(messageId);
-		return getTemplate(message, enmap);
+		return fetchTemplate(message, enmap);
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
-			throw new Error(ul("error.noTemplateId", { channelId, messageId }));
-		throw new Error(ul("error.noTemplate"));
+			throw new Error(ul("error.template.id", { channelId, messageId }));
+		throw new Error(ul("error.template.notFound"));
 	}
 }
 
 /**
- * Get the guild template when clicking on the "registering user" button or when submitting
+ * Retrieves and validates a statistical template from a message attachment.
+ *
+ * Downloads the first attachment from the given message, parses its JSON content, and validates it as a statistical template. If the template validity flag is not set in the settings for the guild, the flag is set and the template is verified before returning.
+ *
+ * @param message - The Discord message containing the template attachment.
+ * @param enmap - The settings storage used to track template validity.
+ * @returns The parsed and validated statistical template, or undefined if no attachment is found.
  */
-export async function getTemplate(
+export async function fetchTemplate(
 	message: Message,
 	enmap: Settings
 ): Promise<StatisticalTemplate | undefined> {

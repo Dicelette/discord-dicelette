@@ -5,8 +5,7 @@ import type { EClient } from "client";
 import { getFirstChar, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { gmCommonOptions, serializeName } from "utils";
-import { rollDice, rollStatistique } from "utils";
+import { gmCommonOptions, rollDice, rollStatistique, serializeName } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 
 export const mjRoll = {
@@ -138,7 +137,7 @@ export const mjRoll = {
 		if (charName && !serializedNameQueries) {
 			await reply(interaction, {
 				embeds: [
-					embedError(ul("error.charName", { charName: charName.capitalize() }), ul),
+					embedError(ul("error.user.charName", { charName: charName.capitalize() }), ul),
 				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -154,7 +153,7 @@ export const mjRoll = {
 			let userName = `<@${user.id}>`;
 			if (charName) userName += ` (${charName})`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}

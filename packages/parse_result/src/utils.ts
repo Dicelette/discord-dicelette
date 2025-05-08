@@ -1,7 +1,7 @@
 import {
-	type Resultat,
 	generateStatsDice,
 	isNumber,
+	type Resultat,
 	roll,
 	standardizeDice,
 } from "@dicelette/core";
@@ -153,6 +153,16 @@ export function trimAll(dice: string) {
 	return result.join(";");
 }
 
+/**
+ * Generates a formatted URL string linking to a Discord message or a provided log URL.
+ *
+ * If a {@link logUrl} is given, returns it as a formatted string. Otherwise, if {@link context} is provided, returns a markdown link to the Discord message using the supplied IDs. Returns an empty string if neither is provided.
+ *
+ * @param ul - Translation function for localizing the link text.
+ * @param context - Optional Discord message context containing guild, channel, and message IDs.
+ * @param logUrl - Optional direct log URL to use instead of constructing a Discord link.
+ * @returns A formatted string containing the appropriate URL or an empty string.
+ */
 export function createUrl(
 	ul: Translation,
 	context?: { guildId: string; channelId: string; messageId: string },
@@ -162,4 +172,33 @@ export function createUrl(
 	if (!context) return "";
 	const { guildId, channelId, messageId } = context;
 	return `\n\n-# ↪ [${ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
+}
+
+/**
+ * Replaces `{exp}` or `{exp || default}` placeholders in a dice string with an evaluated expression or a default value.
+ *
+ * If the provided {@link expression} evaluates to `"0"`, placeholders are replaced with the specified default value (or `"1"` if not provided). Otherwise, placeholders are replaced with the evaluated expression string (without a leading plus sign). If any replacement occurs, the returned `expressionStr` is set to an empty string.
+ *
+ * @param dice - The dice string containing `{exp}` or `{exp || default}` placeholders.
+ * @param expression - The expression to evaluate and insert into the dice string.
+ * @param stats - Optional statistics used for evaluating the expression.
+ * @param total - Optional value used in expression evaluation.
+ * @returns An object with the updated dice string and the evaluated expression string.
+ */
+export function getExpression(
+	dice: string,
+	expression: string,
+	stats?: Record<string, number>,
+	total?: string
+) {
+	let expressionStr = convertExpression(expression, stats, total);
+	const diceRegex = /\{exp( ?\|\| ?(?<default>\d+))?}/gi;
+	let isExp = false;
+	dice = dice.replace(diceRegex, (_match, _p1, _p2, _offset, _string, groups) => {
+		const defaultValue = groups?.default ?? "1";
+		isExp = true;
+		return expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
+	});
+	if (isExp) expressionStr = "";
+	return { dice, expressionStr };
 }

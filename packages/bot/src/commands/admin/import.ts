@@ -1,6 +1,6 @@
 import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
-import { getTemplateWithDB } from "database";
+import { getTemplateWithInteraction } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -41,9 +41,9 @@ export const bulkAdd = {
 			return reply(interaction, { content: ul("import.errors.invalid_file", { ext }) });
 		}
 		/** download the file using paparse */
-		const guildTemplate = await getTemplateWithDB(interaction, client.settings);
+		const guildTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, { content: ul("error.noTemplate") });
+			return reply(interaction, { content: ul("error.template.notFound") });
 		}
 		const { members, errors } = await parseCSV(
 			csvFile.url,
@@ -55,7 +55,7 @@ export const bulkAdd = {
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
 		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 		if (!defaultChannel) {
-			return reply(interaction, { content: ul("error.noDefaultChannel") });
+			return reply(interaction, { content: ul("error.channel.defaultChannel") });
 		}
 		const guildMembers = await interaction.guild?.members.fetch();
 		for (const [user, data] of Object.entries(members)) {
@@ -180,9 +180,9 @@ export const bulkAddTemplate = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
 		const { ul } = getLangAndConfig(client.settings, interaction);
-		const guildTemplate = await getTemplateWithDB(interaction, client.settings);
+		const guildTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, { content: ul("error.noTemplate") });
+			return reply(interaction, { content: ul("error.template.notFound") });
 		}
 		const header = ["user", "charName", "avatar", "channel"];
 		if (guildTemplate.statistics) {

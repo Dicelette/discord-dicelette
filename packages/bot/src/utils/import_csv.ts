@@ -18,12 +18,14 @@ export type CSVRow = {
 };
 
 /**
- * Export a function to parse a CSV file and return the data, using PapaParse
- * @param url {string} The URL of the CSV file, or the content of the file as string
- * @param guildTemplate {StatisticalTemplate} The template of the guild
- * @param interaction {Djs.CommandInteraction | undefined} The interaction to reply to, if any (undefined if used in test)
- * @param allowPrivate
- * @param lang
+ * Parses CSV data containing user statistics and character information for a Discord guild.
+ *
+ * Accepts either a remote CSV file URL or raw CSV text, validates headers and required fields based on the provided guild template, and returns structured user data. Supports localization and can report errors via a Discord interaction if provided.
+ *
+ * @returns A promise resolving to structured user data grouped by user ID.
+ *
+ * @throws {InvalidCsvContent} If the CSV content is empty or missing.
+ * @throws {Error} If required headers are missing or the CSV cannot be parsed.
  */
 export async function parseCSV(
 	url: string,
@@ -109,12 +111,11 @@ async function readCSV(url: string): Promise<string> {
 }
 
 /**
- * Parse the csv file and return the data in the correct format
- * @param csv {CSVRow[]} The data parsed from the CSV file
- * @param guildTemplate {StatisticalTemplate} The template of the guild
- * @param interaction {Djs.CommandInteraction | undefined} The interaction to reply to, if any (undefined if used in test)
- * @param allowPrivate
- * @param lang
+ * Processes parsed CSV rows into structured user data grouped by user ID, validating character names and required statistics according to the guild template.
+ *
+ * @returns An object containing `members`, a mapping of user IDs to arrays of user data, and `errors`, an array of error messages encountered during processing.
+ *
+ * @remark Replies to the provided Discord interaction with error messages for missing users, character names, duplicate character names, or missing statistics.
  */
 async function step(
 	csv: CSVRow[],
@@ -242,9 +243,7 @@ async function step(
 			channel,
 		};
 		logger.trace("Adding character", newChar);
-		// biome-ignore lint/performance/noDelete: I need this because the file will be rewritten and the undefined value can broke object
 		if (!newChar.private) delete newChar.private;
-		// biome-ignore lint/performance/noDelete: I need this because the file will be rewritten and the undefined value can broke object
 		if (!newChar.avatar) delete newChar.avatar;
 		members[userID].push(newChar);
 	}

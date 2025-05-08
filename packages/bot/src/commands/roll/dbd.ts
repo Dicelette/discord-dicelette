@@ -1,7 +1,8 @@
 import { cmdLn, t } from "@dicelette/localization";
+import { uniformizeRecords } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateWithInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { dbdOptions, getLangAndConfig, rollDice, serializeName } from "utils";
@@ -22,17 +23,17 @@ export default {
 			interaction.guild!.id,
 			`user.${interaction.user.id}`
 		);
-		if (!user) return;
+		if (!user && !db.templateID.damageName) return;
 		let choices: string[] = [];
 		if (focused.name === t("rAtq.atq_name.name")) {
 			const char = options.getString(t("common.character"));
 
-			if (char) {
+			if (char && user) {
 				const values = user.find((data) => {
 					return data.charName?.subText(char);
 				});
 				if (values?.damageName) choices = values.damageName;
-			} else {
+			} else if (user) {
 				for (const [, value] of Object.entries(user)) {
 					if (value.damageName) choices = choices.concat(value.damageName);
 				}
@@ -43,7 +44,7 @@ export default {
 				choices.length === 0
 			)
 				choices = choices.concat(db.templateID.damageName);
-		} else if (focused.name === t("common.character")) {
+		} else if (focused.name === t("common.character") && user) {
 			//if dice is set, get all characters that have this dice
 			const skill = options.getString(t("rAtq.atq_name.name"));
 			const allCharactersFromUser = user
@@ -87,10 +88,16 @@ export default {
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !interaction.guild || !interaction.channel) return;
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
-		if (!user) return;
+		const { ul } = getLangAndConfig(client.settings, interaction);
+		if (!user && !db.templateID?.damageName?.length) {
+			await reply(interaction, {
+				embeds: [embedError(t("error.user.data"), ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
 		let charOptions = options.getString(t("common.character")) ?? undefined;
 		const charName = charOptions?.normalize();
-		const { ul } = getLangAndConfig(client.settings, interaction);
 		try {
 			let userStatistique = await getUserFromMessage(
 				client,
@@ -103,7 +110,10 @@ export default {
 			if (charOptions && !selectedCharByQueries) {
 				await reply(interaction, {
 					embeds: [
-						embedError(ul("error.charName", { charName: charOptions.capitalize() }), ul),
+						embedError(
+							ul("error.user.charName", { charName: charOptions.capitalize() }),
+							ul
+						),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -111,23 +121,51 @@ export default {
 			}
 			charOptions = userStatistique?.userName ? userStatistique.userName : undefined;
 			if (!userStatistique && !charName) {
-				const char = await getFirstChar(client, interaction, ul);
+				const char = await getFirstChar(client, interaction, ul, true);
 				userStatistique = char?.userStatistique;
 				charOptions = char?.optionChar ?? undefined;
 			}
-			if (!userStatistique) {
-				await reply(interaction, {
-					embeds: [embedError(ul("error.notRegistered"), ul)],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
-				return;
-			}
-			if (!userStatistique.damage) {
-				await reply(interaction, {
-					embeds: [embedError(ul("error.emptyDamage"), ul)],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
-				return;
+			if (!db.templateID.damageName) {
+				if (!userStatistique) {
+					await reply(interaction, {
+						embeds: [embedError(ul("error.user.youRegistered"), ul)],
+						flags: Djs.MessageFlags.Ephemeral,
+					});
+					return;
+				}
+				if (!userStatistique.damage) {
+					await reply(interaction, {
+						embeds: [embedError(ul("error.damage.empty"), ul)],
+						flags: Djs.MessageFlags.Ephemeral,
+					});
+					return;
+				}
+			} else if (!userStatistique || !userStatistique.damage) {
+				//allow global damage with constructing a new userStatistique with only the damageName and their value
+				//get the damageName from the global template
+				const template = await getTemplateWithInteraction(interaction, client);
+				if (!template) {
+					await reply(interaction, {
+						embeds: [embedError(ul("error.template.notFound"), ul)],
+						flags: Djs.MessageFlags.Ephemeral,
+					});
+					return;
+				}
+				const damage = template.damage
+					? (uniformizeRecords(template.damage) as Record<string, string>)
+					: undefined;
+				logger.trace("The template use:", damage);
+
+				//create the userStatistique with the value got from the template & the commands
+				userStatistique = {
+					userName: charName,
+					template: {
+						diceType: template.diceType,
+						critical: template.critical,
+						customCritical: template.customCritical,
+					},
+					damage,
+				};
 			}
 			return await rollDice(
 				interaction,

@@ -4,6 +4,7 @@ import type { Translation, UserMessageId, UserRegistration } from "@dicelette/ty
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
+import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -15,15 +16,13 @@ import {
 	sendLogs,
 } from "messages";
 import { editUserButtons, selectEditMenu } from "utils";
-import type { TextChannel } from "discord.js";
 
 /**
- * Validate the edit of the dice from the modals
- * Will parse the dice and validate if they are correct
- * Edit the embed with the new dice or remove it if it's empty
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param ul {Translation}
- * @param client
+ * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.
+ *
+ * Parses user-submitted dice input, checks for validity against character stats, updates the message embed fields accordingly, and manages user registration and logging. If all dice are removed or invalid, the dice embed is deleted from the message.
+ *
+ * @throws {Error} If a dice string is invalid or cannot be evaluated against character stats.
  */
 export async function validateDiceEdit(
 	interaction: Djs.ModalSubmitInteraction,
@@ -123,7 +122,7 @@ export async function validateDiceEdit(
 		const embedsList = getEmbedsList(ul, { which: "damage", embed: diceEmbed }, message);
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
-		await message.edit({
+		message.edit({
 			embeds: toAdd,
 			components: [components, selectEditMenu(ul)],
 		});

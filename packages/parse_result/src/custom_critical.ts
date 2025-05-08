@@ -63,6 +63,16 @@ export function rollCustomCritical(
 	return customCritical;
 }
 
+/**
+ * Filters and processes custom critical conditions that affect skills.
+ *
+ * Returns a record of custom criticals with the `affectSkill` flag set to true. If a critical's value does not contain a dollar sign and no {@link dollarsValue} is provided, it is included as-is. Otherwise, if {@link dollarsValue} is provided, the critical's value is updated using {@link generateStatsDice} and rolled with {@link rollOneCustomCritical}.
+ *
+ * @param customCritical - The set of custom critical conditions to filter and process.
+ * @param statistics - Optional statistics used for dice expression generation.
+ * @param dollarsValue - Optional value used to substitute into dice expressions containing a dollar sign.
+ * @returns A record of processed custom criticals affecting skills, or `undefined` if none match.
+ */
 export function skillCustomCritical(
 	customCritical?: Record<string, CustomCritical>,
 	statistics?: Record<string, number>,
@@ -71,8 +81,9 @@ export function skillCustomCritical(
 	if (!customCritical) return undefined;
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
 	for (const [name, value] of Object.entries(customCritical)) {
-		if (!dollarsValue && !value.value.includes("$")) continue;
-		if (value.affectSkill && dollarsValue) {
+		if (!value.affectSkill) continue;
+		if (!dollarsValue && !value.value.includes("$")) customCriticalFiltered[name] = value;
+		else if (value.affectSkill && dollarsValue) {
 			value.value = generateStatsDice(value.value, statistics, dollarsValue?.toString());
 			customCriticalFiltered[name] = rollOneCustomCritical(value);
 		}

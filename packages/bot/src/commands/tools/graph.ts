@@ -4,7 +4,12 @@ import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import type { EClient } from "client";
-import { findChara, getRecordChar, getTemplateWithDB, getUserByEmbed } from "database";
+import {
+	findChara,
+	getRecordChar,
+	getTemplateWithInteraction,
+	getUserByEmbed,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
@@ -175,12 +180,16 @@ export const graph = {
 		let max = options.getNumber(t("graph.max.name")) ?? undefined;
 		const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
 		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+			await reply(interaction, {
+				embeds: [embedError(ul("error.template.notFound"), ul)],
+			});
 			return;
 		}
-		const serverTemplate = await getTemplateWithDB(interaction, client.settings);
+		const serverTemplate = await getTemplateWithInteraction(interaction, client);
 		if (!guildData.templateID.statsName || !serverTemplate?.statistics) {
-			await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
+			await reply(interaction, {
+				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
+			});
 			return;
 		}
 		const user = options.getUser(t("display.userLowercase"));
@@ -190,7 +199,7 @@ export const graph = {
 		if (charName) userName += ` (${charName})`;
 		if (!charData) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}
@@ -202,7 +211,7 @@ export const graph = {
 				userData = await findChara(charData, charName);
 			}
 			if (!userData) {
-				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 				return;
 			}
 			const sheetLocation: PersonnageIds = {
@@ -217,7 +226,7 @@ export const graph = {
 			);
 			if (!thread)
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.noThread"), ul)],
+					embeds: [embedError(ul("error.channel.thread"), ul)],
 				});
 
 			const allowHidden = haveAccess(interaction, thread.id, userId);
@@ -229,11 +238,13 @@ export const graph = {
 			const message = await thread.messages.fetch(sheetLocation.messageId);
 			const userStatistique = getUserByEmbed({ message }, ul, undefined, false);
 			if (!userStatistique) {
-				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 				return;
 			}
 			if (!userStatistique.stats) {
-				await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
+				await reply(interaction, {
+					embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
+				});
 				return;
 			}
 			const titleUser = () => {

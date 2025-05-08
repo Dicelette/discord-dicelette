@@ -1,6 +1,5 @@
 import type { StatisticalTemplate } from "@dicelette/core";
-import type { PersonnageIds } from "@dicelette/types";
-import type { Translation } from "@dicelette/types";
+import type { PersonnageIds, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import { updateMemory } from "database";
 import * as Djs from "discord.js";
@@ -13,11 +12,14 @@ import {
 import { searchUserChannel } from "utils";
 
 /**
- * Update the template of existing user when the template is edited by moderation
- * @param client
- * @param interaction {Djs.CommandInteraction}
- * @param ul {Translation}
- * @param template {StatisticalTemplate}
+ * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
+ *
+ * For each character belonging to users in the guild, fetches the corresponding message and replaces its template embed with one reflecting the updated template fields. Also updates the in-memory character data to match the new embed.
+ *
+ * @param {EClient} client
+ * @param {Djs.CommandInteraction} interaction
+ * @param {Translation} ul
+ * @param {StatisticalTemplate} template - The updated statistical template to apply to all user character messages.
  */
 export async function bulkEditTemplateUser(
 	client: EClient,
@@ -84,10 +86,9 @@ export async function bulkEditTemplateUser(
 }
 
 /**
- * Delete all characters from the guild
- * @param client
- * @param interaction {Djs.CommandInteraction}
- * @param ul {Translation}
+ * Prompts for confirmation and deletes all character data and messages in the guild.
+ *
+ * Displays a confirmation dialog to the user. If confirmed, removes all character messages, clears character data from guild settings and cache, and updates the confirmation message. If canceled or timed out, no characters are deleted.
  */
 export async function bulkDeleteCharacters(
 	client: EClient,
@@ -126,14 +127,12 @@ export async function bulkDeleteCharacters(
 			await deleteMessageChar(client, interaction, ul);
 			guildData.delete(interaction.guild!.id, "user");
 			client.characters.delete(interaction.guild!.id);
-			await rep.edit({
+			rep.edit({
 				components: [],
 				content: ul("register.delete.done"),
 				embeds: [],
 			});
-		} else {
-			await rep.edit({ components: [] });
-		}
+		} else await rep.edit({ components: [] });
 	} catch (err) {
 		console.error("\n", err);
 	}

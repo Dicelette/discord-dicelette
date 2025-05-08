@@ -1,6 +1,8 @@
+/** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
 import dotenv from "dotenv";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
+
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const optionLoggers: ISettingsParam<ILogObj> =
@@ -34,7 +36,7 @@ const defaultOptions = {
 			FATAL: ["bold", "redBright"],
 		},
 		dateIsoStr: "white",
-		filePathWithLine: ["bold", "yellow", "bgYellowBright"],
+		filePathWithLine: ["bold", "yellow"],
 		name: ["white"],
 		nameWithDelimiterPrefix: ["white", "bold"],
 		nameWithDelimiterSuffix: ["white", "bold"],
@@ -58,7 +60,6 @@ export const important: Logger<ILogObj> = new Logger({
 		mm: "dim",
 		yyyy: "dim",
 		hh: "dim",
-		// biome-ignore lint/style/useNamingConvention: <explanation>
 		MM: "dim",
 		ss: "dim",
 		ms: "dim",
@@ -67,7 +68,7 @@ export const important: Logger<ILogObj> = new Logger({
 			SILLY: ["bold", "white"],
 			TRACE: ["bold", "whiteBright"],
 			DEBUG: ["bold", "green"],
-			INFO: ["bold", "green", "bgGreenBright"],
+			INFO: ["bold", "whiteBright", "bgGreenBright"],
 			WARN: ["bold", "yellow"],
 			ERROR: ["bold", "red"],
 			FATAL: ["bold", "redBright"],

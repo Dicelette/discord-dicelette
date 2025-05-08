@@ -112,6 +112,11 @@ export class ResultAsText {
 		const messageResult = this.resultat.result.split(";");
 		let successOrFailure = "";
 		let isCritical: undefined | "failure" | "success" | "custom" = undefined;
+		/**
+		 * @warning Do not forget that the compare value is needed **EVEN while using** custom critical.
+		 *
+		 * So a dice with CustomCritical can be set like `1d100>=1` (always true) to enter in the condition & CC loop.
+		 */
 		if (this.resultat.compare) {
 			msgSuccess = "";
 			let total = 0;

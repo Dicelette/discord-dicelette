@@ -1,11 +1,11 @@
 import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
-import type { UserMessageId } from "@dicelette/types";
-import type { Settings, Translation } from "@dicelette/types";
-import { NoEmbed, capitalizeBetweenPunct } from "@dicelette/utils";
+import type { Settings, Translation, UserMessageId } from "@dicelette/types";
+import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
+
 import type { EClient } from "client";
 import {
-	getTemplateWithDB,
+	getTemplateWithInteraction,
 	getUserByEmbed,
 	getUserNameAndChar,
 	registerUser,
@@ -24,12 +24,10 @@ import {
 import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "utils";
 
 /**
- * Interaction to submit the new skill dice
- * Only works if the user is the owner of the user registered in the embed or if the user is a moderator
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param ul {Translation}
- * @param interactionUser {User}
- * @param client
+ * Handles a modal submit interaction to register new skill damage dice for a user.
+ *
+ * Allows the operation only if the interacting user is the owner referenced in the embed or has moderator permissions.
+ * Replies with an error if the required template is not found or if the user lacks permission.
  */
 export async function storeDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
@@ -37,10 +35,8 @@ export async function storeDamageDice(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	const db = client.settings;
-	const template = await getTemplateWithDB(interaction, db);
-	if (!template) {
-		await reply(interaction, { embeds: [embedError(ul("error.noTemplate"), ul)] });
+	if (!(await getTemplateWithInteraction(interaction, client))) {
+		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
 	}
 	const embed = ensureEmbed(interaction.message ?? undefined);
@@ -86,12 +82,15 @@ export function registerDmgButton(ul: Translation) {
 }
 
 /**
- * Register the new skill dice in the embed and database
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param client
- * @param first {boolean}
- * - true: It's the modal when the user is registered
- * - false: It's the modal when the user is already registered and a new dice is added to edit the user
+ * Registers a new skill damage dice from modal input, updating the corresponding embed and database entry.
+ *
+ * Handles both initial dice registration for a user and subsequent additions or edits. Updates the embed with the new dice, evaluates dice values using user stats, enforces a maximum of 25 dice, manages user roles, and updates the database and in-memory cache as needed.
+ *
+ * @param {Djs.ModalSubmitInteraction} interaction
+ * @param {EClient} client
+ * @param {boolean|undefined} first - If true, indicates this is the initial dice registration for the user; otherwise, a new dice is being added to an existing user.
+ *
+ * @throws {Error} If the interaction is missing a guild or message, or if the user cannot be found in the embed.
  */
 export async function registerDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
@@ -102,7 +101,7 @@ export async function registerDamageDice(
 	const { ul } = getLangAndConfig(db, interaction);
 	const name = interaction.fields.getTextInputValue("damageName");
 	let value = interaction.fields.getTextInputValue("damageValue");
-	if (!interaction.guild) throw new Error(ul("error.noGuild"));
+	if (!interaction.guild) throw new Error(ul("error.guild.empty"));
 	if (!interaction.message) throw new Error(ul("error.noMessage"));
 
 	const oldDiceEmbeds = getEmbeds(
@@ -130,7 +129,7 @@ export async function registerDamageDice(
 			}
 		}
 	const user = getUserByEmbed({ message: interaction.message }, ul, first);
-	if (!user) throw new Error(ul("error.user")); //mean that there is no embed
+	if (!user) throw new Error(ul("error.user.notFound")); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
 	if (

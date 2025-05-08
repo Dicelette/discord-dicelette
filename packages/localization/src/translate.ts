@@ -21,6 +21,16 @@ export function ln(userLang: Djs.Locale) {
 	return i18next.getFixedT(localeName?.[1] ?? "en");
 }
 
+/**
+ * Returns a localized error message based on the error type and user language or interaction locale.
+ *
+ * Selects the appropriate translation for a wide range of custom and Discord.js errors, providing user-friendly messages in the user's language when possible.
+ *
+ * @param e - The error to localize.
+ * @param interaction - Optional Discord interaction to determine the user's locale.
+ * @param userLang - Optional user language override.
+ * @returns The localized error message string.
+ */
 export function lError(
 	e: Error,
 	interaction?: Djs.BaseInteraction,
@@ -41,19 +51,19 @@ export function lError(
 		return ul("error.mustBeGreater", { max: max, value: min });
 	}
 
-	if (e instanceof EmptyObjectError) return ul("error.emptyDamage");
+	if (e instanceof EmptyObjectError) return ul("error.damage.empty");
 
 	if (e.message.includes("TooManyDice")) return ul("error.tooMuchDice");
 
-	if (e instanceof NoStatisticsError) return ul("error.emptyStats");
+	if (e instanceof NoStatisticsError) return ul("error.stats.empty");
 
-	if (e.message.includes("TooManyStats")) return ul("error.tooMuchStats");
+	if (e.message.includes("TooManyStats")) return ul("error.stats.tooMuch");
 
-	if (e instanceof NoEmbed) return ul("error.noEmbed");
+	if (e instanceof NoEmbed) return ul("error.embed.notFound");
 
 	if (e instanceof InvalidCsvContent) return ul("error.csvContent", { fichier: e.file });
 
-	if (e instanceof NoChannel) return ul("error.channel", { channel: "" });
+	if (e instanceof NoChannel) return ul("error.channel.notFound", { channel: "" });
 
 	if (e instanceof Djs.DiscordAPIError) {
 		if (e.method === "DELETE") {

@@ -24,7 +24,7 @@ export const dbRoll = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const { userStatistique, options, ul, optionChar } =
 			(await getStatistics(interaction, client)) ?? {};
-		if (!userStatistique || !options || !ul || !optionChar) return;
+		if (!userStatistique || !options || !ul) return;
 		return await rollStatistique(
 			interaction,
 			client,

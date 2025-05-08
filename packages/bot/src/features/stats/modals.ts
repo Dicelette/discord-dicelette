@@ -1,14 +1,15 @@
 import {
-	FormulaError,
-	type StatisticalTemplate,
 	evalCombinaison,
 	evalOneCombinaison,
+	FormulaError,
+	isNumber,
+	type StatisticalTemplate,
 } from "@dicelette/core";
-import { isNumber } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
-import { getTemplateWithDB, getUserNameAndChar, updateMemory } from "database";
+import { getTemplateWithInteraction, getUserNameAndChar, updateMemory } from "database";
+import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
 import {
@@ -22,14 +23,16 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
-import type { TextChannel } from "discord.js";
 
 /**
- * Embed to display the statistics when adding a new user
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param template {StatisticalTemplate}
- * @param page {number=2}
- * @param lang
+ * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
+ *
+ * Updates the user and statistics embeds with the submitted values, evaluates and adds combination statistics if all required fields are present, and modifies message components to reflect the current registration state.
+ *
+ * @param interaction - The modal submit interaction containing user input.
+ * @param template - The statistical template defining expected statistics and combinations.
+ * @param page - The page number to display in the embed footer (defaults to 2).
+ * @param lang - The language locale for localization (defaults to English GB).
  */
 export async function registerStatistics(
 	interaction: Djs.ModalSubmitInteraction,
@@ -88,7 +91,7 @@ export async function registerStatistics(
 			});
 		}
 
-		await message.edit({
+		message.edit({
 			embeds: [userEmbed, statEmbeds],
 			components: [registerDmgButton(ul)],
 		});
@@ -98,7 +101,7 @@ export async function registerStatistics(
 		});
 		return;
 	}
-	await message.edit({
+	message.edit({
 		embeds: [userEmbed, statEmbeds],
 		components: [continueCancelButtons(ul)],
 	});
@@ -110,10 +113,16 @@ export async function registerStatistics(
 }
 
 /**
- * Validate the stats and edit the embed with the new stats for editing
- * @param interaction {Djs.ModalSubmitInteraction}
- * @param ul {Translation}
- * @param client
+ * Validates and updates user statistics from a modal submission, editing the stats embed in the Discord message.
+ *
+ * Parses and normalizes user input, checks values against the statistical template, evaluates formulas if present, and enforces minimum constraints. Updates or removes the stats embed as appropriate, sends ephemeral confirmation to the user, and logs the changes.
+ *
+ * @param interaction - The modal submit interaction containing the new stats input.
+ * @param ul - Localization function for translating messages.
+ * @param client - The extended Discord client instance.
+ *
+ * @throws {FormulaError} If a stat value contains an invalid formula.
+ * @throws {Error} If a stat name is not found in the template or if a value is below the minimum allowed.
  */
 export async function editStats(
 	interaction: Djs.ModalSubmitInteraction,
@@ -130,7 +139,7 @@ export async function editStats(
 	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
 	if (!statsEmbeds) return;
 	const values = interaction.fields.getTextInputValue("allStats");
-	const templateStats = await getTemplateWithDB(interaction, db);
+	const templateStats = await getTemplateWithInteraction(interaction, client);
 	if (!templateStats || !templateStats.statistics) return;
 	const valuesAsStats = values.split("\n- ").map((stat) => {
 		const [name, value] = stat.split(/ ?: ?/);
@@ -160,7 +169,7 @@ export async function editStats(
 			embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
 		)
 			continue;
-		if (!stat) throw new Error(ul("error.statNotFound", { value: name }));
+		if (!stat) throw new Error(ul("error.stats.notFound", { value: name }));
 
 		if (!isNumber(value)) {
 			//it's a combinaison OR an error

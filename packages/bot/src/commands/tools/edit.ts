@@ -1,6 +1,6 @@
 import { cmdLn, findln, t } from "@dicelette/localization";
-import type { DiscordChannel } from "@dicelette/types";
 import type {
+	DiscordChannel,
 	PersonnageIds,
 	Translation,
 	UserMessageId,
@@ -16,8 +16,7 @@ import {
 	registerUser,
 } from "database";
 import * as Djs from "discord.js";
-import { embedError, findLocation, getEmbeds, getEmbedsList } from "messages";
-import { reply } from "messages";
+import { embedError, findLocation, getEmbeds, getEmbedsList, reply } from "messages";
 import {
 	autoComplete,
 	charUserOptions,
@@ -123,7 +122,7 @@ export const editAvatar = {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.userNotRegistered", { user: userName }), ul)],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}
@@ -165,6 +164,19 @@ export const editAvatar = {
 	},
 };
 
+/**
+ * Updates a character's avatar image in the associated embed message.
+ *
+ * Validates and sets a new avatar URL for the character, updates the embed in the message thread, and provides a success message with a mention and message link. If the avatar URL is invalid or the embed is not found, replies with an appropriate error message.
+ *
+ * @param options - The command interaction options containing the new avatar URL.
+ * @param interaction - The Discord command interaction context.
+ * @param ul - The translation function for localized responses.
+ * @param user - The user associated with the character, or null.
+ * @param charName - The name of the character, if provided.
+ * @param sheetLocation - Identifiers for the character's message and location.
+ * @param thread - The Discord channel thread containing the character's message.
+ */
 async function avatar(
 	options: Djs.CommandInteractionOptionResolver,
 	interaction: Djs.CommandInteraction,
@@ -184,7 +196,7 @@ async function avatar(
 		const embed = getEmbeds(ul, message, "user");
 		if (!embed) {
 			// noinspection ExceptionCaughtLocallyJS
-			throw new Error(ul("error.noEmbed"));
+			throw new Error(ul("error.embed.notFound"));
 		}
 		embed.setThumbnail(imageURL);
 		const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
@@ -198,7 +210,7 @@ async function avatar(
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
-		await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 	}
 }
 
@@ -211,6 +223,22 @@ async function generateButton(
 	await message.edit({ embeds: embedsList, components: [buttons, select] });
 }
 
+/**
+ * Renames a character in the associated embed message and updates the database and client cache.
+ *
+ * Updates the character's name in the embed, persists the change in the database, and synchronizes the client cache. Handles duplicate name errors and replies with localized success or error messages. Also updates message components and cleans up old user data in guild settings.
+ *
+ * @param name - The new name for the character.
+ * @param interaction - The Discord interaction triggering the rename.
+ * @param ul - Localization function for translations.
+ * @param user - The user associated with the character, or null to use the interaction user.
+ * @param client - The Discord bot client instance.
+ * @param sheetLocation - Identifiers for the character's message and location.
+ * @param oldData - Previous character data, including the old name and message ID.
+ * @param thread - The Discord channel (thread) containing the character message.
+ *
+ * @throws {Error} If the embed or character field is not found in the message.
+ */
 export async function rename(
 	name: string,
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -228,11 +256,11 @@ export async function rename(
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character");
-	if (!n) throw new Error(ul("error.noCharacter"));
+	if (!n) throw new Error(ul("error.user.rename"));
 	n.value = name;
 	//update the embed
 	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
@@ -302,6 +330,22 @@ export async function rename(
 	});
 }
 
+/**
+ * Changes the user associated with a character and updates all related data.
+ *
+ * Updates the character embed in the Discord message to mention the new user, moves the character data in the database from the old user to the new user, registers the new user, deletes the old user data from guild settings, updates message buttons, and replies with a localized success or error message.
+ *
+ * @param newUser - The user to associate with the character.
+ * @param interaction - The Discord interaction triggering the change.
+ * @param ul - Localization function for translations.
+ * @param user - The previous user associated with the character, or null.
+ * @param client - The Discord bot client instance.
+ * @param sheetLocation - Identifiers for the character's message and location.
+ * @param oldData - Data about the character and previous association.
+ * @param thread - The Discord channel containing the character message.
+ *
+ * @throws {Error} If the character embed or user field is not found in the message.
+ */
 export async function move(
 	newUser: Djs.User,
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -319,10 +363,10 @@ export async function move(
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(ul, message, "user");
-	if (!embed) throw new Error(ul("error.noEmbed"));
+	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed.toJSON().fields?.find((field) => findln(field.name) === "common.user");
 
-	if (!n) throw new Error(ul("error.oldEmbed"));
+	if (!n) throw new Error(ul("error.embed.old"));
 	n.value = `<@${newUser.id}>`;
 	//update the embed
 	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);

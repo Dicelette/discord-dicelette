@@ -1,7 +1,7 @@
 import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { NoEmbed, cleanAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, NoEmbed } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 export function ensureEmbed(message?: Djs.Message) {

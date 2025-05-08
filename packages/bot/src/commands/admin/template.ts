@@ -223,7 +223,7 @@ export const registerTemplate = {
 		//fetch the template
 		if (!template.contentType?.includes("json")) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.template"), ul)],
+				embeds: [embedError(ul("error.template.json"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -272,9 +272,10 @@ export const registerTemplate = {
 			.setCustomId("register")
 			.setLabel(ul("register.button"))
 			.setStyle(Djs.ButtonStyle.Primary);
-		const components = new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(
-			button
-		);
+		const components =
+			new Djs.ActionRowBuilder<Djs.MessageActionRowComponentBuilder>().addComponents(
+				button
+			);
 		let embedTemplate = new Djs.EmbedBuilder()
 			.setTitle(ul("register.embed.title"))
 			.setDescription(ul("register.embed.description"))
@@ -360,7 +361,8 @@ export const registerTemplate = {
 			components: [components],
 		});
 		await msg.pin();
-
+		//register in the cache
+		client.template.set(guildId, templateData);
 		//save in database file
 		const json = client.settings.get(guildId);
 		const statsName = templateData.statistics

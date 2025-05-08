@@ -1,11 +1,11 @@
 import { ln } from "@dicelette/localization";
 import type {
 	PersonnageIds,
+	Settings,
 	UserData,
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import type { Settings } from "@dicelette/types";
 import type { EClient } from "client";
 import { getUser } from "database";
 import type * as Djs from "discord.js";
@@ -48,9 +48,7 @@ export async function registerUser(
 		damageName: damage,
 		isPrivate,
 	};
-	//biome-ignore lint/performance/noDelete: We need to delete the key if it's not needed (because we are registering in the DB and undefined can lead to a bug)
 	if (!charName) delete newChar.charName;
-	//biome-ignore lint/performance/noDelete: We need to delete the key if it's not needed (because we are registering in the DB and undefined can lead to a bug)
 	if (!damage) delete newChar.damageName;
 	if (user) {
 		const char = user.find((char) => {

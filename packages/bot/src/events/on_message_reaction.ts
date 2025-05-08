@@ -47,7 +47,7 @@ export const onReactionAdd = (client: EClient): void => {
 				.setLabel(ul("copyRollResult.name"))
 				.setEmoji("📱");
 			const message = await reaction.message.fetch();
-			await message.edit({
+			message.edit({
 				components: [
 					new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(
 						copyResButtonDesktop,
