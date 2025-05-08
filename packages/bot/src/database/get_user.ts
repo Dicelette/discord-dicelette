@@ -191,7 +191,8 @@ export async function getUserFromMessage(
 		});
 		return userData;
 	} catch (error) {
-		if (!skipNotFound) throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
+		if (!skipNotFound)
+			throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
 	}
 }
 

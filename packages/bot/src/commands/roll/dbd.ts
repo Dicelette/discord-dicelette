@@ -110,7 +110,10 @@ export default {
 			if (charOptions && !selectedCharByQueries) {
 				await reply(interaction, {
 					embeds: [
-						embedError(ul("error.user.charName", { charName: charOptions.capitalize() }), ul),
+						embedError(
+							ul("error.user.charName", { charName: charOptions.capitalize() }),
+							ul
+						),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
 				});

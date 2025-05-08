@@ -180,7 +180,9 @@ export const graph = {
 		let max = options.getNumber(t("graph.max.name")) ?? undefined;
 		const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
 		if (!guildData) {
-			await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
+			await reply(interaction, {
+				embeds: [embedError(ul("error.template.notFound"), ul)],
+			});
 			return;
 		}
 		const serverTemplate = await getTemplateWithInteraction(interaction, client);
@@ -240,7 +242,9 @@ export const graph = {
 				return;
 			}
 			if (!userStatistique.stats) {
-				await reply(interaction, { embeds: [embedError(ul("error.stats.notFound_plural"), ul)] });
+				await reply(interaction, {
+					embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
+				});
 				return;
 			}
 			const titleUser = () => {
