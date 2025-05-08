@@ -50,4 +50,15 @@ describe("convertExpression", () => {
 		const res = getExpression(dice, "0");
 		expect(res.dice).toBe("1d2+6");
 	});
+	it("Should replace with the correct value in multiple exp", () => {
+		const dice = "1d{exp||2}+{exp||6}";
+		const res = getExpression(dice, "5+8");
+		expect(res.dice).toBe("1d13+13");
+	});
+	it("Should be keept as is if no exp", () => {
+		const dice = "1d100";
+		const res = getExpression(dice, "5+8");
+		expect(res.dice).toBe("1d100");
+		expect(res.expressionStr).toBe("+13");
+	});
 });

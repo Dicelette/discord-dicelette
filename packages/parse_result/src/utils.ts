@@ -172,11 +172,12 @@ export function getExpression(
 ) {
 	let expressionStr = convertExpression(expression, stats, total);
 	const diceRegex = /\{exp( ?\|\| ?(?<default>\d+))?}/gi;
+	let isExp = false;
 	dice = dice.replace(diceRegex, (_match, _p1, _p2, _offset, _string, groups) => {
 		const defaultValue = groups?.default ?? "1";
-		const value = expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
-		expressionStr = "";
-		return value;
+		isExp = true;
+		return expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
 	});
+	if (isExp) expressionStr = "";
 	return { dice, expressionStr };
 }
