@@ -153,6 +153,16 @@ export function trimAll(dice: string) {
 	return result.join(";");
 }
 
+/**
+ * Generates a formatted URL string linking to a Discord message or a provided log URL.
+ *
+ * If a {@link logUrl} is given, returns it as a formatted string. Otherwise, if {@link context} is provided, returns a markdown link to the Discord message using the supplied IDs. Returns an empty string if neither is provided.
+ *
+ * @param ul - Translation function for localizing the link text.
+ * @param context - Optional Discord message context containing guild, channel, and message IDs.
+ * @param logUrl - Optional direct log URL to use instead of constructing a Discord link.
+ * @returns A formatted string containing the appropriate URL or an empty string.
+ */
 export function createUrl(
 	ul: Translation,
 	context?: { guildId: string; channelId: string; messageId: string },
@@ -164,6 +174,17 @@ export function createUrl(
 	return `\n\n-# ↪ [${ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
 }
 
+/**
+ * Replaces `{exp}` or `{exp || default}` placeholders in a dice string with an evaluated expression or a default value.
+ *
+ * If the provided {@link expression} evaluates to `"0"`, placeholders are replaced with the specified default value (or `"1"` if not provided). Otherwise, placeholders are replaced with the evaluated expression string (without a leading plus sign). If any replacement occurs, the returned `expressionStr` is set to an empty string.
+ *
+ * @param dice - The dice string containing `{exp}` or `{exp || default}` placeholders.
+ * @param expression - The expression to evaluate and insert into the dice string.
+ * @param stats - Optional statistics used for evaluating the expression.
+ * @param total - Optional value used in expression evaluation.
+ * @returns An object with the updated dice string and the evaluated expression string.
+ */
 export function getExpression(
 	dice: string,
 	expression: string,

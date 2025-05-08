@@ -59,6 +59,14 @@ export function getUserByEmbed(
 	return user as UserData;
 }
 
+/**
+ * Retrieves the first registered character and associated statistics for the user invoking the interaction.
+ *
+ * If no user data is found and {@link skipNotFound} is false, replies to the interaction with an error embed.
+ *
+ * @param skipNotFound - If true, suppresses error replies and returns early when no user data is found.
+ * @returns An object containing the capitalized character name and user statistics, or `undefined` if not found and {@link skipNotFound} is true.
+ */
 export async function getFirstChar(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
@@ -132,7 +140,16 @@ export async function getUser(
 }
 
 /**
- * Create the UserData starting from the guildData and using a userId
+ * Retrieves a user's character data from a Discord message based on guild settings and user ID.
+ *
+ * Searches in-memory cache first, then fetches the relevant message from the user's character thread if necessary. Validates access permissions for private characters and supports optional behaviors such as skipping errors or fetching additional data.
+ *
+ * @param userId - The Discord user ID whose character data is being retrieved.
+ * @param charName - The character name to search for, if applicable.
+ * @param options - Optional settings to control data integration, access checks, error handling, and additional data fetching.
+ * @returns The user's character data, or `undefined` if not found and `skipNotFound` is enabled.
+ *
+ * @throws {Error} If the user's character thread is missing, access is denied to a private character, or the user is not found (unless `skipNotFound` is true).
  */
 export async function getUserFromMessage(
 	client: EClient,
@@ -196,6 +213,14 @@ export async function getUserFromMessage(
 	}
 }
 
+/**
+ * Retrieves a record mapping user IDs to character data based on interaction options.
+ *
+ * Searches for a character by user or character name within the guild's stored user data. If a character name is provided without a user, searches all users for a matching character. If no character is found and strict mode is enabled, returns `undefined`. Replies with an error embed if guild data is missing.
+ *
+ * @param strict - If true, uses strict substring matching for character names.
+ * @returns A record of user IDs to their corresponding character data, or `undefined` if not found.
+ */
 export async function getRecordChar(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
@@ -279,7 +304,16 @@ export function verifyIfEmbedInDB(
 }
 
 /**
- * Get the userName and the char from the embed between an interaction (button or modal), throw error if not found
+ * Extracts the user ID and character name from an embed in a button or modal interaction.
+ *
+ * Throws an error if the embed, user ID, or a valid thread or text channel is not found.
+ *
+ * @param first - If true, selects the first embed from the message.
+ * @returns An object containing the user ID, character name (if set), and the interaction channel.
+ *
+ * @throws {Error} If the embed is not found in the message.
+ * @throws {Error} If the user ID is not found in the embed.
+ * @throws {Error} If the interaction channel is not a thread or text channel.
  */
 export async function getUserNameAndChar(
 	interaction: Djs.ButtonInteraction | Djs.ModalSubmitInteraction,
@@ -311,6 +345,13 @@ export async function getUserNameAndChar(
 	return { userID, userName, thread: interaction.channel };
 }
 
+/**
+ * Retrieves user statistics and related data for a command interaction.
+ *
+ * Attempts to obtain the user's character statistics based on the interaction options and guild configuration. Handles cases where statistics are required by the dice template, falling back to the first registered character or a minimal template if necessary. Replies with error messages if required data is missing.
+ *
+ * @returns An object containing the user's statistics, translation object, selected character name, and interaction options, or `undefined` if data is unavailable.
+ */
 export async function getStatistics(
 	interaction: Djs.CommandInteraction,
 	client: EClient
@@ -382,6 +423,21 @@ export async function getStatistics(
 	return { userStatistique, ul, optionChar, options };
 }
 
+/**
+ * Retrieves the value of a specified statistic from a user's character data, using fallback names if necessary.
+ *
+ * If the statistic is not found under the given name, attempts to resolve it using alternative names from the guild's template settings. Throws an error if the statistic cannot be found.
+ *
+ * @param userStatistique - The user's character data containing statistics.
+ * @param standardizedStatistic - The primary name of the statistic to retrieve.
+ * @param ul - Translation function for error messages.
+ * @param interaction - The Discord command interaction context.
+ * @param optionChar - The character name, if specified.
+ * @param statistic - The original statistic name requested.
+ * @returns An object containing the statistic value, the resolved standardized statistic name, and the original statistic string.
+ *
+ * @throws {Error} If the statistic cannot be found in the user's data or via template fallbacks.
+ */
 export function getRightValue(
 	userStatistique: UserData,
 	standardizedStatistic: string,

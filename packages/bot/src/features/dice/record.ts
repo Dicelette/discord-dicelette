@@ -24,8 +24,10 @@ import {
 import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "utils";
 
 /**
- * Interaction to submit the new skill dice
- * Only works if the user is the owner of the user registered in the embed or if the user is a moderator
+ * Handles a modal submit interaction to register new skill damage dice for a user.
+ *
+ * Allows the operation only if the interacting user is the owner referenced in the embed or has moderator permissions.
+ * Replies with an error if the required template is not found or if the user lacks permission.
  */
 export async function storeDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
@@ -80,9 +82,13 @@ export function registerDmgButton(ul: Translation) {
 }
 
 /**
- * Register the new skill dice in the embed and database
- * - true: It's the modal when the user is registered
- * - false: It's the modal when the user is already registered and a new dice is added to edit the user
+ * Registers a new skill damage dice from modal input, updating the corresponding embed and database entry.
+ *
+ * Handles both initial dice registration for a user and subsequent additions or edits. Updates the embed with the new dice, evaluates dice values using user stats, enforces a maximum of 25 dice, manages user roles, and updates the database and in-memory cache as needed.
+ *
+ * @param first - If true, indicates this is the initial dice registration for the user; otherwise, a new dice is being added to an existing user.
+ *
+ * @throws {Error} If the interaction is missing a guild or message, or if the user cannot be found in the embed.
  */
 export async function registerDamageDice(
 	interaction: Djs.ModalSubmitInteraction,

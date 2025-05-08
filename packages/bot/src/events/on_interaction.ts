@@ -91,7 +91,12 @@ export default (client: EClient): void => {
 };
 
 /**
- * Switch for modal submission
+ * Handles modal submission interactions by dispatching to the appropriate feature handler based on the modal's custom ID.
+ *
+ * @param interaction - The modal submission interaction to process.
+ * @param ul - The translation utility for localized responses.
+ * @param interactionUser - The user who submitted the modal.
+ * @param client - The client instance for accessing application features and settings.
  */
 async function modalSubmit(
 	interaction: Djs.ModalSubmitInteraction,

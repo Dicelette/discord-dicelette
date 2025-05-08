@@ -18,9 +18,11 @@ import { editUserButtons, selectEditMenu } from "utils";
 import type { TextChannel } from "discord.js";
 
 /**
- * Validate the edit of the dice from the modals
- * Will parse the dice and validate if they are correct
- * Edit the embed with the new dice or remove it if it's empty
+ * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.
+ *
+ * Parses user-submitted dice input, checks for validity against character stats, updates the message embed fields accordingly, and manages user registration and logging. If all dice are removed or invalid, the dice embed is deleted from the message.
+ *
+ * @throws {Error} If a dice string is invalid or cannot be evaluated against character stats.
  */
 export async function validateDiceEdit(
 	interaction: Djs.ModalSubmitInteraction,

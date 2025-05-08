@@ -9,8 +9,13 @@ import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
 import type { EClient } from "client";
 
 /**
- * Register the statistic in the embed when registering a new user and validate the modal
- * Also verify if the template is registered before embedding the statistics
+ * Handles a modal submission to register user statistics for a specific page, validating the page number and template existence.
+ *
+ * If the template is not found, replies with an error embed.
+ *
+ * @param interaction - The modal interaction containing the page number in its custom ID.
+ * @param ul - The translation utility for localized messages.
+ * @param client - The Discord client instance.
  */
 export async function pageNumber(
 	interaction: Djs.ModalSubmitInteraction,
@@ -33,7 +38,9 @@ export async function pageNumber(
 }
 
 /**
- * Submit the first page when the modal is validated
+ * Handles the submission of the first page of a statistics registration modal in a Discord guild.
+ *
+ * If the interaction is valid and a corresponding template is found, generates and displays the initial embed for user statistics registration.
  */
 export async function recordFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
@@ -47,9 +54,15 @@ export async function recordFirstPage(
 }
 
 /**
- * Create the embed after registering the user
- * If the template has statistics, show the continue button
- * Else show the dice button
+ * Creates and sends an embed summarizing user registration details from a modal interaction.
+ *
+ * If the provided template includes statistics, displays a continue/cancel button; otherwise, displays dice-related buttons. Handles user and channel resolution, avatar verification, and privacy settings. Sends error embeds if the user or channel cannot be found.
+ *
+ * @param interaction - The modal interaction containing user input fields.
+ * @param template - The statistical template used to determine embed content and button type.
+ * @param setting - The settings object for retrieving guild-specific configuration.
+ *
+ * @throws {NoChannel} If the interaction channel is missing.
  */
 export async function createEmbedFirstPage(
 	interaction: Djs.ModalSubmitInteraction,

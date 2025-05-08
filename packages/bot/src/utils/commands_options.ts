@@ -29,6 +29,13 @@ export function charUserOptions(
 	return buider;
 }
 
+/**
+ * Adds common character, expression, threshold, and comments options to a Discord slash command builder.
+ *
+ * @param builder - The slash command builder to modify.
+ * @param opts - Options to control inclusion of the expression and threshold fields.
+ * @returns The builder with additional common options configured.
+ */
 export function commonOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 	opts: Partial<{ expression: boolean; threshold: boolean }> = { expression: true }
@@ -88,6 +95,11 @@ export function dbdOptions(
 	return commonOptions(builder);
 }
 
+/**
+ * Adds a non-required, autocompleted "statistic" string option to a Discord slash command builder, then appends common options including "expression", "threshold", and "comments".
+ *
+ * @returns The builder with the additional options configured.
+ */
 export function dbRollOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
 ) {
@@ -103,6 +115,13 @@ export function dbRollOptions(
 	return commonOptions(builder, { expression: true, threshold: true });
 }
 
+/**
+ * Adds calculation-related options to a Discord slash command builder.
+ *
+ * Adds required options for statistic, sign, and expression, as well as an optional transform option, all with localization and autocomplete where applicable. Also appends common options excluding the expression field.
+ *
+ * @returns The builder with calculation and common options configured.
+ */
 export function calcOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {

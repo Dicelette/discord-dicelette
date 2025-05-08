@@ -66,7 +66,21 @@ export async function setTagsForRoll(forum: Djs.ForumChannel) {
 }
 
 /**
- * Repost the character sheet in the thread / channel selected with `guildData.managerId`
+ * Reposts a character sheet embed in the specified thread or channel, creating a new thread if necessary.
+ *
+ * If the target thread does not exist and the channel is a forum, creates a new forum thread for the user and sends the embed with interactive components. Updates user registration and memory with the new message and thread IDs.
+ *
+ * @param embed - The embed(s) representing the character sheet.
+ * @param interaction - The Discord interaction triggering the repost.
+ * @param userTemplate - The user's character data template.
+ * @param userId - The Discord user ID for whom the sheet is being reposted.
+ * @param ul - Translation utility for localized strings.
+ * @param which - Flags indicating which edit buttons to display.
+ * @param guildData - Guild settings and configuration.
+ * @param threadId - The ID of the thread or channel to repost in.
+ * @param characters - Character data for the guild.
+ *
+ * @throws {Error} If the target thread or starter message cannot be found or created.
  */
 export async function repostInThread(
 	embed: Djs.EmbedBuilder[],
@@ -148,6 +162,17 @@ export async function repostInThread(
 	await registerUser(userRegister, interaction, guildData);
 }
 
+/**
+ * Retrieves the thread and message location of a user's character sheet, ensuring access permissions.
+ *
+ * If the thread channel cannot be found, or if the user does not have permission to view a private sheet, an error embed is sent as a reply and only the sheet location is returned.
+ *
+ * @param userData - Character data containing message and channel IDs.
+ * @param interaction - The Discord command interaction context.
+ * @param charData - Character data keyed by user ID, used to check privacy settings.
+ * @param user - Optional user to check access for; defaults to the interaction user.
+ * @returns An object containing the thread channel (if accessible) and the sheet location identifiers.
+ */
 export async function findLocation(
 	userData: CharacterData,
 	interaction: Djs.CommandInteraction,
@@ -186,7 +211,15 @@ export async function findLocation(
 }
 
 /**
- * Find a thread by their data or create it for roll
+ * Finds or creates a thread for dice rolls in a text channel.
+ *
+ * If a roll channel is configured in the guild settings, attempts to fetch and return it. If not found or invalid, removes the setting and logs an error. Otherwise, searches for the most recent unarchived thread with a dice roll prefix, archiving any others. If no suitable thread exists, unarchives an archived thread with the correct name or creates a new one.
+ *
+ * @param db - Guild settings database.
+ * @param channel - The text channel to search for or create the roll thread in.
+ * @param ul - Translation utility for localized strings.
+ * @param hidden - Optional ID for a hidden roll channel.
+ * @returns The found or newly created thread channel for dice rolls.
  */
 export async function findThread(
 	db: Settings,
@@ -259,7 +292,16 @@ export async function findThread(
 }
 
 /**
- * Find a forum channel already existing or creat it
+ * Finds or creates a forum thread for dice rolls within a specified forum channel.
+ *
+ * If a roll channel is configured in the guild settings, attempts to fetch and return it. If not found or invalid, removes the setting and logs an error. Otherwise, searches for an existing forum thread named "🎲 <topic>" matching the provided thread's name. If found, ensures it is unarchived and applies the "Dice Roll" tag. If not found, creates a new forum thread with the appropriate name, tag, and a reason message.
+ *
+ * @param forum - The forum channel to search or create the thread in.
+ * @param thread - The reference thread or text channel whose name is used for the roll thread.
+ * @param db - The settings database for guild configuration.
+ * @param ul - The translation utility for localized messages.
+ * @param hidden - Optional ID for a hidden roll channel.
+ * @returns The found or newly created forum thread for dice rolls.
  */
 export async function findForumChannel(
 	forum: Djs.ForumChannel,

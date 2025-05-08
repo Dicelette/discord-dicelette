@@ -6,6 +6,16 @@ import { verifyIfEmbedInDB } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, reply } from "messages";
 
+/**
+ * Determines whether a user is permitted to edit a Discord message embed in an interaction.
+ *
+ * Checks if the user is the original embed author or has moderator permissions. If the interaction is not the initial ("first") type, verifies the embed's existence in the database. If the embed is missing, sends an ephemeral error message, attempts to delete the message, and denies permission. Otherwise, denies permission with an ephemeral message if the user lacks the required rights.
+ *
+ * @param interaction - The Discord button or select menu interaction.
+ * @param db - The settings database instance.
+ * @param interactionUser - The user attempting the edit.
+ * @returns `true` if the user is allowed to edit; otherwise, `false`.
+ */
 export async function allowEdit(
 	interaction: Djs.ButtonInteraction | Djs.StringSelectMenuInteraction,
 	db: Settings,
@@ -77,6 +87,13 @@ export function serializeName(
 	);
 }
 
+/**
+ * Extracts command interaction options, guild configuration, language, localization utility, and user from a Discord command interaction.
+ *
+ * Sends an error embed reply and returns nothing if the guild configuration is not found.
+ *
+ * @returns An object containing the interaction options, guild configuration, language, localization utility, and the user option.
+ */
 export async function optionInteractions(
 	interaction: Djs.CommandInteraction,
 	client: EClient

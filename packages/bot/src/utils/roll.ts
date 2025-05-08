@@ -66,6 +66,15 @@ export async function rollWithInteraction(
 	return await sendResult(interaction, { roll: defaultMsg }, db, ul, user, hideResult);
 }
 
+/**
+ * Processes a dice roll command based on a user's attack or ability, constructs the appropriate dice formula using user statistics and command options, and sends the roll result to the user.
+ *
+ * If the specified attack or damage is not found in the user's data, replies with an ephemeral error message.
+ *
+ * @param options - Command options containing the attack name, expression, and optional comments.
+ * @param charOptions - Optional character name or identifier to select the relevant character data.
+ * @param hideResult - If true, the roll result is hidden from other users.
+ */
 export async function rollDice(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
@@ -160,6 +169,15 @@ export async function rollDice(
 	);
 }
 
+/**
+ * Processes a statistic-based dice roll command, applying user stats, overrides, and custom criticals, and sends the result to the user.
+ *
+ * If the selected statistic is excluded or required information is missing, replies with an ephemeral error message.
+ *
+ * @param optionChar - Optional character name to associate with the roll.
+ * @param user - Optional user to attribute the roll to.
+ * @param hideResult - If true, hides the roll result from other users.
+ */
 export async function rollStatistique(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
