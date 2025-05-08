@@ -129,7 +129,6 @@ export function calcOptions(
 			option
 				.setName(t("common.expression"))
 				.setDescription(t("calc.formula.desc"))
-				.setRequired(true)
 				.setNameLocalizations(cmdLn("common.expression"))
 				.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
 				.setRequired(true)
