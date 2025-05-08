@@ -322,7 +322,7 @@ export async function move(
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed.toJSON().fields?.find((field) => findln(field.name) === "common.user");
 
-	if (!n) throw new Error(ul("error.oldEmbed"));
+	if (!n) throw new Error(ul("error.embed.old"));
 	n.value = `<@${newUser.id}>`;
 	//update the embed
 	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);

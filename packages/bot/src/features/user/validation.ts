@@ -106,7 +106,7 @@ export async function validateUser(
 		);
 		if (!channel) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.channel", { channel: channelToPost }), ul)],
+				embeds: [embedError(ul("error.channel.notFound", { channel: channelToPost }), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;

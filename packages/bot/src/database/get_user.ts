@@ -171,7 +171,7 @@ export async function getUserFromMessage(
 		ul,
 		userMessageId.channelId
 	);
-	if (!thread) throw new Error(ul("error.noThread"));
+	if (!thread) throw new Error(ul("error.channel.thread"));
 	if (user.isPrivate && !allowAccess && !haveAccess(interaction, thread.id, userId)) {
 		throw new Error(ul("error.private"));
 	}
@@ -302,7 +302,7 @@ export async function getUserNameAndChar(
 		(!(interaction.channel instanceof Djs.ThreadChannel) &&
 			!(interaction.channel instanceof Djs.TextChannel))
 	)
-		throw new Error(ul("error.noThread"));
+		throw new Error(ul("error.channel.thread"));
 	let userName = userEmbed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
@@ -370,7 +370,7 @@ export async function getStatistics(
 
 	if (!userStatistique.stats && !template?.statistics && needStats) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.noStats"), ul)],
+			embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

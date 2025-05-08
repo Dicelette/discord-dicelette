@@ -30,7 +30,7 @@ export async function getTemplateWithInteraction(
 export async function getTemplate(guild: Djs.Guild, enmap: Settings, ul: Translation) {
 	const templateID = enmap.get(guild.id, "templateID");
 	if (!enmap.has(guild.id) || !templateID)
-		throw new Error(ul("error.noGuildData", { server: guild.name }));
+		throw new Error(ul("error.guild.data", { server: guild.name }));
 
 	const { channelId, messageId } = templateID;
 	const channel = await guild.channels.fetch(channelId);
@@ -46,7 +46,7 @@ export async function getTemplate(guild: Djs.Guild, enmap: Settings, ul: Transla
 		return fetchTemplate(message, enmap);
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
-			throw new Error(ul("error.template.notFoundId", { channelId, messageId }));
+			throw new Error(ul("error.template.id", { channelId, messageId }));
 		throw new Error(ul("error.template.notFound"));
 	}
 }

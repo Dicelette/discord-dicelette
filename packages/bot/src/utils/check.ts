@@ -37,7 +37,7 @@ export async function allowEdit(
 		if (!isInDb) {
 			const urlNew = `https://discord.com/channels/${interaction.guild!.id}/${coord?.channelId}/${coord?.messageId}`;
 			await reply(interaction, {
-				embeds: [embedError(ul("error.oldEmbed", { fiche: urlNew }), ul)],
+				embeds: [embedError(ul("error.embed.old", { fiche: urlNew }), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			//delete the message

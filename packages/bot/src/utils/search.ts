@@ -11,7 +11,7 @@ export async function searchUserChannel(
 ): Promise<DiscordChannel> {
 	let thread: Djs.TextChannel | Djs.AnyThreadChannel | undefined | Djs.GuildBasedChannel =
 		undefined;
-	const msg = ul("error.noThread");
+	const msg = ul("error.channel.thread");
 	const embeds = [embedError(msg, ul)];
 	try {
 		const channel = await interaction.guild?.channels.fetch(channelId);

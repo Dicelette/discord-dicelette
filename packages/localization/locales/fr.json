@@ -55,13 +55,7 @@
     "statistic": "Statistiques à utiliser",
     "title": "calc",
     "transform": {
-      "abs": "absolu",
-      "ceil": "arrondir (entier supérieur)",
       "desc": "Arrondir, plafonner, plancher ou élever au cube le résultat.",
-      "floor": "arrondir (entier inférieur)",
-      "round": "arrondir",
-      "sqrt": "sqrt",
-      "square": "élevé au carré",
       "title": "transformer"
     }
   },
@@ -236,7 +230,6 @@
     },
     "name": "désactiver_thread",
     "options": {
-      "desc": "Permet d'activer/désactiver la création auto des fils de résultats",
       "name": "basculer"
     }
   },
@@ -268,21 +261,16 @@
     }
   },
   "edit_avatar": {
-    "character": "Le nom du personnage à modifier",
     "default": "L'image utilisée sera votre avatar actuel !",
     "desc": "Modifier l'avatar d'une fiche de personnage",
     "msg": {
-      "desc": "Lien du message contenant la fiche",
-      "name": "message_url"
     },
     "name": "avatar",
     "success": "Avatar changé pour {{- name}} ([lien vers la fiche]({{-link}})) !",
     "url": {
       "desc": "Lien vers l'image à mettre (pas de lien discord!)",
       "name": "url"
-    },
-    "url_desc": "Lien vers la fiche",
-    "user": "Le joueur à modifier"
+    }
   },
   "edit_name": {
     "success": "Le nom du personnage a bien été changé ! Vous pouvez le retrouver ici: {{- url}}"
@@ -301,7 +289,6 @@
   },
   "error": {
     "avatar": {
-      "discord": "Il n'est pas possible d'utiliser une image discord, car les liens sont actualisés régulièrement.",
       "url": "L'image fournie est invalide : elle doit contenir le format de l'image (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) et être un lien en `https`."
     },
     "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
@@ -348,8 +335,7 @@
     "private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
     "public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
     "roll": {
-      "channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut.",
-      "invalid": "Erreur dans le dé : données invalides pour le dé `{{- dice}}`."
+      "channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut."
     },
     "sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
     "stats": {
@@ -549,8 +535,7 @@
     "alreadySet": "Toutes les statistiques sont déjà définies",
     "avatar": {
       "description": "Le lien vers l'image du personnage (par défaut, utilise l'avatar de l'utilisateur)",
-      "name": "Avatar",
-      "success": "L'avatar du personnage a bien été mis à jour !"
+      "name": "Avatar"
     },
     "channel": {
       "description": "Permet de poster la fiche ailleurs que dans les channels par défaut.",

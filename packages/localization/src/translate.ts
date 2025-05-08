@@ -53,7 +53,7 @@ export function lError(
 
 	if (e instanceof InvalidCsvContent) return ul("error.csvContent", { fichier: e.file });
 
-	if (e instanceof NoChannel) return ul("error.channel", { channel: "" });
+	if (e instanceof NoChannel) return ul("error.channel.notFound", { channel: "" });
 
 	if (e instanceof Djs.DiscordAPIError) {
 		if (e.method === "DELETE") {

@@ -55,13 +55,7 @@
     "statistic": "Statistic to use",
     "title": "calc",
     "transform": {
-      "abs": "absolute",
-      "ceil": "ceil",
       "desc": "round, ceil, floor or cube the result",
-      "floor": "floor",
-      "round": "round",
-      "sqrt": "sqrt",
-      "square": "square",
       "title": "transform"
     }
   },
@@ -236,7 +230,6 @@
     },
     "name": "disable_thread",
     "options": {
-      "desc": "Allows you to activate/deactivate the automatic creation of result feeds",
       "name": "toggle"
     }
   },
@@ -268,21 +261,16 @@
     }
   },
   "edit_avatar": {
-    "character": "The name of the character to modify",
     "default": "The image used will be your actual avatar !",
     "desc": "Edit the avatar of a character sheet",
     "msg": {
-      "desc": "Link to the message containing the file",
-      "name": "message_url"
     },
     "name": "avatar",
     "success": "Avatar changed for {{- name}} ([link to the file]({{-link}}))!",
     "url": {
       "desc": "Link to the image to put (no discord link!)",
       "name": "url"
-    },
-    "url_desc": "Link to the file",
-    "user": "The player to modify"
+    }
   },
   "edit_name": {
     "success": "The character's name has been changed! \nYou can find it here: {{- url}}"
@@ -301,7 +289,6 @@
   },
   "error": {
     "avatar": {
-      "discord": "It is not possible to use a discord image, as the links are updated regularly.",
       "url": "The image provided is invalid: it must contain the image format (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) and be an `https` link."
     },
     "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
@@ -348,8 +335,7 @@
     "private": "This character sheet is private! \nYou do not have permission to read it.",
     "public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
     "roll": {
-      "channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration.",
-      "invalid": "Error during roll: invalid data for `{{- dice}}`."
+      "channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration."
     },
     "sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
     "stats": {
@@ -549,8 +535,7 @@
     "alreadySet": "All statistics are already defined",
     "avatar": {
       "description": "The link to the character image (by default, uses the user's avatar)",
-      "name": "Avatar",
-      "success": "The character's avatar has been updated!"
+      "name": "Avatar"
     },
     "channel": {
       "description": "Allows you to post the file elsewhere than in the default channels",

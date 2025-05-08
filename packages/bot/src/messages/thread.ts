@@ -115,7 +115,7 @@ export async function repostInThread(
 			thread = newThread as Djs.AnyThreadChannel;
 			isForumThread = true;
 			const starterMsg = await newThread.fetchStarterMessage();
-			if (!starterMsg) throw new Error(ul("error.noThread"));
+			if (!starterMsg) throw new Error(ul("error.channel.thread"));
 			msg = starterMsg;
 			const ping = await thread.send(
 				interaction.user.id !== userId
@@ -130,10 +130,10 @@ export async function repostInThread(
 			thread = await createDefaultThread(channel, guildData, interaction);
 	}
 	if (!thread) {
-		throw new Error(ul("error.noThread"));
+		throw new Error(ul("error.channel.thread"));
 	}
 	if (!isForumThread) msg = await thread.send(dataToSend);
-	if (!msg) throw new Error(ul("error.noThread"));
+	if (!msg) throw new Error(ul("error.channel.thread"));
 	const userRegister: UserRegistration = {
 		userID: userId,
 		isPrivate: userTemplate.private,
@@ -157,10 +157,10 @@ export async function findLocation(
 	user?: Djs.User | null
 ): Promise<{
 	thread?:
-		| Djs.PrivateThreadChannel
-		| Djs.TextChannel
-		| Djs.NewsChannel
-		| Djs.PublicThreadChannel<boolean>;
+	| Djs.PrivateThreadChannel
+	| Djs.TextChannel
+	| Djs.NewsChannel
+	| Djs.PublicThreadChannel<boolean>;
 	sheetLocation: PersonnageIds;
 }> {
 	const sheetLocation: PersonnageIds = {
@@ -174,7 +174,7 @@ export async function findLocation(
 		sheetLocation?.channelId
 	);
 	if (!thread) {
-		await reply(interaction, { embeds: [embedError(ul("error.noThread"), ul)] });
+		await reply(interaction, { embeds: [embedError(ul("error.channel.thread"), ul)] });
 		return { sheetLocation };
 	}
 	const allowHidden = haveAccess(interaction, thread.id, user?.id ?? interaction.user.id);
@@ -213,7 +213,7 @@ export async function findThread(
 				db.delete(guild, "hiddenRoll");
 				command = `${ul("config.name")} ${ul("hidden.title")}`;
 			} else db.delete(guild, "rollChannel");
-			await sendLogs(ul("error.rollChannelNotFound", { command }), channel.guild, db);
+			await sendLogs(ul("error.roll.channelNotFound", { command }), channel.guild, db);
 		}
 	}
 	await channel.threads.fetch();
@@ -287,7 +287,7 @@ export async function findForumChannel(
 				db.delete(guild, "hiddenRoll");
 				command = `${ul("config.name")} ${ul("hidden.title")}`;
 			} else db.delete(guild, "rollChannel");
-			await sendLogs(ul("error.rollChannelNotFound", { command }), forum.guild, db);
+			await sendLogs(ul("error.roll.channelNotFound", { command }), forum.guild, db);
 		}
 	}
 	const allForumChannel = forum.threads.cache.sort((a, b) => {
@@ -331,10 +331,10 @@ export async function threadToSend(
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)
 		: await findForumChannel(
-				channel.parent as Djs.ForumChannel,
-				channel as Djs.ThreadChannel,
-				db,
-				ul,
-				isHidden
-			);
+			channel.parent as Djs.ForumChannel,
+			channel as Djs.ThreadChannel,
+			db,
+			ul,
+			isHidden
+		);
 }

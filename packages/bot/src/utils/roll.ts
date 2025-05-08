@@ -108,7 +108,7 @@ export async function rollDice(
 		await reply(interaction, {
 			embeds: [
 				embedError(
-					ul("error.noDamage", {
+					ul("error.damage.notFound", {
 						atq: infoRoll.name.capitalize(),
 						charName: charOptions ?? "",
 					}),

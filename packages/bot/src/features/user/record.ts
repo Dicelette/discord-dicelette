@@ -87,7 +87,7 @@ export async function createEmbedFirstPage(
 		: undefined;
 	if (!existChannel) {
 		await reply(interaction, {
-			embeds: [embedError(ul("error.noThread"), ul)],
+			embeds: [embedError(ul("error.channel.thread"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;

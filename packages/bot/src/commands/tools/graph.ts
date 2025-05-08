@@ -209,7 +209,7 @@ export const graph = {
 				userData = await findChara(charData, charName);
 			}
 			if (!userData) {
-				await reply(interaction, { embeds: [embedError(ul("error.user"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 				return;
 			}
 			const sheetLocation: PersonnageIds = {
@@ -224,7 +224,7 @@ export const graph = {
 			);
 			if (!thread)
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.noThread"), ul)],
+					embeds: [embedError(ul("error.channel.thread"), ul)],
 				});
 
 			const allowHidden = haveAccess(interaction, thread.id, userId);
@@ -240,7 +240,7 @@ export const graph = {
 				return;
 			}
 			if (!userStatistique.stats) {
-				await reply(interaction, { embeds: [embedError(ul("error.noStats"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.stats.notFound_plural"), ul)] });
 				return;
 			}
 			const titleUser = () => {
