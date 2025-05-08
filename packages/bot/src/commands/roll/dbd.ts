@@ -89,7 +89,7 @@ export default {
 		if (!db || !interaction.guild || !interaction.channel) return;
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
 		const { ul } = getLangAndConfig(client.settings, interaction);
-		if (!user && !db.templateID) {
+		if (!user && !db.templateID?.damageName?.length) {
 			await reply(interaction, {
 				embeds: [embedError(t("error.user.data"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
