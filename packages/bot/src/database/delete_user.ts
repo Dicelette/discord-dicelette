@@ -51,6 +51,14 @@ export function deleteByMessageIds(
 	}
 }
 
+/**
+ * Removes user character data and guild settings associated with a specific channel or thread.
+ *
+ * Cleans up user character entries linked to the given channel or thread and deletes related guild configuration keys if they reference the channel.
+ *
+ * @param guildID - The ID of the guild where the channel or thread exists.
+ * @param channel - The channel or thread being deleted or cleaned up.
+ */
 export function deleteIfChannelOrThread(
 	client: EClient,
 	guildID: string,

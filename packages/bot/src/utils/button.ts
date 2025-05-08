@@ -64,8 +64,9 @@ export function selectEditMenu(ul: Translation) {
 }
 
 /**
- * Interaction when the cancel button is pressed
- * Also prevent to cancel by user not authorized
+ * Handles the cancel button interaction, deleting the message if the user is authorized.
+ *
+ * Deletes the interaction message if the interacting user is either the user referenced in the embed or has moderator permissions. Otherwise, replies with a localized no-permission message.
  */
 export async function cancel(
 	interaction: Djs.ButtonInteraction,
@@ -90,8 +91,9 @@ export async function cancel(
 }
 
 /**
- * Add the cancel and continue button when registering user and their are multiple page
- * @param ul {Translation}
+ * Creates an action row with "continue" and "cancel" buttons for multi-page user registration.
+ *
+ * @returns An action row containing the "continue" and "cancel" buttons.
  */
 export function continueCancelButtons(ul: Translation) {
 	const continueButton = new Djs.ButtonBuilder()
@@ -108,6 +110,13 @@ export function continueCancelButtons(ul: Translation) {
 	]);
 }
 
+/**
+ * Reconstructs the appropriate edit buttons and select menu for a user character sheet message.
+ *
+ * Determines which edit buttons ("edit stats" and "edit dice") are present in the given message and generates a new action row of buttons accordingly, along with the select menu for editing options.
+ *
+ * @returns An object containing the reconstructed buttons action row and the select menu action row.
+ */
 export function getButton(message: Djs.Message, ul: Translation) {
 	const oldsButtons =
 		message.components as Djs.ActionRow<Djs.MessageActionRowComponent>[];

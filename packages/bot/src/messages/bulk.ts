@@ -13,7 +13,11 @@ import {
 import { searchUserChannel } from "utils";
 
 /**
- * Update the template of existing user when the template is edited by moderation
+ * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
+ *
+ * For each character belonging to users in the guild, fetches the corresponding message and replaces its template embed with one reflecting the updated template fields. Also updates the in-memory character data to match the new embed.
+ *
+ * @param template - The updated statistical template to apply to all user character messages.
  */
 export async function bulkEditTemplateUser(
 	client: EClient,
@@ -80,7 +84,9 @@ export async function bulkEditTemplateUser(
 }
 
 /**
- * Delete all characters from the guild
+ * Prompts for confirmation and deletes all character data and messages in the guild.
+ *
+ * Displays a confirmation dialog to the user. If confirmed, removes all character messages, clears character data from guild settings and cache, and updates the confirmation message. If canceled or timed out, no characters are deleted.
  */
 export async function bulkDeleteCharacters(
 	client: EClient,

@@ -9,6 +9,13 @@ import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import type { TextChannel } from "discord.js";
 
+/**
+ * Handles validation and execution of a character rename operation from a Discord modal submission.
+ *
+ * Retrieves and validates the relevant message, user, and character data, then updates the character's name and database records accordingly.
+ *
+ * @throws {Error} If the required embed, user ID, user object, or character data cannot be found.
+ */
 export async function validateRename(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,

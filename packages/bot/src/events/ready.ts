@@ -72,6 +72,14 @@ export default (client: EClient): void => {
 	});
 };
 
+/**
+ * Migrates user data for a guild to the updated message ID format if not already converted.
+ *
+ * For each user in the guild, updates character entries with a legacy `messageId` field to use the new array format, associating the message with either a private or default channel. Removes entries that cannot be updated due to missing channel information. Marks the guild as converted upon completion.
+ *
+ * @param db - The settings database instance.
+ * @param guild - The Discord guild whose user data will be migrated.
+ */
 function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 	if (db.get(guild.id, "converted")) return;
 	const users = db.get(guild.id, "user");
@@ -110,12 +118,22 @@ function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 	db.set(guild.id, true, "converted");
 }
 
+/**
+ * Fetches and caches the statistical template for a guild.
+ *
+ * Retrieves the guild's language setting, loads the appropriate localization, fetches the statistical template, and stores it in the client's template cache if found.
+ */
 async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
 	const lang = client.settings.get(guild.id, "lang") ?? Djs.Locale.EnglishUS;
 	const ul = ln(lang);
 	const template = await getTemplate(guild, client.settings, ul);
 	if (template) client.template.set(guild.id, template);
 }
+/**
+ * Removes settings for guilds the bot is no longer a member of.
+ *
+ * Iterates through all guild IDs in the settings database and deletes entries for any guilds that are not present in the client's current guild cache.
+ */
 function cleanData(client: EClient) {
 	const guilds = client.guilds.cache;
 	const settings = client.settings;
