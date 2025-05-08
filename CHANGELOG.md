@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.43.2](https://github.com/Dicelette/discord-dicelette/compare/1.43.1...1.43.2) (2025-05-08)
+
+
+### Bug Fixes
+
+* correct condition for generating stats dice in custom criticals ([a25bf6f](https://github.com/Dicelette/discord-dicelette/commit/a25bf6fa3eef30e87c0a3c74a11fcf3d5e78030b))
+
 ## [1.43.1](https://github.com/Dicelette/discord-dicelette/compare/1.43.0...1.43.1) (2025-05-08)
 
 
