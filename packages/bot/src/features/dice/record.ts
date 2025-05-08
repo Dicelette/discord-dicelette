@@ -86,7 +86,9 @@ export function registerDmgButton(ul: Translation) {
  *
  * Handles both initial dice registration for a user and subsequent additions or edits. Updates the embed with the new dice, evaluates dice values using user stats, enforces a maximum of 25 dice, manages user roles, and updates the database and in-memory cache as needed.
  *
- * @param first - If true, indicates this is the initial dice registration for the user; otherwise, a new dice is being added to an existing user.
+ * @param {Djs.ModalSubmitInteraction} interaction
+ * @param {EClient} client
+ * @param {boolean|undefined} first - If true, indicates this is the initial dice registration for the user; otherwise, a new dice is being added to an existing user.
  *
  * @throws {Error} If the interaction is missing a guild or message, or if the user cannot be found in the embed.
  */
