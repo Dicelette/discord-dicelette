@@ -6,7 +6,9 @@ import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
 
 /**
- * Interaction to add a new skill dice
+ * Handles the interaction for adding a new skill dice via a button press.
+ *
+ * Checks if the user has permission to edit, then displays a modal for entering new skill dice details.
  */
 export async function executeAddDiceButton(
 	interaction: Djs.ButtonInteraction,
@@ -23,12 +25,13 @@ export async function executeAddDiceButton(
 }
 
 /**
- * Modal to add a new skill dice
- * - true: It's the modal when the user is registered
- * - false: It's the modal when the user is already registered and a new dice is added to edit the user
- * @param interaction
- * @param first
- * @param lang
+ * Displays a modal for adding a new skill dice to a user's profile.
+ *
+ * Presents a form with fields for the dice name and value, using localized labels and placeholders.
+ *
+ * @param interaction - The button interaction that triggers the modal.
+ * @param first - Indicates if this is the initial dice addition during registration.
+ * @param lang - The locale used for modal labels and placeholders.
  */
 export async function showDamageDiceModals(
 	interaction: Djs.ButtonInteraction,
@@ -66,8 +69,7 @@ export async function showDamageDiceModals(
 }
 
 /**
- * Start the showEditDice when the button is interacted
- * It will also verify if the user can edit their dice
+ * Initiates the dice editing process when the corresponding button is pressed, verifying the user's permission before displaying the edit modal.
  */
 export async function initiateDiceEdit(
 	interaction: Djs.ButtonInteraction,
@@ -80,8 +82,11 @@ export async function initiateDiceEdit(
 }
 
 /**
- * Show the modal to **edit** the registered dice
- * Will parse registered dice and show them in the modal as `- Skill : Dice`
+ * Displays a modal allowing the user to edit all registered skill dice.
+ *
+ * Parses the current dice from the message embed and pre-fills the modal input with a formatted list of skill-dice pairs.
+ *
+ * @throws {Error} If no valid dice embed is found in the message.
  */
 export async function showEditDice(interaction: Djs.ButtonInteraction, ul: Translation) {
 	const diceEmbed = getEmbeds(ul, interaction.message, "damage");

@@ -13,6 +13,11 @@ import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
 import type { TextChannel } from "discord.js";
 
+/**
+ * Handles a Discord modal submission to validate and process the transfer of a character between users within a guild.
+ *
+ * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
+ */
 export async function validateMove(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,

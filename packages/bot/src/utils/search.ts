@@ -2,6 +2,18 @@ import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError, sendLogs } from "messages";
 import { isValidChannel, isValidInteraction } from "utils";
+/**
+ * Fetches and validates a Discord channel by ID within a guild context, handling errors and localization.
+ *
+ * Attempts to retrieve the specified channel, validates its suitability for interaction, and manages error reporting through embeds and logging. If the channel is a thread and archived, it is unarchived before returning.
+ *
+ * @param guildData - Guild-specific configuration settings.
+ * @param interaction - The Discord.js interaction initiating the request.
+ * @param ul - Function for localized message translation.
+ * @param channelId - The ID of the channel to fetch and validate.
+ * @param register - If true, skips further processing for forum channels.
+ * @returns The fetched and validated Discord channel, or `undefined` if not found or invalid.
+ */
 export async function searchUserChannel(
 	guildData: Settings,
 	interaction: Djs.BaseInteraction,
