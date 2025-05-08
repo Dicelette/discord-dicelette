@@ -6,6 +6,7 @@ import {
 import { t } from "@dicelette/localization";
 import {
 	convertNameToValue,
+	getExpression,
 	getRoll,
 	ResultAsText,
 	replaceStatInDice,
@@ -13,10 +14,9 @@ import {
 	type Server,
 	skillCustomCritical,
 	trimAll,
-	getExpression,
 } from "@dicelette/parse_result";
 import type { Settings, Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue } from "database";
 import * as Djs from "discord.js";
@@ -83,13 +83,10 @@ export async function rollDice(
 	};
 	atq = atq.standardize();
 	const expression = options.getString(t("common.expression")) ?? "0";
-	logger.trace("ATQ USED", atq);
 	const comm = options.getString(t("common.comments"))
 		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
-	//search dice
-
 	let dice = userStatistique.damage?.[atq];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!dice) {

@@ -342,7 +342,10 @@ export async function getStatistics(
 	}
 	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
 	const template = await getTemplateWithInteraction(interaction, client);
-	const needStats = template?.diceType?.includes("$");
+	const diceType = !userStatistique
+		? template?.diceType
+		: userStatistique.template.diceType;
+	const needStats = diceType?.includes("$");
 	if (!userStatistique && !charName && needStats) {
 		//find the first character registered
 		const char = await getFirstChar(client, interaction, ul);
@@ -350,7 +353,7 @@ export async function getStatistics(
 		optionChar = char?.optionChar;
 	}
 
-	if (!needStats && !userStatistique) {
+	if (!needStats && !userStatistique && template) {
 		//we can use the dice without an user i guess
 		userStatistique = {
 			template: {
