@@ -9,6 +9,7 @@ import type { Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
+import { logger } from "@dicelette/utils";
 
 export function timestamp(time?: boolean) {
 	if (time) return ` • <t:${moment().unix()}:d>-<t:${moment().unix()}:t>`;
@@ -171,10 +172,13 @@ export function getExpression(
 	total?: string
 ) {
 	let expressionStr = convertExpression(expression, stats, total);
-	if (dice.includes("{exp}")) {
-		if (expression === "0") dice = dice.replaceAll("{exp}", "1");
-		else dice = dice.replaceAll("{exp}", `${expressionStr.replace(/^\+/, "")}`);
-		expressionStr = "";
-	}
+	const diceRegex = /\{exp( ?\|\| ?(?<default>\d+))?}/gi;
+	dice = dice.replace(diceRegex, (match, _p1, _p2, _offset, _string, groups) => {
+		const defaultValue = groups?.default ?? "1";
+		const value = expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
+		expressionStr = ""; // on vide après usage
+		return value;
+	});
+	logger.trace("Dice", dice);
 	return { dice, expressionStr };
 }

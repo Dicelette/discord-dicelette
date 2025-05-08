@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertExpression } from "../src/utils";
+import { convertExpression, getExpression } from "../src/utils";
 
 describe("convertExpression", () => {
 	it("should return a positive number with a plus sign", () => {
@@ -34,5 +34,20 @@ describe("convertExpression", () => {
 	it("should correctly be converted to a number", () => {
 		const result = convertExpression("2+5");
 		expect(Number.parseInt(result)).toBe(7);
+	});
+	it("Should return the default value with {exp||2}", () => {
+		const dice = "1d{exp||2}";
+		const res = getExpression(dice, "0");
+		expect(res.dice).toBe("1d2");
+	});
+	it("Should return the default value with {exp||2}", () => {
+		const dice = "1d{exp||2}";
+		const res = getExpression(dice, "2+5");
+		expect(res.dice).toBe("1d7");
+	});
+	it("Should replace with the correct value in multiple exp", () => {
+		const dice = "1d{exp||2}+{exp||6}";
+		const res = getExpression(dice, "0");
+		expect(res.dice).toBe("1d2+6");
 	});
 });

@@ -362,7 +362,7 @@ export const registerTemplate = {
 		});
 		await msg.pin();
 		//register in the cache
-
+		client.template.set(guildId, templateData);
 		//save in database file
 		const json = client.settings.get(guildId);
 		const statsName = templateData.statistics
