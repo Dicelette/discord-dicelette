@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.44.0](https://github.com/Dicelette/discord-dicelette/compare/1.43.2...1.44.0) (2025-05-09)
+
+
+### Features
+
+* **mj:** allow roll on global dice if exists ([ac50687](https://github.com/Dicelette/discord-dicelette/commit/ac50687dcaf27b9b95e97ea82be32c1305fd2859))
+
 ## [1.43.2](https://github.com/Dicelette/discord-dicelette/compare/1.43.1...1.43.2) (2025-05-08)
 
 
