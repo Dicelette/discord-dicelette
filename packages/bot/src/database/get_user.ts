@@ -67,7 +67,7 @@ export function getUserByEmbed(
  * @param {EClient} client
  * @param {Djs.CommandInteraction} interaction
  * @param {Translation} ul
- * @param {boolean} skipNotFound - If true, suppresses error replies and returns early when no user data is found.
+ * @param skipNotFound - If true, suppresses error replies and returns early when no user data is found.
  * @returns An object containing the capitalized character name and user statistics, or `undefined` if not found and {@link skipNotFound} is true.
  */
 export async function getFirstChar(
