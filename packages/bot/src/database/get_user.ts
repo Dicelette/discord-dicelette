@@ -473,9 +473,23 @@ export function getRightValue(
 			}
 		}
 		if (userStat) break;
+		if (userStatistique.isFromTemplate) {
+			if (!optionChar)
+				throw new Error(
+					ul("error.stats.user", {
+						stat: standardizedStatistic,
+					})
+				);
+			throw new Error(
+				ul("error.stats.char", {
+					stat: standardizedStatistic,
+					char: optionChar.capitalize(),
+				})
+			);
+		}
 		throw new Error(
 			ul("error.stats.notFound_singular", {
-				stat: standardizedStatistic.capitalize(),
+				stat: standardizedStatistic,
 				char: optionChar ? ` ${optionChar.capitalize()}` : "",
 			})
 		);

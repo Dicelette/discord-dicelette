@@ -1,677 +1,679 @@
 {
-	"anchor": {
-		"description": "Permet d'ajouter un lien vers le message le plus proche du dé",
-		"enabled": {
-			"logs": "Les logs de dés renverrons maintenant vers une \"ancre\" qui permet d'obtenir le contexte du dé (l'ancre est le message précédent le dé).",
-			"noDelete": "Les logs de dés mettront maintenant un lien vers le dé original."
-		},
-		"name": "contexte",
-		"options": "Activer/désactiver l'ancre de contexte"
-	},
-	"autoRole": {
-		"description": "Ajoute automatiquement un rôle quand une fiche est validée.",
-		"dice": {
-			"desc": "Ajoute un rôle quand des dés sont ajoutés (dbd)",
-			"remove": "Aucun rôle ne sera ajouté aux joueurs quand leurs dés sont ajoutés.",
-			"set": "{{- role}} sera maintenant ajoutés aux joueurs quand leurs dés sont enregistrés."
-		},
-		"name": "auto_role",
-		"options": "Rôle à ajouter",
-		"stat": {
-			"desc": "Ajoute un rôle quand les statistiques sont ajoutées (dbroll)",
-			"remove": "Aucun rôle ne sera ajouté aux joueurs quand leurs statistiques sont enregistrées.",
-			"set": "{{- role}} sera maintenant ajouté aux joueurs quand leurs statistiques seront validées."
-		}
-	},
-	"button": {
-		"avatar": {
-			"description": "Modifier l'image d'un personnage",
-			"title": "Avatar"
-		},
-		"cancel": "Annuler",
-		"continue": "Continuer",
-		"dice": "Enregistrer un dé",
-		"edit": {
-			"dice": "Modifier les dés",
-			"move": "Modifier l'utilisateur associé",
-			"name": "Renommer un personnage",
-			"select": "Modifier les données de l'utilisateur",
-			"stats": "Modifier les statistiques"
-		},
-		"name": "Modifier le nom du personnage",
-		"user": "Modifier l'utilisateur associé",
-		"validate": "Valider"
-	},
-	"calc": {
-		"description": "Calculer une valeur à partir d'une statistique",
-		"formula": {
-			"desc": "Formule à utiliser (supporte des dés)"
-		},
-		"sign": {
-			"desc": "Signes mathématiques",
-			"title": "signe"
-		},
-		"statistic": "Statistiques à utiliser",
-		"title": "calc",
-		"transform": {
-			"desc": "Arrondir, plafonner, plancher ou élever au cube le résultat.",
-			"title": "transformer"
-		}
-	},
-	"changeThread": {
-		"delete": "Les résultats des dés ne seront plus envoyés",
-		"description": "Enregistrer un channel pour y envoyer les résultats des dés ou utiliser un thread automatiquement.",
-		"name": "result_channel",
-		"noChan": "Aucun channel de sauvegarde n'a été paramétré auparavant: Annulation de la commande.\n\nSi vous voulez désactiver la création des threads, utiliser la commande `/config result_channel true`.",
-		"options": "Channel des résultats",
-		"set": "Le channel {{- channel}} a été enregistré pour y envoyer les résultats des dés."
-	},
-	"common": {
-		"cancel": "Annulation",
-		"cancelled": "La suppression a été annulée.",
-		"channel": "channel",
-		"charName": "Nom du personnage",
-		"character": "personnage",
-		"comments": "commentaires",
-		"confirm": "Confirmer la suppression",
-		"context": "Contexte",
-		"default": "Défaut",
-		"dice": "dé",
-		"error": "Erreur",
-		"expression": "expression",
-		"false": "Faux",
-		"isPrivate": "Personnage privé",
-		"name": "nom",
-		"no": "✕",
-		"noSet": "/",
-		"page": "Page {{- nb}}",
-		"role": "rôle",
-		"sheet": "[ FICHE ]",
-		"space": " ",
-		"statistic": "statistique",
-		"statistics": "statistiques",
-		"total": "Total",
-		"true": "Vrai",
-		"user": "Joueur",
-		"yes": "✓"
-	},
-	"config": {
-		"admin": {
-			"desc": "Permet de consigner toutes les modifications et créations de personnages dans un channel.",
-			"title": "Administration"
-		},
-		"autoRole": "Rôles automatiques",
-		"context": {
-			"desc": "Dans la sauvegarde du résultat, permet d'afficher un lien vers le message précédent le lancer de dé, ou le lancer lui-même, en fonction des paramètres d'auto-suppression.",
-			"title": "[Sauvegarde du résultat] Lien vers le contexte du dé"
-		},
-		"damageName": "Liste des dés sauvegardés (global)",
-		"defaultSheet": "Channel par défaut",
-		"description": "Permet de configurer le bot pour le serveur",
-		"disableThread": {
-			"desc": "Désactive la sauvegarde globale et l'auto-suppression des résultats, laissant donc le lancer de dés là où il a été fait.",
-			"title": "Désactivation des fils de résultats"
-		},
-		"display": {
-			"description": "Affiche la configuration du serveur",
-			"name": "afficher"
-		},
-		"displayResult": "Affichage des résultats",
-		"excludedStats": "Statistiques exclues",
-		"hiddenRoll": {
-			"desc": "Permet de cacher les résultats des dés des MJ et de l'envoyé dans un channel spécifique ou par message éphémère.",
-			"title": "[MJ] Jets invisibles"
-		},
-		"lang": {
-			"description": "Permet de choisir la langue du bot manuellement",
-			"name": "changer_langue",
-			"options": {
-				"desc": "Langue à utiliser",
-				"name": "langue"
-			},
-			"set": "Le bot utilisera maintenant \"{{-lang}}\" comme langue principale."
-		},
-		"linkToLog": {
-			"desc": "Dans le résultat du dé, permet d'afficher un lien vers la sauvegarde du résultat.",
-			"title": "[Résultat] Lien vers la sauvegarde du résultat de dés"
-		},
-		"logLink": {
-			"description": "Active le lien vers les logs dans le résultat du dé",
-			"name": "lien_sauvegarde"
-		},
-		"logs": "Journalisation",
-		"name": "config",
-		"privateChan": "Channel des personnages privés",
-		"result": {
-			"desc": "Permet de sauvegarder tous les résultats de lancer dans un seul et même channel.",
-			"title": "Sauvegarde des résultats"
-		},
-		"sheet": "Fiches",
-		"statsName": "Nom des statistiques",
-		"template": "Configuration du modèle",
-		"templateMessage": "Lien vers le modèle",
-		"timer": {
-			"desc": "À la fin du timer, le lancer de dés sera supprimé mais sont résultats sera sauvegardé dans le channel approprié.",
-			"title": "Délais avant suppression"
-		},
-		"timestamp": {
-			"desc": "Affichage de l'heure/date du lancer dans l'agrégateur des résultats.",
-			"title": "Affichage des timestamps"
-		},
-		"title": "Configuration de {{- guild}}"
-	},
-	"context": {
-		"disabled": "L'ajout d'un lien vers le contexte est désactivé."
-	},
-	"copyRollResult": {
-		"error": {
-			"noResult": "Aucun résultat de dés n'a été trouvé dans le message.",
-			"notBot": "Ce message ne provient pas de Dicelette. Aucun lien ne peut être créé !"
-		},
-		"info": "Le choix du message à copier pour créer un raccourci vers le résultat dépend de votre plateforme :\n- __Mobile__ : Merci de sélectionner le second message et cliquer sur \"Copier le texte\".\n- __PC__ : Merci de copier le bloc de code ci-dessous.",
-		"name": "Créer un lien vers ce résultat"
-	},
-	"csv_generation": {
-		"description": "Permet de générer le fichier CSV pour la commande ajout_masse.",
-		"name": "csv",
-		"success": "Voici votre fichier CSV ! Attention, par défaut, le délimiteur utilisé est `;`. N'oubliez pas de le préciser à l'import dans votre logiciel (excel/google sheet...).\nPrécisons que vous devez vous-même calculer les combinations !"
-	},
-	"dbRoll": {
-		"description": "Lance un dé avec une statistique enregistrée",
-		"name": "dbroll",
-		"options": {
-			"character": "Le personnage où prendre la valeur.",
-			"comments": {
-				"description": "Description de l'action"
-			},
-			"hidden": {
-				"description": "Cache le résultat du dé (ignoré si la configuration n'est pas faite)",
-				"name": "caché"
-			},
-			"modificator": {
-				"description": "Expression (mathématique) appliqué au lancer"
-			},
-			"override": {
-				"description": "Remplacer le seuil de réussite",
-				"name": "seuil_reussite"
-			},
-			"statistic": "La statistique à utiliser"
-		}
-	},
-	"deleteChar": {
-		"all": "Êtes vous sûre de vouloir supprimer les données de {{- user}} ?",
-		"allMany": "Êtes-vous sûr·e de vouloir **supprimer tous les personnages** de {{- user}} ?\n__Personnages trouvés__ :\n- {{- chara}}",
-		"allOne": "Êtes vous sûr·e de vouloir supprimer le personnage {{- user}} ?",
-		"allSuccess": "Les données de {{- user}} ont bien été supprimée.",
-		"character": "Le nom du personnage à supprimer",
-		"confirm": {
-			"all": "Êtes-vous sûr·e de vouloir supprimer tous les personnages de {{- user}} ?",
-			"title": "Suppression de personnages"
-		},
-		"description": "Supprime un personnage / utilisateur",
-		"name": "supprimer_char",
-		"noCharacters": "L'utilisateur {{- user}} n'est pas inscrit·e dans la base.",
-		"success": "Le personnage de {{- user}} a bien été supprimé !",
-		"user": "Le joueur à supprimer"
-	},
-	"disableThread": {
-		"description": "Désactive/active la création automatique des threads et utilise le channel configuré pour les logs",
-		"disable": {
-			"autoDelete": "L'auto-suppression des résultats a été désactivé.",
-			"mention": "Le channel {{- mention}} ne recevra plus les logs des dés.",
-			"prefix": "Les canaux préfixés par `🎲` ne recevront plus de logs non plus.",
-			"reply": "La création automatique des threads a été désactivée : les résultats des dés seront maintenant conservés dans le channel où la commande a été utilisée."
-		},
-		"enable": {
-			"autoDelete": "L'effacement automatique des réponses a été autorisé. Vous pouvez la configurer avec `/config supprimer_après`.",
-			"mention": "Le channel {{- mention}} recevra de nouveaux les logs des dés.",
-			"prefix": "Les canaux préfixés par `🎲` recevront à nouveau les résultats des dés.",
-			"reply": "Les résultats des dés seront automatiquement envoyés à un fil de discussion créé automatiquement."
-		},
-		"name": "désactiver_thread",
-		"options": {
-			"name": "basculer"
-		}
-	},
-	"display": {
-		"character": "Le personnage à afficher",
-		"description": "Permet d'afficher la fiche d'un joueur/personnage",
-		"title": "afficher",
-		"user": "L'utilisateur à afficher",
-		"userLowercase": "joueur"
-	},
-	"edit": {
-		"desc": "Permet d'éditer les données d'une fiche",
-		"rename": {
-			"desc": "Modifier le nom d'un personnage",
-			"option": {
-				"desc": "Nouveau nom à utiliser",
-				"title": "nouveau_nom"
-			},
-			"title": "rename"
-		},
-		"user": {
-			"desc": "Modifier l'utilisateur associé à un personnage",
-			"option": {
-				"desc": "Le nouveau possesseur du personnage",
-				"title": "nouveau_utilisateur"
-			},
-			"success": "L'utilisateur a bien été changé.",
-			"title": "user"
-		}
-	},
-	"edit_avatar": {
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"success": "Avatar changé pour {{- name}} ([lien vers la fiche]({{-link}})) !",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
-	},
-	"edit_name": {
-		"success": "Le nom du personnage a bien été changé ! Vous pouvez le retrouver ici: {{- url}}"
-	},
-	"embed": {
-		"add": "Enregistrement de l'utilisateur",
-		"dice": "Dés de compétences",
-		"display": "Personnage",
-		"edit": {
-			"dice": "Dés modifiés",
-			"stats": "Statistiques modifiées"
-		},
-		"old": "Joueur enregistré",
-		"template": "Modèle",
-		"user": "⌈⌋ Fiche ⌈⌋"
-	},
-	"error": {
-		"avatar": {
-			"url": "L'image fournie est invalide : elle doit contenir le format de l'image (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) et être un lien en `https`."
-		},
-		"botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
-		"calc": "Une erreur est survenue avec la formule utilisée.",
-		"channel": {
-			"defaultChannel": "Vous devez fournir au moins un channel par défaut pour sauvegarder les fiches.",
-			"notFound": "Le channel `{{-channel}}` n'existe pas sur ce serveur.",
-			"thread": "Aucun channel valide trouvé — Veuillez réenregistrer le modèle si le channel a été supprimé"
-		},
-		"csvContent": "Le contenu du {{- fichier}} est invalide.",
-		"damage": {
-			"empty": "Vous n'avez pas de dés de capacités enregistrés.",
-			"notFound": "`{{- atq}}` n'est pas enregistré pour {{- charName}}."
-		},
-		"discord": "## [DISCORD] :warning: __Erreur__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nMerci de signaler le bug sur [le serveur officiel](https://discord.gg/2PUqwWeQYZ).",
-		"duplicate": "Le nom est déjà utilisé pour un autre personnage ! Vous ne pouvez donc pas l'utiliser ici. Chaque nom doit être unique !",
-		"embed": {
-			"notFound": "Aucun embed trouvé",
-			"old": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>)."
-		},
-		"generic": {
-			"e": "{{- e.message}}",
-			"withWarning": "## [{{- e.name}}] :warning: __Erreur__ :\n{{- e.message}}"
-		},
-		"guild": {
-			"data": "Aucune donnée trouvée pour le serveur {{- server }}.",
-			"empty": " Aucun serveur n'a été trouvé."
-		},
-		"invalidDice": {
-			"embeds": "Aucun embed de dé détecté",
-			"eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
-			"minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
-			"notFound": "Aucun dé n'a été retrouvé dans la commande !",
-			"withDice": "Dé invalide : `{{- dice}}` durant le jet de validation."
-		},
-		"invalidFormula": "Formule invalide : `{{- formula}}`",
-		"missingPermission": "## [DISCORD] :warning: __Erreur__ : **PERMISSIONS MANQUANTES**\nLe bot n'a pas les permissions pour faire l'action demandées. Vérifié qu'il a bien accès au channel/thread demandé !\n",
-		"mustBeGreater": "## :warning: **Une erreur est survenue**\nLa valeur `{{- value}}` doit être plus grande que `{{- min}}`.",
-		"mustBeLower": "La valeur `{{- value}}` doit être plus petite que `{{- max}}`",
-		"noBulkRoll": "Les jets en \"masse\" ne sont pas autorisés dans les dés partagés.",
-		"noDice": "Vous ne pouvez pas lancer cette commande sans avoir un dé type enregistré !",
-		"noMessage": "Aucun message trouvé.",
-		"noPermission": "Vous n'avez pas les permissions pour changer l'image d'un autre utilisateur. Seuls les personnes ayant les autorisations \"GÉRER LES RÔLES\" peuvent utiliser cette commande pour d'autres joueurs.",
-		"private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
-		"public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
-		"roll": {
-			"channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut."
-		},
-		"sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
-		"stats": {
-			"empty": "Cette combination est invalide : aucune statistiques n'existent !",
-			"excluded": "Cette statistique est exclue : Vous ne pouvez pas faire de jet pour elle.",
-			"notFound": "La statistique `{{- value}}` est introuvable ! Avez vous fait une erreur de frappe ?",
-			"notFound_plural": "Cette commande ne peut pas être utilisé : aucune statistique n'a été enregistrée.",
-			"notFound_singular": "La statistique `{{- stat}}` est introuvable sur le personnage sélectionné ({{- char}}).",
-			"shouldSelect": "Vous avez besoin de sélectionner une statistique pour lancer un dé.",
-			"tooMuch": "Trop de statistiques ont été fournies ! Vous ne pouvez pas avoir plus de 25 statistiques."
-		},
-		"template": {
-			"id": "Aucun message trouvé avec les données sauvegardée dans la base de données:\n- Channel : `{{- channelId}}`\n- ID du message : `{{- messageId}}`",
-			"json": "Vous devez fournir un fichier JSON valide.",
-			"notFound": "Aucun modèle ou channel configuré"
-		},
-		"tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",
-		"totalExceededBy": "Le total de `{{- value}}` est dépassé de `{{- max}}`.",
-		"user": {
-			"charName": "Le personnage {{- charName}} n'est pas enregistré.",
-			"data": "Aucunes données d'utilisateurs ou de modèles n'ont été trouvées.",
-			"notFound": "Utilisateur introuvable.\n- Il peut s'agir d'une erreur temporaire causé par la mise à jour du cache,\n- La fiche est introuvable car elle a été supprimé (ou son channel) mais les données n'ont pas été supprimé de la base de données. Si tel est le cas, vous devez utiliser la commande `/supprimer_char`.",
-			"registered": "{{- user}} n'est pas enregistré.",
-			"rename": "Votre personnage n'a pas de nom : il ne peut donc pas être renommé !",
-			"youRegistered": "Vous n'êtes pas enregistré !"
-		}
-	},
-	"export": {
-		"description": "Export tous les personnages sauvegardés dans un fichier csv",
-		"error": {
-			"noData": "Aucun n'utilisateur n'est enregistrés."
-		},
-		"name": "export",
-		"options": {
-			"desc": "Exporter que les personnages marqués comme privé",
-			"name": "fiche_privée_uniquement"
-		}
-	},
-	"generate": {
-		"description": "Générer un modèle de serveur pour les commandes de statistiques/dés",
-		"help": "[Voir la documentation complète sur la génération d'un modèle](<https://dicelette.github.io/docs/model/register>).\nVous pouvez utiliser [ceci](<https://dicelette.github.io/docs/model/register/form>) pour générer un modèle en utilisant une interface.",
-		"name": "générer",
-		"options": {
-			"character": {
-				"description": "Rendre le nom du personnage obligatoire pour l'enregistrement",
-				"name": "personnage"
-			},
-			"critical_fail": {
-				"description": "Définir un échec critique (dé naturel)",
-				"name": "échec_critique"
-			},
-			"critical_success": {
-				"description": "Définir un succès critique (dé naturel)",
-				"name": "succès_critique"
-			},
-			"damage": {
-				"description": "Enregistrer un dé de compétence - Séparer le nom des compétences par un espace ou une virgule",
-				"name": "competence"
-			},
-			"dice": {
-				"description": "Le type de dé à lancer",
-				"name": "dé"
-			},
-			"stats": {
-				"description": "Le nom de la statistique, séparez-les par un espace ou une virgule",
-				"name": "nom"
-			},
-			"total": {
-				"description": "Le total des points de statistiques (sera calculé quand l'utilisateur sera enregistré)",
-				"name": "total"
-			}
-		}
-	},
-	"graph": {
-		"bg": {
-			"description": "Couleur du fond du graphique. Par défaut: #0e47b2",
-			"name": "fond"
-		},
-		"description": "Générer un graphique des statistiques de l'utilisateur",
-		"line": {
-			"description": "Couleur des lignes. Par défaut: #0e47b2",
-			"name": "ligne"
-		},
-		"max": {
-			"description": "Valeur maximale pour la génération du graphique",
-			"name": "max"
-		},
-		"min": {
-			"description": "Valeur minimal pour la génération du graphique",
-			"name": "min"
-		},
-		"name": "graph"
-	},
-	"help": {
-		"admin": {
-			"description": "Affiche les commandes administrative du bot",
-			"messageDB": "## Gestion des personnages et du modèle\n\n- </delete_char:{{- deleteChar}}> : Permet de supprimer un personnage de la base de données. Supprimera le message de la fiche s'il est toujours présent sur le serveur.\n\n### Rôle automatiques\n\nSes deux commandes permettent d'ajouter automatiquement un rôle à la validation des fiches :\n- </config auto_role statistic:{{-stat}}> : Permet d'ajouter un rôle quand des statistiques sont validées (permet d'activer </dbroll:{{- dbroll}}>)\n- </config auto_role dice:{{-dice}}> : Permet d'ajouter un rôle quand un dé est enregistré (active </dbd:{{- dbd}}>).\n\n### Lancer de dé \"maître de jeu\"\n\nLes deux commandes suivantes permettent aux maîtres de jeu de lancer des dés pour tous les joueurs enregistrés.\n\n- </gm dbroll:{{-gm.dbRoll}}> : Lance un dé de statistique, similaire à </dbroll:{{- dbroll}}>.\n- </gm dbd:{{-gm.dBd}}>: Lance un dé enregistré, similaire à </dbd:{{- dbd}}>.",
-			"messageNoDB": "Le bot possède différentes commandes d'administration qui permet de personnaliser votre expérience.\n\nVous trouverez [ici](<https://dicelette.github.io/docs/admin/config>) des explications détaillées des commandes montrées ici :\n- </config display:{{-display}}> : Affiche la configuration du serveur.\n- </config logs:{{- logs}}> : Enregistre un channel pour afficher les erreurs et les modifications apportées aux fiches.\n- </config result_channel:{{- result}}> : Permet de définir un channel ou de désactiver la création automatique des threads pour recevoir les résultats de tous les jets de dés du serveur.\n- </config delete_after:{{-delete}}> : Permet de changer le temps avant suppression du résultat du dé (si </config result_channel:{{- result}}> n'est pas désactivé). Si mis à `0`, les messages de résultats ne seront plus supprimés. Par défaut, les messages sont supprimés après 3 minutes.\n- </config timestamp:{{- timestamp}}> : Affiche ou nom les timestamp dans les logs de lancé de dé.",
-			"name": "admin"
-		},
-		"bug": {
-			"description": "Signaler un bug",
-			"message": "Merci de faire votre rapport de bug [ici](<{{-link}}>). Avant de faire votre rapport, merci de vérifier qu'il n'existe pas déjà un rapport sur votre bug.\n\nN'oubliez pas d'aller lire la [documentation](<https://dicelette.github.io/>) car vous pourrez y trouver des réponses à vos questions.",
-			"name": "bug"
-		},
-		"description": "Affiche l'aide",
-		"diceNotation": "## Notation des dés\n[Voir la documentation pour la notation des dés (en anglais)](<https://dice-roller.github.io/documentation/guide/notation/dice.html>).\n\nLe bot supporte aussi :\n- [Les groupes de dés](<https://dice-roller.github.io/documentation/guide/notation/group-rolls.html>)\n- [Les modifiers](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)\n- [Les commentaires](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)\n- [Les mathématiques](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)\n- Ainsi que les \"bulk rolls\" (lancer plusieurs dés en même temps) avec la notation suivante : `[nombre de dés]#[dés]`, comme par exemple `2#d6` pour lancer 2 dés à 6 faces.",
-		"fr": {
-			"description": "Faire une demande de fonctionnalité",
-			"message": "Vous avez une idée pour améliorer le bot ? Dans ce cas, vous pouvez la suggérer [ici](<{{- link}}>) !\n\nMerci d'éviter les doublons en vérifiant les autres issues ainsi que de lire la [documentation](<https://dicelette.github.io/>) !",
-			"name": "suggestion"
-		},
-		"info": {
-			"description": "Affiche les infos générales du bot",
-			"name": "info"
-		},
-		"invit": {
-			"change_language": "__Par défaut__, je répondrai en {{- lang}}, mais cela peut être modifié avec </config change_language:{{- id.lang}}>.\nPour le moment, cependant, seul le français et l'anglais sont disponibles !",
-			"channel": "Avec **`channel`** = **`#channel`** → Au lieu de créer des fils automatiquement, les résultats seront copiés dans ce salon !",
-			"copy": "De plus, je suis configuré pour __copier__ les résultats des jets de dés dans des fils commençant par `🎲`, qui seront créés automatiquement lorsqu'un lancé est fait.\nCela peut être modifié par la commande </config result_channel:{{-id.result}}>.",
-			"default": "Il suffit de mettre sur `0` pour désactiver l'auto-suppression.",
-			"disable": "Avec **`désactiver_thread`** = **`True`** → Les résultats seront conservés là où la commande a été faite, sans auto-suppression au bout de 3 minutes.",
-			"link": "Vous pouvez retrouver [la documentation ici]({{- docLink}}), car j'ai encore de nombreuses options de personnalisation !",
-			"serv": "Salut ! Je suis Dicelette !\nMerci de m'avoir ajouté sur {{- serv}}.",
-			"timer": "Si vous souhaitez modifier le temps avant la suppression des résultats, il suffit d'utiliser </config delete_after:{{-id.delete}}>. Je suis paramétré pour supprimer après 3 minutes !"
-		},
-		"message": ":game_die: **Dice Roller** :game_die:\n→ Retrouvez le *bot* sur [GitHub](<https://github.com/Dicelette/discord-dicelette/blob/main/README.fr.md>)\n→ [Documentation](<https://dicelette.github.io>)\n\n## Usage\n- </roll:{{- rollId}}> : Lance un dé\n- </scene:{{- sceneId}}> : Crée un nouveau thread pour les dés. Cela archivera tous les threads précédents.\n\nVous pouvez aussi créer une \"bulle temporelle\" avec les paramètres `/scene tempo:True`. Par défaut, le nom du thread sera la date du jour.\n\nVous pouvez utiliser le bot directement dans un message (**sans utiliser de slash commands**), avec :\n- __Un dé direct__ : `dés`, comme `d6` ou `2d6`\n- __Un dé indirect__ : `mon message [dés]`, comme `*Phibi saute sur Wumpus et lui inflige [2d6] dégâts*`.\n- __Un dé semi-direct__ : `1d100 mon message`, comme `1d100 Phibi saute sur Wumpus et lui inflige des dégâts`.\n\n{{- dbCMD}}\n\n",
-		"messageDB": "## Commandes liées aux fiches de personnages\n\n- </dbroll:{{- dbroll}}> : Lance un dés de statistiques, à partir d'une fiche de personnage.\n- </dbd:{{- dbd}}> : Lance un dé enregistré dans votre fiche de personnage.\n- </graph:{{- graph}}> : Permet de générer un graphique à partir des statistiques d'un personnage.\n- </display:{{- display}}> : Permet de consulter les statistiques et les dés d'un personnage.",
-		"name": "aide",
-		"register": {
-			"description": "Affiche l'aide général pour activer la fonction de sauvegarde de fiche.",
-			"message": "Le bot permet de configurer un modèle (\"modèle de serveur\") qui permet ensuite de créer des fiches de personnages ainsi que de retenir des dés. \n\nLes données restent intégralement sur votre serveur, et le modèle est pensé pour être adaptable à l'infini (ou presque !).\n\nVous trouverez [ici](<https://dicelette.github.io/docs/admin/model>) toutes les informations afin de configurer le modèle et enregistrer les fiches, afin de pouvoir utiliser les commandes </dbroll:{{- dbroll}}>, </dbd:{{- dbd}}>, ou encore </graph:{{- graph}}>.",
-			"name": "enregistrer"
-		}
-	},
-	"hidden": {
-		"description": "Permet de cacher les résultats des dés du lancer MJ",
-		"disabled": "Les résultats des dés MJ utilisent maintenant la configuration des dés normaux.",
-		"enabled": "Les dés MJ seront maintenant cachés et leur résultats envoyés dans un message éphémère.",
-		"enabledChan": "Les résultats des dés MJ seront maintenant envoyés dans {{- channel}} directement.",
-		"options": "Permet d'envoyer les résultats dans ce channel (sinon, ils seront envoyés dans un message éphémère)",
-		"title": "jet_invisible"
-	},
-	"import": {
-		"all_success": "Tous les utilisateurs ont été enregistrés.",
-		"description": "Ajouter plusieurs personnages d'un coup",
-		"errors": {
-			"duplicate_charName": "Le personnage {{- charName}} (de {{- user}}) existe déjà dans la base .",
-			"global": "Les erreurs suivantes ont été trouvées :",
-			"headers": "Le nom des colonnes ne correspondent pas à votre modèle. Merci de vous référez à la documentation et votre template pour vérifier le nom des colonnes.\n\nLes colonnes :\n- {{- name}} \nest/sont manquante(s).",
-			"invalid_file": "Le fichier doit être un fichier CSV. \nVous avez fourni un fichier {{-ext}}.",
-			"missing_charName": "Le nom du personnage est manquant pour {{- user}}. Il est pourtant obligatoire dans la template !",
-			"missing_header": "Votre CSV n'a pas de noms de colonnes !",
-			"missing_stats": "Il manque des statistiques pour {{- user}}. \nLes statistiques manquantes sont :\n- {{- stats}}",
-			"no_user": "Aucun membre n'existe sur ce serveur.",
-			"user_not_found": "{{- user}} n'a pas été trouvé sur le serveur. Il est possible que le cache ne soit pas à jour, ou qu'il y ait une erreur dans l'ID ou l'username."
-		},
-		"name": "import",
-		"options": {
-			"description": "Le fichier CSV à importer",
-			"name": "csv"
-		},
-		"success": "{{- user}} a bien été ajouté."
-	},
-	"linkToLog": {
-		"disabled": "Les liens vers les logs des dés sont désactivés.",
-		"enabled": "Les liens vers les logs de dés sont maintenant activés.",
-		"options": "Active/désactive l'option"
-	},
-	"logs": {
-		"delete": "Les logs ne seront plus envoyés",
-		"description": "Choisir un channel où envoyer les logs d'erreurs",
-		"dice": {
-			"add": "{{- user}} a ajouté les dés pour {{- char}} (dans {{- fiche}})",
-			"edit": "{{- user}} a modifié les dés de {{- char}} (dans {{- fiche}})",
-			"remove": "{{- user}} a supprimé les dés de {{-char}} (dans {{- fiche}})"
-		},
-		"inChan": "dans <#{{- chan}}>.",
-		"name": "logs",
-		"options": "Le channel où envoyer les logs",
-		"set": "Logs configurés dans le channel {{- channel}}",
-		"stats": {
-			"added": "{{- user}} a modifié les statistiques de {{- char}} (dans {{- fiche}})",
-			"removed": "{{- user}} a supprimé les statistiques de {{- char}} (dans {{- fiche}})"
-		}
-	},
-	"mjRoll": {
-		"description": "Permet de lancer des dés pour d'autres joueurs",
-		"name": "mj",
-		"user": "Joueur sur lequel lancer le dé"
-	},
-	"modals": {
-		"added": {
-			"dice": "Dés ajoutés",
-			"stats": "Statistiques ajoutés"
-		},
-		"alreadySet": "Toutes les statistiques sont déjà définies",
-		"avatar": {
-			"description": "Le lien vers l'image du personnage (par défaut, utilise l'avatar de l'utilisateur)",
-			"name": "Avatar"
-		},
-		"channel": {
-			"description": "Permet de poster la fiche ailleurs que dans les channels par défaut.",
-			"name": "Channel (sous forme d'ID) où poster la fiche"
-		},
-		"charName": {
-			"description": "Entrez le nom de votre personnage",
-			"name": "Nom du personnage"
-		},
-		"dice": {
-			"max": "Vous ne pouvez pas avoir plus de 25 dés enregistrés (limites de champ discord).",
-			"name": "Nom",
-			"placeholder": "Entrer un dé valide",
-			"value": "Valeur"
-		},
-		"edit": {
-			"dice": "! Suivez la syntaxe. Supprimer avec X ou 0.",
-			"stats": "! Suivez la syntaxe. Supprimer avec X."
-		},
-		"enterValue": {
-			"maxOnly": "Entrez une valeur plus petite que {{- max}}",
-			"minAndMax": "Entrez une valeur entre {{- min}} et {{- max}}",
-			"minOnly": "Entrez une valeur plus grande que {{- min}}"
-		},
-		"finished": "Statistiques terminées",
-		"firstPage": "Enregistrement de l'utilisateur - Page 1/{{- page}}",
-		"noPermission": "Vous n'avez pas les autorisations pour faire cela",
-		"private": {
-			"description": "Si cette fiche est privée, mettez \"x\".",
-			"name": "Fiche privée"
-		},
-		"removed": {
-			"dice": "Les dés ont été supprimés de l'utilisateur",
-			"stats": "Les statistiques ont bien été supprimés"
-		},
-		"steps": "Enregistrement de l'utilisateur - Page {{- page}}/{{- max}}",
-		"user": {
-			"description": "Entrez l'utilisateur attaché au personnage (id ou nom d'utilisateur global)",
-			"name": "utilisateur"
-		}
-	},
-	"rAtq": {
-		"atq_name": {
-			"description": "Le nom de la compétence",
-			"name": "nom"
-		},
-		"description": "Lancer un dé enrégistré pour une compétence/attaque",
-		"name": "dbd"
-	},
-	"refresh": "Suite à une mise à jour, les boutons ont été modifié ! Vous devez maintenant sélectionner l'option \"Avatar\" du menu déroulant pour modifier l'image.\nDe nouvelles options y ont aussi été rajouté !",
-	"register": {
-		"button": "Enregistrer un personnage",
-		"delete": {
-			"confirm": "Êtes vous sûr.e de vouloir supprimer **toutes** les fiches ?",
-			"done": "Les fiches ont bien été supprimé."
-		},
-		"description": "Enregistre un nouveau modèle pour la commande dbroll",
-		"embed": {
-			"comparator": "Comparateur :",
-			"damage": "Dés de dégâts",
-			"description": "Clickez sur le bouton pour enregistrer un personnage",
-			"exclude": "Exclue",
-			"noValue": "Aucune valeur",
-			"registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont désactivés par défaut. \nPour autoriser vos joueurs à les utiliser, veuiller suivre le tutoriel suivant :",
-			"title": "Modèle"
-		},
-		"name": "enregistrer",
-		"options": {
-			"channel": "Le channel où le modèle et les utilisateurs seront enregistrés",
-			"delete": {
-				"description": "Supprime toutes les anciennes fiches",
-				"name": "tout_supprimer"
-			},
-			"private": {
-				"description": "Permet de choisir un channel dans lequel les fiches “privées” seront envoyées",
-				"name": "channel_privé"
-			},
-			"public": {
-				"description": "Permet de choisir un channel dans lequel les fiches “publiques” seront envoyées",
-				"name": "channel_public"
-			},
-			"template": {
-				"description": "Le modèle à enregistrer",
-				"name": "template"
-			},
-			"update": {
-				"description": "Mettre à jour les anciennes fiches de personnages",
-				"name": "mettre-à-jour"
-			}
-		}
-	},
-	"roll": {
-		"critical": {
-			"failure": "Échec critique",
-			"success": "Succès critique"
-		},
-		"description": "Lancer un dé",
-		"failure": "Échec",
-		"name": "roll",
-		"option": {
-			"description": "Dé à lancer",
-			"name": "dé"
-		},
-		"reason": "Nouveau thread de lancer",
-		"success": "Succès"
-	},
-	"scene": {
-		"description": "Crée un nouveau thread pour les dés",
-		"interaction": "Nouveau thread de scène créé : {{- scene}}",
-		"name": "scene",
-		"noScene": "Aucune scène spécifiée",
-		"option": {
-			"description": "Le nom de la scène",
-			"name": "scene"
-		},
-		"reason": "Nouvelle scène",
-		"time": {
-			"description": "Bulle temporelle : replace le dé par une horloge. Par défaut, utilise la date comme nom de thread",
-			"name": "tempo"
-		},
-		"underscore": "__Nouvelle scène__ :"
-	},
-	"timer": {
-		"delete": "Les messages de lancer de dés ne seront plus supprimés.",
-		"description": "Permet de changer le délai de suppression des messages",
-		"error": "L'effacement automatique du résultat du lancer ne peut pas être activé sans un canal de résultat sauvegardé.",
-		"name": "supprimer_après",
-		"option": {
-			"description": "Temps (en seconde) avant suppression, mettez à 0 pour désactiver.",
-			"name": "temps"
-		},
-		"success": "Les messages seront maintenant supprimés après `{{- timer}}`."
-	},
-	"timestamp": {
-		"description": "Affiche ou nom l'heure dans le log de lancer de dé",
-		"disabled": "Les timestamps ne sont plus affichés.",
-		"enabled": "Les timestamps sont maintenant affichés",
-		"name": "timestamp",
-		"options": "Active ou désactive le timestamp"
-	}
+  "anchor": {
+    "description": "Permet d'ajouter un lien vers le message le plus proche du dé",
+    "enabled": {
+      "logs": "Les logs de dés renverrons maintenant vers une \"ancre\" qui permet d'obtenir le contexte du dé (l'ancre est le message précédent le dé).",
+      "noDelete": "Les logs de dés mettront maintenant un lien vers le dé original."
+    },
+    "name": "contexte",
+    "options": "Activer/désactiver l'ancre de contexte"
+  },
+  "autoRole": {
+    "description": "Ajoute automatiquement un rôle quand une fiche est validée.",
+    "dice": {
+      "desc": "Ajoute un rôle quand des dés sont ajoutés (dbd)",
+      "remove": "Aucun rôle ne sera ajouté aux joueurs quand leurs dés sont ajoutés.",
+      "set": "{{- role}} sera maintenant ajoutés aux joueurs quand leurs dés sont enregistrés."
+    },
+    "name": "auto_role",
+    "options": "Rôle à ajouter",
+    "stat": {
+      "desc": "Ajoute un rôle quand les statistiques sont ajoutées (dbroll)",
+      "remove": "Aucun rôle ne sera ajouté aux joueurs quand leurs statistiques sont enregistrées.",
+      "set": "{{- role}} sera maintenant ajouté aux joueurs quand leurs statistiques seront validées."
+    }
+  },
+  "button": {
+    "avatar": {
+      "description": "Modifier l'image d'un personnage",
+      "title": "Avatar"
+    },
+    "cancel": "Annuler",
+    "continue": "Continuer",
+    "dice": "Enregistrer un dé",
+    "edit": {
+      "dice": "Modifier les dés",
+      "move": "Modifier l'utilisateur associé",
+      "name": "Renommer un personnage",
+      "select": "Modifier les données de l'utilisateur",
+      "stats": "Modifier les statistiques"
+    },
+    "name": "Modifier le nom du personnage",
+    "user": "Modifier l'utilisateur associé",
+    "validate": "Valider"
+  },
+  "calc": {
+    "description": "Calculer une valeur à partir d'une statistique",
+    "formula": {
+      "desc": "Formule à utiliser (supporte des dés)"
+    },
+    "sign": {
+      "desc": "Signes mathématiques",
+      "title": "signe"
+    },
+    "statistic": "Statistiques à utiliser",
+    "title": "calc",
+    "transform": {
+      "desc": "Arrondir, plafonner, plancher ou élever au cube le résultat.",
+      "title": "transformer"
+    }
+  },
+  "changeThread": {
+    "delete": "Les résultats des dés ne seront plus envoyés",
+    "description": "Enregistrer un channel pour y envoyer les résultats des dés ou utiliser un thread automatiquement.",
+    "name": "result_channel",
+    "noChan": "Aucun channel de sauvegarde n'a été paramétré auparavant: Annulation de la commande.\n\nSi vous voulez désactiver la création des threads, utiliser la commande `/config result_channel true`.",
+    "options": "Channel des résultats",
+    "set": "Le channel {{- channel}} a été enregistré pour y envoyer les résultats des dés."
+  },
+  "common": {
+    "cancel": "Annulation",
+    "cancelled": "La suppression a été annulée.",
+    "channel": "channel",
+    "charName": "Nom du personnage",
+    "character": "personnage",
+    "comments": "commentaires",
+    "confirm": "Confirmer la suppression",
+    "context": "Contexte",
+    "default": "Défaut",
+    "dice": "dé",
+    "error": "Erreur",
+    "expression": "expression",
+    "false": "Faux",
+    "isPrivate": "Personnage privé",
+    "name": "nom",
+    "no": "✕",
+    "noSet": "/",
+    "page": "Page {{- nb}}",
+    "role": "rôle",
+    "sheet": "[ FICHE ]",
+    "space": " ",
+    "statistic": "statistique",
+    "statistics": "statistiques",
+    "total": "Total",
+    "true": "Vrai",
+    "user": "Joueur",
+    "yes": "✓"
+  },
+  "config": {
+    "admin": {
+      "desc": "Permet de consigner toutes les modifications et créations de personnages dans un channel.",
+      "title": "Administration"
+    },
+    "autoRole": "Rôles automatiques",
+    "context": {
+      "desc": "Dans la sauvegarde du résultat, permet d'afficher un lien vers le message précédent le lancer de dé, ou le lancer lui-même, en fonction des paramètres d'auto-suppression.",
+      "title": "[Sauvegarde du résultat] Lien vers le contexte du dé"
+    },
+    "damageName": "Liste des dés sauvegardés (global)",
+    "defaultSheet": "Channel par défaut",
+    "description": "Permet de configurer le bot pour le serveur",
+    "disableThread": {
+      "desc": "Désactive la sauvegarde globale et l'auto-suppression des résultats, laissant donc le lancer de dés là où il a été fait.",
+      "title": "Désactivation des fils de résultats"
+    },
+    "display": {
+      "description": "Affiche la configuration du serveur",
+      "name": "afficher"
+    },
+    "displayResult": "Affichage des résultats",
+    "excludedStats": "Statistiques exclues",
+    "hiddenRoll": {
+      "desc": "Permet de cacher les résultats des dés des MJ et de l'envoyé dans un channel spécifique ou par message éphémère.",
+      "title": "[MJ] Jets invisibles"
+    },
+    "lang": {
+      "description": "Permet de choisir la langue du bot manuellement",
+      "name": "changer_langue",
+      "options": {
+        "desc": "Langue à utiliser",
+        "name": "langue"
+      },
+      "set": "Le bot utilisera maintenant \"{{-lang}}\" comme langue principale."
+    },
+    "linkToLog": {
+      "desc": "Dans le résultat du dé, permet d'afficher un lien vers la sauvegarde du résultat.",
+      "title": "[Résultat] Lien vers la sauvegarde du résultat de dés"
+    },
+    "logLink": {
+      "description": "Active le lien vers les logs dans le résultat du dé",
+      "name": "lien_sauvegarde"
+    },
+    "logs": "Journalisation",
+    "name": "config",
+    "privateChan": "Channel des personnages privés",
+    "result": {
+      "desc": "Permet de sauvegarder tous les résultats de lancer dans un seul et même channel.",
+      "title": "Sauvegarde des résultats"
+    },
+    "sheet": "Fiches",
+    "statsName": "Nom des statistiques",
+    "template": "Configuration du modèle",
+    "templateMessage": "Lien vers le modèle",
+    "timer": {
+      "desc": "À la fin du timer, le lancer de dés sera supprimé mais sont résultats sera sauvegardé dans le channel approprié.",
+      "title": "Délais avant suppression"
+    },
+    "timestamp": {
+      "desc": "Affichage de l'heure/date du lancer dans l'agrégateur des résultats.",
+      "title": "Affichage des timestamps"
+    },
+    "title": "Configuration de {{- guild}}"
+  },
+  "context": {
+    "disabled": "L'ajout d'un lien vers le contexte est désactivé."
+  },
+  "copyRollResult": {
+    "error": {
+      "noResult": "Aucun résultat de dés n'a été trouvé dans le message.",
+      "notBot": "Ce message ne provient pas de Dicelette. Aucun lien ne peut être créé !"
+    },
+    "info": "Le choix du message à copier pour créer un raccourci vers le résultat dépend de votre plateforme :\n- __Mobile__ : Merci de sélectionner le second message et cliquer sur \"Copier le texte\".\n- __PC__ : Merci de copier le bloc de code ci-dessous.",
+    "name": "Créer un lien vers ce résultat"
+  },
+  "csv_generation": {
+    "description": "Permet de générer le fichier CSV pour la commande ajout_masse.",
+    "name": "csv",
+    "success": "Voici votre fichier CSV ! Attention, par défaut, le délimiteur utilisé est `;`. N'oubliez pas de le préciser à l'import dans votre logiciel (excel/google sheet...).\nPrécisons que vous devez vous-même calculer les combinations !"
+  },
+  "dbRoll": {
+    "description": "Lance un dé avec une statistique enregistrée",
+    "name": "dbroll",
+    "options": {
+      "character": "Le personnage où prendre la valeur.",
+      "comments": {
+        "description": "Description de l'action"
+      },
+      "hidden": {
+        "description": "Cache le résultat du dé (ignoré si la configuration n'est pas faite)",
+        "name": "caché"
+      },
+      "modificator": {
+        "description": "Expression (mathématique) appliqué au lancer"
+      },
+      "override": {
+        "description": "Remplacer le seuil de réussite",
+        "name": "seuil_reussite"
+      },
+      "statistic": "La statistique à utiliser"
+    }
+  },
+  "deleteChar": {
+    "all": "Êtes vous sûre de vouloir supprimer les données de {{- user}} ?",
+    "allMany": "Êtes-vous sûr·e de vouloir **supprimer tous les personnages** de {{- user}} ?\n__Personnages trouvés__ :\n- {{- chara}}",
+    "allOne": "Êtes vous sûr·e de vouloir supprimer le personnage {{- user}} ?",
+    "allSuccess": "Les données de {{- user}} ont bien été supprimée.",
+    "character": "Le nom du personnage à supprimer",
+    "confirm": {
+      "all": "Êtes-vous sûr·e de vouloir supprimer tous les personnages de {{- user}} ?",
+      "title": "Suppression de personnages"
+    },
+    "description": "Supprime un personnage / utilisateur",
+    "name": "supprimer_char",
+    "noCharacters": "L'utilisateur {{- user}} n'est pas inscrit·e dans la base.",
+    "success": "Le personnage de {{- user}} a bien été supprimé !",
+    "user": "Le joueur à supprimer"
+  },
+  "disableThread": {
+    "description": "Désactive/active la création automatique des threads et utilise le channel configuré pour les logs",
+    "disable": {
+      "autoDelete": "L'auto-suppression des résultats a été désactivé.",
+      "mention": "Le channel {{- mention}} ne recevra plus les logs des dés.",
+      "prefix": "Les canaux préfixés par `🎲` ne recevront plus de logs non plus.",
+      "reply": "La création automatique des threads a été désactivée : les résultats des dés seront maintenant conservés dans le channel où la commande a été utilisée."
+    },
+    "enable": {
+      "autoDelete": "L'effacement automatique des réponses a été autorisé. Vous pouvez la configurer avec `/config supprimer_après`.",
+      "mention": "Le channel {{- mention}} recevra de nouveaux les logs des dés.",
+      "prefix": "Les canaux préfixés par `🎲` recevront à nouveau les résultats des dés.",
+      "reply": "Les résultats des dés seront automatiquement envoyés à un fil de discussion créé automatiquement."
+    },
+    "name": "désactiver_thread",
+    "options": {
+      "name": "basculer"
+    }
+  },
+  "display": {
+    "character": "Le personnage à afficher",
+    "description": "Permet d'afficher la fiche d'un joueur/personnage",
+    "title": "afficher",
+    "user": "L'utilisateur à afficher",
+    "userLowercase": "joueur"
+  },
+  "edit": {
+    "desc": "Permet d'éditer les données d'une fiche",
+    "rename": {
+      "desc": "Modifier le nom d'un personnage",
+      "option": {
+        "desc": "Nouveau nom à utiliser",
+        "title": "nouveau_nom"
+      },
+      "title": "rename"
+    },
+    "user": {
+      "desc": "Modifier l'utilisateur associé à un personnage",
+      "option": {
+        "desc": "Le nouveau possesseur du personnage",
+        "title": "nouveau_utilisateur"
+      },
+      "success": "L'utilisateur a bien été changé.",
+      "title": "user"
+    }
+  },
+  "edit_avatar": {
+    "default": "L'image utilisée sera votre avatar actuel !",
+    "desc": "Modifier l'avatar d'une fiche de personnage",
+    "name": "avatar",
+    "success": "Avatar changé pour {{- name}} ([lien vers la fiche]({{-link}})) !",
+    "url": {
+      "desc": "Lien vers l'image à mettre (pas de lien discord!)",
+      "name": "url"
+    }
+  },
+  "edit_name": {
+    "success": "Le nom du personnage a bien été changé ! Vous pouvez le retrouver ici: {{- url}}"
+  },
+  "embed": {
+    "add": "Enregistrement de l'utilisateur",
+    "dice": "Dés de compétences",
+    "display": "Personnage",
+    "edit": {
+      "dice": "Dés modifiés",
+      "stats": "Statistiques modifiées"
+    },
+    "old": "Joueur enregistré",
+    "template": "Modèle",
+    "user": "⌈⌋ Fiche ⌈⌋"
+  },
+  "error": {
+    "avatar": {
+      "url": "L'image fournie est invalide : elle doit contenir le format de l'image (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) et être un lien en `https`."
+    },
+    "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
+    "calc": "Une erreur est survenue avec la formule utilisée.",
+    "channel": {
+      "defaultChannel": "Vous devez fournir au moins un channel par défaut pour sauvegarder les fiches.",
+      "notFound": "Le channel `{{-channel}}` n'existe pas sur ce serveur.",
+      "thread": "Aucun channel valide trouvé — Veuillez réenregistrer le modèle si le channel a été supprimé"
+    },
+    "csvContent": "Le contenu du {{- fichier}} est invalide.",
+    "damage": {
+      "empty": "Vous n'avez pas de dés de capacités enregistrés.",
+      "notFound": "`{{- atq}}` n'est pas enregistré pour {{- charName}}."
+    },
+    "discord": "## [DISCORD] :warning: __Erreur__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nMerci de signaler le bug sur [le serveur officiel](https://discord.gg/2PUqwWeQYZ).",
+    "duplicate": "Le nom est déjà utilisé pour un autre personnage ! Vous ne pouvez donc pas l'utiliser ici. Chaque nom doit être unique !",
+    "embed": {
+      "notFound": "Aucun embed trouvé",
+      "old": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>)."
+    },
+    "generic": {
+      "e": "{{- e.message}}",
+      "withWarning": "## [{{- e.name}}] :warning: __Erreur__ :\n{{- e.message}}"
+    },
+    "guild": {
+      "data": "Aucune donnée trouvée pour le serveur {{- server }}.",
+      "empty": " Aucun serveur n'a été trouvé."
+    },
+    "invalidDice": {
+      "embeds": "Aucun embed de dé détecté",
+      "eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
+      "minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
+      "notFound": "Aucun dé n'a été retrouvé dans la commande !",
+      "withDice": "Dé invalide : `{{- dice}}` durant le jet de validation."
+    },
+    "invalidFormula": "Formule invalide : `{{- formula}}`",
+    "missingPermission": "## [DISCORD] :warning: __Erreur__ : **PERMISSIONS MANQUANTES**\nLe bot n'a pas les permissions pour faire l'action demandées. Vérifié qu'il a bien accès au channel/thread demandé !\n",
+    "mustBeGreater": "## :warning: **Une erreur est survenue**\nLa valeur `{{- value}}` doit être plus grande que `{{- min}}`.",
+    "mustBeLower": "La valeur `{{- value}}` doit être plus petite que `{{- max}}`",
+    "noBulkRoll": "Les jets en \"masse\" ne sont pas autorisés dans les dés partagés.",
+    "noDice": "Vous ne pouvez pas lancer cette commande sans avoir un dé type enregistré !",
+    "noMessage": "Aucun message trouvé.",
+    "noPermission": "Vous n'avez pas les permissions pour changer l'image d'un autre utilisateur. Seuls les personnes ayant les autorisations \"GÉRER LES RÔLES\" peuvent utiliser cette commande pour d'autres joueurs.",
+    "private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
+    "public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
+    "roll": {
+      "channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut."
+    },
+    "sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
+    "stats": {
+      "char": "{{- char}} est introuvable.\nVous devez sélectionner l'utilisateur possédant ce personnage pour lancer un dé sur `{{- stat}}`.",
+      "empty": "Cette combination est invalide : aucune statistiques n'existent !",
+      "excluded": "Cette statistique est exclue : Vous ne pouvez pas faire de jet pour elle.",
+      "notFound": "La statistique `{{- value}}` est introuvable ! Avez vous fait une erreur de frappe ?",
+      "notFound_plural": "Cette commande ne peut pas être utilisé : aucune statistique n'a été enregistrée.",
+      "notFound_singular": "La statistique `{{- stat}}` est introuvable sur le personnage sélectionné{{ char, optional}}.",
+      "shouldSelect": "Vous avez besoin de sélectionner une statistique pour lancer un dé.",
+      "tooMuch": "Trop de statistiques ont été fournies ! Vous ne pouvez pas avoir plus de 25 statistiques.",
+      "user": "Un utilisateur doit être sélectionné pour lancer un dé sur `{{- stat}}`."
+    },
+    "template": {
+      "id": "Aucun message trouvé avec les données sauvegardée dans la base de données:\n- Channel : `{{- channelId}}`\n- ID du message : `{{- messageId}}`",
+      "json": "Vous devez fournir un fichier JSON valide.",
+      "notFound": "Aucun modèle ou channel configuré"
+    },
+    "tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",
+    "totalExceededBy": "Le total de `{{- value}}` est dépassé de `{{- max}}`.",
+    "user": {
+      "charName": "Le personnage {{- charName}} n'est pas enregistré.",
+      "data": "Aucunes données d'utilisateurs ou de modèles n'ont été trouvées.",
+      "notFound": "Utilisateur introuvable.\n- Il peut s'agir d'une erreur temporaire causé par la mise à jour du cache,\n- La fiche est introuvable car elle a été supprimé (ou son channel) mais les données n'ont pas été supprimé de la base de données. Si tel est le cas, vous devez utiliser la commande `/supprimer_char`.",
+      "registered": "{{- user}} n'est pas enregistré.",
+      "rename": "Votre personnage n'a pas de nom : il ne peut donc pas être renommé !",
+      "youRegistered": "Vous n'êtes pas enregistré !"
+    }
+  },
+  "export": {
+    "description": "Export tous les personnages sauvegardés dans un fichier csv",
+    "error": {
+      "noData": "Aucun n'utilisateur n'est enregistrés."
+    },
+    "name": "export",
+    "options": {
+      "desc": "Exporter que les personnages marqués comme privé",
+      "name": "fiche_privée_uniquement"
+    }
+  },
+  "generate": {
+    "description": "Générer un modèle de serveur pour les commandes de statistiques/dés",
+    "help": "[Voir la documentation complète sur la génération d'un modèle](<https://dicelette.github.io/docs/model/register>).\nVous pouvez utiliser [ceci](<https://dicelette.github.io/docs/model/register/form>) pour générer un modèle en utilisant une interface.",
+    "name": "générer",
+    "options": {
+      "character": {
+        "description": "Rendre le nom du personnage obligatoire pour l'enregistrement",
+        "name": "personnage"
+      },
+      "critical_fail": {
+        "description": "Définir un échec critique (dé naturel)",
+        "name": "échec_critique"
+      },
+      "critical_success": {
+        "description": "Définir un succès critique (dé naturel)",
+        "name": "succès_critique"
+      },
+      "damage": {
+        "description": "Enregistrer un dé de compétence - Séparer le nom des compétences par un espace ou une virgule",
+        "name": "competence"
+      },
+      "dice": {
+        "description": "Le type de dé à lancer",
+        "name": "dé"
+      },
+      "stats": {
+        "description": "Le nom de la statistique, séparez-les par un espace ou une virgule",
+        "name": "nom"
+      },
+      "total": {
+        "description": "Le total des points de statistiques (sera calculé quand l'utilisateur sera enregistré)",
+        "name": "total"
+      }
+    }
+  },
+  "graph": {
+    "bg": {
+      "description": "Couleur du fond du graphique. Par défaut: #0e47b2",
+      "name": "fond"
+    },
+    "description": "Générer un graphique des statistiques de l'utilisateur",
+    "line": {
+      "description": "Couleur des lignes. Par défaut: #0e47b2",
+      "name": "ligne"
+    },
+    "max": {
+      "description": "Valeur maximale pour la génération du graphique",
+      "name": "max"
+    },
+    "min": {
+      "description": "Valeur minimal pour la génération du graphique",
+      "name": "min"
+    },
+    "name": "graph"
+  },
+  "help": {
+    "admin": {
+      "description": "Affiche les commandes administrative du bot",
+      "messageDB": "## Gestion des personnages et du modèle\n\n- </delete_char:{{- deleteChar}}> : Permet de supprimer un personnage de la base de données. Supprimera le message de la fiche s'il est toujours présent sur le serveur.\n\n### Rôle automatiques\n\nSes deux commandes permettent d'ajouter automatiquement un rôle à la validation des fiches :\n- </config auto_role statistic:{{-stat}}> : Permet d'ajouter un rôle quand des statistiques sont validées (permet d'activer </dbroll:{{- dbroll}}>)\n- </config auto_role dice:{{-dice}}> : Permet d'ajouter un rôle quand un dé est enregistré (active </dbd:{{- dbd}}>).\n\n### Lancer de dé \"maître de jeu\"\n\nLes deux commandes suivantes permettent aux maîtres de jeu de lancer des dés pour tous les joueurs enregistrés.\n\n- </gm dbroll:{{-gm.dbRoll}}> : Lance un dé de statistique, similaire à </dbroll:{{- dbroll}}>.\n- </gm dbd:{{-gm.dBd}}>: Lance un dé enregistré, similaire à </dbd:{{- dbd}}>.",
+      "messageNoDB": "Le bot possède différentes commandes d'administration qui permet de personnaliser votre expérience.\n\nVous trouverez [ici](<https://dicelette.github.io/docs/admin/config>) des explications détaillées des commandes montrées ici :\n- </config display:{{-display}}> : Affiche la configuration du serveur.\n- </config logs:{{- logs}}> : Enregistre un channel pour afficher les erreurs et les modifications apportées aux fiches.\n- </config result_channel:{{- result}}> : Permet de définir un channel ou de désactiver la création automatique des threads pour recevoir les résultats de tous les jets de dés du serveur.\n- </config delete_after:{{-delete}}> : Permet de changer le temps avant suppression du résultat du dé (si </config result_channel:{{- result}}> n'est pas désactivé). Si mis à `0`, les messages de résultats ne seront plus supprimés. Par défaut, les messages sont supprimés après 3 minutes.\n- </config timestamp:{{- timestamp}}> : Affiche ou nom les timestamp dans les logs de lancé de dé.",
+      "name": "admin"
+    },
+    "bug": {
+      "description": "Signaler un bug",
+      "message": "Merci de faire votre rapport de bug [ici](<{{-link}}>). Avant de faire votre rapport, merci de vérifier qu'il n'existe pas déjà un rapport sur votre bug.\n\nN'oubliez pas d'aller lire la [documentation](<https://dicelette.github.io/>) car vous pourrez y trouver des réponses à vos questions.",
+      "name": "bug"
+    },
+    "description": "Affiche l'aide",
+    "diceNotation": "## Notation des dés\n[Voir la documentation pour la notation des dés (en anglais)](<https://dice-roller.github.io/documentation/guide/notation/dice.html>).\n\nLe bot supporte aussi :\n- [Les groupes de dés](<https://dice-roller.github.io/documentation/guide/notation/group-rolls.html>)\n- [Les modifiers](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)\n- [Les commentaires](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)\n- [Les mathématiques](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)\n- Ainsi que les \"bulk rolls\" (lancer plusieurs dés en même temps) avec la notation suivante : `[nombre de dés]#[dés]`, comme par exemple `2#d6` pour lancer 2 dés à 6 faces.",
+    "fr": {
+      "description": "Faire une demande de fonctionnalité",
+      "message": "Vous avez une idée pour améliorer le bot ? Dans ce cas, vous pouvez la suggérer [ici](<{{- link}}>) !\n\nMerci d'éviter les doublons en vérifiant les autres issues ainsi que de lire la [documentation](<https://dicelette.github.io/>) !",
+      "name": "suggestion"
+    },
+    "info": {
+      "description": "Affiche les infos générales du bot",
+      "name": "info"
+    },
+    "invit": {
+      "change_language": "__Par défaut__, je répondrai en {{- lang}}, mais cela peut être modifié avec </config change_language:{{- id.lang}}>.\nPour le moment, cependant, seul le français et l'anglais sont disponibles !",
+      "channel": "Avec **`channel`** = **`#channel`** → Au lieu de créer des fils automatiquement, les résultats seront copiés dans ce salon !",
+      "copy": "De plus, je suis configuré pour __copier__ les résultats des jets de dés dans des fils commençant par `🎲`, qui seront créés automatiquement lorsqu'un lancé est fait.\nCela peut être modifié par la commande </config result_channel:{{-id.result}}>.",
+      "default": "Il suffit de mettre sur `0` pour désactiver l'auto-suppression.",
+      "disable": "Avec **`désactiver_thread`** = **`True`** → Les résultats seront conservés là où la commande a été faite, sans auto-suppression au bout de 3 minutes.",
+      "link": "Vous pouvez retrouver [la documentation ici]({{- docLink}}), car j'ai encore de nombreuses options de personnalisation !",
+      "serv": "Salut ! Je suis Dicelette !\nMerci de m'avoir ajouté sur {{- serv}}.",
+      "timer": "Si vous souhaitez modifier le temps avant la suppression des résultats, il suffit d'utiliser </config delete_after:{{-id.delete}}>. Je suis paramétré pour supprimer après 3 minutes !"
+    },
+    "message": ":game_die: **Dice Roller** :game_die:\n→ Retrouvez le *bot* sur [GitHub](<https://github.com/Dicelette/discord-dicelette/blob/main/README.fr.md>)\n→ [Documentation](<https://dicelette.github.io>)\n\n## Usage\n- </roll:{{- rollId}}> : Lance un dé\n- </scene:{{- sceneId}}> : Crée un nouveau thread pour les dés. Cela archivera tous les threads précédents.\n\nVous pouvez aussi créer une \"bulle temporelle\" avec les paramètres `/scene tempo:True`. Par défaut, le nom du thread sera la date du jour.\n\nVous pouvez utiliser le bot directement dans un message (**sans utiliser de slash commands**), avec :\n- __Un dé direct__ : `dés`, comme `d6` ou `2d6`\n- __Un dé indirect__ : `mon message [dés]`, comme `*Phibi saute sur Wumpus et lui inflige [2d6] dégâts*`.\n- __Un dé semi-direct__ : `1d100 mon message`, comme `1d100 Phibi saute sur Wumpus et lui inflige des dégâts`.\n\n{{- dbCMD}}\n\n",
+    "messageDB": "## Commandes liées aux fiches de personnages\n\n- </dbroll:{{- dbroll}}> : Lance un dés de statistiques, à partir d'une fiche de personnage.\n- </dbd:{{- dbd}}> : Lance un dé enregistré dans votre fiche de personnage.\n- </graph:{{- graph}}> : Permet de générer un graphique à partir des statistiques d'un personnage.\n- </display:{{- display}}> : Permet de consulter les statistiques et les dés d'un personnage.",
+    "name": "aide",
+    "register": {
+      "description": "Affiche l'aide général pour activer la fonction de sauvegarde de fiche.",
+      "message": "Le bot permet de configurer un modèle (\"modèle de serveur\") qui permet ensuite de créer des fiches de personnages ainsi que de retenir des dés. \n\nLes données restent intégralement sur votre serveur, et le modèle est pensé pour être adaptable à l'infini (ou presque !).\n\nVous trouverez [ici](<https://dicelette.github.io/docs/admin/model>) toutes les informations afin de configurer le modèle et enregistrer les fiches, afin de pouvoir utiliser les commandes </dbroll:{{- dbroll}}>, </dbd:{{- dbd}}>, ou encore </graph:{{- graph}}>.",
+      "name": "enregistrer"
+    }
+  },
+  "hidden": {
+    "description": "Permet de cacher les résultats des dés du lancer MJ",
+    "disabled": "Les résultats des dés MJ utilisent maintenant la configuration des dés normaux.",
+    "enabled": "Les dés MJ seront maintenant cachés et leur résultats envoyés dans un message éphémère.",
+    "enabledChan": "Les résultats des dés MJ seront maintenant envoyés dans {{- channel}} directement.",
+    "options": "Permet d'envoyer les résultats dans ce channel (sinon, ils seront envoyés dans un message éphémère)",
+    "title": "jet_invisible"
+  },
+  "import": {
+    "all_success": "Tous les utilisateurs ont été enregistrés.",
+    "description": "Ajouter plusieurs personnages d'un coup",
+    "errors": {
+      "duplicate_charName": "Le personnage {{- charName}} (de {{- user}}) existe déjà dans la base .",
+      "global": "Les erreurs suivantes ont été trouvées :",
+      "headers": "Le nom des colonnes ne correspondent pas à votre modèle. Merci de vous référez à la documentation et votre template pour vérifier le nom des colonnes.\n\nLes colonnes :\n- {{- name}} \nest/sont manquante(s).",
+      "invalid_file": "Le fichier doit être un fichier CSV. \nVous avez fourni un fichier {{-ext}}.",
+      "missing_charName": "Le nom du personnage est manquant pour {{- user}}. Il est pourtant obligatoire dans la template !",
+      "missing_header": "Votre CSV n'a pas de noms de colonnes !",
+      "missing_stats": "Il manque des statistiques pour {{- user}}. \nLes statistiques manquantes sont :\n- {{- stats}}",
+      "no_user": "Aucun membre n'existe sur ce serveur.",
+      "user_not_found": "{{- user}} n'a pas été trouvé sur le serveur. Il est possible que le cache ne soit pas à jour, ou qu'il y ait une erreur dans l'ID ou l'username."
+    },
+    "name": "import",
+    "options": {
+      "description": "Le fichier CSV à importer",
+      "name": "csv"
+    },
+    "success": "{{- user}} a bien été ajouté."
+  },
+  "linkToLog": {
+    "disabled": "Les liens vers les logs des dés sont désactivés.",
+    "enabled": "Les liens vers les logs de dés sont maintenant activés.",
+    "options": "Active/désactive l'option"
+  },
+  "logs": {
+    "delete": "Les logs ne seront plus envoyés",
+    "description": "Choisir un channel où envoyer les logs d'erreurs",
+    "dice": {
+      "add": "{{- user}} a ajouté les dés pour {{- char}} (dans {{- fiche}})",
+      "edit": "{{- user}} a modifié les dés de {{- char}} (dans {{- fiche}})",
+      "remove": "{{- user}} a supprimé les dés de {{-char}} (dans {{- fiche}})"
+    },
+    "inChan": "dans <#{{- chan}}>.",
+    "name": "logs",
+    "options": "Le channel où envoyer les logs",
+    "set": "Logs configurés dans le channel {{- channel}}",
+    "stats": {
+      "added": "{{- user}} a modifié les statistiques de {{- char}} (dans {{- fiche}})",
+      "removed": "{{- user}} a supprimé les statistiques de {{- char}} (dans {{- fiche}})"
+    }
+  },
+  "mjRoll": {
+    "description": "Permet de lancer des dés pour d'autres joueurs",
+    "name": "mj",
+    "user": "Joueur sur lequel lancer le dé"
+  },
+  "modals": {
+    "added": {
+      "dice": "Dés ajoutés",
+      "stats": "Statistiques ajoutés"
+    },
+    "alreadySet": "Toutes les statistiques sont déjà définies",
+    "avatar": {
+      "description": "Le lien vers l'image du personnage (par défaut, utilise l'avatar de l'utilisateur)",
+      "name": "Avatar"
+    },
+    "channel": {
+      "description": "Permet de poster la fiche ailleurs que dans les channels par défaut.",
+      "name": "Channel (sous forme d'ID) où poster la fiche"
+    },
+    "charName": {
+      "description": "Entrez le nom de votre personnage",
+      "name": "Nom du personnage"
+    },
+    "dice": {
+      "max": "Vous ne pouvez pas avoir plus de 25 dés enregistrés (limites de champ discord).",
+      "name": "Nom",
+      "placeholder": "Entrer un dé valide",
+      "value": "Valeur"
+    },
+    "edit": {
+      "dice": "! Suivez la syntaxe. Supprimer avec X ou 0.",
+      "stats": "! Suivez la syntaxe. Supprimer avec X."
+    },
+    "enterValue": {
+      "maxOnly": "Entrez une valeur plus petite que {{- max}}",
+      "minAndMax": "Entrez une valeur entre {{- min}} et {{- max}}",
+      "minOnly": "Entrez une valeur plus grande que {{- min}}"
+    },
+    "finished": "Statistiques terminées",
+    "firstPage": "Enregistrement de l'utilisateur - Page 1/{{- page}}",
+    "noPermission": "Vous n'avez pas les autorisations pour faire cela",
+    "private": {
+      "description": "Si cette fiche est privée, mettez \"x\".",
+      "name": "Fiche privée"
+    },
+    "removed": {
+      "dice": "Les dés ont été supprimés de l'utilisateur",
+      "stats": "Les statistiques ont bien été supprimés"
+    },
+    "steps": "Enregistrement de l'utilisateur - Page {{- page}}/{{- max}}",
+    "user": {
+      "description": "Entrez l'utilisateur attaché au personnage (id ou nom d'utilisateur global)",
+      "name": "utilisateur"
+    }
+  },
+  "rAtq": {
+    "atq_name": {
+      "description": "Le nom de la compétence",
+      "name": "nom"
+    },
+    "description": "Lancer un dé enrégistré pour une compétence/attaque",
+    "name": "dbd"
+  },
+  "refresh": "Suite à une mise à jour, les boutons ont été modifié ! Vous devez maintenant sélectionner l'option \"Avatar\" du menu déroulant pour modifier l'image.\nDe nouvelles options y ont aussi été rajouté !",
+  "register": {
+    "button": "Enregistrer un personnage",
+    "delete": {
+      "confirm": "Êtes vous sûr.e de vouloir supprimer **toutes** les fiches ?",
+      "done": "Les fiches ont bien été supprimé."
+    },
+    "description": "Enregistre un nouveau modèle pour la commande dbroll",
+    "embed": {
+      "comparator": "Comparateur :",
+      "damage": "Dés de dégâts",
+      "description": "Clickez sur le bouton pour enregistrer un personnage",
+      "exclude": "Exclue",
+      "noValue": "Aucune valeur",
+      "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont désactivés par défaut. \nPour autoriser vos joueurs à les utiliser, veuiller suivre le tutoriel suivant :",
+      "title": "Modèle"
+    },
+    "name": "enregistrer",
+    "options": {
+      "channel": "Le channel où le modèle et les utilisateurs seront enregistrés",
+      "delete": {
+        "description": "Supprime toutes les anciennes fiches",
+        "name": "tout_supprimer"
+      },
+      "private": {
+        "description": "Permet de choisir un channel dans lequel les fiches “privées” seront envoyées",
+        "name": "channel_privé"
+      },
+      "public": {
+        "description": "Permet de choisir un channel dans lequel les fiches “publiques” seront envoyées",
+        "name": "channel_public"
+      },
+      "template": {
+        "description": "Le modèle à enregistrer",
+        "name": "template"
+      },
+      "update": {
+        "description": "Mettre à jour les anciennes fiches de personnages",
+        "name": "mettre-à-jour"
+      }
+    }
+  },
+  "roll": {
+    "critical": {
+      "failure": "Échec critique",
+      "success": "Succès critique"
+    },
+    "description": "Lancer un dé",
+    "failure": "Échec",
+    "name": "roll",
+    "option": {
+      "description": "Dé à lancer",
+      "name": "dé"
+    },
+    "reason": "Nouveau thread de lancer",
+    "success": "Succès"
+  },
+  "scene": {
+    "description": "Crée un nouveau thread pour les dés",
+    "interaction": "Nouveau thread de scène créé : {{- scene}}",
+    "name": "scene",
+    "noScene": "Aucune scène spécifiée",
+    "option": {
+      "description": "Le nom de la scène",
+      "name": "scene"
+    },
+    "reason": "Nouvelle scène",
+    "time": {
+      "description": "Bulle temporelle : replace le dé par une horloge. Par défaut, utilise la date comme nom de thread",
+      "name": "tempo"
+    },
+    "underscore": "__Nouvelle scène__ :"
+  },
+  "timer": {
+    "delete": "Les messages de lancer de dés ne seront plus supprimés.",
+    "description": "Permet de changer le délai de suppression des messages",
+    "error": "L'effacement automatique du résultat du lancer ne peut pas être activé sans un canal de résultat sauvegardé.",
+    "name": "supprimer_après",
+    "option": {
+      "description": "Temps (en seconde) avant suppression, mettez à 0 pour désactiver.",
+      "name": "temps"
+    },
+    "success": "Les messages seront maintenant supprimés après `{{- timer}}`."
+  },
+  "timestamp": {
+    "description": "Affiche ou nom l'heure dans le log de lancer de dé",
+    "disabled": "Les timestamps ne sont plus affichés.",
+    "enabled": "Les timestamps sont maintenant affichés",
+    "name": "timestamp",
+    "options": "Active ou désactive le timestamp"
+  }
 }

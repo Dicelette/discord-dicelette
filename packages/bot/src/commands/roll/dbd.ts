@@ -165,6 +165,7 @@ export default {
 
 				//create the userStatistique with the value got from the template & the commands
 				userStatistique = {
+					isFromTemplate: true,
 					userName: charName,
 					template: {
 						diceType: template.diceType,

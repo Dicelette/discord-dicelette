@@ -136,6 +136,10 @@ export interface UserData {
 	 * The channelID where the message is stored
 	 */
 	channel?: string;
+	/**
+	 * Useful to know if it's a userData created from the template and not an actual user data
+	 */
+	isFromTemplate?: boolean;
 }
 
 export type CharacterData = {
