@@ -168,14 +168,7 @@ export function gmCommonOptions(
 	builder: Djs.SlashCommandSubcommandBuilder,
 	type: "dbroll" | "dbd" | "calc"
 ) {
-	builder.addUserOption((option) =>
-		option
-			.setName(t("display.userLowercase"))
-			.setNameLocalizations(cmdLn("display.userLowercase"))
-			.setDescription(t("mjRoll.user"))
-			.setDescriptionLocalizations(cmdLn("mjRoll.user"))
-			.setRequired(true)
-	);
+	let builderCopy = builder;
 	function addHiddenOpts(
 		builder: SlashCommandSubcommandBuilder
 	): Djs.SlashCommandSubcommandBuilder {
@@ -190,15 +183,36 @@ export function gmCommonOptions(
 		return builder;
 	}
 	switch (type) {
-		case "dbd":
-			return addHiddenOpts(dbdOptions(builder) as Djs.SlashCommandSubcommandBuilder);
-		case "dbroll":
-			return addHiddenOpts(dbRollOptions(builder) as Djs.SlashCommandSubcommandBuilder);
-		case "calc":
-			return addHiddenOpts(calcOptions(builder) as Djs.SlashCommandSubcommandBuilder);
+		case "dbd": {
+			builderCopy = addHiddenOpts(
+				dbdOptions(builder) as Djs.SlashCommandSubcommandBuilder
+			);
+			break;
+		}
+		case "dbroll": {
+			builderCopy = addHiddenOpts(
+				dbRollOptions(builder) as Djs.SlashCommandSubcommandBuilder
+			);
+			break;
+		}
+		case "calc": {
+			builderCopy = addHiddenOpts(
+				calcOptions(builder) as Djs.SlashCommandSubcommandBuilder
+			);
+			break;
+		}
 		default:
-			return builder;
+			break;
 	}
+	builderCopy.addUserOption((option) =>
+		option
+			.setName(t("display.userLowercase"))
+			.setNameLocalizations(cmdLn("display.userLowercase"))
+			.setDescription(t("mjRoll.user"))
+			.setDescriptionLocalizations(cmdLn("mjRoll.user"))
+			.setRequired(false)
+	);
+	return builderCopy;
 }
 export function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;

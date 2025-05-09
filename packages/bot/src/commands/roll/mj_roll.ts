@@ -1,12 +1,13 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
-import type { UserMessageId } from "@dicelette/types";
+import type { UserData, UserMessageId } from "@dicelette/types";
 import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { gmCommonOptions, rollDice, rollStatistique, serializeName } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
+import { uniformizeRecords } from "@dicelette/parse_result";
 
 export const mjRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -127,35 +128,64 @@ export const mjRoll = {
 		const ul = ln(guildData?.lang ?? interaction.locale);
 		if (!guildData) return;
 
-		const user = options.getUser(t("display.userLowercase"), true);
+		const user = options.getUser(t("display.userLowercase"), false) ?? undefined;
 		const charName = options.getString(t("common.character"), false)?.toLowerCase();
 		let optionChar = options.getString(t("common.character")) ?? undefined;
-		let charData = await getUserFromMessage(client, user.id, interaction, charName, {
-			skipNotFound: true,
-		});
-		const serializedNameQueries = serializeName(charData, charName);
-		if (charName && !serializedNameQueries) {
-			await reply(interaction, {
-				embeds: [
-					embedError(ul("error.user.charName", { charName: charName.capitalize() }), ul),
-				],
-				flags: Djs.MessageFlags.Ephemeral,
+		let charData: undefined | UserData = undefined;
+		if (user) {
+			charData = await getUserFromMessage(client, user.id, interaction, charName, {
+				skipNotFound: true,
 			});
-			return;
-		}
-		optionChar = charData?.userName ?? undefined;
-		if (!charData && !charName) {
-			const char = await getFirstChar(client, interaction, ul);
-			charData = char?.userStatistique;
-			optionChar = char?.optionChar;
-		}
-		if (!charData) {
-			let userName = `<@${user.id}>`;
-			if (charName) userName += ` (${charName})`;
-			await reply(interaction, {
-				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
-			});
-			return;
+
+			const serializedNameQueries = serializeName(charData, charName);
+			if (charName && !serializedNameQueries) {
+				await reply(interaction, {
+					embeds: [
+						embedError(
+							ul("error.user.charName", { charName: charName.capitalize() }),
+							ul
+						),
+					],
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
+			optionChar = charData?.userName ?? undefined;
+			if (!charData && !charName) {
+				const char = await getFirstChar(client, interaction, ul);
+				charData = char?.userStatistique;
+				optionChar = char?.optionChar;
+			}
+			if (!charData) {
+				let userName = `<@${user.id}>`;
+				if (charName) userName += ` (${charName})`;
+				await reply(interaction, {
+					embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
+				});
+				return;
+			}
+		} else {
+			//build default char data based on the template
+			const template = await getTemplateByInteraction(interaction, client);
+			if (!template) {
+				await reply(interaction, {
+					embeds: [embedError(ul("error.template.notFound"), ul)],
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+				return;
+			}
+			charData = {
+				isFromTemplate: true,
+				template: {
+					diceType: template.diceType,
+					critical: template.critical,
+					customCritical: template.customCritical,
+				},
+				damage: template.damage
+					? (uniformizeRecords(template.damage) as Record<string, string>)
+					: undefined,
+			};
 		}
 		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
 		const subcommand = options.getSubcommand(true);
