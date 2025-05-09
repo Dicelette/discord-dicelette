@@ -13,7 +13,7 @@ await i18next.init({
 	resources,
 });
 
-i18next.services.formatter.add("optional", (value, _lng, _options) => {
+i18next?.services?.formatter?.add("optional", (value, _lng, _options) => {
 	if (value === undefined || value === null) return "";
 	if (typeof value === "string") {
 		if (!value.length) return "";
