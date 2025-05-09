@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import { filterStatsInDamage } from "../src/utils";
+
 const damages = {
 	perception: "1d100",
 	piercing: "Agilityd100",
