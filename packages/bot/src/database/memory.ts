@@ -1,6 +1,5 @@
-import { uniformizeRecords } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { logger, uniformizeRecords } from "@dicelette/utils";
 import { getUserByEmbed } from "database";
 import type * as Djs from "discord.js";
 

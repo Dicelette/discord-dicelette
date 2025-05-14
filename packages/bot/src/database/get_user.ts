@@ -391,6 +391,7 @@ export async function getStatistics(
 		});
 		return;
 	}
+	const originalOptionChar = optionChar;
 	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
 	const template = await getTemplateByInteraction(interaction, client);
 	const diceType = !userStatistique
@@ -405,6 +406,7 @@ export async function getStatistics(
 	}
 
 	if (!needStats && !userStatistique && template) {
+		optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
 		userStatistique = {
 			template: {

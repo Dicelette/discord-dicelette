@@ -1,10 +1,4 @@
-import {
-	generateStatsDice,
-	isNumber,
-	type Resultat,
-	roll,
-	standardizeDice,
-} from "@dicelette/core";
+import { generateStatsDice, isNumber, type Resultat, roll } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import moment from "moment";
@@ -130,15 +124,6 @@ export function convertNameToValue(
 			diceResult: isRoll.result,
 		};
 	return { total: result };
-}
-
-export function uniformizeRecords(input: Record<string, string | number>) {
-	return Object.fromEntries(
-		Object.entries(input).map(([key, value]) => [
-			key.standardize(),
-			typeof value === "string" ? standardizeDice(value) : value,
-		])
-	) as Record<string, string | number>;
 }
 
 export function trimAll(dice: string) {

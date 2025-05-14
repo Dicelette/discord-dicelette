@@ -123,36 +123,40 @@ export function dbRollOptions(
  * @returns The builder with calculation and common options configured.
  */
 export function calcOptions(
-	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
+	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
+	isCalc = true
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
-	builder
-		.addStringOption((option) =>
-			option
-				.setName(t("common.statistic"))
-				.setDescription(t("calc.statistic"))
-				.setRequired(true)
-				.setNameLocalizations(cmdLn("common.statistic"))
-				.setDescriptionLocalizations(cmdLn("calc.statistic"))
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("calc.sign.title"))
-				.setDescription(t("calc.sign.desc"))
-				.setRequired(true)
-				.setNameLocalizations(cmdLn("calc.sign.title"))
-				.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
-				.setAutocomplete(true)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("common.expression"))
-				.setDescription(t("calc.formula.desc"))
-				.setNameLocalizations(cmdLn("common.expression"))
-				.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
-				.setRequired(true)
-		)
-		.addStringOption((option) =>
+	if (isCalc) {
+		builder
+			.addStringOption((option) =>
+				option
+					.setName(t("common.statistic"))
+					.setDescription(t("calc.statistic"))
+					.setRequired(true)
+					.setNameLocalizations(cmdLn("common.statistic"))
+					.setDescriptionLocalizations(cmdLn("calc.statistic"))
+					.setAutocomplete(true)
+			)
+			.addStringOption((option) =>
+				option
+					.setName(t("calc.sign.title"))
+					.setDescription(t("calc.sign.desc"))
+					.setRequired(true)
+					.setNameLocalizations(cmdLn("calc.sign.title"))
+					.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
+					.setAutocomplete(true)
+			);
+	}
+	builder.addStringOption((option) =>
+		option
+			.setName(t("common.expression"))
+			.setDescription(t("calc.formula.desc"))
+			.setNameLocalizations(cmdLn("common.expression"))
+			.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
+			.setRequired(true)
+	);
+	if (isCalc)
+		builder.addStringOption((option) =>
 			option
 				.setName(t("calc.transform.title"))
 				.setDescription(t("calc.transform.desc"))

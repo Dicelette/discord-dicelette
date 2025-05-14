@@ -1,6 +1,11 @@
 import { cmdLn, t } from "@dicelette/localization";
-import { filterStatsInDamage, uniformizeRecords } from "@dicelette/parse_result";
-import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
+import { filterStatsInDamage } from "@dicelette/parse_result";
+import {
+	capitalizeBetweenPunct,
+	filterChoices,
+	logger,
+	uniformizeRecords,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
