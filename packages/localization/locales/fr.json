@@ -522,6 +522,10 @@
       "removed": "{{- user}} a supprimé les statistiques de {{- char}} (dans {{- fiche}})"
     }
   },
+  "math": {
+    "description": "Parce que je ne sais pas comment faire des maths basiques",
+    "title": "math"
+  },
   "mjRoll": {
     "description": "Permet de lancer des dés pour d'autres joueurs",
     "name": "mj",

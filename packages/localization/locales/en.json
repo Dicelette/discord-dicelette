@@ -522,6 +522,10 @@
       "removed": "{{- user}} deleted the statistics of {{- char}} (in {{- file}})"
     }
   },
+  "math": {
+    "description": "Because I don't know how to do basic maths",
+    "title": "math"
+  },
   "mjRoll": {
     "description": "Allows you to roll dice for other players",
     "name": "gm",

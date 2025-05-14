@@ -1,13 +1,22 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
-import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
+import {
+	capitalizeBetweenPunct,
+	filterChoices,
+	uniformizeRecords,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { gmCommonOptions, rollDice, rollStatistique, serializeName } from "utils";
+import {
+	getLang,
+	gmCommonOptions,
+	rollDice,
+	rollStatistique,
+	serializeName,
+} from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
-import { uniformizeRecords } from "@dicelette/parse_result";
 
 export const mjRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -49,7 +58,8 @@ export const mjRoll = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
-		const transform = autofocusTransform(interaction);
+		const ul = getLang(interaction, client.settings);
+		const transform = autofocusTransform(interaction, ul);
 		if (transform) return await interaction.respond(transform);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
@@ -214,10 +224,10 @@ export const mjRoll = {
 		if (subcommand === ul("calc.title"))
 			return await calculate(
 				options,
-				charData,
 				ul,
 				interaction,
 				client,
+				charData,
 				optionChar,
 				hide,
 				user

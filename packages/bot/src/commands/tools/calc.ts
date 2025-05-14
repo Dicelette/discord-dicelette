@@ -1,5 +1,5 @@
 import { generateStatsDice, isNumber } from "@dicelette/core";
-import { cmdLn, t } from "@dicelette/localization";
+import { cmdLn, ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
@@ -8,7 +8,7 @@ import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
-import { autoCompleteCharacters, calcOptions } from "utils";
+import { autoCompleteCharacters, calcOptions, getLang } from "utils";
 
 export const calc = {
 	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
@@ -20,8 +20,9 @@ export const calc = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
+		const ul = getLang(interaction, client.settings);
 		if (sign) return await interaction.respond(sign);
-		const transform = autofocusTransform(interaction);
+		const transform = autofocusTransform(interaction, ul);
 		if (transform) return await interaction.respond(transform);
 		return await interaction.respond(
 			filter.map((result) => ({
@@ -35,21 +36,44 @@ export const calc = {
 		const { userStatistique, options, ul, optionChar } =
 			(await getStatistics(interaction, client)) ?? {};
 		if (!userStatistique || !ul || !options) return;
-		return await calculate(options, userStatistique, ul, interaction, client, optionChar);
+		return await calculate(options, ul, interaction, client, userStatistique, optionChar);
 	},
 };
 
-export function autofocusTransform(interaction: Djs.AutocompleteInteraction) {
+export function autofocusTransform(
+	interaction: Djs.AutocompleteInteraction,
+	lang: Djs.Locale
+) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
+	const ul = ln(lang);
 	if (focused.name === t("calc.transform.title")) {
-		const transforms = ["abs", "ceil", "floor", "round", "sqrt", "square"].filter(
-			(transform) => transform.includes(focused.value)
-		);
-		return transforms.map((transform) => ({
-			name: transform,
-			value: transform,
-		}));
+		return [
+			{
+				name: ul("calc.transform.abs"),
+				value: "abs",
+			},
+			{
+				name: ul("calc.transform.ceil"),
+				value: "ceil",
+			},
+			{
+				name: ul("calc.transform.floor"),
+				value: "floor",
+			},
+			{
+				name: ul("calc.transform.round"),
+				value: "round",
+			},
+			{
+				name: ul("calc.transform.sqrt"),
+				value: "sqrt",
+			},
+			{
+				name: ul("calc.transform.square"),
+				value: "square",
+			},
+		].filter((transform) => transform.name.includes(focused.value));
 	}
 	return;
 }
@@ -113,10 +137,10 @@ function reverseSign(sign: string) {
  */
 export async function calculate(
 	options: Djs.CommandInteractionOptionResolver,
-	userStatistique: UserData,
 	ul: Translation,
 	interaction: Djs.CommandInteraction,
 	client: EClient,
+	userStatistique?: UserData,
 	optionChar?: string,
 	hide?: boolean | null,
 	user: Djs.User = interaction.user
@@ -124,53 +148,64 @@ export async function calculate(
 	let formula = options
 		.getString(t("common.expression"), true)
 		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
-	const sign = options.getString(t("calc.sign.title"), true);
-	if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
-	if (!sign.match(/^([><]=?|==|!=|[+\-*\/%^])$/)) {
-		const embed = embedError(ul("error.sign", { sign }), ul);
-		return await interaction.reply({ embeds: [embed] });
-	}
 
-	const statInfo: {
-		value: number | undefined;
-		stat: string;
-		name: string;
-	} = {
-		value: undefined,
-		stat: options.getString(t("common.statistic"), true).standardize(),
-		name: options.getString(t("common.statistic"), true),
-	};
-	const rightValue = getRightValue(
-		userStatistique,
-		statInfo.stat,
-		ul,
-		client,
-		interaction,
-		optionChar,
-		statInfo.name
-	);
-	if (!rightValue) return;
-	statInfo.value = rightValue.userStat;
-	statInfo.name = rightValue.statistic;
-	statInfo.stat = rightValue.standardizedStatistic;
-	let formulaWithStats = generateStatsDice(
-		formula,
-		userStatistique.stats,
-		`${statInfo.value}`
-	);
-	logger.trace(`Calculation: ${formulaWithStats}`);
-	const isRoll = getRoll(formulaWithStats);
-	let originalFormula = `${statInfo.value}${sign}(${formula})`;
-	if (isNumber(formula)) originalFormula = `${statInfo.value}${sign}${formula}`;
-	if (isRoll?.total) {
-		formulaWithStats = isRoll.total.toString();
-		originalFormula = `${statInfo.value}${sign}(${formula}) → ${statInfo.value}${sign}(${isRoll.result})`;
+	let originalFormula = formula;
+	let totalFormula = formula;
+
+	let statInfo:
+		| {
+				value: number | undefined;
+				stat: string;
+				name: string;
+		  }
+		| undefined = undefined;
+	if (userStatistique) {
+		const sign = options.getString(t("calc.sign.title"), true);
+		if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
+		if (!sign.match(/^([><]=?|==|!=|[+\-*\/%^])$/)) {
+			const embed = embedError(ul("error.sign", { sign }), ul);
+			return await interaction.reply({ embeds: [embed] });
+		}
+		statInfo = {
+			value: undefined,
+			stat: options.getString(t("common.statistic"), true).standardize(),
+			name: options.getString(t("common.statistic"), true),
+		};
+		const rightValue = getRightValue(
+			userStatistique,
+			statInfo.stat,
+			ul,
+			client,
+			interaction,
+			optionChar,
+			statInfo.name
+		);
+		if (!rightValue) return;
+		statInfo.value = rightValue.userStat;
+		statInfo.name = rightValue.statistic;
+		statInfo.stat = rightValue.standardizedStatistic;
+		let formulaWithStats = generateStatsDice(
+			formula,
+			userStatistique.stats,
+			`${statInfo.value}`
+		);
+		logger.trace(`Calculation: ${formulaWithStats}`);
+		const isRoll = getRoll(formulaWithStats);
+		originalFormula = `${statInfo.value}${sign}(${formula})`;
+		if (isNumber(formula)) originalFormula = `${statInfo.value}${sign}${formula}`;
+		if (isRoll?.total) {
+			formulaWithStats = isRoll.total.toString();
+			originalFormula = `${statInfo.value}${sign}(${formula}) → ${statInfo.value}${sign}(${isRoll.result})`;
+		}
+		totalFormula = `${statInfo.value}${sign}(${formulaWithStats})`;
+		if (isNumber(formulaWithStats))
+			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
+	} else {
+		const isRoll = getRoll(formula);
+		if (isRoll?.total) originalFormula = `${formula} → ${isRoll.result}`;
 	}
-	formulaWithStats = evaluate(formulaWithStats);
 	const comments = options.getString(t("common.comments")) ?? undefined;
-	let totalFormula = `${statInfo.value}${sign}(${formulaWithStats})`;
-	if (isNumber(formulaWithStats))
-		totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
+	logger.debug("Formula: ", totalFormula);
 	try {
 		const result = evaluate(totalFormula);
 		const transform = options.getString(t("calc.transform.title")) ?? undefined;
@@ -181,7 +216,7 @@ export async function calculate(
 				userId: interaction.user.id,
 				ul,
 			},
-			statInfo.name,
+			statInfo?.name,
 			comments,
 			optionChar
 		);
@@ -205,7 +240,7 @@ export async function calculate(
 function infoUserCalc(
 	time: boolean,
 	data: { guildId: string; userId: string; ul: Translation },
-	stat: string,
+	stat?: string,
 	comments?: string,
 	charName?: string
 ) {
@@ -215,7 +250,9 @@ function infoUserCalc(
 	let user = mentionUser;
 	if (time) user += `${timestamp(time)}`;
 	if (user.trim().length > 0) user += `${data.ul("common.space")}:\n`;
-	return `${user}\\🔢[__${stat.capitalize()}__]${comments ? ` *${comments}*` : ""}`;
+	if (stat)
+		return `${user}\\🔢[__${stat.capitalize()}__]${comments ? ` *${comments}*` : ""}`;
+	return `${user}\\🔢${comments ? ` *${comments}*` : ""}`;
 }
 
 function asciiSign(sign: string) {
