@@ -5,7 +5,7 @@
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
-import { autoCompleteCharacters, calcOptions } from "utils";
+import { autoCompleteCharacters, calcOptions, getLang } from "utils";
 import type { EClient } from "client";
 import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
 import { getStatistics } from "database";
@@ -20,7 +20,10 @@ export const math = {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
-		const transform = autofocusTransform(interaction);
+		const transform = autofocusTransform(
+			interaction,
+			getLang(interaction, client.settings)
+		);
 		if (transform) return await interaction.respond(transform);
 		return await interaction.respond(
 			filter.map((result) => ({
