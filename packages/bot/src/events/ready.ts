@@ -3,7 +3,7 @@
 import process from "node:process";
 import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
-import { important, logger } from "@dicelette/utils";
+import { dev, important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { commandsList, contextMenus, dbCmd } from "commands";
 import { getTemplate, getUser } from "database";
@@ -70,6 +70,7 @@ export default (client: EClient): void => {
 		}
 		important.info("Bot is ready");
 		cleanData(client);
+		if (process.env.NODE_ENV === "development") client.template = dev(client.template);
 	});
 };
 
