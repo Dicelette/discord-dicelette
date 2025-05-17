@@ -523,7 +523,7 @@
     }
   },
   "math": {
-    "description": "Basic calculus supporting Math.js evaluation (doesn't support dice)",
+    "description": "Basic calculus supporting Math.js evaluation (support rolling dice)",
     "result": "Basic calculus",
     "title": "math"
   },

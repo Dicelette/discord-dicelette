@@ -523,7 +523,7 @@
     }
   },
   "math": {
-    "description": "Calcul de base supportant l'évaluation Math.js (ne supporte pas les dés!)",
+    "description": "Calcul de base supportant l'évaluation Math.js (support les lancés de dés)",
     "result": "Calcul basique",
     "title": "math"
   },
