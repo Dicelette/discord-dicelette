@@ -140,6 +140,7 @@ export async function calculate(
 				name: string;
 		  }
 		| undefined;
+	let needFormat = true;
 	if (userStatistique) {
 		const sign = options.getString(t("calc.sign.title"), true);
 		if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
@@ -183,7 +184,11 @@ export async function calculate(
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
 		const isRoll = getRoll(formula);
-		if (isRoll?.total) originalFormula = `${formula} → ${isRoll.result}`;
+		if (isRoll?.total) {
+			originalFormula = isRoll.result;
+			totalFormula = isRoll.total.toString();
+			needFormat = false;
+		}
 	}
 	const comments = options.getString(t("common.comments")) ?? undefined;
 	logger.debug("Formula: ", totalFormula);
@@ -202,7 +207,9 @@ export async function calculate(
 			optionChar
 		);
 
-		const msg = formatFormula(ul, totalFormula, `${result}`, originalFormula, transform);
+		const msg = needFormat
+			? formatFormula(ul, totalFormula, `${result}`, originalFormula, transform)
+			: formatDiceResult(originalFormula);
 		const toSend = `${header}\n${msg}`;
 		return await sendResult(
 			interaction,
@@ -216,6 +223,12 @@ export async function calculate(
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });
 	}
+}
+
+function formatDiceResult(input: string) {
+	const [expressionPart, resultPartRaw] = input.split(":").map((s) => s.trim());
+	const [rolls, total] = resultPartRaw.split("=").map((s) => s.trim());
+	return `\`${expressionPart}\` → \`${rolls}\` = \`${total}\``;
 }
 
 function infoUserCalc(
