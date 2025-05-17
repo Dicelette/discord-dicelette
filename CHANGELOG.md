@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.45.0](https://github.com/Dicelette/discord-dicelette/compare/1.44.0...1.45.0) (2025-05-17)
+
+
+### Features
+
+* add basic maths function ([#15](https://github.com/Dicelette/discord-dicelette/issues/15)) ([8c81b27](https://github.com/Dicelette/discord-dicelette/commit/8c81b278c210dab8148f781a7623fce2280499ab))
+
 ## [1.44.0](https://github.com/Dicelette/discord-dicelette/compare/1.43.2...1.44.0) (2025-05-09)
 
 
