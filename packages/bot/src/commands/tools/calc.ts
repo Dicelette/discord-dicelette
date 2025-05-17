@@ -162,7 +162,7 @@ export async function calculate(
 	if (userStatistique) {
 		const sign = options.getString(t("calc.sign.title"), true);
 		if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
-		if (!sign.match(/^([><]=?|==|!=|[+\-*\/%^])$/)) {
+		if (!sign.match(/^([><]=?|==|!=|[+\-*/%^])$/)) {
 			const embed = embedError(ul("error.sign", { sign }), ul);
 			return await interaction.reply({ embeds: [embed] });
 		}
@@ -250,9 +250,7 @@ function infoUserCalc(
 	let user = mentionUser;
 	if (time) user += `${timestamp(time)}`;
 	if (user.trim().length > 0) user += `${data.ul("common.space")}:\n`;
-	if (stat)
-		return `${user}\\🔢[__${stat.capitalize()}__]${comments ? ` *${comments}*` : ""}`;
-	return `${user}\\🔢${comments ? ` *${comments}*` : ""}`;
+	return `${user}\\🔢[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
 }
 
 function asciiSign(sign: string) {
