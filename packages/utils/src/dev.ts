@@ -8,13 +8,13 @@ import type { StatisticalTemplate } from "@dicelette/core";
 import type Enmap from "enmap";
 import { logger } from "./logger";
 
-//import all file from the folder "testing"
+const TESTING_DIRECTORY = "@testing";
 
 export default function (template: Enmap<string, StatisticalTemplate, unknown>) {
-	const allFiles = fs.readdirSync("@testing");
+	const allFiles = fs.readdirSync(TESTING_DIRECTORY);
 	for (const file of allFiles) {
 		if (file.endsWith(".json")) {
-			const filePath = path.resolve("@testing", file);
+			const filePath = path.resolve(TESTING_DIRECTORY, file);
 			const data = fs.readFileSync(filePath, "utf-8");
 			//as we are in testing, we assume the given file is a valid json
 			const json = JSON.parse(data) as StatisticalTemplate;
