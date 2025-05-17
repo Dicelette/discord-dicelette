@@ -48,32 +48,13 @@ export function autofocusTransform(
 	const focused = options.getFocused(true);
 	const ul = ln(lang);
 	if (focused.name === t("calc.transform.title")) {
-		return [
-			{
-				name: ul("calc.transform.abs"),
-				value: "abs",
-			},
-			{
-				name: ul("calc.transform.ceil"),
-				value: "ceil",
-			},
-			{
-				name: ul("calc.transform.floor"),
-				value: "floor",
-			},
-			{
-				name: ul("calc.transform.round"),
-				value: "round",
-			},
-			{
-				name: ul("calc.transform.sqrt"),
-				value: "sqrt",
-			},
-			{
-				name: ul("calc.transform.square"),
-				value: "square",
-			},
-		].filter((transform) => transform.name.includes(focused.value));
+		const keys = ["abs", "ceil", "floor", "round", "sqrt", "square"];
+		return keys
+			.map((k) => ({
+				name: ul(`calc.transform.${k}`),
+				value: k,
+			}))
+			.filter(({ name }) => name.toLowerCase().includes(focused.value.toLowerCase()));
 	}
 	return;
 }
