@@ -150,7 +150,7 @@ export const graph = {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
 		const guildData = client.settings.get(interaction.guild!.id);
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		if (!guildData) return;
 		const choices: string[] = [];
 		let user = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
@@ -178,7 +178,7 @@ export const graph = {
 		if (!interaction.guild) return;
 		let min = options.getNumber(t("graph.min.name")) ?? undefined;
 		let max = options.getNumber(t("graph.max.name")) ?? undefined;
-		const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
+		const { ul, config: guildData } = getLangAndConfig(client, interaction);
 		if (!guildData) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.template.notFound"), ul)],

@@ -100,7 +100,7 @@ export default {
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !interaction.guild || !interaction.channel) return;
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		if (!user && !db.templateID?.damageName?.length) {
 			await reply(interaction, {
 				embeds: [embedError(t("error.user.data"), ul)],

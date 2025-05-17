@@ -1,5 +1,5 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
-import type { Settings, Translation } from "@dicelette/types";
+import type { Translation } from "@dicelette/types";
 import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
@@ -50,7 +50,7 @@ export async function recordFirstPage(
 		return;
 	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) return;
-	await createEmbedFirstPage(interaction, template, client.settings);
+	await createEmbedFirstPage(interaction, template, client);
 }
 
 /**
@@ -60,16 +60,16 @@ export async function recordFirstPage(
  *
  * @param interaction - The modal interaction containing user input fields.
  * @param template - The statistical template used to determine embed content and button type.
- * @param setting - The settings object for retrieving guild-specific configuration.
+ * @param client - The settings object for retrieving guild-specific configuration.
  *
  * @throws {NoChannel} If the interaction channel is missing.
  */
 export async function createEmbedFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
-	setting: Settings
+	client: EClient
 ) {
-	const { ul } = getLangAndConfig(setting, interaction);
+	const { ul } = getLangAndConfig(client, interaction);
 	const channel = interaction.channel;
 	if (!channel) {
 		throw new NoChannel();
@@ -89,8 +89,8 @@ export async function createEmbedFirstPage(
 		interaction.fields.getTextInputValue("private")?.toLowerCase() === "x";
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 	logger.trace("avatar", avatar);
-	let sheetId = setting.get(interaction.guild!.id, "managerId");
-	const privateChannel = setting.get(interaction.guild!.id, "privateChannel");
+	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
+	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel.length > 0) sheetId = customChannel;
 

@@ -36,7 +36,7 @@ export default {
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		const scene = option.getString(t("scene.option.name"));
 		const bubble = option.getBoolean(t("scene.time.name"));
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		if (!scene && !bubble) {
 			await reply(interaction, {
 				content: ul("scene.noScene"),

@@ -146,7 +146,7 @@ export function getLangFromInteraction(
 	interaction: Djs.BaseInteraction,
 	client: EClient
 ): Djs.Locale {
-	const guildLocale = client.guildLocale.get(interaction.guild!.id);
+	const guildLocale = client.guildLocale?.get(interaction.guild!.id);
 	if (guildLocale) return guildLocale;
 	const locale =
 		client.settings.get(interaction.guild!.id, "lang") ??

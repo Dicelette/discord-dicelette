@@ -38,7 +38,7 @@ export const exportData = {
 			await interaction.reply(t("export.error.noData"));
 			return;
 		}
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		const csv: CSVRow[] = [];
 		const statsName = client.settings.get(interaction.guild.id, "templateID.statsName");
 		const isPrivateAllowed = client.settings.get(interaction.guild.id, "privateChannel");

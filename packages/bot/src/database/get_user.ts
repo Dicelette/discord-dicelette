@@ -368,7 +368,7 @@ export async function getStatistics(
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
-	const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
+	const { ul, config: guildData } = getLangAndConfig(client, interaction);
 	if (!guildData) return;
 	let optionChar = options.getString(t("common.character")) ?? undefined;
 	const charName = optionChar?.standardize();

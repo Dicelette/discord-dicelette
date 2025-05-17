@@ -35,7 +35,7 @@ export const diceRoll = {
 		await rollWithInteraction(
 			interaction,
 			dice,
-			client.settings,
+			client,
 			undefined,
 			undefined,
 			undefined,

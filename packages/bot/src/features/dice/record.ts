@@ -98,7 +98,7 @@ export async function registerDamageDice(
 	first?: boolean
 ) {
 	const db = client.settings;
-	const { ul } = getLangAndConfig(db, interaction);
+	const { ul } = getLangAndConfig(client, interaction);
 	const name = interaction.fields.getTextInputValue("damageName");
 	let value = interaction.fields.getTextInputValue("damageValue");
 	if (!interaction.guild) throw new Error(ul("error.guild.empty"));

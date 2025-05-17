@@ -25,7 +25,7 @@ export const deleteChar = {
 		const guildData = client.settings.get(interaction.guildId as string);
 		if (!guildData) return;
 		const choices: string[] = [];
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		let user = options.get(t("display.userLowercase"))?.value;
 		if (typeof user !== "string") user = interaction.user.id;
 		if (fixed.name === t("common.character")) {

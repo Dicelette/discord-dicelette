@@ -20,7 +20,7 @@ export const calc = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
-		const ul = getLangFromInteraction(interaction, client.settings);
+		const ul = getLangFromInteraction(interaction, client);
 		if (sign) return await interaction.respond(sign);
 		const transform = autofocusTransform(interaction, ul);
 		if (transform) return await interaction.respond(transform);

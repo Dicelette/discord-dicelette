@@ -2,13 +2,13 @@
  * Same as calc but without statistics
  */
 
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 import { cmdLn, t } from "@dicelette/localization";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
+import type { EClient } from "client";
+import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { autoCompleteCharacters, calcOptions, getLangFromInteraction } from "utils";
-import type { EClient } from "client";
 import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
-import { getStatistics } from "database";
 
 export const math = {
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
@@ -22,7 +22,7 @@ export const math = {
 		if (sign) return await interaction.respond(sign);
 		const transform = autofocusTransform(
 			interaction,
-			getLangFromInteraction(interaction, client.settings)
+			getLangFromInteraction(interaction, client)
 		);
 		if (transform) return await interaction.respond(transform);
 		return await interaction.respond(

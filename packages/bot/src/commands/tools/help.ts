@@ -50,7 +50,7 @@ export const help = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		const link = interaction.locale === "fr" ? LINKS.fr : LINKS.en;
 		const commandsID = await interaction.guild?.commands.fetch();
 		if (!commandsID) return;

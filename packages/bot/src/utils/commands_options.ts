@@ -221,7 +221,7 @@ export function gmCommonOptions(
 export function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const fixed = options.getFocused(true);
-	const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
+	const { ul, config: guildData } = getLangAndConfig(client, interaction);
 	if (!guildData) return;
 	const choices: string[] = [];
 	let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
