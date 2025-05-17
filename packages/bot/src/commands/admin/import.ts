@@ -34,7 +34,7 @@ export const bulkAdd = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const csvFile = options.getAttachment(t("import.options.name"), true);
-		const { langToUse, ul } = getLangAndConfig(client.settings, interaction);
+		const { langToUse, ul } = getLangAndConfig(client, interaction);
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const ext = csvFile.name.split(".").pop()?.toLowerCase() ?? "";
 		if (!ext || ext !== "csv") {
@@ -104,7 +104,7 @@ export const bulkAdd = {
 					});
 				}
 
-				let templateEmbed: Djs.EmbedBuilder | undefined = undefined;
+				let templateEmbed: Djs.EmbedBuilder | undefined;
 				if (guildTemplate.diceType || guildTemplate.critical) {
 					templateEmbed = new Djs.EmbedBuilder()
 						.setTitle(ul("embed.template"))
@@ -179,7 +179,7 @@ export const bulkAddTemplate = {
 		.setDescriptionLocalizations(cmdLn("csv_generation.description")),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
 			return reply(interaction, { content: ul("error.template.notFound") });

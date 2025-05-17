@@ -1,0 +1,50 @@
+{
+	"diceType": "1d100>=1",
+	"critical": {
+		"success": 100,
+		"failure": 1
+	},
+	"charName": false,
+	"damage": {
+		"Dégâts": "1d({exp||10}/10)+{{floor({exp||0}/20)}}",
+		"Dégâts secondaires": "1d4+{{floor(abs(50-{exp||50})/5)}}"
+	},
+	"customCritical": {
+		"Échec critique": {
+			"sign": "==",
+			"value": "1",
+			"onNaturalDice": false,
+			"affectSkill": false
+		},
+		"Échec grave": {
+			"sign": "<=",
+			"value": "25",
+			"onNaturalDice": false,
+			"affectSkill": false
+		},
+		"Échec léger": {
+			"sign": "<=",
+			"value": "50",
+			"onNaturalDice": false,
+			"affectSkill": false
+		},
+		"Réussite simple": {
+			"sign": "<=",
+			"value": "75",
+			"onNaturalDice": false,
+			"affectSkill": false
+		},
+		"Réussite complète": {
+			"sign": "<=",
+			"value": "99",
+			"onNaturalDice": false,
+			"affectSkill": false
+		},
+		"Réussite critique": {
+			"sign": "==",
+			"value": "100",
+			"onNaturalDice": false,
+			"affectSkill": false
+		}
+	}
+}

@@ -1,7 +1,9 @@
 import { important, logger } from "./src/logger";
 import "uniformize";
+import { standardizeDice } from "@dicelette/core";
 
 export { logger, important };
+export { default as dev } from "./src/dev";
 
 /**
  * filter the choices by removing the accents and check if it includes the removedAccents focused
@@ -74,3 +76,12 @@ export function capitalizeBetweenPunct(input: string) {
 }
 
 export * from "./src/errors";
+
+export function uniformizeRecords(input: Record<string, string | number>) {
+	return Object.fromEntries(
+		Object.entries(input).map(([key, value]) => [
+			key.standardize(),
+			typeof value === "string" ? standardizeDice(value) : value,
+		])
+	) as Record<string, string | number>;
+}

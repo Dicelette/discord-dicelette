@@ -368,7 +368,7 @@ export async function getStatistics(
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
-	const { ul, config: guildData } = getLangAndConfig(client.settings, interaction);
+	const { ul, config: guildData } = getLangAndConfig(client, interaction);
 	if (!guildData) return;
 	let optionChar = options.getString(t("common.character")) ?? undefined;
 	const charName = optionChar?.standardize();
@@ -391,6 +391,7 @@ export async function getStatistics(
 		});
 		return;
 	}
+	const originalOptionChar = optionChar;
 	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
 	const template = await getTemplateByInteraction(interaction, client);
 	const diceType = !userStatistique
@@ -405,6 +406,7 @@ export async function getStatistics(
 	}
 
 	if (!needStats && !userStatistique && template) {
+		optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
 		userStatistique = {
 			template: {

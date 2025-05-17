@@ -1,6 +1,11 @@
 import { cmdLn, t } from "@dicelette/localization";
-import { filterStatsInDamage, uniformizeRecords } from "@dicelette/parse_result";
-import { capitalizeBetweenPunct, filterChoices, logger } from "@dicelette/utils";
+import { filterStatsInDamage } from "@dicelette/parse_result";
+import {
+	capitalizeBetweenPunct,
+	filterChoices,
+	logger,
+	uniformizeRecords,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
@@ -95,7 +100,7 @@ export default {
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !interaction.guild || !interaction.channel) return;
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		if (!user && !db.templateID?.damageName?.length) {
 			await reply(interaction, {
 				embeds: [embedError(t("error.user.data"), ul)],

@@ -15,7 +15,7 @@ export async function commandMenu(
 	interaction: Djs.MessageContextMenuCommandInteraction,
 	client: EClient
 ) {
-	const { ul } = getLangAndConfig(client.settings, interaction);
+	const { ul } = getLangAndConfig(client, interaction);
 	if (interaction.targetMessage.author.id !== client.user?.id) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.notBot"),

@@ -522,6 +522,11 @@
       "removed": "{{- user}} a supprimé les statistiques de {{- char}} (dans {{- fiche}})"
     }
   },
+  "math": {
+    "description": "Calcul de base supportant l'évaluation Math.js (support les lancés de dés)",
+    "result": "Calcul basique",
+    "title": "math"
+  },
   "mjRoll": {
     "description": "Permet de lancer des dés pour d'autres joueurs",
     "name": "mj",

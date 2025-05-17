@@ -15,7 +15,7 @@ import {
 	skillCustomCritical,
 	trimAll,
 } from "@dicelette/parse_result";
-import type { Settings, Translation, UserData } from "@dicelette/types";
+import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue } from "database";
@@ -29,16 +29,16 @@ import { getLangAndConfig } from "utils";
 export async function rollWithInteraction(
 	interaction: Djs.CommandInteraction,
 	dice: string,
-	db: Settings,
-	critical?: { failure?: number; success?: number },
+	client: EClient,
+	critical?: { failure?: number | undefined; success?: number | undefined },
 	user?: Djs.User,
 	charName?: string,
 	infoRoll?: { name: string; standardized: string },
-	hideResult?: boolean | null,
+	hideResult?: false | true | null,
 	customCritical?: Record<string, CustomCritical> | undefined
 ) {
 	//exclude announcement channel
-	const { langToUse, ul, config } = getLangAndConfig(db, interaction);
+	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
 		lang: langToUse,
 		userId: user?.id ?? interaction.user.id,
@@ -63,7 +63,14 @@ export async function rollWithInteraction(
 		return;
 	}
 
-	return await sendResult(interaction, { roll: defaultMsg }, db, ul, user, hideResult);
+	return await sendResult(
+		interaction,
+		{ roll: defaultMsg },
+		client.settings,
+		ul,
+		user,
+		hideResult
+	);
 }
 
 /**
@@ -160,7 +167,7 @@ export async function rollDice(
 	await rollWithInteraction(
 		interaction,
 		roll,
-		client.settings,
+		client,
 		undefined,
 		user,
 		charOptions,
@@ -226,7 +233,7 @@ export async function rollStatistique(
 		: undefined;
 	const comments = comm ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
-	let userStat: undefined | number = undefined;
+	let userStat: undefined | number;
 	const expression = options.getString(t("common.expression")) ?? "0";
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
 		const res = getRightValue(
@@ -285,7 +292,7 @@ export async function rollStatistique(
 	await rollWithInteraction(
 		interaction,
 		roll,
-		client.settings,
+		client,
 		template.critical,
 		user,
 		optionChar,

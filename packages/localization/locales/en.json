@@ -522,6 +522,11 @@
       "removed": "{{- user}} deleted the statistics of {{- char}} (in {{- file}})"
     }
   },
+  "math": {
+    "description": "Basic calculus supporting Math.js evaluation (support rolling dice)",
+    "result": "Basic calculus",
+    "title": "math"
+  },
   "mjRoll": {
     "description": "Allows you to roll dice for other players",
     "name": "gm",

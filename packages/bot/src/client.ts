@@ -24,6 +24,11 @@ export class EClient extends Djs.Client {
 	 */
 	public template: Enmap<string, StatisticalTemplate, unknown>;
 
+	/**
+	 * Enmap for guild locale
+	 */
+	public guildLocale: Enmap<string, Djs.Locale, unknown>;
+
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
@@ -43,6 +48,8 @@ export class EClient extends Djs.Client {
 		this.characters = new Enmap({ inMemory: true });
 		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
 		this.template = new Enmap({ inMemory: true });
+		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
+		this.guildLocale = new Enmap({ inMemory: true });
 	}
 }
 

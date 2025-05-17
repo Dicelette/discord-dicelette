@@ -6,7 +6,7 @@ import dedent from "dedent";
 import * as Djs from "discord.js";
 import { localeList } from "locales";
 import { reply } from "messages";
-import { getLangAndConfig } from "../../utils";
+import { getLangAndConfig } from "utils";
 
 const findLocale = (locale?: Djs.Locale) => {
 	if (locale === Djs.Locale.EnglishUS || locale === Djs.Locale.EnglishGB)
@@ -243,7 +243,7 @@ export const configuration = {
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		const subcommandGroup = options.getSubcommandGroup();
@@ -588,7 +588,7 @@ async function display(
 				`),
 			}
 		);
-	let templateEmbed: undefined | Djs.EmbedBuilder = undefined;
+	let templateEmbed: undefined | Djs.EmbedBuilder;
 	if (guildSettings.templateID) {
 		const templateID = guildSettings.templateID;
 		const { channelId, messageId, statsName, damageName, excludedStats } =

@@ -90,9 +90,9 @@ export const generateTemplate = {
 	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		if (!interaction.guild) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		const name = options.getString(t("generate.options.stats.name")) ?? undefined;
-		let statServer: Statistic | undefined = undefined;
+		let statServer: Statistic | undefined;
 		if (name) {
 			const statistiqueName = name.split(/[, ]+/);
 			statServer = {};
@@ -106,7 +106,7 @@ export const generateTemplate = {
 		}
 
 		const atqName = options.getString(t("generate.options.damage.name"));
-		let atqDice: Record<string, string> | undefined = undefined;
+		let atqDice: Record<string, string> | undefined;
 		if (atqName) {
 			const atq = atqName.split(/[, ]+/);
 			atqDice = {};
@@ -218,7 +218,7 @@ export const registerTemplate = {
 		if (!interaction.guild) return;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const { ul } = getLangAndConfig(client.settings, interaction);
+		const { ul } = getLangAndConfig(client, interaction);
 		const template = options.getAttachment(t("register.options.template.name"), true);
 		//fetch the template
 		if (!template.contentType?.includes("json")) {
@@ -285,7 +285,7 @@ export const registerTemplate = {
 			.setColor("Random");
 
 		//if there are ~25 stats we need to create an embed for it, so go to multiple embed, as user was done.
-		let statisticsEmbed: undefined | Djs.EmbedBuilder = undefined;
+		let statisticsEmbed: undefined | Djs.EmbedBuilder;
 		if (templateData.statistics) {
 			statisticsEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("common.statistics").capitalize())
@@ -332,7 +332,7 @@ export const registerTemplate = {
 				name: ul("common.total"),
 				value: `\`${templateData.total}\``,
 			});
-		let diceEmbed: undefined | Djs.EmbedBuilder = undefined;
+		let diceEmbed: undefined | Djs.EmbedBuilder;
 		if (templateData.damage) {
 			diceEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("embed.dice"))

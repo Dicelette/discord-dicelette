@@ -38,7 +38,7 @@
 	"author": "",
 	"license": "GNU GPLv3",
 	"devDependencies": {
-		"@biomejs/biome": "2.0.0-beta.2",
+		"@biomejs/biome": "2.0.0-beta.4",
 		"commit-and-tag-version": "^12.5.1",
 		"cross-env": "^7.0.3",
 		"i18next": "^25.1.1",
