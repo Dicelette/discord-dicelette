@@ -8,7 +8,7 @@ import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
-import { autoCompleteCharacters, calcOptions, getLang } from "utils";
+import { autoCompleteCharacters, calcOptions, getLangFromInteraction } from "utils";
 
 export const calc = {
 	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
@@ -20,7 +20,7 @@ export const calc = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
-		const ul = getLang(interaction, client.settings);
+		const ul = getLangFromInteraction(interaction, client.settings);
 		if (sign) return await interaction.respond(sign);
 		const transform = autofocusTransform(interaction, ul);
 		if (transform) return await interaction.respond(transform);

@@ -103,7 +103,7 @@ export async function optionInteractions(
 		langToUse: lang,
 		config: guildData,
 		ul,
-	} = getLangAndConfig(client.settings, interaction);
+	} = getLangAndConfig(client, interaction);
 	if (!guildData) {
 		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
 		return;
@@ -135,17 +135,23 @@ export function isValidInteraction(interaction: Djs.BaseInteraction) {
 	);
 }
 
-export function getLangAndConfig(db: Settings, interaction: Djs.BaseInteraction) {
-	const langToUse = getLang(interaction, db);
+export function getLangAndConfig(client: EClient, interaction: Djs.BaseInteraction) {
+	const langToUse = getLangFromInteraction(interaction, client);
 	const ul = ln(langToUse);
-	const config = db.get(interaction.guild!.id);
+	const config = client.settings.get(interaction.guild!.id);
 	return { langToUse, ul, config };
 }
 
-export function getLang(interaction: Djs.BaseInteraction, db: Settings) {
-	return (
-		db.get(interaction.guild!.id, "lang") ??
+export function getLangFromInteraction(
+	interaction: Djs.BaseInteraction,
+	client: EClient
+): Djs.Locale {
+	const guildLocale = client.guildLocale.get(interaction.guild!.id);
+	if (guildLocale) return guildLocale;
+	const locale =
+		client.settings.get(interaction.guild!.id, "lang") ??
 		interaction.guild?.preferredLocale ??
-		interaction.locale
-	);
+		interaction.locale;
+	client.guildLocale.set(interaction.guild!.id, locale);
+	return locale;
 }

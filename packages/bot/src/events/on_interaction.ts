@@ -1,6 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { lError } from "@dicelette/localization";
-import type { Characters, Settings, Translation } from "@dicelette/types";
+import type { Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import {
 	autCompleteCmd,
@@ -18,7 +18,7 @@ import { cancel, getLangAndConfig } from "utils";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
-		const cfg = getLangAndConfig(client.settings, interaction);
+		const cfg = getLangAndConfig(client, interaction);
 		const { ul, langToUse } = cfg;
 		const interactionUser = interaction.user;
 		try {
@@ -49,14 +49,7 @@ export default (client: EClient): void => {
 					});
 					return;
 				}
-				await buttonSubmit(
-					interaction,
-					ul,
-					interactionUser,
-					template,
-					client.settings,
-					client.characters
-				);
+				await buttonSubmit(interaction, ul, interactionUser, template, client);
 			} else if (interaction.isModalSubmit())
 				await modalSubmit(interaction, ul, interactionUser, client);
 			else if (interaction.isStringSelectMenu()) {
@@ -124,37 +117,36 @@ async function modalSubmit(
 
 /**
  * Switch for button interaction
- * @param interaction
- * @param ul
- * @param interactionUser
- * @param template
- * @param db
- * @param characters
+ * @param {Djs.ButtonInteraction} interaction
+ * @param {Translation} ul
+ * @param {Djs.User} interactionUser
+ * @param {StatisticalTemplate} template
+ * @param {EClient} client
  */
 async function buttonSubmit(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
-	db: Settings,
-	characters: Characters
+	client: EClient
 ) {
+	const characters = client.characters;
 	if (interaction.customId === "register")
 		await features.startRegisterUser(
 			interaction,
 			template,
 			interactionUser,
 			ul,
-			db.has(interaction.guild!.id, "privateChannel")
+			client.settings.has(interaction.guild!.id, "privateChannel")
 		);
 	else if (interaction.customId === "continue")
 		await features.continuePage(interaction, template, ul, interactionUser);
 	else if (interaction.customId.includes("add_dice")) {
-		await features.executeAddDiceButton(interaction, interactionUser, db);
+		await features.executeAddDiceButton(interaction, interactionUser, client.settings);
 		if (!interaction.customId.includes("first"))
 			await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "edit_stats") {
-		await features.triggerEditStats(interaction, ul, interactionUser, db);
+		await features.triggerEditStats(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "validate")
 		await features.validateUserButton(
@@ -162,13 +154,13 @@ async function buttonSubmit(
 			interactionUser,
 			template,
 			ul,
-			db,
+			client,
 			characters
 		);
 	else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, interactionUser);
 	else if (interaction.customId === "edit_dice") {
-		await features.initiateDiceEdit(interaction, ul, interactionUser, db);
+		await features.initiateDiceEdit(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);

@@ -10,7 +10,7 @@ import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "data
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import {
-	getLang,
+	getLangFromInteraction,
 	gmCommonOptions,
 	rollDice,
 	rollStatistique,
@@ -58,7 +58,7 @@ export const mjRoll = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
-		const ul = getLang(interaction, client.settings);
+		const ul = getLangFromInteraction(interaction, client);
 		const transform = autofocusTransform(interaction, ul);
 		if (transform) return await interaction.respond(transform);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -141,7 +141,7 @@ export const mjRoll = {
 		const user = options.getUser(t("display.userLowercase"), false) ?? undefined;
 		const charName = options.getString(t("common.character"), false)?.toLowerCase();
 		let optionChar = options.getString(t("common.character")) ?? undefined;
-		let charData: undefined | UserData = undefined;
+		let charData: undefined | UserData;
 		if (user) {
 			charData = await getUserFromMessage(client, user.id, interaction, charName, {
 				skipNotFound: true,

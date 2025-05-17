@@ -1,7 +1,8 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type { Characters, Settings, Translation, UserData } from "@dicelette/types";
+import type { Characters, Translation, UserData } from "@dicelette/types";
 import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
+import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { showStatistiqueModal } from "features";
 import {
@@ -68,13 +69,13 @@ export async function validateUserButton(
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
 	ul: Translation,
-	db: Settings,
+	client: EClient,
 	characters: Characters
 ) {
 	const isModerator = interaction.guild?.members.cache
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-	if (isModerator) await validateUser(interaction, template, db, characters);
+	if (isModerator) await validateUser(interaction, template, client, characters);
 	else
 		await reply(interaction, {
 			content: ul("modals.noPermission"),
@@ -92,10 +93,10 @@ export async function validateUserButton(
 export async function validateUser(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
-	db: Settings,
+	client: EClient,
 	characters: Characters
 ) {
-	const { ul } = getLangAndConfig(db, interaction);
+	const { ul } = getLangAndConfig(client, interaction);
 	const userEmbed = getEmbeds(ul, interaction.message, "user");
 	if (!userEmbed) throw new NoEmbed();
 	const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
@@ -136,8 +137,8 @@ export async function validateUser(
 	const oldStatsEmbed = getEmbeds(ul, interaction.message, "stats");
 	const oldDiceEmbedsFields = oldDiceEmbeds ? (oldDiceEmbeds.toJSON().fields ?? []) : [];
 	const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.toJSON().fields ?? []) : [];
-	let diceEmbed: Djs.EmbedBuilder | undefined = undefined;
-	let statsEmbed: Djs.EmbedBuilder | undefined = undefined;
+	let diceEmbed: Djs.EmbedBuilder | undefined;
+	let statsEmbed: Djs.EmbedBuilder | undefined;
 	for (const field of oldDiceEmbedsFields) {
 		if (!diceEmbed) {
 			diceEmbed = createDiceEmbed(ul);
@@ -175,7 +176,7 @@ export async function validateUser(
 	}
 
 	const damageFields = diceEmbed?.toJSON().fields ?? [];
-	let templateDamage: Record<string, string> | undefined = undefined;
+	let templateDamage: Record<string, string> | undefined;
 	if (damageFields.length > 0) {
 		templateDamage = {};
 
@@ -209,7 +210,7 @@ export async function validateUser(
 		private: isPrivate,
 		avatar: jsonThumbnail ? cleanAvatarUrl(jsonThumbnail) : undefined,
 	};
-	let templateEmbed: Djs.EmbedBuilder | undefined = undefined;
+	let templateEmbed: Djs.EmbedBuilder | undefined;
 	if (template.diceType || template.critical || template.customCritical) {
 		templateEmbed = createTemplateEmbed(ul);
 		if (template.diceType)
@@ -243,7 +244,7 @@ export async function validateUser(
 		userID,
 		ul,
 		{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
-		db,
+		client.settings,
 		channelToPost.replace("<#", "").replace(">", ""),
 		characters
 	);
@@ -252,7 +253,7 @@ export async function validateUser(
 	} catch (e) {
 		logger.warn(e, "validateUser: can't delete the message");
 	}
-	await addAutoRole(interaction, userID, !!statsEmbed, !!diceEmbed, db);
+	await addAutoRole(interaction, userID, !!statsEmbed, !!diceEmbed, client.settings);
 	await reply(interaction, {
 		content: ul("modals.finished"),
 		flags: Djs.MessageFlags.Ephemeral,
