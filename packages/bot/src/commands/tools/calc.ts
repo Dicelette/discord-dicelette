@@ -158,7 +158,7 @@ export async function calculate(
 				stat: string;
 				name: string;
 		  }
-		| undefined = undefined;
+		| undefined;
 	if (userStatistique) {
 		const sign = options.getString(t("calc.sign.title"), true);
 		if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
