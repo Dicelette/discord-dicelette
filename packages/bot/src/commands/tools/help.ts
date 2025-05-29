@@ -247,9 +247,16 @@ export async function helpAtInvit(guild: Djs.Guild) {
 	${ul("help.invit.default")}
 	
 	${ul("help.invit.link", { docLink })}`);
-
+	const owner = await guild.fetchOwner();
 	if (systemChannel === "dm") {
-		const owner = await guild.fetchOwner();
 		await owner.send(msg);
-	} else await systemChannel.send(msg);
+	} else {
+		try {
+			await systemChannel.send(msg);
+		} catch (_e) {
+			//probably no permission to send messages in the system channel
+			//fall back to owner DM
+			await owner.send(msg);
+		}
+	}
 }
