@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.45.1](https://github.com/Dicelette/discord-dicelette/compare/1.45.0...1.45.1) (2025-05-29)
+
+
+### Bug Fixes
+
+* no permission to send the welcome so fallback to DM ([5309d76](https://github.com/Dicelette/discord-dicelette/commit/5309d762cca9683f85367ef0ce9fe56c2e2ed8b4))
+
 ## [1.45.0](https://github.com/Dicelette/discord-dicelette/compare/1.44.0...1.45.0) (2025-05-17)
 
 
