@@ -98,6 +98,5 @@ export async function fetchTemplate(
 		enmap.set(message.guild!.id, true, "templateID.valid");
 		return verifyTemplateValue(res);
 	}
-	const parsedTemplate = templateSchema.parse(res);
-	return parsedTemplate as StatisticalTemplate;
+	return verifyTemplateValue(res, false);
 }
