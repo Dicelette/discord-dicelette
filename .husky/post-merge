@@ -1,1 +1,1 @@
-node ./scripts/remove-overrides.js
+node .husky/scripts/remove-overrides.js

@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const pkgPath = path.resolve(__dirname, "..", "..", "package.json");
+const pkgPath = path.resolve("package.json");
 const raw = fs.readFileSync(pkgPath, "utf-8");
 const pkg = JSON.parse(raw);
 
