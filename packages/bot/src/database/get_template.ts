@@ -70,7 +70,9 @@ export async function getTemplate(
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
 			throw new Error(ul("error.template.id", { channelId, messageId }));
-		throw new Error(ul("error.template.notFound", { guildId: guild.name }));
+		if (!skipNoFound)
+			throw new Error(ul("error.template.notFound", { guildId: guild.name }));
+		return undefined;
 	}
 }
 
