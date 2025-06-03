@@ -181,7 +181,12 @@ export const graph = {
 		const { ul, config: guildData } = getLangAndConfig(client, interaction);
 		if (!guildData) {
 			await reply(interaction, {
-				embeds: [embedError(ul("error.template.notFound"), ul)],
+				embeds: [
+					embedError(
+						ul("error.template.notFound", { guildId: interaction.guild.name }),
+						ul
+					),
+				],
 			});
 			return;
 		}

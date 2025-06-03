@@ -36,7 +36,11 @@ export async function storeDamageDice(
 	client: EClient
 ) {
 	if (!(await getTemplateByInteraction(interaction, client))) {
-		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
+		await reply(interaction, {
+			embeds: [
+				embedError(ul("error.template.notFound", { guildId: interaction.guildId }), ul),
+			],
+		});
 		return;
 	}
 	const embed = ensureEmbed(interaction.message ?? undefined);

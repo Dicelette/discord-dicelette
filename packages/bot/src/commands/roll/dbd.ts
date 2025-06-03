@@ -158,7 +158,12 @@ export default {
 				const template = await getTemplateByInteraction(interaction, client);
 				if (!template) {
 					await reply(interaction, {
-						embeds: [embedError(ul("error.template.notFound"), ul)],
+						embeds: [
+							embedError(
+								ul("error.template.notFound", { guildId: interaction.guild.name }),
+								ul
+							),
+						],
 						flags: Djs.MessageFlags.Ephemeral,
 					});
 					return;

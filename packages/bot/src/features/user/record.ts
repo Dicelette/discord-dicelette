@@ -26,7 +26,16 @@ export async function pageNumber(
 	if (!isNumber(pageNumber)) return;
 	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) {
-		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
+		await reply(interaction, {
+			embeds: [
+				embedError(
+					ul("error.template.notFound", {
+						guildId: interaction.guild?.name ?? interaction.guildId,
+					}),
+					ul
+				),
+			],
+		});
 		return;
 	}
 	await registerStatistics(

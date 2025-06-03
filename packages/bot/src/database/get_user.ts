@@ -239,7 +239,16 @@ export async function getRecordChar(
 	const guildData = client.settings.get(interaction.guildId as string);
 	const ul = ln(interaction.locale as Djs.Locale);
 	if (!guildData) {
-		await reply(interaction, { embeds: [embedError(ul("error.template.notFound"), ul)] });
+		await reply(interaction, {
+			embeds: [
+				embedError(
+					ul("error.template.notFound", {
+						guildId: interaction.guild?.name ?? interaction.guild?.id ?? "unknow guild",
+					}),
+					ul
+				),
+			],
+		});
 		return undefined;
 	}
 	const user = options.getUser(t("display.userLowercase"));

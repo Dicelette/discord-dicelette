@@ -43,7 +43,11 @@ export const bulkAdd = {
 		/** download the file using paparse */
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, { content: ul("error.template.notFound") });
+			return reply(interaction, {
+				content: ul("error.template.notFound", {
+					guildId: interaction.guild?.name ?? interaction.guildId ?? "unknow guild",
+				}),
+			});
 		}
 		const { members, errors } = await parseCSV(
 			csvFile.url,
@@ -182,7 +186,9 @@ export const bulkAddTemplate = {
 		const { ul } = getLangAndConfig(client, interaction);
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, { content: ul("error.template.notFound") });
+			return reply(interaction, {
+				content: ul("error.template.notFound", { guildId: interaction.guild.name }),
+			});
 		}
 		const header = ["user", "charName", "avatar", "channel"];
 		if (guildTemplate.statistics) {

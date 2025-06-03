@@ -45,7 +45,14 @@ export default (client: EClient): void => {
 				if (!template) {
 					if (!interaction.channel || interaction.channel.isDMBased()) return;
 					await (interaction.channel as Djs.TextChannel).send({
-						embeds: [embedError(ul("error.template.notFound"), ul)],
+						embeds: [
+							embedError(
+								ul("error.template.notFound", {
+									guildId: interaction.guild?.name ?? interaction.guildId,
+								}),
+								ul
+							),
+						],
 					});
 					return;
 				}

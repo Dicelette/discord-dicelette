@@ -1,8 +1,4 @@
-import {
-	type StatisticalTemplate,
-	templateSchema,
-	verifyTemplateValue,
-} from "@dicelette/core";
+import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
@@ -74,7 +70,7 @@ export async function getTemplate(
 	} catch (error) {
 		if ((error as Error).message === "Unknown Message")
 			throw new Error(ul("error.template.id", { channelId, messageId }));
-		throw new Error(ul("error.template.notFound"));
+		throw new Error(ul("error.template.notFound", { guildId: guild.name }));
 	}
 }
 
