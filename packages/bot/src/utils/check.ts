@@ -144,7 +144,11 @@ export function isValidInteraction(interaction: Djs.BaseInteraction) {
 	);
 }
 
-export function getLangAndConfig(client: EClient, interaction: Djs.BaseInteraction, guildId?: string) {
+export function getLangAndConfig(
+	client: EClient,
+	interaction: Djs.BaseInteraction,
+	guildId?: string
+) {
 	const langToUse = getLangFromInteraction(interaction, client, guildId);
 	const ul = ln(langToUse);
 	const config = client.settings.get(guildId ?? interaction.guild!.id);

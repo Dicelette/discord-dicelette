@@ -16,6 +16,7 @@ import {
 	createCustomCritical,
 	createDefaultThread,
 	embedError,
+	interactionError,
 	reply,
 } from "messages";
 import { getLangAndConfig } from "../../utils";
@@ -234,198 +235,212 @@ export const registerTemplate = {
 			Djs.ChannelType.PrivateThread,
 		];
 		const res = await fetch(template.url).then((res) => res.json());
-		const templateData = verifyTemplateValue(res);
-		const guildId = interaction.guild.id;
-		const channel = options.getChannel(t("common.channel"), true, allowedChannelType) as
-			| Djs.AnyThreadChannel
-			| Djs.TextChannel;
+		try {
+			const templateData = verifyTemplateValue(res);
+			const guildId = interaction.guild.id;
+			const channel = options.getChannel(t("common.channel"), true, allowedChannelType) as
+				| Djs.AnyThreadChannel
+				| Djs.TextChannel;
 
-		let publicChannel = options.getChannel(t("register.options.public.name"), false);
-		const privateChannel = options.getChannel(t("register.options.private.name"), false);
-		if (channel instanceof Djs.TextChannel && !publicChannel) {
-			publicChannel = await createDefaultThread(
-				channel,
-				client.settings,
-				interaction,
+			let publicChannel = options.getChannel(t("register.options.public.name"), false);
+			const privateChannel = options.getChannel(
+				t("register.options.private.name"),
 				false
 			);
-		} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
-			await reply(interaction, {
-				embeds: [
-					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
-				],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			return;
-		}
-		if (!publicChannel) {
-			await reply(interaction, {
-				embeds: [
-					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
-				],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			return;
-		}
-
-		const button = new Djs.ButtonBuilder()
-			.setCustomId("register")
-			.setLabel(ul("register.button"))
-			.setStyle(Djs.ButtonStyle.Primary);
-		const components =
-			new Djs.ActionRowBuilder<Djs.MessageActionRowComponentBuilder>().addComponents(
-				button
-			);
-		let embedTemplate = new Djs.EmbedBuilder()
-			.setTitle(ul("register.embed.title"))
-			.setDescription(ul("register.embed.description"))
-			.setThumbnail(
-				"https://github.com/dicelette/discord-dicelette/blob/main/assets/template.png?raw=true"
-			)
-			.setColor("Random");
-
-		//if there are ~25 stats we need to create an embed for it, so go to multiple embed, as user was done.
-		let statisticsEmbed: undefined | Djs.EmbedBuilder;
-		if (templateData.statistics) {
-			statisticsEmbed = new Djs.EmbedBuilder()
-				.setTitle(ul("common.statistics").capitalize())
-				.setThumbnail(
-					"https://github.com/dicelette/discord-dicelette/blob/main/assets/player.png?raw=true"
+			if (channel instanceof Djs.TextChannel && !publicChannel) {
+				publicChannel = await createDefaultThread(
+					channel,
+					client.settings,
+					interaction,
+					false
 				);
-			for (const [stat, value] of Object.entries(templateData.statistics)) {
-				const { min, max, combinaison, exclude } = value;
-				let msg = "";
-				if (combinaison)
-					msg += `- Combinaison${ul("common.space")}: \`${combinaison}\`\n`;
-				if (min) msg += `- Min${ul("common.space")}: \`${min}\`\n`;
-				if (max) msg += `- Max${ul("common.space")}: \`${max}\`\n`;
-				msg += `- __${ul("register.embed.exclude")}__${ul("common.space")}: ${exclude ? ul("common.yes") : ul("common.no")}\n`;
-				if (msg.length === 0) msg = ul("register.embed.noValue");
-				statisticsEmbed.addFields({
-					name: stat.capitalize(),
-					value: msg,
-					inline: true,
+			} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
+				await reply(interaction, {
+					embeds: [
+						embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
+					],
+					flags: Djs.MessageFlags.Ephemeral,
 				});
+				return;
 			}
-		}
-		if (templateData.diceType)
-			embedTemplate.addFields({
-				name: ul("common.dice").capitalize(),
-				value: `\`${capitalizeBetweenPunct(templateData.diceType)}\``,
-			});
-		if (templateData.critical) {
-			let msgComparator = "";
-			if (templateData.critical?.success)
-				msgComparator += `- ${ul("roll.critical.success")}${ul("common.space")}: \`${templateData.critical.success}\`\n`;
-			if (templateData.critical?.failure)
-				msgComparator += `- ${ul("roll.critical.failure")}${ul("common.space")}: \`${templateData.critical.failure}\`\n`;
-			if (msgComparator.length > 0)
-				embedTemplate.addFields({
-					name: ul("register.embed.comparator"),
-					value: msgComparator,
+			if (!publicChannel) {
+				await reply(interaction, {
+					embeds: [
+						embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
+					],
+					flags: Djs.MessageFlags.Ephemeral,
 				});
-		}
-		if (templateData.customCritical)
-			embedTemplate = createCustomCritical(embedTemplate, templateData.customCritical);
-		if (templateData.total)
-			embedTemplate.addFields({
-				name: ul("common.total"),
-				value: `\`${templateData.total}\``,
-			});
-		let diceEmbed: undefined | Djs.EmbedBuilder;
-		if (templateData.damage) {
-			diceEmbed = new Djs.EmbedBuilder()
-				.setTitle(ul("embed.dice"))
-				.setThumbnail(
-					"https://raw.githubusercontent.com/dicelette/discord-dicelette/main/assets/dice.png"
+				return;
+			}
+
+			const button = new Djs.ButtonBuilder()
+				.setCustomId("register")
+				.setLabel(ul("register.button"))
+				.setStyle(Djs.ButtonStyle.Primary);
+			const components =
+				new Djs.ActionRowBuilder<Djs.MessageActionRowComponentBuilder>().addComponents(
+					button
 				);
-			for (const [dice, value] of Object.entries(templateData.damage))
-				diceEmbed.addFields({
-					name: dice.capitalize(),
-					value: `\`${value}\``,
-					inline: true,
-				});
-		}
-		const embeds = [embedTemplate, statisticsEmbed, diceEmbed].filter(
-			(embed) => embed !== undefined
-		);
-		const msg = await channel.send({
-			content: "",
-			embeds: embeds as Djs.EmbedBuilder[],
-			files: [
-				{
-					attachment: Buffer.from(JSON.stringify(templateData, null, 2), "utf-8"),
-					name: "template.json",
-				},
-			],
-			components: [components],
-		});
-		await msg.pin();
-		//register in the cache
-		client.template.set(guildId, templateData);
-		//save in database file
-		const json = client.settings.get(guildId);
-		const statsName = templateData.statistics
-			? Object.keys(templateData.statistics)
-			: undefined;
-		const excludedStats = templateData.statistics
-			? Object.keys(
-					Object.fromEntries(
-						Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
-					)
+			let embedTemplate = new Djs.EmbedBuilder()
+				.setTitle(ul("register.embed.title"))
+				.setDescription(ul("register.embed.description"))
+				.setThumbnail(
+					"https://github.com/dicelette/discord-dicelette/blob/main/assets/template.png?raw=true"
 				)
-			: undefined;
-		const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;
-		if (json) {
-			if (json?.templateID?.messageId && json.templateID?.channelId) {
-				try {
-					const channel = await interaction.guild.channels.fetch(
-						json.templateID.channelId
+				.setColor("Random");
+
+			//if there are ~25 stats we need to create an embed for it, so go to multiple embed, as user was done.
+			let statisticsEmbed: undefined | Djs.EmbedBuilder;
+			if (templateData.statistics) {
+				statisticsEmbed = new Djs.EmbedBuilder()
+					.setTitle(ul("common.statistics").capitalize())
+					.setThumbnail(
+						"https://github.com/dicelette/discord-dicelette/blob/main/assets/player.png?raw=true"
 					);
-					const msg = await (channel as Djs.TextChannel).messages.fetch(
-						json.templateID.messageId
-					);
-					await msg.delete();
-				} catch (e) {
-					logger.warn(e, "registerTemplate: delete message");
+				for (const [stat, value] of Object.entries(templateData.statistics)) {
+					const { min, max, combinaison, exclude } = value;
+					let msg = "";
+					if (combinaison)
+						msg += `- Combinaison${ul("common.space")}: \`${combinaison}\`\n`;
+					if (min) msg += `- Min${ul("common.space")}: \`${min}\`\n`;
+					if (max) msg += `- Max${ul("common.space")}: \`${max}\`\n`;
+					msg += `- __${ul("register.embed.exclude")}__${ul("common.space")}: ${exclude ? ul("common.yes") : ul("common.no")}\n`;
+					if (msg.length === 0) msg = ul("register.embed.noValue");
+					statisticsEmbed.addFields({
+						name: stat.capitalize(),
+						value: msg,
+						inline: true,
+					});
 				}
 			}
-			json.templateID = {
-				channelId: channel.id,
-				messageId: msg.id,
-				statsName: statsName ?? [],
-				damageName: damageName ?? [],
-				excludedStats: excludedStats ?? [],
-				valid: true,
-			};
-			json.managerId = publicChannel.id;
-
-			if (privateChannel) json.privateChannel = privateChannel.id;
-			client.settings.set(guildId, json);
-		} else {
-			const newData: GuildData = {
-				lang: interaction.guild.preferredLocale ?? interaction.locale,
-				managerId: undefined,
-				templateID: {
+			if (templateData.diceType)
+				embedTemplate.addFields({
+					name: ul("common.dice").capitalize(),
+					value: `\`${capitalizeBetweenPunct(templateData.diceType)}\``,
+				});
+			if (templateData.critical) {
+				let msgComparator = "";
+				if (templateData.critical?.success)
+					msgComparator += `- ${ul("roll.critical.success")}${ul("common.space")}: \`${templateData.critical.success}\`\n`;
+				if (templateData.critical?.failure)
+					msgComparator += `- ${ul("roll.critical.failure")}${ul("common.space")}: \`${templateData.critical.failure}\`\n`;
+				if (msgComparator.length > 0)
+					embedTemplate.addFields({
+						name: ul("register.embed.comparator"),
+						value: msgComparator,
+					});
+			}
+			if (templateData.customCritical)
+				embedTemplate = createCustomCritical(embedTemplate, templateData.customCritical);
+			if (templateData.total)
+				embedTemplate.addFields({
+					name: ul("common.total"),
+					value: `\`${templateData.total}\``,
+				});
+			let diceEmbed: undefined | Djs.EmbedBuilder;
+			if (templateData.damage) {
+				diceEmbed = new Djs.EmbedBuilder()
+					.setTitle(ul("embed.dice"))
+					.setThumbnail(
+						"https://raw.githubusercontent.com/dicelette/discord-dicelette/main/assets/dice.png"
+					);
+				for (const [dice, value] of Object.entries(templateData.damage))
+					diceEmbed.addFields({
+						name: dice.capitalize(),
+						value: `\`${value}\``,
+						inline: true,
+					});
+			}
+			const embeds = [embedTemplate, statisticsEmbed, diceEmbed].filter(
+				(embed) => embed !== undefined
+			);
+			const msg = await channel.send({
+				content: "",
+				embeds: embeds as Djs.EmbedBuilder[],
+				files: [
+					{
+						attachment: Buffer.from(JSON.stringify(templateData, null, 2), "utf-8"),
+						name: "template.json",
+					},
+				],
+				components: [components],
+			});
+			await msg.pin();
+			//register in the cache
+			client.template.set(guildId, templateData);
+			//save in database file
+			const json = client.settings.get(guildId);
+			const statsName = templateData.statistics
+				? Object.keys(templateData.statistics)
+				: undefined;
+			const excludedStats = templateData.statistics
+				? Object.keys(
+						Object.fromEntries(
+							Object.entries(templateData.statistics).filter(
+								([_, value]) => value.exclude
+							)
+						)
+					)
+				: undefined;
+			const damageName = templateData.damage
+				? Object.keys(templateData.damage)
+				: undefined;
+			if (json) {
+				if (json?.templateID?.messageId && json.templateID?.channelId) {
+					try {
+						const channel = await interaction.guild.channels.fetch(
+							json.templateID.channelId
+						);
+						const msg = await (channel as Djs.TextChannel).messages.fetch(
+							json.templateID.messageId
+						);
+						await msg.delete();
+					} catch (e) {
+						logger.warn(e, "registerTemplate: delete message");
+					}
+				}
+				json.templateID = {
 					channelId: channel.id,
 					messageId: msg.id,
 					statsName: statsName ?? [],
 					damageName: damageName ?? [],
-					valid: true,
 					excludedStats: excludedStats ?? [],
-				},
-				user: {},
-			};
-			client.settings.set(guildId, newData);
+					valid: true,
+				};
+				json.managerId = publicChannel.id;
+
+				if (privateChannel) json.privateChannel = privateChannel.id;
+				client.settings.set(guildId, json);
+			} else {
+				const newData: GuildData = {
+					lang: interaction.guild.preferredLocale ?? interaction.locale,
+					managerId: undefined,
+					templateID: {
+						channelId: channel.id,
+						messageId: msg.id,
+						statsName: statsName ?? [],
+						damageName: damageName ?? [],
+						valid: true,
+						excludedStats: excludedStats ?? [],
+					},
+					user: {},
+				};
+				client.settings.set(guildId, newData);
+			}
+			await reply(interaction, {
+				content: ul("register.embed.registered"),
+				files: downloadTutorialImages(),
+			});
+			if (options.getBoolean(t("register.options.update.name")))
+				await bulkEditTemplateUser(client, interaction, ul, templateData);
+			else if (options.getBoolean(t("register.options.delete.name")))
+				await bulkDeleteCharacters(client, interaction, ul);
+		} catch (e) {
+			logger.fatal(e, "registerTemplate: error while registering template");
+			const langToUse = getLangAndConfig(client, interaction).langToUse;
+			await interactionError(client, interaction, e as Error, ul, langToUse);
+			return;
 		}
-		await reply(interaction, {
-			content: ul("register.embed.registered"),
-			files: downloadTutorialImages(),
-		});
-		if (options.getBoolean(t("register.options.update.name")))
-			await bulkEditTemplateUser(client, interaction, ul, templateData);
-		else if (options.getBoolean(t("register.options.delete.name")))
-			await bulkDeleteCharacters(client, interaction, ul);
 	},
 };
 

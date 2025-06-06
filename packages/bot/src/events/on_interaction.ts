@@ -13,7 +13,7 @@ import {
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import * as features from "features";
-import { embedError, reply } from "messages";
+import { embedError, interactionError, reply } from "messages";
 import { cancel, getLangAndConfig } from "utils";
 
 export default (client: EClient): void => {
@@ -64,28 +64,7 @@ export default (client: EClient): void => {
 				await resetButton(interaction.message, ul);
 			}
 		} catch (e) {
-			console.error("\n", e);
-			if (!interaction.guild) return;
-			const msgError = lError(e as Error, interaction, langToUse);
-			if (msgError.length === 0) return;
-			const cause = (e as Error).cause ? ((e as Error).cause as string) : undefined;
-			const embed = embedError(msgError, ul, cause);
-			if (
-				interaction.isButton() ||
-				interaction.isModalSubmit() ||
-				interaction.isCommand()
-			)
-				await reply(interaction, { embeds: [embed], flags: Djs.MessageFlags.Ephemeral });
-			if (client.settings.has(interaction.guild.id)) {
-				const db = client.settings.get(interaction.guild.id, "logs");
-				if (!db) return;
-				const logs = (await interaction.guild.channels.fetch(
-					db
-				)) as Djs.GuildBasedChannel;
-				if (logs instanceof Djs.TextChannel) {
-					await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
-				}
-			}
+			await interactionError(client, interaction, e as Error, ul, langToUse);
 		}
 	});
 };
