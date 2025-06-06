@@ -12,6 +12,7 @@ export default (client: EClient): void => {
 				logger.trace(`Command ${command.data.name} created in ${guild.name}`);
 				client.settings.set(guild.id, true, "converted");
 			}
+
 			for (const contextMenu of contextMenus) {
 				await guild.commands.create(contextMenu);
 			}

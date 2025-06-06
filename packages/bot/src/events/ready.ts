@@ -20,7 +20,9 @@ export default (client: EClient): void => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
 
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
-		let serializedCommands = commandsList.map((command) => command.data.toJSON());
+		let serializedCommands = commandsList.map((command) =>
+			command.data.toJSON(),
+		);
 		const serializedDbCmds = dbCmd.map((command) => command.data.toJSON());
 
 		client.user.setActivity("Roll Dices 🎲 !", {
@@ -28,10 +30,12 @@ export default (client: EClient): void => {
 		});
 		serializedCommands = serializedCommands.concat(
 			//@ts-ignore
-			contextMenus.map((cmd) => cmd.toJSON())
+			contextMenus.map((cmd) => cmd.toJSON()),
 		);
 
 		for (const guild of client.guilds.cache.values()) {
+			//remove admin commands
+
 			const enabled = client.settings.get(guild.id, "templateID.messageId");
 			if (enabled) {
 				for (const cmd of serializedDbCmds) {
@@ -39,19 +43,24 @@ export default (client: EClient): void => {
 				}
 				//replace in serializedCommands the db commands
 				serializedCommands = serializedCommands.filter(
-					(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name)
+					(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name),
 				);
 				serializedCommands = serializedCommands.concat(serializedDbCmds);
 			}
+
 			logger.trace(`Registering commands for \`${guild.name}\``);
-			const cmds = await guild.client.application.commands.fetch({ guildId: guild.id });
+			const cmds = await guild.client.application.commands.fetch({
+				guildId: guild.id,
+			});
 			//filter the list of the commands that are deleted
 			cmds.forEach(async (command) => {
 				if (serializedCommands.find((c) => c.name === command.name)) return;
 				try {
 					await command.delete();
 				} catch (e) {
-					logger.warn(`Error while deleting command ${command.name} in ${guild.name}`);
+					logger.warn(
+						`Error while deleting command ${command.name} in ${guild.name}`,
+					);
 				}
 			});
 
@@ -59,7 +68,7 @@ export default (client: EClient): void => {
 				Djs.Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
 				{
 					body: serializedCommands,
-				}
+				},
 			);
 
 			convertDatabaseUser(client.settings, guild);
@@ -70,7 +79,8 @@ export default (client: EClient): void => {
 		}
 		important.info("Bot is ready");
 		cleanData(client);
-		if (process.env.NODE_ENV === "development") client.template = dev(client.template);
+		if (process.env.NODE_ENV === "development")
+			client.template = dev(client.template);
 	});
 };
 
@@ -96,7 +106,7 @@ function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 			const data = userData[index];
 			if (!Array.isArray(data.messageId)) {
 				logger.warn(
-					`Converting ${userId} => ${JSON.stringify(userData)} in ${guild.name}`
+					`Converting ${userId} => ${JSON.stringify(userData)} in ${guild.name}`,
 				);
 				let toUpdate = false;
 				if (data.isPrivate && privateChannel) {
@@ -109,7 +119,7 @@ function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 				if (toUpdate) db.set(guild.id, data, `user.${userId}.${index}`);
 				else {
 					logger.warn(
-						`No channel to update for ${userId}/${data.charName} => Deleting it`
+						`No channel to update for ${userId}/${data.charName} => Deleting it`,
 					);
 					db.delete(guild.id, `user.${userId}.${index}`);
 				}
@@ -142,7 +152,7 @@ function cleanData(client: EClient) {
 	for (const [guildId] of settings.entries()) {
 		if (!guilds.has(guildId)) {
 			logger.warn(
-				`Removing ${guildId} from the database as the bot is not in it anymore`
+				`Removing ${guildId} from the database as the bot is not in it anymore`,
 			);
 			client.settings.delete(guildId);
 		}

@@ -1,5 +1,4 @@
 import type { StatisticalTemplate } from "@dicelette/core";
-import { lError } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import {
@@ -13,7 +12,7 @@ import {
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import * as features from "features";
-import { embedError, interactionError, reply } from "messages";
+import { embedError, interactionError } from "messages";
 import { cancel, getLangAndConfig } from "utils";
 
 export default (client: EClient): void => {
@@ -26,19 +25,23 @@ export default (client: EClient): void => {
 				await commandMenu(interaction, client);
 			} else if (interaction.isCommand()) {
 				const command = commandsList.find(
-					(cmd) => cmd.data.name === interaction.commandName
+					(cmd) => cmd.data.name === interaction.commandName,
 				);
 				if (!command) return;
 				await command.execute(interaction, client);
 			} else if (interaction.isAutocomplete()) {
-				const autocompleteInteraction = interaction as Djs.AutocompleteInteraction;
+				const autocompleteInteraction =
+					interaction as Djs.AutocompleteInteraction;
 				const command = autCompleteCmd.find(
-					(cmd) => cmd.data.name === autocompleteInteraction.commandName
+					(cmd) => cmd.data.name === autocompleteInteraction.commandName,
 				);
 				if (!command) return;
 				await command.autocomplete(autocompleteInteraction, client);
 			} else if (interaction.isButton()) {
-				let template = await fetchTemplate(interaction.message, client.settings);
+				let template = await fetchTemplate(
+					interaction.message,
+					client.settings,
+				);
 				template = template
 					? template
 					: await getTemplateByInteraction(interaction, client);
@@ -50,7 +53,7 @@ export default (client: EClient): void => {
 								ul("error.template.notFound", {
 									guildId: interaction.guild?.name ?? interaction.guildId,
 								}),
-								ul
+								ul,
 							),
 						],
 					});
@@ -81,7 +84,7 @@ async function modalSubmit(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
-	client: EClient
+	client: EClient,
 ) {
 	if (interaction.customId.includes("damageDice"))
 		await features.storeDamageDice(interaction, ul, interactionUser, client);
@@ -114,7 +117,7 @@ async function buttonSubmit(
 	ul: Translation,
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
-	client: EClient
+	client: EClient,
 ) {
 	const characters = client.characters;
 	if (interaction.customId === "register")
@@ -123,16 +126,25 @@ async function buttonSubmit(
 			template,
 			interactionUser,
 			ul,
-			client.settings.has(interaction.guild!.id, "privateChannel")
+			client.settings.has(interaction.guild!.id, "privateChannel"),
 		);
 	else if (interaction.customId === "continue")
 		await features.continuePage(interaction, template, ul, interactionUser);
 	else if (interaction.customId.includes("add_dice")) {
-		await features.executeAddDiceButton(interaction, interactionUser, client.settings);
+		await features.executeAddDiceButton(
+			interaction,
+			interactionUser,
+			client.settings,
+		);
 		if (!interaction.customId.includes("first"))
 			await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "edit_stats") {
-		await features.triggerEditStats(interaction, ul, interactionUser, client.settings);
+		await features.triggerEditStats(
+			interaction,
+			ul,
+			interactionUser,
+			client.settings,
+		);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "validate")
 		await features.validateUserButton(
@@ -141,12 +153,17 @@ async function buttonSubmit(
 			template,
 			ul,
 			client,
-			characters
+			characters,
 		);
 	else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, interactionUser);
 	else if (interaction.customId === "edit_dice") {
-		await features.initiateDiceEdit(interaction, ul, interactionUser, client.settings);
+		await features.initiateDiceEdit(
+			interaction,
+			ul,
+			interactionUser,
+			client.settings,
+		);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);
@@ -168,7 +185,7 @@ async function selectSubmit(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
-	db: Settings
+	db: Settings,
 ) {
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
