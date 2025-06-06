@@ -4,11 +4,13 @@ import {
 	FormulaError,
 	NoStatisticsError,
 } from "@dicelette/core";
+import {ZodError} from 'zod'
 import { InvalidCsvContent, NoChannel, NoEmbed, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { default as i18next } from "i18next";
 import { ALL_TRANSLATION_KEYS } from "./flattenJson";
 import { resources } from "./types";
+import { error } from "console";
 
 export const t = i18next.getFixedT("en");
 
@@ -41,6 +43,26 @@ export function lError(
 		if (e.cause !== "noBulkRoll")
 			return ul("error.invalidDice.withDice", { dice: e.dice });
 		return ul("error.noBulkRoll");
+	}
+	if (e instanceof ZodError) {
+		const issues = e.issues;
+		if (issues.length === 0) return ul("error.generic.withWarning", { e });
+		let errorMessage: string[] = [];
+		for (const issue of issues) {
+			const mess = issue.message;
+			if (mess.includes("Max_Greater")) {
+				const max = issue.message.split(";")[2];
+				const min = issue.message.split(";")[1];
+				errorMessage.push(ul("error.mustBeGreater", { max, value: min }));
+			}
+			else if (mess.includes("TooManyDice")) errorMessage.push(ul("error.tooMuchDice"));
+			else if (mess.includes("TooManyDice")) errorMessage.push(ul("error.tooMuchDice"));
+			else if (mess.includes("TooManyStats")) errorMessage.push(ul("error.stats.tooMuch"));
+			else errorMessage.push(mess)
+		}
+		if (errorMessage.length === 0) return ul("error.generic.withWarning", { e });
+		if (errorMessage.length === 1) return errorMessage[0];
+		return `- ${errorMessage.join("\n- ")}`;
 	}
 	if (e instanceof FormulaError)
 		return ul("error.invalidFormula", { formula: e.formula });

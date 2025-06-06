@@ -15,6 +15,7 @@
 	},
 	"private": true,
 	"dependencies": {
-		"@dicelette/utils": "workspace:*"
+		"@dicelette/utils": "workspace:*",
+		"zod": "latest"
 	}
 }
