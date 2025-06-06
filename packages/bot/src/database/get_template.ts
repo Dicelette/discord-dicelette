@@ -68,11 +68,10 @@ export async function getTemplate(
 		const message = await channel.messages.fetch(messageId);
 		return fetchTemplate(message, enmap);
 	} catch (error) {
+		if (skipNoFound) return undefined;
 		if ((error as Error).message === "Unknown Message")
 			throw new Error(ul("error.template.id", { channelId, messageId }));
-		if (!skipNoFound)
-			throw new Error(ul("error.template.notFound", { guildId: guild.name }));
-		return undefined;
+		throw new Error(ul("error.template.notFound", { guildId: guild.name }));
 	}
 }
 
