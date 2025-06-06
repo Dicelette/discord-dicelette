@@ -32,24 +32,26 @@ export async function parseCSV(
 	guildTemplate: StatisticalTemplate,
 	interaction?: Djs.CommandInteraction,
 	allowPrivate?: boolean,
-	lang: Djs.Locale = Djs.Locale.EnglishGB
+	lang: Djs.Locale = Djs.Locale.EnglishGB,
 ) {
 	let header = ["user", "charName", "avatar", "channel"];
 	if (guildTemplate.statistics) {
-		header = header.concat(Object.keys(guildTemplate.statistics));
+		header = header.concat(
+			Object.keys(guildTemplate.statistics).map((key) => key.standardize()),
+		);
 	}
 	if (allowPrivate) header.push("isPrivate");
 
 	const ul = ln(lang);
 	header.push("dice");
-	header = header.map((key) => key.unidecode());
+	header = header.map((key) => key.standardize());
 	//papaparse can't be used in Node, we need first to create a readable stream
 
 	const csvText = url.startsWith("https://") ? await readCSV(url) : url;
 	if (!csvText || csvText.length === 0) {
 		throw new InvalidCsvContent("url");
 	}
-	let error: string | undefined = undefined;
+	let error: string | undefined;
 	let csvData: CSVRow[] = [];
 	Papa.parse(csvText.replaceAll(/\s+;\s*/gi, ";"), {
 		header: true,
@@ -64,23 +66,32 @@ export async function parseCSV(
 				return;
 			}
 			//throw error if missing header (it shouldn't not throw if a header is added)
-			const dataHeader = results.meta.fields?.map((key) => key.unidecode());
+			const dataHeader = results.meta.fields?.map((key) => key.standardize());
 			if (!dataHeader) {
 				console.error("\nError while parsing CSV, missing header");
 				if (interaction)
-					await reply(interaction, { content: ul("import.errors.missing_header") });
+					await reply(interaction, {
+						content: ul("import.errors.missing_header"),
+					});
 				error = "Missing header";
 				return;
 			}
 			//throw error only if missing values for the header
 			const missingHeader = header
 				.filter((key) => !dataHeader.includes(key))
-				.filter((key) => key !== "dice" && key !== "avatar" && key !== "channel");
+				.filter(
+					(key) => key !== "dice" && key !== "avatar" && key !== "channel",
+				);
 			if (missingHeader.length > 0) {
-				console.error("\nError while parsing CSV, missing header values", missingHeader);
+				console.error(
+					"\nError while parsing CSV, missing header values",
+					missingHeader,
+				);
 				if (interaction)
 					await reply(interaction, {
-						content: ul("import.errors.headers", { name: missingHeader.join("\n- ") }),
+						content: ul("import.errors.headers", {
+							name: missingHeader.join("\n- "),
+						}),
 					});
 				error = "Missing header values";
 				return;
@@ -122,7 +133,7 @@ async function step(
 	guildTemplate: StatisticalTemplate,
 	interaction?: Djs.CommandInteraction,
 	allowPrivate?: boolean,
-	lang: Djs.Locale = Djs.Locale.EnglishGB
+	lang: Djs.Locale = Djs.Locale.EnglishGB,
 ) {
 	const members: {
 		[id: string]: UserData[];
@@ -132,7 +143,9 @@ async function step(
 	//get the user id from the guild
 	for (const data of csv) {
 		const user = data.user.toString().replaceAll("'", "").trim();
-		const channel = data.channel ? data.channel.replaceAll("'", "").trim() : undefined;
+		const channel = data.channel
+			? data.channel.replaceAll("'", "").trim()
+			: undefined;
 		const charName = data.charName;
 
 		//get user from the guild
@@ -151,7 +164,7 @@ async function step(
 				(member) =>
 					member.user.id === user ||
 					member.user.username === user ||
-					member.user.tag === user
+					member.user.tag === user,
 			);
 			if (!guildMember || !guildMember.user) {
 				const msg = ul("import.errors.user_not_found", { user });
@@ -198,7 +211,7 @@ async function step(
 		//get the stats
 		if (guildTemplate.statistics) {
 			const emptyStats = Object.keys(guildTemplate.statistics).filter(
-				(key) => !data[key]
+				(key) => !data[key],
 			);
 			if (emptyStats.length > 0) {
 				if (interaction) {
@@ -209,7 +222,9 @@ async function step(
 					await reply(interaction, { content: msg });
 					errors.push(msg);
 				}
-				logger.warn(`Missing stats for ${user}. Missing: ${emptyStats.join("\n- ")}`);
+				logger.warn(
+					`Missing stats for ${user}. Missing: ${emptyStats.join("\n- ")}`,
+				);
 				continue;
 			}
 
@@ -217,7 +232,10 @@ async function step(
 				stats[key] = data[key] as number;
 			}
 		}
-		const dice: Record<string, string> | undefined = data.dice?.replaceAll("'", "")
+		const dice: Record<string, string> | undefined = data.dice?.replaceAll(
+			"'",
+			"",
+		)
 			? data.dice.split(/\r?\n/).reduce(
 					(acc, line) => {
 						const match = line.match(/-\s*([^:]+)\s*:\s*(.+)/);
@@ -227,7 +245,7 @@ async function step(
 						}
 						return acc;
 					},
-					{} as Record<string, string>
+					{} as Record<string, string>,
 				)
 			: undefined;
 		const newChar: UserData = {
