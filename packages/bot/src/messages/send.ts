@@ -2,16 +2,22 @@ import { createUrl, type ResultAsText } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError, findMessageBefore, threadToSend } from "messages";
-import { lError } from "packages/localization";
+import { lError } from "@dicelette/localization";
 import { isValidChannel } from "utils";
 import type { EClient } from "../client";
 
-export async function sendLogs(message: string, guild: Djs.Guild, db: Settings) {
+export async function sendLogs(
+	message: string,
+	guild: Djs.Guild,
+	db: Settings,
+) {
 	const guildData = db.get(guild.id);
 	if (!guildData?.logs) return;
 	const channel = guildData.logs;
 	try {
-		const channelToSend = (await guild.channels.fetch(channel)) as Djs.TextChannel;
+		const channelToSend = (await guild.channels.fetch(
+			channel,
+		)) as Djs.TextChannel;
 		await channelToSend.send({ content: message, allowedMentions: {} });
 	} catch (error) {
 		return;
@@ -23,7 +29,7 @@ export async function reply(
 		| Djs.ModalSubmitInteraction
 		| Djs.ButtonInteraction
 		| Djs.StringSelectMenuInteraction,
-	options: string | Djs.MessagePayload | Djs.InteractionReplyOptions
+	options: string | Djs.MessagePayload | Djs.InteractionReplyOptions,
 ): Promise<Djs.Message | Djs.InteractionResponse> {
 	try {
 		if (interaction.replied || interaction.deferred) {
@@ -50,7 +56,7 @@ export async function reply(
  */
 export async function deleteAfter(
 	message: Djs.InteractionResponse | Djs.Message,
-	time: number
+	time: number,
 ): Promise<void> {
 	if (time === 0) return;
 
@@ -65,7 +71,7 @@ export async function deleteAfter(
 
 export function displayOldAndNewStats(
 	oldStats?: Djs.APIEmbedField[],
-	newStats?: Djs.APIEmbedField[]
+	newStats?: Djs.APIEmbedField[],
 ) {
 	let stats = "";
 	if (oldStats && newStats) {
@@ -99,7 +105,7 @@ export async function sendResult(
 	settings: Settings,
 	ul: Translation,
 	user: Djs.User = interaction.user,
-	hide?: boolean | null
+	hide?: boolean | null,
 ) {
 	let channel = interaction.channel;
 	if (!isValidChannel(channel, interaction)) return;
@@ -115,7 +121,7 @@ export async function sendResult(
 		| boolean
 		| undefined;
 	const hidden = hide && hideResultConfig;
-	let isHidden: undefined | string = undefined;
+	let isHidden: undefined | string;
 	const allowedMentions = { users: user ? [user.id] : [] };
 	const output = result.roll?.defaultMessage() ?? result.expression;
 	if (hidden && output) {
@@ -147,7 +153,7 @@ export async function sendResult(
 		settings,
 		interaction.channel as Djs.TextChannel,
 		ul,
-		isHidden
+		isHidden,
 	);
 	const forwarded = await thread.send("_ _");
 	const linkToLog = settings.get(interaction.guild!.id, "linkToLogs");
@@ -163,20 +169,25 @@ export async function sendResult(
 	const anchor = settings.get(interaction.guild!.id, "context");
 	const dbTime = settings.get(interaction.guild!.id, "deleteAfter");
 	const timer = dbTime ? dbTime : 180000;
-	let messageId = undefined;
+	let messageId;
 	if (anchor) {
 		messageId = replyInteraction.id;
 		if (timer && timer > 0) {
 			const messageBefore = await findMessageBefore(
 				channel,
 				replyInteraction,
-				interaction.client
+				interaction.client,
 			);
 			if (messageBefore) messageId = messageBefore.id;
 		}
-		const ctx = { guildId: interaction.guild!.id, channelId: channel.id, messageId };
+		const ctx = {
+			guildId: interaction.guild!.id,
+			channelId: channel.id,
+			messageId,
+		};
 		const res =
-			result.roll?.context(ctx).result ?? `${result.expression}${createUrl(ul, ctx)}`;
+			result.roll?.context(ctx).result ??
+			`${result.expression}${createUrl(ul, ctx)}`;
 		await forwarded.edit(res);
 	} else await forwarded.edit(output as string);
 	if (!disableThread) await deleteAfter(replyInteraction, timer);
@@ -187,7 +198,7 @@ export async function interactionError(
 	interaction: Djs.BaseInteraction,
 	e: Error,
 	ul: Translation,
-	langToUse?: Djs.Locale
+	langToUse?: Djs.Locale,
 ) {
 	console.error("\n", e);
 	if (!interaction.guild) return;
@@ -195,12 +206,21 @@ export async function interactionError(
 	if (msgError.length === 0) return;
 	const cause = (e as Error).cause ? ((e as Error).cause as string) : undefined;
 	const embed = embedError(msgError, ul, cause);
-	if (interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand())
-		await reply(interaction, { embeds: [embed], flags: Djs.MessageFlags.Ephemeral });
+	if (
+		interaction.isButton() ||
+		interaction.isModalSubmit() ||
+		interaction.isCommand()
+	)
+		await reply(interaction, {
+			embeds: [embed],
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	if (client.settings.has(interaction.guild.id)) {
 		const db = client.settings.get(interaction.guild.id, "logs");
 		if (!db) return;
-		const logs = (await interaction.guild.channels.fetch(db)) as Djs.GuildBasedChannel;
+		const logs = (await interaction.guild.channels.fetch(
+			db,
+		)) as Djs.GuildBasedChannel;
 		if (logs instanceof Djs.TextChannel) {
 			await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
 		}
