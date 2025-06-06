@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.45.2](https://github.com/Dicelette/discord-dicelette/compare/1.45.1...1.45.2) (2025-06-06)
+
+
+### Bug Fixes
+
+* add silent option to suppress error messages in getTemplate function when loading the first time ([2bf6270](https://github.com/Dicelette/discord-dicelette/commit/2bf6270b27419825be88da84ee17aa234d0e78ca))
+* better zod error (prevent crash if too much error) ([508c7f5](https://github.com/Dicelette/discord-dicelette/commit/508c7f53a02f923a4d1258ef54cebeb656c73c0e))
+* **export:** fetch correctly avatar & channel when asked ([e63fee9](https://github.com/Dicelette/discord-dicelette/commit/e63fee9b6c3063a2c4f2ea8432c2549318a8a7a3))
+* **import:** allow to delete old char via an option in the cmd ([d28da76](https://github.com/Dicelette/discord-dicelette/commit/d28da769a128355bd519a6db9da8ce3a5b68a0ec))
+* **import:** standardize header with new lib ([22f32b7](https://github.com/Dicelette/discord-dicelette/commit/22f32b7f7f9bb7baf67c041d5feecfe0604c6d19))
+* should not throw error when a min/max is 0 ([6a6dcd3](https://github.com/Dicelette/discord-dicelette/commit/6a6dcd3b055f2cc16ca13f6ede308bdd68af2c68))
+* skip not found when ready ([aef4c4c](https://github.com/Dicelette/discord-dicelette/commit/aef4c4c0d2ff3e48c727db6c891798a6c3631150))
+* **translate:** import error ([5b9f6e0](https://github.com/Dicelette/discord-dicelette/commit/5b9f6e0530c138e685e7fc5ca7027dfb70ffe038))
+* use new version of verify template (without checking roll) while caching ([8f1aa73](https://github.com/Dicelette/discord-dicelette/commit/8f1aa73682279c6ea3235b3d89260c1b6dd3aceb))
+* user not found when the username has number (like myname124) ([62fbbfd](https://github.com/Dicelette/discord-dicelette/commit/62fbbfd69781a03325afba24fa15235517536dfa))
+
 ## [1.45.1](https://github.com/Dicelette/discord-dicelette/compare/1.45.0...1.45.1) (2025-05-29)
 
 
