@@ -1,5 +1,5 @@
 import { findln, ln, t } from "@dicelette/localization";
-import type { Settings, UserData } from "@dicelette/types";
+import type { Settings, UserData, Databases } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { verifyIfEmbedInDB } from "database";
@@ -71,7 +71,7 @@ export async function isUserNameOrId(
 	userId: string,
 	interaction: Djs.ModalSubmitInteraction
 ) {
-	if (!userId.match(/\d+/))
+	if (!userId.match(/^\d+$/))
 		return (await interaction.guild!.members.fetch({ query: userId })).first();
 	return await interaction.guild!.members.fetch({ user: userId });
 }
@@ -144,23 +144,25 @@ export function isValidInteraction(interaction: Djs.BaseInteraction) {
 	);
 }
 
-export function getLangAndConfig(client: EClient, interaction: Djs.BaseInteraction) {
-	const langToUse = getLangFromInteraction(interaction, client);
+export function getLangAndConfig(client: EClient, interaction: Djs.BaseInteraction, guildId?: string) {
+	const langToUse = getLangFromInteraction(interaction, client, guildId);
 	const ul = ln(langToUse);
-	const config = client.settings.get(interaction.guild!.id);
+	const config = client.settings.get(guildId ?? interaction.guild!.id);
 	return { langToUse, ul, config };
 }
 
 export function getLangFromInteraction(
 	interaction: Djs.BaseInteraction,
-	client: EClient
+	client: EClient,
+	guildId?: string
 ): Djs.Locale {
-	const guildLocale = client.guildLocale?.get(interaction.guild!.id);
+	if (!guildId) guildId = interaction.guild!.id;
+	const guildLocale = client.guildLocale?.get(guildId);
 	if (guildLocale) return guildLocale;
 	const locale =
-		client.settings.get(interaction.guild!.id, "lang") ??
+		client.settings.get(guildId, "lang") ??
 		interaction.guild?.preferredLocale ??
 		interaction.locale;
-	client.guildLocale.set(interaction.guild!.id, locale);
+	client.guildLocale.set(guildId, locale);
 	return locale;
 }
