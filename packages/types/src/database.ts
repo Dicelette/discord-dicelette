@@ -137,6 +137,10 @@ export interface UserData {
 	 */
 	channel?: string;
 	/**
+	 * Message ID of the user data
+	 */
+	messageId?: string;
+	/**
 	 * Useful to know if it's a userData created from the template and not an actual user data
 	 */
 	isFromTemplate?: boolean;

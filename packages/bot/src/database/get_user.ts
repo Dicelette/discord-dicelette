@@ -195,6 +195,7 @@ export async function getUserFromMessage(
 		skipNotFound?: boolean;
 		fetchAvatar?: boolean;
 		fetchChannel?: boolean;
+		fetchMessage?: boolean;
 		guildId?: string;
 	},
 ) {
@@ -202,7 +203,12 @@ export async function getUserFromMessage(
 	const guildData = client.settings;
 	const characters = client.characters;
 	const getChara = getCharaInMemory(characters, userId, guildId, charName);
-	if (getChara && !options?.fetchAvatar && !options?.fetchChannel)
+	if (
+		getChara &&
+		!options?.fetchAvatar &&
+		!options?.fetchChannel &&
+		!options?.fetchMessage
+	)
 		return getChara;
 
 	if (!options)
@@ -249,6 +255,8 @@ export async function getUserFromMessage(
 		await updateMemory(characters, guildId, userId, ul, {
 			userData,
 		});
+		if (options.fetchMessage) userData!.messageId = message.id;
+
 		return userData;
 	} catch (error) {
 		if (!skipNotFound)

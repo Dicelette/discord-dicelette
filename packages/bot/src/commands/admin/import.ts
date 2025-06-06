@@ -1,6 +1,6 @@
 import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
-import { getTemplateByInteraction } from "database";
+import { getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -11,6 +11,8 @@ import {
 	repostInThread,
 } from "messages";
 import { addAutoRole, getLangAndConfig, parseCSV } from "utils";
+import type { DiscordChannel } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 
 /**
  * ! Note: Bulk data doesn't allow to register dice-per-user, as each user can have different dice
@@ -29,7 +31,14 @@ export const bulkAdd = {
 				.setNameLocalizations(cmdLn("import.options.name"))
 				.setDescription(t("import.options.description"))
 				.setDescriptionLocalizations(cmdLn("import.options.description"))
-				.setRequired(true)
+				.setRequired(true),
+		)
+		.addBooleanOption((option) =>
+			option
+				.setName(t("import.delete.title"))
+				.setNameLocalizations(cmdLn("import.delete.title"))
+				.setDescription(t("import.delete.description"))
+				.setDescriptionLocalizations(cmdLn("import.delete.description")),
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -38,14 +47,17 @@ export const bulkAdd = {
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const ext = csvFile.name.split(".").pop()?.toLowerCase() ?? "";
 		if (!ext || ext !== "csv") {
-			return reply(interaction, { content: ul("import.errors.invalid_file", { ext }) });
+			return reply(interaction, {
+				content: ul("import.errors.invalid_file", { ext }),
+			});
 		}
 		/** download the file using paparse */
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
 			return reply(interaction, {
 				content: ul("error.template.notFound", {
-					guildId: interaction.guild?.name ?? interaction.guildId ?? "unknow guild",
+					guildId:
+						interaction.guild?.name ?? interaction.guildId ?? "unknow guild",
 				}),
 			});
 		}
@@ -54,17 +66,26 @@ export const bulkAdd = {
 			guildTemplate,
 			interaction,
 			!!client.settings.get(interaction.guild!.id, "privateChannel"),
-			langToUse
+			langToUse,
 		);
-		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
-		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
+		const defaultChannel = client.settings.get(
+			interaction.guild!.id,
+			"managerId",
+		);
+		const privateChannel = client.settings.get(
+			interaction.guild!.id,
+			"privateChannel",
+		);
 		if (!defaultChannel) {
-			return reply(interaction, { content: ul("error.channel.defaultChannel") });
+			return reply(interaction, {
+				content: ul("error.channel.defaultChannel"),
+			});
 		}
 		const guildMembers = await interaction.guild?.members.fetch();
 		for (const [user, data] of Object.entries(members)) {
 			//we already parsed the user, so the cache should be up to date
-			let member: Djs.GuildMember | Djs.User | undefined = guildMembers!.get(user);
+			let member: Djs.GuildMember | Djs.User | undefined =
+				guildMembers!.get(user);
 			if (!member || !member.user) {
 				continue;
 			}
@@ -74,7 +95,7 @@ export const bulkAdd = {
 					ul,
 					char.avatar ?? member.avatarURL() ?? member.defaultAvatarURL,
 					member.id,
-					char.userName ?? undefined
+					char.userName ?? undefined,
 				);
 
 				const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
@@ -137,8 +158,37 @@ export const bulkAdd = {
 					userDataEmbed,
 					statsEmbed,
 					diceEmbed,
-					templateEmbed
+					templateEmbed,
 				);
+				if (options.getBoolean(t("import.delete.title"))) {
+					//delete old message if it exists
+					const oldChar = await getUserFromMessage(
+						client,
+						member.id,
+						interaction,
+						char.userName,
+						{ fetchChannel: true, fetchMessage: true },
+					);
+					logger.trace("**oldChar**", oldChar);
+					if (oldChar) {
+						const channelId = oldChar.channel;
+						if (channelId) {
+							const channel = interaction.guild?.channels.cache.get(channelId);
+							const messageId = oldChar.messageId;
+							if (channel && messageId) {
+								try {
+									const oldMessage = await (
+										channel as DiscordChannel
+									)?.messages.fetch(messageId);
+									if (oldMessage) await oldMessage.delete();
+								} catch (error) {
+									//skip unknown message
+								}
+							}
+						}
+					}
+				}
+
 				await repostInThread(
 					allEmbeds,
 					interaction,
@@ -149,14 +199,14 @@ export const bulkAdd = {
 					client.settings,
 					char.channel ??
 						(char.private && privateChannel ? privateChannel : defaultChannel),
-					client.characters
+					client.characters,
 				);
 				await addAutoRole(
 					interaction,
 					member.id,
 					!!diceEmbed,
 					!!statsEmbed,
-					client.settings
+					client.settings,
 				);
 				await reply(interaction, {
 					content: ul("import.success", { user: Djs.userMention(member.id) }),
@@ -164,7 +214,8 @@ export const bulkAdd = {
 			}
 		}
 		let msg = ul("import.all_success");
-		if (errors.length > 0) msg += `\n${ul("import.errors.global")}\n${errors.join("\n")}`;
+		if (errors.length > 0)
+			msg += `\n${ul("import.errors.global")}\n${errors.join("\n")}`;
 		await reply(interaction, { content: msg });
 		return;
 	},
@@ -187,7 +238,9 @@ export const bulkAddTemplate = {
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
 			return reply(interaction, {
-				content: ul("error.template.notFound", { guildId: interaction.guild.name }),
+				content: ul("error.template.notFound", {
+					guildId: interaction.guild.name,
+				}),
 			});
 		}
 		const header = ["user", "charName", "avatar", "channel"];
