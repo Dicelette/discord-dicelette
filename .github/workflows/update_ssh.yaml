@@ -20,6 +20,6 @@ jobs:
             set PATH $PATH:/home/.local/share/nvm/v20.14.0/bin
             nvm use v20.14.0
             cd dicelette/
-            git pull
+            git pull --force
             pnpm i
             pnpm run pm2:restart
