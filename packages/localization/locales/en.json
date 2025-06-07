@@ -353,7 +353,7 @@
       "notFound": "No template or channel configured for {{- guildId}}."
     },
     "tooMuchDice": "Too many dice have been saved! You cannot have more than 25 dice saved.",
-    "totalExceededBy": "The total of {{- value}} is exceeded by {{- max}}",
+    "totalExceededBy": "The total of points is exceeded by `{{- max}}`.",
     "user": {
       "charName": "The character {{- charName}} is not registered.",
       "data": "No user data nor template dice found.",

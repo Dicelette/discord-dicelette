@@ -353,7 +353,7 @@
       "notFound": "Aucun modèle ou channel configuré"
     },
     "tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",
-    "totalExceededBy": "Le total de `{{- value}}` est dépassé de `{{- max}}`.",
+    "totalExceededBy": "Le total des points est dépassé de `{{- max}}`.",
     "user": {
       "charName": "Le personnage {{- charName}} n'est pas enregistré.",
       "data": "Aucunes données d'utilisateurs ou de modèles n'ont été trouvées.",
