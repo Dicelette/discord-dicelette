@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.46.1](https://github.com/Dicelette/discord-dicelette/compare/1.46.0...1.46.1) (2025-06-08)
+
+
+### Bug Fixes
+
+* **chainedRoll:** better take into account the comments on_message_send.ts ([ec18748](https://github.com/Dicelette/discord-dicelette/commit/ec187488dbff23130103f5e38f78fd23fda769aa))
+
 ## [1.46.0](https://github.com/Dicelette/discord-dicelette/compare/1.45.3...1.46.0) (2025-06-08)
 
 
