@@ -17,37 +17,40 @@ export const help = {
 				.setName(t("help.info.name"))
 				.setNameLocalizations(cmdLn("help.info.name"))
 				.setDescription(t("help.info.description"))
-				.setDescriptionLocalizations(cmdLn("help.info.description"))
+				.setDescriptionLocalizations(cmdLn("help.info.description")),
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.bug.name"))
 				.setNameLocalizations(cmdLn("help.bug.name"))
 				.setDescription(t("help.bug.description"))
-				.setDescriptionLocalizations(cmdLn("help.bug.description"))
+				.setDescriptionLocalizations(cmdLn("help.bug.description")),
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.fr.name"))
 				.setNameLocalizations(cmdLn("help.fr.name"))
 				.setDescription(t("help.fr.description"))
-				.setDescriptionLocalizations(cmdLn("help.fr.description"))
+				.setDescriptionLocalizations(cmdLn("help.fr.description")),
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.admin.name"))
 				.setNameLocalizations(cmdLn("help.admin.name"))
 				.setDescription(t("help.admin.description"))
-				.setDescriptionLocalizations(cmdLn("help.admin.description"))
+				.setDescriptionLocalizations(cmdLn("help.admin.description")),
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.register.name"))
 				.setNameLocalizations(cmdLn("help.register.name"))
 				.setDescription(t("help.register.description"))
-				.setDescriptionLocalizations(cmdLn("help.register.description"))
+				.setDescriptionLocalizations(cmdLn("help.register.description")),
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
+	async execute(
+		interaction: Djs.CommandInteraction,
+		client: EClient,
+	): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		const { ul } = getLangAndConfig(client, interaction);
@@ -57,7 +60,9 @@ export const help = {
 		switch (subcommand) {
 			case t("help.info.name"): {
 				const rollID = commandsID.findKey((command) => command.name === "roll");
-				const sceneID = commandsID.findKey((command) => command.name === "scene");
+				const sceneID = commandsID.findKey(
+					(command) => command.name === "scene",
+				);
 				const msg = ul("help.message", {
 					rollId: rollID,
 					sceneId: sceneID,
@@ -65,11 +70,13 @@ export const help = {
 						interaction.guild!.id,
 						ul,
 						client.settings,
-						commandsID
+						commandsID,
 					),
 				});
 				await reply(interaction, { content: dedent(msg) });
-				await interaction.followUp({ content: dedent(ul("help.diceNotation")) });
+				await interaction.followUp({
+					content: dedent(ul("help.diceNotation")),
+				});
 				break;
 			}
 			case t("help.bug.name"):
@@ -91,7 +98,7 @@ export const help = {
 							dbroll: helpDBCmd?.[t("dbRoll.name")],
 							graph: helpDBCmd?.[t("graph.name")],
 							display: helpDBCmd?.[t("display.title")],
-						})
+						}),
 					),
 				});
 				break;
@@ -107,13 +114,13 @@ export const help = {
 							delete: idsAdmin?.[t("timer.name")],
 							display: idsAdmin?.[t("config.display.name")],
 							timestamp: idsAdmin?.[t("timestamp.name")],
-						})
+						}),
 					),
 				});
 				const idsAdminDB = getIDForAdminDB(
 					commandsID,
 					client.settings,
-					interaction.guild!.id
+					interaction.guild!.id,
 				);
 				if (!idsAdminDB) return;
 				await interaction.followUp({
@@ -128,7 +135,7 @@ export const help = {
 							},
 							dbroll: idsAdminDB?.[t("dbRoll.name")],
 							dbd: idsAdminDB?.[t("rAtq.name")],
-						})
+						}),
 					),
 				});
 				break;
@@ -138,7 +145,7 @@ export const help = {
 };
 
 function getHelpDBCmd(
-	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 ) {
 	const commandToFind = [
 		t("rAtq.name"),
@@ -157,7 +164,7 @@ function createHelpMessageDB(
 	guildID: Djs.Snowflake,
 	ul: Translation,
 	db: Settings,
-	commandsID?: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
+	commandsID?: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 ) {
 	if (!db.has(guildID, "templateID") || !commandsID) return "";
 	const ids = getHelpDBCmd(commandsID);
@@ -170,10 +177,12 @@ function createHelpMessageDB(
 }
 
 function getConfigIds(
-	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 ) {
 	const ids: Record<string, string | undefined> = {};
-	const idConfig = commandsID.findKey((command) => command.name === t("config.name"));
+	const idConfig = commandsID.findKey(
+		(command) => command.name === t("config.name"),
+	);
 	if (!idConfig) return;
 
 	ids[t("logs.name")] = idConfig;
@@ -188,7 +197,7 @@ function getConfigIds(
 function getIDForAdminDB(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 	db: Settings,
-	guildID: Djs.Snowflake
+	guildID: Djs.Snowflake,
 ) {
 	if (!db.has(guildID, "templateID")) return;
 	const commandToFind = [
@@ -223,10 +232,16 @@ export async function helpAtInvit(guild: Djs.Guild) {
 	const ul = ln(lang);
 	const docLinkExt = lang === "fr" ? "" : "en/";
 	const docLink = `https://dicelette.github.io/${docLinkExt}`;
-	//fetch channel cache
-	await guild.channels.fetch();
 	//get system channel
-	const systemChannel = guild.systemChannel ?? "dm";
+	let systemChannel = guild.systemChannel ?? "dm";
+	if (
+		systemChannel instanceof Djs.TextChannel &&
+		(!systemChannel.isTextBased() ||
+			!systemChannel.viewable ||
+			!systemChannel.permissionsFor(guild.members.me!).has("SendMessages"))
+	)
+		systemChannel = "dm";
+
 	const ids = getConfigIds(commandsId);
 	const commandId = {
 		lang: ids?.[t("config.lang.name")],
@@ -250,12 +265,10 @@ export async function helpAtInvit(guild: Djs.Guild) {
 	const owner = await guild.fetchOwner();
 	if (systemChannel === "dm") {
 		await owner.send(msg);
-	} else {
+	} else if (systemChannel instanceof Djs.TextChannel) {
 		try {
 			await systemChannel.send(msg);
 		} catch (_e) {
-			//probably no permission to send messages in the system channel
-			//fall back to owner DM
 			await owner.send(msg);
 		}
 	}
