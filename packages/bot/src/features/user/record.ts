@@ -1,6 +1,11 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import {
+	cleanAvatarUrl,
+	logger,
+	NoChannel,
+	verifyAvatarUrl,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
@@ -20,7 +25,7 @@ import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
 export async function pageNumber(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	client: EClient
+	client: EClient,
 ) {
 	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
@@ -32,7 +37,7 @@ export async function pageNumber(
 					ul("error.template.notFound", {
 						guildId: interaction.guild?.name ?? interaction.guildId,
 					}),
-					ul
+					ul,
 				),
 			],
 		});
@@ -42,7 +47,7 @@ export async function pageNumber(
 		interaction,
 		template,
 		Number.parseInt(pageNumber, 10),
-		client.settings.get(interaction.guild!.id, "lang") ?? interaction.locale
+		getLangAndConfig(client, interaction).langToUse,
 	);
 }
 
@@ -53,9 +58,13 @@ export async function pageNumber(
  */
 export async function recordFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
-	client: EClient
+	client: EClient,
 ) {
-	if (!interaction.guild || !interaction.channel || interaction.channel.isDMBased())
+	if (
+		!interaction.guild ||
+		!interaction.channel ||
+		interaction.channel.isDMBased()
+	)
 		return;
 	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) return;
@@ -76,7 +85,7 @@ export async function recordFirstPage(
 export async function createEmbedFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
-	client: EClient
+	client: EClient,
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const channel = interaction.channel;
@@ -99,7 +108,10 @@ export async function createEmbedFirstPage(
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 	logger.trace("avatar", avatar);
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
-	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
+	const privateChannel = client.settings.get(
+		interaction.guild!.id,
+		"privateChannel",
+	);
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel.length > 0) sheetId = customChannel;
 
@@ -124,8 +136,16 @@ export async function createEmbedFirstPage(
 				value: charName.length > 0 ? charName : ul("common.noSet"),
 				inline: true,
 			},
-			{ name: ul("common.user"), value: Djs.userMention(user.id), inline: true },
-			{ name: ul("common.isPrivate"), value: isPrivate ? "✓" : "✕", inline: true }
+			{
+				name: ul("common.user"),
+				value: Djs.userMention(user.id),
+				inline: true,
+			},
+			{
+				name: ul("common.isPrivate"),
+				value: isPrivate ? "✓" : "✕",
+				inline: true,
+			},
 		);
 	if (sheetId) {
 		embed.addFields({ name: "_ _", value: "_ _", inline: true });
