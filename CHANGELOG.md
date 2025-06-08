@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.46.0](https://github.com/Dicelette/discord-dicelette/compare/1.45.3...1.46.0) (2025-06-08)
+
+
+### Features
+
+* **threshold:** allow to use "simple" number to replace the original threshold (if any) ([362386b](https://github.com/Dicelette/discord-dicelette/commit/362386b3dd149d53b6eb6464cf2ae03606c2ccdf))
+
 ## [1.45.3](https://github.com/Dicelette/discord-dicelette/compare/1.45.2...1.45.3) (2025-06-08)
 
 
