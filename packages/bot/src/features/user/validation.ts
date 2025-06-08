@@ -27,10 +27,13 @@ export async function continuePage(
 	dbTemplate: StatisticalTemplate,
 	ul: Translation,
 	interactionUser: Djs.User,
+	selfRegister?: boolean,
 ) {
-	const isModerator = interaction.guild?.members.cache
-		.get(interactionUser.id)
-		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	const isModerator =
+		selfRegister ||
+		interaction.guild?.members.cache
+			.get(interactionUser.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (!isModerator) {
 		await reply(interaction, {
 			content: ul("modals.noPermission"),
@@ -80,9 +83,11 @@ export async function validateUserButton(
 	client: EClient,
 	characters: Characters,
 ) {
-	const isModerator = interaction.guild?.members.cache
-		.get(interactionUser.id)
-		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	const isModerator =
+		client.settings.get(interaction.guild!.id, "allowSelfRegister") ||
+		interaction.guild?.members.cache
+			.get(interactionUser.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (isModerator)
 		await validateUser(interaction, template, client, characters);
 	else

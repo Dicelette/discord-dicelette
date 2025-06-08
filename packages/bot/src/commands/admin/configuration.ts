@@ -240,6 +240,22 @@ export const configuration = {
 							Djs.ChannelType.PrivateThread,
 						),
 				),
+		)
+		/** SELF REGISTRATION */
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setName(t("config.selfRegister.name"))
+				.setNameLocalizations(cmdLn("config.selfRegister.name"))
+				.setDescription(t("config.selfRegister.description"))
+				.setDescriptionLocalizations(cmdLn("config.selfRegister.description"))
+				.addBooleanOption((option) =>
+					option
+						.setName(t("disableThread.options.name"))
+						.setNameLocalizations(cmdLn("disableThread.options.name"))
+						.setDescription(t("linkToLog.options"))
+						.setDescriptionLocalizations(cmdLn("linkToLog.options"))
+						.setRequired(true),
+				),
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
@@ -272,6 +288,8 @@ export const configuration = {
 				return await hiddenRoll(interaction, client, ul, options);
 			case t("config.lang.name"):
 				return changeLanguage(options, client, interaction);
+			case t("config.selfRegister.name"):
+				return allowSelfRegistration(client, interaction, ul, options);
 		}
 	},
 };
@@ -292,6 +310,27 @@ function changeLanguage(
 	client.guildLocale.set(interaction.guild!.id, lang);
 	return reply(interaction, {
 		content: ul("config.lang.set", { lang: nameOfLang }),
+	});
+}
+
+function allowSelfRegistration(
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	ul: Translation,
+	options: Djs.CommandInteractionOptionResolver,
+) {
+	const toggle = options.getBoolean(t("disableThread.options.name"), true);
+	if (toggle === null) return;
+	client.settings.set(interaction.guild!.id, toggle, "allowSelfRegister");
+	if (!toggle) {
+		return reply(interaction, {
+			content: ul("config.selfRegister.disable"),
+		});
+	}
+	const template = client.settings.get(interaction.guild!.id, "templateID");
+	const url = `https://discord.com/channels/${interaction.guild!.id}/${template?.channelId}/${template?.messageId}`;
+	return reply(interaction, {
+		content: ul("config.selfRegister.enable", { url }),
 	});
 }
 

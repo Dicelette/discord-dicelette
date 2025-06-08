@@ -146,6 +146,12 @@
       "desc": "Permet de sauvegarder tous les résultats de lancer dans un seul et même channel.",
       "title": "Sauvegarde des résultats"
     },
+    "selfRegister": {
+      "description": "Permettre aux joueurs d'enregistrer directement leurs personnages.",
+      "disable": "L'auto-enregistrement est désactivé : les joueurs ont besoin d'un modérateur pour enregistrer leurs personnages.",
+      "enable": "L'auto-enregistrement est activé : les joueurs peuvent maintenant enregistrer leurs personnages librement, s'ils ont accès au message modèle (à {{- url}}).\n\n💡 Vous pouvez limiter l’accès au canal/fil contenant le modèle à un rôle spécifique, afin que seuls les utilisateurs autorisés puissent y accéder.  ",
+      "name": "auto_enregistrement"
+    },
     "sheet": "Fiches",
     "statsName": "Nom des statistiques",
     "template": "Configuration du modèle",

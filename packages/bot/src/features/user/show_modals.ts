@@ -9,14 +9,22 @@ export async function startRegisterUser(
 	interactionUser: Djs.User,
 	ul: Translation,
 	havePrivate?: boolean,
+	selfRegister?: boolean,
 ) {
-	const isModerator = interaction.guild?.members.cache
+	const moderatorPermission = interaction.guild?.members.cache
 		.get(interactionUser.id)
-		//@todo: autoriser éventuellement les utilisateurs à s'enregistrer eux-mêmes ; via un paramètre de configuration!
-		//du genre: "/config allowSelfRegister true"
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	const isModerator = selfRegister || moderatorPermission;
+
 	if (isModerator)
-		await showFirstPageModal(interaction, template, ul, havePrivate);
+		await showFirstPageModal(
+			interaction,
+			template,
+			ul,
+			havePrivate,
+			selfRegister,
+			moderatorPermission,
+		);
 	else
 		await reply(interaction, {
 			content: ul("modals.noPermission"),
@@ -32,6 +40,8 @@ export async function showFirstPageModal(
 	template: StatisticalTemplate,
 	ul: Translation,
 	havePrivate?: boolean,
+	selfRegister?: boolean,
+	isModerator?: boolean,
 ) {
 	let nbOfPages = 1;
 	if (template.statistics) {
@@ -53,6 +63,7 @@ export async function showFirstPageModal(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short),
 		);
+
 	const userIdInputs =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -83,12 +94,8 @@ export async function showFirstPageModal(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short),
 		);
-	const components = [
-		charNameInput,
-		userIdInputs,
-		avatarInputs,
-		channelIdInput,
-	];
+	const components = [charNameInput, avatarInputs, channelIdInput];
+	if (!selfRegister || isModerator) components.push(userIdInputs);
 	if (havePrivate) {
 		const privateInput =
 			new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(

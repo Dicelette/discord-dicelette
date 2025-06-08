@@ -127,9 +127,16 @@ async function buttonSubmit(
 			interactionUser,
 			ul,
 			client.settings.has(interaction.guild!.id, "privateChannel"),
+			client.settings.get(interaction.guild!.id, "allowSelfRegister"),
 		);
 	else if (interaction.customId === "continue")
-		await features.continuePage(interaction, template, ul, interactionUser);
+		await features.continuePage(
+			interaction,
+			template,
+			ul,
+			interactionUser,
+			client.settings.get(interaction.guild!.id, "allowSelfRegister"),
+		);
 	else if (interaction.customId.includes("add_dice")) {
 		await features.executeAddDiceButton(
 			interaction,
