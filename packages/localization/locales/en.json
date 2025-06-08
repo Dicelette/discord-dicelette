@@ -149,7 +149,7 @@
     "selfRegister": {
       "description": "Allow player to register their characters directly.",
       "disable": "The self-registration is disabled: player need a moderator to register their characters.",
-      "enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message (at {{- url}}).\n\n💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
+      "enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
       "name": "self_register"
     },
     "sheet": "Sheet",

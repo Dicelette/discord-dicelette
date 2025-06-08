@@ -328,7 +328,10 @@ function allowSelfRegistration(
 		});
 	}
 	const template = client.settings.get(interaction.guild!.id, "templateID");
-	const url = `https://discord.com/channels/${interaction.guild!.id}/${template?.channelId}/${template?.messageId}`;
+	const url =
+		template?.channelId && template?.messageId
+			? ` (https://discord.com/channels/${interaction.guild!.id}/${template?.channelId}/${template?.messageId})`
+			: "";
 	return reply(interaction, {
 		content: ul("config.selfRegister.enable", { url }),
 	});
