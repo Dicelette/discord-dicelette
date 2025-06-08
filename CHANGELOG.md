@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.45.3](https://github.com/Dicelette/discord-dicelette/compare/1.45.2...1.45.3) (2025-06-08)
+
+
+### Bug Fixes
+
+* **lang:** update the lang in memory too ([7bda09c](https://github.com/Dicelette/discord-dicelette/commit/7bda09ca97d86000c8f49712610aba21f5a70994))
+* should calculate points on all stats, not only the "page" stats. ([7be5803](https://github.com/Dicelette/discord-dicelette/commit/7be58037fa1ec24fe4e94cad1d987a031fd4ae77))
+
 ## [1.45.2](https://github.com/Dicelette/discord-dicelette/compare/1.45.1...1.45.2) (2025-06-06)
 
 
