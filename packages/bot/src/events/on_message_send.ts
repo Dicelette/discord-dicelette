@@ -20,6 +20,7 @@ export default (client: EClient): void => {
 
 			//is a valid roll as we are in the function so we can work as always
 			const userLang =
+				client.guildLocale?.get(message.guild.id) ??
 				client.settings.get(message.guild.id, "lang") ??
 				message.guild.preferredLocale ??
 				Djs.Locale.EnglishUS;
