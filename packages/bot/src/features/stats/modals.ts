@@ -8,7 +8,11 @@ import {
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type { EClient } from "client";
-import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
+import {
+	getTemplateByInteraction,
+	getUserNameAndChar,
+	updateMemory,
+} from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { registerDmgButton } from "features";
@@ -23,6 +27,7 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
+import { logger } from "@dicelette/utils";
 
 /**
  * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
@@ -38,18 +43,31 @@ export async function registerStatistics(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
 	page: number | undefined = 2,
-	lang: Djs.Locale = Djs.Locale.EnglishGB
+	lang: Djs.Locale = Djs.Locale.EnglishGB,
 ) {
 	if (!interaction.message) return;
 	const message = await (interaction.channel as TextChannel).messages.fetch(
-		interaction.message.id
+		interaction.message.id,
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const ul = ln(lang);
 	const userEmbed = getEmbeds(ul, message, "user");
 	if (!userEmbed) return;
 	const statsEmbed = getEmbeds(ul, message, "stats");
-	const { combinaisonFields, stats } = getStatistiqueFields(interaction, template, ul);
+	const oldStatsTotal = (statsEmbed?.toJSON().fields ?? [])
+		.filter((field) => isNumber(field.value.removeBacktick()))
+		.reduce(
+			(sum, field) => sum + Number.parseInt(field.value.removeBacktick(), 10),
+			0,
+		);
+	logger.trace(`Old stats total: ${oldStatsTotal}`);
+
+	const { combinaisonFields, stats } = getStatistiqueFields(
+		interaction,
+		template,
+		ul,
+		oldStatsTotal,
+	);
 	//combine all embeds as one
 	userEmbed.setFooter({ text: ul("common.page", { nb: page }) });
 	//add old fields
@@ -72,13 +90,18 @@ export async function registerStatistics(
 	if (!fields) return;
 	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
-		parsedFields[field.name.standardize()] = field.value.removeBacktick().standardize();
+		parsedFields[field.name.standardize()] = field.value
+			.removeBacktick()
+			.standardize();
 	}
 
 	const embedStats = Object.fromEntries(
-		Object.entries(parsedFields).filter(([key]) => statsWithoutCombinaison.includes(key))
+		Object.entries(parsedFields).filter(([key]) =>
+			statsWithoutCombinaison.includes(key),
+		),
 	);
-	if (Object.keys(embedStats).length === statsWithoutCombinaison.length) {
+	const nbStats = Object.keys(embedStats).length;
+	if (nbStats === statsWithoutCombinaison.length) {
 		// noinspection JSUnusedAssignment
 		let combinaison: Record<string, number> = {};
 		combinaison = evalCombinaison(combinaisonFields, embedStats);
@@ -101,15 +124,42 @@ export async function registerStatistics(
 		});
 		return;
 	}
+	const ilReste = calculateRemainingPoints(
+		template.total,
+		oldStatsTotal,
+		stats,
+	);
+	const restePoints = ilReste
+		? `\n${ul("modals.stats.reste", { reste: ilReste, total: template.total, nbStats: statsWithoutCombinaison.length - nbStats })}`
+		: "";
+
 	message.edit({
 		embeds: [userEmbed, statEmbeds],
 		components: [continueCancelButtons(ul)],
 	});
 	await reply(interaction, {
-		content: ul("modals.added.stats"),
+		content: `${ul("modals.added.stats")}${restePoints}`,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	return;
+}
+
+function calculateRemainingPoints(
+	total: number = 0,
+	oldTotal: number = 0,
+	stats?: Record<string, number>,
+) {
+	if (total === 0) return undefined;
+	if (oldTotal === 0 && stats) {
+		const newTotal = Object.values(stats).reduce(
+			(sum, value) => sum + value,
+			0,
+		);
+		return total - newTotal;
+	} else if (oldTotal > 0) {
+		return total - oldTotal;
+	}
+	return undefined;
 }
 
 /**
@@ -127,13 +177,13 @@ export async function registerStatistics(
 export async function editStats(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	client: EClient
+	client: EClient,
 ) {
 	const db = client.settings;
 	const characters = client.characters;
 	if (!interaction.message) return;
 	const message = await (interaction.channel as TextChannel).messages.fetch(
-		interaction.message.id
+		interaction.message.id,
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
@@ -151,14 +201,14 @@ export async function editStats(
 			acc[name] = value;
 			return acc;
 		},
-		{} as Record<string, string>
+		{} as Record<string, string>,
 	);
 	//verify value from template
 	const template = Object.fromEntries(
 		Object.entries(templateStats.statistics).map(([name, value]) => [
 			name.unidecode(),
 			value,
-		])
+		]),
 	);
 	const embedsStatsFields: Djs.APIEmbedField[] = [];
 	for (const [name, value] of Object.entries(stats)) {
@@ -166,7 +216,9 @@ export async function editStats(
 		if (
 			value.toLowerCase() === "x" ||
 			value.trim().length === 0 ||
-			embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
+			embedsStatsFields.find(
+				(field) => field.name.unidecode() === name.unidecode(),
+			)
 		)
 			continue;
 		if (!stat) throw new Error(ul("error.stats.notFound", { value: name }));
@@ -188,7 +240,9 @@ export async function editStats(
 		}
 		const num = Number.parseInt(value, 10);
 		if (stat.min && num < stat.min) {
-			throw new Error(ul("error.mustBeGreater", { value: name, min: stat.min }));
+			throw new Error(
+				ul("error.mustBeGreater", { value: name, min: stat.min }),
+			);
 		} //skip register total + max because leveling can be done here
 		embedsStatsFields.push({
 			name: name.capitalize(),
@@ -205,7 +259,9 @@ export async function editStats(
 				field.value !== "0" &&
 				field.value.toLowerCase() !== "x" &&
 				field.value.trim().length > 0 &&
-				embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
+				embedsStatsFields.find(
+					(field) => field.name.unidecode() === name.unidecode(),
+				)
 			) {
 				//register the old value
 				embedsStatsFields.push({
@@ -220,7 +276,8 @@ export async function editStats(
 	const fieldsToAppend: Djs.APIEmbedField[] = [];
 	for (const field of embedsStatsFields) {
 		const name = field.name.toLowerCase();
-		if (fieldsToAppend.find((f) => f.name.unidecode() === name.unidecode())) continue;
+		if (fieldsToAppend.find((f) => f.name.unidecode() === name.unidecode()))
+			continue;
 		fieldsToAppend.push(field);
 	}
 	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
@@ -230,7 +287,7 @@ export async function editStats(
 		const { list, exists } = getEmbedsList(
 			ul,
 			{ which: "stats", embed: newEmbedStats },
-			message
+			message,
 		);
 		const toAdd = removeEmbedsFromList(list, "stats");
 		const components = editUserButtons(ul, false, exists.damage);
@@ -246,11 +303,15 @@ export async function editStats(
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 			}),
 			interaction.guild as Djs.Guild,
-			db
+			db,
 		);
 	}
 	//get the other embeds
-	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
+	const { list } = getEmbedsList(
+		ul,
+		{ which: "stats", embed: newEmbedStats },
+		message,
+	);
 	await message.edit({ embeds: list });
 	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
@@ -259,12 +320,19 @@ export async function editStats(
 		content: ul("embed.edit.stats"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
+	const compare = displayOldAndNewStats(
+		statsEmbeds.toJSON().fields,
+		fieldsToAppend,
+	);
 	const logMessage = ul("logs.stats.added", {
 		user: Djs.userMention(interaction.user.id),
 		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
 	//update the characters in the memory ;
-	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
+	await sendLogs(
+		`${logMessage}\n${compare}`,
+		interaction.guild as Djs.Guild,
+		db,
+	);
 }

@@ -580,6 +580,9 @@
       "dice": "The dice have been removed from the user",
       "stats": "The statistics have been deleted"
     },
+    "stats": {
+      "reste": "You still have {{- reste}}/{{- total}} points to distribute for {{- nbStats}} statistics."
+    },
     "steps": "User Registration - Page {{- page}}/{{- max}}",
     "user": {
       "description": "Enter the user attached to the character (id or global username)",

@@ -580,6 +580,9 @@
       "dice": "Les dés ont été supprimés de l'utilisateur",
       "stats": "Les statistiques ont bien été supprimés"
     },
+    "stats": {
+      "reste": "Il vous reste {{- reste}}/{{- total}} points à distribuer pour {{- nbStats}} statistiques."
+    },
     "steps": "Enregistrement de l'utilisateur - Page {{- page}}/{{- max}}",
     "user": {
       "description": "Entrez l'utilisateur attaché au personnage (id ou nom d'utilisateur global)",
