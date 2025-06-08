@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.47.0](https://github.com/Dicelette/discord-dicelette/compare/1.46.1...1.47.0) (2025-06-08)
+
+
+### Features
+
+* allow self registration  ([deda85e](https://github.com/Dicelette/discord-dicelette/commit/deda85e08944d5e9bad24088ef3e47c7b3d9aa75))
+
 ## [1.46.1](https://github.com/Dicelette/discord-dicelette/compare/1.46.0...1.46.1) (2025-06-08)
 
 
