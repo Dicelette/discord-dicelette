@@ -35,7 +35,7 @@ export async function rollWithInteraction(
 	charName?: string,
 	infoRoll?: { name: string; standardized: string },
 	hideResult?: false | true | null,
-	customCritical?: Record<string, CustomCritical> | undefined
+	customCritical?: Record<string, CustomCritical> | undefined,
 ) {
 	//exclude announcement channel
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
@@ -52,7 +52,7 @@ export async function rollWithInteraction(
 		critical,
 		charName,
 		infoRoll,
-		customCritical
+		customCritical,
 	);
 	const output = defaultMsg.defaultMessage();
 	if (defaultMsg.error) {
@@ -69,7 +69,7 @@ export async function rollWithInteraction(
 		client.settings,
 		ul,
 		user,
-		hideResult
+		hideResult,
 	);
 }
 
@@ -95,7 +95,7 @@ export async function rollDice(
 	ul: Translation,
 	charOptions?: string,
 	user?: Djs.User,
-	hideResult?: boolean | null
+	hideResult?: boolean | null,
 ) {
 	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
@@ -130,7 +130,7 @@ export async function rollDice(
 						atq: infoRoll.name.capitalize(),
 						charName: charOptions ?? "",
 					}),
-					ul
+					ul,
 				),
 			],
 			flags: Djs.MessageFlags.Ephemeral,
@@ -138,7 +138,12 @@ export async function rollDice(
 		return;
 	}
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
-	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
+	const expr = getExpression(
+		dice,
+		expression,
+		userStatistique.stats,
+		dollarValue?.total,
+	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
@@ -155,13 +160,23 @@ export async function rollDice(
 			infoRoll.name = replaceStatInDice(
 				infoRoll.name,
 				userStatistique.stats,
-				dollarValue.diceResult
+				dollarValue.diceResult,
 			).trimEnd();
-		else infoRoll.name = replaceStatInDice(infoRoll.name, userStatistique.stats, "");
-		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
+		else
+			infoRoll.name = replaceStatInDice(
+				infoRoll.name,
+				userStatistique.stats,
+				"",
+			);
+		if (infoRoll.name.length === 0)
+			infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 
-	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
+	comparator = generateStatsDice(
+		comparator,
+		userStatistique.stats,
+		dollarValue?.total,
+	);
 
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	await rollWithInteraction(
@@ -176,8 +191,8 @@ export async function rollDice(
 		skillCustomCritical(
 			userStatistique.template.customCritical,
 			userStatistique.stats,
-			dollarValue?.total
-		)
+			dollarValue?.total,
+		),
 	);
 }
 
@@ -203,7 +218,7 @@ export async function rollStatistique(
 	ul: Translation,
 	optionChar?: string,
 	user?: Djs.User,
-	hideResult?: boolean | null
+	hideResult?: boolean | null,
 ) {
 	let statistic = options.getString(t("common.statistic"), false);
 	const template = userStatistique.template;
@@ -243,7 +258,7 @@ export async function rollStatistique(
 			client,
 			interaction,
 			optionChar,
-			statistic
+			statistic,
 		);
 		if (!res) return;
 		statistic = res.statistic;
@@ -263,15 +278,31 @@ export async function rollStatistique(
 		const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
 		const diceMatch = signRegex.exec(dice);
 		const overrideMatch = signRegex.exec(override);
-		if (diceMatch && overrideMatch && diceMatch.groups && overrideMatch.groups) {
+		if (diceMatch?.groups && overrideMatch?.groups) {
 			dice = dice.replace(diceMatch[0], overrideMatch[0]);
 		} else if (!diceMatch && overrideMatch) {
 			dice += overrideMatch[0];
+		} else if (diceMatch?.groups && !overrideMatch) {
+			//search if they are a simple number and not a sign;
+			const simpleNumberMatch = /(?<comparator>(.+))/.exec(override);
+			const diceComparator = diceMatch.groups.comparator;
+			if (simpleNumberMatch && simpleNumberMatch.groups) {
+				//if the override is a simple number, we replace the comparator with it
+				dice = dice.replace(
+					diceComparator,
+					simpleNumberMatch.groups.comparator,
+				);
+			}
 		}
 	}
 
 	const userStatStr = userStat?.toString();
-	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
+	const expr = getExpression(
+		dice,
+		expression,
+		userStatistique.stats,
+		userStatStr,
+	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
@@ -283,7 +314,11 @@ export async function rollStatistique(
 	}
 	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
 	const customCritical = template.customCritical
-		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
+		? rollCustomCritical(
+				template.customCritical,
+				userStat,
+				userStatistique.stats,
+			)
 		: undefined;
 	const infoRoll =
 		statistic && standardizedStatistic
@@ -298,6 +333,6 @@ export async function rollStatistique(
 		optionChar,
 		infoRoll,
 		hideResult,
-		customCritical
+		customCritical,
 	);
 }
