@@ -6,7 +6,11 @@ import {
 	uniformizeRecords,
 } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
+import {
+	getFirstChar,
+	getTemplateByInteraction,
+	getUserFromMessage,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import {
@@ -14,7 +18,7 @@ import {
 	gmCommonOptions,
 	rollDice,
 	rollStatistique,
-	serializeName,
+	isSerializedNameEquals,
 } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 
@@ -27,35 +31,38 @@ export const mjRoll = {
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.addSubcommand(
 			(
-				sub //dbRoll
+				sub, //dbRoll
 			) =>
 				gmCommonOptions(sub, "dbroll")
 					.setName(t("dbRoll.name"))
 					.setNameLocalizations(cmdLn("dbRoll.name"))
 					.setDescription(t("dbRoll.description"))
-					.setDescriptionLocalizations(cmdLn("dbRoll.description"))
+					.setDescriptionLocalizations(cmdLn("dbRoll.description")),
 		)
 		.addSubcommand(
 			(
-				sub //dbd
+				sub, //dbd
 			) =>
 				gmCommonOptions(sub, "dbd")
 					.setName(t("rAtq.name"))
 					.setDescription(t("rAtq.description"))
 					.setNameLocalizations(cmdLn("rAtq.name"))
-					.setDescriptionLocalizations(cmdLn("rAtq.description"))
+					.setDescriptionLocalizations(cmdLn("rAtq.description")),
 		)
 		.addSubcommand(
 			(
-				sub //calc
+				sub, //calc
 			) =>
 				gmCommonOptions(sub, "calc")
 					.setName(t("calc.title"))
 					.setDescription(t("calc.description"))
 					.setNameLocalizations(cmdLn("calc.title"))
-					.setDescriptionLocalizations(cmdLn("calc.description"))
+					.setDescriptionLocalizations(cmdLn("calc.description")),
 		),
-	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+	async autocomplete(
+		interaction: Djs.AutocompleteInteraction,
+		client: EClient,
+	) {
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
 		const ul = getLangFromInteraction(interaction, client);
@@ -91,13 +98,17 @@ export const mjRoll = {
 						?.map((x) => x.standardize())
 						.includes(skill.standardize())
 				) {
-					choices = allCharFromGuild.map((data) => data.charName ?? t("common.default"));
+					choices = allCharFromGuild.map(
+						(data) => data.charName ?? t("common.default"),
+					);
 				} else {
 					//search in all characters for the skill
 					const findSkillInAll = allCharFromGuild.filter((data) => {
 						return data.damageName?.includes(skill);
 					});
-					choices = findSkillInAll.map((data) => data.charName ?? t("common.default"));
+					choices = findSkillInAll.map(
+						(data) => data.charName ?? t("common.default"),
+					);
 				}
 			} else {
 				for (const data of allCharFromGuild) {
@@ -111,7 +122,9 @@ export const mjRoll = {
 
 			const character = options.getString(t("common.character"), false);
 			if (character) {
-				const char = allCharFromGuild.find((c) => c.charName?.subText(character));
+				const char = allCharFromGuild.find((c) =>
+					c.charName?.subText(character),
+				);
 				if (char?.damageName) {
 					choices = char.damageName;
 				}
@@ -128,7 +141,7 @@ export const mjRoll = {
 			filter.map((result) => ({
 				name: capitalizeBetweenPunct(result.capitalize()),
 				value: result,
-			}))
+			})),
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
@@ -138,22 +151,31 @@ export const mjRoll = {
 		const ul = ln(guildData?.lang ?? interaction.locale);
 		if (!guildData) return;
 
-		const user = options.getUser(t("display.userLowercase"), false) ?? undefined;
-		const charName = options.getString(t("common.character"), false)?.toLowerCase();
+		const user =
+			options.getUser(t("display.userLowercase"), false) ?? undefined;
+		const charName = options
+			.getString(t("common.character"), false)
+			?.toLowerCase();
 		let optionChar = options.getString(t("common.character")) ?? undefined;
 		let charData: undefined | UserData;
 		if (user) {
-			charData = await getUserFromMessage(client, user.id, interaction, charName, {
-				skipNotFound: true,
-			});
+			charData = await getUserFromMessage(
+				client,
+				user.id,
+				interaction,
+				charName,
+				{
+					skipNotFound: true,
+				},
+			);
 
-			const serializedNameQueries = serializeName(charData, charName);
+			const serializedNameQueries = isSerializedNameEquals(charData, charName);
 			if (charName && !serializedNameQueries) {
 				await reply(interaction, {
 					embeds: [
 						embedError(
 							ul("error.user.charName", { charName: charName.capitalize() }),
-							ul
+							ul,
 						),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
@@ -171,7 +193,9 @@ export const mjRoll = {
 				let userName = `<@${user.id}>`;
 				if (charName) userName += ` (${charName})`;
 				await reply(interaction, {
-					embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
+					embeds: [
+						embedError(ul("error.user.registered", { user: userName }), ul),
+					],
 				});
 				return;
 			}
@@ -182,8 +206,10 @@ export const mjRoll = {
 				await reply(interaction, {
 					embeds: [
 						embedError(
-							ul("error.template.notFound", { guildId: interaction.guild.name }),
-							ul
+							ul("error.template.notFound", {
+								guildId: interaction.guild.name,
+							}),
+							ul,
 						),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
@@ -213,7 +239,7 @@ export const mjRoll = {
 				ul,
 				optionChar,
 				user,
-				hide
+				hide,
 			);
 		if (subcommand === ul("rAtq.name"))
 			return await rollDice(
@@ -224,7 +250,7 @@ export const mjRoll = {
 				ul,
 				optionChar,
 				user,
-				hide
+				hide,
 			);
 		if (subcommand === ul("calc.title"))
 			return await calculate(
@@ -235,7 +261,7 @@ export const mjRoll = {
 				charData,
 				optionChar,
 				hide,
-				user
+				user,
 			);
 	},
 };

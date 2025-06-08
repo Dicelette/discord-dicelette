@@ -1,14 +1,23 @@
 import type { Settings } from "@dicelette/types";
 import * as Djs from "discord.js";
+import { fetchChannel } from "./fetch";
 
-async function fetchDiceRole(diceEmbed: boolean, guild: Djs.Guild, role?: string) {
+async function fetchDiceRole(
+	diceEmbed: boolean,
+	guild: Djs.Guild,
+	role?: string,
+) {
 	if (!diceEmbed || !role) return;
 	const diceRole = guild.roles.cache.get(role);
 	if (!diceRole) return await guild.roles.fetch(role);
 	return diceRole;
 }
 
-async function fetchStatsRole(statsEmbed: boolean, guild: Djs.Guild, role?: string) {
+async function fetchStatsRole(
+	statsEmbed: boolean,
+	guild: Djs.Guild,
+	role?: string,
+) {
 	if (!statsEmbed || !role) return;
 	const statsRole = guild.roles.cache.get(role);
 	if (!statsRole) return await guild.roles.fetch(role);
@@ -18,7 +27,7 @@ async function fetchStatsRole(statsEmbed: boolean, guild: Djs.Guild, role?: stri
 export function haveAccess(
 	interaction: Djs.BaseInteraction,
 	thread: Djs.GuildChannelResolvable,
-	user?: string
+	user?: string,
 ): boolean {
 	if (!user) return false;
 	if (user === interaction.user.id) return true;
@@ -36,7 +45,7 @@ export async function addAutoRole(
 	member: string,
 	diceEmbed: boolean,
 	statsEmbed: boolean,
-	db: Settings
+	db: Settings,
 ) {
 	const autoRole = db.get(interaction.guild!.id, "autoRole");
 	if (!autoRole) return;
@@ -47,11 +56,15 @@ export async function addAutoRole(
 			guildMember = await interaction.guild!.members.fetch(member);
 		}
 		//fetch role
-		const diceRole = await fetchDiceRole(diceEmbed, interaction.guild!, autoRole.dice);
+		const diceRole = await fetchDiceRole(
+			diceEmbed,
+			interaction.guild!,
+			autoRole.dice,
+		);
 		const statsRole = await fetchStatsRole(
 			statsEmbed,
 			interaction.guild!,
-			autoRole.stats
+			autoRole.stats,
 		);
 
 		if (diceEmbed && diceRole) await guildMember.roles.add(diceRole);
@@ -64,7 +77,7 @@ export async function addAutoRole(
 		const dbLogs = db.get(interaction.guild!.id, "logs");
 		const errorMessage = `\`\`\`\n${(e as Error).message}\n\`\`\``;
 		if (dbLogs) {
-			const logs = await interaction.guild!.channels.fetch(dbLogs);
+			const logs = await fetchChannel(interaction.guild!, dbLogs);
 			if (logs?.type === Djs.ChannelType.GuildText) {
 				await logs.send(errorMessage);
 			}

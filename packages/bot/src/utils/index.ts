@@ -7,3 +7,4 @@ export * from "./import_csv";
 export * from "./roles";
 export * from "./roll";
 export * from "./search";
+export * from "./fetch";

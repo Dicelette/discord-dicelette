@@ -4,6 +4,7 @@ import type { Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
+import { fetchChannel } from "../utils";
 
 /**
  * Retrieves the statistical template for a guild based on the interaction context.
@@ -20,7 +21,7 @@ export async function getTemplateByInteraction(
 		| Djs.ModalSubmitInteraction
 		| Djs.AutocompleteInteraction
 		| Djs.CommandInteraction,
-	client: EClient
+	client: EClient,
 ) {
 	if (!interaction.guild) return;
 	const guild = interaction.guild;
@@ -48,15 +49,16 @@ export async function getTemplate(
 	guild: Djs.Guild,
 	enmap: Settings,
 	ul: Translation,
-	skipNoFound = false
+	skipNoFound = false,
 ) {
 	const templateID = enmap.get(guild.id, "templateID");
 	if (!enmap.has(guild.id) || !templateID) {
-		if (!skipNoFound) throw new Error(ul("error.guild.data", { server: guild.name }));
+		if (!skipNoFound)
+			throw new Error(ul("error.guild.data", { server: guild.name }));
 		return undefined;
 	}
 	const { channelId, messageId } = templateID;
-	const channel = await guild.channels.fetch(channelId);
+	const channel = await fetchChannel(guild, channelId);
 	if (
 		!channel ||
 		channel instanceof Djs.CategoryChannel ||
@@ -86,7 +88,7 @@ export async function getTemplate(
  */
 export async function fetchTemplate(
 	message: Message,
-	enmap: Settings
+	enmap: Settings,
 ): Promise<StatisticalTemplate | undefined> {
 	const template = message?.attachments.first();
 	if (!template) return;

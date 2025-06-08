@@ -3,7 +3,7 @@ import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError, findMessageBefore, threadToSend } from "messages";
 import { lError } from "@dicelette/localization";
-import { isValidChannel } from "utils";
+import { isValidChannel, fetchChannel } from "utils";
 import type { EClient } from "../client";
 
 export async function sendLogs(
@@ -15,7 +15,8 @@ export async function sendLogs(
 	if (!guildData?.logs) return;
 	const channel = guildData.logs;
 	try {
-		const channelToSend = (await guild.channels.fetch(
+		const channelToSend = (await fetchChannel(
+			guild,
 			channel,
 		)) as Djs.TextChannel;
 		await channelToSend.send({ content: message, allowedMentions: {} });
@@ -218,7 +219,8 @@ export async function interactionError(
 	if (client.settings.has(interaction.guild.id)) {
 		const db = client.settings.get(interaction.guild.id, "logs");
 		if (!db) return;
-		const logs = (await interaction.guild.channels.fetch(
+		const logs = (await fetchChannel(
+			interaction.guild!,
 			db,
 		)) as Djs.GuildBasedChannel;
 		if (logs instanceof Djs.TextChannel) {

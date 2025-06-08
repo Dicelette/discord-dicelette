@@ -3,6 +3,7 @@ import { isRolling, ResultAsText } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, threadToSend } from "messages";
+import { fetchChannel } from "../utils";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
@@ -33,7 +34,10 @@ export default (client: EClient): void => {
 				client.settings.get(message.guild.id, "disableThread") === true ||
 				client.settings.get(message.guild.id, "rollChannel") === channel.id
 			) {
-				await message.reply({ content: parser, allowedMentions: { repliedUser: true } });
+				await message.reply({
+					content: parser,
+					allowedMentions: { repliedUser: true },
+				});
 				return;
 			}
 			let context = {
@@ -43,7 +47,11 @@ export default (client: EClient): void => {
 			};
 			if (deleteInput) {
 				if (client.settings.get(message.guild.id, "context")) {
-					const messageBefore = await findMessageBefore(channel, message, client);
+					const messageBefore = await findMessageBefore(
+						channel,
+						message,
+						client,
+					);
 					if (messageBefore)
 						context = {
 							guildId: message.guildId ?? "",
@@ -67,7 +75,8 @@ export default (client: EClient): void => {
 						content: resultAsText.onMessageSend(idMessage),
 						allowedMentions: { repliedUser: true },
 					});
-			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
+			const timer =
+				client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
 			await deleteAfter(reply, timer);
 			if (deleteInput) await message.delete();
 			return;
@@ -83,7 +92,7 @@ export default (client: EClient): void => {
 			await message.channel.send({ content: msgError });
 			const logsId = client.settings.get(message.guild.id, "logs");
 			if (logsId) {
-				const logs = await message.guild.channels.fetch(logsId);
+				const logs = await fetchChannel(message.guild, logsId);
 				if (logs instanceof Djs.TextChannel) {
 					await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
 				}

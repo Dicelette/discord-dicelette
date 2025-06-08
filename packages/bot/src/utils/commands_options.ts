@@ -3,10 +3,11 @@ import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import type { SlashCommandSubcommandBuilder } from "discord.js";
-import { getLangAndConfig } from "./check";
+
+import { getLangAndConfig } from "./fetch";
 
 export function charUserOptions(
-	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
+	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 ) {
 	buider
 		.addUserOption((option) =>
@@ -15,7 +16,7 @@ export function charUserOptions(
 				.setNameLocalizations(cmdLn("display.userLowercase"))
 				.setDescription(t("display.user"))
 				.setDescriptionLocalizations(cmdLn("display.user"))
-				.setRequired(false)
+				.setRequired(false),
 		)
 		.addStringOption((option) =>
 			option
@@ -24,7 +25,7 @@ export function charUserOptions(
 				.setDescription(t("display.character"))
 				.setDescriptionLocalizations(cmdLn("display.character"))
 				.setRequired(false)
-				.setAutocomplete(true)
+				.setAutocomplete(true),
 		);
 	return buider;
 }
@@ -38,7 +39,9 @@ export function charUserOptions(
  */
 export function commonOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
-	opts: Partial<{ expression: boolean; threshold: boolean }> = { expression: true }
+	opts: Partial<{ expression: boolean; threshold: boolean }> = {
+		expression: true,
+	},
 ) {
 	builder.addStringOption((option) =>
 		option
@@ -47,7 +50,7 @@ export function commonOptions(
 			.setNameLocalizations(cmdLn("common.character"))
 			.setDescriptionLocalizations(cmdLn("dbRoll.options.character"))
 			.setRequired(false)
-			.setAutocomplete(true)
+			.setAutocomplete(true),
 	);
 	if (opts.expression) {
 		builder.addStringOption((option) =>
@@ -55,8 +58,10 @@ export function commonOptions(
 				.setName(t("common.expression"))
 				.setDescription(t("dbRoll.options.modificator.description"))
 				.setNameLocalizations(cmdLn("common.expression"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.modificator.description"))
-				.setRequired(false)
+				.setDescriptionLocalizations(
+					cmdLn("dbRoll.options.modificator.description"),
+				)
+				.setRequired(false),
 		);
 	}
 	if (opts.threshold) {
@@ -65,8 +70,10 @@ export function commonOptions(
 				.setName(t("dbRoll.options.override.name"))
 				.setDescription(t("dbRoll.options.override.description"))
 				.setNameLocalizations(cmdLn("dbRoll.options.override.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.override.description"))
-				.setRequired(false)
+				.setDescriptionLocalizations(
+					cmdLn("dbRoll.options.override.description"),
+				)
+				.setRequired(false),
 		);
 	}
 	builder.addStringOption((option) =>
@@ -75,13 +82,13 @@ export function commonOptions(
 			.setDescription(t("dbRoll.options.comments.description"))
 			.setNameLocalizations(cmdLn("common.comments"))
 			.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
-			.setRequired(false)
+			.setRequired(false),
 	);
 	return builder;
 }
 
 export function dbdOptions(
-	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
+	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
 	builder.addStringOption((option) =>
 		option
@@ -90,7 +97,7 @@ export function dbdOptions(
 			.setDescription(t("rAtq.atq_name.description"))
 			.setDescriptionLocalizations(cmdLn("rAtq.atq_name.description"))
 			.setRequired(true)
-			.setAutocomplete(true)
+			.setAutocomplete(true),
 	);
 	return commonOptions(builder);
 }
@@ -101,7 +108,7 @@ export function dbdOptions(
  * @returns The builder with the additional options configured.
  */
 export function dbRollOptions(
-	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
+	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 ) {
 	builder.addStringOption((option) =>
 		option
@@ -110,7 +117,7 @@ export function dbRollOptions(
 			.setDescription(t("dbRoll.options.statistic"))
 			.setDescriptionLocalizations(cmdLn("dbRoll.options.statistic"))
 			.setRequired(false)
-			.setAutocomplete(true)
+			.setAutocomplete(true),
 	);
 	return commonOptions(builder, { expression: true, threshold: true });
 }
@@ -124,7 +131,7 @@ export function dbRollOptions(
  */
 export function calcOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
-	isCalc = true
+	isCalc = true,
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
 	if (isCalc) {
 		builder
@@ -135,7 +142,7 @@ export function calcOptions(
 					.setRequired(true)
 					.setNameLocalizations(cmdLn("common.statistic"))
 					.setDescriptionLocalizations(cmdLn("calc.statistic"))
-					.setAutocomplete(true)
+					.setAutocomplete(true),
 			)
 			.addStringOption((option) =>
 				option
@@ -144,7 +151,7 @@ export function calcOptions(
 					.setRequired(true)
 					.setNameLocalizations(cmdLn("calc.sign.title"))
 					.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
-					.setAutocomplete(true)
+					.setAutocomplete(true),
 			);
 	}
 	builder.addStringOption((option) =>
@@ -153,7 +160,7 @@ export function calcOptions(
 			.setDescription(t("calc.formula.desc"))
 			.setNameLocalizations(cmdLn("common.expression"))
 			.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
-			.setRequired(true)
+			.setRequired(true),
 	);
 	if (isCalc)
 		builder.addStringOption((option) =>
@@ -163,18 +170,18 @@ export function calcOptions(
 				.setRequired(false)
 				.setNameLocalizations(cmdLn("calc.transform.title"))
 				.setDescriptionLocalizations(cmdLn("calc.transform.desc"))
-				.setAutocomplete(true)
+				.setAutocomplete(true),
 		);
 	return commonOptions(builder, { expression: false });
 }
 
 export function gmCommonOptions(
 	builder: Djs.SlashCommandSubcommandBuilder,
-	type: "dbroll" | "dbd" | "calc"
+	type: "dbroll" | "dbd" | "calc",
 ) {
 	let builderCopy = builder;
 	function addHiddenOpts(
-		builder: SlashCommandSubcommandBuilder
+		builder: SlashCommandSubcommandBuilder,
 	): Djs.SlashCommandSubcommandBuilder {
 		builder.addBooleanOption((option) =>
 			option
@@ -182,26 +189,26 @@ export function gmCommonOptions(
 				.setDescription(t("dbRoll.options.hidden.description"))
 				.setNameLocalizations(cmdLn("dbRoll.options.hidden.name"))
 				.setDescriptionLocalizations(cmdLn("dbRoll.options.hidden.description"))
-				.setRequired(false)
+				.setRequired(false),
 		);
 		return builder;
 	}
 	switch (type) {
 		case "dbd": {
 			builderCopy = addHiddenOpts(
-				dbdOptions(builder) as Djs.SlashCommandSubcommandBuilder
+				dbdOptions(builder) as Djs.SlashCommandSubcommandBuilder,
 			);
 			break;
 		}
 		case "dbroll": {
 			builderCopy = addHiddenOpts(
-				dbRollOptions(builder) as Djs.SlashCommandSubcommandBuilder
+				dbRollOptions(builder) as Djs.SlashCommandSubcommandBuilder,
 			);
 			break;
 		}
 		case "calc": {
 			builderCopy = addHiddenOpts(
-				calcOptions(builder) as Djs.SlashCommandSubcommandBuilder
+				calcOptions(builder) as Djs.SlashCommandSubcommandBuilder,
 			);
 			break;
 		}
@@ -214,17 +221,21 @@ export function gmCommonOptions(
 			.setNameLocalizations(cmdLn("display.userLowercase"))
 			.setDescription(t("mjRoll.user"))
 			.setDescriptionLocalizations(cmdLn("mjRoll.user"))
-			.setRequired(false)
+			.setRequired(false),
 	);
 	return builderCopy;
 }
-export function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+export function autoComplete(
+	interaction: Djs.AutocompleteInteraction,
+	client: EClient,
+) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const fixed = options.getFocused(true);
 	const { ul, config: guildData } = getLangAndConfig(client, interaction);
 	if (!guildData) return;
 	const choices: string[] = [];
-	let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
+	let userID =
+		options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
 	if (typeof userID !== "string") userID = interaction.user.id;
 	return { fixed, guildData, choices, ul, userID };
 }
@@ -232,7 +243,7 @@ export function autoComplete(interaction: Djs.AutocompleteInteraction, client: E
 export function autoCompleteCharacters(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,
-	exclude = true
+	exclude = true,
 ) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
@@ -244,13 +255,13 @@ export function autoCompleteCharacters(
 		choices = guildData.templateID.statsName;
 		if (exclude)
 			choices = choices.filter(
-				(item) => !guildData.templateID.excludedStats?.includes(item)
+				(item) => !guildData.templateID.excludedStats?.includes(item),
 			);
 	} else if (focused.name === t("common.character")) {
 		//get user characters
 		const userData = client.settings.get(
 			interaction.guild!.id,
-			`user.${interaction.user.id}`
+			`user.${interaction.user.id}`,
 		);
 		if (!userData) return;
 		choices = userData

@@ -11,7 +11,12 @@ import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import { registerDmgButton, registerStatistics } from "features";
 import { embedError, reply } from "messages";
-import { continueCancelButtons, getLangAndConfig, isUserNameOrId } from "utils";
+import {
+	continueCancelButtons,
+	fetchChannel,
+	getLangAndConfig,
+	isUserNameOrId,
+} from "utils";
 
 /**
  * Handles a modal submission to register user statistics for a specific page, validating the page number and template existence.
@@ -117,7 +122,7 @@ export async function createEmbedFirstPage(
 
 	const verifiedAvatar = verifyAvatarUrl(avatar);
 	const existChannel = sheetId
-		? await interaction.guild?.channels.fetch(sheetId)
+		? fetchChannel(interaction.guild!, sheetId)
 		: undefined;
 	if (!existChannel) {
 		await reply(interaction, {

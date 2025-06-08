@@ -1,7 +1,7 @@
 import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError, sendLogs } from "messages";
-import { isValidChannel, isValidInteraction } from "utils";
+import { fetchChannel, isValidChannel, isValidInteraction } from "utils";
 /**
  * Fetches and validates a Discord channel by ID within a guild context, handling errors and localization.
  *
@@ -19,14 +19,17 @@ export async function searchUserChannel(
 	interaction: Djs.BaseInteraction,
 	ul: Translation,
 	channelId: string,
-	register?: boolean
+	register?: boolean,
 ): Promise<DiscordChannel> {
-	let thread: Djs.TextChannel | Djs.AnyThreadChannel | undefined | Djs.GuildBasedChannel =
-		undefined;
+	let thread:
+		| Djs.TextChannel
+		| Djs.AnyThreadChannel
+		| undefined
+		| Djs.GuildBasedChannel;
 	const msg = ul("error.channel.thread");
 	const embeds = [embedError(msg, ul)];
 	try {
-		const channel = await interaction.guild?.channels.fetch(channelId);
+		const channel = await fetchChannel(interaction.guild!, channelId);
 		if (channel?.type === Djs.ChannelType.GuildForum && register) return;
 		if (!isValidChannel(channel, interaction)) {
 			if (isValidInteraction(interaction) && interaction.channel?.isSendable())

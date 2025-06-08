@@ -7,10 +7,19 @@ import {
 	uniformizeRecords,
 } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
+import {
+	getFirstChar,
+	getTemplateByInteraction,
+	getUserFromMessage,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { dbdOptions, getLangAndConfig, rollDice, serializeName } from "utils";
+import {
+	dbdOptions,
+	getLangAndConfig,
+	rollDice,
+	isSerializedNameEquals,
+} from "utils";
 
 export default {
 	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
@@ -19,14 +28,17 @@ export default {
 		.setNameLocalizations(cmdLn("rAtq.name"))
 		.setDescriptionLocalizations(cmdLn("rAtq.description"))
 		.setDefaultMemberPermissions(0),
-	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+	async autocomplete(
+		interaction: Djs.AutocompleteInteraction,
+		client: EClient,
+	) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const focused = options.getFocused(true);
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !db.templateID) return;
 		const user = client.settings.get(
 			interaction.guild!.id,
-			`user.${interaction.user.id}`
+			`user.${interaction.user.id}`,
 		);
 		if (!user && !db.templateID.damageName) return;
 		let choices: string[] = [];
@@ -52,7 +64,7 @@ export default {
 				if (!template) choices = choices.concat(db.templateID.damageName);
 				else if (template.damage) {
 					choices = choices.concat(
-						filterStatsInDamage(template.damage, db.templateID.damageName)
+						filterStatsInDamage(template.damage, db.templateID.damageName),
 					);
 				}
 			}
@@ -92,14 +104,17 @@ export default {
 			filter.map((result) => ({
 				name: capitalizeBetweenPunct(result.capitalize()),
 				value: result,
-			}))
+			})),
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !interaction.guild || !interaction.channel) return;
-		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
+		const user = client.settings.get(
+			interaction.guild.id,
+			`user.${interaction.user.id}`,
+		);
 		const { ul } = getLangAndConfig(client, interaction);
 		if (!user && !db.templateID?.damageName?.length) {
 			await reply(interaction, {
@@ -116,22 +131,27 @@ export default {
 				interaction.user.id,
 				interaction,
 				charName,
-				{ skipNotFound: true }
+				{ skipNotFound: true },
 			);
-			const selectedCharByQueries = serializeName(userStatistique, charName);
+			const selectedCharByQueries = isSerializedNameEquals(
+				userStatistique,
+				charName,
+			);
 			if (charOptions && !selectedCharByQueries) {
 				await reply(interaction, {
 					embeds: [
 						embedError(
 							ul("error.user.charName", { charName: charOptions.capitalize() }),
-							ul
+							ul,
 						),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 				return;
 			}
-			charOptions = userStatistique?.userName ? userStatistique.userName : undefined;
+			charOptions = userStatistique?.userName
+				? userStatistique.userName
+				: undefined;
 			if (!userStatistique && !charName) {
 				const char = await getFirstChar(client, interaction, ul, true);
 				userStatistique = char?.userStatistique;
@@ -160,8 +180,10 @@ export default {
 					await reply(interaction, {
 						embeds: [
 							embedError(
-								ul("error.template.notFound", { guildId: interaction.guild.name }),
-								ul
+								ul("error.template.notFound", {
+									guildId: interaction.guild.name,
+								}),
+								ul,
 							),
 						],
 						flags: Djs.MessageFlags.Ephemeral,
@@ -191,7 +213,7 @@ export default {
 				userStatistique,
 				options,
 				ul,
-				charOptions
+				charOptions,
 			);
 		} catch (e) {
 			logger.fatal(e);

@@ -27,7 +27,8 @@ import {
 	getLangAndConfig,
 	haveAccess,
 	searchUserChannel,
-	serializeName,
+	isSerializedNameEquals,
+	fetchChannel,
 } from "utils";
 
 export function getUserByEmbed(
@@ -141,17 +142,17 @@ export async function getUser(
 
 	if (!channel) {
 		//get the channel from the guild
-		const fetchChannel = await guild.channels.fetch(sheetLocation.channelId);
+		const fetchedChannel = await fetchChannel(guild, sheetLocation.channelId);
 		// noinspection SuspiciousTypeOfGuard
 		if (
-			!fetchChannel ||
-			fetchChannel instanceof Djs.CategoryChannel ||
-			fetchChannel instanceof Djs.ForumChannel ||
-			fetchChannel instanceof Djs.MediaChannel
+			!fetchedChannel ||
+			fetchedChannel instanceof Djs.CategoryChannel ||
+			fetchedChannel instanceof Djs.ForumChannel ||
+			fetchedChannel instanceof Djs.MediaChannel
 		)
 			return;
 
-		channel = fetchChannel;
+		channel = fetchedChannel;
 	}
 	try {
 		if ("messages" in channel) {
@@ -440,7 +441,10 @@ export async function getStatistics(
 		charName,
 		{ skipNotFound: true },
 	);
-	const selectedCharByQueries = serializeName(userStatistique, charName);
+	const selectedCharByQueries = isSerializedNameEquals(
+		userStatistique,
+		charName,
+	);
 
 	if (optionChar && !selectedCharByQueries) {
 		await reply(interaction, {

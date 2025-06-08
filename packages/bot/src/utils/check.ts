@@ -1,10 +1,11 @@
 import { findln, ln, t } from "@dicelette/localization";
-import type { Settings, UserData, Databases } from "@dicelette/types";
+import type { Settings, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { verifyIfEmbedInDB } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, reply } from "messages";
+import { getLangAndConfig } from "./fetch";
 
 /**
  * Determines whether a user is permitted to edit a Discord message embed in an interaction.
@@ -19,7 +20,7 @@ import { embedError, ensureEmbed, reply } from "messages";
 export async function allowEdit(
 	interaction: Djs.ButtonInteraction | Djs.StringSelectMenuInteraction,
 	db: Settings,
-	interactionUser: Djs.User
+	interactionUser: Djs.User,
 ) {
 	const ul = ln(interaction.locale as Djs.Locale);
 	const embed = ensureEmbed(interaction.message);
@@ -33,16 +34,18 @@ export async function allowEdit(
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	const first = interaction.customId.includes("first");
 	const userName = embed.fields.find((field) =>
-		["common.character", "common.charName"].includes(findln(field.name))
+		["common.character", "common.charName"].includes(findln(field.name)),
 	);
 	const userNameValue =
-		userName && findln(userName?.value) === "common.noSet" ? undefined : userName?.value;
+		userName && findln(userName?.value) === "common.noSet"
+			? undefined
+			: userName?.value;
 	if (!first && user) {
 		const { isInDb, coord } = verifyIfEmbedInDB(
 			db,
 			interaction.message,
 			user,
-			userNameValue
+			userNameValue,
 		);
 		if (!isInDb) {
 			const urlNew = `https://discord.com/channels/${interaction.guild!.id}/${coord?.channelId}/${coord?.messageId}`;
@@ -69,15 +72,15 @@ export async function allowEdit(
 
 export async function isUserNameOrId(
 	userId: string,
-	interaction: Djs.ModalSubmitInteraction
+	interaction: Djs.ModalSubmitInteraction,
 ) {
 	if (!userId.match(/^\d+$/))
 		return (await interaction.guild!.members.fetch({ query: userId })).first();
 	return await interaction.guild!.members.fetch({ user: userId });
 }
-export function serializeName(
+export function isSerializedNameEquals(
 	userStatistique: UserData | undefined,
-	charName: string | undefined
+	charName: string | undefined,
 ) {
 	const serializedNameDB = userStatistique?.userName?.standardize(true);
 	const serializedNameQueries = charName?.standardize(true);
@@ -96,7 +99,7 @@ export function serializeName(
  */
 export async function optionInteractions(
 	interaction: Djs.CommandInteraction,
-	client: EClient
+	client: EClient,
 ) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const {
@@ -111,7 +114,7 @@ export async function optionInteractions(
 					ul("error.template.notFound", {
 						guildId: interaction.guild?.name ?? interaction.guildId,
 					}),
-					ul
+					ul,
 				),
 			],
 		});
@@ -123,7 +126,7 @@ export async function optionInteractions(
 
 export function isValidChannel(
 	channel: Djs.GuildBasedChannel | null | undefined | Djs.TextBasedChannel,
-	interaction: Djs.CommandInteraction | Djs.BaseInteraction
+	interaction: Djs.CommandInteraction | Djs.BaseInteraction,
 ) {
 	return (
 		channel &&
@@ -142,31 +145,4 @@ export function isValidInteraction(interaction: Djs.BaseInteraction) {
 		interaction.type === Djs.InteractionType.MessageComponent ||
 		interaction.type === Djs.InteractionType.ModalSubmit
 	);
-}
-
-export function getLangAndConfig(
-	client: EClient,
-	interaction: Djs.BaseInteraction,
-	guildId?: string
-) {
-	const langToUse = getLangFromInteraction(interaction, client, guildId);
-	const ul = ln(langToUse);
-	const config = client.settings.get(guildId ?? interaction.guild!.id);
-	return { langToUse, ul, config };
-}
-
-export function getLangFromInteraction(
-	interaction: Djs.BaseInteraction,
-	client: EClient,
-	guildId?: string
-): Djs.Locale {
-	if (!guildId) guildId = interaction.guild!.id;
-	const guildLocale = client.guildLocale?.get(guildId);
-	if (guildLocale) return guildLocale;
-	const locale =
-		client.settings.get(guildId, "lang") ??
-		interaction.guild?.preferredLocale ??
-		interaction.locale;
-	client.guildLocale.set(guildId, locale);
-	return locale;
 }
