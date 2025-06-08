@@ -97,7 +97,18 @@ export async function createEmbedFirstPage(
 	if (!channel) {
 		throw new NoChannel();
 	}
-	const userFromField = interaction.fields.getTextInputValue("userID");
+	const selfRegister = client.settings.get(
+		interaction.guild!.id,
+		"allowSelfRegister",
+	);
+	const moderator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	const userFromField =
+		!selfRegister || moderator
+			? interaction.fields.getTextInputValue("userID")
+			: interaction.user.id;
+	logger.trace(`User from field: ${userFromField}`);
 	const user = await isUserNameOrId(userFromField, interaction);
 	if (!user) {
 		await reply(interaction, {
@@ -111,7 +122,6 @@ export async function createEmbedFirstPage(
 	const isPrivate =
 		interaction.fields.getTextInputValue("private")?.toLowerCase() === "x";
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
-	logger.trace("avatar", avatar);
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	const privateChannel = client.settings.get(
 		interaction.guild!.id,
@@ -120,7 +130,7 @@ export async function createEmbedFirstPage(
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel.length > 0) sheetId = customChannel;
 
-	const verifiedAvatar = verifyAvatarUrl(avatar);
+	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : "";
 	const existChannel = sheetId
 		? fetchChannel(interaction.guild!, sheetId)
 		: undefined;
