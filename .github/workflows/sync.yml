@@ -1,0 +1,17 @@
+name: Sync changelog with documentation
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+    paths: ["CHANGELOG.md"]
+  workflow_dispatch:
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@main
+            - uses: BetaHuhn/repo-file-sync-action@latest
+              with:
+                GH_PAT: ${{secrets.GH_PAT}}
+                SKIP_PR: true

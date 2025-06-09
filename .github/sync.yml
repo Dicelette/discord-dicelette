@@ -1,0 +1,7 @@
+Dicelette/i18n:
+  - source: CHANGELOG.md
+    target: en/docusaurus-plugin-content-docs/current/dev/CHANGELOG.md
+
+Dicelette/fr-docs:
+  - source: CHANGELOG.md
+    target: docs/dev/CHANGELOG.md
