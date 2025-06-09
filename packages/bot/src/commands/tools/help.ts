@@ -5,7 +5,6 @@ import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 import { getLangAndConfig } from "../../utils";
-
 export const help = {
 	data: new Djs.SlashCommandBuilder()
 		.setName(t("help.name"))
@@ -53,8 +52,8 @@ export const help = {
 	): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
-		const { ul } = getLangAndConfig(client, interaction);
-		const link = interaction.locale === "fr" ? LINKS.fr : LINKS.en;
+		const { ul, langToUse } = getLangAndConfig(client, interaction);
+		const link = langToUse === "fr" ? LINKS.fr : LINKS.en;
 		const commandsID = await interaction.guild?.commands.fetch();
 		if (!commandsID) return;
 		switch (subcommand) {
@@ -98,6 +97,7 @@ export const help = {
 							dbroll: helpDBCmd?.[t("dbRoll.name")],
 							graph: helpDBCmd?.[t("graph.name")],
 							display: helpDBCmd?.[t("display.title")],
+							calc: helpDBCmd?.[t("calc.title")],
 						}),
 					),
 				});
@@ -114,6 +114,8 @@ export const help = {
 							delete: idsAdmin?.[t("timer.name")],
 							display: idsAdmin?.[t("config.display.name")],
 							timestamp: idsAdmin?.[t("timestamp.name")],
+							self_register: idsAdmin?.[t("config.selfRegister.name")],
+							language: idsAdmin?.[t("config.lang.options.name")],
 						}),
 					),
 				});
@@ -126,15 +128,17 @@ export const help = {
 				await interaction.followUp({
 					content: dedent(
 						ul("help.admin.messageDB", {
-							deleteChar: idsAdminDB?.[t("deleteChar.name")],
+							delete_char: idsAdminDB?.[t("deleteChar.name")],
 							stat: idsAdminDB?.["auto_role statistic"],
 							dice: idsAdminDB?.["auto_role dice"],
 							gm: {
 								dBd: idsAdminDB?.["gm dbd"],
 								dbRoll: idsAdminDB?.["gm dbroll"],
+								calc: idsAdminDB?.["gm calc"],
 							},
 							dbroll: idsAdminDB?.[t("dbRoll.name")],
 							dbd: idsAdminDB?.[t("rAtq.name")],
+							calc: idsAdminDB?.[t("calc.title")],
 						}),
 					),
 				});
@@ -152,6 +156,7 @@ function getHelpDBCmd(
 		t("dbRoll.name"),
 		t("graph.name"),
 		t("display.title"),
+		t("calc.title"),
 	];
 	const ids: Record<string, string | undefined> = {};
 	for (const cmd of commandToFind) {
@@ -173,6 +178,7 @@ function createHelpMessageDB(
 		dbroll: ids?.[t("dbRoll.name")],
 		graph: ids?.[t("graph.name")],
 		display: ids?.[t("display.title")],
+		calc: ids?.[t("calc.title")],
 	});
 }
 
@@ -191,6 +197,8 @@ function getConfigIds(
 	ids[t("config.display.name")] = idConfig;
 	ids[t("timestamp.name")] = idConfig;
 	ids[t("config.lang.name")] = idConfig;
+	ids[t("config.selfRegister.name")] = idConfig;
+	ids[t("config.lang.options.name")] = idConfig;
 	return ids;
 }
 
@@ -206,6 +214,7 @@ function getIDForAdminDB(
 		t("mjRoll.name"),
 		t("dbRoll.name"),
 		t("rAtq.name"),
+		t("calc.title"),
 	];
 	const ids: Record<string, string | undefined> = {};
 	for (const cmd of commandToFind) {
@@ -214,6 +223,7 @@ function getIDForAdminDB(
 			if (id) {
 				ids["gm dbd"] = id;
 				ids["gm dbroll"] = id;
+				ids["gm calc"] = id;
 			}
 		} else if (cmd === t("config.name")) {
 			const id = commandsID.findKey((command) => command.name === cmd);

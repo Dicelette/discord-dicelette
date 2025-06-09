@@ -5,9 +5,10 @@
 	"type": "module",
 	"main": "dist/index.js",
 	"scripts": {
-		"prebuild": "rimraf dist",
+		"prebuild": "rimraf dist && tsx docs/build-help.ts",
 		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json",
-		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+		"help": "tsx docs/build-help.ts"
 	},
 	"repository": {
 		"type": "git",
