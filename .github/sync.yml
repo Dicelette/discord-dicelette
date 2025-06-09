@@ -4,4 +4,4 @@ Dicelette/i18n:
 
 Dicelette/fr-docs:
   - source: CHANGELOG.md
-    dest: docs/dev/CHANGELOG.md
+    dest: dev/CHANGELOG.md
