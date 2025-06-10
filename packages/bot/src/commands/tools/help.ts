@@ -16,40 +16,37 @@ export const help = {
 				.setName(t("help.info.name"))
 				.setNameLocalizations(cmdLn("help.info.name"))
 				.setDescription(t("help.info.description"))
-				.setDescriptionLocalizations(cmdLn("help.info.description")),
+				.setDescriptionLocalizations(cmdLn("help.info.description"))
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.bug.name"))
 				.setNameLocalizations(cmdLn("help.bug.name"))
 				.setDescription(t("help.bug.description"))
-				.setDescriptionLocalizations(cmdLn("help.bug.description")),
+				.setDescriptionLocalizations(cmdLn("help.bug.description"))
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.fr.name"))
 				.setNameLocalizations(cmdLn("help.fr.name"))
 				.setDescription(t("help.fr.description"))
-				.setDescriptionLocalizations(cmdLn("help.fr.description")),
+				.setDescriptionLocalizations(cmdLn("help.fr.description"))
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.admin.name"))
 				.setNameLocalizations(cmdLn("help.admin.name"))
 				.setDescription(t("help.admin.description"))
-				.setDescriptionLocalizations(cmdLn("help.admin.description")),
+				.setDescriptionLocalizations(cmdLn("help.admin.description"))
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName(t("help.register.name"))
 				.setNameLocalizations(cmdLn("help.register.name"))
 				.setDescription(t("help.register.description"))
-				.setDescriptionLocalizations(cmdLn("help.register.description")),
+				.setDescriptionLocalizations(cmdLn("help.register.description"))
 		),
-	async execute(
-		interaction: Djs.CommandInteraction,
-		client: EClient,
-	): Promise<void> {
+	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		const { ul, langToUse } = getLangAndConfig(client, interaction);
@@ -59,9 +56,7 @@ export const help = {
 		switch (subcommand) {
 			case t("help.info.name"): {
 				const rollID = commandsID.findKey((command) => command.name === "roll");
-				const sceneID = commandsID.findKey(
-					(command) => command.name === "scene",
-				);
+				const sceneID = commandsID.findKey((command) => command.name === "scene");
 				const msg = ul("help.message", {
 					rollId: rollID,
 					sceneId: sceneID,
@@ -69,7 +64,7 @@ export const help = {
 						interaction.guild!.id,
 						ul,
 						client.settings,
-						commandsID,
+						commandsID
 					),
 				});
 				await reply(interaction, { content: dedent(msg) });
@@ -98,7 +93,7 @@ export const help = {
 							graph: helpDBCmd?.[t("graph.name")],
 							display: helpDBCmd?.[t("display.title")],
 							calc: helpDBCmd?.[t("calc.title")],
-						}),
+						})
 					),
 				});
 				break;
@@ -116,13 +111,13 @@ export const help = {
 							timestamp: idsAdmin?.[t("timestamp.name")],
 							self_register: idsAdmin?.[t("config.selfRegister.name")],
 							language: idsAdmin?.[t("config.lang.options.name")],
-						}),
+						})
 					),
 				});
 				const idsAdminDB = getIDForAdminDB(
 					commandsID,
 					client.settings,
-					interaction.guild!.id,
+					interaction.guild!.id
 				);
 				if (!idsAdminDB) return;
 				await interaction.followUp({
@@ -139,7 +134,7 @@ export const help = {
 							dbroll: idsAdminDB?.[t("dbRoll.name")],
 							dbd: idsAdminDB?.[t("rAtq.name")],
 							calc: idsAdminDB?.[t("calc.title")],
-						}),
+						})
 					),
 				});
 				break;
@@ -149,7 +144,7 @@ export const help = {
 };
 
 function getHelpDBCmd(
-	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
 	const commandToFind = [
 		t("rAtq.name"),
@@ -169,7 +164,7 @@ function createHelpMessageDB(
 	guildID: Djs.Snowflake,
 	ul: Translation,
 	db: Settings,
-	commandsID?: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
+	commandsID?: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
 	if (!db.has(guildID, "templateID") || !commandsID) return "";
 	const ids = getHelpDBCmd(commandsID);
@@ -183,12 +178,10 @@ function createHelpMessageDB(
 }
 
 function getConfigIds(
-	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
 	const ids: Record<string, string | undefined> = {};
-	const idConfig = commandsID.findKey(
-		(command) => command.name === t("config.name"),
-	);
+	const idConfig = commandsID.findKey((command) => command.name === t("config.name"));
 	if (!idConfig) return;
 
 	ids[t("logs.name")] = idConfig;
@@ -205,7 +198,7 @@ function getConfigIds(
 function getIDForAdminDB(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 	db: Settings,
-	guildID: Djs.Snowflake,
+	guildID: Djs.Snowflake
 ) {
 	if (!db.has(guildID, "templateID")) return;
 	const commandToFind = [

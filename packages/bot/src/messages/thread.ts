@@ -25,12 +25,11 @@ export async function createDefaultThread(
 	parent: Djs.ThreadChannel | Djs.TextChannel,
 	guildData: Settings,
 	interaction: Djs.BaseInteraction,
-	save = true,
+	save = true
 ) {
-	if (parent instanceof Djs.ThreadChannel)
-		parent = parent.parent as Djs.TextChannel;
+	if (parent instanceof Djs.ThreadChannel) parent = parent.parent as Djs.TextChannel;
 	let thread = (await parent.threads.fetch()).threads.find(
-		(thread) => thread.name === "📝 • [STATS]",
+		(thread) => thread.name === "📝 • [STATS]"
 	) as Djs.AnyThreadChannel | undefined;
 	if (!thread) {
 		thread = (await parent.threads.create({
@@ -49,7 +48,7 @@ export async function setTagsForRoll(forum: Djs.ForumChannel) {
 	//check if the tags `🪡 roll logs` exists
 	const allTags = forum.availableTags;
 	const diceRollTag = allTags.find(
-		(tag) => tag.name === "Dice Roll" && tag.emoji?.name === "🪡",
+		(tag) => tag.name === "Dice Roll" && tag.emoji?.name === "🪡"
 	);
 	if (diceRollTag) return diceRollTag;
 
@@ -68,7 +67,7 @@ export async function setTagsForRoll(forum: Djs.ForumChannel) {
 	await forum.setAvailableTags(availableTags);
 
 	return forum.availableTags.find(
-		(tag) => tag.name === "Dice Roll" && tag.emoji?.name === "🪡",
+		(tag) => tag.name === "Dice Roll" && tag.emoji?.name === "🪡"
 	) as Djs.GuildForumTagData;
 }
 
@@ -98,14 +97,12 @@ export async function repostInThread(
 	which: { stats?: boolean; dice?: boolean; template?: boolean },
 	guildData: Settings,
 	threadId: string,
-	characters: Characters,
+	characters: Characters
 ) {
 	userTemplate.userName = userTemplate.userName
 		? userTemplate.userName.toLowerCase()
 		: undefined;
-	const damageName = userTemplate.damage
-		? Object.keys(userTemplate.damage)
-		: undefined;
+	const damageName = userTemplate.damage ? Object.keys(userTemplate.damage) : undefined;
 	const channel = interaction.channel;
 	// noinspection SuspiciousTypeOfGuard
 	if (!channel || channel instanceof Djs.CategoryChannel) return;
@@ -113,23 +110,14 @@ export async function repostInThread(
 		throw new Error(
 			ul("error.generic.e", {
 				e: "No server data found in database for this server.",
-			}),
+			})
 		);
 	const dataToSend = {
 		embeds: embed,
-		components: [
-			editUserButtons(ul, which.stats, which.dice),
-			selectEditMenu(ul),
-		],
+		components: [editUserButtons(ul, which.stats, which.dice), selectEditMenu(ul)],
 	};
 	let isForumThread = false;
-	let thread = await searchUserChannel(
-		guildData,
-		interaction,
-		ul,
-		threadId,
-		true,
-	);
+	let thread = await searchUserChannel(guildData, interaction, ul, threadId, true);
 	let msg: Djs.Message | undefined;
 	if (!thread) {
 		const channel = await fetchChannel(interaction.guild!, threadId);
@@ -140,9 +128,7 @@ export async function repostInThread(
 				(await interaction.guild?.members.fetch(userId))?.displayName;
 			//create a new thread in the forum
 			const newThread = await channel.threads.create({
-				name:
-					userName ??
-					`${ul("common.sheet")} ${ul("common.character").toUpperCase()}`,
+				name: userName ?? `${ul("common.sheet")} ${ul("common.character").toUpperCase()}`,
 				autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneWeek,
 				message: dataToSend,
 			});
@@ -154,7 +140,7 @@ export async function repostInThread(
 			const ping = await thread.send(
 				interaction.user.id !== userId
 					? `<@${interaction.user.id}> || <@${userId}>`
-					: `<@${interaction.user.id}>`,
+					: `<@${interaction.user.id}>`
 			);
 			await deleteAfter(ping, 5000);
 		}
@@ -175,15 +161,9 @@ export async function repostInThread(
 		damage: damageName,
 		msgId: [msg.id, thread.id],
 	};
-	const userData = await updateMemory(
-		characters,
-		interaction.guild!.id,
-		userId,
-		ul,
-		{
-			userData: userTemplate,
-		},
-	);
+	const userData = await updateMemory(characters, interaction.guild!.id, userId, ul, {
+		userData: userTemplate,
+	});
 	logger.trace("User data updated", userData);
 	await registerUser(userRegister, interaction, guildData);
 }
@@ -207,7 +187,7 @@ export async function findLocation(
 	client: EClient,
 	ul: Translation,
 	charData: CharDataWithName,
-	user?: Djs.User | null,
+	user?: Djs.User | null
 ): Promise<{
 	thread?:
 		| Djs.PrivateThreadChannel
@@ -224,7 +204,7 @@ export async function findLocation(
 		client.settings,
 		interaction,
 		ul,
-		sheetLocation?.channelId,
+		sheetLocation?.channelId
 	);
 	if (!thread) {
 		await reply(interaction, {
@@ -232,11 +212,7 @@ export async function findLocation(
 		});
 		return { sheetLocation };
 	}
-	const allowHidden = haveAccess(
-		interaction,
-		thread.id,
-		user?.id ?? interaction.user.id,
-	);
+	const allowHidden = haveAccess(interaction, thread.id, user?.id ?? interaction.user.id);
 	if (!allowHidden && charData[user?.id ?? interaction.user.id]?.isPrivate) {
 		await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
 		return { sheetLocation };
@@ -259,7 +235,7 @@ export async function findThread(
 	db: Settings,
 	channel: Djs.TextChannel,
 	ul: Translation,
-	hidden?: string,
+	hidden?: string
 ) {
 	const guild = channel.guild.id;
 	const rollChannelId = !hidden ? db.get(guild, "rollChannel") : hidden;
@@ -280,11 +256,7 @@ export async function findThread(
 				db.delete(guild, "hiddenRoll");
 				command = `${ul("config.name")} ${ul("hidden.title")}`;
 			} else db.delete(guild, "rollChannel");
-			await sendLogs(
-				ul("error.roll.channelNotFound", { command }),
-				channel.guild,
-				db,
-			);
+			await sendLogs(ul("error.roll.channelNotFound", { command }), channel.guild, db);
 		}
 	}
 	await channel.threads.fetch();
@@ -299,27 +271,20 @@ export async function findThread(
 	});
 	const threadName = `🎲 ${channel.name.replaceAll("-", " ")}`;
 	const thread = mostRecentThread.find(
-		(thread) => thread.name.decode().startsWith("🎲") && !thread.archived,
+		(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
 	);
 	if (thread) {
 		const threadThatMustBeArchived = mostRecentThread.filter(
-			(tr) =>
-				tr.name.decode().startsWith("🎲") &&
-				!tr.archived &&
-				tr.id !== thread.id,
+			(tr) => tr.name.decode().startsWith("🎲") && !tr.archived && tr.id !== thread.id
 		);
 		for (const thread of threadThatMustBeArchived) {
 			await thread[1].setArchived(true);
 		}
 		return thread;
 	}
-	if (
-		mostRecentThread.find(
-			(thread) => thread.name === threadName && thread.archived,
-		)
-	) {
+	if (mostRecentThread.find((thread) => thread.name === threadName && thread.archived)) {
 		const thread = mostRecentThread.find(
-			(thread) => thread.name === threadName && thread.archived,
+			(thread) => thread.name === threadName && thread.archived
 		);
 		if (thread) {
 			await thread.setArchived(false);
@@ -353,7 +318,7 @@ export async function findForumChannel(
 	thread: Djs.ThreadChannel | Djs.TextChannel,
 	db: Settings,
 	ul: Translation,
-	hidden?: string,
+	hidden?: string
 ) {
 	const guild = forum.guild.id;
 	const rollChannelId = !hidden ? db.get(guild, "rollChannel") : hidden;
@@ -374,11 +339,7 @@ export async function findForumChannel(
 				db.delete(guild, "hiddenRoll");
 				command = `${ul("config.name")} ${ul("hidden.title")}`;
 			} else db.delete(guild, "rollChannel");
-			await sendLogs(
-				ul("error.roll.channelNotFound", { command }),
-				forum.guild,
-				db,
-			);
+			await sendLogs(ul("error.roll.channelNotFound", { command }), forum.guild, db);
 		}
 	}
 	const allForumChannel = forum.threads.cache.sort((a, b) => {
@@ -390,9 +351,7 @@ export async function findForumChannel(
 		return 0;
 	});
 	const topic = thread.name;
-	const rollTopic = allForumChannel.find(
-		(thread) => thread.name === `🎲 ${topic}`,
-	);
+	const rollTopic = allForumChannel.find((thread) => thread.name === `🎲 ${topic}`);
 	const tags = await setTagsForRoll(forum);
 	if (rollTopic) {
 		//archive all other roll topic
@@ -418,10 +377,9 @@ export async function threadToSend(
 		| Djs.PublicThreadChannel<boolean>
 		| Djs.VoiceChannel,
 	ul: Translation,
-	isHidden?: string,
+	isHidden?: string
 ) {
-	const parentChannel =
-		channel instanceof Djs.ThreadChannel ? channel.parent : channel;
+	const parentChannel = channel instanceof Djs.ThreadChannel ? channel.parent : channel;
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)
 		: await findForumChannel(
@@ -429,6 +387,6 @@ export async function threadToSend(
 				channel as Djs.ThreadChannel,
 				db,
 				ul,
-				isHidden,
+				isHidden
 			);
 }

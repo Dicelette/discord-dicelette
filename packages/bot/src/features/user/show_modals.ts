@@ -9,7 +9,7 @@ export async function startRegisterUser(
 	interactionUser: Djs.User,
 	ul: Translation,
 	havePrivate?: boolean,
-	selfRegister?: boolean,
+	selfRegister?: boolean
 ) {
 	const moderatorPermission = interaction.guild?.members.cache
 		.get(interactionUser.id)
@@ -23,7 +23,7 @@ export async function startRegisterUser(
 			ul,
 			havePrivate,
 			selfRegister,
-			moderatorPermission,
+			moderatorPermission
 		);
 	else
 		await reply(interaction, {
@@ -41,13 +41,12 @@ export async function showFirstPageModal(
 	ul: Translation,
 	havePrivate?: boolean,
 	selfRegister?: boolean,
-	isModerator?: boolean,
+	isModerator?: boolean
 ) {
 	let nbOfPages = 1;
 	if (template.statistics) {
 		const nbOfStatistique = Object.keys(template.statistics).length;
-		nbOfPages =
-			Math.ceil(nbOfStatistique / 5) > 0 ? Math.ceil(nbOfStatistique / 5) : 2;
+		nbOfPages = Math.ceil(nbOfStatistique / 5) > 0 ? Math.ceil(nbOfStatistique / 5) : 2;
 	}
 
 	const modal = new Djs.ModalBuilder()
@@ -61,7 +60,7 @@ export async function showFirstPageModal(
 				.setPlaceholder(ul("modals.charName.description"))
 				.setRequired(template.charName || false)
 				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short),
+				.setStyle(Djs.TextInputStyle.Short)
 		);
 
 	const userIdInputs =
@@ -72,7 +71,7 @@ export async function showFirstPageModal(
 				.setPlaceholder(ul("modals.user.description"))
 				.setRequired(true)
 				.setValue(interaction.user.username ?? interaction.user.id)
-				.setStyle(Djs.TextInputStyle.Short),
+				.setStyle(Djs.TextInputStyle.Short)
 		);
 	const avatarInputs =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
@@ -82,7 +81,7 @@ export async function showFirstPageModal(
 				.setPlaceholder(ul("modals.avatar.description"))
 				.setRequired(false)
 				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short),
+				.setStyle(Djs.TextInputStyle.Short)
 		);
 	const channelIdInput =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
@@ -92,7 +91,7 @@ export async function showFirstPageModal(
 				.setPlaceholder(ul("modals.channel.description"))
 				.setRequired(false)
 				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short),
+				.setStyle(Djs.TextInputStyle.Short)
 		);
 	const components = [charNameInput, avatarInputs, channelIdInput];
 	if (!selfRegister || isModerator) components.push(userIdInputs);
@@ -105,7 +104,7 @@ export async function showFirstPageModal(
 					.setPlaceholder(ul("modals.private.description"))
 					.setRequired(false)
 					.setValue("")
-					.setStyle(Djs.TextInputStyle.Short),
+					.setStyle(Djs.TextInputStyle.Short)
 			);
 		components.push(privateInput);
 	}

@@ -1,11 +1,6 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import {
-	cleanAvatarUrl,
-	logger,
-	NoChannel,
-	verifyAvatarUrl,
-} from "@dicelette/utils";
+import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
@@ -30,7 +25,7 @@ import {
 export async function pageNumber(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
-	client: EClient,
+	client: EClient
 ) {
 	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
@@ -42,7 +37,7 @@ export async function pageNumber(
 					ul("error.template.notFound", {
 						guildId: interaction.guild?.name ?? interaction.guildId,
 					}),
-					ul,
+					ul
 				),
 			],
 		});
@@ -52,7 +47,7 @@ export async function pageNumber(
 		interaction,
 		template,
 		Number.parseInt(pageNumber, 10),
-		getLangAndConfig(client, interaction).langToUse,
+		getLangAndConfig(client, interaction).langToUse
 	);
 }
 
@@ -63,13 +58,9 @@ export async function pageNumber(
  */
 export async function recordFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
-	client: EClient,
+	client: EClient
 ) {
-	if (
-		!interaction.guild ||
-		!interaction.channel ||
-		interaction.channel.isDMBased()
-	)
+	if (!interaction.guild || !interaction.channel || interaction.channel.isDMBased())
 		return;
 	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) return;
@@ -90,17 +81,14 @@ export async function recordFirstPage(
 export async function createEmbedFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
-	client: EClient,
+	client: EClient
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const channel = interaction.channel;
 	if (!channel) {
 		throw new NoChannel();
 	}
-	const selfRegister = client.settings.get(
-		interaction.guild!.id,
-		"allowSelfRegister",
-	);
+	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
 	const moderator = interaction.guild?.members.cache
 		.get(interaction.user.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
@@ -123,17 +111,12 @@ export async function createEmbedFirstPage(
 		interaction.fields.getTextInputValue("private")?.toLowerCase() === "x";
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
-	const privateChannel = client.settings.get(
-		interaction.guild!.id,
-		"privateChannel",
-	);
+	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel.length > 0) sheetId = customChannel;
 
 	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : "";
-	const existChannel = sheetId
-		? fetchChannel(interaction.guild!, sheetId)
-		: undefined;
+	const existChannel = sheetId ? fetchChannel(interaction.guild!, sheetId) : undefined;
 	if (!existChannel) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.channel.thread"), ul)],
@@ -160,7 +143,7 @@ export async function createEmbedFirstPage(
 				name: ul("common.isPrivate"),
 				value: isPrivate ? "✓" : "✕",
 				inline: true,
-			},
+			}
 		);
 	if (sheetId) {
 		embed.addFields({ name: "_ _", value: "_ _", inline: true });

@@ -19,13 +19,9 @@ export async function searchUserChannel(
 	interaction: Djs.BaseInteraction,
 	ul: Translation,
 	channelId: string,
-	register?: boolean,
+	register?: boolean
 ): Promise<DiscordChannel> {
-	let thread:
-		| Djs.TextChannel
-		| Djs.AnyThreadChannel
-		| undefined
-		| Djs.GuildBasedChannel;
+	let thread: Djs.TextChannel | Djs.AnyThreadChannel | undefined | Djs.GuildBasedChannel;
 	const msg = ul("error.channel.thread");
 	const embeds = [embedError(msg, ul)];
 	try {

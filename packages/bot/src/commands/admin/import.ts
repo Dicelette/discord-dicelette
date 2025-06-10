@@ -30,14 +30,14 @@ export const bulkAdd = {
 				.setNameLocalizations(cmdLn("import.options.name"))
 				.setDescription(t("import.options.description"))
 				.setDescriptionLocalizations(cmdLn("import.options.description"))
-				.setRequired(true),
+				.setRequired(true)
 		)
 		.addBooleanOption((option) =>
 			option
 				.setName(t("import.delete.title"))
 				.setNameLocalizations(cmdLn("import.delete.title"))
 				.setDescription(t("import.delete.description"))
-				.setDescriptionLocalizations(cmdLn("import.delete.description")),
+				.setDescriptionLocalizations(cmdLn("import.delete.description"))
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -55,8 +55,7 @@ export const bulkAdd = {
 		if (!guildTemplate) {
 			return reply(interaction, {
 				content: ul("error.template.notFound", {
-					guildId:
-						interaction.guild?.name ?? interaction.guildId ?? "unknow guild",
+					guildId: interaction.guild?.name ?? interaction.guildId ?? "unknow guild",
 				}),
 			});
 		}
@@ -65,16 +64,10 @@ export const bulkAdd = {
 			guildTemplate,
 			interaction,
 			!!client.settings.get(interaction.guild!.id, "privateChannel"),
-			langToUse,
+			langToUse
 		);
-		const defaultChannel = client.settings.get(
-			interaction.guild!.id,
-			"managerId",
-		);
-		const privateChannel = client.settings.get(
-			interaction.guild!.id,
-			"privateChannel",
-		);
+		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
+		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 		if (!defaultChannel) {
 			return reply(interaction, {
 				content: ul("error.channel.defaultChannel"),
@@ -83,8 +76,7 @@ export const bulkAdd = {
 		const guildMembers = await interaction.guild?.members.fetch();
 		for (const [user, data] of Object.entries(members)) {
 			//we already parsed the user, so the cache should be up to date
-			let member: Djs.GuildMember | Djs.User | undefined =
-				guildMembers!.get(user);
+			let member: Djs.GuildMember | Djs.User | undefined = guildMembers!.get(user);
 			if (!member || !member.user) {
 				continue;
 			}
@@ -94,7 +86,7 @@ export const bulkAdd = {
 					ul,
 					char.avatar ?? member.avatarURL() ?? member.defaultAvatarURL,
 					member.id,
-					char.userName ?? undefined,
+					char.userName ?? undefined
 				);
 
 				const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
@@ -157,7 +149,7 @@ export const bulkAdd = {
 					userDataEmbed,
 					statsEmbed,
 					diceEmbed,
-					templateEmbed,
+					templateEmbed
 				);
 				if (options.getBoolean(t("import.delete.title"))) {
 					//delete old message if it exists
@@ -166,7 +158,7 @@ export const bulkAdd = {
 						member.id,
 						interaction,
 						char.userName,
-						{ fetchChannel: true, fetchMessage: true },
+						{ fetchChannel: true, fetchMessage: true }
 					);
 					if (oldChar) {
 						const channelId = oldChar.channel;
@@ -175,9 +167,9 @@ export const bulkAdd = {
 							const messageId = oldChar.messageId;
 							if (channel && messageId) {
 								try {
-									const oldMessage = await (
-										channel as DiscordChannel
-									)?.messages.fetch(messageId);
+									const oldMessage = await (channel as DiscordChannel)?.messages.fetch(
+										messageId
+									);
 									if (oldMessage) await oldMessage.delete();
 								} catch (error) {
 									//skip unknown message
@@ -197,14 +189,14 @@ export const bulkAdd = {
 					client.settings,
 					char.channel ??
 						(char.private && privateChannel ? privateChannel : defaultChannel),
-					client.characters,
+					client.characters
 				);
 				await addAutoRole(
 					interaction,
 					member.id,
 					!!diceEmbed,
 					!!statsEmbed,
-					client.settings,
+					client.settings
 				);
 				await reply(interaction, {
 					content: ul("import.success", { user: Djs.userMention(member.id) }),
@@ -212,8 +204,7 @@ export const bulkAdd = {
 			}
 		}
 		let msg = ul("import.all_success");
-		if (errors.length > 0)
-			msg += `\n${ul("import.errors.global")}\n${errors.join("\n")}`;
+		if (errors.length > 0) msg += `\n${ul("import.errors.global")}\n${errors.join("\n")}`;
 		await reply(interaction, { content: msg });
 		return;
 	},

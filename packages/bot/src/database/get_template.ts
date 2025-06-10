@@ -21,7 +21,7 @@ export async function getTemplateByInteraction(
 		| Djs.ModalSubmitInteraction
 		| Djs.AutocompleteInteraction
 		| Djs.CommandInteraction,
-	client: EClient,
+	client: EClient
 ) {
 	if (!interaction.guild) return;
 	const guild = interaction.guild;
@@ -49,12 +49,11 @@ export async function getTemplate(
 	guild: Djs.Guild,
 	enmap: Settings,
 	ul: Translation,
-	skipNoFound = false,
+	skipNoFound = false
 ) {
 	const templateID = enmap.get(guild.id, "templateID");
 	if (!enmap.has(guild.id) || !templateID) {
-		if (!skipNoFound)
-			throw new Error(ul("error.guild.data", { server: guild.name }));
+		if (!skipNoFound) throw new Error(ul("error.guild.data", { server: guild.name }));
 		return undefined;
 	}
 	const { channelId, messageId } = templateID;
@@ -88,7 +87,7 @@ export async function getTemplate(
  */
 export async function fetchTemplate(
 	message: Message,
-	enmap: Settings,
+	enmap: Settings
 ): Promise<StatisticalTemplate | undefined> {
 	const template = message?.attachments.first();
 	if (!template) return;

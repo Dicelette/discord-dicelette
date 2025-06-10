@@ -5,7 +5,7 @@ import { ln } from "@dicelette/localization";
 export function getLangAndConfig(
 	client: EClient,
 	interaction: Djs.BaseInteraction,
-	guildId?: string,
+	guildId?: string
 ) {
 	const langToUse = getLangFromInteraction(interaction, client, guildId);
 	const ul = ln(langToUse);
@@ -16,7 +16,7 @@ export function getLangAndConfig(
 export function getLangFromInteraction(
 	interaction: Djs.BaseInteraction,
 	client: EClient,
-	guildId?: string,
+	guildId?: string
 ): Djs.Locale {
 	if (!guildId) guildId = interaction.guild!.id;
 	const guildLocale = client.guildLocale?.get(guildId);
@@ -31,13 +31,10 @@ export function getLangFromInteraction(
 
 export async function fetchChannel(
 	guild: Djs.Guild,
-	channelId: Djs.Snowflake,
+	channelId: Djs.Snowflake
 ): Promise<Djs.GuildBasedChannel | null> {
 	try {
-		return (
-			guild.channels.cache.get(channelId) ??
-			(await guild.channels.fetch(channelId))
-		);
+		return guild.channels.cache.get(channelId) ?? (await guild.channels.fetch(channelId));
 	} catch (error) {
 		console.error(`Failed to fetch channel with ID ${channelId}:`, error);
 		return null;

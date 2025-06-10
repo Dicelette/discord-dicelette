@@ -34,8 +34,7 @@ function replaceInLocales(dryRun?: boolean) {
 		const output: Target = {};
 		for (const [key, value] of Object.entries(pathToReplace)) {
 			const filePath = path.join(sourcePath, lang, `${value}.md`);
-			if (fs.existsSync(filePath))
-				output[key] = fs.readFileSync(filePath, "utf-8");
+			if (fs.existsSync(filePath)) output[key] = fs.readFileSync(filePath, "utf-8");
 			else console.warn(`File not found: ${filePath}`);
 		}
 		//console.log(output);
@@ -46,8 +45,7 @@ function replaceInLocales(dryRun?: boolean) {
 			for (const [key, value] of Object.entries(output))
 				setNestedKey(existingContent, key, value);
 
-			if (!dryRun)
-				fs.writeFileSync(outputPath, JSON.stringify(existingContent, null, 2));
+			if (!dryRun) fs.writeFileSync(outputPath, JSON.stringify(existingContent, null, 2));
 			else console.log(existingContent.help.diceNotation);
 			console.log(`Updated ${lang}.json with new content.`);
 		} else {

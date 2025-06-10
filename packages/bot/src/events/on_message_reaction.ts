@@ -10,15 +10,12 @@ export const onReactionAdd = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				console.error(
-					"\nSomething went wrong when fetching the message: ",
-					error,
-				);
+				console.error("\nSomething went wrong when fetching the message: ", error);
 				return;
 			}
 		}
 		logger.trace(
-			`${user.globalName} reacted with "${reaction.emoji.name}" on message ${reaction.message.id}`,
+			`${user.globalName} reacted with "${reaction.emoji.name}" on message ${reaction.message.id}`
 		);
 		if (!reaction.message.guild) return;
 		if (reaction.message.author?.id !== client.user?.id) return;
@@ -55,7 +52,7 @@ export const onReactionAdd = (client: EClient): void => {
 				components: [
 					new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(
 						copyResButtonDesktop,
-						copyResButtonMobile,
+						copyResButtonMobile
 					),
 				],
 			});
@@ -69,7 +66,7 @@ export const onReactionAdd = (client: EClient): void => {
 
 async function sendRollToDM(
 	reaction: Djs.MessageReaction | Djs.PartialMessageReaction,
-	user: Djs.User | Djs.PartialUser,
+	user: Djs.User | Djs.PartialUser
 ) {
 	let message: Djs.Message | Djs.PartialMessage | undefined =
 		await getSavedMessage(reaction);
@@ -82,13 +79,13 @@ async function sendRollToDM(
 }
 
 async function getSavedMessage(
-	reaction: Djs.MessageReaction | Djs.PartialMessageReaction,
+	reaction: Djs.MessageReaction | Djs.PartialMessageReaction
 ) {
 	const message = reaction.message;
 	if (!message || !message.content) return;
 	const regexChannel = new RegExp(
 		`-# ↪ https:\\/\\/discord.com\\/channels\\/${reaction.message!.guild!.id}\\/(?<channelID>\\d+)\\/(?<messageID>\\d+)\\/?`,
-		"gi",
+		"gi"
 	);
 	const match = regexChannel.exec(message.content);
 	if (!match || !match.groups) return;
@@ -106,9 +103,7 @@ async function getSavedMessage(
 	return await channel.messages.fetch(messageID);
 }
 
-async function copyReaction(
-	reaction: Djs.MessageReaction | Djs.PartialMessageReaction,
-) {
+async function copyReaction(reaction: Djs.MessageReaction | Djs.PartialMessageReaction) {
 	const messageToCopy = await getSavedMessage(reaction);
 	if (!messageToCopy) return;
 	try {
@@ -124,15 +119,12 @@ export const onReactionRemove = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				console.error(
-					"\nSomething went wrong when fetching the message: ",
-					error,
-				);
+				console.error("\nSomething went wrong when fetching the message: ", error);
 				return;
 			}
 		}
 		logger.trace(
-			`${user.globalName} removed reaction "${reaction.emoji.name}" from message ${reaction.message.id}`,
+			`${user.globalName} removed reaction "${reaction.emoji.name}" from message ${reaction.message.id}`
 		);
 		if (!reaction.message.guild) return;
 		if (reaction.message.author?.id !== client.user?.id) return;
@@ -142,7 +134,7 @@ export const onReactionRemove = (client: EClient): void => {
 
 async function removeCopiedReaction(
 	reaction: Djs.MessageReaction | Djs.PartialMessageReaction,
-	user: Djs.User | Djs.PartialUser,
+	user: Djs.User | Djs.PartialUser
 ) {
 	const messageToCopy = await getSavedMessage(reaction);
 	if (!messageToCopy) return;

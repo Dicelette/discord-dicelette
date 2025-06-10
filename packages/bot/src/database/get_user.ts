@@ -16,11 +16,7 @@ import type {
 } from "@dicelette/types";
 import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import {
-	getCharaInMemory,
-	getTemplateByInteraction,
-	updateMemory,
-} from "database";
+import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import {
@@ -40,13 +36,11 @@ export function getUserByEmbed(
 	first: boolean | undefined = false,
 	integrateCombinaison = true,
 	fetchAvatar = false,
-	fetchChannel = false,
+	fetchChannel = false
 ) {
 	const { message, embeds } = data;
 	const user: Partial<UserData> = {};
-	const userEmbed = first
-		? ensureEmbed(message)
-		: getEmbeds(ul, message, "user", embeds);
+	const userEmbed = first ? ensureEmbed(message) : getEmbeds(ul, message, "user", embeds);
 	if (!userEmbed) return;
 	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	const charNameFields = [
@@ -56,29 +50,14 @@ export function getUserByEmbed(
 	if (charNameFields && charNameFields.value !== "common.noSet") {
 		user.userName = charNameFields.value;
 	}
-	const statsFields = getEmbeds(
-		ul,
-		message,
-		"stats",
-		embeds,
-	)?.toJSON() as Djs.Embed;
-	user.stats = parseEmbedToStats(
-		parseEmbedFields(statsFields),
-		integrateCombinaison,
-	);
-	const damageFields = getEmbeds(
-		ul,
-		message,
-		"damage",
-		embeds,
-	)?.toJSON() as Djs.Embed;
+	const statsFields = getEmbeds(ul, message, "stats", embeds)?.toJSON() as Djs.Embed;
+	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
+	const damageFields = getEmbeds(ul, message, "damage", embeds)?.toJSON() as Djs.Embed;
 	const templateDamage = parseDamageFields(damageFields);
-	const templateEmbed = first
-		? userEmbed
-		: getEmbeds(ul, message, "template", embeds);
+	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
-		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed),
+		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
 	);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
 	if (user.avatar) user.avatar = cleanAvatarUrl(user.avatar);
@@ -101,11 +80,11 @@ export async function getFirstChar(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
 	ul: Translation,
-	skipNotFound = false,
+	skipNotFound = false
 ) {
 	const userData = client.settings.get(
 		interaction.guild!.id,
-		`user.${interaction.user.id}`,
+		`user.${interaction.user.id}`
 	);
 	if (!userData) {
 		if (skipNotFound) return;
@@ -122,7 +101,7 @@ export async function getFirstChar(
 		client,
 		interaction.user.id,
 		interaction,
-		firstChar.charName,
+		firstChar.charName
 	);
 
 	return { optionChar, userStatistique };
@@ -131,7 +110,7 @@ export async function getFirstChar(
 export async function getUser(
 	messageId: UserMessageId,
 	guild: Djs.Guild,
-	client: EClient,
+	client: EClient
 ) {
 	const sheetLocation: PersonnageIds = {
 		channelId: messageId[1],
@@ -161,9 +140,7 @@ export async function getUser(
 				logger.warn(`Message ${sheetLocation.messageId} not found`);
 				return;
 			}
-			const ul = ln(
-				client.settings.get(guild.id, "lang") ?? guild.preferredLocale,
-			);
+			const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
 			return getUserByEmbed({ message }, ul);
 		}
 	} catch (_e) {
@@ -198,7 +175,7 @@ export async function getUserFromMessage(
 		fetchChannel?: boolean;
 		fetchMessage?: boolean;
 		guildId?: string;
-	},
+	}
 ) {
 	const guildId = options?.guildId ?? interaction.guild!.id;
 	const guildData = client.settings;
@@ -232,14 +209,10 @@ export async function getUserFromMessage(
 		guildData,
 		interaction,
 		ul,
-		userMessageId.channelId,
+		userMessageId.channelId
 	);
 	if (!thread) throw new Error(ul("error.channel.thread"));
-	if (
-		user.isPrivate &&
-		!allowAccess &&
-		!haveAccess(interaction, thread.id, userId)
-	) {
+	if (user.isPrivate && !allowAccess && !haveAccess(interaction, thread.id, userId)) {
 		throw new Error(ul("error.private"));
 	}
 	try {
@@ -250,7 +223,7 @@ export async function getUserFromMessage(
 			undefined,
 			integrateCombinaison,
 			options.fetchAvatar,
-			options.fetchChannel,
+			options.fetchChannel
 		);
 		//set chara in memory
 		await updateMemory(characters, guildId, userId, ul, {
@@ -280,7 +253,7 @@ export async function getRecordChar(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	t: Translation,
-	strict = true,
+	strict = true
 ): Promise<Record<string, UserGuildData> | undefined> {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const guildData = client.settings.get(interaction.guildId as string);
@@ -290,12 +263,9 @@ export async function getRecordChar(
 			embeds: [
 				embedError(
 					ul("error.template.notFound", {
-						guildId:
-							interaction.guild?.name ??
-							interaction.guild?.id ??
-							"unknow guild",
+						guildId: interaction.guild?.name ?? interaction.guild?.id ?? "unknow guild",
 					}),
-					ul,
+					ul
 				),
 			],
 		});
@@ -303,8 +273,7 @@ export async function getRecordChar(
 	}
 	const user = options.getUser(t("display.userLowercase"));
 	let charName = options.getString(t("common.character"))?.toLowerCase();
-	if (charName?.includes(ul("common.default").toLowerCase()))
-		charName = undefined;
+	if (charName?.includes(ul("common.default").toLowerCase())) charName = undefined;
 
 	if (!user && charName) {
 		//get the character data in the database
@@ -323,7 +292,7 @@ export async function getRecordChar(
 	}
 	const userData = client.settings.get(
 		interaction.guild!.id,
-		`user.${user?.id ?? interaction.user.id}`,
+		`user.${user?.id ?? interaction.user.id}`
 	);
 	const findChara = userData?.find((char) => {
 		if (charName) return char.charName?.subText(charName, strict);
@@ -351,7 +320,7 @@ export function verifyIfEmbedInDB(
 	db: Settings,
 	message: Djs.Message,
 	userId: string,
-	userName?: string,
+	userName?: string
 ): { isInDb: boolean; coord?: PersonnageIds } {
 	const charData = db.get(message.guild!.id, `user.${userId}`);
 	if (!charData) return { isInDb: false };
@@ -366,8 +335,7 @@ export function verifyIfEmbedInDB(
 		messageId: charName.messageId[0],
 	};
 	return {
-		isInDb:
-			message.channel.id === ids.channelId && message.id === ids.messageId,
+		isInDb: message.channel.id === ids.channelId && message.id === ids.messageId,
 		coord: ids,
 	};
 }
@@ -389,7 +357,7 @@ export function verifyIfEmbedInDB(
 export async function getUserNameAndChar(
 	interaction: Djs.ButtonInteraction | Djs.ModalSubmitInteraction,
 	ul: Translation,
-	first?: boolean,
+	first?: boolean
 ) {
 	let userEmbed = getEmbeds(ul, interaction?.message ?? undefined, "user");
 	if (first) {
@@ -425,7 +393,7 @@ export async function getUserNameAndChar(
  */
 export async function getStatistics(
 	interaction: Djs.CommandInteraction,
-	client: EClient,
+	client: EClient
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -439,20 +407,14 @@ export async function getStatistics(
 		interaction.user.id,
 		interaction,
 		charName,
-		{ skipNotFound: true },
+		{ skipNotFound: true }
 	);
-	const selectedCharByQueries = isSerializedNameEquals(
-		userStatistique,
-		charName,
-	);
+	const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
 
 	if (optionChar && !selectedCharByQueries) {
 		await reply(interaction, {
 			embeds: [
-				embedError(
-					ul("error.user.charName", { charName: optionChar.capitalize() }),
-					ul,
-				),
+				embedError(ul("error.user.charName", { charName: optionChar.capitalize() }), ul),
 			],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -525,18 +487,15 @@ export function getRightValue(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
 	optionChar: string | undefined,
-	statistic: string,
+	statistic: string
 ) {
 	let userStat = userStatistique.stats?.[standardizedStatistic];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!userStat) {
-		const guildData = client.settings.get(
-			interaction.guild!.id,
-			"templateID.statsName",
-		);
+		const guildData = client.settings.get(interaction.guild!.id, "templateID.statsName");
 		if (userStatistique.stats && guildData) {
 			const findStatInList = guildData.find((stat) =>
-				stat.subText(standardizedStatistic),
+				stat.subText(standardizedStatistic)
 			);
 			if (findStatInList) {
 				standardizedStatistic = findStatInList.standardize(true);
@@ -550,20 +509,20 @@ export function getRightValue(
 				throw new Error(
 					ul("error.stats.user", {
 						stat: standardizedStatistic,
-					}),
+					})
 				);
 			throw new Error(
 				ul("error.stats.char", {
 					stat: standardizedStatistic,
 					char: optionChar.capitalize(),
-				}),
+				})
 			);
 		}
 		throw new Error(
 			ul("error.stats.notFound_singular", {
 				stat: standardizedStatistic,
 				char: optionChar ? ` ${optionChar.capitalize()}` : "",
-			}),
+			})
 		);
 	}
 	return { userStat, standardizedStatistic, statistic };

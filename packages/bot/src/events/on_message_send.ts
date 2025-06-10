@@ -48,11 +48,7 @@ export default (client: EClient): void => {
 			};
 			if (deleteInput) {
 				if (client.settings.get(message.guild.id, "context")) {
-					const messageBefore = await findMessageBefore(
-						channel,
-						message,
-						client,
-					);
+					const messageBefore = await findMessageBefore(channel, message, client);
 					if (messageBefore)
 						context = {
 							guildId: message.guildId ?? "",
@@ -76,8 +72,7 @@ export default (client: EClient): void => {
 						content: resultAsText.onMessageSend(idMessage),
 						allowedMentions: { repliedUser: true },
 					});
-			const timer =
-				client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
+			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
 			await deleteAfter(reply, timer);
 			if (deleteInput) await message.delete();
 			return;

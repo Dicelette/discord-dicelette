@@ -20,7 +20,7 @@ export const exportData = {
 				.setNameLocalizations(cmdLn("export.options.name"))
 				.setDescription(t("export.options.desc"))
 				.setDescriptionLocalizations(cmdLn("export.options.desc"))
-				.setRequired(false),
+				.setRequired(false)
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
@@ -48,7 +48,7 @@ async function exportToCsv(
 	client: EClient,
 	guildId: string,
 	interaction: Djs.CommandInteraction,
-	isPrivate?: boolean,
+	isPrivate?: boolean
 ) {
 	const guildData = client.settings.get(guildId);
 	if (!guildData) {
@@ -73,24 +73,16 @@ async function exportToCsv(
 				? data.filter((char) => !char.isPrivate)
 				: data;
 		for (const char of chara) {
-			const stats = await getUserFromMessage(
-				client,
-				user,
-				interaction,
-				char.charName,
-				{
-					skipNotFound: true,
-					fetchAvatar: true,
-					fetchChannel: true,
-				},
-			);
+			const stats = await getUserFromMessage(client, user, interaction, char.charName, {
+				skipNotFound: true,
+				fetchAvatar: true,
+				fetchChannel: true,
+			});
 			if (!stats) continue;
 			//reparse the statsName to get the name with accented characters
 			const dice: undefined | string = stats.damage
 				? `'${Object.keys(stats.damage)
-						.map(
-							(key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`,
-						)
+						.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
 						.join("\n")}`
 				: undefined;
 			let newStats: Record<string, number | undefined> = {};
@@ -99,9 +91,7 @@ async function exportToCsv(
 					newStats[name] = stats.stats?.[name.unidecode()];
 				}
 			} else if (stats.stats) newStats = stats.stats;
-			const statChannelAsString = stats.channel
-				? `'${stats.channel}`
-				: undefined;
+			const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
 			csv.push({
 				user: `'${user}`,
 				charName: char.charName,

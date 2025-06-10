@@ -13,12 +13,7 @@ import {
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
-import {
-	charUserOptions,
-	getLangAndConfig,
-	haveAccess,
-	searchUserChannel,
-} from "utils";
+import { charUserOptions, getLangAndConfig, haveAccess, searchUserChannel } from "utils";
 
 async function chart(
 	userData: UserData,
@@ -26,7 +21,7 @@ async function chart(
 	lineColor = "#FF0000",
 	fillColor = "#FF0000",
 	min?: number,
-	max?: number,
+	max?: number
 ) {
 	if (!userData.stats) return;
 	const data = {
@@ -112,9 +107,7 @@ function fontPath(fontName: string) {
 }
 
 export const graph = {
-	data: (
-		charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder
-	)
+	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setName(t("graph.name"))
 		.setDefaultMemberPermissions(0)
 		.setNameLocalizations(cmdLn("graph.name"))
@@ -127,7 +120,7 @@ export const graph = {
 				.setDescription(t("graph.line.description"))
 				.setDescriptionLocalizations(cmdLn("graph.line.description"))
 				.setNameLocalizations(cmdLn("graph.line.name"))
-				.setRequired(false),
+				.setRequired(false)
 		)
 		.addNumberOption((option) =>
 			option
@@ -135,7 +128,7 @@ export const graph = {
 				.setDescription(t("graph.min.description"))
 				.setDescriptionLocalizations(cmdLn("graph.min.description"))
 				.setNameLocalizations(cmdLn("graph.min.name"))
-				.setRequired(false),
+				.setRequired(false)
 		)
 		.addNumberOption((option) =>
 			option
@@ -143,7 +136,7 @@ export const graph = {
 				.setDescription(t("graph.max.description"))
 				.setRequired(false)
 				.setDescriptionLocalizations(cmdLn("graph.max.description"))
-				.setNameLocalizations(cmdLn("graph.max.name")),
+				.setNameLocalizations(cmdLn("graph.max.name"))
 		)
 		.addStringOption((option) =>
 			option
@@ -151,11 +144,11 @@ export const graph = {
 				.setDescription(t("graph.bg.description"))
 				.setNameLocalizations(cmdLn("graph.bg.name"))
 				.setDescriptionLocalizations(cmdLn("graph.bg.description"))
-				.setRequired(false),
+				.setRequired(false)
 		),
 	async autocomplete(
 		interaction: Djs.AutocompleteInteraction,
-		client: EClient,
+		client: EClient
 	): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
@@ -163,8 +156,7 @@ export const graph = {
 		const { ul } = getLangAndConfig(client, interaction);
 		if (!guildData) return;
 		const choices: string[] = [];
-		let user =
-			options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
+		let user = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
 		if (typeof user !== "string") {
 			user = interaction.user.id;
 		}
@@ -181,7 +173,7 @@ export const graph = {
 		if (choices.length === 0) return;
 		const filter = filterChoices(choices, interaction.options.getFocused());
 		await interaction.respond(
-			filter.map((result) => ({ name: result.capitalize(), value: result })),
+			filter.map((result) => ({ name: result.capitalize(), value: result }))
 		);
 	},
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
@@ -196,7 +188,7 @@ export const graph = {
 				embeds: [
 					embedError(
 						ul("error.template.notFound", { guildId: interaction.guild.name }),
-						ul,
+						ul
 					),
 				],
 			});
@@ -216,9 +208,7 @@ export const graph = {
 		if (charName) userName += ` (${charName})`;
 		if (!charData) {
 			await reply(interaction, {
-				embeds: [
-					embedError(ul("error.user.registered", { user: userName }), ul),
-				],
+				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
 		}
@@ -243,7 +233,7 @@ export const graph = {
 				client.settings,
 				interaction,
 				ul,
-				sheetLocation?.channelId,
+				sheetLocation?.channelId
 			);
 			if (!thread)
 				return await reply(interaction, {
@@ -281,10 +271,10 @@ export const graph = {
 			const labels = guildData.templateID.statsName;
 			//only keep labels that exists in the user stats
 			const userStatKeys = Object.keys(userStatistique.stats).map((key) =>
-				key.unidecode(),
+				key.unidecode()
 			);
 			const filteredLabels = labels.filter((label) =>
-				userStatKeys.includes(label.unidecode()),
+				userStatKeys.includes(label.unidecode())
 			);
 			//remove combined stats
 			const lineColor = options.getString(t("graph.line.name"));
@@ -302,12 +292,10 @@ export const graph = {
 					if (allMin.length > 0) min = Math.min(...allMin);
 				}
 				if (!max) {
-					const allMax = Object.values(serverTemplate.statistics).map(
-						(stat) => {
-							if (stat.max == null) return 0;
-							return stat.max;
-						},
-					);
+					const allMax = Object.values(serverTemplate.statistics).map((stat) => {
+						if (stat.max == null) return 0;
+						return stat.max;
+					});
 					max = Math.max(...allMax);
 				}
 
@@ -317,7 +305,7 @@ export const graph = {
 						max = serverTemplate.critical.success;
 					} else if (serverTemplate.diceType) {
 						const comparatorRegex = /(?<sign>[><=!]+)(?<comparator>(\d+))/.exec(
-							serverTemplate.diceType,
+							serverTemplate.diceType
 						);
 						if (comparatorRegex?.groups?.comparator) {
 							max = Number.parseInt(comparatorRegex.groups.comparator, 10);
@@ -336,7 +324,7 @@ export const graph = {
 				color.line,
 				color.background,
 				min,
-				max,
+				max
 			);
 			if (!image) {
 				await reply(interaction, {
@@ -356,7 +344,7 @@ export const graph = {
 			await sendLogs(
 				ul("error.generic.e", { e: error as Error }),
 				interaction.guild,
-				client.settings,
+				client.settings
 			);
 			logger.fatal(error);
 		}
@@ -391,7 +379,7 @@ async function imagePersonalized(
 	lineColor?: string,
 	fillColor?: string,
 	min?: number,
-	max?: number,
+	max?: number
 ) {
 	const charGraph = await chart(stat, labels, lineColor, fillColor, min, max);
 	if (!charGraph) return;

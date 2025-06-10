@@ -28,11 +28,7 @@ export function isRolling(content: string) {
 }
 
 function chainedComments(content: string, comments: string) {
-	if (
-		comments.match(/\[(.*)]/) &&
-		content.includes("&") &&
-		content.includes(";")
-	) {
+	if (comments.match(/\[(.*)]/) && content.includes("&") && content.includes(";")) {
 		//we must search for the global comments, that will start as `# comments`
 		const globalComments = content.match(/# ?(.*)/)?.[1];
 		//remove from the content the comments

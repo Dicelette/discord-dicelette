@@ -30,7 +30,7 @@ export function createEmbedsList(
 	userDataEmbed: Djs.EmbedBuilder,
 	statsEmbed?: Djs.EmbedBuilder,
 	diceEmbed?: Djs.EmbedBuilder,
-	templateEmbed?: Djs.EmbedBuilder,
+	templateEmbed?: Djs.EmbedBuilder
 ) {
 	const allEmbeds = [userDataEmbed];
 	if (statsEmbed) allEmbeds.push(statsEmbed);
@@ -49,7 +49,7 @@ export function getEmbedsList(
 		which: "user" | "stats" | "damage" | "template";
 		embed: Djs.EmbedBuilder;
 	},
-	message?: Djs.Message<boolean>,
+	message?: Djs.Message<boolean>
 ) {
 	const userDataEmbed =
 		embedToReplace.which === "user"
@@ -86,7 +86,7 @@ export function getEmbeds(
 	ul: Translation,
 	message?: Djs.Message<boolean>,
 	which?: "user" | "stats" | "damage" | "template",
-	allEmbeds?: Djs.EmbedBuilder[] | Djs.Embed[],
+	allEmbeds?: Djs.EmbedBuilder[] | Djs.Embed[]
 ) {
 	if (!allEmbeds) {
 		allEmbeds = message?.embeds;
@@ -120,7 +120,7 @@ export function createUserEmbed(
 	ul: Translation,
 	thumbnail: string | null,
 	user: string,
-	charName?: string,
+	charName?: string
 ) {
 	const userEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("embed.user"))
@@ -161,9 +161,7 @@ export function createStatsEmbed(ul: Translation) {
  * @param ul {Translation}
  */
 export function createTemplateEmbed(ul: Translation) {
-	return new Djs.EmbedBuilder()
-		.setTitle(ul("embed.template"))
-		.setColor("DarkGrey");
+	return new Djs.EmbedBuilder().setTitle(ul("embed.template")).setColor("DarkGrey");
 }
 
 /**
@@ -181,7 +179,7 @@ export function getStatistiqueFields(
 	interaction: Djs.ModalSubmitInteraction,
 	templateData: StatisticalTemplate,
 	ul: Translation,
-	oldStatsTotal?: number,
+	oldStatsTotal?: number
 ) {
 	const combinaisonFields: Record<string, string> = {};
 	const stats: Record<string, number> = {};
@@ -199,9 +197,7 @@ export function getStatistiqueFields(
 		if (!statValue) continue;
 		const num = Number.parseInt(statValue, 10);
 		if (value.min && num < value.min)
-			throw new Error(
-				ul("error.mustBeGreater", { value: name, min: value.min }),
-			);
+			throw new Error(ul("error.mustBeGreater", { value: name, min: value.min }));
 		if (value.max && num > value.max)
 			throw new Error(ul("error.mustBeLower", { value: name, max: value.max }));
 		if (total) {
@@ -211,9 +207,7 @@ export function getStatistiqueFields(
 			total -= num;
 			if (total < 0) {
 				exceeded = exceeded || total * -1;
-				throw new Error(
-					ul("error.totalExceededBy", { value: name, max: exceeded }),
-				);
+				throw new Error(ul("error.totalExceededBy", { value: name, max: exceeded }));
 			}
 			stats[key] = num;
 		} else stats[key] = num;
@@ -226,16 +220,14 @@ export function getStatistiqueFields(
  */
 export function removeEmbedsFromList(
 	embeds: Djs.EmbedBuilder[],
-	which: "user" | "stats" | "damage" | "template",
+	which: "user" | "stats" | "damage" | "template"
 ) {
 	return embeds.filter((embed) => {
 		const embedTitle = embed.toJSON().title;
 		if (!embedTitle) return false;
 		const title = findln(embedTitle);
 		if (which === "user")
-			return (
-				title !== "embed.user" && title !== "embed.add" && title !== "embed.old"
-			);
+			return title !== "embed.user" && title !== "embed.add" && title !== "embed.old";
 		if (which === "stats")
 			return title !== "common.statistic" && title !== "common.statistics";
 		if (which === "damage") return title !== "embed.dice";
@@ -245,7 +237,7 @@ export function removeEmbedsFromList(
 
 export function createCustomCritical(
 	templateEmbed: Djs.EmbedBuilder,
-	criticalTemplate: Record<string, CustomCritical>,
+	criticalTemplate: Record<string, CustomCritical>
 ) {
 	for (const [name, value] of Object.entries(criticalTemplate)) {
 		const effectOnSkill = value.affectSkill ? "(S) " : "";

@@ -33,10 +33,8 @@ export const generateTemplate = {
 				.setName(t("generate.options.stats.name"))
 				.setNameLocalizations(cmdLn("generate.options.stats.name"))
 				.setDescription(t("generate.options.stats.description"))
-				.setDescriptionLocalizations(
-					cmdLn("generate.options.stats.description"),
-				)
-				.setRequired(false),
+				.setDescriptionLocalizations(cmdLn("generate.options.stats.description"))
+				.setRequired(false)
 		)
 
 		.addStringOption((option) =>
@@ -45,68 +43,56 @@ export const generateTemplate = {
 				.setDescription(t("generate.options.dice.description"))
 				.setDescriptionLocalizations(cmdLn("generate.options.dice.description"))
 				.setNameLocalizations(cmdLn("generate.options.dice.name"))
-				.setRequired(false),
+				.setRequired(false)
 		)
 
 		.addNumberOption((option) =>
 			option
 				.setName(t("generate.options.total.name"))
 				.setDescription(t("generate.options.total.description"))
-				.setDescriptionLocalizations(
-					cmdLn("generate.options.total.description"),
-				)
+				.setDescriptionLocalizations(cmdLn("generate.options.total.description"))
 				.setNameLocalizations(cmdLn("generate.options.total.name"))
-				.setRequired(false),
+				.setRequired(false)
 		)
 		.addBooleanOption((option) =>
 			option
 				.setName(t("generate.options.character.name"))
 				.setDescription(t("generate.options.character.description"))
-				.setDescriptionLocalizations(
-					cmdLn("generate.options.character.description"),
-				)
+				.setDescriptionLocalizations(cmdLn("generate.options.character.description"))
 				.setNameLocalizations(cmdLn("generate.options.character.name"))
-				.setRequired(false),
+				.setRequired(false)
 		)
 		.addNumberOption((option) =>
 			option
 				.setName(t("generate.options.critical_success.name"))
 				.setDescription(t("generate.options.critical_success.description"))
 				.setDescriptionLocalizations(
-					cmdLn("generate.options.critical_success.description"),
+					cmdLn("generate.options.critical_success.description")
 				)
 				.setNameLocalizations(cmdLn("generate.options.critical_success.name"))
-				.setRequired(false),
+				.setRequired(false)
 		)
 		.addNumberOption((option) =>
 			option
 				.setName(t("generate.options.critical_fail.name"))
 				.setNameLocalizations(cmdLn("generate.options.critical_fail.name"))
 				.setDescription(t("generate.options.critical_fail.description"))
-				.setDescriptionLocalizations(
-					cmdLn("generate.options.critical_fail.description"),
-				)
-				.setRequired(false),
+				.setDescriptionLocalizations(cmdLn("generate.options.critical_fail.description"))
+				.setRequired(false)
 		)
 		.addStringOption((option) =>
 			option
 				.setName(t("generate.options.damage.name"))
 				.setDescription(t("generate.options.damage.description"))
-				.setDescriptionLocalizations(
-					cmdLn("generate.options.damage.description"),
-				)
+				.setDescriptionLocalizations(cmdLn("generate.options.damage.description"))
 				.setNameLocalizations(cmdLn("generate.options.damage.name"))
-				.setRequired(false),
+				.setRequired(false)
 		),
-	async execute(
-		interaction: Djs.CommandInteraction,
-		client: EClient,
-	): Promise<void> {
+	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		if (!interaction.guild) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const { ul } = getLangAndConfig(client, interaction);
-		const name =
-			options.getString(t("generate.options.stats.name")) ?? undefined;
+		const name = options.getString(t("generate.options.stats.name")) ?? undefined;
 		let statServer: Statistic | undefined;
 		if (name) {
 			const statistiqueName = name.split(/[, ]+/);
@@ -130,20 +116,16 @@ export const generateTemplate = {
 			}
 		}
 		let critical: Critical | undefined = {
-			failure:
-				options.getNumber(t("generate.options.critical_fail.name")) ??
-				undefined,
+			failure: options.getNumber(t("generate.options.critical_fail.name")) ?? undefined,
 			success:
-				options.getNumber(t("generate.options.critical_success.name")) ??
-				undefined,
+				options.getNumber(t("generate.options.critical_success.name")) ?? undefined,
 		};
 		//verify if everything is undefined in comparator object
 		const isUndefined = Object.values(critical).every((value) => value == null);
 		if (isUndefined) critical = undefined;
 
 		const statistiqueTemplate: StatisticalTemplate = {
-			charName:
-				options.getBoolean(t("generate.options.character.name")) || false,
+			charName: options.getBoolean(t("generate.options.character.name")) || false,
 			statistics: statServer,
 			diceType: options.getString(t("generate.options.dice.name")) || undefined,
 			critical,
@@ -155,10 +137,7 @@ export const generateTemplate = {
 			content: help,
 			files: [
 				{
-					attachment: Buffer.from(
-						JSON.stringify(statistiqueTemplate, null, 2),
-						"utf-8",
-					),
+					attachment: Buffer.from(JSON.stringify(statistiqueTemplate, null, 2), "utf-8"),
 					name: "template.json",
 				},
 			],
@@ -183,81 +162,65 @@ export const registerTemplate = {
 				.addChannelTypes(
 					Djs.ChannelType.PublicThread,
 					Djs.ChannelType.GuildText,
-					Djs.ChannelType.PrivateThread,
-				),
+					Djs.ChannelType.PrivateThread
+				)
 		)
 		.addAttachmentOption((option) =>
 			option
 				.setName(t("register.options.template.name"))
 				.setDescription(t("register.options.template.description"))
 				.setNameLocalizations(cmdLn("register.options.template.name"))
-				.setDescriptionLocalizations(
-					cmdLn("register.options.template.description"),
-				)
-				.setRequired(true),
+				.setDescriptionLocalizations(cmdLn("register.options.template.description"))
+				.setRequired(true)
 		)
 		.addChannelOption((option) =>
 			option
 				.setName(t("register.options.public.name"))
 				.setDescription(t("register.options.public.description"))
 				.setNameLocalizations(cmdLn("register.options.public.name"))
-				.setDescriptionLocalizations(
-					cmdLn("register.options.public.description"),
-				)
+				.setDescriptionLocalizations(cmdLn("register.options.public.description"))
 				.setRequired(false)
 				.addChannelTypes(
 					Djs.ChannelType.PublicThread,
 					Djs.ChannelType.GuildText,
 					Djs.ChannelType.PrivateThread,
-					Djs.ChannelType.GuildForum,
-				),
+					Djs.ChannelType.GuildForum
+				)
 		)
 		.addChannelOption((option) =>
 			option
 				.setName(t("register.options.private.name"))
 				.setDescription(t("register.options.private.description"))
 				.setNameLocalizations(cmdLn("register.options.private.name"))
-				.setDescriptionLocalizations(
-					cmdLn("register.options.private.description"),
-				)
+				.setDescriptionLocalizations(cmdLn("register.options.private.description"))
 				.setRequired(false)
 				.addChannelTypes(
 					Djs.ChannelType.PublicThread,
 					Djs.ChannelType.GuildText,
 					Djs.ChannelType.PrivateThread,
-					Djs.ChannelType.GuildForum,
-				),
+					Djs.ChannelType.GuildForum
+				)
 		)
 		.addBooleanOption((option) =>
 			option
 				.setName(t("register.options.update.name"))
 				.setDescription(t("register.options.update.description"))
 				.setNameLocalizations(cmdLn("register.options.update.name"))
-				.setDescriptionLocalizations(
-					cmdLn("register.options.update.description"),
-				),
+				.setDescriptionLocalizations(cmdLn("register.options.update.description"))
 		)
 		.addBooleanOption((option) =>
 			option
 				.setName(t("register.options.delete.name"))
 				.setDescription(t("register.options.delete.description"))
 				.setNameLocalizations(cmdLn("register.options.delete.name"))
-				.setDescriptionLocalizations(
-					cmdLn("register.options.delete.description"),
-				),
+				.setDescriptionLocalizations(cmdLn("register.options.delete.description"))
 		),
-	async execute(
-		interaction: Djs.CommandInteraction,
-		client: EClient,
-	): Promise<void> {
+	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
 		if (!interaction.guild) return;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const { ul } = getLangAndConfig(client, interaction);
-		const template = options.getAttachment(
-			t("register.options.template.name"),
-			true,
-		);
+		const template = options.getAttachment(t("register.options.template.name"), true);
 		//fetch the template
 		if (!template.contentType?.includes("json")) {
 			await reply(interaction, {
@@ -275,37 +238,26 @@ export const registerTemplate = {
 		try {
 			const templateData = verifyTemplateValue(res);
 			const guildId = interaction.guild.id;
-			const channel = options.getChannel(
-				t("common.channel"),
-				true,
-				allowedChannelType,
-			) as Djs.AnyThreadChannel | Djs.TextChannel;
+			const channel = options.getChannel(t("common.channel"), true, allowedChannelType) as
+				| Djs.AnyThreadChannel
+				| Djs.TextChannel;
 
-			let publicChannel = options.getChannel(
-				t("register.options.public.name"),
-				false,
-			);
+			let publicChannel = options.getChannel(t("register.options.public.name"), false);
 			const privateChannel = options.getChannel(
 				t("register.options.private.name"),
-				false,
+				false
 			);
 			if (channel instanceof Djs.TextChannel && !publicChannel) {
 				publicChannel = await createDefaultThread(
 					channel,
 					client.settings,
 					interaction,
-					false,
+					false
 				);
-			} else if (
-				!(channel instanceof Djs.BaseGuildTextChannel) &&
-				!publicChannel
-			) {
+			} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
 				await reply(interaction, {
 					embeds: [
-						embedError(
-							ul("error.public", { chan: Djs.channelMention(channel.id) }),
-							ul,
-						),
+						embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -314,10 +266,7 @@ export const registerTemplate = {
 			if (!publicChannel) {
 				await reply(interaction, {
 					embeds: [
-						embedError(
-							ul("error.public", { chan: Djs.channelMention(channel.id) }),
-							ul,
-						),
+						embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -330,13 +279,13 @@ export const registerTemplate = {
 				.setStyle(Djs.ButtonStyle.Primary);
 			const components =
 				new Djs.ActionRowBuilder<Djs.MessageActionRowComponentBuilder>().addComponents(
-					button,
+					button
 				);
 			let embedTemplate = new Djs.EmbedBuilder()
 				.setTitle(ul("register.embed.title"))
 				.setDescription(ul("register.embed.description"))
 				.setThumbnail(
-					"https://github.com/dicelette/discord-dicelette/blob/main/assets/template.png?raw=true",
+					"https://github.com/dicelette/discord-dicelette/blob/main/assets/template.png?raw=true"
 				)
 				.setColor("Random");
 
@@ -346,7 +295,7 @@ export const registerTemplate = {
 				statisticsEmbed = new Djs.EmbedBuilder()
 					.setTitle(ul("common.statistics").capitalize())
 					.setThumbnail(
-						"https://github.com/dicelette/discord-dicelette/blob/main/assets/player.png?raw=true",
+						"https://github.com/dicelette/discord-dicelette/blob/main/assets/player.png?raw=true"
 					);
 				for (const [stat, value] of Object.entries(templateData.statistics)) {
 					const { min, max, combinaison, exclude } = value;
@@ -382,10 +331,7 @@ export const registerTemplate = {
 					});
 			}
 			if (templateData.customCritical)
-				embedTemplate = createCustomCritical(
-					embedTemplate,
-					templateData.customCritical,
-				);
+				embedTemplate = createCustomCritical(embedTemplate, templateData.customCritical);
 			if (templateData.total)
 				embedTemplate.addFields({
 					name: ul("common.total"),
@@ -396,7 +342,7 @@ export const registerTemplate = {
 				diceEmbed = new Djs.EmbedBuilder()
 					.setTitle(ul("embed.dice"))
 					.setThumbnail(
-						"https://raw.githubusercontent.com/dicelette/discord-dicelette/main/assets/dice.png",
+						"https://raw.githubusercontent.com/dicelette/discord-dicelette/main/assets/dice.png"
 					);
 				for (const [dice, value] of Object.entries(templateData.damage))
 					diceEmbed.addFields({
@@ -406,17 +352,14 @@ export const registerTemplate = {
 					});
 			}
 			const embeds = [embedTemplate, statisticsEmbed, diceEmbed].filter(
-				(embed) => embed !== undefined,
+				(embed) => embed !== undefined
 			);
 			const msg = await channel.send({
 				content: "",
 				embeds: embeds as Djs.EmbedBuilder[],
 				files: [
 					{
-						attachment: Buffer.from(
-							JSON.stringify(templateData, null, 2),
-							"utf-8",
-						),
+						attachment: Buffer.from(JSON.stringify(templateData, null, 2), "utf-8"),
 						name: "template.json",
 					},
 				],
@@ -434,9 +377,9 @@ export const registerTemplate = {
 				? Object.keys(
 						Object.fromEntries(
 							Object.entries(templateData.statistics).filter(
-								([_, value]) => value.exclude,
-							),
-						),
+								([_, value]) => value.exclude
+							)
+						)
 					)
 				: undefined;
 			const damageName = templateData.damage
@@ -447,10 +390,10 @@ export const registerTemplate = {
 					try {
 						const channel = await fetchChannel(
 							interaction.guild,
-							json.templateID.channelId,
+							json.templateID.channelId
 						);
 						const msg = await (channel as Djs.TextChannel).messages.fetch(
-							json.templateID.messageId,
+							json.templateID.messageId
 						);
 						await msg.delete();
 					} catch (e) {

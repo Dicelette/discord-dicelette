@@ -20,7 +20,7 @@ import { getLangAndConfig } from "./fetch";
 export async function allowEdit(
 	interaction: Djs.ButtonInteraction | Djs.StringSelectMenuInteraction,
 	db: Settings,
-	interactionUser: Djs.User,
+	interactionUser: Djs.User
 ) {
 	const ul = ln(interaction.locale as Djs.Locale);
 	const embed = ensureEmbed(interaction.message);
@@ -34,18 +34,16 @@ export async function allowEdit(
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	const first = interaction.customId.includes("first");
 	const userName = embed.fields.find((field) =>
-		["common.character", "common.charName"].includes(findln(field.name)),
+		["common.character", "common.charName"].includes(findln(field.name))
 	);
 	const userNameValue =
-		userName && findln(userName?.value) === "common.noSet"
-			? undefined
-			: userName?.value;
+		userName && findln(userName?.value) === "common.noSet" ? undefined : userName?.value;
 	if (!first && user) {
 		const { isInDb, coord } = verifyIfEmbedInDB(
 			db,
 			interaction.message,
 			user,
-			userNameValue,
+			userNameValue
 		);
 		if (!isInDb) {
 			const urlNew = `https://discord.com/channels/${interaction.guild!.id}/${coord?.channelId}/${coord?.messageId}`;
@@ -72,7 +70,7 @@ export async function allowEdit(
 
 export async function isUserNameOrId(
 	userId: string,
-	interaction: Djs.ModalSubmitInteraction,
+	interaction: Djs.ModalSubmitInteraction
 ) {
 	if (!userId.match(/^\d+$/))
 		return (await interaction.guild!.members.fetch({ query: userId })).first();
@@ -80,7 +78,7 @@ export async function isUserNameOrId(
 }
 export function isSerializedNameEquals(
 	userStatistique: UserData | undefined,
-	charName: string | undefined,
+	charName: string | undefined
 ) {
 	const serializedNameDB = userStatistique?.userName?.standardize(true);
 	const serializedNameQueries = charName?.standardize(true);
@@ -99,7 +97,7 @@ export function isSerializedNameEquals(
  */
 export async function optionInteractions(
 	interaction: Djs.CommandInteraction,
-	client: EClient,
+	client: EClient
 ) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const {
@@ -114,7 +112,7 @@ export async function optionInteractions(
 					ul("error.template.notFound", {
 						guildId: interaction.guild?.name ?? interaction.guildId,
 					}),
-					ul,
+					ul
 				),
 			],
 		});
@@ -126,7 +124,7 @@ export async function optionInteractions(
 
 export function isValidChannel(
 	channel: Djs.GuildBasedChannel | null | undefined | Djs.TextBasedChannel,
-	interaction: Djs.CommandInteraction | Djs.BaseInteraction,
+	interaction: Djs.CommandInteraction | Djs.BaseInteraction
 ) {
 	return (
 		channel &&
