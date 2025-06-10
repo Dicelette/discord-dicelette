@@ -1,9 +1,11 @@
+// noinspection SuspiciousTypeOfGuard
+
+import { lError } from "@dicelette/localization";
 import { createUrl, type ResultAsText } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError, findMessageBefore, threadToSend } from "messages";
-import { lError } from "@dicelette/localization";
-import { isValidChannel, fetchChannel } from "utils";
+import { fetchChannel, isValidChannel } from "utils";
 import type { EClient } from "../client";
 
 export async function sendLogs(message: string, guild: Djs.Guild, db: Settings) {
@@ -163,7 +165,7 @@ export async function sendResult(
 	const anchor = settings.get(interaction.guild!.id, "context");
 	const dbTime = settings.get(interaction.guild!.id, "deleteAfter");
 	const timer = dbTime ? dbTime : 180000;
-	let messageId;
+	let messageId: string | undefined;
 	if (anchor) {
 		messageId = replyInteraction.id;
 		if (timer && timer > 0) {
