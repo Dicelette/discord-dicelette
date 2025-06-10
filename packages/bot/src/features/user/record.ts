@@ -158,9 +158,10 @@ export async function createEmbedFirstPage(
 	//add continue button
 	if (template.statistics) {
 		await reply(interaction, {
-			content: verifiedAvatar
-				? ""
-				: `:warning: **${ul("error.avatar.url")}** *${ul("edit_avatar.default")}*`,
+			content:
+				verifiedAvatar !== false
+					? ""
+					: `:warning: **${ul("error.avatar.url")}** \n-# *${ul("edit_avatar.default")}*`,
 			embeds: [embed],
 			components: [continueCancelButtons(ul)],
 		});
