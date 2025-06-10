@@ -21,9 +21,9 @@ export async function sendErrorToWebhook(error: unknown) {
 	const ownerId = process.env.OWNER_ID;
 	const webhookId = process.env.DISCORD_WEBHOOK_ID!;
 	const webhookToken = process.env.DISCORD_WEBHOOK_TOKEN!;
-	
-	const webhookClient = new Djs.WebhookClient({id: webhookId, token: webhookToken});
-	
+
+	const webhookClient = new Djs.WebhookClient({ id: webhookId, token: webhookToken });
+
 	const content =
 		typeof error === "string"
 			? error
@@ -32,8 +32,9 @@ export async function sendErrorToWebhook(error: unknown) {
 				: `<@${ownerId}>\n\`\`\`json\n${JSON.stringify(error)}\n\`\`\``;
 	const params = {
 		username: "Dicelette - Uncaught Exception",
-		avatarURL: "https://github.com/Dicelette/discord-dicelette/blob/main/assets/warning.png?raw=true"
-	}
+		avatarURL:
+			"https://github.com/Dicelette/discord-dicelette/blob/main/assets/warning.png?raw=true",
+	};
 	if (content.length > 2000) {
 		for (let i = 0; i < content.length; i += 2000) {
 			await webhookClient.send({
@@ -42,9 +43,9 @@ export async function sendErrorToWebhook(error: unknown) {
 			});
 		}
 	} else {
-			await webhookClient.send({
-				content: content,
-				...params,
-			});
-		}
+		await webhookClient.send({
+			content: content,
+			...params,
+		});
+	}
 }
