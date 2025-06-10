@@ -259,7 +259,7 @@ export async function validateUser(
 	} catch (e) {
 		logger.warn(e, "validateUser: can't delete the message");
 	}
-	await addAutoRole(interaction, userID, !!statsEmbed, !!diceEmbed, client.settings);
+	await addAutoRole(interaction, userID, !!diceEmbed, !!statsEmbed, client.settings);
 	await reply(interaction, {
 		content: ul("modals.finished"),
 		flags: Djs.MessageFlags.Ephemeral,
