@@ -35,7 +35,7 @@ function uniqueValues(array: string[]) {
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
-	if (url.match(/^(https:\/{2})[\w\-.\/%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi))
+	if (url.match(/^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi))
 		return url;
 	return false;
 }
