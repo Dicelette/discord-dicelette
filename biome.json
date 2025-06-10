@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.0.0-beta.2/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.0-beta.6/schema.json",
 	"files": {
 		"includes": ["**", "!**/node_modules", "!**/dist"]
 	},
@@ -17,7 +17,9 @@
 				"noExtraBooleanCast": "error",
 				"noAdjacentSpacesInRegex": "error",
 				"noUselessCatch": "error",
-				"noWith": "error"
+				"noCommaOperator": "error",
+				"useNumericLiterals": "error",
+				"noArguments": "error"
 			},
 			"correctness": {
 				"noConstAssign": "error",
@@ -45,10 +47,12 @@
 				"noUnusedVariables": "off",
 				"useIsNan": "error",
 				"useValidForDirection": "error",
-				"useYield": "error"
+				"useYield": "error",
+				"useValidTypeof": "error"
 			},
 			"suspicious": {
 				"noAssignInExpressions": "off",
+				"noWith": "error",
 				"noAsyncPromiseExecutor": "error",
 				"noCatchAssign": "error",
 				"noClassAssign": "error",
@@ -70,7 +74,6 @@
 				"noShadowRestrictedNames": "error",
 				"noUnsafeNegation": "error",
 				"useGetterReturn": "error",
-				"useValidTypeof": "error",
 				"noVar": "error"
 			},
 			"style": {
@@ -87,10 +90,10 @@
 				"useConst": "error",
 				"noNonNullAssertion": "off",
 				"useLiteralEnumMembers": "error",
-				"noCommaOperator": "error",
+
 				"useNodejsImportProtocol": "error",
 				"useAsConstAssertion": "error",
-				"useNumericLiterals": "error",
+
 				"useEnumInitializers": "error",
 				"useSelfClosingElements": "error",
 				"useSingleVarDeclarator": "error",
@@ -99,7 +102,7 @@
 				"noInferrableTypes": "error",
 				"useExponentiationOperator": "error",
 				"useDefaultParameterLast": "error",
-				"noArguments": "error",
+
 				"useExportType": "error",
 				"noUselessElse": "error",
 				"useShorthandFunctionType": "error"
