@@ -2,7 +2,7 @@ import { generateStatsDice, isNumber } from "@dicelette/core";
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
@@ -171,11 +171,10 @@ export async function calculate(
 			userStatistique.stats,
 			`${statInfo.value}`
 		);
-		logger.trace(`Calculation: ${formulaWithStats}`);
 		const isRoll = getRoll(formulaWithStats);
 		originalFormula = `${statInfo.value}${sign}(${formula})`;
 		if (isNumber(formula)) originalFormula = `${statInfo.value}${sign}${formula}`;
-		if (isRoll?.total) {
+		if (isRoll?.total != null) {
 			formulaWithStats = isRoll.total.toString();
 			originalFormula = `${statInfo.value}${sign}(${formula}) → ${statInfo.value}${sign}(${isRoll.result})`;
 		}
@@ -184,14 +183,13 @@ export async function calculate(
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
 		const isRoll = getRoll(formula);
-		if (isRoll?.total) {
+		if (isRoll?.total != null) {
 			originalFormula = isRoll.result;
 			totalFormula = isRoll.total.toString();
 			needFormat = false;
 		}
 	}
 	const comments = options.getString(t("common.comments")) ?? undefined;
-	logger.debug("Formula: ", totalFormula);
 	try {
 		const result = evaluate(totalFormula);
 		const transform = options.getString(t("calc.transform.title")) ?? undefined;
