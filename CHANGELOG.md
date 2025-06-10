@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.48.1](https://github.com/Dicelette/discord-dicelette/compare/1.48.0...1.48.1) (2025-06-10)
+
+
+### Bug Fixes
+
+* **calc:** undefined symbol when calc's result = 0 ([8698ada](https://github.com/Dicelette/discord-dicelette/commit/8698adaf6a3b2df9aca43a73300aff098f52b305))
+
 ## [1.48.0](https://github.com/Dicelette/discord-dicelette/compare/1.47.1...1.48.0) (2025-06-10)
 
 
