@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.48.0](https://github.com/Dicelette/discord-dicelette/compare/1.47.1...1.48.0) (2025-06-10)
+
+
+### Features
+
+* exit the bot on uncaught error + send a message via webhook for alert ([24aabc2](https://github.com/Dicelette/discord-dicelette/commit/24aabc24e61fb1d9651b08baa22ddc09bf6bd3d4))
+
 ## [1.47.1](https://github.com/Dicelette/discord-dicelette/compare/1.47.0...1.47.1) (2025-06-09)
 
 ## [1.47.0](https://github.com/Dicelette/discord-dicelette/compare/1.46.1...1.47.0) (2025-06-08)
