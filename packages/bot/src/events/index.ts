@@ -4,6 +4,7 @@ import onMessageSend from "./on_message_send";
 import ready from "./ready";
 
 export * from "./on_delete";
+export { default as onDisconnect, sendErrorToWebhook } from "./on_disconnect";
 export * from "./on_message_reaction";
 export { ready, onInteraction, onJoin, onMessageSend };
 export { default as onError } from "./on_error";
