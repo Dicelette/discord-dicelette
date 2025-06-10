@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.48.2](https://github.com/Dicelette/discord-dicelette/compare/1.48.1...1.48.2) (2025-06-10)
+
+
+### Bug Fixes
+
+* **auto-role:** inverted the stats/dice role ([153f4ca](https://github.com/Dicelette/discord-dicelette/commit/153f4ca65509f8ed039486c3b23ea656b0026fe0))
+
 ## [1.48.1](https://github.com/Dicelette/discord-dicelette/compare/1.48.0...1.48.1) (2025-06-10)
 
 
