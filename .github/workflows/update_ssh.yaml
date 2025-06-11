@@ -20,6 +20,8 @@ jobs:
             set PATH $PATH:/home/.local/share/nvm/v20.14.0/bin
             nvm use v20.14.0
             cd dicelette/
-            git pull --force
+            git stash push --include-untracked --message "Locales temporaires"
+            git pull --rebase
+            git stash pop || echo "Pas de stash à appliquer"
             pnpm i
             pnpm run pm2:restart
