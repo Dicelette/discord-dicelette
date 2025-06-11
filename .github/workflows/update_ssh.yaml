@@ -22,6 +22,5 @@ jobs:
             cd dicelette/
             git stash push --include-untracked --message "Locales temporaires"
             git pull --rebase
-            git stash pop || echo "Pas de stash à appliquer"
             pnpm i
             pnpm run pm2:restart
