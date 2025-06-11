@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.48.3](https://github.com/Dicelette/discord-dicelette/compare/1.48.2...1.48.3) (2025-06-11)
+
+
+### Bug Fixes
+
+* **on-message:** regression with "comments" on normal dice (like `1d20 hello` or `1d20 # hello`) ([410f5c0](https://github.com/Dicelette/discord-dicelette/commit/410f5c028ee8055ab18307de82d527e2ef6547d3))
+
 ## [1.48.2](https://github.com/Dicelette/discord-dicelette/compare/1.48.1...1.48.2) (2025-06-10)
 
 
