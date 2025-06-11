@@ -3,7 +3,7 @@ import { DETECT_DICE_MESSAGE } from "./interfaces.js";
 import { trimAll } from "./utils";
 
 export function isRolling(content: string) {
-	const detectRoll = content.match(/\[[^:]+?\]/)?.[1];
+	const detectRoll = content.match(/\[.*\]/)?.[1];
 	let comments = content.match(DETECT_DICE_MESSAGE)?.[3].replaceAll("*", "\\*");
 	if (comments && !detectRoll) {
 		const diceValue = content.match(/^\S*#?d\S+|\{.*\}/i);
@@ -14,9 +14,7 @@ export function isRolling(content: string) {
 	}
 	let result: Resultat | undefined;
 	try {
-		result = detectRoll
-			? roll(trimAll(detectRoll))
-			: roll(trimAll(content.replace(/\[\/{2}(.*)\]/, "[$1]")));
+		result = detectRoll ? roll(trimAll(detectRoll)) : roll(trimAll(content));
 	} catch (e) {
 		return undefined;
 	}
@@ -29,6 +27,9 @@ export function isRolling(content: string) {
 
 function chainedComments(content: string, comments: string) {
 	if (comments.match(/\[(.*)]/) && content.includes("&") && content.includes(";")) {
+		content = content.match(/^\[(.*)\]$/)
+			? content.replace(/\[(.*)\]/, "$1").trim()
+			: content;
 		//we must search for the global comments, that will start as `# comments`
 		const globalComments = content.match(/# ?(.*)/)?.[1];
 		//remove from the content the comments
@@ -43,5 +44,6 @@ function chainedComments(content: string, comments: string) {
 	}
 	return {
 		content: content.replace(DETECT_DICE_MESSAGE, "$1"),
+		comments: content.match(/# ?(.*)/)?.[1] ?? comments,
 	};
 }
