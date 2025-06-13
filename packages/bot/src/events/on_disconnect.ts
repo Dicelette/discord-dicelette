@@ -1,16 +1,19 @@
+import {important} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import type { EClient } from "../client";
 
 export default (client: EClient): void => {
 	client.on("shardDisconnect", async (event, shardId) => {
-		if (!process.env.OWNER_ID) return;
-		const dm = await client.users.createDM(process.env.OWNER_ID);
-		await dm.send({
-			content:
-				"## ❌ Le bot a été déconnecté du serveur Discord.\n\n" +
-				"Veuillez vérifier l'état du bot et le redémarrer si nécessaire.",
-		});
-		console.error(`Shard ${shardId} disconnected:`, event);
+		if (process.env.OWNER_ID) {
+			const dm = await client.users.createDM(process.env.OWNER_ID);
+			await dm.send({
+				content:
+					"## ❌ Le bot a été déconnecté du serveur Discord.\n\n" +
+					"Veuillez vérifier l'état du bot et le redémarrer si nécessaire.",
+			});
+		}
+		await sendErrorToWebhook(`Shard disconnected: ${event.toString()}`);
+		important.error(`Shard ${shardId} disconnected:`, event);
 		process.exit(1); // Optionally exit the process to restart the bot by pm2
 	});
 };

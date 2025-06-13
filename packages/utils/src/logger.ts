@@ -54,7 +54,7 @@ export const important: Logger<ILogObj> = new Logger({
 	minLevel: 0,
 	hideLogPositionForProduction: true,
 	prettyLogTemplate:
-		"[{{logLevelName}}]",
+		"[{{logLevelName}}] ",
 	prettyLogStyles: {
 		dd: "dim",
 		mm: "dim",
