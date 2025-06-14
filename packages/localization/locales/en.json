@@ -149,7 +149,12 @@
     "selfRegister": {
       "description": "Allow player to register their characters directly.",
       "disable": "The self-registration is disabled: player need a moderator to register their characters.",
-      "enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
+      "enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n> 💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
+      "enableModeration": "Only moderators can validate the self-registered sheet.",
+      "moderation": {
+        "desc": "Only the moderation can validate a self registered sheet.",
+        "name": "validation_moderation"
+      },
       "name": "self_register"
     },
     "sheet": "Sheet",
@@ -523,14 +528,15 @@
       "edit": "{{- user}} modified the dice of {{- char}} (in {{- file}})",
       "remove": "{{- user}} deleted the dice from {{-char}} (in {{- file}})"
     },
-    "inChan": "to <#{{- chan}}>.",
+    "inChan": "to {{- chan}}.",
     "name": "logs",
     "options": "The channel to send logs to",
     "set": "Logs configured in channel {{- channel}}",
     "stats": {
       "added": "{{- user}} modified the statistics of {{- char}} (in {{- file}})",
       "removed": "{{- user}} deleted the statistics of {{- char}} (in {{- file}})"
-    }
+    },
+    "validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
   },
   "math": {
     "description": "Basic calculus supporting Math.js evaluation (support rolling dice)",
@@ -577,7 +583,8 @@
     },
     "finished": "Completed statistics",
     "firstPage": "User Registration - Page 1/{{- page}}",
-    "noPermission": "You do not have permissions to do this",
+    "noPermission": "You do not have permissions to do this.",
+    "onlyModerator": "Only moderator (with manage role) can validate a sheet. A notification was send to finish the registration.",
     "private": {
       "description": "If this record is private, put \"x\".",
       "name": "Private character sheet"
@@ -617,6 +624,7 @@
       "damage": "Damage dice",
       "description": "Click the button to register a character",
       "exclude": "Excluded",
+      "forceDistrib": "Force point's distribution",
       "noValue": "No value",
       "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are disabled by default.\n\nTo authorize your players to use them, please follow the following tutorial:\n",
       "title": "Model"

@@ -332,11 +332,18 @@ export const registerTemplate = {
 			}
 			if (templateData.customCritical)
 				embedTemplate = createCustomCritical(embedTemplate, templateData.customCritical);
-			if (templateData.total)
+			if (templateData.total) {
 				embedTemplate.addFields({
 					name: ul("common.total"),
 					value: `\`${templateData.total}\``,
+					inline: true,
 				});
+				embedTemplate.addFields({
+					name: ul("register.embed.forceDistrib"),
+					value: `\`${templateData.forceDistrib ? ul("common.yes") : ul("common.no")}\``,
+					inline: true,
+				});
+			}
 			let diceEmbed: undefined | Djs.EmbedBuilder;
 			if (templateData.damage) {
 				diceEmbed = new Djs.EmbedBuilder()

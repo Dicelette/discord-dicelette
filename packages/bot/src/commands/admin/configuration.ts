@@ -256,6 +256,14 @@ export const configuration = {
 						.setDescriptionLocalizations(cmdLn("linkToLog.options"))
 						.setRequired(true)
 				)
+				.addBooleanOption((option) =>
+					option
+						.setName(t("config.selfRegister.moderation.name"))
+						.setNameLocalizations(cmdLn("config.selfRegister.moderation.name"))
+						.setDescription(t("config.selfRegister.moderation.desc"))
+						.setDescriptionLocalizations(cmdLn("config.selfRegister.moderation.desc"))
+						.setRequired(false)
+				)
 		),
 	async execute(interaction: Djs.CommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
@@ -315,8 +323,15 @@ function allowSelfRegistration(
 	ul: Translation,
 	options: Djs.CommandInteractionOptionResolver
 ) {
-	const toggle = options.getBoolean(t("disableThread.options.name"), true);
-	if (toggle === null) return;
+	let toggle: boolean | string = options.getBoolean(
+		t("disableThread.options.name"),
+		true
+	);
+	const forceModeration = options.getBoolean(
+		t("config.selfRegister.moderation.name"),
+		false
+	);
+	if (forceModeration) toggle = "moderation";
 	client.settings.set(interaction.guild!.id, toggle, "allowSelfRegister");
 	if (!toggle) {
 		return reply(interaction, {
@@ -328,8 +343,15 @@ function allowSelfRegistration(
 		template?.channelId && template?.messageId
 			? ` (https://discord.com/channels/${interaction.guild!.id}/${template?.channelId}/${template?.messageId})`
 			: "";
+	let msg = ul("config.selfRegister.enable", { url });
+	if (toggle === "moderation") {
+		console.debug(
+			`Self registration enabled with moderation for ${interaction.guild!.name}`
+		);
+		msg += `\n\n**__${ul("config.selfRegister.enableModeration")}__**`;
+	}
 	return reply(interaction, {
-		content: ul("config.selfRegister.enable", { url }),
+		content: msg,
 	});
 }
 
@@ -379,7 +401,7 @@ async function setErrorLogs(
 	ul: Translation,
 	options: Djs.CommandInteractionOptionResolver
 ) {
-	const channel = options.getChannel(ul("common.channel"), true);
+	const channel = options.getChannel(ul("common.channel"), false);
 	// noinspection SuspiciousTypeOfGuard
 	if (
 		!channel ||

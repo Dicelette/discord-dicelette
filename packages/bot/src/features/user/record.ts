@@ -168,5 +168,6 @@ export async function createEmbedFirstPage(
 		return;
 	}
 	const allButtons = registerDmgButton(ul);
-	await reply(interaction, { embeds: [embed], components: [allButtons] });
+
+	const msg = await reply(interaction, { embeds: [embed], components: [allButtons] });
 }

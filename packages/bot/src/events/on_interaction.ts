@@ -140,7 +140,7 @@ async function buttonSubmit(
 	} else if (interaction.customId === "edit_stats") {
 		await features.triggerEditStats(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
-	} else if (interaction.customId === "validate")
+	} else if (interaction.customId === "validate") {
 		await features.validateUserButton(
 			interaction,
 			interactionUser,
@@ -149,7 +149,7 @@ async function buttonSubmit(
 			client,
 			characters
 		);
-	else if (interaction.customId === "cancel")
+	} else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, interactionUser);
 	else if (interaction.customId === "edit_dice") {
 		await features.initiateDiceEdit(interaction, ul, interactionUser, client.settings);

@@ -9,7 +9,7 @@ export async function startRegisterUser(
 	interactionUser: Djs.User,
 	ul: Translation,
 	havePrivate?: boolean,
-	selfRegister?: boolean
+	selfRegister?: boolean | string
 ) {
 	const moderatorPermission = interaction.guild?.members.cache
 		.get(interactionUser.id)
@@ -40,7 +40,7 @@ export async function showFirstPageModal(
 	template: StatisticalTemplate,
 	ul: Translation,
 	havePrivate?: boolean,
-	selfRegister?: boolean,
+	selfRegister?: boolean | string,
 	isModerator?: boolean
 ) {
 	let nbOfPages = 1;

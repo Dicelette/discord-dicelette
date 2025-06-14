@@ -76,7 +76,7 @@ export interface GuildData {
 		valid?: boolean;
 	};
 	user: Record<string, UserGuildData[]>;
-	allowSelfRegister?: boolean;
+	allowSelfRegister?: boolean | string;
 }
 
 export type UserGuildData = {

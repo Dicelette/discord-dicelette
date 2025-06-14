@@ -202,7 +202,7 @@ export function getStatistiqueFields(
 			throw new Error(ul("error.mustBeLower", { value: name, max: value.max }));
 		if (total) {
 			logger.trace("oldStatsTotal", oldStatsTotal, "total", total, "num", num);
-			let exceeded;
+			let exceeded: number | undefined;
 			if (oldStatsTotal) exceeded = oldStatsTotal + num;
 			total -= num;
 			if (total < 0) {

@@ -8,13 +8,18 @@ import { embedError, findMessageBefore, threadToSend } from "messages";
 import { fetchChannel, isValidChannel } from "utils";
 import type { EClient } from "../client";
 
-export async function sendLogs(message: string, guild: Djs.Guild, db: Settings) {
-	const guildData = db.get(guild.id);
-	if (!guildData?.logs) return;
-	const channel = guildData.logs;
+export async function sendLogs(
+	message: string,
+	guild: Djs.Guild,
+	db: Settings,
+	allowMentions?: boolean
+) {
+	const channel = db.get(guild.id, "logs");
 	try {
+		if (!channel) return;
 		const channelToSend = (await fetchChannel(guild, channel)) as Djs.TextChannel;
-		await channelToSend.send({ content: message, allowedMentions: {} });
+		const allowedMentions = allowMentions ? undefined : {};
+		await channelToSend.send({ content: message, allowedMentions });
 	} catch (error) {
 		return;
 	}

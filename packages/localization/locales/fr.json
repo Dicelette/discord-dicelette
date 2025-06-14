@@ -149,7 +149,12 @@
     "selfRegister": {
       "description": "Permettre aux joueurs d'enregistrer directement leurs personnages.",
       "disable": "L'auto-enregistrement est désactivé : les joueurs ont besoin d'un modérateur pour enregistrer leurs personnages.",
-      "enable": "L'auto-enregistrement est activé : les joueurs peuvent maintenant enregistrer leurs personnages librement, s'ils ont accès au message modèle{{- url}}.\n\n💡 Vous pouvez limiter l’accès au canal/fil contenant le modèle à un rôle spécifique, afin que seuls les utilisateurs autorisés puissent y accéder.  ",
+      "enable": "L'auto-enregistrement est activé : les joueurs peuvent maintenant enregistrer leurs personnages librement, s'ils ont accès au message modèle{{- url}}.\n\n> 💡 Vous pouvez limiter l’accès au canal/fil contenant le modèle à un rôle spécifique, afin que seuls les utilisateurs autorisés puissent y accéder.  ",
+      "enableModeration": "Seul les modérateurs pourront valider la fiche.",
+      "moderation": {
+        "desc": "Seulement les modérateurs peuvent valider une fiche auto-enregistrée.",
+        "name": "moderation_validation"
+      },
       "name": "auto_enregistrement"
     },
     "sheet": "Fiches",
@@ -523,14 +528,15 @@
       "edit": "{{- user}} a modifié les dés de {{- char}} (dans {{- fiche}})",
       "remove": "{{- user}} a supprimé les dés de {{-char}} (dans {{- fiche}})"
     },
-    "inChan": "dans <#{{- chan}}>.",
+    "inChan": "dans {{- chan}}.",
     "name": "logs",
     "options": "Le channel où envoyer les logs",
     "set": "Logs configurés dans le channel {{- channel}}",
     "stats": {
       "added": "{{- user}} a modifié les statistiques de {{- char}} (dans {{- fiche}})",
       "removed": "{{- user}} a supprimé les statistiques de {{- char}} (dans {{- fiche}})"
-    }
+    },
+    "validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
   },
   "math": {
     "description": "Calcul de base supportant l'évaluation Math.js (support les lancés de dés)",
@@ -577,7 +583,8 @@
     },
     "finished": "Statistiques terminées",
     "firstPage": "Enregistrement de l'utilisateur - Page 1/{{- page}}",
-    "noPermission": "Vous n'avez pas les autorisations pour faire cela",
+    "noPermission": "Vous n'avez pas les autorisations pour faire cela.",
+    "onlyModerator": "Seulement les modérateurs (ayant les droits sur les rôles) peuvent valider une fiche. Une notification leur a été envoyé pour finir l'enregistrement.",
     "private": {
       "description": "Si cette fiche est privée, mettez \"x\".",
       "name": "Fiche privée"
@@ -617,6 +624,7 @@
       "damage": "Dés de dégâts",
       "description": "Clickez sur le bouton pour enregistrer un personnage",
       "exclude": "Exclue",
+      "forceDistrib": "Forcer la distribution des points",
       "noValue": "Aucune valeur",
       "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont désactivés par défaut. \nPour autoriser vos joueurs à les utiliser, veuiller suivre le tutoriel suivant :",
       "title": "Modèle"

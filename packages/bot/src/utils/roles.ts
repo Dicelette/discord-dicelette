@@ -32,6 +32,14 @@ export function haveAccess(
 	);
 }
 
+export function pingModeratorRole(guild: Djs.Guild) {
+	return guild.roles.cache
+		.filter((role) => role.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles))
+		.filter((role) => role.mentionable)
+		.map((role) => `<@&${role.id}>`)
+		.join(", ");
+}
+
 export async function addAutoRole(
 	interaction: Djs.BaseInteraction,
 	member: string,

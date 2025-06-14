@@ -16,8 +16,9 @@ import {
 	getEmbeds,
 	reply,
 	repostInThread,
+	sendLogs,
 } from "messages";
-import { addAutoRole, fetchChannel, getLangAndConfig } from "utils";
+import { addAutoRole, fetchChannel, getLangAndConfig, pingModeratorRole } from "utils";
 
 /**
  * Interaction to continue to the next page of the statistics when registering a new user
@@ -27,7 +28,7 @@ export async function continuePage(
 	dbTemplate: StatisticalTemplate,
 	ul: Translation,
 	interactionUser: Djs.User,
-	selfRegister?: boolean
+	selfRegister?: boolean | string
 ) {
 	const isModerator =
 		selfRegister ||
@@ -76,18 +77,70 @@ export async function validateUserButton(
 	characters: Characters
 ) {
 	const isModerator =
-		client.settings.get(interaction.guild!.id, "allowSelfRegister") ||
+		client.settings.get(interaction.guild!.id, "allowSelfRegister") === true ||
 		interaction.guild?.members.cache
 			.get(interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (isModerator) await validateUser(interaction, template, client, characters);
-	else
+	else {
+		let notAllowedMsg = ul("modals.noPermission");
+		notAllowedMsg += `\n${ul("modals.onlyModerator")}`;
+		await sendValidationMessage(interaction, interactionUser, ul, client);
 		await reply(interaction, {
-			content: ul("modals.noPermission"),
+			content: notAllowedMsg,
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+	}
 }
 
+async function sendValidationMessage(
+	interaction: Djs.ButtonInteraction,
+	interactionUser: Djs.User,
+	ul: Translation,
+	client: EClient
+) {
+	const logChannel = client.settings.get(interaction.guild!.id, "logs");
+	if (logChannel)
+		await sendLogs(
+			ul("logs.validationWaiting", {
+				user: `${interactionUser.id}`,
+				url: interaction.message.url,
+				role: `\n -# ${pingModeratorRole(interaction.guild!)}`,
+			}),
+			interaction.guild!,
+			client.settings,
+			true
+		);
+	else {
+		//send a message in system channel if any
+		const systemChannel = interaction.guild?.safetyAlertsChannel;
+		if (systemChannel?.isSendable()) {
+			systemChannel.send({
+				content: ul("logs.validationWaiting", {
+					user: `${interactionUser.id}`,
+					url: interaction.message.url,
+					role: `\n -# ${pingModeratorRole(interaction.guild!)}`,
+				}),
+			});
+		} else {
+			//send a DM to the owner
+			const owner = await interaction.guild?.fetchOwner();
+			if (owner) {
+				try {
+					await owner.send({
+						content: ul("logs.validationWaiting", {
+							user: `${interactionUser.id}`,
+							url: interaction.message.url,
+							role: "",
+						}),
+					});
+				} catch (e) {
+					logger.warn(e, "validateUserButton: can't send DM to the owner");
+				}
+			}
+		}
+	}
+}
 /**
  * Validates a user's registration and compiles their statistics, then posts the finalized embeds and user data to the appropriate Discord thread or channel.
  *
