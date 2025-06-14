@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.50.0](https://github.com/Dicelette/discord-dicelette/compare/1.49.0...1.50.0) (2025-06-14)
+
+
+### Features
+
+* **allowSelf:** add option where moderator needs to validate the sheet ([64fb496](https://github.com/Dicelette/discord-dicelette/commit/64fb496f6fffbe35d6bfbfe54eee6162974b0d56))
+
 ## [1.49.0](https://github.com/Dicelette/discord-dicelette/compare/1.48.4...1.49.0) (2025-06-14)
 
 
