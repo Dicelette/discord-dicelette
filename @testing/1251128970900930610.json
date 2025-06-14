@@ -34,5 +34,6 @@
 		"success": 20
 	},
 	"total": 88,
-	"charName": true
+	"charName": true,
+	"forceDistrib": true
 }

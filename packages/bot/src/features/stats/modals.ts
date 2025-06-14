@@ -7,6 +7,7 @@ import {
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -23,7 +24,6 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
-import { logger } from "@dicelette/utils";
 
 /**
  * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
@@ -90,6 +90,27 @@ export async function registerStatistics(
 		Object.entries(parsedFields).filter(([key]) => statsWithoutCombinaison.includes(key))
 	);
 	const nbStats = Object.keys(embedStats).length;
+	logger.debug(stats, oldStatsTotal);
+	const ilReste = calculateRemainingPoints(template.total, oldStatsTotal, stats);
+	if (
+		nbStats === statsWithoutCombinaison.length &&
+		ilReste &&
+		ilReste - oldStatsTotal > 0 &&
+		template.forceDistrib
+	) {
+		await reply(interaction, {
+			content: ul("modals.stats.forceDistrib", { reste: ilReste - oldStatsTotal }),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		//retour à l'étape précédente
+		//change the page to 1
+		userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+		message.edit({
+			embeds: [userEmbed],
+			components: [continueCancelButtons(ul)],
+		});
+		return;
+	}
 	if (nbStats === statsWithoutCombinaison.length) {
 		// noinspection JSUnusedAssignment
 		let combinaison: Record<string, number> = {};
@@ -113,7 +134,6 @@ export async function registerStatistics(
 		});
 		return;
 	}
-	const ilReste = calculateRemainingPoints(template.total, oldStatsTotal, stats);
 	const restePoints = ilReste
 		? `\n${ul("modals.stats.reste", { reste: ilReste, total: template.total, nbStats: statsWithoutCombinaison.length - nbStats })}`
 		: "";
@@ -130,17 +150,17 @@ export async function registerStatistics(
 }
 
 function calculateRemainingPoints(
-	total: number = 0,
-	oldTotal: number = 0,
+	total = 0,
+	oldTotal = 0,
 	stats?: Record<string, number>
 ) {
 	if (total === 0) return undefined;
 	if (oldTotal === 0 && stats) {
 		const newTotal = Object.values(stats).reduce((sum, value) => sum + value, 0);
 		return total - newTotal;
-	} else if (oldTotal > 0) {
-		return total - oldTotal;
 	}
+	if (oldTotal > 0) return total - oldTotal;
+
 	return undefined;
 }
 

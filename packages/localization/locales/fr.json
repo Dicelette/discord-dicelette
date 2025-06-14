@@ -587,6 +587,7 @@
       "stats": "Les statistiques ont bien été supprimés"
     },
     "stats": {
+      "forceDistrib": "Les points doivent être distribués entièrement. Il reste `{{- reste}}` points à mettre.\nVotre fiche ne peut être validée.",
       "reste": "Il vous reste {{- reste}}/{{- total}} points à distribuer pour {{- nbStats}} statistiques."
     },
     "steps": "Enregistrement de l'utilisateur - Page {{- page}}/{{- max}}",

@@ -587,6 +587,7 @@
       "stats": "The statistics have been deleted"
     },
     "stats": {
+      "forceDistrib": "Points must be ditributed in full. There are `{{- reste}}` points to put in.\nYour sheet cannot be validated.",
       "reste": "You still have {{- reste}}/{{- total}} points to distribute between {{- nbStats}} statistics."
     },
     "steps": "User Registration - Page {{- page}}/{{- max}}",

@@ -67,6 +67,9 @@
       "better-sqlite3",
       "canvas",
       "esbuild"
-    ]
+    ],
+    "overrides": {
+      "@dicelette/core": "link:../core"
+    }
   }
 }
