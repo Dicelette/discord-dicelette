@@ -1,18 +1,23 @@
 # Supprimer un personnage
 
-- </delete_char:{{- delete_char }}> : Permet de supprimer un personnage de la base de données. Supprime le message de la feuille de personnage s'il est encore présent sur le serveur.
+### Aperçu des commandes :
+- **</delete_char:{{- delete_char }}>** : Supprime un personnage de la base de données. Si le message de la feuille de personnage est encore présent sur le serveur, il sera également supprimé.
 
 # Rôles automatiques
 
-Ces deux commandes permettent d'ajouter automatiquement un rôle lors de la validation des fichiers :
-- </config auto_role statistic:{{- stat}}> : Ajoute un rôle lors de la validation des statistiques (active </dbroll:{{- dbroll}}>).
-- </config auto_role dice:{{- dice}}> : permet d'ajouter un rôle lorsqu'un dé est enregistré (active </dbd:{{- dbd}}>).
+### Aperçu des commandes :
+Ces commandes permettent l'attribution automatique de rôles lors de la validation des fichiers :
+- **</config auto_role statistic:{{- stat}}>** : Ajoute un rôle lors de la validation des statistiques. Cela active l'utilisation de </dbroll:{{- dbroll}}>.
+- **</config auto_role dice:{{- dice}}>** : Ajoute un rôle lors de l'enregistrement d'un dé. Cela active l'utilisation de </dbd:{{- dbd}}>.
 
-# Lancement de dé « maître de jeu
+# Lancers de dés « maître de jeu »
 
-Les deux commandes suivantes permettent aux maîtres de jeu de lancer les dés pour tous les joueurs enregistrés.
+### Aperçu des commandes :
+Ces commandes permettent aux maîtres de jeu de lancer des dés pour tous les joueurs enregistrés :
+- **</gm dbroll:{{- gm.dbRoll}}>** : Lance un dé de statistiques, similaire à </dbroll:{{- dbroll}}>.
+- **</gm dbd:{{- gm.dBd}}>** : Lance un dé enregistré, similaire à </dbd:{{- dbd}}>.
+- **</gm calc:{{- gm.calc}}>** : Lance un dé de calcul, similaire à </calc:{{- calc}}>.
 
-- </gm dbroll:{{- gm.dbRoll}}> : Lance un dé de statistiques, similaire à </dbroll:{{- dbroll}}>.
-- </gm dbd:{{- gm.dBd}}> : Lance un dé enregistré, similaire à </dbd:{{- dbd}}>.
-- </gm calc:{{- gm.calc}}> : lance un dé de calcul, similaire à </calc:{{- calc}}>.
+### Ressources supplémentaires :
+Pour plus de détails sur ces commandes, consultez la [documentation](<https://dicelette.github.io/>).
 

@@ -1,17 +1,25 @@
 # :game_die: **Dicelette** :game_die:
 
+### Aperçu :
+Dicelette est un bot polyvalent conçu pour les lancers de dés, les opérations mathématiques et la gestion des fils de discussion.
+
+### Ressources :
 - Trouvez le *bot* sur [GitHub](<https://github.com/Dicelette/discord-dicelette/blob/main/README.md>)
-- [Documentation](<https://dicelette.github.io/en>)
+- Accédez à la [Documentation](<https://dicelette.github.io/>) pour des instructions détaillées.
 
-# Utilisation
-- </roll:{{- rollId}}> : Lancer un dé
-- </scene:{{- sceneId}}> : crée un nouveau fil de discussion pour les dés. Cela archivera toutes les discussions précédentes.
+### Utilisation :
+#### Commandes :
+- **</roll:{{- rollId}}>** : Lancez un dé. Exemple : `d6` ou `2d6`.
+- **</scene:{{- sceneId}}>** : Crée un nouveau fil de discussion pour les lancers de dés. Archive automatiquement tous les fils précédents.
+- **</math:{{- mathId}}>** : Effectuez des opérations mathématiques, telles que `2+2`, `3*4` ou `sqrt(16)`.
 
-Vous pouvez également créer une « bulle temporelle » avec le paramètre `/scene tempo:True`. Par défaut, le nom du thread sera la date du jour.
+#### Fonctionnalités avancées :
+- **Bulle temporelle** : Utilisez `/scene tempo:True` pour créer un fil nommé avec la date actuelle.
+- **Dés directs** : Lancez des dés directement dans un message, par exemple `d6` ou `2d6`.
+- **Dés indirects** : Incluez des lancers de dés dans un message, par exemple `*Phibi saute sur Wumpus et lui inflige [2d6] dégâts*`.
+- **Dés semi-directs** : Combinez des lancers de dés avec un message, par exemple `1d100 Phibi saute sur Wumpus et lui inflige des dégâts`.
 
-Vous pouvez utiliser le bot directement dans un message (**sans utiliser les commandes slash**), avec :
-- __Un dé direct__ : `des`, comme `d6` ou `2d6`.
-- __Un dé indirect__ : `mon message [dé]`, comme `*Phibi saute sur Wumpus et lui inflige [2d6] dégâts*`.
-- __Un dé semi-direct__ : `1d100 mon message`, comme `1d100 Phibi saute sur Wumpus et lui inflige des dégâts`.
+### Ressources supplémentaires :
+Pour des configurations et fonctionnalités avancées, consultez la [documentation](<https://dicelette.github.io/>).
 
 {{- dbCMD}}

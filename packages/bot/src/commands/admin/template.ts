@@ -1,14 +1,8 @@
-import {
-	type Critical,
-	type Statistic,
-	type StatisticalTemplate,
-	verifyTemplateValue,
-} from "@dicelette/core";
+import { verifyTemplateValue } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
 import { type GuildData, TUTORIAL_IMAGES } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import dedent from "dedent";
 import * as Djs from "discord.js";
 import {
 	bulkDeleteCharacters,
@@ -19,131 +13,7 @@ import {
 	interactionError,
 	reply,
 } from "messages";
-import { fetchChannel, getLangAndConfig } from "../../utils";
-
-export const generateTemplate = {
-	data: new Djs.SlashCommandBuilder()
-		.setName(t("generate.name"))
-		.setNameLocalizations(cmdLn("generate.name"))
-		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.setDescription(t("generate.description"))
-		.setDescriptionLocalizations(cmdLn("generate.description"))
-		.addStringOption((option) =>
-			option
-				.setName(t("generate.options.stats.name"))
-				.setNameLocalizations(cmdLn("generate.options.stats.name"))
-				.setDescription(t("generate.options.stats.description"))
-				.setDescriptionLocalizations(cmdLn("generate.options.stats.description"))
-				.setRequired(false)
-		)
-
-		.addStringOption((option) =>
-			option
-				.setName(t("generate.options.dice.name"))
-				.setDescription(t("generate.options.dice.description"))
-				.setDescriptionLocalizations(cmdLn("generate.options.dice.description"))
-				.setNameLocalizations(cmdLn("generate.options.dice.name"))
-				.setRequired(false)
-		)
-
-		.addNumberOption((option) =>
-			option
-				.setName(t("generate.options.total.name"))
-				.setDescription(t("generate.options.total.description"))
-				.setDescriptionLocalizations(cmdLn("generate.options.total.description"))
-				.setNameLocalizations(cmdLn("generate.options.total.name"))
-				.setRequired(false)
-		)
-		.addBooleanOption((option) =>
-			option
-				.setName(t("generate.options.character.name"))
-				.setDescription(t("generate.options.character.description"))
-				.setDescriptionLocalizations(cmdLn("generate.options.character.description"))
-				.setNameLocalizations(cmdLn("generate.options.character.name"))
-				.setRequired(false)
-		)
-		.addNumberOption((option) =>
-			option
-				.setName(t("generate.options.critical_success.name"))
-				.setDescription(t("generate.options.critical_success.description"))
-				.setDescriptionLocalizations(
-					cmdLn("generate.options.critical_success.description")
-				)
-				.setNameLocalizations(cmdLn("generate.options.critical_success.name"))
-				.setRequired(false)
-		)
-		.addNumberOption((option) =>
-			option
-				.setName(t("generate.options.critical_fail.name"))
-				.setNameLocalizations(cmdLn("generate.options.critical_fail.name"))
-				.setDescription(t("generate.options.critical_fail.description"))
-				.setDescriptionLocalizations(cmdLn("generate.options.critical_fail.description"))
-				.setRequired(false)
-		)
-		.addStringOption((option) =>
-			option
-				.setName(t("generate.options.damage.name"))
-				.setDescription(t("generate.options.damage.description"))
-				.setDescriptionLocalizations(cmdLn("generate.options.damage.description"))
-				.setNameLocalizations(cmdLn("generate.options.damage.name"))
-				.setRequired(false)
-		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
-		if (!interaction.guild) return;
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const { ul } = getLangAndConfig(client, interaction);
-		const name = options.getString(t("generate.options.stats.name")) ?? undefined;
-		let statServer: Statistic | undefined;
-		if (name) {
-			const statistiqueName = name.split(/[, ]+/);
-			statServer = {};
-			for (const stat of statistiqueName) {
-				statServer[stat] = {
-					max: 0,
-					min: 0,
-					combinaison: "",
-				};
-			}
-		}
-
-		const atqName = options.getString(t("generate.options.damage.name"));
-		let atqDice: Record<string, string> | undefined;
-		if (atqName) {
-			const atq = atqName.split(/[, ]+/);
-			atqDice = {};
-			for (const name of atq) {
-				atqDice[name] = "1d5";
-			}
-		}
-		let critical: Critical | undefined = {
-			failure: options.getNumber(t("generate.options.critical_fail.name")) ?? undefined,
-			success:
-				options.getNumber(t("generate.options.critical_success.name")) ?? undefined,
-		};
-		//verify if everything is undefined in comparator object
-		const isUndefined = Object.values(critical).every((value) => value == null);
-		if (isUndefined) critical = undefined;
-
-		const statistiqueTemplate: StatisticalTemplate = {
-			charName: options.getBoolean(t("generate.options.character.name")) || false,
-			statistics: statServer,
-			diceType: options.getString(t("generate.options.dice.name")) || undefined,
-			critical,
-			total: options.getNumber(t("generate.options.total.name")) || undefined,
-			damage: atqDice,
-		};
-		const help = dedent(ul("generate.help"));
-		await reply(interaction, {
-			content: help,
-			files: [
-				{
-					attachment: Buffer.from(JSON.stringify(statistiqueTemplate, null, 2), "utf-8"),
-					name: "template.json",
-				},
-			],
-		});
-	},
-};
+import { fetchChannel, getLangAndConfig } from "utils";
 
 export const registerTemplate = {
 	data: new Djs.SlashCommandBuilder()

@@ -1,7 +1,14 @@
-# Commands linked to character sheet
+# Commands Linked to Character Sheets
 
-- </dbroll:{{- dbroll}}>: Rolls a statistics dice, from a character sheet.
-- </dbd:{{- dbd}}>: Rolls a die recorded in your character sheet.
-- </graph:{{- graph}}>: Allows you to generate a graph from a character's statistics.
-- </display:{{- display}}>: Allows you to consult the statistics and dice of a character.
-- </calc:{{- calc}}>: Allows you to perform calculations with the statistics of a character.
+### Overview:
+These commands allow you to interact with character sheets, perform dice rolls, and analyze statistics.
+
+### Commands:
+- **</dbroll:{{- dbroll}}>:** Rolls a statistics dice based on the data saved in a character sheet. Useful for evaluating character abilities or traits.
+- **</dbd:{{- dbd}}>:** Rolls a die recorded in your character sheet. Ideal for predefined dice rolls linked to specific actions or abilities.
+- **</graph:{{- graph}}>:** Generates a graph from a character's statistics. This is helpful for visualizing data trends or comparing attributes.
+- **</display:{{- display}}>:** Displays the statistics and dice of a character. Use this to review or share character details.
+- **</calc:{{- calc}}>:** Performs calculations using the statistics of a character. Perfect for deriving values or outcomes based on character data.
+
+### Additional Resources:
+For more information on how to use these commands effectively, consult the [documentation](<https://dicelette.github.io/en/>).
