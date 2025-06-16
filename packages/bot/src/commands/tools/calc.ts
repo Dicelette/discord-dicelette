@@ -2,7 +2,7 @@ import { generateStatsDice, isNumber } from "@dicelette/core";
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
@@ -220,6 +220,7 @@ export async function calculate(
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });
+		logger.warn(error);
 	}
 }
 

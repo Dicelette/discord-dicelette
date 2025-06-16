@@ -1,7 +1,7 @@
 import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -74,6 +74,7 @@ export async function validateDiceEdit(
 		try {
 			evalStatsDice(dice, statsValues);
 		} catch (error) {
+			logger.warn(error);
 			throw new Error(ul("error.invalidDice.eval", { dice }));
 		}
 		newEmbedDice.push({

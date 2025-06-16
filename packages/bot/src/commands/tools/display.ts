@@ -1,7 +1,7 @@
 import { generateStatsDice } from "@dicelette/core";
 import { cmdLn, findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
-import { cleanAvatarUrl, filterChoices } from "@dicelette/utils";
+import { cleanAvatarUrl, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
@@ -122,7 +122,7 @@ export const displayUser = {
 			if (newDiceEmbed) displayEmbeds.push(newDiceEmbed);
 			await reply(interaction, { embeds: displayEmbeds });
 		} catch (e) {
-			console.error("\n", e);
+			logger.error("\n", e);
 			await reply(interaction, {
 				embeds: [embedError(ul("error.user.notFound"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,

@@ -5,6 +5,7 @@ import type { EClient } from "client";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
 import { fetchChannel } from "../utils";
+import { logger } from "@dicelette/utils";
 
 /**
  * Retrieves the statistical template for a guild based on the interaction context.
@@ -69,6 +70,7 @@ export async function getTemplate(
 		const message = await channel.messages.fetch(messageId);
 		return fetchTemplate(message, enmap);
 	} catch (error) {
+		logger.warn(error);
 		if (skipNoFound) return undefined;
 		if ((error as Error).message === "Unknown Message")
 			throw new Error(ul("error.template.id", { channelId, messageId }));

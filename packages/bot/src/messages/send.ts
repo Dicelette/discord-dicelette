@@ -7,6 +7,7 @@ import * as Djs from "discord.js";
 import { embedError, findMessageBefore, threadToSend } from "messages";
 import { fetchChannel, isValidChannel } from "utils";
 import type { EClient } from "../client";
+import { logger } from "@dicelette/utils";
 
 export async function sendLogs(
 	message: string,
@@ -21,6 +22,7 @@ export async function sendLogs(
 		const allowedMentions = allowMentions ? undefined : {};
 		await channelToSend.send({ content: message, allowedMentions });
 	} catch (error) {
+		logger.warn(error);
 		return;
 	}
 }
@@ -43,7 +45,7 @@ export async function reply(
 		}
 		return await interaction.reply(options);
 	} catch (e) {
-		console.error("\n", e);
+		logger.error("\n", e);
 		return await interaction.followUp(options);
 	}
 }
@@ -65,6 +67,7 @@ export async function deleteAfter(
 		try {
 			await message.delete();
 		} catch (error) {
+			logger.warn(error);
 			// Can't delete message, probably because the message was already deleted; ignoring the error.
 		}
 	}, time);
@@ -200,7 +203,7 @@ export async function interactionError(
 	ul: Translation,
 	langToUse?: Djs.Locale
 ) {
-	console.error("\n", e);
+	logger.error("\n", e);
 	if (!interaction.guild) return;
 	const msgError = lError(e as Error, interaction, langToUse);
 	if (msgError.length === 0) return;

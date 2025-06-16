@@ -10,7 +10,7 @@ export const onReactionAdd = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				console.error("\nSomething went wrong when fetching the message: ", error);
+				logger.error("\nSomething went wrong when fetching the message: ", error);
 				return;
 			}
 		}
@@ -109,7 +109,7 @@ async function copyReaction(reaction: Djs.MessageReaction | Djs.PartialMessageRe
 	try {
 		await messageToCopy.react(reaction.emoji);
 	} catch (error) {
-		logger.trace(error);
+		logger.warn(error);
 	}
 }
 
@@ -119,7 +119,7 @@ export const onReactionRemove = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				console.error("\nSomething went wrong when fetching the message: ", error);
+				logger.warn("\nSomething went wrong when fetching the message: ", error);
 				return;
 			}
 		}

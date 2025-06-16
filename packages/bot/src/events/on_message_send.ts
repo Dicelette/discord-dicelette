@@ -4,6 +4,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, threadToSend } from "messages";
 import { fetchChannel } from "../utils";
+import { logger } from "@dicelette/utils";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
@@ -77,7 +78,7 @@ export default (client: EClient): void => {
 			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
-			console.error("\n", e);
+			logger.error("\n", e);
 			if (!message.guild) return;
 			const userLang =
 				client.settings.get(message.guild.id, "lang") ??

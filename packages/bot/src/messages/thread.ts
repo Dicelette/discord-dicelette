@@ -250,6 +250,7 @@ export async function findThread(
 				return rollChannel;
 			}
 		} catch (e) {
+			logger.warn(e);
 			let command = `${ul("config.name")} ${ul("changeThread.name")}`;
 
 			if (hidden) {
@@ -333,6 +334,7 @@ export async function findForumChannel(
 				return rollChannel;
 			}
 		} catch (e) {
+			logger.warn(e);
 			let command = `${ul("config.name")} ${ul("changeThread.name")}`;
 
 			if (hidden) {

@@ -144,6 +144,7 @@ export async function getUser(
 			return getUserByEmbed({ message }, ul);
 		}
 	} catch (_e) {
+		logger.warn(_e);
 		return;
 	}
 }
@@ -233,6 +234,7 @@ export async function getUserFromMessage(
 
 		return userData;
 	} catch (error) {
+		logger.warn(error);
 		if (!skipNotFound)
 			throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
 	}

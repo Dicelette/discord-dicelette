@@ -3,6 +3,7 @@ import { DiscordAPIError } from "@discordjs/rest";
 import type { EClient } from "client";
 import dedent from "dedent";
 import dotenv from "dotenv";
+import { logger } from "@dicelette/utils";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
@@ -30,7 +31,7 @@ export default (client: EClient): void => {
 		if (error instanceof DiscordAPIError && ignoreCode.includes(<number>error.code))
 			return;
 
-		console.warn("\n", error);
+		logger.warn("\n", error);
 		if (!process.env.OWNER_ID) return;
 		const dm = await client.users.createDM(process.env.OWNER_ID);
 		await dm.send({ content: formatErrorMessage(error) });

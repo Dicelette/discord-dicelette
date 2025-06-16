@@ -1,5 +1,6 @@
 import { generateStatsDice, isNumber, type Resultat, roll } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { DETECT_DICE_MESSAGE } from "./interfaces";
@@ -38,6 +39,7 @@ export function getRoll(dice: string): Resultat | undefined {
 		}
 		return rollDice;
 	} catch (error) {
+		logger.warn(error);
 		return undefined;
 	}
 }
@@ -60,6 +62,7 @@ export function convertExpression(
 			return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
 	} catch (error) {
 		//pass
+		logger.warn(error);
 	}
 	if (!dice.startsWith("+") && !dice.startsWith("-")) return `+${dice}`;
 	return dice;

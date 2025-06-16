@@ -10,6 +10,7 @@ import type { EClient } from "client";
 import { getUser } from "database";
 import type * as Djs from "discord.js";
 import { searchUserChannel } from "utils";
+import { logger } from "@dicelette/utils";
 
 /**
  * Register the managerId in the database
@@ -73,6 +74,7 @@ export async function registerUser(
 						if (oldMessage) await oldMessage.delete();
 					}
 				} catch (error) {
+					logger.warn(error);
 					//skip unknown message
 				}
 			}

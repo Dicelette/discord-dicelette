@@ -1,6 +1,7 @@
 import { type Resultat, roll } from "@dicelette/core";
 import { DETECT_DICE_MESSAGE } from "./interfaces.js";
 import { trimAll } from "./utils";
+import { logger } from "@dicelette/utils";
 
 export function isRolling(content: string) {
 	const detectRoll = content.match(/\[.*\]/)?.[1];
@@ -16,6 +17,7 @@ export function isRolling(content: string) {
 	try {
 		result = detectRoll ? roll(trimAll(detectRoll)) : roll(trimAll(content));
 	} catch (e) {
+		logger.warn(e);
 		return undefined;
 	}
 	if (comments && !detectRoll && result) {

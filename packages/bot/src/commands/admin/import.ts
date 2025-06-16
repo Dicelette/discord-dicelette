@@ -12,6 +12,7 @@ import {
 } from "messages";
 import { addAutoRole, getLangAndConfig, parseCSV } from "utils";
 import type { DiscordChannel } from "@dicelette/types";
+import {logger} from "@dicelette/utils";
 
 /**
  * ! Note: Bulk data doesn't allow to register dice-per-user, as each user can have different dice
@@ -173,6 +174,7 @@ export const bulkAdd = {
 									if (oldMessage) await oldMessage.delete();
 								} catch (error) {
 									//skip unknown message
+									logger.warn(error)
 								}
 							}
 						}

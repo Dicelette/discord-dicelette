@@ -1,6 +1,7 @@
 import type { EClient } from "../client";
 import type * as Djs from "discord.js";
 import { ln } from "@dicelette/localization";
+import { logger } from "@dicelette/utils";
 
 export function getLangAndConfig(
 	client: EClient,
@@ -36,7 +37,7 @@ export async function fetchChannel(
 	try {
 		return guild.channels.cache.get(channelId) ?? (await guild.channels.fetch(channelId));
 	} catch (error) {
-		console.error(`Failed to fetch channel with ID ${channelId}:`, error);
+		logger.warn(`Failed to fetch channel with ID ${channelId}:`, error);
 		return null;
 	}
 }

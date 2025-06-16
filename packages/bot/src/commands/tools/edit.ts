@@ -6,7 +6,7 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import { cleanAvatarUrl, filterChoices, verifyAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, filterChoices, logger, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	deleteUser,
@@ -211,6 +211,7 @@ async function avatar(
 		});
 	} catch (error) {
 		await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
+		logger.warn(error);
 	}
 }
 
@@ -309,6 +310,7 @@ export async function rename(
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
+		logger.warn(error);
 		if ((error as Error).message === "DUPLICATE")
 			await reply(interaction, {
 				embeds: [embedError(ul("error.duplicate"), ul, "duplicate")],
@@ -390,6 +392,7 @@ export async function move(
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
+		logger.warn(error);
 		if ((error as Error).message === "DUPLICATE")
 			await reply(interaction, { embeds: [embedError(ul("error.duplicate"), ul)] });
 		else

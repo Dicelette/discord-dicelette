@@ -1,6 +1,6 @@
 import { cmdLn, LocalePrimary, ln, t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
@@ -345,7 +345,7 @@ function allowSelfRegistration(
 			: "";
 	let msg = ul("config.selfRegister.enable", { url });
 	if (toggle === "moderation") {
-		console.debug(
+		logger.trace(
 			`Self registration enabled with moderation for ${interaction.guild!.name}`
 		);
 		msg += `\n\n**__${ul("config.selfRegister.enableModeration")}__**`;

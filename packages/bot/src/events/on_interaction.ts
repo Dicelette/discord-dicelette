@@ -14,6 +14,7 @@ import * as Djs from "discord.js";
 import * as features from "features";
 import { embedError, interactionError } from "messages";
 import { cancel, getLangAndConfig } from "utils";
+import { logger } from "@dicelette/utils";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
@@ -63,6 +64,7 @@ export default (client: EClient): void => {
 				await resetButton(interaction.message, ul);
 			}
 		} catch (e) {
+			logger.warn(e);
 			await interactionError(client, interaction, e as Error, ul, langToUse);
 		}
 	});

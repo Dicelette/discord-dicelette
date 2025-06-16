@@ -18,6 +18,7 @@ const pathToReplace: Target = {
 	"help.register.message": "register",
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: dynamic object structure
 function setNestedKey(obj: any, keyPath: string, value: string) {
 	const keys = keyPath.split(".");
 	let current = obj;

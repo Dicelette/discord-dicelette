@@ -10,6 +10,7 @@ import {
 	getEmbedsList,
 } from "messages";
 import { searchUserChannel } from "utils";
+import { logger } from "@dicelette/utils";
 
 /**
  * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
@@ -78,7 +79,8 @@ export async function bulkEditTemplateUser(
 				await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 					embeds: listEmbed.list,
 				});
-			} catch {
+			} catch (e) {
+				logger.warn(e);
 				//pass
 			}
 		}
@@ -134,7 +136,7 @@ export async function bulkDeleteCharacters(
 			});
 		} else await rep.edit({ components: [] });
 	} catch (err) {
-		console.error("\n", err);
+		logger.error("\n", err);
 	}
 	return;
 }
@@ -154,7 +156,7 @@ async function deleteMessageChar(
 			try {
 				await thread.messages.delete(messageId);
 			} catch (err) {
-				console.error(err);
+				logger.error(err);
 			}
 		}
 	}

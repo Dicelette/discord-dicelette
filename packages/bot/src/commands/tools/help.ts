@@ -5,6 +5,7 @@ import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 import { getLangAndConfig } from "../../utils";
+import { logger } from "@dicelette/utils";
 export const help = {
 	data: new Djs.SlashCommandBuilder()
 		.setName(t("help.name"))
@@ -145,7 +146,7 @@ export const help = {
 };
 
 function getCommandIds(
-	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>, 
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 	commandNames: string[]
 ) {
 	const ids: Record<string, string | undefined> = {};
@@ -170,34 +171,34 @@ function getHelpDBCmd(
 }
 
 function getConfigIds(
-  commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
-  const ids: Record<string, string | undefined> = {};
-  const idConfig = commandsID.findKey((command) => command.name === t("config.name"));
-  if (!idConfig) return;
+	const ids: Record<string, string | undefined> = {};
+	const idConfig = commandsID.findKey((command) => command.name === t("config.name"));
+	if (!idConfig) return;
 
-  ids[t("logs.name")] = idConfig;
-  ids[t("changeThread.name")] = idConfig;
-  ids[t("timer.name")] = idConfig;
-  ids[t("config.display.name")] = idConfig;
-  ids[t("timestamp.name")] = idConfig;
-  ids[t("config.lang.name")] = idConfig;
-  ids[t("config.selfRegister.name")] = idConfig;
-  ids[t("config.lang.options.name")] = idConfig;
+	ids[t("logs.name")] = idConfig;
+	ids[t("changeThread.name")] = idConfig;
+	ids[t("timer.name")] = idConfig;
+	ids[t("config.display.name")] = idConfig;
+	ids[t("timestamp.name")] = idConfig;
+	ids[t("config.lang.name")] = idConfig;
+	ids[t("config.selfRegister.name")] = idConfig;
+	ids[t("config.lang.options.name")] = idConfig;
 
-  // Recherche des subcommandes qui commencent par /config
-  commandsID.forEach((command) => {
-    if (command.name.startsWith("config")) {
-      ids[command.name] = command.id;
-    }
-  });
+	// Recherche des subcommandes qui commencent par /config
+	commandsID.forEach((command) => {
+		if (command.name.startsWith("config")) {
+			ids[command.name] = command.id;
+		}
+	});
 
-  return ids;
+	return ids;
 }
 
 function getIDForAdminDB(
-	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>, 
-	db: Settings, 
+	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
+	db: Settings,
 	guildID: Djs.Snowflake
 ) {
 	if (!db.has(guildID, "templateID")) return;
@@ -226,20 +227,20 @@ function getIDForAdminDB(
 }
 
 function createHelpMessageDB(
-  guildID: Djs.Snowflake,
-  ul: Translation,
-  db: Settings,
-  commandsID?: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
+	guildID: Djs.Snowflake,
+	ul: Translation,
+	db: Settings,
+	commandsID?: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
-  if (!db.has(guildID, "templateID") || !commandsID) return "";
-  const ids = getHelpDBCmd(commandsID);
-  return ul("help.messageDB", {
-    dbd: ids?.[t("rAtq.name")],
-    dbroll: ids?.[t("dbRoll.name")],
-    graph: ids?.[t("graph.name")],
-    display: ids?.[t("display.title")],
-    calc: ids?.[t("calc.title")],
-  });
+	if (!db.has(guildID, "templateID") || !commandsID) return "";
+	const ids = getHelpDBCmd(commandsID);
+	return ul("help.messageDB", {
+		dbd: ids?.[t("rAtq.name")],
+		dbroll: ids?.[t("dbRoll.name")],
+		graph: ids?.[t("graph.name")],
+		display: ids?.[t("display.title")],
+		calc: ids?.[t("calc.title")],
+	});
 }
 
 export async function helpAtInvit(guild: Djs.Guild) {
@@ -286,6 +287,7 @@ export async function helpAtInvit(guild: Djs.Guild) {
 			await systemChannel.send(msg);
 		} catch (_e) {
 			await owner.send(msg);
+			logger.warn(_e);
 		}
 	}
 }
