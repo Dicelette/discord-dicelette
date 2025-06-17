@@ -1,4 +1,4 @@
-import {important} from "@dicelette/utils";
+import { important } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import type { EClient } from "../client";
 
@@ -19,11 +19,13 @@ export default (client: EClient): void => {
 };
 
 export async function sendErrorToWebhook(error: unknown) {
-	const DiscordWebhookUrl = process.env.DISCORD_WEBHOOK_URL!;
-	if (!DiscordWebhookUrl) return;
 	const ownerId = process.env.OWNER_ID;
-	const webhookId = process.env.DISCORD_WEBHOOK_ID!;
-	const webhookToken = process.env.DISCORD_WEBHOOK_TOKEN!;
+	const webhookUrl = process.env.WEBHOOK_URL;
+	if (!ownerId || !webhookUrl) {
+		console.error("Owner ID or Webhook URL is not set in environment variables.");
+		return;
+	}
+	const [webhookId, webhookToken] = webhookUrl.split("/").slice(-2);
 
 	const webhookClient = new Djs.WebhookClient({ id: webhookId, token: webhookToken });
 
