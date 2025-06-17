@@ -15,15 +15,45 @@ const optionLoggers: ISettingsParam<ILogObj> =
 				hideLogPositionForProduction: true,
 			};
 
-const defaultOptions = {
-	prettyLogTemplate:
-		"{{logLevelName}} [{{filePathWithLine}}] ",
+const overwrite = {
+	transportFormatted: (
+		logMetaMarkup: string,
+		logArgs: unknown[],
+		logErrors: string[]
+	) => {
+		const logLevel = logMetaMarkup.trim().split("\t")[1];
+		switch (logLevel) {
+			case "WARN":
+				console.warn(logMetaMarkup, ...logArgs, ...logErrors);
+				break;
+			case "ERROR":
+			case "FATAL":
+				console.error(logMetaMarkup, ...logArgs, ...logErrors);
+				break;
+			case "INFO":
+				console.info(logMetaMarkup, ...logArgs, ...logErrors);
+				break;
+			case "DEBUG":
+			case "TRACE":
+			case "SILLY":
+				console.debug(logMetaMarkup, ...logArgs, ...logErrors);
+				break;
+			default:
+				console.log(logMetaMarkup, ...logArgs, ...logErrors);
+				break;
+		}
+	},
+};
+
+const defaultOptions: ISettingsParam<ILogObj> = {
+	prettyLogTemplate: "{{logLevelName}} [{{filePathWithLine}}] ",
 	prettyErrorTemplate: "\n{{errorName}} {{errorMessage}}\nerror stack:\n{{errorStack}}",
 	prettyErrorStackTemplate: "  • {{fileName}}\t{{method}}\n\t{{filePathWithLine}}",
 	prettyErrorParentNamesSeparator: ":",
 	prettyErrorLoggerNameDelimiter: "\t",
 	stylePrettyLogs: true,
-	prettyLogTimeZone: "Europe/Paris",
+	prettyLogTimeZone: "local",
+	overwrite,
 	prettyLogStyles: {
 		logLevelName: {
 			"*": ["bold", "black", "bgWhiteBright", "dim"],
@@ -42,7 +72,7 @@ const defaultOptions = {
 		nameWithDelimiterSuffix: ["white", "bold"],
 		errorName: ["bold", "bgRedBright", "whiteBright"],
 		fileName: ["white"],
-		fileNameWithLine: "white",
+		fileLine: ["dim", "white"],
 	},
 };
 
@@ -53,8 +83,8 @@ export const important: Logger<ILogObj> = new Logger({
 	name: "Note",
 	minLevel: 0,
 	hideLogPositionForProduction: true,
-	prettyLogTemplate:
-		"[{{logLevelName}}] ",
+	prettyLogTemplate: "[{{logLevelName}}] ",
+	overwrite,
 	prettyLogStyles: {
 		dd: "dim",
 		mm: "dim",

@@ -3,11 +3,11 @@
 import { lError } from "@dicelette/localization";
 import { createUrl, type ResultAsText } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, findMessageBefore, threadToSend } from "messages";
 import { fetchChannel, isValidChannel } from "utils";
 import type { EClient } from "../client";
-import { logger } from "@dicelette/utils";
 
 export async function sendLogs(
 	message: string,
