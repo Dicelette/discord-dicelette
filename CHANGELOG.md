@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.51.1](https://github.com/Dicelette/discord-dicelette/compare/1.51.0...1.51.1) (2025-06-19)
+
+
+### Bug Fixes
+
+* **dbroll:** forgot to remove the detect critical before parsing the comparator ([f824942](https://github.com/Dicelette/discord-dicelette/commit/f824942aef63d1ccc60b5a835cedb11175e7d3d3))
+
 ## [1.51.0](https://github.com/Dicelette/discord-dicelette/compare/1.50.1...1.51.0) (2025-06-19)
 
 
