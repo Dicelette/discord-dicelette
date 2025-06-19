@@ -4,7 +4,7 @@ import type { Characters, Translation, UserData } from "@dicelette/types";
 import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { showStatistiqueModal } from "features";
+import { findDuplicate, showStatistiqueModal } from "features";
 import {
 	createCustomCritical,
 	createDiceEmbed,
@@ -243,12 +243,15 @@ export async function validateUser(
 			templateDamage[damage.name.unidecode(true)] = damage.value;
 		}
 	}
+	// Add the template damage to the user if exists
 	for (const [name, dice] of Object.entries(template.damage ?? {})) {
 		if (!templateDamage) templateDamage = {};
 		templateDamage[name] = dice;
 		if (!diceEmbed) {
 			diceEmbed = createDiceEmbed(ul);
 		}
+		//prevent duplicate fields in the dice embed
+		if (findDuplicate(diceEmbed, name)) continue;
 		//why i forgot this????
 		diceEmbed.addFields({
 			name: `${name}`,

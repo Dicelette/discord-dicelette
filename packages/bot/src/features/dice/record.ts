@@ -22,6 +22,7 @@ import {
 	sendLogs,
 } from "messages";
 import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "utils";
+import type { EmbedBuilder } from "discord.js";
 
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.
@@ -128,7 +129,8 @@ export async function registerDamageDice(
 			if (
 				diceEmbed
 					.toJSON()
-					.fields?.findIndex((f) => f.name.unidecode() === field.name.unidecode()) === -1
+					.fields?.findIndex((f) => f.name.standardize() === field.name.standardize()) ===
+				-1
 			) {
 				diceEmbed.addFields(newField);
 			}
@@ -137,12 +139,7 @@ export async function registerDamageDice(
 	if (!user) throw new Error(ul("error.user.notFound")); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
-	if (
-		diceEmbed
-			.toJSON()
-			.fields?.findIndex((f) => f.name.unidecode() === name.unidecode()) === -1 ||
-		!diceEmbed.toJSON().fields
-	) {
+	if (!findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {
 		diceEmbed.addFields({
 			name: capitalizeBetweenPunct(name),
 			value: `\`${value}\``,
@@ -257,4 +254,12 @@ async function edit(
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
 	return await sendLogs(`${msg}\n${compare}`, interaction.guild as Djs.Guild, db);
+}
+
+export function findDuplicate(diceEmbed: EmbedBuilder, name: string) {
+	return (
+		diceEmbed
+			.toJSON()
+			.fields?.findIndex((f) => f.name.standardize() === name.standardize()) !== -1
+	);
 }
