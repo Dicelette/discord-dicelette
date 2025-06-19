@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.51.0](https://github.com/Dicelette/discord-dicelette/compare/1.50.1...1.51.0) (2025-06-19)
+
+
+### Features
+
+* custom critical per dice roll with `{(*)c(sf):(sign)(number)}` syntax. ([ba55c42](https://github.com/Dicelette/discord-dicelette/commit/ba55c4231e727bbcaa1fdf8c9a1031df7a298855))
+
+
+### Bug Fixes
+
+* **damage:** allow overriding template dice when registering an user (aka fix duplicate) ([9d09c94](https://github.com/Dicelette/discord-dicelette/commit/9d09c94fad95462a946b4abef7094d30597ad6b6))
+* **damage:** on duplicate value registered with damage dice, allow to override a existing value ([035a9ef](https://github.com/Dicelette/discord-dicelette/commit/035a9ef6c4c4e85473f0fbe987e65ff765b123f8))
+* roll custom critical if they are dice ([702a131](https://github.com/Dicelette/discord-dicelette/commit/702a1312ad1219c54b5ca47123c54c080f353cf0))
+
 ## [1.50.1](https://github.com/Dicelette/discord-dicelette/compare/1.50.0...1.50.1) (2025-06-15)
 
 ## [1.50.0](https://github.com/Dicelette/discord-dicelette/compare/1.49.0...1.50.0) (2025-06-14)
