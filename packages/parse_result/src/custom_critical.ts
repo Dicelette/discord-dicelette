@@ -51,10 +51,11 @@ function rollOneCustomCritical(critical: CustomCritical) {
 }
 
 export function rollCustomCritical(
-	custom: Record<string, CustomCritical>,
+	custom?: Record<string, CustomCritical>,
 	statValue?: number,
 	statistics?: Record<string, number>
 ) {
+	if (!custom) return undefined;
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
 		value.value = generateStatsDice(value.value, statistics, statValue?.toString());
@@ -129,4 +130,15 @@ export function getCriticalFromDice(
 		};
 	}
 	return Object.keys(customCritical).length > 0 ? customCritical : undefined;
+}
+
+export function rollCustomCriticalsFromDice(
+	dice: string,
+	ul: Translation,
+	statValue?: number,
+	statistics?: Record<string, number>
+): Record<string, CustomCriticalRoll> | undefined {
+	const customCritical = getCriticalFromDice(dice, ul);
+	if (!customCritical) return undefined;
+	return rollCustomCritical(customCritical, statValue, statistics);
 }

@@ -10,9 +10,7 @@ export function getCharaInMemory(
 	charName?: string | null
 ) {
 	const getChara = characters.get(guildID, userID);
-	const found = getChara?.find((char) => char.userName?.subText(charName, true));
-	logger.trace(`Found ${charName} in memory`, found);
-	return found;
+	return getChara?.find((char) => char.userName?.subText(charName, true));
 }
 
 export async function updateMemory(

@@ -1,7 +1,8 @@
 import { cmdLn, t } from "@dicelette/localization";
+import { rollCustomCriticalsFromDice } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { rollWithInteraction } from "utils";
+import { getLangAndConfig, rollWithInteraction } from "utils";
 
 export const diceRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -35,6 +36,8 @@ export const diceRoll = {
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		const dice = option.getString(t("roll.option.name"), true);
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));
+		const { ul } = getLangAndConfig(client, interaction);
+		const rCC = rollCustomCriticalsFromDice(dice, ul);
 		await rollWithInteraction(
 			interaction,
 			dice,
@@ -43,7 +46,8 @@ export const diceRoll = {
 			undefined,
 			undefined,
 			undefined,
-			hidden
+			hidden,
+			rCC
 		);
 	},
 };

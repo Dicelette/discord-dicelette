@@ -2,15 +2,18 @@ import {
 	type CustomCritical,
 	generateStatsDice,
 	replaceFormulaInDice,
+	DETECT_CRITICAL,
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
 	convertNameToValue,
+	getCriticalFromDice,
 	getExpression,
 	getRoll,
 	ResultAsText,
 	replaceStatInDice,
 	rollCustomCritical,
+	rollCustomCriticalsFromDice,
 	type Server,
 	skillCustomCritical,
 	trimAll,
@@ -138,11 +141,14 @@ export async function rollDice(
 		});
 		return;
 	}
+
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
 	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
+	const rCC = getCriticalFromDice(dice, ul);
+	dice = dice.replace(DETECT_CRITICAL, "").trim();
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -175,7 +181,7 @@ export async function rollDice(
 		infoRoll,
 		hideResult,
 		skillCustomCritical(
-			userStatistique.template.customCritical,
+			rCC || userStatistique.template.customCritical,
 			userStatistique.stats,
 			dollarValue?.total
 		)
@@ -291,9 +297,9 @@ export async function rollStatistique(
 		comparator = comparatorMatch[0];
 	}
 	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
-	const customCritical = template.customCritical
-		? rollCustomCritical(template.customCritical, userStat, userStatistique.stats)
-		: undefined;
+	const customCritical =
+		rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats) ||
+		rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
 	const infoRoll =
 		statistic && standardizedStatistic
 			? { name: statistic, standardized: standardizedStatistic }

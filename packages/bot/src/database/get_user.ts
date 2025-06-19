@@ -144,7 +144,7 @@ export async function getUser(
 			return getUserByEmbed({ message }, ul);
 		}
 	} catch (_e) {
-		logger.warn(_e);
+		//logger.warn(_e);
 		return;
 	}
 }

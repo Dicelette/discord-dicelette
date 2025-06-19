@@ -1,5 +1,9 @@
 import { lError, ln } from "@dicelette/localization";
-import { getCriticalFromDice, isRolling, ResultAsText } from "@dicelette/parse_result";
+import {
+	isRolling,
+	ResultAsText,
+	rollCustomCriticalsFromDice,
+} from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, threadToSend } from "messages";
@@ -28,7 +32,7 @@ export default (client: EClient): void => {
 			const ul = ln(userLang);
 			const channel = message.channel;
 			if (!result) return;
-			const critical = getCriticalFromDice(content, ul);
+			const critical = rollCustomCriticalsFromDice(content, ul);
 			const resultAsText = new ResultAsText(
 				result,
 				{ lang: userLang },
