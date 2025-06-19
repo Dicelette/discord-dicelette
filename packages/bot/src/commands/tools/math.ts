@@ -32,7 +32,7 @@ export const math = {
 			}))
 		);
 	},
-	async execute(interaction: Djs.CommandInteraction, client: EClient) {
+	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const { options, ul, optionChar } = (await getStatistics(interaction, client)) ?? {};
 		if (!ul || !options) return;

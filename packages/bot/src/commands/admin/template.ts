@@ -85,7 +85,10 @@ export const registerTemplate = {
 				.setNameLocalizations(cmdLn("register.options.delete.name"))
 				.setDescriptionLocalizations(cmdLn("register.options.delete.description"))
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
+	async execute(
+		interaction: Djs.ChatInputCommandInteraction,
+		client: EClient
+	): Promise<void> {
 		if (!interaction.guild) return;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;

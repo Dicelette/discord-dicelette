@@ -131,7 +131,7 @@ export const mjRoll = {
 			}))
 		);
 	},
-	async execute(interaction: Djs.CommandInteraction, client: EClient) {
+	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const guildData = client.settings.get(interaction.guild.id);

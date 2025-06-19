@@ -104,7 +104,7 @@ export const editAvatar = {
 			filter.map((result) => ({ name: result.capitalize(), value: result }))
 		);
 	},
-	async execute(interaction: Djs.CommandInteraction, client: EClient) {
+	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const int = await optionInteractions(interaction, client);
 		if (!int) return;
 		const { options, ul, user } = int;

@@ -31,7 +31,7 @@ export const calc = {
 			}))
 		);
 	},
-	async execute(interaction: Djs.CommandInteraction, client: EClient) {
+	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const { userStatistique, options, ul, optionChar } =
 			(await getStatistics(interaction, client)) ?? {};

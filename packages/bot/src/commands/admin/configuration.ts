@@ -265,7 +265,7 @@ export const configuration = {
 						.setRequired(false)
 				)
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient) {
+	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
 		const { ul } = getLangAndConfig(client, interaction);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -725,7 +725,7 @@ async function timestamp(
  * Updates the guild's settings to show or hide context links and replies with a localized confirmation message based on the new setting and the current message deletion timer.
  */
 async function setContextLink(
-	interaction: Djs.CommandInteraction,
+	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	ul: Translation
 ) {
@@ -748,7 +748,7 @@ async function setContextLink(
 }
 
 async function linkToLog(
-	interaction: Djs.CommandInteraction,
+	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	ul: Translation
 ) {

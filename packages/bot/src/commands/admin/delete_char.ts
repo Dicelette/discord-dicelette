@@ -63,7 +63,10 @@ export const deleteChar = {
 				.setDescription(t("deleteChar.character"))
 				.setAutocomplete(true)
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
+	async execute(
+		interaction: Djs.ChatInputCommandInteraction,
+		client: EClient
+	): Promise<void> {
 		const int = await optionInteractions(interaction, client);
 		if (!int) return;
 		const { options, guildData, ul, user } = int;

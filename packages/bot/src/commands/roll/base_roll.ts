@@ -25,7 +25,10 @@ export const diceRoll = {
 				.setDescription(t("dbRoll.options.hidden.description"))
 				.setRequired(false)
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
+	async execute(
+		interaction: Djs.ChatInputCommandInteraction,
+		client: EClient
+	): Promise<void> {
 		if (!interaction.guild) return;
 		const channel = interaction.channel;
 		if (!channel || !channel.isTextBased()) return;

@@ -252,7 +252,7 @@ export async function getUserFromMessage(
  * @returns A record of user IDs to their corresponding character data, or `undefined` if not found.
  */
 export async function getRecordChar(
-	interaction: Djs.CommandInteraction,
+	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	t: Translation,
 	strict = true
@@ -394,7 +394,7 @@ export async function getUserNameAndChar(
  * @returns An object containing the user's statistics, translation object, selected character name, and interaction options, or `undefined` if data is unavailable.
  */
 export async function getStatistics(
-	interaction: Djs.CommandInteraction,
+	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;

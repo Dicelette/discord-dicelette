@@ -27,7 +27,10 @@ export default {
 				.setDescriptionLocalizations(cmdLn("scene.time.description"))
 				.setRequired(false)
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
+	async execute(
+		interaction: Djs.ChatInputCommandInteraction,
+		client: EClient
+	): Promise<void> {
 		if (!interaction.guild) return;
 		const allCommands = await interaction.guild.commands.fetch();
 		const channel = interaction.channel;

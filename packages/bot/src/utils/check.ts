@@ -96,7 +96,7 @@ export function isSerializedNameEquals(
  * @returns An object containing the interaction options, guild configuration, language, localization utility, and the user option.
  */
 export async function optionInteractions(
-	interaction: Djs.CommandInteraction,
+	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient
 ) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;

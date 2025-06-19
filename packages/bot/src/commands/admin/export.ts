@@ -22,7 +22,7 @@ export const exportData = {
 				.setDescriptionLocalizations(cmdLn("export.options.desc"))
 				.setRequired(false)
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient) {
+	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const isPrivate = options.getBoolean(t("export.options.name")) ?? undefined;

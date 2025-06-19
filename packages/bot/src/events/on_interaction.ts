@@ -29,7 +29,7 @@ export default (client: EClient): void => {
 					(cmd) => cmd.data.name === interaction.commandName
 				);
 				if (!command) return;
-				await command.execute(interaction, client);
+				await command.execute(interaction as Djs.ChatInputCommandInteraction, client);
 			} else if (interaction.isAutocomplete()) {
 				const autocompleteInteraction = interaction as Djs.AutocompleteInteraction;
 				const command = autCompleteCmd.find(

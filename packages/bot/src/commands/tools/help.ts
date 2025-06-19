@@ -47,7 +47,10 @@ export const help = {
 				.setDescription(t("help.register.description"))
 				.setDescriptionLocalizations(cmdLn("help.register.description"))
 		),
-	async execute(interaction: Djs.CommandInteraction, client: EClient): Promise<void> {
+	async execute(
+		interaction: Djs.ChatInputCommandInteraction,
+		client: EClient
+	): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		const { ul, langToUse } = getLangAndConfig(client, interaction);
