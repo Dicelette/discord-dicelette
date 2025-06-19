@@ -145,7 +145,22 @@ export async function registerDamageDice(
 			value: `\`${value}\``,
 			inline: true,
 		});
+	} else {
+		const allFieldWithoutDuplicate = diceEmbed
+			.toJSON()
+			?.fields?.filter((field) => field.name.standardize() !== name.standardize());
+		if (allFieldWithoutDuplicate) {
+			diceEmbed.setFields([
+				...allFieldWithoutDuplicate,
+				{
+					name: capitalizeBetweenPunct(name),
+					value: `\`${value}\``,
+					inline: true,
+				},
+			]);
+		}
 	}
+
 	const damageName = diceEmbed.toJSON().fields?.reduce(
 		(acc, field) => {
 			acc[field.name] = field.value.removeBacktick();

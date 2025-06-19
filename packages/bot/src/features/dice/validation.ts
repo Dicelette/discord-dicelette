@@ -94,7 +94,8 @@ export async function validateDiceEdit(
 	if (oldDice) {
 		for (const field of oldDice) {
 			const name = field.name.toLowerCase();
-			if (!newEmbedDice.find((field) => compareUnidecode(field.name, name))) {
+			const newValue = newEmbedDice.find((f) => compareUnidecode(f.name, name));
+			if (!newValue) {
 				//register the old value
 				newEmbedDice.push({
 					name: name.capitalize(),
