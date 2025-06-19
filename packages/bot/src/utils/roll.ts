@@ -289,6 +289,9 @@ export async function rollStatistique(
 	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
+	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
+	dice = dice.replace(DETECT_CRITICAL, "").trim();
+
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -298,8 +301,7 @@ export async function rollStatistique(
 	}
 	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
 	const customCritical =
-		rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats) ||
-		rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
+		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
 	const infoRoll =
 		statistic && standardizedStatistic
 			? { name: statistic, standardized: standardizedStatistic }
