@@ -4,17 +4,6 @@ import dotenv from "dotenv";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
-
-const optionLoggers: ISettingsParam<ILogObj> =
-	process.env.NODE_ENV === "development"
-		? {
-				minLevel: 0,
-			}
-		: {
-				minLevel: 4,
-				hideLogPositionForProduction: true,
-			};
-
 const overwrite = {
 	transportFormatted: (
 		logMetaMarkup: string,
@@ -45,15 +34,22 @@ const overwrite = {
 	},
 };
 
+const optionLoggers: ISettingsParam<ILogObj> =
+	process.env.NODE_ENV === "development"
+		? {
+				minLevel: 0,
+				stylePrettyLogs: true,
+			}
+		: {
+				minLevel: 4,
+				hideLogPositionForProduction: true,
+				overwrite,
+				stylePrettyLogs: false,
+			};
+
 const defaultOptions: ISettingsParam<ILogObj> = {
-	prettyLogTemplate: "{{logLevelName}} [{{filePathWithLine}}] ",
-	prettyErrorTemplate: "\n{{errorName}} {{errorMessage}}\nerror stack:\n{{errorStack}}",
-	prettyErrorStackTemplate: "  • {{fileName}}\t{{method}}\n\t{{filePathWithLine}}",
-	prettyErrorParentNamesSeparator: ":",
-	prettyErrorLoggerNameDelimiter: "\t",
 	stylePrettyLogs: true,
 	prettyLogTimeZone: "local",
-	overwrite,
 	prettyLogStyles: {
 		logLevelName: {
 			"*": ["bold", "black", "bgWhiteBright", "dim"],
@@ -65,14 +61,14 @@ const defaultOptions: ISettingsParam<ILogObj> = {
 			ERROR: ["bold", "red"],
 			FATAL: ["bold", "redBright"],
 		},
-		dateIsoStr: "white",
+		dateIsoStr: ["bgWhiteBright", "black", "dim"],
 		filePathWithLine: ["bold", "yellow"],
 		name: ["white"],
 		nameWithDelimiterPrefix: ["white", "bold"],
 		nameWithDelimiterSuffix: ["white", "bold"],
 		errorName: ["bold", "bgRedBright", "whiteBright"],
-		fileName: ["white"],
-		fileLine: ["dim", "white"],
+		fileName: ["bold", "bgWhiteBright", "black"],
+		fileLine: ["dim", "bgWhiteBright", "black"],
 	},
 };
 
@@ -82,9 +78,9 @@ export const logger: Logger<ILogObj> = new Logger(
 export const important: Logger<ILogObj> = new Logger({
 	name: "Note",
 	minLevel: 0,
+	overwrite,
 	hideLogPositionForProduction: true,
 	prettyLogTemplate: "[{{logLevelName}}] ",
-	overwrite,
 	prettyLogStyles: {
 		dd: "dim",
 		mm: "dim",

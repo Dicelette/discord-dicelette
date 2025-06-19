@@ -307,7 +307,11 @@
       "notFound": "Le channel `{{-channel}}` n'existe pas sur ce serveur.",
       "thread": "Aucun channel valide trouvé — Veuillez réenregistrer le modèle si le channel a été supprimé"
     },
+    "colon": "Un nom de dé avec un double point n'est pas autorisé.",
     "csvContent": "Le contenu du {{- fichier}} est invalide.",
+    "customCritical": {
+      "type_error": "{{- type}} n'est pas une valeur valide. Les valeurs valides sont `cs` ou `cf`. "
+    },
     "damage": {
       "empty": "Vous n'avez pas de dés de capacités enregistrés.",
       "notFound": "`{{- atq}}` n'est pas enregistré pour {{- charName}}."
@@ -320,7 +324,7 @@
     },
     "generic": {
       "e": "{{- e.message}}",
-      "withWarning": "## [{{- e.name}}] :warning: __Erreur__ :\n{{- e.message}}"
+      "withWarning": "## :warning: __Erreur__ :\n{{- e.message}}"
     },
     "guild": {
       "data": "Aucune donnée trouvée pour le serveur {{- server }}.",
@@ -478,7 +482,7 @@
     "name": "aide",
     "register": {
       "description": "Affiche l'aide général pour activer la fonction de sauvegarde de fiche.",
-      "message": "Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous permet ensuite de créer des feuilles de personnage ainsi que de retenir les dés.\r\n\r\n### Fonctionnalités principales :\r\n- **Confidentialité et contrôle** : Toutes les données sont stockées localement sur votre serveur.\r\n- **Adaptabilité** : Le modèle est conçu pour répondre à des besoins variés, offrant une grande personnalisation.\r\n\r\n### Premiers pas :\r\n1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://dicelette.github.io/docs/sheet/model>) pour configurer votre modèle de serveur.\r\n2. **Sauvegarder les fiches de personnage** : Une fois le modèle configuré, vous pouvez sauvegarder les fiches directement sur votre serveur via la commande `</register:{{-register}}>`.\r\n\r\n### Aperçu des commandes :\r\nAprès avoir configuré le modèle, vous pouvez utiliser les commandes suivantes pour interagir avec les fiches de personnage :\r\n- **</dbd:{{-dbd}}>** : Lancez des dés basés sur les données sauvegardées.\r\n- **</dbroll:{{-dbroll}}>** : Effectuez des lancers de dés statistiques.\r\n- **</graph:{{-graph}}>** : Générez des graphiques à partir des statistiques des personnages.\r\n- **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.\r\n\r\n### Ressources supplémentaires :\r\n- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://dicelette.github.io/>).\r\n- **Support** : En cas de problème, consultez la documentation ou contactez l'équipe de support.",
+      "message": "Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous permet ensuite de créer des feuilles de personnage ainsi que de retenir les dés.\r\n\r\n### Fonctionnalités principales :\r\n- **Confidentialité et contrôle** : Toutes les données sont stockées localement sur votre serveur.\r\n- **Adaptabilité** : Le modèle est conçu pour répondre à des besoins variés, offrant une grande personnalisation.\r\n\r\n### Premiers pas :\r\n1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://dicelette.github.io/docs/sheet/model>) pour configurer votre modèle de serveur.\r\n2. **Sauvegarder les fiches de personnage** : Une fois le modèle configuré, vous pouvez sauvegarder les fiches directement sur votre serveur via la commande </register:{{-register}}>.\r\n\r\n### Aperçu des commandes :\r\nAprès avoir configuré le modèle, vous pouvez utiliser les commandes suivantes pour interagir avec les fiches de personnage :\r\n- **</dbd:{{-dbd}}>** : Lancez des dés basés sur les données sauvegardées.\r\n- **</dbroll:{{-dbroll}}>** : Effectuez des lancers de dés statistiques.\r\n- **</graph:{{-graph}}>** : Générez des graphiques à partir des statistiques des personnages.\r\n- **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.\r\n\r\n### Ressources supplémentaires :\r\n- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://dicelette.github.io/>).\r\n- **Support** : En cas de problème, consultez la documentation ou contactez l'équipe de support.",
       "name": "enregistrer"
     }
   },

@@ -307,7 +307,11 @@
       "notFound": "The channel `{{-channel}}` does not exist on this server.",
       "thread": "No valid channel found - Please re-register the template if the channel was deleted"
     },
+    "colon": "A dice name with a colon is not allowed.",
     "csvContent": "The content of {{- fichier}} is invalid.",
+    "customCritical": {
+      "type_error": "{{- type}} is not recognized. Valid value are `cs` or `cf`"
+    },
     "damage": {
       "empty": "You have no ability dice saved.",
       "notFound": "`{{- atq}}` is not saved in `{{- charName}}`."
@@ -478,7 +482,7 @@
     "name": "help",
     "register": {
       "description": "Displays general help for activating the record save function.",
-      "message": "The bot allows you to configure a server model, enabling the creation and management of character sheets and dice rolls.\r\n\r\n### Key Features:\r\n- **Privacy and Control**: All data is stored locally on your server.\r\n- **Adaptability**: The model is designed to meet diverse needs, making it highly customizable.\r\n\r\n### Getting Started:\r\n1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.\r\n2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using `</register:{{-register}}>`. \r\n\r\n### Commands Overview:\r\nAfter setting up the model, you can use the following commands to interact with character sheets:\r\n- **</dbd:{{-dbd}}>**: Roll dice based on saved data.\r\n- **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.\r\n- **</graph:{{-graph}}>**: Generate graphs from character statistics.\r\n- **</calc:{{-calc}}>**: Calculate values using character statistics.\r\n\r\n### Additional Resources:\r\n- **Documentation**: For more advanced configurations and features, visit the [official documentation](<https://dicelette.github.io/en/>).\r\n- **Support**: If you encounter issues, consult the documentation or reach out to the support team.",
+      "message": "The bot allows you to configure a server model, enabling the creation and management of character sheets and dice rolls.\r\n\r\n### Key Features:\r\n- **Privacy and Control**: All data is stored locally on your server.\r\n- **Adaptability**: The model is designed to meet diverse needs, making it highly customizable.\r\n\r\n### Getting Started:\r\n1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.\r\n2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}>. \r\n\r\n### Commands Overview:\r\nAfter setting up the model, you can use the following commands to interact with character sheets:\r\n- **</dbd:{{-dbd}}>**: Roll dice based on saved data.\r\n- **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.\r\n- **</graph:{{-graph}}>**: Generate graphs from character statistics.\r\n- **</calc:{{-calc}}>**: Calculate values using character statistics.\r\n\r\n### Additional Resources:\r\n- **Documentation**: For more advanced configurations and features, visit the [official documentation](<https://dicelette.github.io/en/>).\r\n- **Support**: If you encounter issues, consult the documentation or reach out to the support team.",
       "name": "register"
     }
   },

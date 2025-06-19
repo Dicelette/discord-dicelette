@@ -108,6 +108,7 @@ export async function registerDamageDice(
 	if (!interaction.guild) throw new Error(ul("error.guild.empty"));
 	if (!interaction.message) throw new Error(ul("error.noMessage"));
 
+	if (name.includes(":")) throw new Error(ul("error.colon"));
 	const oldDiceEmbeds = getEmbeds(
 		ul,
 		interaction.message ?? undefined,

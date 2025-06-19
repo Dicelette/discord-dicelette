@@ -1,5 +1,5 @@
 import { type CustomCritical, generateStatsDice } from "@dicelette/core";
-import type { CustomCriticalRoll } from "@dicelette/types";
+import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import { getRoll } from "./utils";
 
@@ -90,4 +90,43 @@ export function skillCustomCritical(
 	}
 	if (Object.keys(customCriticalFiltered).length === 0) return undefined;
 	return customCriticalFiltered;
+}
+
+/**
+ * Dice can have the {cs:value} and/or {fs:value} to indicate a custom critical or a failure success. It overrides the template critical.
+ * @param dice {string} the dice to parse
+ * @param ul
+ * @return {success?: number, failure?: number}
+ */
+export function getCriticalFromDice(
+	dice: string,
+	ul: Translation
+): Record<string, CustomCritical> | undefined {
+	const critical = /\{(?<natDice>\*)?(?<type>c[fs]):(?<sign>[<>=!]+)(?<value>.+?)}/gim;
+	const customCritical: Record<string, CustomCritical> = {};
+	const match = critical.exec(dice);
+	if (match?.groups) {
+		const { natDice, type, sign, value } = match.groups;
+		let textType = "";
+		if (type) {
+			switch (type) {
+				case "cs":
+					textType = ul("roll.critical.success");
+					break;
+				case "cf":
+					textType = ul("roll.critical.failure");
+					break;
+				default:
+					throw new Error(ul("error.customCritical.type_error", { type }));
+			}
+		} else throw new Error(ul("error.customCritical.type_error", { type }));
+
+		customCritical[textType] = {
+			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
+			value: value.standardize(),
+			onNaturalDice: !!natDice,
+			affectSkill: true,
+		};
+	}
+	return Object.keys(customCritical).length > 0 ? customCritical : undefined;
 }

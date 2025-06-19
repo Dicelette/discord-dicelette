@@ -46,6 +46,7 @@ export async function rollWithInteraction(
 		dice,
 	};
 	const result = getRoll(dice);
+
 	const defaultMsg = new ResultAsText(
 		result,
 		data,
@@ -271,7 +272,7 @@ export async function rollStatistique(
 			//search if they are a simple number and not a sign;
 			const simpleNumberMatch = /(?<comparator>(.+))/.exec(override);
 			const diceComparator = diceMatch.groups.comparator;
-			if (simpleNumberMatch && simpleNumberMatch.groups) {
+			if (simpleNumberMatch?.groups) {
 				//if the override is a simple number, we replace the comparator with it
 				dice = dice.replace(diceComparator, simpleNumberMatch.groups.comparator);
 			}

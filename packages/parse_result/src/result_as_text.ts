@@ -25,7 +25,7 @@ export class ResultAsText {
 	constructor(
 		result: Resultat | undefined,
 		data: Server,
-		critical?: { failure?: number; success?: number },
+		critical?: { failure?: number; success?: number; onResult?: boolean },
 		charName?: string,
 		infoRoll?: { name: string; standardized: string },
 		customCritical?: Record<string, CustomCritical>
@@ -111,7 +111,7 @@ export class ResultAsText {
 		let msgSuccess: string;
 		const messageResult = this.resultat.result.split(";");
 		let successOrFailure = "";
-		let isCritical: undefined | "failure" | "success" | "custom" = undefined;
+		let isCritical: undefined | "failure" | "success" | "custom";
 		/**
 		 * @warning Do not forget that the compare value is needed **EVEN while using** custom critical.
 		 *
