@@ -105,9 +105,8 @@ export function getCriticalFromDice(
 ): Record<string, CustomCritical> | undefined {
 	const critical = /\{(?<natDice>\*)?(?<type>c[fs]):(?<sign>[<>=!]+)(?<value>.+?)}/gim;
 	const customCritical: Record<string, CustomCritical> = {};
-	const match = critical.exec(dice);
-	if (match?.groups) {
-		const { natDice, type, sign, value } = match.groups;
+for (const match of dice.matchAll(critical)) {
+		const { natDice, type, value, sign } = match.groups ?? {};
 		let textType = "";
 		if (type) {
 			switch (type) {
