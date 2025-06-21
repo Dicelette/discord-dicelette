@@ -12,9 +12,9 @@ import { embedError, reply } from "messages";
 import {
 	getLangFromInteraction,
 	gmCommonOptions,
+	isSerializedNameEquals,
 	rollDice,
 	rollStatistique,
-	isSerializedNameEquals,
 } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 

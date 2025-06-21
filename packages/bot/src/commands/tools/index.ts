@@ -10,5 +10,5 @@ export * from "./display";
 export * from "./edit";
 export * from "./graph";
 export * from "./help";
-export * from "./new_scene";
 export * from "./math";
+export * from "./new_scene";
