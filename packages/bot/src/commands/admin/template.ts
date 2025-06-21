@@ -14,6 +14,7 @@ import {
 	reply,
 } from "messages";
 import { fetchChannel, getLangAndConfig } from "utils";
+import { DB_CMD_NAME } from "../index";
 
 export const registerTemplate = {
 	data: new Djs.SlashCommandBuilder()
@@ -328,9 +329,7 @@ export const registerTemplate = {
 
 async function removeRestriction(guildId: string, client: EClient): Promise<void> {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
-	const cmds = guildCommmands?.filter((cmd) =>
-		[t("rAtq.name"), t("dbRoll.name"), t("calc.title")].includes(cmd.name)
-	);
+	const cmds = guildCommmands?.filter((cmd) => DB_CMD_NAME.includes(cmd.name));
 	for (const cmd of cmds?.values() ?? []) {
 		await cmd.edit({ defaultMemberPermissions: null });
 	}

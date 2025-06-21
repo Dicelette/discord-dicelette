@@ -4,7 +4,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import { sendLogs } from "messages";
-import { t } from "@dicelette/localization";
+import { DB_CMD_NAME } from "../commands";
 
 export const onDeleteChannel = (client: EClient): void => {
 	client.on("channelDelete", async (channel) => {
@@ -49,9 +49,7 @@ export const onDeleteThread = (client: EClient): void => {
 
 export async function addRestriction(client: EClient, guildId: string) {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
-	const cmds = guildCommmands?.filter((cmd) =>
-		[t("rAtq.name"), t("dbRoll.name"), t("calc.title")].includes(cmd.name)
-	);
+	const cmds = guildCommmands?.filter((cmd) => DB_CMD_NAME.includes(cmd.name));
 	for (const cmd of cmds?.values() ?? []) {
 		await cmd.edit({ defaultMemberPermissions: Djs.PermissionFlagsBits.Administrator });
 	}
