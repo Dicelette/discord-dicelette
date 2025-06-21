@@ -261,6 +261,7 @@
       },
       "title": "rename"
     },
+    "title": "edit",
     "user": {
       "desc": "Modifier l'utilisateur associé à un personnage",
       "option": {
@@ -630,7 +631,7 @@
       "exclude": "Exclue",
       "forceDistrib": "Forcer la distribution des points",
       "noValue": "Aucune valeur",
-      "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont désactivés par défaut. \nPour autoriser vos joueurs à les utiliser, veuiller suivre le tutoriel suivant :",
+      "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont activés pour tous les utilisateurs par défaut. \nPour restreindre à vos joueurs uniquement en suivant le tutoriel suivant:\n",
       "title": "Modèle"
     },
     "name": "enregistrer",

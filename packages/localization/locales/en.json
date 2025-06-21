@@ -261,6 +261,7 @@
       },
       "title": "rename"
     },
+    "title": "edit",
     "user": {
       "desc": "Modify the user associated with a character",
       "option": {
@@ -630,7 +631,7 @@
       "exclude": "Excluded",
       "forceDistrib": "Force point's distribution",
       "noValue": "No value",
-      "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are disabled by default.\n\nTo authorize your players to use them, please follow the following tutorial:\n",
+      "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are enabled for all user by default.\n\nYou can restrict to your player only with following the tutorial:\n",
       "title": "Model"
     },
     "name": "register",

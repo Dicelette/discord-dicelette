@@ -27,7 +27,8 @@ import {
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
-		.setName("edit")
+		.setName(t("edit.title"))
+		.setNameLocalizations(cmdLn("edit.title"))
 		.setDescription(t("edit.desc"))
 		.setDescriptionLocalizations(cmdLn("edit.desc"))
 		.setDefaultMemberPermissions(0)
