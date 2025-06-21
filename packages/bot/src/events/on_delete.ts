@@ -1,15 +1,17 @@
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
+import * as Djs from "discord.js";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import { sendLogs } from "messages";
+import { t } from "@dicelette/localization";
 
 export const onDeleteChannel = (client: EClient): void => {
 	client.on("channelDelete", async (channel) => {
 		try {
 			if (channel.isDMBased()) return;
 			const guildID = channel.guild.id;
-			deleteIfChannelOrThread(client, guildID, channel);
+			await deleteIfChannelOrThread(client, guildID, channel);
 		} catch (error) {
 			logger.error("\n", error);
 			if (channel.isDMBased()) return;
@@ -36,7 +38,7 @@ export const onDeleteThread = (client: EClient): void => {
 			//search channelID in database and delete it
 			const guildID = thread.guild.id;
 			//verify if the user message was in the thread
-			deleteIfChannelOrThread(client, guildID, thread);
+			await deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
 			logger.error("\n", error);
 			if (thread.isDMBased()) return;
@@ -44,6 +46,17 @@ export const onDeleteThread = (client: EClient): void => {
 		}
 	});
 };
+
+export async function addRestriction(client: EClient, guildId: string) {
+	const guildCommmands = await client.application?.commands.fetch({ guildId });
+	const cmds = guildCommmands?.filter((cmd) =>
+		[t("rAtq.name"), t("dbRoll.name"), t("calc.title")].includes(cmd.name)
+	);
+	for (const cmd of cmds?.values() ?? []) {
+		await cmd.edit({ defaultMemberPermissions: Djs.PermissionFlagsBits.Administrator });
+	}
+	logger.trace("Restrictions added to commands for guild", guildId);
+}
 export const onDeleteMessage = (client: EClient): void => {
 	client.on("messageDelete", async (message) => {
 		try {
@@ -56,6 +69,7 @@ export const onDeleteMessage = (client: EClient): void => {
 			if (client.settings.get(guildID, "templateID.messageId") === messageId) {
 				client.settings.delete(guildID, "templateID");
 				client.template.delete(guildID); //template is deleted
+				await addRestriction(client, guildID);
 			}
 
 			const dbUser = client.settings.get(guildID, "user");

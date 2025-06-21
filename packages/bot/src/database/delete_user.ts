@@ -3,6 +3,7 @@ import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import { deleteUserInChar } from "./memory";
+import { addRestriction } from "../events";
 
 export function deleteUser(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -60,7 +61,7 @@ export function deleteByMessageIds(
  * @param {string} guildID - The ID of the guild where the channel or thread exists.
  * @param {Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel} channel - The channel or thread being deleted or cleaned up.
  */
-export function deleteIfChannelOrThread(
+export async function deleteIfChannelOrThread(
 	client: EClient,
 	guildID: string,
 	channel: Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel
@@ -71,6 +72,7 @@ export function deleteIfChannelOrThread(
 	if (db.get(guildID, "templateID.channelId") === channelID) {
 		db.delete(guildID, "templateID");
 		client.template.delete(guildID);
+		await addRestriction(client, guildID);
 	}
 	if (db.get(guildID, "logs") === channelID) db.delete(guildID, "logs");
 	if (db.get(guildID, "managerId") === channelID) db.delete(guildID, "managerId");

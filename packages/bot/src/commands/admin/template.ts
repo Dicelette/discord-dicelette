@@ -316,6 +316,7 @@ export const registerTemplate = {
 				await bulkEditTemplateUser(client, interaction, ul, templateData);
 			else if (options.getBoolean(t("register.options.delete.name")))
 				await bulkDeleteCharacters(client, interaction, ul);
+			await removeRestriction(interaction.guild.id, client);
 		} catch (e) {
 			logger.fatal(e, "registerTemplate: error while registering template");
 			const langToUse = getLangAndConfig(client, interaction).langToUse;
@@ -324,6 +325,16 @@ export const registerTemplate = {
 		}
 	},
 };
+
+async function removeRestriction(guildId: string, client: EClient): Promise<void> {
+	const guildCommmands = await client.application?.commands.fetch({ guildId });
+	const cmds = guildCommmands?.filter((cmd) =>
+		[t("rAtq.name"), t("dbRoll.name"), t("calc.title")].includes(cmd.name)
+	);
+	for (const cmd of cmds?.values() ?? []) {
+		await cmd.edit({ defaultMemberPermissions: null });
+	}
+}
 
 function downloadTutorialImages() {
 	const imageBufferAttachments: Djs.AttachmentBuilder[] = [];

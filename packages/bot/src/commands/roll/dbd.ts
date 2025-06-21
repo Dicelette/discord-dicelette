@@ -10,7 +10,7 @@ import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { dbdOptions, getLangAndConfig, rollDice, isSerializedNameEquals } from "utils";
+import { dbdOptions, getLangAndConfig, isSerializedNameEquals, rollDice } from "utils";
 
 export default {
 	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
