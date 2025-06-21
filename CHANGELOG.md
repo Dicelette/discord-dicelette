@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.52.0](https://github.com/Dicelette/discord-dicelette/compare/1.51.1...1.52.0) (2025-06-21)
+
+
+### Features
+
+* remove restriction on adding a template & add it when template is deleted ([ea61eb2](https://github.com/Dicelette/discord-dicelette/commit/ea61eb2e0568fcb1feeb2970e7685b57d0cb5e0e))
+
+
+### Bug Fixes
+
+* allow to get cs and cf ([00b547c](https://github.com/Dicelette/discord-dicelette/commit/00b547ce698dc8a02239cfd4eec96786f61211dc))
+* use const for restricted command name ([3e959f0](https://github.com/Dicelette/discord-dicelette/commit/3e959f043deb3d639663214943c8fd3da9fbff90))
+
 ## [1.51.1](https://github.com/Dicelette/discord-dicelette/compare/1.51.0...1.51.1) (2025-06-19)
 
 
