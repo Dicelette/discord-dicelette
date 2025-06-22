@@ -99,7 +99,7 @@ export async function showFirstPageModal(
 	if (!selfRegister?.toString().endsWith("_channel") || isModerator)
 		components.push(channelIdInput);
 
-	if (havePrivate) {
+	if (havePrivate && isModerator) {
 		const privateInput =
 			new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 				new Djs.TextInputBuilder()
