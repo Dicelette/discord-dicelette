@@ -38,7 +38,6 @@ function replaceInLocales(dryRun?: boolean) {
 			if (fs.existsSync(filePath)) output[key] = fs.readFileSync(filePath, "utf-8");
 			else console.warn(`File not found: ${filePath}`);
 		}
-		//console.log(output);
 		const outputPath = path.resolve(`../localization/locales/${lang}.json`);
 		if (fs.existsSync(outputPath)) {
 			const existingContent = JSON.parse(fs.readFileSync(outputPath, "utf-8"));
