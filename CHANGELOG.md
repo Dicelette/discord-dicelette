@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.54.1](https://github.com/Dicelette/discord-dicelette/compare/1.54.0...1.54.1) (2025-06-22)
+
+
+### Bug Fixes
+
+* user shouldn't be allowed to set a private sheet ([80962de](https://github.com/Dicelette/discord-dicelette/commit/80962de9530964efd3387d550540e72389b7b206))
+
 ## [1.54.0](https://github.com/Dicelette/discord-dicelette/compare/1.53.1...1.54.0) (2025-06-22)
 
 
