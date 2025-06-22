@@ -76,8 +76,10 @@ export async function validateUserButton(
 	client: EClient,
 	characters: Characters
 ) {
+	const selfAllow = client.settings.get(interaction.guild!.id, "allowSelfRegister");
+	const selfRegisterAllow = selfAllow ? /true/.test(selfAllow.toString()) : false;
 	const isModerator =
-		client.settings.get(interaction.guild!.id, "allowSelfRegister") === true ||
+		selfRegisterAllow ||
 		interaction.guild?.members.cache
 			.get(interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);

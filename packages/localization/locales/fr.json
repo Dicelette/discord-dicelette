@@ -147,8 +147,13 @@
       "title": "Sauvegarde des résultats"
     },
     "selfRegister": {
+      "channel": {
+        "desc": "Interdire à l'utilisateur d'envoyer la feuille dans n'importe quel canal.",
+        "name": "interdire_channel"
+      },
       "description": "Permettre aux joueurs d'enregistrer directement leurs personnages.",
       "disable": "L'auto-enregistrement est désactivé : les joueurs ont besoin d'un modérateur pour enregistrer leurs personnages.",
+      "disableChannel": "L'utilisateur ne peut envoyer sa fiche dans aucun channel : elle sera envoyée dans le channel configuré par défaut.",
       "enable": "L'auto-enregistrement est activé : les joueurs peuvent maintenant enregistrer leurs personnages librement, s'ils ont accès au message modèle{{- url}}.\n\n> 💡 Vous pouvez limiter l’accès au canal/fil contenant le modèle à un rôle spécifique, afin que seuls les utilisateurs autorisés puissent y accéder.  ",
       "enableModeration": "Seul les modérateurs pourront valider la fiche.",
       "moderation": {

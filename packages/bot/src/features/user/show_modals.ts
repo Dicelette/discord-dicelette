@@ -73,6 +73,7 @@ export async function showFirstPageModal(
 				.setValue(interaction.user.username ?? interaction.user.id)
 				.setStyle(Djs.TextInputStyle.Short)
 		);
+
 	const avatarInputs =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -93,8 +94,11 @@ export async function showFirstPageModal(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short)
 		);
-	const components = [charNameInput, avatarInputs, channelIdInput];
+	const components = [charNameInput, avatarInputs];
 	if (!selfRegister || isModerator) components.push(userIdInputs);
+	if (!selfRegister?.toString().endsWith("_channel") || isModerator)
+		components.push(channelIdInput);
+
 	if (havePrivate) {
 		const privateInput =
 			new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(

@@ -1,6 +1,6 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { cleanAvatarUrl, logger, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
@@ -88,15 +88,17 @@ export async function createEmbedFirstPage(
 	if (!channel) {
 		throw new NoChannel();
 	}
-	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
+	const selfRegister = selfRegisterAllowance(
+		client.settings.get(interaction.guild!.id, "allowSelfRegister")
+	);
 	const moderator = interaction.guild?.members.cache
 		.get(interaction.user.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	const userFromField =
-		!selfRegister || moderator
+		!selfRegister.allowSelfRegister || moderator
 			? interaction.fields.getTextInputValue("userID")
 			: interaction.user.id;
-	logger.trace(`User from field: ${userFromField}`);
+
 	const user = await isUserNameOrId(userFromField, interaction);
 	if (!user) {
 		await reply(interaction, {
@@ -105,10 +107,15 @@ export async function createEmbedFirstPage(
 		});
 		return;
 	}
-	const customChannel = interaction.fields.getTextInputValue("channelId");
+
+	const customChannel =
+		(!selfRegister.disallowChannel && selfRegister.allowSelfRegister) || moderator
+			? interaction.fields.getTextInputValue("channelId")
+			: "";
 	const charName = interaction.fields.getTextInputValue("charName");
-	const isPrivate =
-		interaction.fields.getTextInputValue("private")?.toLowerCase() === "x";
+	const isPrivate = client.settings.get(interaction.guild!.id, "privateChannel")
+		? interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
+		: false;
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
@@ -170,4 +177,34 @@ export async function createEmbedFirstPage(
 	const allButtons = registerDmgButton(ul);
 
 	const msg = await reply(interaction, { embeds: [embed], components: [allButtons] });
+}
+
+export function selfRegisterAllowance(value?: string | boolean) {
+	if (typeof value === "boolean")
+		return {
+			moderation: false,
+			disallowChannel: false,
+			allowSelfRegister: value,
+		};
+	if (typeof value === "string") {
+		const res = {
+			moderation: false,
+			disallowChannel: false,
+			allowSelfRegister: true,
+		};
+		if (value.startsWith("moderation")) res.moderation = true;
+		if (value.endsWith("_channel")) {
+			const listValue = value.split("_"); // expected ["true", "channel"], ["false", "channel"], ["moderation", "channel"]
+			if (listValue.length === 2) {
+				res.allowSelfRegister = listValue[0] === "true" || listValue[0] === "moderation";
+				res.disallowChannel = listValue[1] === "channel";
+			}
+		}
+		return res;
+	}
+	return {
+		moderation: false,
+		disallowChannel: false,
+		allowSelfRegister: false,
+	};
 }

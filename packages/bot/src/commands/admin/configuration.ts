@@ -264,6 +264,14 @@ export const configuration = {
 						.setDescriptionLocalizations(cmdLn("config.selfRegister.moderation.desc"))
 						.setRequired(false)
 				)
+				.addBooleanOption((option) =>
+					option
+						.setName(t("config.selfRegister.channel.name"))
+						.setNameLocalizations(cmdLn("config.selfRegister.channel.name"))
+						.setDescription(t("config.selfRegister.channel.desc"))
+						.setDescriptionLocalizations(cmdLn("config.selfRegister.channel.desc"))
+						.setRequired(false)
+				)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
@@ -331,7 +339,9 @@ function allowSelfRegistration(
 		t("config.selfRegister.moderation.name"),
 		false
 	);
+	const allowChannel = options.getBoolean(t("config.selfRegister.channel.name"), false);
 	if (forceModeration) toggle = "moderation";
+	if (allowChannel) toggle += "_channel";
 	client.settings.set(interaction.guild!.id, toggle, "allowSelfRegister");
 	if (!toggle) {
 		return reply(interaction, {
@@ -344,11 +354,17 @@ function allowSelfRegistration(
 			? ` (https://discord.com/channels/${interaction.guild!.id}/${template?.channelId}/${template?.messageId})`
 			: "";
 	let msg = ul("config.selfRegister.enable", { url });
-	if (toggle === "moderation") {
+	if (toggle.toString().startsWith("moderation")) {
 		logger.trace(
 			`Self registration enabled with moderation for ${interaction.guild!.name}`
 		);
 		msg += `\n\n**__${ul("config.selfRegister.enableModeration")}__**`;
+	}
+	if (toggle.toString().endsWith("channel")) {
+		logger.trace(
+			`Self registration enabled with disallow channel for ${interaction.guild!.name}`
+		);
+		msg += `\n\n**__${ul("config.selfRegister.disableChannel")}__**`;
 	}
 	return reply(interaction, {
 		content: msg,

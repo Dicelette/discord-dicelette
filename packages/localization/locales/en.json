@@ -147,8 +147,13 @@
       "title": "Saving results"
     },
     "selfRegister": {
+      "channel": {
+        "desc": "Disallow user to send the sheet in any channel.",
+        "name": "disallow_channel"
+      },
       "description": "Allow player to register their characters directly.",
       "disable": "The self-registration is disabled: player need a moderator to register their characters.",
+      "disableChannel": "User can't send their sheet in any channel : it will be sent into the default configured channel.",
       "enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n> 💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
       "enableModeration": "Only moderators can validate the self-registered sheet.",
       "moderation": {
