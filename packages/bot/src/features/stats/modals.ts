@@ -90,16 +90,15 @@ export async function registerStatistics(
 		Object.entries(parsedFields).filter(([key]) => statsWithoutCombinaison.includes(key))
 	);
 	const nbStats = Object.keys(embedStats).length;
-	logger.debug(stats, oldStatsTotal);
 	const ilReste = calculateRemainingPoints(template.total, oldStatsTotal, stats);
 	if (
 		nbStats === statsWithoutCombinaison.length &&
 		ilReste &&
-		ilReste - oldStatsTotal > 0 &&
+		ilReste > 0 &&
 		template.forceDistrib
 	) {
 		await reply(interaction, {
-			content: ul("modals.stats.forceDistrib", { reste: ilReste - oldStatsTotal }),
+			content: ul("modals.stats.forceDistrib", { reste: ilReste }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		//retour à l'étape précédente
@@ -154,12 +153,13 @@ function calculateRemainingPoints(
 	oldTotal = 0,
 	stats?: Record<string, number>
 ) {
+	let newTotal = 0;
+	if (stats) newTotal = Object.values(stats).reduce((sum, value) => sum + value, 0);
 	if (total === 0) return undefined;
-	if (oldTotal === 0 && stats) {
-		const newTotal = Object.values(stats).reduce((sum, value) => sum + value, 0);
+	if (oldTotal === 0) {
 		return total - newTotal;
 	}
-	if (oldTotal > 0) return total - oldTotal;
+	if (oldTotal > 0) return total - (oldTotal + newTotal);
 
 	return undefined;
 }
