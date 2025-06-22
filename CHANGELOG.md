@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.53.0](https://github.com/Dicelette/discord-dicelette/compare/1.52.0...1.53.0) (2025-06-22)
+
+
+### Features
+
+* opposition roll option in dice ([6a49ec2](https://github.com/Dicelette/discord-dicelette/commit/6a49ec22b3f08970a80bb694a5b86559479af125))
+
 ## [1.52.0](https://github.com/Dicelette/discord-dicelette/compare/1.51.1...1.52.0) (2025-06-21)
 
 
