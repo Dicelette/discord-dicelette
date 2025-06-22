@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.54.0](https://github.com/Dicelette/discord-dicelette/compare/1.53.1...1.54.0) (2025-06-22)
+
+
+### Features
+
+* disallow channel with self register ([09f1cc3](https://github.com/Dicelette/discord-dicelette/commit/09f1cc3a99c2eb24b812b4b684c393d6abc53a44))
+
+
+### Bug Fixes
+
+* private channel should not be allowed if private channel is not set ([be08927](https://github.com/Dicelette/discord-dicelette/commit/be08927f1bbf3d6610545af0ba5499c90aebfc0c))
+* remaining value not accurate ([c168085](https://github.com/Dicelette/discord-dicelette/commit/c168085e99b3d1e54eaa03c6a8e593229aab7007))
+
 ## [1.53.1](https://github.com/Dicelette/discord-dicelette/compare/1.53.0...1.53.1) (2025-06-22)
 
 ## [1.53.0](https://github.com/Dicelette/discord-dicelette/compare/1.52.0...1.53.0) (2025-06-22)
