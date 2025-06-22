@@ -1,11 +1,12 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { LINKS, type Settings, type Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
-import { getLangAndConfig } from "../../utils";
-import { logger } from "@dicelette/utils";
+import { getLangAndConfig } from "utils";
+import { VERSION } from "../../../index";
 export const help = {
 	data: new Djs.SlashCommandBuilder()
 		.setName(t("help.name"))
@@ -61,20 +62,36 @@ export const help = {
 			case t("help.info.name"): {
 				const rollID = commandsID.findKey((command) => command.name === "roll");
 				const sceneID = commandsID.findKey((command) => command.name === "scene");
+				const mathId = commandsID.findKey((command) => command.name === "math");
 				const msg = ul("help.message", {
 					rollId: rollID,
 					sceneId: sceneID,
-					dbCMD: createHelpMessageDB(
-						interaction.guild!.id,
-						ul,
-						client.settings,
-						commandsID
-					),
+					mathId,
+					version: VERSION,
 				});
-				await reply(interaction, { content: dedent(msg) });
+				const dbCMD = createHelpMessageDB(
+					interaction.guild!.id,
+					ul,
+					client.settings,
+					commandsID
+				);
+				const replySection = [];
+
+				replySection.push(new Djs.TextDisplayBuilder().setContent(dedent(msg)));
+
+				if (dbCMD)
+					replySection.push(new Djs.TextDisplayBuilder().setContent(dedent(dbCMD)));
+
+				const end = dedent(ul("help.diceNotation"));
+
+				await interaction.reply({
+					flags: Djs.MessageFlags.IsComponentsV2,
+					components: replySection,
+				});
 				await interaction.followUp({
-					content: dedent(ul("help.diceNotation")),
+					content: end,
 				});
+
 				break;
 			}
 			case t("help.bug.name"):
@@ -84,7 +101,7 @@ export const help = {
 				break;
 			case t("help.fr.name"):
 				await reply(interaction, {
-					content: dedent(ul("help.fr.message", { link: link.fr })),
+					content: dedent(ul("helpfr.message", { link: link.fr })),
 				});
 				break;
 			case t("help.register.name"): {
@@ -105,42 +122,52 @@ export const help = {
 			}
 			case t("help.admin.name"): {
 				const idsAdmin = getConfigIds(commandsID);
-				await reply(interaction, {
-					content: dedent(
-						ul("help.admin.messageNoDB", {
-							logs: idsAdmin?.[t("logs.name")],
-							disable: idsAdmin?.[t("disableThread.name")],
-							result: idsAdmin?.[t("changeThread.name")],
-							delete: idsAdmin?.[t("timer.name")],
-							display: idsAdmin?.[t("config.display.name")],
-							timestamp: idsAdmin?.[t("timestamp.name")],
-							self_register: idsAdmin?.[t("config.selfRegister.name")],
-							language: idsAdmin?.[t("config.lang.options.name")],
-						})
-					),
-				});
+				const replySection = [];
+
+				replySection.push(
+					new Djs.TextDisplayBuilder().setContent(
+						dedent(
+							ul("help.admin.messageNoDB", {
+								logs: idsAdmin?.[t("logs.name")],
+								disable: idsAdmin?.[t("disableThread.name")],
+								result: idsAdmin?.[t("changeThread.name")],
+								delete: idsAdmin?.[t("timer.name")],
+								display: idsAdmin?.[t("config.display.name")],
+								timestamp: idsAdmin?.[t("timestamp.name")],
+								self_register: idsAdmin?.[t("config.selfRegister.name")],
+								language: idsAdmin?.[t("config.lang.options.name")],
+							})
+						)
+					)
+				);
 				const idsAdminDB = getIDForAdminDB(
 					commandsID,
 					client.settings,
 					interaction.guild!.id
 				);
 				if (!idsAdminDB) return;
-				await interaction.followUp({
-					content: dedent(
-						ul("help.admin.messageDB", {
-							delete_char: idsAdminDB?.[t("deleteChar.name")],
-							stat: idsAdminDB?.["auto_role statistic"],
-							dice: idsAdminDB?.["auto_role dice"],
-							gm: {
-								dBd: idsAdminDB?.["gm dbd"],
-								dbRoll: idsAdminDB?.["gm dbroll"],
-								calc: idsAdminDB?.["gm calc"],
-							},
-							dbroll: idsAdminDB?.[t("dbRoll.name")],
-							dbd: idsAdminDB?.[t("rAtq.name")],
-							calc: idsAdminDB?.[t("calc.title")],
-						})
-					),
+				replySection.push(
+					new Djs.TextDisplayBuilder().setContent(
+						dedent(
+							ul("help.admin.messageDB", {
+								delete_char: idsAdminDB?.[t("deleteChar.name")],
+								stat: idsAdminDB?.["auto_role statistics"],
+								dice: idsAdminDB?.["auto_role dice"],
+								gm: {
+									dBd: idsAdminDB?.["gm dbd"],
+									dbRoll: idsAdminDB?.["gm dbroll"],
+									calc: idsAdminDB?.["gm calc"],
+								},
+								dbroll: idsAdminDB?.[t("dbRoll.name")],
+								dbd: idsAdminDB?.[t("rAtq.name")],
+								calc: idsAdminDB?.[t("calc.title")],
+							})
+						)
+					)
+				);
+				await interaction.reply({
+					components: replySection,
+					flags: Djs.MessageFlags.IsComponentsV2,
 				});
 				break;
 			}
@@ -222,7 +249,7 @@ function getIDForAdminDB(
 	}
 
 	if (ids[t("config.name")]) {
-		ids["auto_role statistic"] = ids[t("config.name")];
+		ids["auto_role statistics"] = ids[t("config.name")];
 		ids["auto_role dice"] = ids[t("config.name")];
 	}
 
