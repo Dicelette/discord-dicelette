@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.54.2](https://github.com/Dicelette/discord-dicelette/compare/1.54.1...1.54.2) (2025-06-22)
+
+
+### Bug Fixes
+
+* help message doesn't send right as they are pretty long ([76669e2](https://github.com/Dicelette/discord-dicelette/commit/76669e2fd56baa42db63e587515878e92f244268))
+
 ## [1.54.1](https://github.com/Dicelette/discord-dicelette/compare/1.54.0...1.54.1) (2025-06-22)
 
 
