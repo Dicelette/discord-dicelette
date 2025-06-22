@@ -1,4 +1,5 @@
 import process from "node:process";
+import { DISCORD_ERROR_CODE, MATCH_API_ERROR } from "@dicelette/types";
 import { DiscordAPIError } from "@discordjs/rest";
 import type { EClient } from "client";
 import dedent from "dedent";
@@ -26,9 +27,10 @@ export function formatErrorMessage(error: unknown): string {
 }
 
 export async function sendMessageError(error: unknown, client: EClient): Promise<void> {
-	const ignoreCode = [50001, 50013];
-	if (error instanceof DiscordAPIError && ignoreCode.includes(<number>error.code)) return;
-
+	if (error instanceof DiscordAPIError && DISCORD_ERROR_CODE.includes(<number>error.code))
+		return;
+	if (error instanceof Error && MATCH_API_ERROR.test(error.stack || error.message))
+		return;
 	console.error("\n", error);
 	if (!process.env.OWNER_ID) return;
 	const dm = await client.users.createDM(process.env.OWNER_ID);

@@ -1,6 +1,7 @@
 import { important } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import type { EClient } from "../client";
+import { MATCH_API_ERROR } from "@dicelette/types";
 
 export default (client: EClient): void => {
 	client.on("shardDisconnect", async (event, shardId) => {
@@ -19,6 +20,8 @@ export default (client: EClient): void => {
 };
 
 export async function sendErrorToWebhook(error: unknown) {
+	if (error instanceof Error && MATCH_API_ERROR.test(error.stack || error.message))
+		return;
 	const ownerId = process.env.OWNER_ID;
 	const webhookUrl = process.env.WEBHOOK_URL;
 	if (!ownerId || !webhookUrl) {

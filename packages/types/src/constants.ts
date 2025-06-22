@@ -16,3 +16,6 @@ export const LINKS = {
 		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=enhancement%2Ctriage%2Cenglish&projects=&template=request_english.yml&title=%5BFR%5D%3A+",
 	},
 } as const;
+
+export const DISCORD_ERROR_CODE = [50001, 50013];
+export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
