@@ -124,7 +124,7 @@ async function buttonSubmit(
 			template,
 			interactionUser,
 			ul,
-			client.settings.has(interaction.guild!.id, "privateChannel"),
+			!!client.settings.get(interaction.guild!.id, "privateChannel"),
 			client.settings.get(interaction.guild!.id, "allowSelfRegister")
 		);
 	else if (interaction.customId === "continue")
