@@ -3,6 +3,7 @@ import {
 	generateStatsDice,
 	replaceFormulaInDice,
 	DETECT_CRITICAL,
+	type ComparedValue,
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
@@ -17,6 +18,7 @@ import {
 	type Server,
 	skillCustomCritical,
 	trimAll,
+	parseOpposition,
 } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
@@ -38,7 +40,8 @@ export async function rollWithInteraction(
 	charName?: string,
 	infoRoll?: { name: string; standardized: string },
 	hideResult?: false | true | null,
-	customCritical?: Record<string, CustomCritical> | undefined
+	customCritical?: Record<string, CustomCritical> | undefined,
+	opposition?: ComparedValue
 ) {
 	//exclude announcement channel
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
@@ -56,7 +59,8 @@ export async function rollWithInteraction(
 		critical,
 		charName,
 		infoRoll,
-		customCritical
+		customCritical,
+		opposition
 	);
 	const output = defaultMsg.defaultMessage();
 	if (defaultMsg.error) {
@@ -108,6 +112,7 @@ export async function rollDice(
 	};
 	atq = atq.standardize();
 	const expression = options.getString(t("common.expression")) ?? "0";
+	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
 	const comm = options.getString(t("common.comments"))
 		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
@@ -169,7 +174,14 @@ export async function rollDice(
 	}
 
 	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
-
+	const opposition = oppositionVal
+		? parseOpposition(
+				oppositionVal,
+				comparator,
+				userStatistique.stats,
+				dollarValue?.total
+			)
+		: undefined;
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	await rollWithInteraction(
 		interaction,
@@ -184,7 +196,8 @@ export async function rollDice(
 			rCC || userStatistique.template.customCritical,
 			userStatistique.stats,
 			dollarValue?.total
-		)
+		),
+		opposition
 	);
 }
 
@@ -240,6 +253,7 @@ export async function rollStatistique(
 		: undefined;
 	const comments = comm ?? "";
 	const override = options.getString(t("dbRoll.options.override.name"));
+	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
 	let userStat: undefined | number;
 	const expression = options.getString(t("common.expression")) ?? "0";
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
@@ -292,14 +306,18 @@ export async function rollStatistique(
 	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
 	dice = dice.replace(DETECT_CRITICAL, "").trim();
 
-	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
+	const comparatorMatch = /([><=!]+)(.+)/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
 		//remove from dice
 		dice = dice.replace(comparatorMatch[0], "").trim();
 		comparator = comparatorMatch[0];
 	}
-	const roll = `${trimAll(replaceFormulaInDice(dice))}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
+	const diceEvaluated = replaceFormulaInDice(dice);
+	const opposition = oppositionVal
+		? parseOpposition(oppositionVal, comparator, userStatistique.stats, userStatStr)
+		: undefined;
+	const roll = `${trimAll(diceEvaluated)}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
 	const customCritical =
 		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
 	const infoRoll =
@@ -315,6 +333,7 @@ export async function rollStatistique(
 		optionChar,
 		infoRoll,
 		hideResult,
-		customCritical
+		customCritical,
+		opposition
 	);
 }

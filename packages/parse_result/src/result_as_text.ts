@@ -28,7 +28,8 @@ export class ResultAsText {
 		critical?: { failure?: number; success?: number; onResult?: boolean },
 		charName?: string,
 		infoRoll?: { name: string; standardized: string },
-		customCritical?: Record<string, CustomCritical>
+		customCritical?: Record<string, CustomCritical>,
+		opposition?: ComparedValue
 	) {
 		this.data = data;
 		this.infoRoll = infoRoll;
@@ -39,7 +40,7 @@ export class ResultAsText {
 			this.error = true;
 			this.output = this.errorMessage();
 		} else {
-			parser = this.parseResult(!!infoRoll, critical, customCritical);
+			parser = this.parseResult(!!infoRoll, critical, customCritical, opposition);
 		}
 		this.output = this.defaultMessage();
 		this.parser = parser;
@@ -104,7 +105,8 @@ export class ResultAsText {
 	private parseResult(
 		interaction?: boolean,
 		critical?: { failure?: number; success?: number },
-		customCritical?: Record<string, CustomCritical>
+		customCritical?: Record<string, CustomCritical>,
+		opposition?: ComparedValue
 	) {
 		if (!this.resultat) return "";
 		const regexForFormulesDices = /^[✕✓]/;
@@ -130,11 +132,23 @@ export class ResultAsText {
 				if (tot) {
 					total = Number.parseInt(tot[1], 10);
 				}
-				successOrFailure = evaluate(
+				const resultOfCompare = evaluate(
 					`${total} ${this.resultat.compare.sign} ${this.resultat.compare.value}`
-				)
+				);
+				successOrFailure = resultOfCompare
 					? `**${this.ul("roll.success")}**`
 					: `**${this.ul("roll.failure")}**`;
+				let oldCompare: ComparedValue | undefined;
+				if (opposition && resultOfCompare) {
+					const newCompare = evaluate(`${total} ${opposition.sign} ${opposition.value}`);
+					successOrFailure = newCompare
+						? `**${this.ul("roll.success")}**`
+						: `**${this.ul("roll.failure")}**`;
+					if (newCompare) {
+						oldCompare = structuredClone(this.resultat.compare);
+						this.resultat.compare = opposition;
+					}
+				}
 				// noinspection RegExpRedundantEscape
 				const naturalDice = r.matchAll(/\[(\d+)\]/gi);
 				for (const dice of naturalDice) {
@@ -151,6 +165,7 @@ export class ResultAsText {
 				}
 				let testValue = this.resultat.compare;
 				let goodSign = this.goodCompareSign(testValue, total);
+
 				if (customCritical) {
 					for (const [name, custom] of Object.entries(customCritical)) {
 						const valueToCompare = custom.onNaturalDice ? natural : total;
@@ -163,12 +178,23 @@ export class ResultAsText {
 							isCritical = "custom";
 							testValue = this.convertCustomCriticalToCompare(custom);
 							goodSign = this.goodCompareSign(testValue, total);
+
 							break;
 						}
 					}
 				}
+				let oldCompareStr = "";
+				if (oldCompare) {
+					const goodSignOld = this.goodCompareSign(oldCompare, total);
+					oldCompareStr += ` **&** \`[${total}] ${goodSignOld} ${this.compareValue(oldCompare, "`")}`;
+				}
+				if (isCritical === "custom" && opposition) {
+					//on fait pareil ;)
+					const gooldOldSign = this.goodCompareSign(opposition, total);
+					oldCompareStr += ` **&** \`[${total}] ${gooldOldSign} ${this.compareValue(opposition, "`")}`;
+				}
 				const totalSuccess = testValue
-					? ` = \`[${total}] ${goodSign} ${this.compareValue(testValue, "`")}`
+					? ` = \`[${total}] ${goodSign} ${this.compareValue(testValue, "`")}${oldCompareStr}`
 					: `= \`[${total}]\``;
 				const resMsg = this.messageResult(r, totalSuccess);
 				if (resMsg.match(/^[✕✓※]/))

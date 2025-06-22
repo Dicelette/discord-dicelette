@@ -202,6 +202,10 @@
       "modificator": {
         "description": "Expression (mathématique) appliqué au lancer"
       },
+      "opposition": {
+        "description": "Seuil de succès secondaire contre un adversaire.",
+        "name": "opposition"
+      },
       "override": {
         "description": "Remplacer le seuil de réussite",
         "name": "seuil_reussite"

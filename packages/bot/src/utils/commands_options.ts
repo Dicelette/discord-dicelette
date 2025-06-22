@@ -39,7 +39,7 @@ export function charUserOptions(
  */
 export function commonOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
-	opts: Partial<{ expression: boolean; threshold: boolean }> = {
+	opts: Partial<{ expression: boolean; threshold: boolean; opposition: boolean }> = {
 		expression: true,
 	}
 ) {
@@ -59,6 +59,16 @@ export function commonOptions(
 				.setDescription(t("dbRoll.options.modificator.description"))
 				.setNameLocalizations(cmdLn("common.expression"))
 				.setDescriptionLocalizations(cmdLn("dbRoll.options.modificator.description"))
+				.setRequired(false)
+		);
+	}
+	if (opts.opposition) {
+		builder.addStringOption((option) =>
+			option
+				.setName(t("dbRoll.options.opposition.name"))
+				.setDescription(t("dbRoll.options.opposition.description"))
+				.setNameLocalizations(cmdLn("dbRoll.options.opposition.name"))
+				.setDescriptionLocalizations(cmdLn("dbRoll.options.opposition.description"))
 				.setRequired(false)
 		);
 	}
@@ -95,7 +105,7 @@ export function dbdOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder);
+	return commonOptions(builder, { opposition: true });
 }
 
 /**
@@ -115,7 +125,7 @@ export function dbRollOptions(
 			.setRequired(false)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { expression: true, threshold: true });
+	return commonOptions(builder, { expression: true, threshold: true, opposition: true });
 }
 
 /**

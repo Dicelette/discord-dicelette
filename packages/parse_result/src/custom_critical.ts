@@ -1,4 +1,9 @@
-import { type CustomCritical, generateStatsDice } from "@dicelette/core";
+import {
+	type ComparedValue,
+	type CustomCritical,
+	generateStatsDice,
+	isNumber,
+} from "@dicelette/core";
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import { getRoll } from "./utils";
@@ -26,6 +31,35 @@ export function parseCustomCritical(
 			onNaturalDice,
 			affectSkill,
 		},
+	};
+}
+
+export function parseOpposition(
+	opposition: string,
+	diceComparator: string,
+	userStatistique?: Record<string, number>,
+	userStatStr?: string
+): ComparedValue | undefined {
+	const replaced = generateStatsDice(opposition, userStatistique, userStatStr);
+	const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
+	const match = signRegex.exec(replaced);
+	const comparator = match?.groups?.comparator || replaced;
+	const comp = signRegex.exec(diceComparator);
+	const sign = match?.groups?.sign || comp?.groups?.sign;
+	if (!sign || !comparator) return;
+	const rolledValue = getRoll(comparator);
+	if (rolledValue?.total) {
+		return {
+			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
+			value: rolledValue.total,
+			originalDice: rolledValue.dice,
+			rollValue: rolledValue.result,
+		};
+	}
+	if (!isNumber(replaced)) return undefined;
+	return {
+		sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
+		value: Number(replaced),
 	};
 }
 
@@ -105,7 +139,7 @@ export function getCriticalFromDice(
 ): Record<string, CustomCritical> | undefined {
 	const critical = /\{(?<natDice>\*)?(?<type>c[fs]):(?<sign>[<>=!]+)(?<value>.+?)}/gim;
 	const customCritical: Record<string, CustomCritical> = {};
-for (const match of dice.matchAll(critical)) {
+	for (const match of dice.matchAll(critical)) {
 		const { natDice, type, value, sign } = match.groups ?? {};
 		let textType = "";
 		if (type) {
