@@ -27,3 +27,15 @@ export class NoChannel extends Error {
 		this.name = "NoChannel";
 	}
 }
+
+export class TotalExceededError extends Error {
+	exceeded: number;
+	statName: string;
+
+	constructor(message: string, statName: string, exceeded: number) {
+		super(message);
+		this.name = "TotalExceededError";
+		this.statName = statName;
+		this.exceeded = exceeded;
+	}
+}

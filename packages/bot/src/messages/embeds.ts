@@ -1,7 +1,7 @@
 import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
+import { cleanAvatarUrl, logger, NoEmbed, TotalExceededError } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 export function ensureEmbed(message?: Djs.Message) {
@@ -202,12 +202,11 @@ export function getStatistiqueFields(
 			throw new Error(ul("error.mustBeLower", { value: name, max: value.max }));
 		if (total) {
 			logger.trace("oldStatsTotal", oldStatsTotal, "total", total, "num", num);
-			let exceeded: number | undefined;
-			if (oldStatsTotal) exceeded = oldStatsTotal + num;
 			total -= num;
 			if (total < 0) {
-				exceeded = exceeded || total * -1;
-				throw new Error(ul("error.totalExceededBy", { value: name, max: exceeded }));
+				const exceeded = Math.abs(total);
+				const errorMessage = ul("error.totalExceededBy", { value: name, max: exceeded });
+				throw new TotalExceededError(errorMessage, name, exceeded);
 			}
 			stats[key] = num;
 		} else stats[key] = num;
