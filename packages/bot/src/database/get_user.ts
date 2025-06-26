@@ -213,7 +213,7 @@ export async function getUserFromMessage(
 		userMessageId.channelId
 	);
 	if (!thread) throw new Error(ul("error.channel.thread"));
-	if (user.isPrivate && !allowAccess && !haveAccess(interaction, thread.id, userId)) {
+	if (user.isPrivate && !allowAccess && !(await haveAccess(interaction, thread.id, userId))) {
 		throw new Error(ul("error.private"));
 	}
 	try {

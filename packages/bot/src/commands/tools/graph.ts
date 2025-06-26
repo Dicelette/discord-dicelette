@@ -164,7 +164,7 @@ export const graph = {
 			const guildChars = guildData.user[user as string];
 			if (!guildChars) return;
 			for (const data of guildChars) {
-				const allowed = haveAccess(interaction, data.messageId[1], user);
+				const allowed = await haveAccess(interaction, data.messageId[1], user);
 				const toPush = data.charName ? data.charName : ul("common.default");
 				if (!data.isPrivate) choices.push(toPush);
 				else if (allowed) choices.push(toPush);
@@ -240,7 +240,7 @@ export const graph = {
 					embeds: [embedError(ul("error.channel.thread"), ul)],
 				});
 
-			const allowHidden = haveAccess(interaction, thread.id, userId);
+			const allowHidden = await haveAccess(interaction, thread.id, userId);
 			if (!allowHidden && charData[userId]?.isPrivate) {
 				await reply(interaction, {
 					embeds: [embedError(ul("error.private"), ul)],

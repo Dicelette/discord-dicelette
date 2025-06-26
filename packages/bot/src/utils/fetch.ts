@@ -41,3 +41,26 @@ export async function fetchChannel(
 		return null;
 	}
 }
+
+export async function fetchUser(client: EClient, userId: string) {
+	try {
+		return client.users.cache.get(userId) ?? (await client.users.fetch(userId));
+	} catch (error) {
+		logger.warn(`Failed to fetch user with ID ${userId}:`, error);
+		return undefined;
+	}
+}
+export async function fetchMember(
+	guild: Djs.Guild,
+	memberId: string
+): Promise<Djs.GuildMember | undefined> {
+	// Try to get the member from the cache first
+	try {
+		return guild.members.cache.get(memberId) ?? (await guild.members.fetch(memberId));
+	}
+	catch (error) {
+		logger.warn(`Failed to fetch member with ID ${memberId}:`, error);
+		return undefined;
+	}
+
+}

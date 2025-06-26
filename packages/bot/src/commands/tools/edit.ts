@@ -93,7 +93,7 @@ export const editAvatar = {
 			const guildChars = guildData.user[userID];
 			if (!guildChars) return;
 			for (const data of guildChars) {
-				const allowed = haveAccess(interaction, data.messageId[1], userID);
+				const allowed = await haveAccess(interaction, data.messageId[1], userID);
 				const toPush = data.charName ? data.charName : ul("common.default");
 				if (!data.isPrivate) choices.push(toPush);
 				else if (allowed) choices.push(toPush);

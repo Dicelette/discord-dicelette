@@ -1,6 +1,6 @@
 import type { Settings } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { fetchChannel } from "./fetch";
+import { fetchChannel, fetchMember } from "./fetch";
 import { logger } from "@dicelette/utils";
 
 async function fetchDiceRole(diceEmbed: boolean, guild: Djs.Guild, role?: string) {
@@ -17,15 +17,15 @@ async function fetchStatsRole(statsEmbed: boolean, guild: Djs.Guild, role?: stri
 	return statsRole;
 }
 
-export function haveAccess(
+export async function haveAccess(
 	interaction: Djs.BaseInteraction,
 	thread: Djs.GuildChannelResolvable,
 	user?: string
-): boolean {
+): Promise<boolean> {
 	if (!user) return false;
 	if (user === interaction.user.id) return true;
 	//verify if the user have access to the channel/thread, like reading the channel
-	const member = interaction.guild?.members.cache.get(interaction.user.id);
+	const member = await fetchMember(interaction.guild!, user);
 	if (!member || !thread) return false;
 	return (
 		member.permissions.has(Djs.PermissionFlagsBits.ManageRoles) ||
@@ -51,11 +51,10 @@ export async function addAutoRole(
 	const autoRole = db.get(interaction.guild!.id, "autoRole");
 	if (!autoRole) return;
 	try {
-		let guildMember = interaction.guild!.members.cache.get(member);
-		if (!guildMember) {
-			//Use the fetch in case the member is not in the cache
-			guildMember = await interaction.guild!.members.fetch(member);
-		}
+		const guildMember = await fetchMember(interaction.guild!, member);
+		if (!guildMember)
+			throw new Error("Member not found in the guild. Should not happen. Please report this issue. Prout.");
+
 		//fetch role
 		const diceRole = await fetchDiceRole(diceEmbed, interaction.guild!, autoRole.dice);
 		const statsRole = await fetchStatsRole(
