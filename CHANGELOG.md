@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.54.3](https://github.com/Dicelette/discord-dicelette/compare/1.54.2...1.54.3) (2025-06-26)
+
+
+### Bug Fixes
+
+* fetch user when not found in cache ([e8d345d](https://github.com/Dicelette/discord-dicelette/commit/e8d345db3a8c78253bc09aafcb1a733c74fa04fb))
+* total exceeded should be accurate ([cb6c28d](https://github.com/Dicelette/discord-dicelette/commit/cb6c28d3076aff700ad216e0749a5dd2ca589169))
+
 ## [1.54.2](https://github.com/Dicelette/discord-dicelette/compare/1.54.1...1.54.2) (2025-06-22)
 
 
