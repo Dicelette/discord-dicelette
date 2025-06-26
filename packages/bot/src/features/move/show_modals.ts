@@ -2,7 +2,7 @@ import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { allowEdit } from "utils";
 
-export async function initiateMove(
+export async function start(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,

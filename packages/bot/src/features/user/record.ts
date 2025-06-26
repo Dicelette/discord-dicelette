@@ -4,7 +4,7 @@ import { cleanAvatarUrl, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { registerDmgButton, registerStatistics } from "features";
+import { Dice, Stats } from "features";
 import { embedError, reply } from "messages";
 import {
 	continueCancelButtons,
@@ -43,7 +43,7 @@ export async function pageNumber(
 		});
 		return;
 	}
-	await registerStatistics(
+	await Stats.register(
 		interaction,
 		template,
 		Number.parseInt(pageNumber, 10),
@@ -56,7 +56,7 @@ export async function pageNumber(
  *
  * If the interaction is valid and a corresponding template is found, generates and displays the initial embed for user statistics registration.
  */
-export async function recordFirstPage(
+export async function firstPage(
 	interaction: Djs.ModalSubmitInteraction,
 	client: EClient
 ) {
@@ -64,7 +64,7 @@ export async function recordFirstPage(
 		return;
 	const template = await getTemplateByInteraction(interaction, client);
 	if (!template) return;
-	await createEmbedFirstPage(interaction, template, client);
+	await createFirstPage(interaction, template, client);
 }
 
 /**
@@ -78,7 +78,7 @@ export async function recordFirstPage(
  *
  * @throws {NoChannel} If the interaction channel is missing.
  */
-export async function createEmbedFirstPage(
+async function createFirstPage(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
 	client: EClient
@@ -174,12 +174,12 @@ export async function createEmbedFirstPage(
 		});
 		return;
 	}
-	const allButtons = registerDmgButton(ul);
+	const allButtons = Dice.buttons(ul);
 
-	const msg = await reply(interaction, { embeds: [embed], components: [allButtons] });
+	await reply(interaction, { embeds: [embed], components: [allButtons] });
 }
 
-export function selfRegisterAllowance(value?: string | boolean) {
+function selfRegisterAllowance(value?: string | boolean) {
 	if (typeof value === "boolean")
 		return {
 			moderation: false,

@@ -4,20 +4,8 @@ import type { Characters, Translation, UserData } from "@dicelette/types";
 import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { findDuplicate, showStatistiqueModal } from "features";
-import {
-	createCustomCritical,
-	createDiceEmbed,
-	createEmbedsList,
-	createStatsEmbed,
-	createTemplateEmbed,
-	createUserEmbed,
-	embedError,
-	getEmbeds,
-	reply,
-	repostInThread,
-	sendLogs,
-} from "messages";
+import { Dice, Stats } from "features";
+import * as Messages from "messages";
 import { addAutoRole, fetchChannel, getLangAndConfig, pingModeratorRole } from "utils";
 
 /**
@@ -36,7 +24,7 @@ export async function continuePage(
 			.get(interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	if (!isModerator) {
-		await reply(interaction, {
+		await Messages.reply(interaction, {
 			content: ul("modals.noPermission"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -44,9 +32,10 @@ export async function continuePage(
 	}
 	const pageNumber = interaction.customId.replace("page", "");
 	const page = !isNumber(pageNumber) ? 1 : Number.parseInt(pageNumber, 10);
-	const embed = getEmbeds(ul, interaction.message, "user");
+	const embed = Messages.getEmbeds(ul, interaction.message, "user");
 	if (!embed || !dbTemplate.statistics) return;
-	const statsEmbed = getEmbeds(ul, interaction.message, "stats") ?? createStatsEmbed(ul);
+	const statsEmbed =
+		Messages.getEmbeds(ul, interaction.message, "stats") ?? Messages.createStatsEmbed(ul);
 	const allTemplateStat = Object.keys(dbTemplate.statistics).map((stat) =>
 		stat.unidecode()
 	);
@@ -55,20 +44,20 @@ export async function continuePage(
 		.filter((stat) => allTemplateStat.includes(stat.unidecode()))
 		.map((stat) => stat.unidecode());
 	if (statsAlreadySet.length === allTemplateStat.length) {
-		await reply(interaction, {
+		await Messages.reply(interaction, {
 			content: ul("modals.alreadySet"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
-	await showStatistiqueModal(interaction, dbTemplate, statsAlreadySet, page + 1);
+	await Stats.show(interaction, dbTemplate, statsAlreadySet, page + 1);
 }
 
 /**
  * Validate the user and create the embeds when the button is clicked
  */
 
-export async function validateUserButton(
+export async function button(
 	interaction: Djs.ButtonInteraction,
 	interactionUser: Djs.User,
 	template: StatisticalTemplate,
@@ -88,7 +77,7 @@ export async function validateUserButton(
 		let notAllowedMsg = ul("modals.noPermission");
 		notAllowedMsg += `\n${ul("modals.onlyModerator")}`;
 		await sendValidationMessage(interaction, interactionUser, ul, client);
-		await reply(interaction, {
+		await Messages.reply(interaction, {
 			content: notAllowedMsg,
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -103,7 +92,7 @@ async function sendValidationMessage(
 ) {
 	const logChannel = client.settings.get(interaction.guild!.id, "logs");
 	if (logChannel)
-		await sendLogs(
+		await Messages.sendLogs(
 			ul("logs.validationWaiting", {
 				user: `${interactionUser.id}`,
 				url: interaction.message.url,
@@ -137,7 +126,7 @@ async function sendValidationMessage(
 						}),
 					});
 				} catch (e) {
-					logger.warn(e, "validateUserButton: can't send DM to the owner");
+					logger.warn(e, "button: can't send DM to the owner");
 				}
 			}
 		}
@@ -157,7 +146,7 @@ export async function validateUser(
 	characters: Characters
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
-	const userEmbed = getEmbeds(ul, interaction.message, "user");
+	const userEmbed = Messages.getEmbeds(ul, interaction.message, "user");
 	if (!userEmbed) throw new NoEmbed();
 	const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	let userID = oldEmbedsFields?.["common.user"];
@@ -170,9 +159,12 @@ export async function validateUser(
 			channelToPost.replace("<#", "").replace(">", "")
 		);
 		if (!channel) {
-			await reply(interaction, {
+			await Messages.reply(interaction, {
 				embeds: [
-					embedError(ul("error.channel.notFound", { channel: channelToPost }), ul),
+					Messages.embedError(
+						ul("error.channel.notFound", { channel: channelToPost }),
+						ul
+					),
 				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -181,28 +173,28 @@ export async function validateUser(
 	}
 	if (charName && charName === "common.noSet") charName = undefined;
 	if (!userID) {
-		await reply(interaction, {
-			embeds: [embedError(ul("error.user.notFound"), ul)],
+		await Messages.reply(interaction, {
+			embeds: [Messages.embedError(ul("error.user.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	userID = userID.replace("<@", "").replace(">", "");
-	const userDataEmbed = createUserEmbed(
+	const userDataEmbed = Messages.createUserEmbed(
 		ul,
 		userEmbed.toJSON().thumbnail?.url || "",
 		userID,
 		charName
 	);
-	const oldDiceEmbeds = getEmbeds(ul, interaction.message, "damage");
-	const oldStatsEmbed = getEmbeds(ul, interaction.message, "stats");
+	const oldDiceEmbeds = Messages.getEmbeds(ul, interaction.message, "damage");
+	const oldStatsEmbed = Messages.getEmbeds(ul, interaction.message, "stats");
 	const oldDiceEmbedsFields = oldDiceEmbeds ? (oldDiceEmbeds.toJSON().fields ?? []) : [];
 	const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.toJSON().fields ?? []) : [];
 	let diceEmbed: Djs.EmbedBuilder | undefined;
 	let statsEmbed: Djs.EmbedBuilder | undefined;
 	for (const field of oldDiceEmbedsFields) {
 		if (!diceEmbed) {
-			diceEmbed = createDiceEmbed(ul);
+			diceEmbed = Messages.createDiceEmbed(ul);
 		}
 		diceEmbed.addFields({
 			name: field.name.unidecode(true).capitalize(),
@@ -212,7 +204,7 @@ export async function validateUser(
 	}
 	for (const field of statEmbedsFields) {
 		if (!statsEmbed) {
-			statsEmbed = createStatsEmbed(ul);
+			statsEmbed = Messages.createStatsEmbed(ul);
 		}
 		statsEmbed.addFields({
 			name: field.name.unidecode(true).capitalize(),
@@ -250,10 +242,10 @@ export async function validateUser(
 		if (!templateDamage) templateDamage = {};
 		templateDamage[name] = dice;
 		if (!diceEmbed) {
-			diceEmbed = createDiceEmbed(ul);
+			diceEmbed = Messages.createDiceEmbed(ul);
 		}
 		//prevent duplicate fields in the dice embed
-		if (findDuplicate(diceEmbed, name)) continue;
+		if (Dice.findDuplicate(diceEmbed, name)) continue;
 		//why i forgot this????
 		diceEmbed.addFields({
 			name: `${name}`,
@@ -276,7 +268,7 @@ export async function validateUser(
 	};
 	let templateEmbed: Djs.EmbedBuilder | undefined;
 	if (template.diceType || template.critical || template.customCritical) {
-		templateEmbed = createTemplateEmbed(ul);
+		templateEmbed = Messages.createTemplateEmbed(ul);
 		if (template.diceType)
 			templateEmbed.addFields({
 				name: ul("common.dice").capitalize(),
@@ -298,10 +290,15 @@ export async function validateUser(
 			});
 		}
 		const criticalTemplate = template.customCritical ?? {};
-		templateEmbed = createCustomCritical(templateEmbed, criticalTemplate);
+		templateEmbed = Messages.createCustomCritical(templateEmbed, criticalTemplate);
 	}
-	const allEmbeds = createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed);
-	await repostInThread(
+	const allEmbeds = Messages.createEmbedsList(
+		userDataEmbed,
+		statsEmbed,
+		diceEmbed,
+		templateEmbed
+	);
+	await Messages.repostInThread(
 		allEmbeds,
 		interaction,
 		userStatistique,
@@ -318,7 +315,7 @@ export async function validateUser(
 		logger.warn(e, "validateUser: can't delete the message");
 	}
 	await addAutoRole(interaction, userID, !!diceEmbed, !!statsEmbed, client.settings);
-	await reply(interaction, {
+	await Messages.reply(interaction, {
 		content: ul("modals.finished"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});

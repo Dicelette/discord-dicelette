@@ -4,7 +4,7 @@ import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
 
-export async function initiateAvatarEdit(
+export async function start(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
@@ -22,7 +22,7 @@ export async function initiateAvatarEdit(
  *
  * @throws {Error} If the user embed is not found in the interaction message.
  */
-export async function showAvatarEdit(
+async function showAvatarEdit(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation
 ) {

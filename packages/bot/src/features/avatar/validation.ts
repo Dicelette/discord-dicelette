@@ -15,10 +15,7 @@ import { embedError, getEmbeds, getEmbedsList, reply } from "messages";
  *
  * @throws {Error} If the user embed is not found in the message.
  */
-export async function validateAvatarEdit(
-	interaction: Djs.ModalSubmitInteraction,
-	ul: Translation
-) {
+export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translation) {
 	if (!interaction.message) return;
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id

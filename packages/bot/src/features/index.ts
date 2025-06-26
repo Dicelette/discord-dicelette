@@ -1,7 +1,6 @@
-export * from "./avatar";
-export * from "./dice";
-export * from "./dice";
-export * from "./move";
-export * from "./rename";
-export * from "./stats";
-export * from "./user";
+export * as Avatar from "./avatar";
+export * as Dice from "./dice";
+export * as Move from "./move";
+export * as Rename from "./rename";
+export * as Stats from "./stats";
+export * as User from "./user";

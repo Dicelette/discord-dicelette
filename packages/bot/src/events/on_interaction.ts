@@ -1,5 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	autCompleteCmd,
@@ -11,10 +12,9 @@ import {
 } from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import * as features from "features";
+import { Dice, Stats, User, Avatar, Move, Rename } from "features";
 import { embedError, interactionError } from "messages";
 import { cancel, getLangAndConfig } from "utils";
-import { logger } from "@dicelette/utils";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
@@ -85,21 +85,19 @@ async function modalSubmit(
 	client: EClient
 ) {
 	if (interaction.customId.includes("damageDice"))
-		await features.storeDamageDice(interaction, ul, interactionUser, client);
+		await Dice.store(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
-		await features.pageNumber(interaction, ul, client);
+		await User.pageNumber(interaction, ul, client);
 	else if (interaction.customId === "editStats")
-		await features.editStats(interaction, ul, client);
+		await Stats.validateEdit(interaction, ul, client);
 	else if (interaction.customId === "firstPage")
-		await features.recordFirstPage(interaction, client);
+		await User.firstPage(interaction, client);
 	else if (interaction.customId === "editDice")
-		await features.validateDiceEdit(interaction, ul, client);
-	else if (interaction.customId === "editAvatar")
-		await features.validateAvatarEdit(interaction, ul);
+		await Dice.validate(interaction, ul, client);
+	else if (interaction.customId === "editAvatar") await Avatar.edit(interaction, ul);
 	else if (interaction.customId === "rename")
-		await features.validateRename(interaction, ul, client);
-	else if (interaction.customId === "move")
-		await features.validateMove(interaction, ul, client);
+		await Rename.validate(interaction, ul, client);
+	else if (interaction.customId === "move") await Move.validate(interaction, ul, client);
 }
 
 /**
@@ -119,7 +117,7 @@ async function buttonSubmit(
 ) {
 	const characters = client.characters;
 	if (interaction.customId === "register")
-		await features.startRegisterUser(
+		await User.start(
 			interaction,
 			template,
 			interactionUser,
@@ -128,7 +126,7 @@ async function buttonSubmit(
 			client.settings.get(interaction.guild!.id, "allowSelfRegister")
 		);
 	else if (interaction.customId === "continue")
-		await features.continuePage(
+		await User.continuePage(
 			interaction,
 			template,
 			ul,
@@ -136,25 +134,18 @@ async function buttonSubmit(
 			client.settings.get(interaction.guild!.id, "allowSelfRegister")
 		);
 	else if (interaction.customId.includes("add_dice")) {
-		await features.executeAddDiceButton(interaction, interactionUser, client.settings);
+		await Dice.add(interaction, interactionUser, client.settings);
 		if (!interaction.customId.includes("first"))
 			await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "edit_stats") {
-		await features.triggerEditStats(interaction, ul, interactionUser, client.settings);
+		await Stats.edit(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "validate") {
-		await features.validateUserButton(
-			interaction,
-			interactionUser,
-			template,
-			ul,
-			client,
-			characters
-		);
+		await User.button(interaction, interactionUser, template, ul, client, characters);
 	} else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, interactionUser);
 	else if (interaction.customId === "edit_dice") {
-		await features.initiateDiceEdit(interaction, ul, interactionUser, client.settings);
+		await Dice.edit(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);
@@ -182,13 +173,13 @@ async function selectSubmit(
 		const value = interaction.values[0];
 		switch (value) {
 			case "name":
-				await features.initiateRenaming(interaction, ul, interactionUser, db);
+				await Rename.start(interaction, ul, interactionUser, db);
 				break;
 			case "avatar":
-				await features.initiateAvatarEdit(interaction, ul, interactionUser, db);
+				await Avatar.start(interaction, ul, interactionUser, db);
 				break;
 			case "user":
-				await features.initiateMove(interaction, ul, interactionUser, db);
+				await Move.start(interaction, ul, interactionUser, db);
 				break;
 		}
 	}

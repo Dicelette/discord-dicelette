@@ -11,6 +11,7 @@ import { getUserByEmbed, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
+import { fetchUser } from "utils";
 
 /**
  * Handles validation and execution of a character rename operation from a Discord modal submission.
@@ -19,7 +20,7 @@ import { getEmbeds } from "messages";
  *
  * @throws {Error} If the required embed, user ID, user object, or character data cannot be found.
  */
-export async function validateRename(
+export async function validate(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	client: EClient
@@ -39,12 +40,12 @@ export async function validateRename(
 		?.value.replace("<@", "")
 		.replace(">", "");
 	if (!userId) throw new Error(ul("error.user.notFound"));
-	const user = interaction.client.users.cache.get(userId);
-	if (!user) throw new Error(ul("error.user.notFound"));
+	const user = await fetchUser(interaction.client as EClient, userId);
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel.id,
 		messageId: message.id,
 	};
+	if (!user) throw new Error(ul("error.user.notFound"));
 	const charData = getUserByEmbed({ message: message }, ul);
 	if (!charData) throw new Error(ul("error.user.youRegistered"));
 	const oldData: {

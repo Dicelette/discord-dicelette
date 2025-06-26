@@ -11,6 +11,7 @@ import {
 	registerUser,
 	updateMemory,
 } from "database";
+import type { EmbedBuilder } from "discord.js";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -22,7 +23,6 @@ import {
 	sendLogs,
 } from "messages";
 import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "utils";
-import type { EmbedBuilder } from "discord.js";
 
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.
@@ -30,7 +30,7 @@ import type { EmbedBuilder } from "discord.js";
  * Allows the operation only if the interacting user is the owner referenced in the embed or has moderator permissions.
  * Replies with an error if the required template is not found or if the user lacks permission.
  */
-export async function storeDamageDice(
+export async function store(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
@@ -66,7 +66,7 @@ export async function storeDamageDice(
  * Button when registering the user, adding the "add dice" button
  * @param ul {Translation}
  */
-export function registerDmgButton(ul: Translation) {
+export function buttons(ul: Translation) {
 	const validateButton = new Djs.ButtonBuilder()
 		.setCustomId("validate")
 		.setLabel(ul("button.validate"))
@@ -97,7 +97,7 @@ export function registerDmgButton(ul: Translation) {
  *
  * @throws {Error} If the interaction is missing a guild or message, or if the user cannot be found in the embed.
  */
-export async function registerDamageDice(
+async function registerDamageDice(
 	interaction: Djs.ModalSubmitInteraction,
 	client: EClient,
 	first?: boolean
@@ -217,7 +217,7 @@ export async function registerDamageDice(
 			embeds: allEmbeds,
 		});
 	} else {
-		components = [registerDmgButton(ul)];
+		components = [buttons(ul)];
 	}
 
 	await edit(

@@ -4,7 +4,7 @@ import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import { isArrayEqual } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { registerDmgButton } from "features";
+import { Dice } from "features";
 import { getEmbeds, reply } from "messages";
 import { allowEdit } from "utils";
 
@@ -13,7 +13,7 @@ import { allowEdit } from "utils";
  * Will display the statistics that are not already set
  * 5 statistics per page
  */
-export async function showStatistiqueModal(
+export async function show(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
 	stats?: string[],
@@ -36,8 +36,8 @@ export async function showStatistiqueModal(
 	if (stats && stats.length > 0) {
 		statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
 		if (statToDisplay.length === 0) {
-			//remove button
-			const button = registerDmgButton(ul);
+			//remove butto
+			const button = Dice.buttons(ul);
 			await reply(interaction, {
 				content: ul("modals.alreadySet"),
 				flags: Djs.MessageFlags.Ephemeral,
@@ -76,7 +76,7 @@ export async function showStatistiqueModal(
 /**
  * The button that trigger the stats editor
  */
-export async function triggerEditStats(
+export async function edit(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
@@ -93,7 +93,7 @@ export async function triggerEditStats(
  *
  * @throws {Error} If no statistics embed is found in the interaction message.
  */
-export async function showEditorStats(
+async function showEditorStats(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	db: Settings

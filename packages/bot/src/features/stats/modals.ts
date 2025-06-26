@@ -7,12 +7,12 @@ import {
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { logger, TotalExceededError } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
-import { registerDmgButton } from "features";
+import { Dice } from "features";
 import {
 	createStatsEmbed,
 	displayOldAndNewStats,
@@ -35,7 +35,7 @@ import { continueCancelButtons, editUserButtons } from "utils";
  * @param page - The page number to display in the embed footer (defaults to 2).
  * @param lang - The language locale for localization (defaults to English GB).
  */
-export async function registerStatistics(
+export async function register(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
 	page: number | undefined = 2,
@@ -55,12 +55,33 @@ export async function registerStatistics(
 		.reduce((sum, field) => sum + Number.parseInt(field.value.removeBacktick(), 10), 0);
 	logger.trace(`Old stats total: ${oldStatsTotal}`);
 
-	const { combinaisonFields, stats } = getStatistiqueFields(
-		interaction,
-		template,
-		ul,
-		oldStatsTotal
-	);
+	let combinaisonFields: Record<string, string> = {};
+	let stats: Record<string, number> = {};
+
+	try {
+		const result = getStatistiqueFields(interaction, template, ul, oldStatsTotal);
+		combinaisonFields = result.combinaisonFields;
+		stats = result.stats;
+	} catch (error) {
+		// Si le total est dépassé et que forceDistrib est activé, reset le modal
+		if (error instanceof TotalExceededError && template.forceDistrib) {
+			await reply(interaction, {
+				content: error.message,
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			//retour à l'étape précédente
+			//change the page to 1
+			userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+			message.edit({
+				embeds: [userEmbed],
+				components: [continueCancelButtons(ul)],
+			});
+			return;
+		}
+		// Si ce n'est pas une erreur de dépassement ou si forceDistrib n'est pas activé, relancer l'erreur
+		throw error;
+	}
+
 	//combine all embeds as one
 	userEmbed.setFooter({ text: ul("common.page", { nb: page }) });
 	//add old fields
@@ -75,8 +96,8 @@ export async function registerStatistics(
 	}
 	const statsWithoutCombinaison = template.statistics
 		? Object.keys(template.statistics)
-				.filter((stat) => !template.statistics![stat].combinaison)
-				.map((name) => name.standardize())
+			.filter((stat) => !template.statistics![stat].combinaison)
+			.map((name) => name.standardize())
 		: [];
 	const embedObject = statEmbeds.toJSON();
 	const fields = embedObject.fields;
@@ -125,7 +146,7 @@ export async function registerStatistics(
 
 		message.edit({
 			embeds: [userEmbed, statEmbeds],
-			components: [registerDmgButton(ul)],
+			components: [Dice.buttons(ul)],
 		});
 		await reply(interaction, {
 			content: ul("modals.added.stats"),
@@ -176,7 +197,7 @@ function calculateRemainingPoints(
  * @throws {FormulaError} If a stat value contains an invalid formula.
  * @throws {Error} If a stat name is not found in the template or if a value is below the minimum allowed.
  */
-export async function editStats(
+export async function validateEdit(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	client: EClient

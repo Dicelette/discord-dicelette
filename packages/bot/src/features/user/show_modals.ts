@@ -3,7 +3,7 @@ import type { Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 
-export async function startRegisterUser(
+export async function start(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
 	interactionUser: Djs.User,
@@ -17,14 +17,7 @@ export async function startRegisterUser(
 	const isModerator = selfRegister || moderatorPermission;
 
 	if (isModerator)
-		await showFirstPageModal(
-			interaction,
-			template,
-			ul,
-			havePrivate,
-			selfRegister,
-			moderatorPermission
-		);
+		await show(interaction, template, ul, havePrivate, selfRegister, moderatorPermission);
 	else
 		await reply(interaction, {
 			content: ul("modals.noPermission"),
@@ -35,7 +28,7 @@ export async function startRegisterUser(
 /**
  * Modal opened to register a new user with the name of the character and the user id
  */
-export async function showFirstPageModal(
+async function show(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
 	ul: Translation,

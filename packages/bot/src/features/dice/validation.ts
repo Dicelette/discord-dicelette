@@ -24,7 +24,7 @@ import { editUserButtons, selectEditMenu } from "utils";
  *
  * @throws {Error} If a dice string is invalid or cannot be evaluated against character stats.
  */
-export async function validateDiceEdit(
+export async function validate(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	client: EClient

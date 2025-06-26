@@ -18,7 +18,7 @@ import { isUserNameOrId } from "utils";
  *
  * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
  */
-export async function validateMove(
+export async function validate(
 	interaction: Djs.ModalSubmitInteraction,
 	ul: Translation,
 	client: EClient

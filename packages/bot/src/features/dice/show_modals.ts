@@ -10,14 +10,14 @@ import { allowEdit } from "utils";
  *
  * Checks if the user has permission to edit, then displays a modal for entering new skill dice details.
  */
-export async function executeAddDiceButton(
+export async function add(
 	interaction: Djs.ButtonInteraction,
 	interactionUser: Djs.User,
 	db: Settings
 ) {
 	const allow = await allowEdit(interaction, db, interactionUser);
 	if (allow)
-		await showDamageDiceModals(
+		await show(
 			interaction,
 			interaction.customId.includes("first"),
 			db.get(interaction.guild!.id, "lang") ?? interaction.locale
@@ -25,15 +25,13 @@ export async function executeAddDiceButton(
 }
 
 /**
- * Displays a modal for adding a new skill dice to a user's profile.
- *
- * Presents a form with fields for the dice name and value, using localized labels and placeholders.
+ * Creates and displays a modal for adding damage dice to a character.
  *
  * @param interaction - The button interaction that triggers the modal.
  * @param first - Indicates if this is the initial dice addition during registration.
  * @param lang - The locale used for modal labels and placeholders.
  */
-export async function showDamageDiceModals(
+async function show(
 	interaction: Djs.ButtonInteraction,
 	first?: boolean,
 	lang: Djs.Locale = Djs.Locale.EnglishGB
@@ -71,14 +69,13 @@ export async function showDamageDiceModals(
 /**
  * Initiates the dice editing process when the corresponding button is pressed, verifying the user's permission before displaying the edit modal.
  */
-export async function initiateDiceEdit(
+export async function edit(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	interactionUser: Djs.User,
 	db: Settings
 ) {
-	if (await allowEdit(interaction, db, interactionUser))
-		await showEditDice(interaction, ul);
+	if (await allowEdit(interaction, db, interactionUser)) await showEdit(interaction, ul);
 }
 
 /**
@@ -88,7 +85,7 @@ export async function initiateDiceEdit(
  *
  * @throws {Error} If no valid dice embed is found in the message.
  */
-export async function showEditDice(interaction: Djs.ButtonInteraction, ul: Translation) {
+async function showEdit(interaction: Djs.ButtonInteraction, ul: Translation) {
 	const diceEmbed = getEmbeds(ul, interaction.message, "damage");
 	if (!diceEmbed) throw new Error(ul("error.invalidDice.embeds"));
 	const diceFields = parseEmbedFields(diceEmbed.toJSON() as Djs.Embed);
