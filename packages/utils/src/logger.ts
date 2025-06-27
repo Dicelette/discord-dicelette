@@ -41,14 +41,13 @@ const optionLoggers: ISettingsParam<ILogObj> =
 				stylePrettyLogs: true,
 			}
 		: {
-				minLevel: 4,
+				minLevel: 5,
 				hideLogPositionForProduction: true,
 				overwrite,
 				stylePrettyLogs: false,
 			};
 
 const defaultOptions: ISettingsParam<ILogObj> = {
-	stylePrettyLogs: true,
 	prettyLogTimeZone: "local",
 	prettyLogStyles: {
 		logLevelName: {
