@@ -1,12 +1,13 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { LINKS, type Settings, type Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { getChangelogSince, logger, normalizeChangelogFormat, splitChangelogByVersion } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 import { getLangAndConfig } from "utils";
 import { VERSION } from "../../../index";
+import { getAllVersions, getOptionsVersion } from "@dicelette/utils";
 export const help = {
 	data: new Djs.SlashCommandBuilder()
 		.setName(t("help.name"))
@@ -47,7 +48,40 @@ export const help = {
 				.setNameLocalizations(cmdLn("help.register.name"))
 				.setDescription(t("help.register.description"))
 				.setDescriptionLocalizations(cmdLn("help.register.description"))
+		)
+		.addSubcommand((sub) =>
+			sub
+				.setName(t("help.changelog.name"))
+				.setNameLocalizations(cmdLn("help.changelog.name"))
+				.setDescription(t("help.changelog.description"))
+				.setDescriptionLocalizations(cmdLn("help.changelog.description"))
+				.addStringOption((sub) =>
+					sub
+						.setName(t("help.changelog.version.name"))
+						.setNameLocalizations(cmdLn("help.changelog.version.name"))
+						.setDescription(t("help.changelog.version.description"))
+						.setDescriptionLocalizations(cmdLn("help.changelog.version.description"))
+						.setRequired(false)
+						.setAutocomplete(true)
+				)
 		),
+	async autocomplete(
+		interaction: Djs.AutocompleteInteraction,
+	): Promise<void> {
+		const options = interaction.options as Djs.CommandInteractionOptionResolver;
+		const subcommand = options.getSubcommand(true);
+		if (subcommand !== t("help.changelog.name")) return;
+		const focused = options.getFocused(true);
+		if (focused.name !== t("help.changelog.version.name")) return;
+		const versions = getOptionsVersion();
+		const filteredVersions = versions.filter((v) =>
+			v.name.toLowerCase().includes(focused.value.toLowerCase())
+		);
+		await interaction.respond(
+			filteredVersions.slice(0, 25).map((v) => ({ name: v.name, value: v.value }))
+		);
+	},
+
 	async execute(
 		interaction: Djs.ChatInputCommandInteraction,
 		client: EClient
@@ -101,7 +135,7 @@ export const help = {
 				break;
 			case t("help.fr.name"):
 				await reply(interaction, {
-					content: dedent(ul("helpfr.message", { link: link.fr })),
+					content: dedent(ul("help.fr.message", { link: link.fr })),
 				});
 				break;
 			case t("help.register.name"): {
@@ -169,6 +203,44 @@ export const help = {
 					components: replySection,
 					flags: Djs.MessageFlags.IsComponentsV2,
 				});
+				break;
+			}
+			case t("help.changelog.name"): {
+				await interaction.deferReply();
+				const options = interaction.options as Djs.CommandInteractionOptionResolver;
+				let version = options.getString(t("help.changelog.version.name"), false);
+				const allVersion = getAllVersions();
+				if (!version) version = allVersion[0];
+				const changelog = getChangelogSince(version, true);
+				const splittedChangelog = splitChangelogByVersion(changelog);
+				if (!changelog) {
+					await reply(interaction, {
+						content: ul("help.changelog.noChanges", { version }),
+					});
+					return;
+				}
+				const firstMessage = new Djs.TextDisplayBuilder().setContent(normalizeChangelogFormat(splittedChangelog[0]));
+				if (splittedChangelog.length === 1) {
+					await interaction.editReply({
+						components: [firstMessage],
+						flags: Djs.MessageFlags.IsComponentsV2,
+					});
+					return;
+				}
+				//edit reply with the first part of the changelog
+				await interaction.editReply({
+					flags: Djs.MessageFlags.IsComponentsV2,
+					components: [
+						firstMessage
+					],
+				});
+				for (const split of splittedChangelog.slice(1)) {
+					const msg = new Djs.TextDisplayBuilder().setContent(normalizeChangelogFormat(split))
+					await interaction.followUp({
+						components: [msg],
+						flags: Djs.MessageFlags.IsComponentsV2,
+					})
+				}
 				break;
 			}
 		}

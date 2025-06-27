@@ -466,6 +466,16 @@
       "message": "Veuillez déposer votre rapport de bug [ici](<{{- link}}>).\r\n\r\n### Avant de signaler :\r\n1. **Vérifiez les rapports existants** : Assurez-vous qu'il n'existe pas déjà un rapport pour votre problème.\r\n2. **Consultez la documentation** : Visitez la [documentation](<https://dicelette.github.io/>) pour trouver des réponses aux questions courantes.\r\n\r\n### Informations à inclure dans votre rapport :\r\n- **Commande utilisée** : Précisez la commande et les arguments ayant causé le problème.\r\n- **Comportement observé** : Décrivez ce qui s'est passé lorsque le bug est survenu.\r\n- **Captures d'écran** : Ajoutez des images liées au bug, comme les messages d'erreur ou les fiches de personnage affectées.\r\n- **Logs** : Fournissez les logs d'erreur générés par le bot.\r\n- **Modèle de serveur** : Si le bug est lié à la base de données ou au modèle, incluez le modèle de serveur.\r\n\r\nMerci de nous aider à améliorer le bot !",
       "name": "bug"
     },
+    "changelog": {
+      "description": "Obtenir le journal des modifications depuis une version ou le dernier.",
+      "loading": "Chargement du changelog…",
+      "name": "changelog",
+      "noChanges": "Aucun fichier trouvé, erreur",
+      "version": {
+        "description": "Numéro de version",
+        "name": "version"
+      }
+    },
     "description": "Affiche l'aide",
     "diceNotation": "## Notations prises en charge par Dicelette :\r\n- **Lancers de dés basiques** : Effectuez des lancers de dés standard en utilisant le format `XdY`, où `X` est le nombre de dés et `Y` est le nombre de faces. Exemple : `2d6` lance deux dés à 6 faces.\r\n- **[Groupes de dés](<https://dice-roller.github.io/documentation/guide/notation/group-rolls.html>)** : Regroupez plusieurs lancers de dés pour des scénarios complexes. Exemple : `(1d6, 2d8)`.\r\n- **[Modificateurs](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)** : Appliquez des opérations mathématiques aux lancers de dés, comme ajouter ou soustraire des valeurs. Exemple : `1d20+5`.\r\n- **[Commentaires](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)** : Ajoutez des descriptions à vos lancers pour plus de clarté. Exemple : `1d6 // Dégâts d'attaque`.\r\n- **[Mathématiques](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)** : Effectuez des calculs avancés en utilisant des lancers de dés. Exemple : `(1d6+2)*3`.\r\n- **[Lancers multiples](<https://dicelette.github.io/docs/introduction/expression#lancers-en-masse-bulk-rolls>)** : Lancez plusieurs dés simultanément en utilisant le format `[nombre de dés]#[dé]`. Exemple : `2#d6` lance deux dés à 6 faces.\r\n- **[Lancers partagés](<https://dicelette.github.io/docs/introduction/expression#jets-uniques-partag%C3%A9s-r%C3%A9utilisation-de-r%C3%A9sultats>)** : Réutilisez le résultat d'un lancer précédent dans des calculs ultérieurs. Exemple : `1d6;&+10`.\r\n- **[Critique par dé](<https://dicelette.github.io/docs/introduction/expression#succ%C3%A8s-et-%C3%A9checs-critiques>)** : Spécifiez des conditions de critique pour les lancers de dés. Exemple : `1d20{cs:>=10}>=20` signifie que le lancer est un critique si le résultat est supérieur ou égal à 10.\r\n",
     "fr": {

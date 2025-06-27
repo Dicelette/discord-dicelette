@@ -4,6 +4,7 @@ import { standardizeDice } from "@dicelette/core";
 
 export { logger, important };
 export { default as dev } from "./src/dev";
+export * from "./src/changelog";
 
 /**
  * filter the choices by removing the accents and check if it includes the removedAccents focused
