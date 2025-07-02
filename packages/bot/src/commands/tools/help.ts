@@ -1,6 +1,11 @@
 import { cmdLn, ln, t } from "@dicelette/localization";
 import { LINKS, type Settings, type Translation } from "@dicelette/types";
-import { getChangelogSince, logger, normalizeChangelogFormat, splitChangelogByVersion } from "@dicelette/utils";
+import {
+	getChangelogSince,
+	logger,
+	normalizeChangelogFormat,
+	splitChangelogByVersion,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
@@ -65,9 +70,7 @@ export const help = {
 						.setAutocomplete(true)
 				)
 		),
-	async autocomplete(
-		interaction: Djs.AutocompleteInteraction,
-	): Promise<void> {
+	async autocomplete(interaction: Djs.AutocompleteInteraction): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		if (subcommand !== t("help.changelog.name")) return;
@@ -219,7 +222,9 @@ export const help = {
 					});
 					return;
 				}
-				const firstMessage = new Djs.TextDisplayBuilder().setContent(normalizeChangelogFormat(splittedChangelog[0]));
+				const firstMessage = new Djs.TextDisplayBuilder().setContent(
+					normalizeChangelogFormat(splittedChangelog[0])
+				);
 				if (splittedChangelog.length === 1) {
 					await interaction.editReply({
 						components: [firstMessage],
@@ -230,16 +235,16 @@ export const help = {
 				//edit reply with the first part of the changelog
 				await interaction.editReply({
 					flags: Djs.MessageFlags.IsComponentsV2,
-					components: [
-						firstMessage
-					],
+					components: [firstMessage],
 				});
 				for (const split of splittedChangelog.slice(1)) {
-					const msg = new Djs.TextDisplayBuilder().setContent(normalizeChangelogFormat(split))
+					const msg = new Djs.TextDisplayBuilder().setContent(
+						normalizeChangelogFormat(split)
+					);
 					await interaction.followUp({
 						components: [msg],
 						flags: Djs.MessageFlags.IsComponentsV2,
-					})
+					});
 				}
 				break;
 			}

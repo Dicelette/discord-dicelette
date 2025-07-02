@@ -53,7 +53,9 @@ export async function addAutoRole(
 	try {
 		const guildMember = await fetchMember(interaction.guild!, member);
 		if (!guildMember)
-			throw new Error("Member not found in the guild. Should not happen. Please report this issue. Prout.");
+			throw new Error(
+				"Member not found in the guild. Should not happen. Please report this issue. Prout."
+			);
 
 		//fetch role
 		const diceRole = await fetchDiceRole(diceEmbed, interaction.guild!, autoRole.dice);

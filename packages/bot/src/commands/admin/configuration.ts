@@ -425,7 +425,7 @@ async function stripOOC(
 					components: [],
 				});
 			}
-		})
+		});
 	} catch (e) {
 		console.error("Error in stripOOC selection:", e);
 		await interaction.editReply({

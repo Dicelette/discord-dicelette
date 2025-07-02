@@ -191,10 +191,10 @@ export async function findLocation(
 	user?: Djs.User | null
 ): Promise<{
 	thread?:
-	| Djs.PrivateThreadChannel
-	| Djs.TextChannel
-	| Djs.NewsChannel
-	| Djs.PublicThreadChannel<boolean>;
+		| Djs.PrivateThreadChannel
+		| Djs.TextChannel
+		| Djs.NewsChannel
+		| Djs.PublicThreadChannel<boolean>;
 	sheetLocation: PersonnageIds;
 }> {
 	const sheetLocation: PersonnageIds = {
@@ -213,7 +213,11 @@ export async function findLocation(
 		});
 		return { sheetLocation };
 	}
-	const allowHidden = await haveAccess(interaction, thread.id, user?.id ?? interaction.user.id);
+	const allowHidden = await haveAccess(
+		interaction,
+		thread.id,
+		user?.id ?? interaction.user.id
+	);
 	if (!allowHidden && charData[user?.id ?? interaction.user.id]?.isPrivate) {
 		await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
 		return { sheetLocation };
@@ -386,10 +390,10 @@ export async function threadToSend(
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)
 		: await findForumChannel(
-			channel.parent as Djs.ForumChannel,
-			channel as Djs.ThreadChannel,
-			db,
-			ul,
-			isHidden
-		);
+				channel.parent as Djs.ForumChannel,
+				channel as Djs.ThreadChannel,
+				db,
+				ul,
+				isHidden
+			);
 }

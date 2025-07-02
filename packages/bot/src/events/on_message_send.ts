@@ -161,7 +161,7 @@ async function stripOOC(message: Djs.Message, client: EClient) {
 function replaceOOC(regex: RegExp, message: string) {
 	const reg = regex.exec(message);
 	if (!reg) return message;
-	return message.replace(regex, reg[reg.length-1]).trim();
+	return message.replace(regex, reg[reg.length - 1]).trim();
 }
 
 function allValuesUndefined<T extends Record<string, any>>(obj: T): boolean {

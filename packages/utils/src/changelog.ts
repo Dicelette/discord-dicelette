@@ -28,7 +28,7 @@ export function getChangelogSince(version: string, inclusive = false): string {
 		inclusive ? semver.gte(e.version, version) : semver.gt(e.version, version)
 	);
 
-	return filtered.map((e) => content.slice(e.start, e.end).trim()).join("\n\n")
+	return filtered.map((e) => content.slice(e.start, e.end).trim()).join("\n\n");
 }
 
 /**
@@ -65,7 +65,10 @@ export function splitChangelogByVersion(fullChangelog: string, limit = 4000): st
 
 	for (let i = 0; i < matches.length; i++) {
 		const start = matches[i].index ?? 0;
-		const end = i + 1 < matches.length ? matches[i + 1].index ?? fullChangelog.length : fullChangelog.length;
+		const end =
+			i + 1 < matches.length
+				? (matches[i + 1].index ?? fullChangelog.length)
+				: fullChangelog.length;
 
 		const section = fullChangelog.slice(start, end).trim();
 
@@ -82,7 +85,6 @@ export function splitChangelogByVersion(fullChangelog: string, limit = 4000): st
 	return slices;
 }
 
-
 export function normalizeChangelogFormat(md: string): string {
 	const lines = md.split(/\r?\n/);
 	const result: string[] = [];
@@ -90,13 +92,11 @@ export function normalizeChangelogFormat(md: string): string {
 	let previousLineEmpty = false;
 	for (let i = 0; i < lines.length; i++) {
 		let line = lines[i].trimEnd();
-		if (line.startsWith("### Features"))
-			line = line.replace("Features", "✨ Features");
+		if (line.startsWith("### Features")) line = line.replace("Features", "✨ Features");
 		else if (line.startsWith("### Bug Fixes"))
-			line = line.replace("Bug Fixes", "🐛 Bug Fixes")
+			line = line.replace("Bug Fixes", "🐛 Bug Fixes");
 		else if (line.match(/^## (\[.*?\]\(.*?\))/g))
-			line = line.replace(/^# (\[.*?\]\(.*?\))/g, "## __$1__")
-
+			line = line.replace(/^# (\[.*?\]\(.*?\))/g, "## __$1__");
 		else if (line === "") {
 			if (!previousLineEmpty) previousLineEmpty = true;
 			continue;
