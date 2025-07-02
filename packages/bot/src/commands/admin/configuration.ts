@@ -1,5 +1,5 @@
-import { cmdLn, LocalePrimary, ln, t } from "@dicelette/localization";
-import type { Translation } from "@dicelette/types";
+import { LocalePrimary, ln, t } from "@dicelette/localization";
+import type { StripOOC, Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
@@ -7,6 +7,7 @@ import * as Djs from "discord.js";
 import { localeList } from "locales";
 import { reply } from "messages";
 import { getLangAndConfig } from "utils";
+import "../../discord_ext";
 
 const findLocale = (locale?: Djs.Locale) => {
 	if (locale === Djs.Locale.EnglishUS || locale === Djs.Locale.EnglishGB)
@@ -22,24 +23,18 @@ const findLocale = (locale?: Djs.Locale) => {
 
 export const configuration = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("config.name"))
-		.setNameLocalizations(cmdLn("config.name"))
+		.setNames("config.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.setDescription(t("config.description"))
-		.setDescriptionLocalizations(cmdLn("config.description"))
+		.setDescriptions("config.description")
 		/* CHANGE LANG*/
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(t("config.lang.name"))
-				.setNameLocalizations(cmdLn("config.lang.name"))
-				.setDescription(t("config.lang.description"))
-				.setDescriptionLocalizations(cmdLn("config.lang.description"))
+				.setNames("config.lang.name")
+				.setDescriptions("config.lang.description")
 				.addStringOption((option) =>
 					option
-						.setName(t("config.lang.options.name"))
-						.setNameLocalizations(cmdLn("config.lang.options.name"))
-						.setDescription(t("config.lang.options.desc"))
-						.setDescriptionLocalizations(cmdLn("config.lang.options.desc"))
+						.setNames("config.lang.options.name")
+						.setDescriptions("config.lang.options.desc")
 						.setRequired(true)
 						.addChoices(...localeList)
 				)
@@ -48,17 +43,12 @@ export const configuration = {
 		/* LOGS */
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(t("logs.name"))
-				.setNameLocalizations(cmdLn("logs.name"))
-				.setDescription(t("logs.description"))
-				.setDescriptionLocalizations(cmdLn("logs.description"))
-				.setNameLocalizations(cmdLn("logs.name"))
+				.setNames("logs.name")
+				.setDescriptions("logs.description")
 				.addChannelOption((option) =>
 					option
-						.setName(t("common.channel"))
-						.setDescription(t("logs.options"))
-						.setDescriptionLocalizations(cmdLn("logs.options"))
-						.setNameLocalizations(cmdLn("common.channel"))
+						.setNames("common.channel")
+						.setDescriptions("logs.options")
 						.setRequired(false)
 						.addChannelTypes(
 							Djs.ChannelType.GuildText,
@@ -70,24 +60,19 @@ export const configuration = {
 		/* RESULT CHANNEL */
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(t("changeThread.name"))
-				.setNameLocalizations(cmdLn("changeThread.name"))
-				.setDescription(t("changeThread.description"))
-				.setDescriptionLocalizations(cmdLn("changeThread.description"))
+				.setNames("changeThread.name")
+				.setDescriptions("changeThread.description")
+
 				.addBooleanOption((option) =>
 					option
-						.setName(t("disableThread.name"))
-						.setDescription(t("disableThread.description"))
-						.setDescriptionLocalizations(cmdLn("disableThread.description"))
-						.setNameLocalizations(cmdLn("disableThread.name"))
+						.setNames("disableThread.name")
+						.setDescriptions("disableThread.description")
 						.setRequired(false)
 				)
 				.addChannelOption((option) =>
 					option
-						.setName(t("common.channel"))
-						.setNameLocalizations(cmdLn("common.channel"))
-						.setDescription(t("changeThread.options"))
-						.setDescriptionLocalizations(cmdLn("changeThread.options"))
+						.setNames("common.channel")
+						.setDescription("changeThread.options")
 						.setRequired(false)
 						.addChannelTypes(
 							Djs.ChannelType.GuildText,
@@ -100,16 +85,12 @@ export const configuration = {
 		/* DELETE AFTER */
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(t("timer.name"))
-				.setNameLocalizations(cmdLn("timer.name"))
-				.setDescription(t("timer.description"))
-				.setDescriptionLocalizations(cmdLn("timer.description"))
+				.setNames("timer.name")
+				.setDescription("timer.description")
 				.addNumberOption((option) =>
 					option
-						.setName(t("timer.option.name"))
-						.setNameLocalizations(cmdLn("timer.option.name"))
-						.setDescription(t("timer.option.description"))
-						.setDescriptionLocalizations(cmdLn("timer.option.description"))
+						.setNames("timer.option.name")
+						.setDescriptions("timer.option.description")
 						.setRequired(true)
 						.setMinValue(0)
 						.setMaxValue(3600)
@@ -119,45 +100,33 @@ export const configuration = {
 		/* DISPLAY */
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(t("config.display.name"))
-				.setNameLocalizations(cmdLn("config.display.name"))
-				.setDescription(t("config.display.description"))
-				.setDescriptionLocalizations(cmdLn("config.display.description"))
+				.setNames("config.display.name")
+				.setDescriptions("config.display.description")
 		)
 		/* AUTO ROLE */
 		.addSubcommandGroup((group) =>
 			group
-				.setName(t("autoRole.name"))
-				.setNameLocalizations(cmdLn("autoRole.name"))
-				.setDescription(t("autoRole.description"))
-				.setDescriptionLocalizations(cmdLn("autoRole.description"))
+				.setNames("autoRole.name")
+				.setDescriptions("autoRole.description")
 				.addSubcommand((subcommand) =>
 					subcommand
-						.setName(t("common.statistics"))
-						.setNameLocalizations(cmdLn("common.statistics"))
-						.setDescription(t("autoRole.stat.desc"))
-						.setDescriptionLocalizations(cmdLn("autoRole.stat.desc"))
+						.setNames("common.statistics")
+						.setDescriptions("autoRole.stat.desc")
 						.addRoleOption((option) =>
 							option
-								.setName(t("common.role"))
-								.setNameLocalizations(cmdLn("common.role"))
-								.setDescription(t("autoRole.options"))
-								.setDescriptionLocalizations(cmdLn("autoRole.options"))
+								.setNames("common.role")
+								.setDescriptions("autoRole.options")
 								.setRequired(false)
 						)
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
-						.setName(t("common.dice"))
-						.setNameLocalizations(cmdLn("common.dice"))
-						.setDescription(t("autoRole.dice.desc"))
-						.setDescriptionLocalizations(cmdLn("autoRole.dice.desc"))
+						.setNames("common.dice")
+						.setDescriptions("autoRole.dice.desc")
 						.addRoleOption((option) =>
 							option
-								.setName(t("common.role"))
-								.setNameLocalizations(cmdLn("common.role"))
-								.setDescription(t("autoRole.options"))
-								.setDescriptionLocalizations(cmdLn("autoRole.options"))
+								.setNames("common.role")
+								.setDescriptions("autoRole.options")
 								.setRequired(false)
 						)
 				)
@@ -166,30 +135,24 @@ export const configuration = {
 		/* TIMESTAMP */
 		.addSubcommand((sub) =>
 			sub
-				.setName(t("timestamp.name"))
-				.setDescription(t("timestamp.description"))
-				.setDescriptionLocalizations(cmdLn("timestamp.description"))
-				.setNameLocalizations(cmdLn("timestamp.name"))
+				.setNames("timestamp.name")
+				.setDescriptions("timestamp.description")
 				.addBooleanOption((option) =>
 					option
-						.setName(t("disableThread.options.name"))
-						.setDescription(t("timestamp.options"))
+						.setNames("disableThread.options.name")
+						.setDescriptions("timestamp.options")
 						.setRequired(true)
 				)
 		)
 		/* ANCHOR */
 		.addSubcommand((sub) =>
 			sub
-				.setName(t("anchor.name"))
-				.setDescription(t("anchor.description"))
-				.setDescriptionLocalizations(cmdLn("anchor.description"))
-				.setNameLocalizations(cmdLn("anchor.name"))
+				.setNames("anchor.name")
+				.setDescriptions("anchor.description")
 				.addBooleanOption((option) =>
 					option
-						.setName(t("disableThread.options.name"))
-						.setDescription(t("anchor.options"))
-						.setNameLocalizations(cmdLn("disableThread.options.name"))
-						.setDescriptionLocalizations(cmdLn("anchor.options"))
+						.setNames("disableThread.options.name")
+						.setDescriptions("anchor.options")
 						.setRequired(true)
 				)
 		)
@@ -199,40 +162,30 @@ export const configuration = {
 		 */
 		.addSubcommand((sub) =>
 			sub
-				.setName(t("config.logLink.name"))
-				.setDescription(t("config.logLink.description"))
-				.setDescriptionLocalizations(cmdLn("config.logLink.description"))
-				.setNameLocalizations(cmdLn("config.logLink.name"))
+				.setNames("config.logLink.name")
+				.setDescriptions("config.logLink.description")
 				.addBooleanOption((option) =>
 					option
-						.setName(t("disableThread.options.name"))
-						.setDescription(t("linkToLog.options"))
-						.setNameLocalizations(cmdLn("disableThread.options.name"))
-						.setDescriptionLocalizations(cmdLn("linkToLog.options"))
+						.setNames("disableThread.options.name")
+						.setDescriptions("linkToLog.options")
 						.setRequired(true)
 				)
 		)
 		/** HIDDEN ROLL FOR MJROLL */
 		.addSubcommand((sub) =>
 			sub
-				.setName(t("hidden.title"))
-				.setDescriptionLocalizations(cmdLn("hidden.description"))
-				.setDescription(t("hidden.description"))
-				.setNameLocalizations(cmdLn("hidden.title"))
+				.setNames("hidden.title")
+				.setDescriptions("hidden.description")
 				.addBooleanOption((option) =>
 					option
-						.setName(t("disableThread.options.name"))
-						.setDescription(t("linkToLog.options"))
-						.setNameLocalizations(cmdLn("disableThread.options.name"))
-						.setDescriptionLocalizations(cmdLn("linkToLog.options"))
+						.setNames("disableThread.options.name")
+						.setDescriptions("linkToLog.options")
 						.setRequired(true)
 				)
 				.addChannelOption((option) =>
 					option
-						.setName(t("common.channel"))
-						.setNameLocalizations(cmdLn("common.channel"))
-						.setDescription(t("hidden.options"))
-						.setDescriptionLocalizations(cmdLn("hidden.options"))
+						.setNames("common.channel")
+						.setDescriptions("hidden.options")
 						.setRequired(false)
 						.addChannelTypes(
 							Djs.ChannelType.GuildText,
@@ -244,33 +197,68 @@ export const configuration = {
 		/** SELF REGISTRATION */
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setName(t("config.selfRegister.name"))
-				.setNameLocalizations(cmdLn("config.selfRegister.name"))
-				.setDescription(t("config.selfRegister.description"))
-				.setDescriptionLocalizations(cmdLn("config.selfRegister.description"))
+				.setNames("config.selfRegister.name")
+				.setDescriptions("config.selfRegister.description")
 				.addBooleanOption((option) =>
 					option
-						.setName(t("disableThread.options.name"))
-						.setNameLocalizations(cmdLn("disableThread.options.name"))
-						.setDescription(t("linkToLog.options"))
-						.setDescriptionLocalizations(cmdLn("linkToLog.options"))
+						.setNames("disableThread.options.name")
+						.setDescriptions("linkToLog.options")
 						.setRequired(true)
 				)
 				.addBooleanOption((option) =>
 					option
-						.setName(t("config.selfRegister.moderation.name"))
-						.setNameLocalizations(cmdLn("config.selfRegister.moderation.name"))
-						.setDescription(t("config.selfRegister.moderation.desc"))
-						.setDescriptionLocalizations(cmdLn("config.selfRegister.moderation.desc"))
+						.setNames("config.selfRegister.moderation.name")
+						.setDescriptions("config.selfRegister.moderation.desc")
 						.setRequired(false)
 				)
 				.addBooleanOption((option) =>
 					option
-						.setName(t("config.selfRegister.channel.name"))
-						.setNameLocalizations(cmdLn("config.selfRegister.channel.name"))
-						.setDescription(t("config.selfRegister.channel.desc"))
-						.setDescriptionLocalizations(cmdLn("config.selfRegister.channel.desc"))
+						.setNames("config.selfRegister.channel.name")
+						.setDescriptions("config.selfRegister.channel.desc")
 						.setRequired(false)
+				)
+		)
+		/**
+		 * Strip OOC
+		 * @example /config strip_ooc prefix suffix timer channel
+		 * @example /config strip_ooc regex timer channel
+		 * @example /config strip_ooc prefix suffix timer (will only delete)
+		 */
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setNames("config.stripOOC.name")
+				.setDescriptions("config.stripOOC.description")
+				.addStringOption((option) =>
+					option
+						.setNames("config.stripOOC.prefix.name")
+						.setDescriptions("config.stripOOC.prefix.description")
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("config.stripOOC.suffix.name")
+						.setDescriptions("config.stripOOC.suffix.description")
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("config.stripOOC.regex.name")
+						.setDescriptions("config.stripOOC.regex.description")
+				)
+				.addNumberOption((option) =>
+					option
+						.setNames("config.stripOOC.timer.name")
+						.setDescriptions("config.stripOOC.timer.description")
+						.setMinValue(0)
+						.setMaxValue(3600)
+				)
+				.addChannelOption((option) =>
+					option
+						.setNames("config.stripOOC.channel.name")
+						.setDescriptions("config.stripOOC.channel.description")
+						.addChannelTypes(
+							Djs.ChannelType.GuildText,
+							Djs.ChannelType.PublicThread,
+							Djs.ChannelType.PrivateThread
+						)
 				)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -304,10 +292,114 @@ export const configuration = {
 			case t("config.lang.name"):
 				return changeLanguage(options, client, interaction);
 			case t("config.selfRegister.name"):
-				return allowSelfRegistration(client, interaction, ul, options);
+				return await allowSelfRegistration(client, interaction, ul, options);
+			case t("config.stripOOC.name"):
+				return await stripOOC(options, client, interaction, ul);
 		}
 	},
 };
+
+async function stripOOC(
+	options: Djs.CommandInteractionOptionResolver,
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	ul: Translation
+) {
+	const prefix = options.getString(t("config.stripOOC.prefix.name"), false);
+	const suffix = options.getString(t("config.stripOOC.suffix.name"), false);
+	let regex = options.getString(t("config.stripOOC.regex.name"), false);
+	const timer = options.getNumber(t("config.stripOOC.timer.name"), false);
+	const channel = options.getChannel(t("config.stripOOC.channel.name"), false);
+
+	if ((!prefix && !suffix && !regex) || timer === 0) {
+		//delete
+		client.settings.delete(interaction.guild!.id, "stripOOC");
+		await reply(interaction, {
+			content: ul("config.stripOOC.delete"),
+		});
+		return;
+	}
+	if (!prefix && !suffix && !regex) {
+		throw new Error(ul("config.stripOOC.error"));
+	}
+	if (regex) {
+		//validate regex
+		if (!regex.startsWith("^")) regex = `^${regex}`;
+		if (!regex.endsWith("$")) regex = `${regex}$`;
+		try {
+			new RegExp(regex);
+		} catch (e) {
+			throw new Error(ul("config.stripOOC.regex.error", { e }));
+		}
+	}
+	//construct regex based on prefix/suffix
+	if (suffix && prefix && !regex) {
+		regex = `^${escapeRegex(prefix)}(.*)${escapeRegex(suffix)}$`;
+	}
+	if (!regex) throw new Error(ul("config.stripOOC.error"));
+	const row = new Djs.ActionRowBuilder<Djs.ChannelSelectMenuBuilder>().addComponents(
+		new Djs.ChannelSelectMenuBuilder()
+			.setCustomId("stripOoc_select")
+			.setChannelTypes(
+				Djs.ChannelType.GuildText,
+				Djs.ChannelType.GuildCategory,
+				Djs.ChannelType.PrivateThread,
+				Djs.ChannelType.PublicThread
+			)
+			.setPlaceholder(ul("config.stripOOC.channel.placeholder"))
+			.setMinValues(1)
+			.setMaxValues(25)
+	);
+	const response = await interaction.reply({
+		content: ul("config.stripOOC.select"),
+		components: [row],
+		withResponse: true,
+	});
+	try {
+		const collectorFilter: (i: Djs.StringSelectMenuInteraction | Djs.ChannelSelectMenuInteraction) => boolean = (i) =>
+			i.user.id === interaction.user.id && i.customId === "stripOoc_select";
+		if (!response.resource?.message) {
+			throw new Error("Failed to send the initial message or get the response.");
+		}
+		const selection = response.resource.message.createMessageComponentCollector({
+			filter: collectorFilter,
+			componentType: Djs.ComponentType.ChannelSelect,
+			time: 60_000, // Timeout en ms
+		});
+		selection.on("collect", async (i) => {
+			const values = i.values;
+
+			if (values.length > 0) {
+				const stripOOC: Partial<StripOOC> = {
+					regex,
+					timer: timer ? timer * 1000 : 0,
+					forwardId: channel?.id ?? undefined,
+					categoryId: values,
+				};
+				client.settings.set(interaction.guildId!, stripOOC, "stripOOC");
+				await reply(interaction, {
+					content: ul("config.stripOOC.success", {
+						regex: regex ?? ul("common.no"),
+						timer: timer ? `${timer}s` : ul("common.no"),
+						channel: channel ? Djs.channelMention(channel.id) : ul("common.no"),
+						categories: values.map((v) => Djs.channelMention(v)).join("\n- "),
+					}),
+				});
+			}
+		})
+	} catch (e) {
+		console.error("Error in stripOOC selection:", e);
+		await interaction.editReply({
+			content: ul("config.stripOOC.timeOut"),
+			components: [],
+		});
+		return;
+	}
+}
+
+function escapeRegex(str: string) {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 function changeLanguage(
 	options: Djs.CommandInteractionOptionResolver,
@@ -325,7 +417,7 @@ function changeLanguage(
 	});
 }
 
-function allowSelfRegistration(
+async function allowSelfRegistration(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
 	ul: Translation,
@@ -344,7 +436,7 @@ function allowSelfRegistration(
 	if (allowChannel) toggle += "_channel";
 	client.settings.set(interaction.guild!.id, toggle, "allowSelfRegister");
 	if (!toggle) {
-		return reply(interaction, {
+		return await reply(interaction, {
 			content: ul("config.selfRegister.disable"),
 		});
 	}
@@ -366,7 +458,7 @@ function allowSelfRegistration(
 		);
 		msg += `\n\n**__${ul("config.selfRegister.disableChannel")}__**`;
 	}
-	return reply(interaction, {
+	return await reply(interaction, {
 		content: msg,
 	});
 }
@@ -604,15 +696,23 @@ async function display(
 		return `- **__${ul(content)}__**${ul("common.space")}:`;
 	};
 
-	const dp = (settings?: string | boolean | number, type?: "role" | "chan" | "timer") => {
-		if (!settings && type === "timer") return "`180`s (`3`min)";
+	const dp = (
+		settings?: string | boolean | number,
+		type?: "role" | "chan" | "time_delete" | "text" | "timer"
+	) => {
+		if (!settings && type === "time_delete") return "`180`s (`3`min)";
 		if (!settings) return ul("common.no");
 		if (typeof settings === "boolean") return ul("common.yes");
-		if (typeof settings === "number") {
+		if (typeof settings === "number" && type === "time_delete") {
 			if (settings === 0 || guildSettings?.disableThread) return ul("common.no");
 			return `\`${settings / 1000}s\` (\`${formatDuration(settings / 1000)}\`)`;
 		}
 		if (type === "role") return `<@&${settings}>`;
+		if (type === "text") return `\`${settings}\``;
+		if (type === "timer" && typeof settings === "number") {
+			if (settings == 0) return ul("common.no");
+			return `\`${settings / 1000}s\` (\`${formatDuration(settings / 1000)}\`)`
+		};
 		return `<#${settings}>`;
 	};
 
@@ -620,6 +720,11 @@ async function display(
 		findLocale(guildSettings.lang) ??
 		findLocale(interaction.guild!.preferredLocale) ??
 		"English";
+
+	const catooc = guildSettings.stripOOC?.categoryId;
+	let resOoc = ul("common.no")
+	if (catooc && catooc.length > 0) resOoc = "\n  - " + catooc.map((c) => Djs.channelMention(c)).join("\n  - ");
+
 	const baseEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("config.title", { guild: interaction.guild!.name }))
 		.setThumbnail(interaction.guild!.iconURL() ?? "")
@@ -655,7 +760,7 @@ async function display(
 				value: dedent(`
 					${dpTitle("config.timestamp.title")} ${dp(guildSettings.timestamp)}
 					 ${ul("config.timestamp.desc")}
-					${dpTitle("config.timer.title")} ${dp(guildSettings.deleteAfter, "timer")}
+					${dpTitle("config.timer.title")} ${dp(guildSettings.deleteAfter, "time_delete")}
 					 ${ul("config.timer.desc")}
 					${dpTitle("config.context.title")} ${dp(guildSettings.context)}
 					 ${ul("config.context.desc")}
@@ -670,6 +775,17 @@ async function display(
 					${dpTitle("common.dice", true)} ${dp(guildSettings.autoRole?.dice, "role")}
 					${dpTitle("common.statistics", true)} ${dp(guildSettings.autoRole?.stats, "role")}
 				`),
+			},
+			{
+				name: ul("config.selfRegister.name").replace("_", " ").toTitle(),
+				value: `${dp(guildSettings.allowSelfRegister)}`,
+			},
+			{
+				name: ul("config.stripOOC.title"),
+				value: `${dpTitle("config.stripOOC.regex.name", true)} ${dp(guildSettings.stripOOC?.regex, "text")}` + '\n' +
+					`${dpTitle("config.stripOOC.timer.name", true)} ${dp(guildSettings.stripOOC?.timer, "timer")}` + '\n' +
+					`${dpTitle("config.stripOOC.forward")} ${dp(guildSettings.stripOOC?.forwardId, "chan")}` + '\n' +
+					`${dpTitle("config.stripOOC.categories")} ${resOoc}`
 			}
 		);
 	let templateEmbed: undefined | Djs.EmbedBuilder;

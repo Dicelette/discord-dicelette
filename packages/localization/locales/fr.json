@@ -164,6 +164,46 @@
     },
     "sheet": "Fiches",
     "statsName": "Nom des statistiques",
+    "stripOOC": {
+      "categories": "Channels",
+      "category": {
+        "error": "La fonction de suppression ne peut fonctionner que si des channels sont sélectionnés.",
+        "name": "category"
+      },
+      "channel": {
+        "description": "Salon optionnel où transférer le HRP.",
+        "name": "channel",
+        "placeholder": "Sélectionner au minimum un channel."
+      },
+      "delete": "Le HRP ne sera plus supprimé.",
+      "description": "Supprimer tout le texte entre un préfixe et un suffixe après un timer.",
+      "error": "Vous devez fournir au moins un préfixe et un suffix ou une expression régulière (regex).",
+      "forward": "Transfert des messages",
+      "name": "supprimer_hrp",
+      "prefix": {
+        "description": "Chaine de caractère préfixant",
+        "name": "prefix"
+      },
+      "regex": {
+        "description": "Expression régulière. Nécessite uniquement un groupe (pour les utilisateurs avancés uniquement)",
+        "end": " Les expressions régulières doivent finir par `$`.",
+        "error": "L'expression régulière est invalide: {{- e}}",
+        "name": "regex",
+        "start": "Les expressions régulières doivent commencer par `^`."
+      },
+      "select": "Merci de choisir les salons ou catégories où le HRP sera supprimé.",
+      "success": "La suppression du texte HRP est bien configuré :\n- Expression régulière : `{{- regex}}`\n- Timer: `{{- timer}}`\n- Channel de transfert : {{- channel}}\n\nEt sera fait dans les channels suivants :\n- {{- categories}}",
+      "suffix": {
+        "description": "Chaine de caractère à la fin",
+        "name": "suffixe"
+      },
+      "timeOut": "Temps écoulé ! Annulation.",
+      "timer": {
+        "description": "Temps avant la suppression du HRP.",
+        "name": "timer"
+      },
+      "title": "Suppression des messages HRP"
+    },
     "template": "Configuration du modèle",
     "templateMessage": "Lien vers le modèle",
     "timer": {

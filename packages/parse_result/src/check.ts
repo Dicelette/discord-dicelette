@@ -24,6 +24,7 @@ export function isRolling(content: string) {
 		result.dice = `${result.dice} /* ${comments} */`;
 		result.comment = comments;
 	}
+	if (!result && !detectRoll) return undefined;
 	return { result, detectRoll };
 }
 

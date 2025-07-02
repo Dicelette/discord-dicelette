@@ -77,7 +77,15 @@ export interface GuildData {
 	};
 	user: Record<string, UserGuildData[]>;
 	allowSelfRegister?: boolean | string;
+	stripOOC?: Partial<StripOOC>;
 }
+
+export type StripOOC = {
+	regex: string;
+	forwardId: string;
+	timer: number;
+	categoryId: string[];
+};
 
 export type UserGuildData = {
 	charName?: string | null;

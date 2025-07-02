@@ -19,7 +19,7 @@ export default (client: EClient): void => {
 			const content = message.content;
 			//detect roll between bracket
 			const isRoll = isRolling(content);
-			if (!isRoll) return;
+			if (!isRoll || allValuesUndefined(isRoll)) return await stripOOC(message, client);
 			const { result, detectRoll } = isRoll;
 			const deleteInput = !detectRoll;
 
@@ -73,23 +73,24 @@ export default (client: EClient): void => {
 			const thread = await threadToSend(client.settings, channel, ul);
 			const msgToEdit = await thread.send("_ _");
 			const msg = resultAsText.onMessageSend(context, message.author.id);
-			await msgToEdit.edit(msg);
+			msgToEdit.edit(msg);
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
 				? msgToEdit.url
 				: undefined;
 			const reply = deleteInput
 				? await channel.send({
-						content: resultAsText.onMessageSend(idMessage, message.author.id),
-					})
+					content: resultAsText.onMessageSend(idMessage, message.author.id),
+				})
 				: await message.reply({
-						content: resultAsText.onMessageSend(idMessage),
-						allowedMentions: { repliedUser: true },
-					});
+					content: resultAsText.onMessageSend(idMessage),
+					allowedMentions: { repliedUser: true },
+				});
 			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
 			await deleteAfter(reply, timer);
 			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
+			console.log("ERROR ON MESSAGE CREATE", e);
 			logger.error("\n", e);
 			if (!message.guild) return;
 			const userLang =
@@ -109,3 +110,41 @@ export default (client: EClient): void => {
 		}
 	});
 };
+
+async function stripOOC(message: Djs.Message, client: EClient) {
+	if (message.author.bot) return;
+	if (!message.guild) return;
+	const stripOoc = client.settings.get(message.guild.id, "stripOOC");
+	const channelsAllowed = stripOoc?.categoryId;
+	const channel = message.channel as Djs.TextChannel | Djs.ThreadChannel
+	const parent = channel.parent;
+	if (
+		!channelsAllowed?.includes(message.channel.id) &&
+		(!parent || !channelsAllowed?.includes(parent.id))
+	) {
+		return;
+	};
+	if (!stripOoc || stripOoc?.timer === 0 || !stripOoc?.regex) return;
+	const timer = stripOoc.timer;
+	if (!timer) return;
+	const regex = new RegExp(stripOoc.regex, "i");
+	if (regex.test(message.content)) {
+		if (stripOoc.forwardId) {
+			const channel = await fetchChannel(message.guild, stripOoc.forwardId) as Djs.TextChannel | Djs.ThreadChannel;
+			if (!channel) return;
+			const forward = new Djs.EmbedBuilder()
+				.setAuthor({ name: message.member?.displayName ?? message.author.globalName ?? message.author.username, iconURL: message.member?.displayAvatarURL() ?? message.author.displayAvatarURL() })
+				.setDescription(message.content.replace(regex, "$1").trim() + "\n\n-# ↪ " + Djs.channelMention(message.channelId))
+				.setTimestamp(message.createdTimestamp)
+			await channel.send({ embeds: [forward] });
+
+
+		}
+		await deleteAfter(message, timer);
+	}
+	return;
+}
+
+function allValuesUndefined<T extends Record<string, any>>(obj: T): boolean {
+	return Object.values(obj).every(value => value === undefined);
+}

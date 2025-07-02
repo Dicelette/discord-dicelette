@@ -164,6 +164,46 @@
     },
     "sheet": "Sheet",
     "statsName": "Name of statistics",
+    "stripOOC": {
+      "categories": "Channels",
+      "category": {
+        "error": "The strip ooc fonction can only be enabled with a selected channel.",
+        "name": "category"
+      },
+      "channel": {
+        "description": "Optional channel to transfer OOC.",
+        "name": "channel",
+        "placeholder": "Select at last one channel."
+      },
+      "delete": "OOC won't be deleted.",
+      "description": "Delete any text between prefix/suffix (or regex) after a timer.",
+      "error": "You must provide at least one of prefix and suffix or regex.",
+      "forward": "Transfert des messages",
+      "name": "strip_ooc",
+      "prefix": {
+        "description": "Prefix string",
+        "name": "prefix"
+      },
+      "regex": {
+        "description": "regex. Need to contains only one groups (advanced user only)",
+        "end": " Regex must end with `$`.",
+        "error": "The regex is invalid: {{- e}}",
+        "name": "regex",
+        "start": "Regex must starts with `^`."
+      },
+      "select": "Choose channel where the OOC will be deleted.",
+      "success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n\nAnd will be done in:\n- {{- categories}}",
+      "suffix": {
+        "description": "suffix string",
+        "name": "suffix"
+      },
+      "timeOut": "Timeout! Cancellation.",
+      "timer": {
+        "description": "Time before OOC deletion",
+        "name": "timer"
+      },
+      "title": "OOC's message deletion"
+    },
     "template": "Model setup",
     "templateMessage": "Link to model",
     "timer": {
