@@ -114,7 +114,15 @@
     },
     "display": {
       "description": "Affiche la configuration du serveur",
-      "name": "afficher"
+      "general": {
+        "description": "Affiche la configuration générale du serveur",
+        "name": "générale"
+      },
+      "name": "afficher",
+      "template": {
+        "description": "Affiche la configuration du modèle si existante.",
+        "name": "modèle"
+      }
     },
     "displayResult": "Affichage des résultats",
     "excludedStats": "Statistiques exclues",
@@ -141,6 +149,7 @@
     },
     "logs": "Journalisation",
     "name": "config",
+    "noTemplate": "Il n'y a pas de modèle configurée pour ce serveur.",
     "privateChan": "Channel des personnages privés",
     "result": {
       "desc": "Permet de sauvegarder tous les résultats de lancer dans un seul et même channel.",
@@ -180,6 +189,7 @@
       "error": "Vous devez fournir au moins un préfixe et un suffix ou une expression régulière (regex).",
       "forward": "Transfert des messages",
       "name": "supprimer_hrp",
+      "noSelection": "Vous devez sélectionner au moins un channel ou une catégorie.",
       "prefix": {
         "description": "Chaine de caractère préfixant",
         "name": "prefix"
@@ -372,6 +382,7 @@
       "notFound": "Aucun embed trouvé",
       "old": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>)."
     },
+    "failedReply": "Échec de l'envoi du message initial ou de l'obtention de la réponse.",
     "generic": {
       "e": "{{- e.message}}",
       "withWarning": "## :warning: __Erreur__ :\n{{- e.message}}"

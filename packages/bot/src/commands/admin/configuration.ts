@@ -98,10 +98,20 @@ export const configuration = {
 		)
 
 		/* DISPLAY */
-		.addSubcommand((subcommand) =>
-			subcommand
+		.addSubcommandGroup((group) =>
+			group
 				.setNames("config.display.name")
 				.setDescriptions("config.display.description")
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("config.display.general.name")
+						.setDescriptions("config.display.general.description")
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("config.display.template.name")
+						.setDescriptions("config.display.template.description")
+				)
 		)
 		/* AUTO ROLE */
 		.addSubcommandGroup((group) =>
@@ -267,11 +277,25 @@ export const configuration = {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
 		const subcommandGroup = options.getSubcommandGroup();
-		if (subcommandGroup && subcommandGroup === t("autoRole.name")) {
-			if (subcommand === t("common.statistics"))
-				return stats(options, client, ul, interaction);
-			if (subcommand === t("common.dice")) return dice(options, client, ul, interaction);
-		}
+		if (subcommandGroup)
+			switch (subcommandGroup) {
+				case t("config.display.name"):
+					switch (subcommand) {
+						case t("config.display.general.name"):
+							return await display(interaction, client, ul);
+						case t("config.display.template.name"):
+							return await displayTemplate(interaction, client, ul);
+					}
+					break;
+				case t("autoRole.name"):
+					switch (subcommand) {
+						case t("common.statistics"):
+							return stats(options, client, ul, interaction);
+						case t("common.dice"):
+							return dice(options, client, ul, interaction);
+					}
+					break;
+			}
 		switch (subcommand) {
 			case t("logs.name"):
 				return await setErrorLogs(interaction, client, ul, options);
@@ -279,8 +303,6 @@ export const configuration = {
 				return await resultChannel(interaction, client, ul, options);
 			case t("timer.name"):
 				return await deleteAfter(interaction, client, ul, options);
-			case t("config.display.name"):
-				return await display(interaction, client, ul);
 			case t("timestamp.name"):
 				return await timestamp(interaction, client, ul, options);
 			case t("anchor.name"):
@@ -356,10 +378,13 @@ async function stripOOC(
 		withResponse: true,
 	});
 	try {
-		const collectorFilter: (i: Djs.StringSelectMenuInteraction | Djs.ChannelSelectMenuInteraction) => boolean = (i) =>
+		const collectorFilter: (
+			i: Djs.StringSelectMenuInteraction | Djs.ChannelSelectMenuInteraction
+		) => boolean = (i) =>
 			i.user.id === interaction.user.id && i.customId === "stripOoc_select";
 		if (!response.resource?.message) {
-			throw new Error("Failed to send the initial message or get the response.");
+			// noinspection ExceptionCaughtLocallyJS
+			throw new Error(ul("error.failedReply"));
 		}
 		const selection = response.resource.message.createMessageComponentCollector({
 			filter: collectorFilter,
@@ -371,19 +396,33 @@ async function stripOOC(
 
 			if (values.length > 0) {
 				const stripOOC: Partial<StripOOC> = {
-					regex,
+					regex: regex,
 					timer: timer ? timer * 1000 : 0,
 					forwardId: channel?.id ?? undefined,
 					categoryId: values,
 				};
 				client.settings.set(interaction.guildId!, stripOOC, "stripOOC");
-				await reply(interaction, {
+				await interaction.editReply({
+					components: [],
 					content: ul("config.stripOOC.success", {
 						regex: regex ?? ul("common.no"),
 						timer: timer ? `${timer}s` : ul("common.no"),
 						channel: channel ? Djs.channelMention(channel.id) : ul("common.no"),
 						categories: values.map((v) => Djs.channelMention(v)).join("\n- "),
 					}),
+				});
+			}
+		});
+		selection.on("end", async (collected, reason) => {
+			if (reason === "time") {
+				await interaction.editReply({
+					content: ul("config.stripOOC.timeOut"),
+					components: [],
+				});
+			} else if (collected.size === 0) {
+				await interaction.editReply({
+					content: ul("config.stripOOC.noSelection"),
+					components: [],
 				});
 			}
 		})
@@ -682,6 +721,63 @@ async function deleteAfter(
 		});
 }
 
+async function displayTemplate(
+	interaction: Djs.CommandInteraction,
+	client: EClient,
+	ul: Translation
+) {
+	if (!interaction.guild) return;
+	const guildSettings = client.settings.get(interaction.guild.id);
+
+	let templateEmbed: undefined | Djs.EmbedBuilder;
+	if (guildSettings?.templateID) {
+		const templateID = guildSettings.templateID;
+		const { channelId, messageId, statsName, damageName, excludedStats } =
+			templateID ?? {};
+		if (messageId && messageId.length > 0 && channelId && channelId.length > 0) {
+			templateEmbed = new Djs.EmbedBuilder()
+				.setTitle(ul("config.template"))
+				.setColor("Random")
+				.setThumbnail(
+					"https://github.com/Dicelette/discord-dicelette/blob/main/assets/communication.png?raw=true"
+				)
+				.addFields({
+					name: ul("config.templateMessage"),
+					value: `https://discord.com/channels/${interaction.guild!.id}/${channelId}/${messageId}`,
+				});
+			const excluded =
+				excludedStats?.length > 0 ? excludedStats.join("\n- ") : ul("common.no");
+			const filteredStats = statsName?.filter((stat) => !excludedStats?.includes(stat));
+			if (statsName && statsName.length > 0) {
+				templateEmbed.addFields({
+					name: ul("config.statsName"),
+					value: `- ${filteredStats.join("\n- ")}`,
+				});
+			}
+			if (excludedStats && excludedStats.length > 0) {
+				templateEmbed.addFields({
+					name: ul("config.excludedStats"),
+					value: `- ${excluded}`,
+				});
+			}
+			if (damageName && damageName.length > 0) {
+				templateEmbed.addFields({
+					name: ul("config.damageName"),
+					value: `- ${damageName.map((value) => capitalizeBetweenPunct(value)).join("\n- ")}`,
+				});
+			}
+			await interaction.reply({ embeds: [templateEmbed] });
+		} else {
+			await interaction.reply({
+				content: ul("error.template.id"),
+			});
+		}
+	} else {
+		await interaction.reply({
+			content: ul("config.noTemplate"),
+		});
+	}
+}
 async function display(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
@@ -710,9 +806,9 @@ async function display(
 		if (type === "role") return `<@&${settings}>`;
 		if (type === "text") return `\`${settings}\``;
 		if (type === "timer" && typeof settings === "number") {
-			if (settings == 0) return ul("common.no");
-			return `\`${settings / 1000}s\` (\`${formatDuration(settings / 1000)}\`)`
-		};
+			if (settings === 0) return ul("common.no");
+			return `\`${settings / 1000}s\` (\`${formatDuration(settings / 1000)}\`)`;
+		}
 		return `<#${settings}>`;
 	};
 
@@ -722,8 +818,9 @@ async function display(
 		"English";
 
 	const catooc = guildSettings.stripOOC?.categoryId;
-	let resOoc = ul("common.no")
-	if (catooc && catooc.length > 0) resOoc = "\n  - " + catooc.map((c) => Djs.channelMention(c)).join("\n  - ");
+	let resOoc = ul("common.no");
+	if (catooc && catooc.length > 0)
+		resOoc = `\n  - ${catooc.map((c) => Djs.channelMention(c)).join("\n  - ")}`;
 
 	const baseEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("config.title", { guild: interaction.guild!.name }))
@@ -782,53 +879,17 @@ async function display(
 			},
 			{
 				name: ul("config.stripOOC.title"),
-				value: `${dpTitle("config.stripOOC.regex.name", true)} ${dp(guildSettings.stripOOC?.regex, "text")}` + '\n' +
-					`${dpTitle("config.stripOOC.timer.name", true)} ${dp(guildSettings.stripOOC?.timer, "timer")}` + '\n' +
-					`${dpTitle("config.stripOOC.forward")} ${dp(guildSettings.stripOOC?.forwardId, "chan")}` + '\n' +
-					`${dpTitle("config.stripOOC.categories")} ${resOoc}`
+				value:
+					`${dpTitle("config.stripOOC.regex.name", true)} ${dp(guildSettings.stripOOC?.regex, "text")}` +
+					"\n" +
+					`${dpTitle("config.stripOOC.timer.name", true)} ${dp(guildSettings.stripOOC?.timer, "timer")}` +
+					"\n" +
+					`${dpTitle("config.stripOOC.forward")} ${dp(guildSettings.stripOOC?.forwardId, "chan")}` +
+					"\n" +
+					`${dpTitle("config.stripOOC.categories")} ${resOoc}`,
 			}
 		);
-	let templateEmbed: undefined | Djs.EmbedBuilder;
-	if (guildSettings.templateID) {
-		const templateID = guildSettings.templateID;
-		const { channelId, messageId, statsName, damageName, excludedStats } =
-			templateID ?? {};
-		if (messageId && messageId.length > 0 && channelId && channelId.length > 0) {
-			templateEmbed = new Djs.EmbedBuilder()
-				.setTitle(ul("config.template"))
-				.setColor("Random")
-				.setThumbnail(
-					"https://github.com/Dicelette/discord-dicelette/blob/main/assets/communication.png?raw=true"
-				)
-				.addFields({
-					name: ul("config.templateMessage"),
-					value: `https://discord.com/channels/${interaction.guild!.id}/${channelId}/${messageId}`,
-				});
-			const excluded =
-				excludedStats?.length > 0 ? excludedStats.join("\n- ") : ul("common.no");
-			const filteredStats = statsName?.filter((stat) => !excludedStats?.includes(stat));
-			if (statsName && statsName.length > 0) {
-				templateEmbed.addFields({
-					name: ul("config.statsName"),
-					value: `- ${filteredStats.join("\n- ")}`,
-				});
-			}
-			if (excludedStats && excludedStats.length > 0) {
-				templateEmbed.addFields({
-					name: ul("config.excludedStats"),
-					value: `- ${excluded}`,
-				});
-			}
-			if (damageName && damageName.length > 0) {
-				templateEmbed.addFields({
-					name: ul("config.damageName"),
-					value: `- ${damageName.map((value) => capitalizeBetweenPunct(value)).join("\n- ")}`,
-				});
-			}
-		}
-	}
 	const embeds = [baseEmbed];
-	if (templateEmbed) embeds.push(templateEmbed);
 	await interaction.reply({ embeds });
 }
 

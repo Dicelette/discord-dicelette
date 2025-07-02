@@ -114,7 +114,15 @@
     },
     "display": {
       "description": "Shows server configuration",
-      "name": "display"
+      "general": {
+        "description": "Display the general configuration of the server",
+        "name": "general"
+      },
+      "name": "display",
+      "template": {
+        "description": "Display the model configuration if any.",
+        "name": "template"
+      }
     },
     "displayResult": "Displaying results",
     "excludedStats": "Excluded statistics",
@@ -141,6 +149,7 @@
     },
     "logs": "Logging",
     "name": "config",
+    "noTemplate": "There is no template configured for the server.",
     "privateChan": "Private characters channel",
     "result": {
       "desc": "Allows you to save all dice results in a single channel.",
@@ -180,6 +189,7 @@
       "error": "You must provide at least one of prefix and suffix or regex.",
       "forward": "Transfert des messages",
       "name": "strip_ooc",
+      "noSelection": "You need to select at last one channel or category.",
       "prefix": {
         "description": "Prefix string",
         "name": "prefix"
@@ -372,6 +382,7 @@
       "notFound": "No embeds found",
       "old": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}})."
     },
+    "failedReply": "Failed to send the initial message or get the response.",
     "generic": {
       "e": "{{- e.message}}",
       "withWarning": "## [{{- e.name}}]\n{{- e.message}}"

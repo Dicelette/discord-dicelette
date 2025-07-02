@@ -4,11 +4,11 @@ import {
 	ResultAsText,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, threadToSend } from "messages";
 import { fetchChannel } from "../utils";
-import { logger } from "@dicelette/utils";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
@@ -79,12 +79,12 @@ export default (client: EClient): void => {
 				: undefined;
 			const reply = deleteInput
 				? await channel.send({
-					content: resultAsText.onMessageSend(idMessage, message.author.id),
-				})
+						content: resultAsText.onMessageSend(idMessage, message.author.id),
+					})
 				: await message.reply({
-					content: resultAsText.onMessageSend(idMessage),
-					allowedMentions: { repliedUser: true },
-				});
+						content: resultAsText.onMessageSend(idMessage),
+						allowedMentions: { repliedUser: true },
+					});
 			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
 			await deleteAfter(reply, timer);
 			if (deleteInput) await message.delete();
@@ -112,39 +112,58 @@ export default (client: EClient): void => {
 };
 
 async function stripOOC(message: Djs.Message, client: EClient) {
+	logger.trace("Strip OOC", message.content);
 	if (message.author.bot) return;
 	if (!message.guild) return;
 	const stripOoc = client.settings.get(message.guild.id, "stripOOC");
 	const channelsAllowed = stripOoc?.categoryId;
-	const channel = message.channel as Djs.TextChannel | Djs.ThreadChannel
+	const channel = message.channel as Djs.TextChannel | Djs.ThreadChannel;
 	const parent = channel.parent;
 	if (
 		!channelsAllowed?.includes(message.channel.id) &&
 		(!parent || !channelsAllowed?.includes(parent.id))
 	) {
 		return;
-	};
+	}
 	if (!stripOoc || stripOoc?.timer === 0 || !stripOoc?.regex) return;
 	const timer = stripOoc.timer;
 	if (!timer) return;
 	const regex = new RegExp(stripOoc.regex, "i");
+	logger.trace(regex.source, regex.test(message.content));
 	if (regex.test(message.content)) {
 		if (stripOoc.forwardId) {
-			const channel = await fetchChannel(message.guild, stripOoc.forwardId) as Djs.TextChannel | Djs.ThreadChannel;
+			const channel = (await fetchChannel(message.guild, stripOoc.forwardId)) as
+				| Djs.TextChannel
+				| Djs.ThreadChannel;
 			if (!channel) return;
 			const forward = new Djs.EmbedBuilder()
-				.setAuthor({ name: message.member?.displayName ?? message.author.globalName ?? message.author.username, iconURL: message.member?.displayAvatarURL() ?? message.author.displayAvatarURL() })
-				.setDescription(message.content.replace(regex, "$1").trim() + "\n\n-# ↪ " + Djs.channelMention(message.channelId))
-				.setTimestamp(message.createdTimestamp)
+				.setAuthor({
+					name:
+						message.member?.displayName ??
+						message.author.globalName ??
+						message.author.username,
+					iconURL:
+						message.member?.displayAvatarURL() ?? message.author.displayAvatarURL(),
+				})
+				.setDescription(
+					replaceOOC(regex, message.content) +
+						"\n\n-# ↪ " +
+						Djs.channelMention(message.channelId)
+				)
+				.setTimestamp(message.createdTimestamp);
 			await channel.send({ embeds: [forward] });
-
-
 		}
 		await deleteAfter(message, timer);
 	}
 	return;
 }
 
+function replaceOOC(regex: RegExp, message: string) {
+	const reg = regex.exec(message);
+	if (!reg) return message;
+	return message.replace(regex, reg[reg.length-1]).trim();
+}
+
 function allValuesUndefined<T extends Record<string, any>>(obj: T): boolean {
-	return Object.values(obj).every(value => value === undefined);
+	return Object.values(obj).every((value) => value === undefined);
 }
