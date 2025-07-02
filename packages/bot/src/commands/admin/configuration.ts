@@ -7,7 +7,7 @@ import * as Djs from "discord.js";
 import { localeList } from "locales";
 import { reply } from "messages";
 import { getLangAndConfig } from "utils";
-import "../../discord_ext";
+import "discord_ext";
 
 const findLocale = (locale?: Djs.Locale) => {
 	if (locale === Djs.Locale.EnglishUS || locale === Djs.Locale.EnglishGB)

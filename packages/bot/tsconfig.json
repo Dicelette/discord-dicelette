@@ -12,6 +12,7 @@
 		"rootDir": "./",
 		"paths": {
 			"client": ["packages/bot/src/client.js"],
+			"discord_ext": ["packages/bot/src/discord_ext.js"],
 			"messages": ["packages/bot/src/messages/index.js"],
 			"utils": ["packages/bot/src/utils/index.js"],
 			"database": ["packages/bot/src/database/index.js"],
