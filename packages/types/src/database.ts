@@ -83,6 +83,7 @@ export interface GuildData {
 export type StripOOC = {
 	regex: string;
 	forwardId: string;
+	threadMode: boolean;
 	timer: number;
 	categoryId: string[];
 };

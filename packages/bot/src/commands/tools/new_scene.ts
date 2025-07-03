@@ -1,7 +1,7 @@
 import { t } from "@dicelette/localization";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { deleteAfter, reply, setTagsForRoll } from "messages";
+import { deleteAfter, reply, setTags } from "messages";
 import moment from "moment";
 import { getLangAndConfig } from "utils";
 import "discord_ext";
@@ -75,7 +75,7 @@ export default {
 						name: threadName,
 						message: { content: ul("scene.reason") },
 						appliedTags: [
-							(await setTagsForRoll(channel.parent as Djs.ForumChannel)).id as string,
+							(await setTags(channel.parent as Djs.ForumChannel)).id as string,
 						],
 					});
 

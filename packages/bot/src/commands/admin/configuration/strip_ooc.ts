@@ -3,6 +3,7 @@ import type { StripOOC, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { reply } from "messages";
+import { fetchChannel } from "utils";
 
 export async function stripOOC(
 	options: Djs.CommandInteractionOptionResolver,
@@ -14,7 +15,8 @@ export async function stripOOC(
 	const suffix = options.getString(t("config.stripOOC.suffix.name"), false);
 	let regex = options.getString(t("config.stripOOC.regex.name"), false);
 	const timer = options.getNumber(t("config.stripOOC.timer.name"), false);
-	const channel = options.getChannel(t("config.stripOOC.channel.name"), false);
+	let channel = options.getChannel(t("config.stripOOC.channel.name"), false);
+	const threadMode = options.getBoolean(t("config.stripOOC.thread_mode.name"), false);
 
 	if ((!prefix && !suffix && !regex) || timer === 0) {
 		//delete
@@ -49,7 +51,8 @@ export async function stripOOC(
 				Djs.ChannelType.GuildText,
 				Djs.ChannelType.GuildCategory,
 				Djs.ChannelType.PrivateThread,
-				Djs.ChannelType.PublicThread
+				Djs.ChannelType.PublicThread,
+				Djs.ChannelType.GuildForum
 			)
 			.setPlaceholder(ul("config.stripOOC.channel.placeholder"))
 			.setMinValues(1)
@@ -78,12 +81,20 @@ export async function stripOOC(
 			const values = i.values;
 
 			if (values.length > 0) {
+				if (threadMode) channel = null;
 				const stripOOC: Partial<StripOOC> = {
 					regex: regex,
 					timer: timer ? timer * 1000 : 0,
 					forwardId: channel?.id ?? undefined,
+					threadMode: threadMode ?? false,
 					categoryId: values,
 				};
+				const categories = (
+					await Promise.all(values.map((v) => isCatOrChannel(v, interaction.guild!)))
+				)
+					.filter((v) => v !== undefined)
+					.join("\n- ");
+
 				client.settings.set(interaction.guildId!, stripOOC, "stripOOC");
 				await interaction.editReply({
 					components: [],
@@ -91,21 +102,9 @@ export async function stripOOC(
 						regex: regex ?? ul("common.no"),
 						timer: timer ? `${timer}s` : ul("common.no"),
 						channel: channel ? Djs.channelMention(channel.id) : ul("common.no"),
-						categories: values.map((v) => Djs.channelMention(v)).join("\n- "),
+						threadMode: threadMode ? ul("common.yes") : ul("common.no"),
+						categories,
 					}),
-				});
-			}
-		});
-		selection.on("end", async (collected, reason) => {
-			if (reason === "time") {
-				await interaction.editReply({
-					content: ul("config.stripOOC.timeOut"),
-					components: [],
-				});
-			} else if (collected.size === 0) {
-				await interaction.editReply({
-					content: ul("config.stripOOC.noSelection"),
-					components: [],
 				});
 			}
 		});
@@ -121,4 +120,13 @@ export async function stripOOC(
 
 function escapeRegex(str: string) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function isCatOrChannel(channel: string, guild: Djs.Guild) {
+	const fetched = await fetchChannel(guild, channel);
+	if (!fetched) return undefined;
+	if (fetched.isTextBased()) {
+		return Djs.channelMention(channel);
+	}
+	if (fetched.type === Djs.ChannelType.GuildCategory) return `📂 ${fetched.name}`;
 }

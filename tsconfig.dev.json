@@ -42,7 +42,8 @@
 			"features": ["packages/bot/src/features/index.js"],
 			"commands": ["packages/bot/src/commands/index.js"],
 			"event": ["packages/bot/src/events/index.js"],
-			"locales": ["packages/bot/src/locales.js"]
+			"locales": ["packages/bot/src/locales.js"],
+			"discord_ext": ["packages/bot/src/discord_ext.js"]
 		}
 	},
 	"exclude": ["node_modules"],

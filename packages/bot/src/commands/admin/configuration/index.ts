@@ -261,6 +261,11 @@ export const configuration = {
 							Djs.ChannelType.PrivateThread
 						)
 				)
+				.addBooleanOption((option) =>
+					option
+						.setNames("config.stripOOC.thread_mode.name")
+						.setDescriptions("config.stripOOC.thread_mode.description")
+				)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;

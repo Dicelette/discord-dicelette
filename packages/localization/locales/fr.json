@@ -84,6 +84,7 @@
     "name": "nom",
     "no": "✕",
     "noSet": "/",
+    "ooc": "HRP",
     "page": "Page {{- nb}}",
     "role": "rôle",
     "sheet": "[ FICHE ]",
@@ -202,10 +203,14 @@
         "start": "Les expressions régulières doivent commencer par `^`."
       },
       "select": "Merci de choisir les salons ou catégories où le HRP sera supprimé.",
-      "success": "La suppression du texte HRP est bien configuré :\n- Expression régulière : `{{- regex}}`\n- Timer: `{{- timer}}`\n- Channel de transfert : {{- channel}}\n\nEt sera fait dans les channels suivants :\n- {{- categories}}",
+      "success": "La suppression du texte HRP est bien configuré :\n- Expression régulière : `{{- regex}}`\n- Timer: `{{- timer}}`\n- Channel de transfert : {{- channel}}\n- Mode thread : {{- threadMode}}\n\nEt sera fait dans les channels suivants :\n- {{- categories}}",
       "suffix": {
         "description": "Chaine de caractère à la fin",
         "name": "suffixe"
+      },
+      "thread_mode": {
+        "description": "Envoie le HRP dans un thread plutôt qu'un channel commun.",
+        "name": "thread_mode"
       },
       "timeOut": "Temps écoulé ! Annulation.",
       "timer": {

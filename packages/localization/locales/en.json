@@ -84,6 +84,7 @@
     "name": "name",
     "no": "✕",
     "noSet": "/",
+    "ooc": "OOC",
     "page": "Page {{- nb}}",
     "role": "role",
     "sheet": "[ SHEET ]",
@@ -202,10 +203,14 @@
         "start": "Regex must starts with `^`."
       },
       "select": "Choose channel where the OOC will be deleted.",
-      "success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n\nAnd will be done in:\n- {{- categories}}",
+      "success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n- Thread mode: {{- threadMode}}\n\nAnd will be done in:\n- {{- categories}}",
       "suffix": {
         "description": "suffix string",
         "name": "suffix"
+      },
+      "thread_mode": {
+        "description": "Send the OOC into a thread instead of a global channel.",
+        "name": "thread_mode"
       },
       "timeOut": "Timeout! Cancellation.",
       "timer": {
