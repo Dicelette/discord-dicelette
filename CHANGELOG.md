@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.56.0](https://github.com/Dicelette/discord-dicelette/compare/1.55.0...1.56.0) (2025-07-03)
+
+
+### Features
+
+* add strip_ooc option to remove out-of-characters messages, and other improvements ([1ccbe33](https://github.com/Dicelette/discord-dicelette/commit/1ccbe335374a0ca40ca00bc48600093c6f69c34b))
+* **config:** enhance display command with general and template subcommands ([b9cb377](https://github.com/Dicelette/discord-dicelette/commit/b9cb37749e37ebd9a757ed5ad130a462e5968592))
+* **stripOOC:** add thread mode option for OOC deletion configuration ([9694448](https://github.com/Dicelette/discord-dicelette/commit/9694448593774ec3fffdcef8f4b49e3714fa4f10))
+
 ## [1.55.0](https://github.com/Dicelette/discord-dicelette/compare/1.54.3...1.55.0) (2025-06-27)
 
 
