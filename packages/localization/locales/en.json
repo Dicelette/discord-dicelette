@@ -84,6 +84,7 @@
     "name": "name",
     "no": "✕",
     "noSet": "/",
+    "ooc": "OOC",
     "page": "Page {{- nb}}",
     "role": "role",
     "sheet": "[ SHEET ]",
@@ -114,7 +115,15 @@
     },
     "display": {
       "description": "Shows server configuration",
-      "name": "display"
+      "general": {
+        "description": "Display the general configuration of the server",
+        "name": "general"
+      },
+      "name": "display",
+      "template": {
+        "description": "Display the model configuration if any.",
+        "name": "template"
+      }
     },
     "displayResult": "Displaying results",
     "excludedStats": "Excluded statistics",
@@ -141,6 +150,7 @@
     },
     "logs": "Logging",
     "name": "config",
+    "noTemplate": "There is no template configured for the server.",
     "privateChan": "Private characters channel",
     "result": {
       "desc": "Allows you to save all dice results in a single channel.",
@@ -164,6 +174,51 @@
     },
     "sheet": "Sheet",
     "statsName": "Name of statistics",
+    "stripOOC": {
+      "categories": "Channels",
+      "category": {
+        "error": "The strip ooc fonction can only be enabled with a selected channel.",
+        "name": "category"
+      },
+      "channel": {
+        "description": "Optional channel to transfer OOC.",
+        "name": "channel",
+        "placeholder": "Select at last one channel."
+      },
+      "delete": "OOC won't be deleted.",
+      "description": "Delete any text between prefix/suffix (or regex) after a timer.",
+      "error": "You must provide at least one of prefix and suffix or regex.",
+      "forward": "Transfert des messages",
+      "name": "strip_ooc",
+      "noSelection": "You need to select at last one channel or category.",
+      "prefix": {
+        "description": "Prefix string",
+        "name": "prefix"
+      },
+      "regex": {
+        "description": "regex. Need to contains only one groups (advanced user only)",
+        "end": " Regex must end with `$`.",
+        "error": "The regex is invalid: {{- e}}",
+        "name": "regex",
+        "start": "Regex must starts with `^`."
+      },
+      "select": "Choose channel where the OOC will be deleted.",
+      "success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n- Thread mode: {{- threadMode}}\n\nAnd will be done in:\n- {{- categories}}",
+      "suffix": {
+        "description": "suffix string",
+        "name": "suffix"
+      },
+      "thread_mode": {
+        "description": "Send the OOC into a thread instead of a global channel.",
+        "name": "thread_mode"
+      },
+      "timeOut": "Timeout! Cancellation.",
+      "timer": {
+        "description": "Time before OOC deletion",
+        "name": "timer"
+      },
+      "title": "OOC's message deletion"
+    },
     "template": "Model setup",
     "templateMessage": "Link to model",
     "timer": {
@@ -332,6 +387,7 @@
       "notFound": "No embeds found",
       "old": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}})."
     },
+    "failedReply": "Failed to send the initial message or get the response.",
     "generic": {
       "e": "{{- e.message}}",
       "withWarning": "## [{{- e.name}}]\n{{- e.message}}"

@@ -57,10 +57,8 @@ export async function fetchMember(
 	// Try to get the member from the cache first
 	try {
 		return guild.members.cache.get(memberId) ?? (await guild.members.fetch(memberId));
-	}
-	catch (error) {
+	} catch (error) {
 		logger.warn(`Failed to fetch member with ID ${memberId}:`, error);
 		return undefined;
 	}
-
 }

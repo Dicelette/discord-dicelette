@@ -1,30 +1,25 @@
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { deleteAfter, reply, setTagsForRoll } from "messages";
+import { deleteAfter, reply, setTags } from "messages";
 import moment from "moment";
-import { getLangAndConfig } from "../../utils";
+import { getLangAndConfig } from "utils";
+import "discord_ext";
 
 export default {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("scene.name"))
-		.setDescription(t("scene.description"))
-		.setDescriptionLocalizations(cmdLn("scene.description"))
-		.setNameLocalizations(cmdLn("scene.name"))
+		.setNames("scene.name")
+		.setDescriptions("scene.description")
 		.addStringOption((option) =>
 			option
-				.setName(t("scene.option.name"))
-				.setNameLocalizations(cmdLn("scene.option.name"))
-				.setDescription(t("scene.option.description"))
-				.setDescriptionLocalizations(cmdLn("scene.option.description"))
+				.setNames("scene.option.name")
+				.setDescriptions("scene.option.description")
 				.setRequired(false)
 		)
 		.addBooleanOption((option) =>
 			option
-				.setName(t("scene.time.name"))
-				.setNameLocalizations(cmdLn("scene.time.name"))
-				.setDescription(t("scene.time.description"))
-				.setDescriptionLocalizations(cmdLn("scene.time.description"))
+				.setNames("scene.time.name")
+				.setDescriptions("scene.time.description")
 				.setRequired(false)
 		),
 	async execute(
@@ -80,7 +75,7 @@ export default {
 						name: threadName,
 						message: { content: ul("scene.reason") },
 						appliedTags: [
-							(await setTagsForRoll(channel.parent as Djs.ForumChannel)).id as string,
+							(await setTags(channel.parent as Djs.ForumChannel)).id as string,
 						],
 					});
 

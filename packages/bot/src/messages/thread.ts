@@ -42,14 +42,38 @@ export async function createDefaultThread(
 	return thread;
 }
 
+export async function fetchThread(
+	parent: Djs.TextChannel | Djs.NewsChannel | Djs.ForumChannel
+): Promise<Djs.AnyThreadChannel | undefined> {
+	const threads: Djs.Collection<string, Djs.AnyThreadChannel> =
+		//@ts-ignore
+		parent.threads.cache.filter(
+			(thread: Djs.ThreadChannel) =>
+				thread.name.startsWith("📄") && thread.parentId === parent.id
+		);
+	if (threads.size > 0) {
+		return threads.first();
+	}
+
+	//fetch
+	const fetchedThreads = await parent.threads.fetchActive();
+	return fetchedThreads.threads.find(
+		(thread) => thread.name.startsWith("📄") && thread.parentId === parent.id
+	);
+}
+
 /**
  * Set the tags for thread channel in forum
  */
-export async function setTagsForRoll(forum: Djs.ForumChannel) {
+export async function setTags(
+	forum: Djs.ForumChannel,
+	tagName = "Dice Roll",
+	tagEmoji = "🪡"
+) {
 	//check if the tags `🪡 roll logs` exists
 	const allTags = forum.availableTags;
 	const diceRollTag = allTags.find(
-		(tag) => tag.name === "Dice Roll" && tag.emoji?.name === "🪡"
+		(tag) => tag.name === tagName && tag.emoji?.name === tagEmoji
 	);
 	if (diceRollTag) return diceRollTag;
 
@@ -62,13 +86,13 @@ export async function setTagsForRoll(forum: Djs.ForumChannel) {
 		};
 	});
 	availableTags.push({
-		name: "Dice Roll",
-		emoji: { id: null, name: "🪡" },
+		name: tagName,
+		emoji: { id: null, name: tagEmoji },
 	});
 	await forum.setAvailableTags(availableTags);
 
 	return forum.availableTags.find(
-		(tag) => tag.name === "Dice Roll" && tag.emoji?.name === "🪡"
+		(tag) => tag.name === tagName && tag.emoji?.name === tagEmoji
 	) as Djs.GuildForumTagData;
 }
 
@@ -191,10 +215,10 @@ export async function findLocation(
 	user?: Djs.User | null
 ): Promise<{
 	thread?:
-	| Djs.PrivateThreadChannel
-	| Djs.TextChannel
-	| Djs.NewsChannel
-	| Djs.PublicThreadChannel<boolean>;
+		| Djs.PrivateThreadChannel
+		| Djs.TextChannel
+		| Djs.NewsChannel
+		| Djs.PublicThreadChannel<boolean>;
 	sheetLocation: PersonnageIds;
 }> {
 	const sheetLocation: PersonnageIds = {
@@ -213,7 +237,11 @@ export async function findLocation(
 		});
 		return { sheetLocation };
 	}
-	const allowHidden = await haveAccess(interaction, thread.id, user?.id ?? interaction.user.id);
+	const allowHidden = await haveAccess(
+		interaction,
+		thread.id,
+		user?.id ?? interaction.user.id
+	);
 	if (!allowHidden && charData[user?.id ?? interaction.user.id]?.isPrivate) {
 		await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
 		return { sheetLocation };
@@ -355,7 +383,7 @@ export async function findForumChannel(
 	});
 	const topic = thread.name;
 	const rollTopic = allForumChannel.find((thread) => thread.name === `🎲 ${topic}`);
-	const tags = await setTagsForRoll(forum);
+	const tags = await setTags(forum);
 	if (rollTopic) {
 		//archive all other roll topic
 		if (rollTopic.archived) await rollTopic.setArchived(false);
@@ -386,10 +414,10 @@ export async function threadToSend(
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)
 		: await findForumChannel(
-			channel.parent as Djs.ForumChannel,
-			channel as Djs.ThreadChannel,
-			db,
-			ul,
-			isHidden
-		);
+				channel.parent as Djs.ForumChannel,
+				channel as Djs.ThreadChannel,
+				db,
+				ul,
+				isHidden
+			);
 }

@@ -1,25 +1,22 @@
 /**
  * Allow to export all characters from the database to a CSV file
  */
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import type { EClient } from "client";
 import { getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import { type CSVRow, getLangAndConfig } from "utils";
+import "discord_ext";
 
 export const exportData = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("export.name"))
-		.setNameLocalizations(cmdLn("export.name"))
-		.setDescription(t("export.description"))
-		.setDescriptionLocalizations(cmdLn("export.description"))
+		.setNames("export.name")
+		.setDescriptions("export.description")
 		.addBooleanOption((option) =>
 			option
-				.setName(t("export.options.name"))
-				.setNameLocalizations(cmdLn("export.options.name"))
-				.setDescription(t("export.options.desc"))
-				.setDescriptionLocalizations(cmdLn("export.options.desc"))
+				.setNames("export.options.name")
+				.setDescriptions("export.options.desc")
 				.setRequired(false)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {

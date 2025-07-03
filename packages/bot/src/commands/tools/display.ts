@@ -1,5 +1,5 @@
 import { generateStatsDice } from "@dicelette/core";
-import { cmdLn, findln, t } from "@dicelette/localization";
+import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
 import { cleanAvatarUrl, filterChoices, logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -14,14 +14,13 @@ import {
 	reply,
 } from "messages";
 import { autoComplete, charUserOptions, haveAccess, optionInteractions } from "utils";
+import "discord_ext";
 
 export const displayUser = {
 	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setName(t("display.title"))
-		.setDescription(t("display.description"))
-		.setNameLocalizations(cmdLn("display.title"))
-		.setDefaultMemberPermissions(0)
-		.setDescriptionLocalizations(cmdLn("display.description")),
+		.setNames("display.title")
+		.setDescriptions("display.description")
+		.setDefaultMemberPermissions(0),
 	async autocomplete(
 		interaction: Djs.AutocompleteInteraction,
 		client: EClient

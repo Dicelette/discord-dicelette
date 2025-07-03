@@ -84,6 +84,7 @@
     "name": "nom",
     "no": "✕",
     "noSet": "/",
+    "ooc": "HRP",
     "page": "Page {{- nb}}",
     "role": "rôle",
     "sheet": "[ FICHE ]",
@@ -114,7 +115,15 @@
     },
     "display": {
       "description": "Affiche la configuration du serveur",
-      "name": "afficher"
+      "general": {
+        "description": "Affiche la configuration générale du serveur",
+        "name": "générale"
+      },
+      "name": "afficher",
+      "template": {
+        "description": "Affiche la configuration du modèle si existante.",
+        "name": "modèle"
+      }
     },
     "displayResult": "Affichage des résultats",
     "excludedStats": "Statistiques exclues",
@@ -141,6 +150,7 @@
     },
     "logs": "Journalisation",
     "name": "config",
+    "noTemplate": "Il n'y a pas de modèle configurée pour ce serveur.",
     "privateChan": "Channel des personnages privés",
     "result": {
       "desc": "Permet de sauvegarder tous les résultats de lancer dans un seul et même channel.",
@@ -164,6 +174,51 @@
     },
     "sheet": "Fiches",
     "statsName": "Nom des statistiques",
+    "stripOOC": {
+      "categories": "Channels",
+      "category": {
+        "error": "La fonction de suppression ne peut fonctionner que si des channels sont sélectionnés.",
+        "name": "category"
+      },
+      "channel": {
+        "description": "Salon optionnel où transférer le HRP.",
+        "name": "channel",
+        "placeholder": "Sélectionner au minimum un channel."
+      },
+      "delete": "Le HRP ne sera plus supprimé.",
+      "description": "Supprimer tout le texte entre un préfixe et un suffixe après un timer.",
+      "error": "Vous devez fournir au moins un préfixe et un suffix ou une expression régulière (regex).",
+      "forward": "Transfert des messages",
+      "name": "supprimer_hrp",
+      "noSelection": "Vous devez sélectionner au moins un channel ou une catégorie.",
+      "prefix": {
+        "description": "Chaine de caractère préfixant",
+        "name": "prefix"
+      },
+      "regex": {
+        "description": "Expression régulière. Nécessite uniquement un groupe (pour les utilisateurs avancés uniquement)",
+        "end": " Les expressions régulières doivent finir par `$`.",
+        "error": "L'expression régulière est invalide: {{- e}}",
+        "name": "regex",
+        "start": "Les expressions régulières doivent commencer par `^`."
+      },
+      "select": "Merci de choisir les salons ou catégories où le HRP sera supprimé.",
+      "success": "La suppression du texte HRP est bien configuré :\n- Expression régulière : `{{- regex}}`\n- Timer: `{{- timer}}`\n- Channel de transfert : {{- channel}}\n- Mode thread : {{- threadMode}}\n\nEt sera fait dans les channels suivants :\n- {{- categories}}",
+      "suffix": {
+        "description": "Chaine de caractère à la fin",
+        "name": "suffixe"
+      },
+      "thread_mode": {
+        "description": "Envoie le HRP dans un thread plutôt qu'un channel commun.",
+        "name": "thread_mode"
+      },
+      "timeOut": "Temps écoulé ! Annulation.",
+      "timer": {
+        "description": "Temps avant la suppression du HRP.",
+        "name": "timer"
+      },
+      "title": "Suppression des messages HRP"
+    },
     "template": "Configuration du modèle",
     "templateMessage": "Lien vers le modèle",
     "timer": {
@@ -332,6 +387,7 @@
       "notFound": "Aucun embed trouvé",
       "old": "Cette fiche ne correspond pas à celle dans la base de données. Vous trouverez la nouvelle fiche [ici](<{{- fiche}}>)."
     },
+    "failedReply": "Échec de l'envoi du message initial ou de l'obtention de la réponse.",
     "generic": {
       "e": "{{- e.message}}",
       "withWarning": "## :warning: __Erreur__ :\n{{- e.message}}"

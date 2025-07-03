@@ -1,5 +1,5 @@
 import { verifyTemplateValue } from "@dicelette/core";
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import { type GuildData, TUTORIAL_IMAGES } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -15,20 +15,17 @@ import {
 } from "messages";
 import { fetchChannel, getLangAndConfig } from "utils";
 import { DB_CMD_NAME } from "../index";
+import "discord_ext";
 
 export const registerTemplate = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("register.name"))
-		.setNameLocalizations(cmdLn("register.name"))
+		.setNames("register.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.setDescription(t("register.description"))
-		.setDescriptionLocalizations(cmdLn("register.description"))
+		.setDescriptions("register.description")
 		.addChannelOption((option) =>
 			option
-				.setName(t("common.channel"))
-				.setDescription(t("register.options.channel"))
-				.setNameLocalizations(cmdLn("common.channel"))
-				.setDescriptionLocalizations(cmdLn("register.options.channel"))
+				.setNames("common.channel")
+				.setDescriptions("register.options.channel")
 				.setRequired(true)
 				.addChannelTypes(
 					Djs.ChannelType.PublicThread,
@@ -38,18 +35,14 @@ export const registerTemplate = {
 		)
 		.addAttachmentOption((option) =>
 			option
-				.setName(t("register.options.template.name"))
-				.setDescription(t("register.options.template.description"))
-				.setNameLocalizations(cmdLn("register.options.template.name"))
-				.setDescriptionLocalizations(cmdLn("register.options.template.description"))
+				.setNames("register.options.template.name")
+				.setDescriptions("register.options.template.description")
 				.setRequired(true)
 		)
 		.addChannelOption((option) =>
 			option
-				.setName(t("register.options.public.name"))
-				.setDescription(t("register.options.public.description"))
-				.setNameLocalizations(cmdLn("register.options.public.name"))
-				.setDescriptionLocalizations(cmdLn("register.options.public.description"))
+				.setNames("register.options.public.name")
+				.setDescriptions("register.options.public.description")
 				.setRequired(false)
 				.addChannelTypes(
 					Djs.ChannelType.PublicThread,
@@ -60,10 +53,8 @@ export const registerTemplate = {
 		)
 		.addChannelOption((option) =>
 			option
-				.setName(t("register.options.private.name"))
-				.setDescription(t("register.options.private.description"))
-				.setNameLocalizations(cmdLn("register.options.private.name"))
-				.setDescriptionLocalizations(cmdLn("register.options.private.description"))
+				.setNames("register.options.private.name")
+				.setDescriptions("register.options.private.description")
 				.setRequired(false)
 				.addChannelTypes(
 					Djs.ChannelType.PublicThread,
@@ -74,17 +65,13 @@ export const registerTemplate = {
 		)
 		.addBooleanOption((option) =>
 			option
-				.setName(t("register.options.update.name"))
-				.setDescription(t("register.options.update.description"))
-				.setNameLocalizations(cmdLn("register.options.update.name"))
-				.setDescriptionLocalizations(cmdLn("register.options.update.description"))
+				.setNames("register.options.update.name")
+				.setDescriptions("register.options.update.description")
 		)
 		.addBooleanOption((option) =>
 			option
-				.setName(t("register.options.delete.name"))
-				.setDescription(t("register.options.delete.description"))
-				.setNameLocalizations(cmdLn("register.options.delete.name"))
-				.setDescriptionLocalizations(cmdLn("register.options.delete.description"))
+				.setNames("register.options.delete.name")
+				.setDescriptions("register.options.delete.description")
 		),
 	async execute(
 		interaction: Djs.ChatInputCommandInteraction,

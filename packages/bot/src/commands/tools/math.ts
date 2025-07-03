@@ -2,20 +2,18 @@
  * Same as calc but without statistics
  */
 
-import { cmdLn, t } from "@dicelette/localization";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { autoCompleteCharacters, calcOptions, getLangFromInteraction } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
+import "discord_ext";
 
 export const math = {
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
-		.setName(t("math.title"))
-		.setNameLocalizations(cmdLn("math.title"))
-		.setDescription(t("math.description"))
-		.setDescriptionLocalizations(cmdLn("math.description")),
+		.setNames("math.title")
+		.setDescriptions("math.description"),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);

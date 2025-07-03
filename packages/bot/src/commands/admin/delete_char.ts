@@ -1,4 +1,3 @@
-import { cmdLn } from "@dicelette/localization";
 import type {
 	DiscordChannel,
 	GuildData,
@@ -13,6 +12,7 @@ import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
 import { getLangAndConfig, optionInteractions, searchUserChannel } from "utils";
+import "discord_ext";
 export const t = i18next.getFixedT("en");
 
 export const deleteChar = {
@@ -42,25 +42,19 @@ export const deleteChar = {
 		);
 	},
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("deleteChar.name"))
+		.setNames("deleteChar.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.setNameLocalizations(cmdLn("deleteChar.name"))
-		.setDescription(t("deleteChar.description"))
-		.setDescriptionLocalizations(cmdLn("deleteChar.description"))
+		.setDescriptions("deleteChar.description")
 		.addUserOption((option) =>
 			option
-				.setName(t("display.userLowercase"))
-				.setNameLocalizations(cmdLn("display.userLowercase"))
-				.setDescription(t("deleteChar.user"))
-				.setDescriptionLocalizations(cmdLn("deleteChar.user"))
+				.setNames("display.userLowercase")
+				.setDescriptions("deleteChar.user")
 				.setRequired(true)
 		)
 		.addStringOption((option) =>
 			option
-				.setName(t("common.character"))
-				.setNameLocalizations(cmdLn("common.character"))
-				.setDescriptionLocalizations(cmdLn("deleteChar.character"))
-				.setDescription(t("deleteChar.character"))
+				.setNames("common.character")
+				.setDescriptions("deleteChar.character")
 				.setAutocomplete(true)
 		),
 	async execute(

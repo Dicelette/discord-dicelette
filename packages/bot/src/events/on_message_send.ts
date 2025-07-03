@@ -4,11 +4,11 @@ import {
 	ResultAsText,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
+import { allValuesUndefined, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, threadToSend } from "messages";
-import { fetchChannel } from "../utils";
-import { logger } from "@dicelette/utils";
+import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
+import { fetchChannel } from "utils";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
@@ -19,17 +19,19 @@ export default (client: EClient): void => {
 			const content = message.content;
 			//detect roll between bracket
 			const isRoll = isRolling(content);
-			if (!isRoll) return;
-			const { result, detectRoll } = isRoll;
-			const deleteInput = !detectRoll;
-
-			//is a valid roll as we are in the function so we can work as always
 			const userLang =
 				client.guildLocale?.get(message.guild.id) ??
 				client.settings.get(message.guild.id, "lang") ??
 				message.guild.preferredLocale ??
 				Djs.Locale.EnglishUS;
 			const ul = ln(userLang);
+			if (!isRoll || allValuesUndefined(isRoll))
+				return await stripOOC(message, client, ul);
+			const { result, detectRoll } = isRoll;
+			const deleteInput = !detectRoll;
+
+			//is a valid roll as we are in the function so we can work as always
+
 			const channel = message.channel;
 			if (!result) return;
 			const critical = rollCustomCriticalsFromDice(content, ul);
@@ -73,7 +75,7 @@ export default (client: EClient): void => {
 			const thread = await threadToSend(client.settings, channel, ul);
 			const msgToEdit = await thread.send("_ _");
 			const msg = resultAsText.onMessageSend(context, message.author.id);
-			await msgToEdit.edit(msg);
+			msgToEdit.edit(msg);
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
 				? msgToEdit.url
 				: undefined;
@@ -90,6 +92,7 @@ export default (client: EClient): void => {
 			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
+			console.log("ERROR ON MESSAGE CREATE", e);
 			logger.error("\n", e);
 			if (!message.guild) return;
 			const userLang =

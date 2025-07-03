@@ -1,29 +1,24 @@
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import { rollCustomCriticalsFromDice } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getLangAndConfig, rollWithInteraction } from "utils";
+import "discord_ext";
 
 export const diceRoll = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("roll.name"))
-		.setNameLocalizations(cmdLn("roll.name"))
-		.setDescription(t("roll.description"))
-		.setDescriptionLocalizations(cmdLn("roll.description"))
+		.setNames("roll.name")
+		.setDescriptions("roll.description")
 		.addStringOption((option) =>
 			option
-				.setName(t("roll.option.name"))
-				.setNameLocalizations(cmdLn("roll.option.name"))
-				.setDescription(t("roll.option.description"))
-				.setDescriptionLocalizations(cmdLn("roll.option.description"))
+				.setNames("roll.option.name")
+				.setDescriptions("roll.option.description")
 				.setRequired(true)
 		)
 		.addBooleanOption((option) =>
 			option
-				.setName(t("dbRoll.options.hidden.name"))
-				.setNameLocalizations(cmdLn("dbRoll.options.hidden.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.hidden.description"))
-				.setDescription(t("dbRoll.options.hidden.description"))
+				.setNames("dbRoll.options.hidden.name")
+				.setDescriptions("dbRoll.options.hidden.description")
 				.setRequired(false)
 		),
 	async execute(

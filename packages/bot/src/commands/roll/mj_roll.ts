@@ -1,4 +1,4 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import {
 	capitalizeBetweenPunct,
@@ -17,43 +17,36 @@ import {
 	rollStatistique,
 } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
+import "discord_ext";
 
 export const mjRoll = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("mjRoll.name"))
-		.setNameLocalizations(cmdLn("mjRoll.name"))
-		.setDescription(t("mjRoll.description"))
-		.setDescriptionLocalizations(cmdLn("mjRoll.description"))
+		.setNames("mjRoll.name")
+		.setDescriptions("mjRoll.description")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.addSubcommand(
 			(
 				sub //dbRoll
 			) =>
 				gmCommonOptions(sub, "dbroll")
-					.setName(t("dbRoll.name"))
-					.setNameLocalizations(cmdLn("dbRoll.name"))
-					.setDescription(t("dbRoll.description"))
-					.setDescriptionLocalizations(cmdLn("dbRoll.description"))
+					.setNames("dbRoll.name")
+					.setDescriptions("dbRoll.description")
 		)
 		.addSubcommand(
 			(
 				sub //dbd
 			) =>
 				gmCommonOptions(sub, "dbd")
-					.setName(t("rAtq.name"))
-					.setDescription(t("rAtq.description"))
-					.setNameLocalizations(cmdLn("rAtq.name"))
-					.setDescriptionLocalizations(cmdLn("rAtq.description"))
+					.setNames("rAtq.name")
+					.setDescriptions("rAtq.description")
 		)
 		.addSubcommand(
 			(
 				sub //calc
 			) =>
 				gmCommonOptions(sub, "calc")
-					.setName(t("calc.title"))
-					.setDescription(t("calc.description"))
-					.setNameLocalizations(cmdLn("calc.title"))
-					.setDescriptionLocalizations(cmdLn("calc.description"))
+					.setNames("calc.title")
+					.setDescriptions("calc.description")
 		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const sign = autoFocuseSign(interaction);

@@ -1,4 +1,4 @@
-import { cmdLn, findln, t } from "@dicelette/localization";
+import { findln, t } from "@dicelette/localization";
 import type {
 	DiscordChannel,
 	PersonnageIds,
@@ -24,28 +24,23 @@ import {
 	haveAccess,
 	optionInteractions,
 } from "utils";
+import "discord_ext";
 
 export const editAvatar = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("edit.title"))
-		.setNameLocalizations(cmdLn("edit.title"))
-		.setDescription(t("edit.desc"))
-		.setDescriptionLocalizations(cmdLn("edit.desc"))
+		.setNames("edit.title")
+		.setDescriptions("edit.desc")
 		.setDefaultMemberPermissions(0)
 		.addSubcommand(
 			(subcommand) =>
 				charUserOptions(
 					subcommand
-						.setName(t("edit_avatar.name"))
-						.setNameLocalizations(cmdLn("edit_avatar.name"))
-						.setDescription(t("edit_avatar.desc"))
-						.setDescriptionLocalizations(cmdLn("edit_avatar.desc"))
+						.setNames("edit_avatar.name")
+						.setDescriptions("edit_avatar.desc")
 						.addStringOption((option) =>
 							option
-								.setName(t("edit_avatar.url.name"))
-								.setNameLocalizations(cmdLn("edit_avatar.url.name"))
-								.setDescription(t("edit_avatar.url.desc"))
-								.setDescriptionLocalizations(cmdLn("edit_avatar.url.desc"))
+								.setNames("edit_avatar.url.name")
+								.setDescriptions("edit_avatar.url.desc")
 								.setRequired(true)
 						)
 				) as Djs.SlashCommandSubcommandBuilder
@@ -54,14 +49,12 @@ export const editAvatar = {
 			(subcommand) =>
 				charUserOptions(
 					subcommand
-						.setName(t("edit.rename.title"))
-						.setDescription(t("edit.rename.desc"))
+						.setNames("edit.rename.title")
+						.setDescriptions("edit.rename.desc")
 						.addStringOption((option) =>
 							option
-								.setName(t("edit.rename.option.title"))
-								.setDescription(t("edit.rename.option.desc"))
-								.setNameLocalizations(cmdLn("edit.rename.option.title"))
-								.setDescriptionLocalizations(cmdLn("edit.rename.option.desc"))
+								.setNames("edit.rename.option.title")
+								.setDescriptions("edit.rename.option.desc")
 								.setRequired(true)
 						)
 				) as Djs.SlashCommandSubcommandBuilder
@@ -70,16 +63,12 @@ export const editAvatar = {
 			(subcommand) =>
 				charUserOptions(
 					subcommand
-						.setName(t("edit.user.title"))
-						.setDescription(t("edit.user.desc"))
-						.setDescriptionLocalizations(cmdLn("edit.user.desc"))
-						.setNameLocalizations(cmdLn("edit.user.title"))
+						.setNames("edit.user.title")
+						.setDescriptions("edit.user.desc")
 						.addUserOption((option) =>
 							option
-								.setName(t("edit.user.option.title"))
-								.setDescription(t("edit.user.option.desc"))
-								.setNameLocalizations(cmdLn("edit.user.option.title"))
-								.setDescriptionLocalizations(cmdLn("edit.user.option.desc"))
+								.setNames("edit.user.option.title")
+								.setDescriptions("edit.user.option.desc")
 								.setRequired(true)
 						)
 				) as Djs.SlashCommandSubcommandBuilder

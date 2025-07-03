@@ -3,8 +3,8 @@ import "uniformize";
 import { standardizeDice } from "@dicelette/core";
 
 export { logger, important };
-export { default as dev } from "./src/dev";
 export * from "./src/changelog";
+export { default as dev } from "./src/dev";
 
 /**
  * filter the choices by removing the accents and check if it includes the removedAccents focused
@@ -85,4 +85,8 @@ export function uniformizeRecords(input: Record<string, string | number>) {
 			typeof value === "string" ? standardizeDice(value) : value,
 		])
 	) as Record<string, string | number>;
+}
+
+export function allValuesUndefined<T extends Record<string, unknown>>(obj: T): boolean {
+	return Object.values(obj).every((value) => value === undefined);
 }

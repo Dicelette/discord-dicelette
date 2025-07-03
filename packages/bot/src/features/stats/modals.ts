@@ -96,8 +96,8 @@ export async function register(
 	}
 	const statsWithoutCombinaison = template.statistics
 		? Object.keys(template.statistics)
-			.filter((stat) => !template.statistics![stat].combinaison)
-			.map((name) => name.standardize())
+				.filter((stat) => !template.statistics![stat].combinaison)
+				.map((name) => name.standardize())
 		: [];
 	const embedObject = statEmbeds.toJSON();
 	const fields = embedObject.fields;
