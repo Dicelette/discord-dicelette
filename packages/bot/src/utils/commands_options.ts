@@ -3,7 +3,7 @@ import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import type { SlashCommandSubcommandBuilder } from "discord.js";
-
+import "discord_ext";
 import { getLangAndConfig } from "./fetch";
 
 export function charUserOptions(
@@ -12,18 +12,14 @@ export function charUserOptions(
 	buider
 		.addUserOption((option) =>
 			option
-				.setName(t("display.userLowercase"))
-				.setNameLocalizations(cmdLn("display.userLowercase"))
-				.setDescription(t("display.user"))
-				.setDescriptionLocalizations(cmdLn("display.user"))
+				.setNames("display.userLowercase")
+				.setDescriptions("display.user")
 				.setRequired(false)
 		)
 		.addStringOption((option) =>
 			option
-				.setName(t("common.character"))
-				.setNameLocalizations(cmdLn("common.character"))
-				.setDescription(t("display.character"))
-				.setDescriptionLocalizations(cmdLn("display.character"))
+				.setNames("common.character")
+				.setDescriptions("display.character")
 				.setRequired(false)
 				.setAutocomplete(true)
 		);
@@ -45,49 +41,39 @@ export function commonOptions(
 ) {
 	builder.addStringOption((option) =>
 		option
-			.setName(t("common.character"))
-			.setDescription(t("dbRoll.options.character"))
-			.setNameLocalizations(cmdLn("common.character"))
-			.setDescriptionLocalizations(cmdLn("dbRoll.options.character"))
+			.setNames("common.character")
+			.setDescriptions("dbRoll.options.character")
 			.setRequired(false)
 			.setAutocomplete(true)
 	);
 	if (opts.expression) {
 		builder.addStringOption((option) =>
 			option
-				.setName(t("common.expression"))
-				.setDescription(t("dbRoll.options.modificator.description"))
-				.setNameLocalizations(cmdLn("common.expression"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.modificator.description"))
+				.setNames("common.expression")
+				.setDescriptions("dbRoll.options.modificator.description")
 				.setRequired(false)
 		);
 	}
 	if (opts.opposition) {
 		builder.addStringOption((option) =>
 			option
-				.setName(t("dbRoll.options.opposition.name"))
-				.setDescription(t("dbRoll.options.opposition.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.opposition.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.opposition.description"))
+				.setNames("dbRoll.options.opposition.name")
+				.setDescriptions("dbRoll.options.opposition.description")
 				.setRequired(false)
 		);
 	}
 	if (opts.threshold) {
 		builder.addStringOption((option) =>
 			option
-				.setName(t("dbRoll.options.override.name"))
-				.setDescription(t("dbRoll.options.override.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.override.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.override.description"))
+				.setNames("dbRoll.options.override.name")
+				.setDescriptions("dbRoll.options.override.description")
 				.setRequired(false)
 		);
 	}
 	builder.addStringOption((option) =>
 		option
-			.setName(t("common.comments"))
-			.setDescription(t("dbRoll.options.comments.description"))
-			.setNameLocalizations(cmdLn("common.comments"))
-			.setDescriptionLocalizations(cmdLn("dbRoll.options.comments.description"))
+			.setNames("common.comments")
+			.setDescriptions("dbRoll.options.comments.description")
 			.setRequired(false)
 	);
 	return builder;
@@ -98,10 +84,8 @@ export function dbdOptions(
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
 	builder.addStringOption((option) =>
 		option
-			.setName(t("rAtq.atq_name.name"))
-			.setNameLocalizations(cmdLn("rAtq.atq_name.name"))
-			.setDescription(t("rAtq.atq_name.description"))
-			.setDescriptionLocalizations(cmdLn("rAtq.atq_name.description"))
+			.setNames("rAtq.atq_name.name")
+			.setDescriptions("rAtq.atq_name.description")
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
@@ -118,10 +102,8 @@ export function dbRollOptions(
 ) {
 	builder.addStringOption((option) =>
 		option
-			.setName(t("common.statistic"))
-			.setNameLocalizations(cmdLn("common.statistic"))
-			.setDescription(t("dbRoll.options.statistic"))
-			.setDescriptionLocalizations(cmdLn("dbRoll.options.statistic"))
+			.setNames("common.statistic")
+			.setDescriptions("dbRoll.options.statistic")
 			.setRequired(false)
 			.setAutocomplete(true)
 	);
@@ -143,39 +125,31 @@ export function calcOptions(
 		builder
 			.addStringOption((option) =>
 				option
-					.setName(t("common.statistic"))
-					.setDescription(t("calc.statistic"))
+					.setNames("common.statistic")
+					.setDescriptions("calc.statistic")
 					.setRequired(true)
-					.setNameLocalizations(cmdLn("common.statistic"))
-					.setDescriptionLocalizations(cmdLn("calc.statistic"))
 					.setAutocomplete(true)
 			)
 			.addStringOption((option) =>
 				option
-					.setName(t("calc.sign.title"))
-					.setDescription(t("calc.sign.desc"))
+					.setNames("calc.sign.title")
+					.setDescriptions("calc.sign.desc")
 					.setRequired(true)
-					.setNameLocalizations(cmdLn("calc.sign.title"))
-					.setDescriptionLocalizations(cmdLn("calc.sign.desc"))
 					.setAutocomplete(true)
 			);
 	}
 	builder.addStringOption((option) =>
 		option
-			.setName(t("common.expression"))
-			.setDescription(t("calc.formula.desc"))
-			.setNameLocalizations(cmdLn("common.expression"))
-			.setDescriptionLocalizations(cmdLn("calc.formula.desc"))
+			.setNames("common.expression")
+			.setDescriptions("calc.formula.desc")
 			.setRequired(true)
 	);
 	if (isCalc)
 		builder.addStringOption((option) =>
 			option
-				.setName(t("calc.transform.title"))
-				.setDescription(t("calc.transform.desc"))
+				.setNames("calc.transform.title")
+				.setDescriptions("calc.transform.desc")
 				.setRequired(false)
-				.setNameLocalizations(cmdLn("calc.transform.title"))
-				.setDescriptionLocalizations(cmdLn("calc.transform.desc"))
 				.setAutocomplete(true)
 		);
 	return commonOptions(builder, { expression: false });
@@ -191,10 +165,8 @@ export function gmCommonOptions(
 	): Djs.SlashCommandSubcommandBuilder {
 		builder.addBooleanOption((option) =>
 			option
-				.setName(t("dbRoll.options.hidden.name"))
-				.setDescription(t("dbRoll.options.hidden.description"))
-				.setNameLocalizations(cmdLn("dbRoll.options.hidden.name"))
-				.setDescriptionLocalizations(cmdLn("dbRoll.options.hidden.description"))
+				.setNames("dbRoll.options.hidden.name")
+				.setDescriptions("dbRoll.options.hidden.description")
 				.setRequired(false)
 		);
 		return builder;
@@ -223,10 +195,8 @@ export function gmCommonOptions(
 	}
 	builderCopy.addUserOption((option) =>
 		option
-			.setName(t("display.userLowercase"))
-			.setNameLocalizations(cmdLn("display.userLowercase"))
-			.setDescription(t("mjRoll.user"))
-			.setDescriptionLocalizations(cmdLn("mjRoll.user"))
+			.setNames("display.userLowercase")
+			.setDescriptions("mjRoll.user")
 			.setRequired(false)
 	);
 	return builderCopy;

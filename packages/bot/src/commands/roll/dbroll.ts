@@ -1,16 +1,14 @@
-import { cmdLn, t } from "@dicelette/localization";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { autoCompleteCharacters, dbRollOptions, rollStatistique } from "utils";
+import "discord_ext";
 
 export const dbRoll = {
 	data: (dbRollOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setName(t("dbRoll.name"))
-		.setNameLocalizations(cmdLn("dbRoll.name"))
-		.setDescription(t("dbRoll.description"))
-		.setDescriptionLocalizations(cmdLn("dbRoll.description"))
+		.setNames("dbRoll.name")
+		.setDescriptions("dbRoll.description")
 		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client) ?? [];

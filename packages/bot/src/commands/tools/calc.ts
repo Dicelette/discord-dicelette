@@ -1,5 +1,5 @@
 import { generateStatsDice, isNumber } from "@dicelette/core";
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
@@ -9,14 +9,13 @@ import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
 import { autoCompleteCharacters, calcOptions, getLangFromInteraction } from "utils";
+import "discord_ext";
 
 export const calc = {
 	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setName(t("calc.title"))
-		.setNameLocalizations(cmdLn("calc.title"))
-		.setDescription(t("calc.description"))
-		.setDefaultMemberPermissions(0)
-		.setDescriptionLocalizations(cmdLn("calc.description")),
+		.setNames("calc.title")
+		.setDescriptions("calc.description")
+		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);

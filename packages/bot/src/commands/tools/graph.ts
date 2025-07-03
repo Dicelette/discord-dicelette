@@ -1,5 +1,5 @@
 import path from "node:path";
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
@@ -14,6 +14,7 @@ import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
 import { charUserOptions, getLangAndConfig, haveAccess, searchUserChannel } from "utils";
+import "discord_ext";
 
 async function chart(
 	userData: UserData,
@@ -108,42 +109,32 @@ function fontPath(fontName: string) {
 
 export const graph = {
 	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setName(t("graph.name"))
+		.setNames("graph.name")
 		.setDefaultMemberPermissions(0)
-		.setNameLocalizations(cmdLn("graph.name"))
-		.setDescription(t("graph.description"))
-		.setDescriptionLocalizations(cmdLn("graph.description"))
+		.setDescriptions("graph.description")
 
 		.addStringOption((option) =>
 			option
-				.setName(t("graph.line.name"))
-				.setDescription(t("graph.line.description"))
-				.setDescriptionLocalizations(cmdLn("graph.line.description"))
-				.setNameLocalizations(cmdLn("graph.line.name"))
+				.setNames("graph.line.name")
+				.setDescriptions("graph.line.description")
 				.setRequired(false)
 		)
 		.addNumberOption((option) =>
 			option
-				.setName(t("graph.min.name"))
-				.setDescription(t("graph.min.description"))
-				.setDescriptionLocalizations(cmdLn("graph.min.description"))
-				.setNameLocalizations(cmdLn("graph.min.name"))
+				.setNames("graph.min.name")
+				.setDescriptions("graph.min.description")
 				.setRequired(false)
 		)
 		.addNumberOption((option) =>
 			option
-				.setName(t("graph.max.name"))
-				.setDescription(t("graph.max.description"))
+				.setNames("graph.max.name")
+				.setDescriptions("graph.max.description")
 				.setRequired(false)
-				.setDescriptionLocalizations(cmdLn("graph.max.description"))
-				.setNameLocalizations(cmdLn("graph.max.name"))
 		)
 		.addStringOption((option) =>
 			option
-				.setName(t("graph.bg.name"))
-				.setDescription(t("graph.bg.description"))
-				.setNameLocalizations(cmdLn("graph.bg.name"))
-				.setDescriptionLocalizations(cmdLn("graph.bg.description"))
+				.setNames("graph.bg.name")
+				.setDescriptions("graph.bg.description")
 				.setRequired(false)
 		),
 	async autocomplete(

@@ -1,7 +1,9 @@
-import { cmdLn, ln, t } from "@dicelette/localization";
+import { ln, t } from "@dicelette/localization";
 import { LINKS, type Settings, type Translation } from "@dicelette/types";
 import {
+	getAllVersions,
 	getChangelogSince,
+	getOptionsVersion,
 	logger,
 	normalizeChangelogFormat,
 	splitChangelogByVersion,
@@ -12,60 +14,35 @@ import * as Djs from "discord.js";
 import { reply } from "messages";
 import { getLangAndConfig } from "utils";
 import { VERSION } from "../../../index";
-import { getAllVersions, getOptionsVersion } from "@dicelette/utils";
+import "discord_ext";
+
 export const help = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("help.name"))
-		.setNameLocalizations(cmdLn("help.name"))
-		.setDescription(t("help.description"))
-		.setDescriptionLocalizations(cmdLn("help.description"))
+		.setNames("help.name")
+		.setDescriptions("help.description")
 		.addSubcommand((sub) =>
-			sub
-				.setName(t("help.info.name"))
-				.setNameLocalizations(cmdLn("help.info.name"))
-				.setDescription(t("help.info.description"))
-				.setDescriptionLocalizations(cmdLn("help.info.description"))
+			sub.setNames("help.info.name").setDescriptions("help.info.description")
+		)
+		.addSubcommand((sub) =>
+			sub.setNames("help.bug.name").setDescriptions("help.bug.description")
+		)
+		.addSubcommand((sub) =>
+			sub.setNames("help.fr.name").setDescriptions("help.fr.description")
+		)
+		.addSubcommand((sub) =>
+			sub.setNames("help.admin.name").setDescriptions("help.admin.description")
+		)
+		.addSubcommand((sub) =>
+			sub.setNames("help.register.name").setDescriptions("help.register.description")
 		)
 		.addSubcommand((sub) =>
 			sub
-				.setName(t("help.bug.name"))
-				.setNameLocalizations(cmdLn("help.bug.name"))
-				.setDescription(t("help.bug.description"))
-				.setDescriptionLocalizations(cmdLn("help.bug.description"))
-		)
-		.addSubcommand((sub) =>
-			sub
-				.setName(t("help.fr.name"))
-				.setNameLocalizations(cmdLn("help.fr.name"))
-				.setDescription(t("help.fr.description"))
-				.setDescriptionLocalizations(cmdLn("help.fr.description"))
-		)
-		.addSubcommand((sub) =>
-			sub
-				.setName(t("help.admin.name"))
-				.setNameLocalizations(cmdLn("help.admin.name"))
-				.setDescription(t("help.admin.description"))
-				.setDescriptionLocalizations(cmdLn("help.admin.description"))
-		)
-		.addSubcommand((sub) =>
-			sub
-				.setName(t("help.register.name"))
-				.setNameLocalizations(cmdLn("help.register.name"))
-				.setDescription(t("help.register.description"))
-				.setDescriptionLocalizations(cmdLn("help.register.description"))
-		)
-		.addSubcommand((sub) =>
-			sub
-				.setName(t("help.changelog.name"))
-				.setNameLocalizations(cmdLn("help.changelog.name"))
-				.setDescription(t("help.changelog.description"))
-				.setDescriptionLocalizations(cmdLn("help.changelog.description"))
+				.setNames("help.changelog.name")
+				.setDescriptions("help.changelog.description")
 				.addStringOption((sub) =>
 					sub
-						.setName(t("help.changelog.version.name"))
-						.setNameLocalizations(cmdLn("help.changelog.version.name"))
-						.setDescription(t("help.changelog.version.description"))
-						.setDescriptionLocalizations(cmdLn("help.changelog.version.description"))
+						.setNames("help.changelog.version.name")
+						.setDescriptions("help.changelog.version.description")
 						.setRequired(false)
 						.setAutocomplete(true)
 				)

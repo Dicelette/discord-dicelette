@@ -1,4 +1,4 @@
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import { filterStatsInDamage } from "@dicelette/parse_result";
 import {
 	capitalizeBetweenPunct,
@@ -11,13 +11,12 @@ import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "data
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { dbdOptions, getLangAndConfig, isSerializedNameEquals, rollDice } from "utils";
+import "discord_ext";
 
 export default {
 	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setName(t("rAtq.name"))
-		.setDescription(t("rAtq.description"))
-		.setNameLocalizations(cmdLn("rAtq.name"))
-		.setDescriptionLocalizations(cmdLn("rAtq.description"))
+		.setNames("rAtq.name")
+		.setDescription("rAtq.description")
 		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;

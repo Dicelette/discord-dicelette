@@ -1,5 +1,5 @@
-import * as Djs from "discord.js";
 import { cmdLn, t } from "@dicelette/localization";
+import * as Djs from "discord.js";
 
 // Déclarations TypeScript
 declare module "discord.js" {
@@ -39,6 +39,26 @@ declare module "discord.js" {
 	}
 
 	interface SlashCommandNumberOption {
+		setNames(key: string): this;
+		setDescriptions(key: string): this;
+	}
+
+	interface SlashCommandMentionableOption {
+		setNames(key: string): this;
+		setDescriptions(key: string): this;
+	}
+
+	interface SlashCommandUserOption {
+		setNames(key: string): this;
+		setDescriptions(key: string): this;
+	}
+
+	interface SlashCommandAttachmentOption {
+		setNames(key: string): this;
+		setDescriptions(key: string): this;
+	}
+
+	interface SlashCommandAttachmentOption {
 		setNames(key: string): this;
 		setDescriptions(key: string): this;
 	}
@@ -90,6 +110,9 @@ const optionTypes = [
 	{ name: "Channel", class: Djs.SlashCommandChannelOption },
 	{ name: "Role", class: Djs.SlashCommandRoleOption },
 	{ name: "Number", class: Djs.SlashCommandNumberOption },
+	{ name: "Mentionable", class: Djs.SlashCommandMentionableOption },
+	{ name: "User", class: Djs.SlashCommandUserOption },
+	{ name: "Attachment", class: Djs.SlashCommandAttachmentOption },
 ];
 
 optionTypes.forEach(({ class: optionClass }) => {

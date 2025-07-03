@@ -1,4 +1,6 @@
 import { cmdLn, t } from "@dicelette/localization";
+import type { DiscordChannel } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
@@ -11,8 +13,7 @@ import {
 	repostInThread,
 } from "messages";
 import { addAutoRole, getLangAndConfig, parseCSV } from "utils";
-import type { DiscordChannel } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import "discord_ext";
 
 /**
  * ! Note: Bulk data doesn't allow to register dice-per-user, as each user can have different dice
@@ -20,25 +21,17 @@ import { logger } from "@dicelette/utils";
  */
 export const bulkAdd = {
 	data: new Djs.SlashCommandBuilder()
-		.setName(t("import.name"))
+		.setNames("import.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.setNameLocalizations(cmdLn("import.name"))
-		.setDescription(t("import.description"))
-		.setDescriptionLocalizations(cmdLn("import.description"))
+		.setDescriptions("import.description")
 		.addAttachmentOption((option) =>
 			option
-				.setName(t("import.options.name"))
-				.setNameLocalizations(cmdLn("import.options.name"))
-				.setDescription(t("import.options.description"))
-				.setDescriptionLocalizations(cmdLn("import.options.description"))
+				.setNames("import.options.name")
+				.setDescriptions("import.options.description")
 				.setRequired(true)
 		)
 		.addBooleanOption((option) =>
-			option
-				.setName(t("import.delete.title"))
-				.setNameLocalizations(cmdLn("import.delete.title"))
-				.setDescription(t("import.delete.description"))
-				.setDescriptionLocalizations(cmdLn("import.delete.description"))
+			option.setNames("import.delete.title").setDescriptions("import.delete.description")
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
