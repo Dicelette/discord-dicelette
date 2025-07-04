@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.56.2](https://github.com/Dicelette/discord-dicelette/compare/1.56.1...1.56.2) (2025-07-04)
+
+
+### Bug Fixes
+
+* await in fetchChannel ([9d4a9cf](https://github.com/Dicelette/discord-dicelette/commit/9d4a9cf412e4889a64014200c11edeedbccc1852))
+* **cache:** duplicate key translation create a cascading issue in french ([fe3b227](https://github.com/Dicelette/discord-dicelette/commit/fe3b2270f639d7dfbddffb90414194b6d74673ff))
+* **dbd:** missing translation ([0d87190](https://github.com/Dicelette/discord-dicelette/commit/0d87190995c33b611e988b6e983778869abfabea))
+* **registration:** duplicate found even if the diceEmbed is empty ([f858a2f](https://github.com/Dicelette/discord-dicelette/commit/f858a2f6b5fc1cd6c1ad217855f40e85fe6bf968))
+
 ## [1.56.1](https://github.com/Dicelette/discord-dicelette/compare/1.56.0...1.56.1) (2025-07-04)
 
 
