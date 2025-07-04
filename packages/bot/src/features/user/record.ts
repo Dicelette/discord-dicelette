@@ -123,7 +123,9 @@ async function createFirstPage(
 	if (customChannel.length > 0) sheetId = customChannel;
 
 	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : "";
-	const existChannel = sheetId ? fetchChannel(interaction.guild!, sheetId) : undefined;
+	const existChannel = sheetId
+		? await fetchChannel(interaction.guild!, sheetId)
+		: undefined;
 	if (!existChannel) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.channel.thread"), ul)],
