@@ -30,7 +30,6 @@ export default (client: EClient): void => {
 			contextMenus.map((cmd) => cmd.toJSON())
 		);
 
-		// Parallélisation du traitement de toutes les guildes
 		const guildPromises = Array.from(client.guilds.cache.values()).map(async (guild) => {
 			//remove admin commands
 			let guildCommands = [...serializedCommands];
@@ -52,7 +51,6 @@ export default (client: EClient): void => {
 				guildId: guild.id,
 			});
 
-			// Parallélisation de la suppression des commandes obsolètes
 			const deletePromises = cmds.map(async (command) => {
 				if (guildCommands.find((c) => c.name === command.name)) return;
 				try {
@@ -71,13 +69,11 @@ export default (client: EClient): void => {
 				}
 			);
 
-			// Parallélisation des opérations de cache
 			const cachePromises = [
 				fetchAllCharacter(client, guild),
 				cacheStatisticalTemplate(client, guild),
 			];
 
-			// Exécution synchrone de convertDatabaseUser
 			convertDatabaseUser(client.settings, guild);
 
 			await Promise.all(cachePromises);
@@ -174,16 +170,11 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 	const characters = client.characters;
 	const allUsers = db.get(guild.id, "user");
 	if (!allUsers) return;
-
-	// Parallélisation de la récupération des personnages pour tous les utilisateurs
 	const userPromises = Object.entries(allUsers).map(async ([userId, chars]) => {
 		if (!Array.isArray(chars)) return;
-
-		// Parallélisation de la récupération des personnages pour chaque utilisateur
 		const characterPromises = chars.map(async (char) => {
 			return await getUser(char.messageId, guild, client);
 		});
-
 		const allCharacters = (await Promise.all(characterPromises)).filter(
 			Boolean
 		) as UserData[];
