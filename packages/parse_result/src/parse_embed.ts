@@ -31,7 +31,7 @@ export function parseEmbedToStats(
 	embed?: Record<string, string>,
 	integrateCombinaison = true
 ) {
-	let stats: Record<string, number> | undefined = undefined;
+	let stats: Record<string, number> | undefined;
 	if (embed) {
 		stats = {};
 		for (const [name, damageValue] of Object.entries(embed)) {
