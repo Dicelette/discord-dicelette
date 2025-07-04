@@ -468,18 +468,21 @@ export async function getStatistics(
 		});
 		return;
 	}
+	/*
+	Comments this because it defenitly not needed as it shouldn't be happend NEVER
 	if (userStatistique && allValuesUndefined(userStatistique.template) && template) {
-	 	userStatistique.template = template;
-	 	await updateMemory(
-	 		client.characters,
-	 		interaction.guild!.id,
-	 		interaction.user.id,
-	 		ul,
-	 		{
-	 			userData: userStatistique,
-	 		}
-	 	);
-	 }
+		userStatistique.template = template;
+		await updateMemory(
+			client.characters,
+			interaction.guild!.id,
+			interaction.user.id,
+			ul,
+			{
+				userData: userStatistique,
+			}
+		);
+	}
+	*/
 	return { userStatistique, ul, optionChar, options };
 }
 

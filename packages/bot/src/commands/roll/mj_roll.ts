@@ -205,13 +205,14 @@ export const mjRoll = {
 		}
 		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
 		const subcommand = options.getSubcommand(true);
+		/** Should never happen
 		if (allValuesUndefined(charData.template) && template && user) {
 			charData.template = template;
 			//update in memory
 			await updateMemory(client.characters, interaction.guild.id, user.id, ul, {
 				userData: charData,
 			});
-		}
+		}*/
 		if (subcommand === ul("dbRoll.name"))
 			return await rollStatistique(
 				interaction,
