@@ -25,11 +25,14 @@ const BASE_STYLE: ISettingsParam<ILogObj>["prettyLogStyles"] = {
 
 const BASE_ERROR_TEMPLATE = "\n{{errorName}} {{errorMessage}}\nStack:\n{{errorStack}}";
 const BASE_STACK_TEMPLATE = "    at {{method}} ({{filePathWithLine}})";
+const TEMPLATE = "{{logLevelName}} [{{filePathWithLine}}{{name}}] ";
+const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
+const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
 const prodSettings: ISettingsParam<ILogObj> = {
-	minLevel: 5, // error+
+	minLevel: process.env.PROD ? 4 : 5, // error+
 	stylePrettyLogs: true,
-	prettyLogTemplate: "{{logLevelName}} [{{filePathWithLine}}{{name}}] ",
+	prettyLogTemplate: PROD_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyLogStyles: BASE_STYLE,
@@ -52,12 +55,16 @@ export const logger: Logger<ILogObj> = new Logger(
 	process.env.NODE_ENV === "production" ? prodSettings : devSettings
 );
 
+const IMPORTANT_LOG_TEMPLATE = process.env.PROD
+	? `${TIME_TEMPLATE}[{{logLevelName}}] `
+	: "[{{logLevelName}}] ";
+
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
 	name: "Note",
 	minLevel: 0,
 	stylePrettyLogs: true,
-	prettyLogTemplate: "[{{logLevelName}}] ",
+	prettyLogTemplate: IMPORTANT_LOG_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyLogStyles: {
