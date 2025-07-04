@@ -11,7 +11,7 @@ export const diceRoll = {
 		.setDescriptions("roll.description")
 		.addStringOption((option) =>
 			option
-				.setNames("roll.option.name")
+				.setNames("common.dice")
 				.setDescriptions("roll.option.description")
 				.setRequired(true)
 		)
@@ -29,7 +29,7 @@ export const diceRoll = {
 		const channel = interaction.channel;
 		if (!channel || !channel.isTextBased()) return;
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
-		const dice = option.getString(t("roll.option.name"), true);
+		const dice = option.getString(t("common.name"), true);
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));
 		const { ul } = getLangAndConfig(client, interaction);
 		const rCC = rollCustomCriticalsFromDice(dice, ul);

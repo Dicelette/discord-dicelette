@@ -84,7 +84,7 @@ export function dbdOptions(
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
 	builder.addStringOption((option) =>
 		option
-			.setNames("rAtq.atq_name.name")
+			.setNames("common.name")
 			.setDescriptions("rAtq.atq_name.description")
 			.setRequired(true)
 			.setAutocomplete(true)

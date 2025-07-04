@@ -73,7 +73,7 @@ export function buttons(ul: Translation) {
 		.setStyle(Djs.ButtonStyle.Success);
 	const cancelButton = new Djs.ButtonBuilder()
 		.setCustomId("cancel")
-		.setLabel(ul("button.cancel"))
+		.setLabel(ul("common.cancel"))
 		.setStyle(Djs.ButtonStyle.Danger);
 	const registerDmgButton = new Djs.ButtonBuilder()
 		.setCustomId("add_dice_first")

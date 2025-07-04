@@ -25,15 +25,12 @@
   },
   "button": {
     "avatar": {
-      "description": "Edit a character's image",
-      "title": "Avatar"
+      "description": "Edit a character's image"
     },
-    "cancel": "Cancel",
     "continue": "Continue",
     "dice": "Save a die",
     "edit": {
       "dice": "Edit dice",
-      "move": "Edit the associated user",
       "name": "Rename a character",
       "select": "Edit user data",
       "stats": "Edit statistics"
@@ -70,7 +67,7 @@
     "cancel": "Cancel",
     "cancelled": "Deletion has been canceled.",
     "channel": "channel",
-    "charName": "character name",
+    "charName": "Character name",
     "character": "character",
     "comments": "comments",
     "confirm": "Confirm deletion",
@@ -91,6 +88,7 @@
     "space": "",
     "statistic": "statistic",
     "statistics": "statistics",
+    "template": "template",
     "total": "Total",
     "true": "True",
     "user": "Player",
@@ -119,10 +117,8 @@
         "description": "Display the general configuration of the server",
         "name": "general"
       },
-      "name": "display",
       "template": {
-        "description": "Display the model configuration if any.",
-        "name": "template"
+        "description": "Display the model configuration if any."
       }
     },
     "displayResult": "Displaying results",
@@ -182,7 +178,6 @@
       },
       "channel": {
         "description": "Optional channel to transfer OOC.",
-        "name": "channel",
         "placeholder": "Select at last one channel."
       },
       "delete": "OOC won't be deleted.",
@@ -455,41 +450,6 @@
       "name": "private_sheet_only"
     }
   },
-  "generate": {
-    "description": "Generate server template for stats/dice commands",
-    "help": "See [documentation](<https://dicelette.github.io/en/docs/model/register>) for template notation and help.\nYou can use ![this](<https://dicelette.github.io/en/docs/model/register/form>) to generate a template with a UI.",
-    "name": "generate",
-    "options": {
-      "character": {
-        "description": "Make character name mandatory for registration",
-        "name": "character"
-      },
-      "critical_fail": {
-        "description": "Define a critical failure (natural die)",
-        "name": "critical_fail"
-      },
-      "critical_success": {
-        "description": "Define a critical success (natural die)",
-        "name": "critical_success"
-      },
-      "damage": {
-        "description": "Register a competence die - Separate competence names with a space or comma",
-        "name": "competence"
-      },
-      "dice": {
-        "description": "The type of die to throw",
-        "name": "dice"
-      },
-      "stats": {
-        "description": "The name of the statistic, separate with a space or comma",
-        "name": "name"
-      },
-      "total": {
-        "description": "The total of the statistics points (will be calculated when the user is registered)",
-        "name": "total"
-      }
-    }
-  },
   "graph": {
     "bg": {
       "description": "Background color of the chart. By default: #0e47b2",
@@ -558,8 +518,7 @@
     "name": "help",
     "register": {
       "description": "Displays general help for activating the record save function.",
-      "message": "The bot allows you to configure a server model, enabling the creation and management of character sheets and dice rolls.\r\n\r\n### Key Features:\r\n- **Privacy and Control**: All data is stored locally on your server.\r\n- **Adaptability**: The model is designed to meet diverse needs, making it highly customizable.\r\n\r\n### Getting Started:\r\n1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.\r\n2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}>. \r\n\r\n### Commands Overview:\r\nAfter setting up the model, you can use the following commands to interact with character sheets:\r\n- **</dbd:{{-dbd}}>**: Roll dice based on saved data.\r\n- **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.\r\n- **</graph:{{-graph}}>**: Generate graphs from character statistics.\r\n- **</calc:{{-calc}}>**: Calculate values using character statistics.\r\n\r\n### Additional Resources:\r\n- **Documentation**: For more advanced configurations and features, visit the [official documentation](<https://dicelette.github.io/en/>).\r\n- **Support**: If you encounter issues, consult the documentation or reach out to the support team.",
-      "name": "register"
+      "message": "The bot allows you to configure a server model, enabling the creation and management of character sheets and dice rolls.\r\n\r\n### Key Features:\r\n- **Privacy and Control**: All data is stored locally on your server.\r\n- **Adaptability**: The model is designed to meet diverse needs, making it highly customizable.\r\n\r\n### Getting Started:\r\n1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.\r\n2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}>. \r\n\r\n### Commands Overview:\r\nAfter setting up the model, you can use the following commands to interact with character sheets:\r\n- **</dbd:{{-dbd}}>**: Roll dice based on saved data.\r\n- **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.\r\n- **</graph:{{-graph}}>**: Generate graphs from character statistics.\r\n- **</calc:{{-calc}}>**: Calculate values using character statistics.\r\n\r\n### Additional Resources:\r\n- **Documentation**: For more advanced configurations and features, visit the [official documentation](<https://dicelette.github.io/en/>).\r\n- **Support**: If you encounter issues, consult the documentation or reach out to the support team."
     }
   },
   "hidden": {
@@ -590,8 +549,7 @@
     },
     "name": "import",
     "options": {
-      "description": "The CSV file to import",
-      "name": "csv"
+      "description": "The CSV file to import"
     },
     "success": "{{- user}} has been added."
   },
@@ -643,8 +601,7 @@
       "name": "Channel (in ID form) where to post the file"
     },
     "charName": {
-      "description": "Enter your character's name",
-      "name": "Character name"
+      "description": "Enter your character's name"
     },
     "dice": {
       "max": "You cannot have more than 25 registered dice (discord field limits).",
@@ -679,14 +636,12 @@
     },
     "steps": "User Registration - Page {{- page}}/{{- max}}",
     "user": {
-      "description": "Enter the user attached to the character (id or global username)",
-      "name": "user"
+      "description": "Enter the user attached to the character (id or global username)"
     }
   },
   "rAtq": {
     "atq_name": {
-      "description": "The name of the skill",
-      "name": "name"
+      "description": "The name of the skill"
     },
     "description": "Roll a registered die for a skill/attack",
     "name": "dbd"
@@ -706,8 +661,7 @@
       "exclude": "Excluded",
       "forceDistrib": "Force point's distribution",
       "noValue": "No value",
-      "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are enabled for all user by default.\n\nYou can restrict to your player only with following the tutorial:\n",
-      "title": "Model"
+      "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are enabled for all user by default.\n\nYou can restrict to your player only with following the tutorial:\n"
     },
     "name": "register",
     "options": {
@@ -725,8 +679,7 @@
         "name": "public_channel"
       },
       "template": {
-        "description": "The template to be registered",
-        "name": "template"
+        "description": "The template to be registered"
       },
       "update": {
         "description": "Update old character sheets",
@@ -743,8 +696,7 @@
     "failure": "Failure",
     "name": "roll",
     "option": {
-      "description": "roll die",
-      "name": "die"
+      "description": "roll die"
     },
     "reason": "New roll thread",
     "success": "Success"
@@ -755,8 +707,7 @@
     "name": "scene",
     "noScene": "No scene specified",
     "option": {
-      "description": "The name of the scene",
-      "name": "scene"
+      "description": "The name of the scene"
     },
     "reason": "New scene",
     "time": {

@@ -104,10 +104,7 @@ export function getEmbeds(
 			return new Djs.EmbedBuilder(embedJSON);
 		if (titleKey === "embed.dice" && which === "damage")
 			return new Djs.EmbedBuilder(embedJSON);
-		if (
-			["embed.template", "config.display.template.name"].includes(titleKey) &&
-			which === "template"
-		)
+		if (["embed.template", "common.template"].includes(titleKey) && which === "template")
 			return new Djs.EmbedBuilder(embedJSON);
 	}
 }

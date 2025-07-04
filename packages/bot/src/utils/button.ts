@@ -50,7 +50,7 @@ export function selectEditMenu(ul: Translation) {
 				.setValue("name")
 				.setDescription(ul("button.name")),
 			new Djs.StringSelectMenuOptionBuilder()
-				.setLabel(ul("button.avatar.title"))
+				.setLabel(ul("modals.avatar.name"))
 				.setValue("avatar")
 				.setEmoji("🖼")
 				.setDescription(ul("button.avatar.description")),
@@ -102,7 +102,7 @@ export function continueCancelButtons(ul: Translation) {
 		.setStyle(Djs.ButtonStyle.Success);
 	const cancelButton = new Djs.ButtonBuilder()
 		.setCustomId("cancel")
-		.setLabel(ul("button.cancel"))
+		.setLabel(ul("common.cancel"))
 		.setStyle(Djs.ButtonStyle.Danger);
 	return new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents([
 		continueButton,

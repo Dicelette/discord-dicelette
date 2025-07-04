@@ -91,7 +91,7 @@ export const configuration = {
 		/* DISPLAY */
 		.addSubcommandGroup((group) =>
 			group
-				.setNames("config.display.name")
+				.setNames("display.title")
 				.setDescriptions("config.display.description")
 				.addSubcommand((subcommand) =>
 					subcommand
@@ -100,7 +100,7 @@ export const configuration = {
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
-						.setNames("config.display.template.name")
+						.setNames("common.template")
 						.setDescriptions("config.display.template.description")
 				)
 		)
@@ -253,7 +253,7 @@ export const configuration = {
 				)
 				.addChannelOption((option) =>
 					option
-						.setNames("config.stripOOC.channel.name")
+						.setNames("common.channel")
 						.setDescriptions("config.stripOOC.channel.description")
 						.addChannelTypes(
 							Djs.ChannelType.GuildText,
@@ -275,11 +275,11 @@ export const configuration = {
 		const subcommandGroup = options.getSubcommandGroup();
 		if (subcommandGroup)
 			switch (subcommandGroup) {
-				case t("config.display.name"):
+				case t("display.title"):
 					switch (subcommand) {
 						case t("config.display.general.name"):
 							return await display(interaction, client, ul);
-						case t("config.display.template.name"):
+						case t("common.template"):
 							return await displayTemplate(interaction, client, ul);
 					}
 					break;

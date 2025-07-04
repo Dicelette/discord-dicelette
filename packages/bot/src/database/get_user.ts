@@ -14,7 +14,7 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { allValuesUndefined, cleanAvatarUrl, logger } from "@dicelette/utils";
+import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import * as Djs from "discord.js";

@@ -26,7 +26,7 @@ export const bulkAdd = {
 		.setDescriptions("import.description")
 		.addAttachmentOption((option) =>
 			option
-				.setNames("import.options.name")
+				.setNames("csv_generation.name")
 				.setDescriptions("import.options.description")
 				.setRequired(true)
 		)
@@ -35,7 +35,7 @@ export const bulkAdd = {
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const csvFile = options.getAttachment(t("import.options.name"), true);
+		const csvFile = options.getAttachment(t("csv_generation.name"), true);
 		const { langToUse, ul } = getLangAndConfig(client, interaction);
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const ext = csvFile.name.split(".").pop()?.toLowerCase() ?? "";

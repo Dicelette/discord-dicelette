@@ -12,9 +12,7 @@ export async function start(
 }
 
 async function showMove(interaction: Djs.StringSelectMenuInteraction, ul: Translation) {
-	const modal = new Djs.ModalBuilder()
-		.setCustomId("move")
-		.setTitle(ul("button.edit.move"));
+	const modal = new Djs.ModalBuilder().setCustomId("move").setTitle(ul("button.user"));
 	const input =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()

@@ -57,7 +57,7 @@ export default {
 			}
 		} else if (focused.name === t("common.character") && user) {
 			//if dice is set, get all characters that have this dice
-			const skill = options.getString(t("rAtq.atq_name.name"));
+			const skill = options.getString(t("common.name"));
 			const allCharactersFromUser = user
 				.map((data) => data.charName ?? "")
 				.filter((data) => data.length > 0);

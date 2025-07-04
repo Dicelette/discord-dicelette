@@ -33,7 +33,7 @@ export const help = {
 			sub.setNames("help.admin.name").setDescriptions("help.admin.description")
 		)
 		.addSubcommand((sub) =>
-			sub.setNames("help.register.name").setDescriptions("help.register.description")
+			sub.setNames("register.name").setDescriptions("help.register.description")
 		)
 		.addSubcommand((sub) =>
 			sub
@@ -118,7 +118,7 @@ export const help = {
 					content: dedent(ul("help.fr.message", { link: link.fr })),
 				});
 				break;
-			case t("help.register.name"): {
+			case t("register.name"): {
 				const helpDBCmd = getHelpDBCmd(commandsID);
 				await reply(interaction, {
 					content: dedent(
@@ -146,7 +146,7 @@ export const help = {
 								disable: idsAdmin?.[t("disableThread.name")],
 								result: idsAdmin?.[t("changeThread.name")],
 								delete: idsAdmin?.[t("timer.name")],
-								display: idsAdmin?.[t("config.display.name")],
+								display: idsAdmin?.[t("display.title")],
 								timestamp: idsAdmin?.[t("timestamp.name")],
 								self_register: idsAdmin?.[t("config.selfRegister.name")],
 								language: idsAdmin?.[t("config.lang.options.name")],
@@ -264,7 +264,7 @@ function getConfigIds(
 	ids[t("logs.name")] = idConfig;
 	ids[t("changeThread.name")] = idConfig;
 	ids[t("timer.name")] = idConfig;
-	ids[t("config.display.name")] = idConfig;
+	ids[t("display.title")] = idConfig;
 	ids[t("timestamp.name")] = idConfig;
 	ids[t("config.lang.name")] = idConfig;
 	ids[t("config.selfRegister.name")] = idConfig;

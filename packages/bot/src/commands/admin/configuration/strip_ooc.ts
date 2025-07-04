@@ -15,7 +15,7 @@ export async function stripOOC(
 	const suffix = options.getString(t("config.stripOOC.suffix.name"), false);
 	let regex = options.getString(t("config.stripOOC.regex.name"), false);
 	const timer = options.getNumber(t("config.stripOOC.timer.name"), false);
-	let channel = options.getChannel(t("config.stripOOC.channel.name"), false);
+	let channel = options.getChannel(t("common.channel"), false);
 	const threadMode = options.getBoolean(t("config.stripOOC.thread_mode.name"), false);
 
 	if ((!prefix && !suffix && !regex) || timer === 0) {

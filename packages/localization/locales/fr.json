@@ -25,15 +25,12 @@
   },
   "button": {
     "avatar": {
-      "description": "Modifier l'image d'un personnage",
-      "title": "Avatar"
+      "description": "Modifier l'image d'un personnage"
     },
-    "cancel": "Annuler",
     "continue": "Continuer",
     "dice": "Enregistrer un dé",
     "edit": {
       "dice": "Modifier les dés",
-      "move": "Modifier l'utilisateur associé",
       "name": "Renommer un personnage",
       "select": "Modifier les données de l'utilisateur",
       "stats": "Modifier les statistiques"
@@ -91,6 +88,7 @@
     "space": " ",
     "statistic": "statistique",
     "statistics": "statistiques",
+    "template": "modèle",
     "total": "Total",
     "true": "Vrai",
     "user": "Joueur",
@@ -119,10 +117,8 @@
         "description": "Affiche la configuration générale du serveur",
         "name": "générale"
       },
-      "name": "afficher",
       "template": {
-        "description": "Affiche la configuration du modèle si existante.",
-        "name": "modèle"
+        "description": "Affiche la configuration du modèle si existante."
       }
     },
     "displayResult": "Affichage des résultats",
@@ -182,7 +178,6 @@
       },
       "channel": {
         "description": "Salon optionnel où transférer le HRP.",
-        "name": "channel",
         "placeholder": "Sélectionner au minimum un channel."
       },
       "delete": "Le HRP ne sera plus supprimé.",
@@ -455,41 +450,6 @@
       "name": "fiche_privée_uniquement"
     }
   },
-  "generate": {
-    "description": "Générer un modèle de serveur pour les commandes de statistiques/dés",
-    "help": "[Voir la documentation complète sur la génération d'un modèle](<https://dicelette.github.io/docs/model/register>).\nVous pouvez utiliser [ceci](<https://dicelette.github.io/docs/model/register/form>) pour générer un modèle en utilisant une interface.",
-    "name": "générer",
-    "options": {
-      "character": {
-        "description": "Rendre le nom du personnage obligatoire pour l'enregistrement",
-        "name": "personnage"
-      },
-      "critical_fail": {
-        "description": "Définir un échec critique (dé naturel)",
-        "name": "échec_critique"
-      },
-      "critical_success": {
-        "description": "Définir un succès critique (dé naturel)",
-        "name": "succès_critique"
-      },
-      "damage": {
-        "description": "Enregistrer un dé de compétence - Séparer le nom des compétences par un espace ou une virgule",
-        "name": "competence"
-      },
-      "dice": {
-        "description": "Le type de dé à lancer",
-        "name": "dé"
-      },
-      "stats": {
-        "description": "Le nom de la statistique, séparez-les par un espace ou une virgule",
-        "name": "nom"
-      },
-      "total": {
-        "description": "Le total des points de statistiques (sera calculé quand l'utilisateur sera enregistré)",
-        "name": "total"
-      }
-    }
-  },
   "graph": {
     "bg": {
       "description": "Couleur du fond du graphique. Par défaut: #0e47b2",
@@ -558,8 +518,7 @@
     "name": "aide",
     "register": {
       "description": "Affiche l'aide général pour activer la fonction de sauvegarde de fiche.",
-      "message": "Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous permet ensuite de créer des feuilles de personnage ainsi que de retenir les dés.\r\n\r\n### Fonctionnalités principales :\r\n- **Confidentialité et contrôle** : Toutes les données sont stockées localement sur votre serveur.\r\n- **Adaptabilité** : Le modèle est conçu pour répondre à des besoins variés, offrant une grande personnalisation.\r\n\r\n### Premiers pas :\r\n1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://dicelette.github.io/docs/sheet/model>) pour configurer votre modèle de serveur.\r\n2. **Sauvegarder les fiches de personnage** : Une fois le modèle configuré, vous pouvez sauvegarder les fiches directement sur votre serveur via la commande </register:{{-register}}>.\r\n\r\n### Aperçu des commandes :\r\nAprès avoir configuré le modèle, vous pouvez utiliser les commandes suivantes pour interagir avec les fiches de personnage :\r\n- **</dbd:{{-dbd}}>** : Lancez des dés basés sur les données sauvegardées.\r\n- **</dbroll:{{-dbroll}}>** : Effectuez des lancers de dés statistiques.\r\n- **</graph:{{-graph}}>** : Générez des graphiques à partir des statistiques des personnages.\r\n- **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.\r\n\r\n### Ressources supplémentaires :\r\n- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://dicelette.github.io/>).\r\n- **Support** : En cas de problème, consultez la documentation ou contactez l'équipe de support.",
-      "name": "enregistrer"
+      "message": "Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous permet ensuite de créer des feuilles de personnage ainsi que de retenir les dés.\r\n\r\n### Fonctionnalités principales :\r\n- **Confidentialité et contrôle** : Toutes les données sont stockées localement sur votre serveur.\r\n- **Adaptabilité** : Le modèle est conçu pour répondre à des besoins variés, offrant une grande personnalisation.\r\n\r\n### Premiers pas :\r\n1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://dicelette.github.io/docs/sheet/model>) pour configurer votre modèle de serveur.\r\n2. **Sauvegarder les fiches de personnage** : Une fois le modèle configuré, vous pouvez sauvegarder les fiches directement sur votre serveur via la commande </register:{{-register}}>.\r\n\r\n### Aperçu des commandes :\r\nAprès avoir configuré le modèle, vous pouvez utiliser les commandes suivantes pour interagir avec les fiches de personnage :\r\n- **</dbd:{{-dbd}}>** : Lancez des dés basés sur les données sauvegardées.\r\n- **</dbroll:{{-dbroll}}>** : Effectuez des lancers de dés statistiques.\r\n- **</graph:{{-graph}}>** : Générez des graphiques à partir des statistiques des personnages.\r\n- **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.\r\n\r\n### Ressources supplémentaires :\r\n- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://dicelette.github.io/>).\r\n- **Support** : En cas de problème, consultez la documentation ou contactez l'équipe de support."
     }
   },
   "hidden": {
@@ -590,8 +549,7 @@
     },
     "name": "import",
     "options": {
-      "description": "Le fichier CSV à importer",
-      "name": "csv"
+      "description": "Le fichier CSV à importer"
     },
     "success": "{{- user}} a bien été ajouté."
   },
@@ -643,8 +601,7 @@
       "name": "Channel (sous forme d'ID) où poster la fiche"
     },
     "charName": {
-      "description": "Entrez le nom de votre personnage",
-      "name": "Nom du personnage"
+      "description": "Entrez le nom de votre personnage"
     },
     "dice": {
       "max": "Vous ne pouvez pas avoir plus de 25 dés enregistrés (limites de champ discord).",
@@ -679,14 +636,12 @@
     },
     "steps": "Enregistrement de l'utilisateur - Page {{- page}}/{{- max}}",
     "user": {
-      "description": "Entrez l'utilisateur attaché au personnage (id ou nom d'utilisateur global)",
-      "name": "utilisateur"
+      "description": "Entrez l'utilisateur attaché au personnage (id ou nom d'utilisateur global)"
     }
   },
   "rAtq": {
     "atq_name": {
-      "description": "Le nom de la compétence",
-      "name": "nom"
+      "description": "Le nom de la compétence"
     },
     "description": "Lancer un dé enrégistré pour une compétence/attaque",
     "name": "dbd"
@@ -706,8 +661,7 @@
       "exclude": "Exclue",
       "forceDistrib": "Forcer la distribution des points",
       "noValue": "Aucune valeur",
-      "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont activés pour tous les utilisateurs par défaut. \nPour restreindre à vos joueurs uniquement en suivant le tutoriel suivant:\n",
-      "title": "Modèle"
+      "registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont activés pour tous les utilisateurs par défaut. \nPour restreindre à vos joueurs uniquement en suivant le tutoriel suivant:\n"
     },
     "name": "enregistrer",
     "options": {
@@ -725,8 +679,7 @@
         "name": "channel_public"
       },
       "template": {
-        "description": "Le modèle à enregistrer",
-        "name": "template"
+        "description": "Le modèle à enregistrer"
       },
       "update": {
         "description": "Mettre à jour les anciennes fiches de personnages",
@@ -743,8 +696,7 @@
     "failure": "Échec",
     "name": "roll",
     "option": {
-      "description": "Dé à lancer",
-      "name": "dé"
+      "description": "Dé à lancer"
     },
     "reason": "Nouveau thread de lancer",
     "success": "Succès"
@@ -755,8 +707,7 @@
     "name": "scene",
     "noScene": "Aucune scène spécifiée",
     "option": {
-      "description": "Le nom de la scène",
-      "name": "scene"
+      "description": "Le nom de la scène"
     },
     "reason": "Nouvelle scène",
     "time": {

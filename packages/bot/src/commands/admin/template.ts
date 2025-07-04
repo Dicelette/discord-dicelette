@@ -35,7 +35,7 @@ export const registerTemplate = {
 		)
 		.addAttachmentOption((option) =>
 			option
-				.setNames("register.options.template.name")
+				.setNames("common.template")
 				.setDescriptions("register.options.template.description")
 				.setRequired(true)
 		)
@@ -81,7 +81,7 @@ export const registerTemplate = {
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const { ul } = getLangAndConfig(client, interaction);
-		const template = options.getAttachment(t("register.options.template.name"), true);
+		const template = options.getAttachment(t("common.template"), true);
 		//fetch the template
 		if (!template.contentType?.includes("json")) {
 			await reply(interaction, {
@@ -143,7 +143,7 @@ export const registerTemplate = {
 					button
 				);
 			let embedTemplate = new Djs.EmbedBuilder()
-				.setTitle(ul("register.embed.title"))
+				.setTitle(ul("embed.template"))
 				.setDescription(ul("register.embed.description"))
 				.setThumbnail(
 					"https://github.com/dicelette/discord-dicelette/blob/main/assets/template.png?raw=true"

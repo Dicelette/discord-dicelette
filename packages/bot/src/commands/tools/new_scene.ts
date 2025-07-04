@@ -12,7 +12,7 @@ export default {
 		.setDescriptions("scene.description")
 		.addStringOption((option) =>
 			option
-				.setNames("scene.option.name")
+				.setNames("scene.name")
 				.setDescriptions("scene.option.description")
 				.setRequired(false)
 		)
@@ -32,7 +32,7 @@ export default {
 		if (!channel || channel.isDMBased() || !channel.isTextBased()) return;
 
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
-		const scene = option.getString(t("scene.option.name"));
+		const scene = option.getString(t("scene.name"));
 		const bubble = option.getBoolean(t("scene.time.name"));
 		const { ul } = getLangAndConfig(client, interaction);
 		if (!scene && !bubble) {

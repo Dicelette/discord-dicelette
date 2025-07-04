@@ -1,18 +1,12 @@
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import {
-	allValuesUndefined,
 	capitalizeBetweenPunct,
 	filterChoices,
 	uniformizeRecords,
 } from "@dicelette/utils";
 import type { EClient } from "client";
-import {
-	getFirstChar,
-	getTemplateByInteraction,
-	getUserFromMessage,
-	updateMemory,
-} from "database";
+import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import {
@@ -83,7 +77,7 @@ export const mjRoll = {
 		} else allCharFromGuild = guildData.user[user];
 		if (fixed.name === t("common.character")) {
 			//get ALL characters from the guild
-			const skill = options.getString(t("rAtq.atq_name.name"));
+			const skill = options.getString(t("common.name"));
 			if (skill) {
 				if (
 					guildData.templateID.damageName
@@ -105,7 +99,7 @@ export const mjRoll = {
 			}
 		} else if (fixed.name === t("common.statistic")) {
 			choices = guildData.templateID.statsName;
-		} else if (fixed.name === t("rAtq.atq_name.name")) {
+		} else if (fixed.name === t("common.name")) {
 			const defaultDice = guildData.templateID.damageName;
 
 			const character = options.getString(t("common.character"), false);
