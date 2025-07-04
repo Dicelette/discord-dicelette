@@ -16,7 +16,7 @@ import "discord_ext";
 export default {
 	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("rAtq.name")
-		.setDescription("rAtq.description")
+		.setDescriptions("rAtq.description")
 		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
