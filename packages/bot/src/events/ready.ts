@@ -30,8 +30,10 @@ export default (client: EClient): void => {
 			contextMenus.map((cmd) => cmd.toJSON())
 		);
 
-		for (const guild of client.guilds.cache.values()) {
+		// Parallélisation du traitement de toutes les guildes
+		const guildPromises = Array.from(client.guilds.cache.values()).map(async (guild) => {
 			//remove admin commands
+			let guildCommands = [...serializedCommands];
 
 			const enabled = client.settings.get(guild.id, "templateID.messageId");
 			if (enabled) {
@@ -39,19 +41,20 @@ export default (client: EClient): void => {
 					cmd.default_member_permissions = undefined;
 				}
 				//replace in serializedCommands the db commands
-				serializedCommands = serializedCommands.filter(
+				guildCommands = guildCommands.filter(
 					(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name)
 				);
-				serializedCommands = serializedCommands.concat(serializedDbCmds);
+				guildCommands = guildCommands.concat(serializedDbCmds);
 			}
 
 			logger.trace(`Registering commands for \`${guild.name}\``);
 			const cmds = await guild.client.application.commands.fetch({
 				guildId: guild.id,
 			});
-			//filter the list of the commands that are deleted
-			cmds.forEach(async (command) => {
-				if (serializedCommands.find((c) => c.name === command.name)) return;
+
+			// Parallélisation de la suppression des commandes obsolètes
+			const deletePromises = cmds.map(async (command) => {
+				if (guildCommands.find((c) => c.name === command.name)) return;
 				try {
 					await command.delete();
 				} catch (e) {
@@ -59,19 +62,32 @@ export default (client: EClient): void => {
 				}
 			});
 
+			await Promise.all(deletePromises);
+
 			await rest.put(
-				Djs.Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
+				Djs.Routes.applicationGuildCommands(process.env.CLIENT_ID!, guild.id),
 				{
-					body: serializedCommands,
+					body: guildCommands,
 				}
 			);
 
+			// Parallélisation des opérations de cache
+			const cachePromises = [
+				fetchAllCharacter(client, guild),
+				cacheStatisticalTemplate(client, guild),
+			];
+
+			// Exécution synchrone de convertDatabaseUser
 			convertDatabaseUser(client.settings, guild);
+
+			await Promise.all(cachePromises);
 			logger.info(`User saved in memory for ${guild.name}`);
-			await fetchAllCharacter(client, guild);
-			await cacheStatisticalTemplate(client, guild);
 			logger.info(`Template saved in memory for ${guild.name}`);
-		}
+		});
+
+		// Attendre que toutes les guildes soient traitées
+		await Promise.all(guildPromises);
+
 		important.info("Bot is ready");
 		cleanData(client);
 		if (process.env.NODE_ENV === "development") client.template = dev(client.template);
@@ -158,13 +174,22 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 	const characters = client.characters;
 	const allUsers = db.get(guild.id, "user");
 	if (!allUsers) return;
-	for (const [userId, chars] of Object.entries(allUsers)) {
-		const allCharacters: UserData[] = [];
-		if (!Array.isArray(chars)) continue;
-		for (const char of chars) {
+
+	// Parallélisation de la récupération des personnages pour tous les utilisateurs
+	const userPromises = Object.entries(allUsers).map(async ([userId, chars]) => {
+		if (!Array.isArray(chars)) return;
+
+		// Parallélisation de la récupération des personnages pour chaque utilisateur
+		const characterPromises = chars.map(async (char) => {
 			const userStats = await getUser(char.messageId, guild, client);
-			if (userStats) allCharacters.push(userStats);
-		}
+			return userStats;
+		});
+
+		const allCharacters = (await Promise.all(characterPromises)).filter(
+			Boolean
+		) as UserData[];
 		characters.set(guild.id, allCharacters, userId);
-	}
+	});
+
+	await Promise.all(userPromises);
 }

@@ -63,6 +63,7 @@ export async function getTemplate(
 	)
 		return;
 	try {
+		if (!channel.messages && skipNoFound) return undefined;
 		const message = await channel.messages.fetch(messageId);
 		return fetchTemplate(message, enmap);
 	} catch (error) {
