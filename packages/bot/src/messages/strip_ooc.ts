@@ -7,7 +7,6 @@ import { deleteAfter } from "./send";
 import { fetchThread, setTags } from "./thread";
 
 export async function stripOOC(message: Djs.Message, client: EClient, ul: Translation) {
-	logger.trace("Strip OOC", message.content);
 	if (message.author.bot) return;
 	if (!message.guild) return;
 	const stripOoc = client.settings.get(message.guild.id, "stripOOC");
@@ -22,7 +21,6 @@ export async function stripOOC(message: Djs.Message, client: EClient, ul: Transl
 			(id) => id && channelsAllowed?.includes(id)
 		)
 	) {
-		logger.trace("Not allowed channel for OOC stripping");
 		return;
 	}
 	if (!stripOoc || stripOoc?.timer === 0 || !stripOoc?.regex) return;

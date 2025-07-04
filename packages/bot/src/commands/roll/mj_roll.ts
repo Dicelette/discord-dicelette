@@ -1,12 +1,18 @@
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import {
+	allValuesUndefined,
 	capitalizeBetweenPunct,
 	filterChoices,
 	uniformizeRecords,
 } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
+import {
+	getFirstChar,
+	getTemplateByInteraction,
+	getUserFromMessage,
+	updateMemory,
+} from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import {
@@ -135,6 +141,7 @@ export const mjRoll = {
 		const charName = options.getString(t("common.character"), false)?.toLowerCase();
 		let optionChar = options.getString(t("common.character")) ?? undefined;
 		let charData: undefined | UserData;
+		const template = await getTemplateByInteraction(interaction, client);
 		if (user) {
 			charData = await getUserFromMessage(client, user.id, interaction, charName, {
 				skipNotFound: true,
@@ -170,7 +177,6 @@ export const mjRoll = {
 			}
 		} else {
 			//build default char data based on the template
-			const template = await getTemplateByInteraction(interaction, client);
 			if (!template) {
 				await reply(interaction, {
 					embeds: [
@@ -199,6 +205,13 @@ export const mjRoll = {
 		}
 		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
 		const subcommand = options.getSubcommand(true);
+		if (allValuesUndefined(charData.template) && template && user) {
+			charData.template = template;
+			//update in memory
+			await updateMemory(client.characters, interaction.guild.id, user.id, ul, {
+				userData: charData,
+			});
+		}
 		if (subcommand === ul("dbRoll.name"))
 			return await rollStatistique(
 				interaction,

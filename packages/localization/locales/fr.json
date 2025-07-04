@@ -418,7 +418,7 @@
     },
     "sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
     "stats": {
-      "char": "{{ -char}} est introuvable.\nVous devez sélectionner l'utilisateur possédant ce personnage pour lancer un dé sur `{{- stat}}`.",
+      "char": "{{- char}} est introuvable.\nVous devez sélectionner l'utilisateur possédant ce personnage pour lancer un dé sur `{{- stat}}`.",
       "empty": "Cette combination est invalide : aucune statistiques n'existent !",
       "excluded": "Cette statistique est exclue : Vous ne pouvez pas faire de jet pour elle.",
       "notFound": "La statistique `{{- value}}` est introuvable ! Avez vous fait une erreur de frappe ?",

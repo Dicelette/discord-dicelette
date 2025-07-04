@@ -87,6 +87,17 @@ export function uniformizeRecords(input: Record<string, string | number>) {
 	) as Record<string, string | number>;
 }
 
-export function allValuesUndefined<T extends Record<string, unknown>>(obj: T): boolean {
-	return Object.values(obj).every((value) => value === undefined);
+export function allValuesUndefined(obj: unknown): boolean {
+	if (obj === null || obj === undefined) return true;
+
+	if (typeof obj !== "object") return false;
+
+	if (Array.isArray(obj)) {
+		return obj.every((item) => allValuesUndefined(item));
+	}
+
+	const entries = Object.entries(obj);
+	if (entries.length === 0) return true;
+
+	return entries.every(([, value]) => allValuesUndefined(value));
 }

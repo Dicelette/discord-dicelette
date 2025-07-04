@@ -1,11 +1,11 @@
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
 import { fetchChannel } from "../utils";
-import { logger } from "@dicelette/utils";
 
 /**
  * Retrieves the statistical template for a guild based on the interaction context.
@@ -17,11 +17,7 @@ import { logger } from "@dicelette/utils";
  * @returns The statistical template for the guild, or undefined if the interaction is not in a guild.
  */
 export async function getTemplateByInteraction(
-	interaction:
-		| Djs.ButtonInteraction
-		| Djs.ModalSubmitInteraction
-		| Djs.AutocompleteInteraction
-		| Djs.CommandInteraction,
+	interaction: Djs.BaseInteraction,
 	client: EClient
 ) {
 	if (!interaction.guild) return;

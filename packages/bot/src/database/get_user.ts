@@ -14,17 +14,17 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { cleanAvatarUrl, logger } from "@dicelette/utils";
+import { allValuesUndefined, cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import {
+	fetchChannel,
 	getLangAndConfig,
 	haveAccess,
-	searchUserChannel,
 	isSerializedNameEquals,
-	fetchChannel,
+	searchUserChannel,
 } from "utils";
 
 export function getUserByEmbed(
@@ -182,6 +182,7 @@ export async function getUserFromMessage(
 	const guildData = client.settings;
 	const characters = client.characters;
 	const getChara = getCharaInMemory(characters, userId, guildId, charName);
+
 	if (
 		getChara &&
 		!options?.fetchAvatar &&
@@ -466,6 +467,18 @@ export async function getStatistics(
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
+	}
+	if (userStatistique && allValuesUndefined(userStatistique.template) && template) {
+		userStatistique.template = template;
+		await updateMemory(
+			client.characters,
+			interaction.guild!.id,
+			interaction.user.id,
+			ul,
+			{
+				userData: userStatistique,
+			}
+		);
 	}
 	return { userStatistique, ul, optionChar, options };
 }
