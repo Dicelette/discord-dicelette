@@ -469,17 +469,17 @@ export async function getStatistics(
 		return;
 	}
 	if (userStatistique && allValuesUndefined(userStatistique.template) && template) {
-		userStatistique.template = template;
-		await updateMemory(
-			client.characters,
-			interaction.guild!.id,
-			interaction.user.id,
-			ul,
-			{
-				userData: userStatistique,
-			}
-		);
-	}
+	 	userStatistique.template = template;
+	 	await updateMemory(
+	 		client.characters,
+	 		interaction.guild!.id,
+	 		interaction.user.id,
+	 		ul,
+	 		{
+	 			userData: userStatistique,
+	 		}
+	 	);
+	 }
 	return { userStatistique, ul, optionChar, options };
 }
 
