@@ -181,8 +181,7 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 
 		// Parallélisation de la récupération des personnages pour chaque utilisateur
 		const characterPromises = chars.map(async (char) => {
-			const userStats = await getUser(char.messageId, guild, client);
-			return userStats;
+			return await getUser(char.messageId, guild, client);
 		});
 
 		const allCharacters = (await Promise.all(characterPromises)).filter(
