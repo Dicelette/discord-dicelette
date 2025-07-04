@@ -4,99 +4,71 @@ import dotenv from "dotenv";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
-const overwrite = {
-	transportFormatted: (
-		logMetaMarkup: string,
-		logArgs: unknown[],
-		logErrors: string[]
-	) => {
-		const logLevel = logMetaMarkup.trim().split("\t")[1];
-		switch (logLevel) {
-			case "WARN":
-				console.warn(logMetaMarkup, ...logArgs, ...logErrors);
-				break;
-			case "ERROR":
-			case "FATAL":
-				console.error(logMetaMarkup, ...logArgs, ...logErrors);
-				break;
-			case "INFO":
-				console.info(logMetaMarkup, ...logArgs, ...logErrors);
-				break;
-			case "DEBUG":
-			case "TRACE":
-			case "SILLY":
-				console.debug(logMetaMarkup, ...logArgs, ...logErrors);
-				break;
-			default:
-				console.log(logMetaMarkup, ...logArgs, ...logErrors);
-				break;
-		}
+
+const BASE_STYLE: ISettingsParam<ILogObj>["prettyLogStyles"] = {
+	logLevelName: {
+		"*": ["bold", "black", "bgWhiteBright", "dim"],
+		SILLY: ["bold", "white"],
+		TRACE: ["bold", "whiteBright"],
+		DEBUG: ["bold", "green"],
+		INFO: ["bold", "blue"],
+		WARN: ["bold", "yellow"],
+		ERROR: ["bold", "red"],
+		FATAL: ["bold", "redBright"],
 	},
+	dateIsoStr: ["dim"],
+	filePathWithLine: ["dim"],
+	name: ["white", "bold"],
+	errorName: ["bold", "bgRedBright", "whiteBright"],
+	fileName: ["yellow"],
 };
 
-const optionLoggers: ISettingsParam<ILogObj> =
-	process.env.NODE_ENV === "development"
-		? {
-				minLevel: 0,
-				stylePrettyLogs: true,
-			}
-		: {
-				minLevel: 5,
-				hideLogPositionForProduction: true,
-				overwrite,
-				stylePrettyLogs: false,
-			};
+const BASE_ERROR_TEMPLATE = "\n{{errorName}} {{errorMessage}}\nStack:\n{{errorStack}}";
+const BASE_STACK_TEMPLATE = "    at {{method}} ({{filePathWithLine}})";
 
-const defaultOptions: ISettingsParam<ILogObj> = {
+const prodSettings: ISettingsParam<ILogObj> = {
+	minLevel: 5, // error+
+	stylePrettyLogs: true,
+	prettyLogTemplate: "{{logLevelName}} [{{filePathWithLine}}{{name}}] ",
+	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
+	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
+	prettyLogStyles: BASE_STYLE,
+	hideLogPositionForProduction: true,
 	prettyLogTimeZone: "local",
-	prettyLogStyles: {
-		logLevelName: {
-			"*": ["bold", "black", "bgWhiteBright", "dim"],
-			SILLY: ["bold", "white"],
-			TRACE: ["bold", "whiteBright"],
-			DEBUG: ["bold", "green"],
-			INFO: ["bold", "blue"],
-			WARN: ["bold", "yellow"],
-			ERROR: ["bold", "red"],
-			FATAL: ["bold", "redBright"],
-		},
-		dateIsoStr: ["bgWhiteBright", "black", "dim"],
-		filePathWithLine: ["bold", "yellow"],
-		name: ["white"],
-		nameWithDelimiterPrefix: ["white", "bold"],
-		nameWithDelimiterSuffix: ["white", "bold"],
-		errorName: ["bold", "bgRedBright", "whiteBright"],
-		fileName: ["bold", "bgWhiteBright", "black"],
-		fileLine: ["dim", "bgWhiteBright", "black"],
-	},
+};
+
+const devSettings: ISettingsParam<ILogObj> = {
+	minLevel: 0, // everything
+	stylePrettyLogs: true,
+	prettyLogTemplate:
+		"{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} {{logLevelName}} [{{filePathWithLine}}{{name}}] ",
+	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
+	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
+	prettyLogStyles: BASE_STYLE,
+	prettyLogTimeZone: "local",
 };
 
 export const logger: Logger<ILogObj> = new Logger(
-	Object.assign(defaultOptions, optionLoggers)
+	process.env.NODE_ENV === "production" ? prodSettings : devSettings
 );
+
+// Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
 	name: "Note",
 	minLevel: 0,
-	overwrite,
-	hideLogPositionForProduction: true,
+	stylePrettyLogs: true,
 	prettyLogTemplate: "[{{logLevelName}}] ",
+	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
+	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyLogStyles: {
-		dd: "dim",
-		mm: "dim",
-		yyyy: "dim",
-		hh: "dim",
-		MM: "dim",
-		ss: "dim",
-		ms: "dim",
+		...BASE_STYLE,
 		logLevelName: {
-			"*": ["bold", "black", "bgWhiteBright", "dim"],
-			SILLY: ["bold", "white"],
-			TRACE: ["bold", "whiteBright"],
-			DEBUG: ["bold", "green"],
+			"*": ["bold", "white", "bgBlue"],
 			INFO: ["bold", "whiteBright", "bgGreenBright"],
-			WARN: ["bold", "yellow"],
-			ERROR: ["bold", "red"],
-			FATAL: ["bold", "redBright"],
+			WARN: ["bold", "black", "bgYellow"],
+			ERROR: ["bold", "white", "bgRed"],
 		},
 	},
+	hideLogPositionForProduction: true,
+	prettyLogTimeZone: "local",
 });
