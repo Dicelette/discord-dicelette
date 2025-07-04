@@ -273,8 +273,9 @@ async function edit(
 
 export function findDuplicate(diceEmbed: EmbedBuilder, name: string) {
 	if (!diceEmbed.toJSON().fields) return false;
-	return;
-	diceEmbed
-		.toJSON()
-		.fields?.findIndex((f) => f.name.standardize() === name.standardize()) !== -1;
+	return (
+		diceEmbed
+			.toJSON()
+			.fields?.findIndex((f) => f.name.standardize() === name.standardize()) !== -1
+	);
 }
