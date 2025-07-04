@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.56.1](https://github.com/Dicelette/discord-dicelette/compare/1.56.0...1.56.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* **diceNotFound:** I dunno why but in some condition, the template is not fully fetched on user resulting in cache error. ([1dd6be0](https://github.com/Dicelette/discord-dicelette/commit/1dd6be006d56d8f98cfaadea03bbd571dc744388))
+
 ## [1.56.0](https://github.com/Dicelette/discord-dicelette/compare/1.55.0...1.56.0) (2025-07-03)
 
 
