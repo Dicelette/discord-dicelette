@@ -1,3 +1,4 @@
+import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -55,3 +56,15 @@ function replaceInLocales(dryRun?: boolean) {
 }
 
 replaceInLocales();
+//exec biome
+exec("pnpm biome format --write ../localization/locales", (error, stdout, stderr) => {
+	if (error) {
+		console.error(error);
+		return;
+	}
+	if (stderr) {
+		console.error(stderr);
+		return;
+	}
+	console.log(stdout);
+});
