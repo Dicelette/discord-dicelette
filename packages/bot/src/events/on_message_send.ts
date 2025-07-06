@@ -9,6 +9,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
 import { fetchChannel } from "utils";
+import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
@@ -92,9 +93,8 @@ export default (client: EClient): void => {
 			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
-			console.log("ERROR ON MESSAGE CREATE", e);
-			logger.error("\n", e);
 			if (!message.guild) return;
+			if (!isApiError(e)) logger.trace(e);
 			const userLang =
 				client.settings.get(message.guild.id, "lang") ??
 				message.guild.preferredLocale ??

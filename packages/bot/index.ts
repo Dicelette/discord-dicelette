@@ -4,35 +4,19 @@ import "uniformize";
 import process from "node:process";
 import { important } from "@dicelette/utils";
 import { client } from "client";
-import {
-	onDebug,
-	onDeleteChannel,
-	onDeleteMessage,
-	onDeleteThread,
-	onDisconnect,
-	onError,
-	onInteraction,
-	onJoin,
-	onKick,
-	onMessageSend,
-	onReactionAdd,
-	onReactionRemove,
-	onWarn,
-	ready,
-	sendErrorToWebhook,
-} from "event";
+import * as event from "event";
 import packageJson from "./package.json" with { type: "json" };
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 process.on("unhandledRejection", async (reason) => {
-	await sendErrorToWebhook(reason);
+	await event.sendErrorToWebhook(reason);
 	important.error(reason);
 	process.exit(1);
 });
 
 process.on("uncaughtException", async (err) => {
-	await sendErrorToWebhook(err);
+	await event.sendErrorToWebhook(err);
 	important.error(err);
 	process.exit(1);
 });
@@ -41,20 +25,20 @@ important.info("Starting bot...");
 //@ts-ignore
 export const VERSION = packageJson.version ?? "/";
 try {
-	ready(client);
-	onInteraction(client);
-	onJoin(client);
-	onMessageSend(client);
-	onKick(client);
-	onDeleteMessage(client);
-	onDeleteChannel(client);
-	onDeleteThread(client);
-	onReactionAdd(client);
-	onReactionRemove(client);
-	onDisconnect(client);
-	onError(client);
-	onWarn(client);
-	onDebug(client);
+	event.ready(client);
+	event.onInteraction(client);
+	event.onJoin(client);
+	event.onMessageSend(client);
+	event.onKick(client);
+	event.onDeleteMessage(client);
+	event.onDeleteChannel(client);
+	event.onDeleteThread(client);
+	event.onReactionAdd(client);
+	event.onReactionRemove(client);
+	event.onDisconnect(client);
+	event.onError(client);
+	event.onWarn(client);
+	event.onDebug(client);
 } catch (error) {
 	logger.fatal(error);
 }
