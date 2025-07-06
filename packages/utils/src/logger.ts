@@ -30,7 +30,7 @@ const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
 const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
 const prodSettings: ISettingsParam<ILogObj> = {
-	minLevel: process.env.PROD ? 4 : 5, // error+
+	minLevel: process.env.PROD ? 4 : 4, // error+
 	stylePrettyLogs: true,
 	prettyLogTemplate: PROD_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
