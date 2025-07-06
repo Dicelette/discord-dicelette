@@ -1,7 +1,14 @@
+import { important } from "@dicelette/utils";
 import type { EClient } from "../client";
-import { sendMessageError } from "./on_error";
-export default (client: EClient): void => {
+
+export const onWarn = (client: EClient): void => {
 	client.on("warn", async (error) => {
-		await sendMessageError(error, client);
+		important.warn(error);
+	});
+};
+
+export const onDebug = (client: EClient): void => {
+	client.on("debug", async (message) => {
+		important.debug(message);
 	});
 };

@@ -5,6 +5,7 @@ import process from "node:process";
 import { important } from "@dicelette/utils";
 import { client } from "client";
 import {
+	onDebug,
 	onDeleteChannel,
 	onDeleteMessage,
 	onDeleteThread,
@@ -16,6 +17,7 @@ import {
 	onMessageSend,
 	onReactionAdd,
 	onReactionRemove,
+	onWarn,
 	ready,
 	sendErrorToWebhook,
 } from "event";
@@ -51,6 +53,8 @@ try {
 	onReactionRemove(client);
 	onDisconnect(client);
 	onError(client);
+	onWarn(client);
+	onDebug(client);
 } catch (error) {
 	logger.fatal(error);
 }
@@ -61,5 +65,5 @@ client
 		important.info("Bot started");
 	})
 	.catch((error) => {
-		logger.fatal(error);
+		important.fatal(error);
 	});

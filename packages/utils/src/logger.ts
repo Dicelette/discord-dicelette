@@ -5,17 +5,19 @@ import { type ILogObj, type ISettingsParam, Logger } from "tslog";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
+const LOG_LEVEL_COLORS = {
+	"*": ["bold", "black", "bgWhiteBright", "dim"],
+	SILLY: ["bold", "white"],
+	TRACE: ["bold", "whiteBright"],
+	DEBUG: ["bold", "green"],
+	INFO: ["bold", "blue"],
+	WARN: ["bold", "yellow"],
+	ERROR: ["bold", "red"],
+	FATAL: ["bold", "redBright"],
+};
+
 const BASE_STYLE: ISettingsParam<ILogObj>["prettyLogStyles"] = {
-	logLevelName: {
-		"*": ["bold", "black", "bgWhiteBright", "dim"],
-		SILLY: ["bold", "white"],
-		TRACE: ["bold", "whiteBright"],
-		DEBUG: ["bold", "green"],
-		INFO: ["bold", "blue"],
-		WARN: ["bold", "yellow"],
-		ERROR: ["bold", "red"],
-		FATAL: ["bold", "redBright"],
-	},
+	logLevelName: LOG_LEVEL_COLORS,
 	dateIsoStr: ["dim"],
 	filePathWithLine: ["dim"],
 	name: ["white", "bold"],
@@ -30,7 +32,8 @@ const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
 const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
 const prodSettings: ISettingsParam<ILogObj> = {
-	minLevel: process.env.PROD ? 4 : 4, // error+
+	name: "LOGGER",
+	minLevel: 4,
 	stylePrettyLogs: true,
 	prettyLogTemplate: PROD_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
@@ -61,7 +64,7 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
-	name: "Note",
+	name: "IMPORTANT",
 	minLevel: 0,
 	stylePrettyLogs: true,
 	prettyLogTemplate: IMPORTANT_LOG_TEMPLATE,
@@ -69,12 +72,7 @@ export const important: Logger<ILogObj> = new Logger({
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyLogStyles: {
 		...BASE_STYLE,
-		logLevelName: {
-			"*": ["bold", "white", "bgBlue"],
-			INFO: ["bold", "whiteBright", "bgGreenBright"],
-			WARN: ["bold", "black", "bgYellow"],
-			ERROR: ["bold", "white", "bgRed"],
-		},
+		logLevelName: LOG_LEVEL_COLORS,
 	},
 	hideLogPositionForProduction: true,
 	prettyLogTimeZone: "local",

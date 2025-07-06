@@ -27,9 +27,11 @@ export function formatErrorMessage(error: unknown): string {
 }
 
 export async function sendMessageError(error: unknown, client: EClient): Promise<void> {
-	if (error instanceof DiscordAPIError && DISCORD_ERROR_CODE.includes(<number>error.code))
-		return;
-	if (error instanceof Error && MATCH_API_ERROR.test(error.stack || error.message))
+	if (
+		(error instanceof DiscordAPIError &&
+			DISCORD_ERROR_CODE.includes(<number>error.code)) ||
+		(error instanceof Error && MATCH_API_ERROR.test(error.stack || error.message))
+	)
 		return;
 	console.error("\n", error);
 	if (!process.env.OWNER_ID) return;
