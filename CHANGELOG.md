@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.57.0](https://github.com/Dicelette/discord-dicelette/compare/1.56.3...1.57.0) (2025-07-11)
+
+
+### Features
+
+* add onDebug and onWarn event handlers to logger ([770e23c](https://github.com/Dicelette/discord-dicelette/commit/770e23ca8a33597b43f91c889df6ec033e75a590))
+
+
+### Bug Fixes
+
+* typo during refractor broke cmd ([07108c3](https://github.com/Dicelette/discord-dicelette/commit/07108c375357b5b0ba7c587308da600e207f0ce6))
+
 ## [1.56.3](https://github.com/Dicelette/discord-dicelette/compare/1.56.2...1.56.3) (2025-07-04)
 
 ## [1.56.2](https://github.com/Dicelette/discord-dicelette/compare/1.56.1...1.56.2) (2025-07-04)
