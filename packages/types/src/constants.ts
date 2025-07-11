@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
 export const TUTORIAL_IMAGES = [
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_1.png?raw=true",
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_2.png?raw=true",
@@ -19,3 +20,14 @@ export const LINKS = {
 
 export const DISCORD_ERROR_CODE = [50001, 50013];
 export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
+
+// Regex patterns for dice detection
+export const DICE_PATTERNS = {
+	DETECT_DICE_MESSAGE: /([\w.]+|(\{.*\})) (.*)/i,
+	BRACKET_ROLL: /\[(.*)\]/,
+	DICE_VALUE: /^\S*#?d\S+|\{.*\}/i,
+	GLOBAL_COMMENTS: /# ?(.*)/,
+	BRACKETED_COMMENTS: /\[(.*)\]/,
+	BRACKETED_CONTENT: /^\[(.*)\]$/,
+	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,
+} as const;

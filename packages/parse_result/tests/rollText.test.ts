@@ -2,9 +2,9 @@ import type { CustomCritical, Resultat } from "@dicelette/core";
 import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
 import { rollCustomCritical } from "../src/custom_critical";
+import { getRoll } from "../src/dice_extractor";
 import type { Server } from "../src/interfaces";
 import { ResultAsText } from "../src/result_as_text";
-import { getRoll } from "../src/utils";
 
 const data: Server = {
 	lang: Djs.Locale.EnglishUS,

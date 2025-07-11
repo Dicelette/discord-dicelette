@@ -6,7 +6,8 @@ import {
 } from "@dicelette/core";
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
-import { getRoll } from "./utils";
+
+import { getRoll } from "./dice_extractor";
 
 /**
  * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`

@@ -1,47 +1,13 @@
-import { generateStatsDice, isNumber, type Resultat, roll } from "@dicelette/core";
+import { generateStatsDice, isNumber } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
-import { DETECT_DICE_MESSAGE } from "./interfaces";
+import { getRoll } from "./dice_extractor";
 
 export function timestamp(time?: boolean) {
 	if (time) return ` • <t:${moment().unix()}:d>-<t:${moment().unix()}:t>`;
 	return "";
-}
-
-function getRollInShared(dice: string) {
-	const mainComments = /# ?(?<comment>.*)/i;
-	const main = mainComments.exec(dice)?.groups?.comment;
-	dice = dice.replace(mainComments, "");
-	const rollDice = roll(dice);
-	if (!rollDice) {
-		return undefined;
-	}
-	rollDice.dice = dice;
-	if (main) rollDice.comment = main;
-	return rollDice;
-}
-
-export function getRoll(dice: string): Resultat | undefined {
-	if (dice.includes(";")) return getRollInShared(dice);
-	const comments = dice.match(DETECT_DICE_MESSAGE)?.[3].replaceAll("*", "\\*");
-	if (comments) {
-		dice = dice.replace(DETECT_DICE_MESSAGE, "$1");
-	}
-	dice = dice.trim();
-	try {
-		const rollDice = roll(dice);
-		if (!rollDice) return undefined;
-		if (comments) {
-			rollDice.comment = comments;
-			rollDice.dice = `${dice} /* ${comments} */`;
-		}
-		return rollDice;
-	} catch (error) {
-		logger.warn(error);
-		return undefined;
-	}
 }
 
 export function convertExpression(
