@@ -1,7 +1,7 @@
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
-import type { Translation, UserData } from "@dicelette/types";
+import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
@@ -242,7 +242,7 @@ function infoUserCalc(
 	let user = mentionUser;
 	if (time) user += `${timestamp(time)}`;
 	if (user.trim().length > 0) user += `${data.ul("common.space")}:\n`;
-	return `${user}\\🔢[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
+	return `${user}${EMOJI_MATH}[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
 }
 
 function asciiSign(sign: string) {

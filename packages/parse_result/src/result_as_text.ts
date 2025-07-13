@@ -5,7 +5,7 @@ import {
 	type CustomCritical,
 	type Resultat,
 } from "@dicelette/core";
-import type { CustomCriticalRoll, Translation } from "@dicelette/types";
+import { AND, type CustomCriticalRoll, type Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import type { Server } from "./interfaces";
 import { createUrl, timestamp } from "./utils.js";
@@ -184,15 +184,11 @@ export class ResultAsText {
 					}
 				}
 				let oldCompareStr = "";
-				if (oldCompare) {
-					const goodSignOld = this.goodCompareSign(oldCompare, total);
-					oldCompareStr += ` **&** \`[${total}] ${goodSignOld} ${this.compareValue(oldCompare, "`")}`;
-				}
-				if (isCritical === "custom" && opposition) {
-					//on fait pareil ;)
-					const gooldOldSign = this.goodCompareSign(opposition, total);
-					oldCompareStr += ` **&** \`[${total}] ${gooldOldSign} ${this.compareValue(opposition, "`")}`;
-				}
+				if (oldCompare) oldCompareStr += this.compareStr(total, oldCompare);
+
+				if (isCritical === "custom" && opposition)
+					oldCompareStr += this.compareStr(total, opposition);
+
 				const totalSuccess = testValue
 					? ` = \`[${total}] ${goodSign} ${this.compareValue(testValue, "`")}${oldCompareStr}`
 					: `= \`[${total}]\``;
@@ -241,6 +237,11 @@ export class ResultAsText {
 			finalRes.push(res.trimStart());
 		}
 		return `${comment} ${finalRes.join("\n  ").trimEnd()}`;
+	}
+
+	private compareStr(total: number, oldCompare: ComparedValue) {
+		const goodSignOld = this.goodCompareSign(oldCompare, total);
+		return ` ${AND} \`[${total}] ${goodSignOld} ${this.compareValue(oldCompare, "`")}`;
 	}
 
 	private compareValue(compare?: ComparedValue, lastChar?: string) {

@@ -1,4 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
+
+import process from "node:process";
+
 export const TUTORIAL_IMAGES = [
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_1.png?raw=true",
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_2.png?raw=true",
@@ -31,3 +34,12 @@ export const DICE_PATTERNS = {
 	BRACKETED_CONTENT: /^\[(.*)\]$/,
 	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,
 } as const;
+
+const MATH = {
+	dev: "<:math:1394002307431010334>",
+	prod: "<:math:1394002540143710358>",
+} as const;
+
+export const EMOJI_MATH = process.env.PROD ? MATH.prod : MATH.dev;
+
+export const AND = "⊶";
