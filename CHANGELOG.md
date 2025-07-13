@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.58.0](https://github.com/Dicelette/discord-dicelette/compare/1.57.0...1.58.0) (2025-07-13)
+
+
+### Features
+
+* add EMOJI_MATH constant and update return statements to include it ([40441e5](https://github.com/Dicelette/discord-dicelette/commit/40441e5b9aa4dd09eaeb2cb226d9c1f8d61ddf6d))
+
 ## [1.57.0](https://github.com/Dicelette/discord-dicelette/compare/1.56.3...1.57.0) (2025-07-11)
 
 
