@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.59.0](https://github.com/Dicelette/discord-dicelette/compare/1.58.0...1.59.0) (2025-07-21)
+
+
+### Features
+
+* add `invert` option for some system ([85225c1](https://github.com/Dicelette/discord-dicelette/commit/85225c1506810dbdeae4f6a5f5bc8a5640e15511))
+
 ## [1.58.0](https://github.com/Dicelette/discord-dicelette/compare/1.57.0...1.58.0) (2025-07-13)
 
 
