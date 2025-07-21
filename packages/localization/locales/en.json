@@ -456,6 +456,10 @@
 			"name": "background"
 		},
 		"description": "Generate a graph of the user's stats",
+		"invert": {
+			"description": "Invert the graph for system that use \"better is little\" number.",
+			"name": "invert"
+		},
 		"line": {
 			"description": "Line color. By default: #0e47b2",
 			"name": "line"

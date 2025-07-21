@@ -15,6 +15,7 @@ import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
 import { charUserOptions, getLangAndConfig, haveAccess, searchUserChannel } from "utils";
 import "discord_ext";
+import type { Statistic, StatisticalTemplate } from "@dicelette/core";
 
 async function chart(
 	userData: UserData,
@@ -22,14 +23,27 @@ async function chart(
 	lineColor = "#FF0000",
 	fillColor = "#FF0000",
 	min?: number,
-	max?: number
+	max?: number,
+	invert = false
 ) {
 	if (!userData.stats) return;
+
+	let statsValues = Object.values(userData.stats);
+	const autoMin = Math.min(...statsValues);
+	const autoMax = Math.max(...statsValues);
+	let finalMin = min ?? autoMin;
+	let finalMax = max ?? autoMax;
+
+	if (invert) {
+		statsValues = statsValues.map((v) => finalMax - (v - finalMin));
+		finalMin = finalMax - autoMax;
+		finalMax = finalMax - autoMin;
+	}
 	const data = {
 		labels: labels.map((key) => key.capitalize()),
 		datasets: [
 			{
-				data: Object.values(userData.stats),
+				data: statsValues,
 				fill: true,
 				backgroundColor: fillColor,
 				borderColor: lineColor,
@@ -79,8 +93,8 @@ async function chart(
 					display: true,
 					centerPointLabels: false,
 				},
-				suggestedMin: min,
-				suggestedMax: max,
+				suggestedMin: finalMin,
+				suggestedMax: finalMax,
 			},
 		},
 		plugins: {
@@ -112,7 +126,12 @@ export const graph = {
 		.setNames("graph.name")
 		.setDefaultMemberPermissions(0)
 		.setDescriptions("graph.description")
-
+		.addBooleanOption((option) =>
+			option
+				.setNames("graph.invert.name")
+				.setDescriptions("graph.invert.description")
+				.setRequired(false)
+		)
 		.addStringOption((option) =>
 			option
 				.setNames("graph.line.name")
@@ -207,9 +226,8 @@ export const graph = {
 			if (!interaction.guild || !interaction.channel) return;
 			const userId = user?.id ?? interaction.user.id;
 			let userData: CharacterData | undefined = charData[userId];
-			if (!userData) {
-				userData = await findChara(charData, charName);
-			}
+			if (!userData) userData = await findChara(charData, charName);
+
 			if (!userData) {
 				await reply(interaction, {
 					embeds: [embedError(ul("error.user.notFound"), ul)],
@@ -271,51 +289,21 @@ export const graph = {
 			const lineColor = options.getString(t("graph.line.name"));
 			const fillColor = options.getString(t("graph.bg.name"));
 			const color = generateColor(lineColor, fillColor);
+			const invert = options.getBoolean(t("graph.invert.name"), false) ?? false;
 
-			if (serverTemplate?.statistics && (!min || !max)) {
-				if (!min) {
-					const allMin = Object.values(serverTemplate.statistics)
-						.map((stat) => {
-							if (stat.min == null) return 0;
-							return stat.min;
-						})
-						.filter((min) => min > 0);
-					if (allMin.length > 0) min = Math.min(...allMin);
-				}
-				if (!max) {
-					const allMax = Object.values(serverTemplate.statistics).map((stat) => {
-						if (stat.max == null) return 0;
-						return stat.max;
-					});
-					max = Math.max(...allMax);
-				}
-
-				if (min === 0) min = undefined;
-				if (max === 0) {
-					if (serverTemplate.critical?.success) {
-						max = serverTemplate.critical.success;
-					} else if (serverTemplate.diceType) {
-						const comparatorRegex = /(?<sign>[><=!]+)(?<comparator>(\d+))/.exec(
-							serverTemplate.diceType
-						);
-						if (comparatorRegex?.groups?.comparator) {
-							max = Number.parseInt(comparatorRegex.groups.comparator, 10);
-						} else {
-							const diceMatch = /d(?<face>\d+)/.exec(serverTemplate.diceType);
-							max = diceMatch?.groups?.face
-								? Number.parseInt(diceMatch.groups.face, 10)
-								: undefined;
-						}
-					}
-				} else max = undefined;
+			if (serverTemplate?.statistics) {
+				if (!min) min = getMin(serverTemplate.statistics);
+				if (!max) max = getMax(serverTemplate);
 			}
+
 			const image = await imagePersonalized(
 				userStatistique,
 				filteredLabels,
 				color.line,
 				color.background,
 				min,
-				max
+				max,
+				invert
 			);
 			if (!image) {
 				await reply(interaction, {
@@ -370,9 +358,52 @@ async function imagePersonalized(
 	lineColor?: string,
 	fillColor?: string,
 	min?: number,
-	max?: number
+	max?: number,
+	invert?: boolean
 ) {
-	const charGraph = await chart(stat, labels, lineColor, fillColor, min, max);
+	const charGraph = await chart(stat, labels, lineColor, fillColor, min, max, invert);
 	if (!charGraph) return;
 	return new Djs.AttachmentBuilder(charGraph);
+}
+
+function getMin(statistics: Statistic): number | undefined {
+	let min: number | undefined;
+	const allMin = Object.values(statistics)
+		.map((stat) => {
+			if (stat.min == null) return 0;
+			return stat.min;
+		})
+		.filter((min) => min > 0);
+	if (allMin.length > 0) min = Math.min(...allMin);
+
+	if (min === 0) return undefined;
+	return min;
+}
+
+function getMax(serverTemplate: StatisticalTemplate): number | undefined {
+	let max: number | undefined;
+	const allMax = Object.values(serverTemplate!.statistics as Statistic).map((stat) => {
+		if (stat.max == null) return 0;
+		return stat.max;
+	});
+	max = Math.max(...allMax);
+	if (max === 0) {
+		if (serverTemplate.critical?.success) {
+			max = serverTemplate.critical.success;
+		} else if (serverTemplate.diceType) {
+			const comparatorRegex = /(?<sign>[><=!]+)(?<comparator>(\d+))/.exec(
+				serverTemplate.diceType
+			);
+			if (comparatorRegex?.groups?.comparator) {
+				max = Number.parseInt(comparatorRegex.groups.comparator, 10);
+			} else {
+				const diceMatch = /d(?<face>\d+)/.exec(serverTemplate.diceType);
+				max = diceMatch?.groups?.face
+					? Number.parseInt(diceMatch.groups.face, 10)
+					: undefined;
+			}
+		}
+	} else max = undefined;
+	if (max === 0) return undefined;
+	return max;
 }

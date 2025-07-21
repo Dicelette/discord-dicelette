@@ -456,6 +456,10 @@
 			"name": "fond"
 		},
 		"description": "Générer un graphique des statistiques de l'utilisateur",
+		"invert": {
+			"description": "Inverser le graphique pour les systèmes qui utilisent le chiffre « mieux c'est peu ».",
+			"name": "inverser"
+		},
 		"line": {
 			"description": "Couleur des lignes. Par défaut: #0e47b2",
 			"name": "ligne"
