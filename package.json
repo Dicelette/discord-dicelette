@@ -1,6 +1,6 @@
 {
   "name": "dicelette",
-  "version": "1.59.0",
+  "version": "1.59.1",
   "engineStrict": true,
   "private": true,
   "scripts": {
