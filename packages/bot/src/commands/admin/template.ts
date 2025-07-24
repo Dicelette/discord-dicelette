@@ -16,6 +16,7 @@ import {
 import { fetchChannel, getLangAndConfig } from "utils";
 import { DB_CMD_NAME } from "../index";
 import "discord_ext";
+import process from "node:process";
 
 export const registerTemplate = {
 	data: new Djs.SlashCommandBuilder()
@@ -82,6 +83,10 @@ export const registerTemplate = {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const { ul } = getLangAndConfig(client, interaction);
 		const template = options.getAttachment(t("common.template"), true);
+		if (process.env.NODE_ENV === "development" && process.env.PROXY_DISCORD_CDN) template.url = template.url.replace(
+			"https://cdn.discordapp.com",
+			process.env.PROXY_DISCORD_CDN
+		);
 		//fetch the template
 		if (!template.contentType?.includes("json")) {
 			await reply(interaction, {

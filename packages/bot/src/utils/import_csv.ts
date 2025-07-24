@@ -6,6 +6,7 @@ import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "uniformize";
 import { reply } from "messages";
+import process from "node:process";
 
 export type CSVRow = {
 	user: string;
@@ -109,10 +110,14 @@ export async function parseCSV(
  * @returns {Promise<string>}
  */
 async function readCSV(url: string): Promise<string> {
+	if (process.env.NODE_ENV === "development" && process.env.PROXY_DISCORD_CDN) url = url.replace(
+			"https://cdn.discordapp.com",
+			process.env.PROXY_DISCORD_CDN
+		);
 	const response = await fetch(url);
-	if (!response.ok) {
+	if (!response.ok)
 		throw new InvalidURL(url);
-	}
+	
 	return response.text();
 }
 

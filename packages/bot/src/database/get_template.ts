@@ -6,6 +6,7 @@ import type { EClient } from "client";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
 import { fetchChannel } from "../utils";
+import process from "node:process";
 
 /**
  * Retrieves the statistical template for a guild based on the interaction context.
@@ -90,6 +91,10 @@ export async function fetchTemplate(
 ): Promise<StatisticalTemplate | undefined> {
 	const template = message?.attachments.first();
 	if (!template) return;
+	if (process.env.NODE_ENV === "development" && process.env.PROXY_DISCORD_CDN) template.url = template.url.replace(
+			"https://cdn.discordapp.com",
+			process.env.PROXY_DISCORD_CDN
+		);
 	const res = await fetch(template.url).then((res) => res.json());
 	if (!enmap.get(message.guild!.id, "templateID.valid")) {
 		enmap.set(message.guild!.id, true, "templateID.valid");
