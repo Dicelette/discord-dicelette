@@ -300,15 +300,22 @@ export class ResultAsText {
 		let oldCompareStr = "";
 		// Do not display opposition comparisons for critical failures
 		// A critical failure short-circuits any logic of comparison
+		let first = this.ul("roll.opposition");
 		if (isCritical !== "failure") {
-			if (oldCompare) oldCompareStr += this.chained(total, oldCompare);
 			if (isCritical === "custom" && opposition) {
-				oldCompareStr += this.chained(total, opposition);
+				first = successOrFailure
+					? this.ul("roll.cc", {
+							custom: successOrFailure.toLowerCase().replaceAll("**", ""),
+						})
+					: "other";
+				oldCompareStr += this.chained(total, opposition, "opposition");
 			}
+			if (oldCompare) oldCompareStr += this.chained(total, oldCompare, "base");
 		}
+		const text = opposition && oldCompareStr.length > 0 ? first : "";
 
 		const totalSuccess = testValue
-			? ` = \`[${total}] ${goodSign} ${this.formatCompare(testValue, "`")}${oldCompareStr}`
+			? ` = \`[${total}] ${goodSign} ${this.formatCompare(testValue, "`")}${text}${oldCompareStr}`
 			: `= \`[${total}]\``;
 
 		const resMsg = this.message(r, totalSuccess);
@@ -384,9 +391,14 @@ export class ResultAsText {
 			.replace("✓", `**${this.ul("roll.success")}** —`);
 	}
 
-	private chained(total: number, oldCompare: ComparedValue): string {
+	private chained(
+		total: number,
+		oldCompare: ComparedValue,
+		is: "opposition" | "base" | "other" = "other"
+	): string {
 		const goodSignOld = this.goodCompareSign(oldCompare, total);
-		return ` ${AND} \`[${total}] ${goodSignOld} ${this.formatCompare(oldCompare, "`")}`;
+		const text = this.ul(`roll.${is}`);
+		return ` ${AND} \`${goodSignOld} ${this.formatCompare(oldCompare, "`")}${text}`;
 	}
 
 	private formatCompare(compare?: ComparedValue, lastChar?: string) {

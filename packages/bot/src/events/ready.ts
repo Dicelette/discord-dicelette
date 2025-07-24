@@ -81,7 +81,6 @@ export default (client: EClient): void => {
 			logger.info(`Template saved in memory for ${guild.name}`);
 		});
 
-		// Attendre que toutes les guildes soient traitées
 		await Promise.all(guildPromises);
 
 		important.info("Bot is ready");

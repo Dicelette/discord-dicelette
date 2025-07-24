@@ -42,4 +42,4 @@ const MATH = {
 
 export const EMOJI_MATH = process.env.PROD ? MATH.prod : MATH.dev;
 
-export const AND = "⋈";
+export const AND = "&";
