@@ -6,11 +6,11 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUser } from "database";
 import type * as Djs from "discord.js";
 import { searchUserChannel } from "utils";
-import { logger } from "@dicelette/utils";
 
 /**
  * Register the managerId in the database
@@ -43,6 +43,7 @@ export async function registerUser(
 	if (!guildData.user) guildData.user = {};
 
 	const user = enmap.get(interaction.guild.id, `user.${userID}`);
+
 	const newChar = {
 		charName,
 		messageId: msgId,
@@ -52,12 +53,10 @@ export async function registerUser(
 	if (!charName) delete newChar.charName;
 	if (!damage) delete newChar.damageName;
 	if (user) {
-		const char = user.find((char) => {
-			return char.charName?.subText(charName, true);
-		});
 		const charIndex = user.findIndex((char) => {
 			return char.charName?.subText(charName, true);
 		});
+		const char = user[charIndex];
 		if (char) {
 			if (errorOnDuplicate) throw new Error("DUPLICATE");
 			//delete old message
@@ -70,7 +69,7 @@ export async function registerUser(
 						ids.channelId
 					);
 					if (threadOfChar) {
-						const oldMessage = await threadOfChar.messages.fetch(char.messageId[1]);
+						const oldMessage = await threadOfChar.messages.fetch(char.messageId[0]);
 						if (oldMessage) await oldMessage.delete();
 					}
 				} catch (error) {

@@ -106,7 +106,7 @@ async function sendValidationMessage(
 		//send a message in system channel if any
 		const systemChannel = interaction.guild?.safetyAlertsChannel;
 		if (systemChannel?.isSendable()) {
-			systemChannel.send({
+			await systemChannel.send({
 				content: ul("logs.validationWaiting", {
 					user: `${interactionUser.id}`,
 					url: interaction.message.url,
