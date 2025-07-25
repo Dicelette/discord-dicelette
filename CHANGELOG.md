@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.59.2](https://github.com/Dicelette/discord-dicelette/compare/1.59.1...1.59.2) (2025-07-25)
+
+
+### Bug Fixes
+
+* messageId is the first in the list ; not the last. ([b4ae012](https://github.com/Dicelette/discord-dicelette/commit/b4ae0120e932a765ec2fc50494ca00069666668e))
+
 ## [1.59.1](https://github.com/Dicelette/discord-dicelette/compare/1.59.0...1.59.1) (2025-07-24)
 
 ## [1.59.0](https://github.com/Dicelette/discord-dicelette/compare/1.58.0...1.59.0) (2025-07-21)
