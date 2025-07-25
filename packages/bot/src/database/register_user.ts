@@ -6,6 +6,7 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUser } from "database";
 import type * as Djs from "discord.js";
@@ -55,6 +56,7 @@ export async function registerUser(
 		const charIndex = user.findIndex((char) => {
 			return char.charName?.subText(charName, true);
 		});
+		const char = user[charIndex];
 		if (char) {
 			if (errorOnDuplicate) throw new Error("DUPLICATE");
 			//delete old message
