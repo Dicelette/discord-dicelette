@@ -1,10 +1,10 @@
 import { configuration } from "./configuration";
 import { exportData } from "./export";
 import { bulkAdd, bulkAddTemplate } from "./import";
-import { registerTemplate } from "./template";
+import { templateManager } from "./template";
 export const ADMIN = [
 	configuration,
-	registerTemplate,
+	templateManager,
 	bulkAdd,
 	bulkAddTemplate,
 	exportData,
