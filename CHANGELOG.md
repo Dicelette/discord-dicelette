@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.60.0](https://github.com/Dicelette/discord-dicelette/compare/1.59.3...1.60.0) (2025-07-26)
+
+
+### Features
+
+* add an "update template" commands to quick update without re-registering the channels. ([c808658](https://github.com/Dicelette/discord-dicelette/commit/c8086580f3c3287c43480ee742fe470212d4e45d))
+
 ## [1.59.3](https://github.com/Dicelette/discord-dicelette/compare/1.59.2...1.59.3) (2025-07-25)
 
 ## [1.59.2](https://github.com/Dicelette/discord-dicelette/compare/1.59.1...1.59.2) (2025-07-25)
