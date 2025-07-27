@@ -181,7 +181,7 @@ async function selectSubmit(
 				await Avatar.start(interaction, ul, interactionUser, db);
 				break;
 			case "user":
-				await Move.start(interaction, ul, interactionUser, db);
+				await Move.start(interaction, ul, interactionUser);
 				break;
 		}
 	}
