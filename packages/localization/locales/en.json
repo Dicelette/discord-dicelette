@@ -306,8 +306,11 @@
     }
   },
   "display": {
+    "allowSelfRegister": "Self-registration:",
     "character": "The character to display",
     "description": "Allows you to display the profile of a player/character",
+    "disallowChannel": "Disallow any channel:",
+    "moderation": "Validation only by moderation:",
     "title": "display",
     "user": "The user to display",
     "userLowercase": "player"

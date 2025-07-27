@@ -11,6 +11,7 @@ import {
 	fetchChannel,
 	getLangAndConfig,
 	isUserNameOrId,
+	selfRegisterAllowance,
 } from "utils";
 
 /**
@@ -179,34 +180,4 @@ async function createFirstPage(
 	const allButtons = Dice.buttons(ul);
 
 	await reply(interaction, { embeds: [embed], components: [allButtons] });
-}
-
-function selfRegisterAllowance(value?: string | boolean) {
-	if (typeof value === "boolean")
-		return {
-			moderation: false,
-			disallowChannel: false,
-			allowSelfRegister: value,
-		};
-	if (typeof value === "string") {
-		const res = {
-			moderation: false,
-			disallowChannel: false,
-			allowSelfRegister: true,
-		};
-		if (value.startsWith("moderation")) res.moderation = true;
-		if (value.endsWith("_channel")) {
-			const listValue = value.split("_"); // expected ["true", "channel"], ["false", "channel"], ["moderation", "channel"]
-			if (listValue.length === 2) {
-				res.allowSelfRegister = listValue[0] === "true" || listValue[0] === "moderation";
-				res.disallowChannel = listValue[1] === "channel";
-			}
-		}
-		return res;
-	}
-	return {
-		moderation: false,
-		disallowChannel: false,
-		allowSelfRegister: false,
-	};
 }

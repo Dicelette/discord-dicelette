@@ -3,6 +3,7 @@ import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
+import { selfRegisterAllowance } from "utils";
 import { findLocale, formatDuration } from "./utils";
 
 export async function displayTemplate(
@@ -78,7 +79,7 @@ export async function display(
 
 	const dp = (
 		settings?: string | boolean | number,
-		type?: "role" | "chan" | "time_delete" | "text" | "timer"
+		type?: "role" | "chan" | "time_delete" | "text" | "timer" | "selfRegister"
 	) => {
 		if (!settings && type === "time_delete") return "`180`s (`3`min)";
 		if (!settings) return ul("common.no");
@@ -92,6 +93,16 @@ export async function display(
 		if (type === "timer" && typeof settings === "number") {
 			if (settings === 0) return ul("common.no");
 			return `\`${settings / 1000}s\` (\`${formatDuration(settings / 1000)}\`)`;
+		}
+		if (type === "selfRegister") {
+			const selfRegister = selfRegisterAllowance(guildSettings.allowSelfRegister);
+			if (!selfRegister || !selfRegister.allowSelfRegister) return ul("common.no");
+			const res = [
+				`__**${ul("display.allowSelfRegister")}**__ ${selfRegister.allowSelfRegister ? ul("common.yes") : ul("common.no")}`,
+				`__**${ul("display.moderation")}**__ ${selfRegister.moderation ? ul("common.yes") : ul("common.no")}`,
+				`__**${ul("display.disallowChannel")}**__ ${selfRegister.disallowChannel ? ul("common.yes") : ul("common.no")}`,
+			];
+			return `- ${res.join("\n- ")}`;
 		}
 		return `<#${settings}>`;
 	};
@@ -159,7 +170,7 @@ export async function display(
 			},
 			{
 				name: ul("config.selfRegister.name").replace("_", " ").toTitle(),
-				value: `${dp(guildSettings.allowSelfRegister)}`,
+				value: `${dp(guildSettings.allowSelfRegister, "selfRegister")}`,
 			},
 			{
 				name: ul("config.stripOOC.title"),
