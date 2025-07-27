@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.61.0](https://github.com/Dicelette/discord-dicelette/compare/1.60.0...1.61.0) (2025-07-27)
+
+
+### Features
+
+* **selfRegister:** enhance validation process with modal support and footer data handling ([515868d](https://github.com/Dicelette/discord-dicelette/commit/515868de1049faa1556b8c5f15f5ccbef85893c9))
+
+
+### Bug Fixes
+
+* crash with private allowed only for moderator ([44b5d63](https://github.com/Dicelette/discord-dicelette/commit/44b5d6337b4b8a37a8f9e6623d0e7ac3035db303))
+* displaying of the self registration configuration ([b1ed88b](https://github.com/Dicelette/discord-dicelette/commit/b1ed88b5db32bad5eae2f70f9cd3d349c5262e36))
+* only moderator should be allowed to move an user to another ([c0a8151](https://github.com/Dicelette/discord-dicelette/commit/c0a8151daeed8b7bb5d848ef1f24f40cc8b645e8))
+
 ## [1.60.0](https://github.com/Dicelette/discord-dicelette/compare/1.59.3...1.60.0) (2025-07-26)
 
 
