@@ -160,6 +160,8 @@ async function buttonSubmit(
 		if (isMobile) await mobileLink(interaction, ul);
 		else await desktopLink(interaction, ul);
 		await message.edit({ components: [] });
+	} else if (interaction.customId.includes("modo_stats_validation")) {
+		await Stats.couldByValidated(interaction, ul, client, interactionUser);
 	}
 }
 

@@ -1,4 +1,4 @@
-import type { Translation } from "@dicelette/types";
+import type { DataToFooter, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { ensureEmbed, reply } from "messages";
 
@@ -74,11 +74,19 @@ export async function cancel(
 	interactionUser: Djs.User
 ) {
 	const embed = ensureEmbed(interaction.message);
-	const user =
+	let user =
 		embed.fields
 			.find((field) => field.name === ul("common.user"))
 			?.value.replace("<@", "")
 			.replace(">", "") === interactionUser.id;
+	if (!user) {
+		//find the user in the footer
+		const footer = embed.footer?.text;
+		if (footer) {
+			const data: DataToFooter = JSON.parse(footer);
+			user = data.userID === interactionUser.id;
+		}
+	}
 	const isModerator = interaction.guild?.members.cache
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);

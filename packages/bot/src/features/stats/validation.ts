@@ -6,7 +6,7 @@ import {
 	type StatisticalTemplate,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
-import type { Translation } from "@dicelette/types";
+import type { DataToFooter, Translation } from "@dicelette/types";
 import { logger, TotalExceededError } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
@@ -23,9 +23,14 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import { continueCancelButtons, editUserButtons } from "utils";
+import {
+	continueCancelButtons,
+	editUserButtons,
+	fetchChannel,
+	selfRegisterAllowance,
+} from "utils";
 import * as Messages from "../../messages";
-import { selfRegisterAllowance, sendValidationMessage } from "../user";
+import { sendValidationMessage } from "../user";
 
 /**
  * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
@@ -187,6 +192,25 @@ function calculateRemainingPoints(
 	return undefined;
 }
 
+async function getFromModal(
+	interaction: Djs.ModalSubmitInteraction,
+	client: EClient,
+	ul: Translation
+) {
+	if (!interaction.message) return;
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
+	if (!statsEmbeds) return;
+	return {
+		fieldsToAppend: await getFieldsToAppend(ul, interaction, client, statsEmbeds),
+		statsEmbeds,
+		message,
+	};
+}
+
 /**
  * Validates and updates user statistics from a modal submission, editing the stats embed in the Discord message.
  *
@@ -196,27 +220,35 @@ function calculateRemainingPoints(
  * @param ul - Localization function for translating messages.
  * @param client - The extended Discord client instance.
  *
+ * @param data
+ * @param userData
  * @throws {FormulaError} If a stat value contains an invalid formula.
  * @throws {Error} If a stat name is not found in the template or if a value is below the minimum allowed.
  */
 export async function validateEdit(
-	interaction: Djs.ModalSubmitInteraction,
+	interaction: Djs.ModalSubmitInteraction | Djs.ButtonInteraction,
 	ul: Translation,
-	client: EClient
+	client: EClient,
+	data?: {
+		fieldsToAppend?: Djs.APIEmbedField[];
+		statsEmbeds: Djs.EmbedBuilder;
+		message: Djs.Message;
+	},
+	userData?: {
+		userID: string;
+		userName?: string;
+	}
 ) {
 	const db = client.settings;
 	const characters = client.characters;
-	if (!interaction.message) return;
-	const message = await (interaction.channel as TextChannel).messages.fetch(
-		interaction.message.id
-	);
-	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
-	if (!statsEmbeds) return;
-	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
+	if (interaction.isModalSubmit()) data = await getFromModal(interaction, client, ul);
+
+	if (!data) return;
+	const { fieldsToAppend, statsEmbeds, message } = data;
 	if (!fieldsToAppend) return;
 	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
-	const { userID, userName } = await getUserNameAndChar(interaction, ul);
+	if (!userData) userData = await getUserNameAndChar(interaction, ul);
+	const { userID, userName } = userData;
 	if (!fieldsToAppend || fieldsToAppend.length === 0) {
 		//stats was removed
 		const { list, exists } = getEmbedsList(
@@ -380,7 +412,6 @@ export async function validateByModeration(
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id
 	);
-	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
 	if (!statsEmbeds) return;
 	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
@@ -392,16 +423,44 @@ export async function validateByModeration(
 		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
-	const msg = `${logMessage}\n${compare}`;
+	//send logs
+	await sendLogs(
+		`${logMessage}\n${compare}`,
+		interaction.guild as Djs.Guild,
+		client.settings
+	);
+	//add a new message embed in the channel with the new stats for the future validation
+	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
+	//we should add the original message as channelId: message.id
+	const user = await getUserNameAndChar(interaction, ul);
+	const footer = JSON.stringify({
+		userID: user.userID,
+		userName: user.userName,
+		channelId: interaction.message.channelId,
+		messageId: interaction.message.id,
+	});
+	newEmbedStats.setFooter({
+		text: footer,
+	});
+
 	const button = new Djs.ButtonBuilder()
 		.setCustomId("modo_stats_validation")
-		.setLabel(ul("buttons.validate"))
+		.setLabel(ul("button.validate"))
 		.setStyle(Djs.ButtonStyle.Success)
 		.setEmoji("✅")
 		.setDisabled(false);
+
+	const cancel = new Djs.ButtonBuilder()
+		.setCustomId("cancel")
+		.setLabel(ul("common.cancel"))
+		.setStyle(Djs.ButtonStyle.Secondary)
+		.setEmoji("❌");
+
 	await interaction.reply({
-		content: msg,
-		components: [new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(button)],
+		embeds: [newEmbedStats],
+		components: [
+			new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents([button, cancel]),
+		],
 	});
 }
 
@@ -428,5 +487,43 @@ export async function couldByValidated(
 		});
 		return;
 	}
-	await validateEdit(interaction, ul, client);
+	//now we should get the message from the footer
+	const replyIds = interaction.message.embeds[0]?.footer?.text;
+	if (!replyIds) throw new Error(ul("error.embed.notFound"));
+	const data: DataToFooter = JSON.parse(replyIds);
+	const { channelId, messageId } = data;
+	const userData = {
+		userID: data.userID,
+		userName: data.userName,
+	};
+	logger.trace("Data from footer:", channelId, messageId);
+	if (!channelId || !messageId) throw new Error(ul("error.embed.notFound"));
+	const channel = await fetchChannel(interaction.guild!, channelId);
+	if (!channel || !(channel instanceof Djs.TextChannel))
+		throw new Error(ul("error.channel.notFound"));
+
+	const message = await channel.messages.fetch(messageId);
+	//now we should get the stats embed from the message
+	const oldStatsEmbed = getEmbeds(ul, message ?? undefined, "stats");
+	//we should get the new fields from the embed from the interaction
+	const fieldsToAppend = interaction.message.embeds[0]?.toJSON().fields;
+
+	//set data to undefined if one of the fields is undefined
+	if (!fieldsToAppend || !message || !oldStatsEmbed)
+		throw new Error(ul("error.embed.notFound"));
+
+	await validateEdit(
+		interaction,
+		ul,
+		client,
+		{
+			fieldsToAppend: fieldsToAppend,
+			statsEmbeds: oldStatsEmbed,
+			message: message,
+		},
+		userData
+	);
+
+	//delete the message
+	await interaction.message.delete();
 }
