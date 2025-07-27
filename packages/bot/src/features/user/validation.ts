@@ -84,7 +84,7 @@ export async function button(
 	}
 }
 
-async function sendValidationMessage(
+export async function sendValidationMessage(
 	interaction: Djs.ButtonInteraction,
 	interactionUser: Djs.User,
 	ul: Translation,

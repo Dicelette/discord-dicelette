@@ -1,15 +1,20 @@
-import type { Settings, Translation } from "@dicelette/types";
+import type { Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { allowEdit } from "utils";
 
 export async function start(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation,
-	interactionUser: Djs.User,
-	db: Settings
+	interactionUser: Djs.User
 ) {
-	//should we allow only the moderation team to use this?
-	if (await allowEdit(interaction, db, interactionUser)) await showMove(interaction, ul);
+	const moderator = interaction.guild?.members.cache
+		.get(interactionUser.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	if (moderator) await showMove(interaction, ul);
+	else
+		await interaction.reply({
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 }
 
 async function showMove(interaction: Djs.StringSelectMenuInteraction, ul: Translation) {

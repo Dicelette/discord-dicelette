@@ -109,14 +109,17 @@ async function createFirstPage(
 		return;
 	}
 
-	const customChannel =
-		(!selfRegister.disallowChannel && selfRegister.allowSelfRegister) || moderator
-			? interaction.fields.getTextInputValue("channelId")
-			: "";
+	const allowCustomChannel =
+		(!selfRegister.disallowChannel && selfRegister.allowSelfRegister) || moderator;
+
+	const customChannel = allowCustomChannel
+		? interaction.fields.getTextInputValue("channelId")
+		: "";
 	const charName = interaction.fields.getTextInputValue("charName");
-	const isPrivate = client.settings.get(interaction.guild!.id, "privateChannel")
-		? interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
-		: false;
+	const isPrivate =
+		client.settings.get(interaction.guild!.id, "privateChannel") && allowCustomChannel
+			? interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
+			: false;
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
