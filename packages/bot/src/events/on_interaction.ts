@@ -12,7 +12,7 @@ import {
 } from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { Dice, Stats, User, Avatar, Move, Rename } from "features";
+import { Avatar, Dice, Move, Rename, Stats, User } from "features";
 import { embedError, interactionError } from "messages";
 import { cancel, getLangAndConfig } from "utils";
 
@@ -89,7 +89,7 @@ async function modalSubmit(
 	else if (interaction.customId.includes("page"))
 		await User.pageNumber(interaction, ul, client);
 	else if (interaction.customId === "editStats")
-		await Stats.validateEdit(interaction, ul, client);
+		await Stats.validateByModeration(interaction, ul, client);
 	else if (interaction.customId === "firstPage")
 		await User.firstPage(interaction, client);
 	else if (interaction.customId === "editDice")

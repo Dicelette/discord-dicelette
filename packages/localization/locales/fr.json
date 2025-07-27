@@ -306,8 +306,11 @@
     }
   },
   "display": {
+    "allowSelfRegister": "Auto-enregistrement :",
     "character": "Le personnage à afficher",
     "description": "Permet d'afficher la fiche d'un joueur/personnage",
+    "disallowChannel": "Channel libre non autorisé :",
+    "moderation": "Validation par la modération :",
     "title": "afficher",
     "user": "L'utilisateur à afficher",
     "userLowercase": "joueur"

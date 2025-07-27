@@ -24,6 +24,8 @@ import {
 	sendLogs,
 } from "messages";
 import { continueCancelButtons, editUserButtons } from "utils";
+import * as Messages from "../../messages";
+import { selfRegisterAllowance, sendValidationMessage } from "../user";
 
 /**
  * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
@@ -211,6 +213,62 @@ export async function validateEdit(
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
 	if (!statsEmbeds) return;
+	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
+	if (!fieldsToAppend) return;
+	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
+	const { userID, userName } = await getUserNameAndChar(interaction, ul);
+	if (!fieldsToAppend || fieldsToAppend.length === 0) {
+		//stats was removed
+		const { list, exists } = getEmbedsList(
+			ul,
+			{ which: "stats", embed: newEmbedStats },
+			message
+		);
+		const toAdd = removeEmbedsFromList(list, "stats");
+		const components = editUserButtons(ul, false, exists.damage);
+		await message.edit({ embeds: toAdd, components: [components] });
+		await reply(interaction, {
+			content: ul("modals.removed.stats"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		await sendLogs(
+			ul("logs.stats.removed", {
+				user: Djs.userMention(interaction.user.id),
+				fiche: message.url,
+				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+			}),
+			interaction.guild as Djs.Guild,
+			db
+		);
+	}
+	//get the other embeds
+	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
+	await message.edit({ embeds: list });
+
+	await reply(interaction, {
+		content: ul("embed.edit.stats"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
+	const logMessage = ul("logs.stats.added", {
+		user: Djs.userMention(interaction.user.id),
+		fiche: message.url,
+		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+	});
+	//send logs
+	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
+	//update memory
+	await updateMemory(characters, interaction.guild!.id, userID, ul, {
+		embeds: list,
+	});
+}
+
+async function getFieldsToAppend(
+	ul: Translation,
+	interaction: Djs.ModalSubmitInteraction,
+	client: EClient,
+	statsEmbeds: Djs.EmbedBuilder
+) {
 	const values = interaction.fields.getTextInputValue("allStats");
 	const templateStats = await getTemplateByInteraction(interaction, client);
 	if (!templateStats || !templateStats.statistics) return;
@@ -296,50 +354,79 @@ export async function validateEdit(
 		if (fieldsToAppend.find((f) => f.name.unidecode() === name.unidecode())) continue;
 		fieldsToAppend.push(field);
 	}
-	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
-	const { userID, userName } = await getUserNameAndChar(interaction, ul);
-	if (!fieldsToAppend || fieldsToAppend.length === 0) {
-		//stats was removed
-		const { list, exists } = getEmbedsList(
-			ul,
-			{ which: "stats", embed: newEmbedStats },
-			message
-		);
-		const toAdd = removeEmbedsFromList(list, "stats");
-		const components = editUserButtons(ul, false, exists.damage);
-		await message.edit({ embeds: toAdd, components: [components] });
-		await reply(interaction, {
-			content: ul("modals.removed.stats"),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		await sendLogs(
-			ul("logs.stats.removed", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: message.url,
-				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-			}),
-			interaction.guild as Djs.Guild,
-			db
-		);
-	}
-	//get the other embeds
-	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
-	await message.edit({ embeds: list });
+	return fieldsToAppend;
+}
 
-	await reply(interaction, {
-		content: ul("embed.edit.stats"),
-		flags: Djs.MessageFlags.Ephemeral,
-	});
+export async function validateByModeration(
+	interaction: Djs.ModalSubmitInteraction,
+	ul: Translation,
+	client: EClient
+) {
+	//only used when the self-registration is enabled.
+	//after the modals the user can't validate the stats by himself and the moderation team should push the button "validate"
+	//we should display a little message in the channel to set the edit and add a button to validate
+	const allowance = selfRegisterAllowance(
+		client.settings.get(interaction.guild!.id, "allowSelfRegister")
+	);
+	const moderator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	if (!allowance.allowSelfRegister || moderator || !allowance.moderation) {
+		//self registration allow to "prevent" user to validate their own stats, so we should directly edit in the case of the self registration is not allowed
+		await validateEdit(interaction, ul, client);
+		return;
+	}
+	if (!interaction.message) return;
+	const message = await (interaction.channel as TextChannel).messages.fetch(
+		interaction.message.id
+	);
+	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
+	if (!statsEmbeds) return;
+	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
+	if (!fieldsToAppend) return;
+	const { userID, userName } = await getUserNameAndChar(interaction, ul);
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
 		user: Djs.userMention(interaction.user.id),
 		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
-	//send logs
-	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
-	//update memory
-	await updateMemory(characters, interaction.guild!.id, userID, ul, {
-		embeds: list,
+	const msg = `${logMessage}\n${compare}`;
+	const button = new Djs.ButtonBuilder()
+		.setCustomId("modo_stats_validation")
+		.setLabel(ul("buttons.validate"))
+		.setStyle(Djs.ButtonStyle.Success)
+		.setEmoji("✅")
+		.setDisabled(false);
+	await interaction.reply({
+		content: msg,
+		components: [new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(button)],
 	});
+}
+
+export async function couldByValidated(
+	interaction: Djs.ButtonInteraction,
+	ul: Translation,
+	client: EClient,
+	interactionUser: Djs.User
+) {
+	//tricky part as my brain is not working well
+	//It's the validation & push button
+	//aka like the first validation in the registration user
+	//Only moderation team can validate so we should check if the user is a moderator
+	const moderator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	if (!moderator) {
+		let notAllowedMsg = ul("modals.noPermission");
+		notAllowedMsg += `\n${ul("modals.onlyModerator")}`;
+		await sendValidationMessage(interaction, interactionUser, ul, client);
+		await Messages.reply(interaction, {
+			content: notAllowedMsg,
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	await validateEdit(interaction, ul, client);
 }

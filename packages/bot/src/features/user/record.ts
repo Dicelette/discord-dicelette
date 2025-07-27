@@ -181,7 +181,7 @@ async function createFirstPage(
 	await reply(interaction, { embeds: [embed], components: [allButtons] });
 }
 
-function selfRegisterAllowance(value?: string | boolean) {
+export function selfRegisterAllowance(value?: string | boolean) {
 	if (typeof value === "boolean")
 		return {
 			moderation: false,
