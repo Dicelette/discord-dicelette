@@ -8,6 +8,7 @@ export async function start(
 	interactionUser: Djs.User,
 	db: Settings
 ) {
+	//should we allow only the moderation team to use this?
 	if (await allowEdit(interaction, db, interactionUser)) await showMove(interaction, ul);
 }
 

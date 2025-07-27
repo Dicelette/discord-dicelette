@@ -325,9 +325,7 @@ export async function validateEdit(
 	//get the other embeds
 	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
 	await message.edit({ embeds: list });
-	await updateMemory(characters, interaction.guild!.id, userID, ul, {
-		embeds: list,
-	});
+
 	await reply(interaction, {
 		content: ul("embed.edit.stats"),
 		flags: Djs.MessageFlags.Ephemeral,
@@ -338,6 +336,10 @@ export async function validateEdit(
 		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 	});
-	//update the characters in the memory ;
+	//send logs
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
+	//update memory
+	await updateMemory(characters, interaction.guild!.id, userID, ul, {
+		embeds: list,
+	});
 }
