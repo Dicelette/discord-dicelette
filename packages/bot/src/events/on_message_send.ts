@@ -4,6 +4,7 @@ import {
 	ResultAsText,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
+import type { DiscordTextChannel } from "@dicelette/types";
 import { allValuesUndefined, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
@@ -46,32 +47,36 @@ export default (client: EClient): void => {
 			);
 			const parser = resultAsText.parser;
 			if (!parser) return;
-			if (
-				channel.name.decode().startsWith("🎲") ||
-				client.settings.get(message.guild.id, "disableThread") === true ||
-				client.settings.get(message.guild.id, "rollChannel") === channel.id
-			) {
-				await message.reply({
+			const isRollChannel =
+				client.settings.get(message.guild.id, "rollChannel") === channel.id ||
+				channel.name.decode().startsWith("🎲");
+
+			if (client.settings.get(message.guild.id, "disableThread") === true) {
+				await replyDice(deleteInput, message, resultAsText);
+				if (deleteInput) message.delete();
+				return;
+			}
+
+			if (isRollChannel) {
+				return await message.reply({
 					content: parser,
 					allowedMentions: { repliedUser: true },
 				});
-				return;
 			}
+
 			let context = {
 				guildId: message.guildId ?? "",
 				channelId: channel.id,
 				messageId: message.id,
 			};
-			if (deleteInput) {
-				if (client.settings.get(message.guild.id, "context")) {
-					const messageBefore = await findMessageBefore(channel, message, client);
-					if (messageBefore)
-						context = {
-							guildId: message.guildId ?? "",
-							channelId: channel.id,
-							messageId: messageBefore.id,
-						};
-				}
+			if (deleteInput && client.settings.get(message.guild.id, "context")) {
+				const messageBefore = await findMessageBefore(channel, message, client);
+				if (messageBefore)
+					context = {
+						guildId: message.guildId ?? "",
+						channelId: channel.id,
+						messageId: messageBefore.id,
+					};
 			}
 			const thread = await threadToSend(client.settings, channel, ul);
 			const msgToEdit = await thread.send("_ _");
@@ -80,17 +85,10 @@ export default (client: EClient): void => {
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
 				? msgToEdit.url
 				: undefined;
-			const reply = deleteInput
-				? await channel.send({
-						content: resultAsText.onMessageSend(idMessage, message.author.id),
-					})
-				: await message.reply({
-						content: resultAsText.onMessageSend(idMessage),
-						allowedMentions: { repliedUser: true },
-					});
+			const reply = await replyDice(deleteInput, message, resultAsText, idMessage);
 			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
 			await deleteAfter(reply, timer);
-			if (deleteInput) await message.delete();
+			if (deleteInput) message.delete();
 			return;
 		} catch (e) {
 			if (!message.guild) return;
@@ -112,3 +110,20 @@ export default (client: EClient): void => {
 		}
 	});
 };
+
+async function replyDice(
+	deleteInput: boolean,
+	message: Djs.Message,
+	resultAsText: ResultAsText,
+	idMessage?: string
+) {
+	const channel = message.channel as DiscordTextChannel;
+	return deleteInput
+		? await channel.send({
+				content: resultAsText.onMessageSend(idMessage, message.author.id),
+			})
+		: await message.reply({
+				content: resultAsText.onMessageSend(idMessage),
+				allowedMentions: { repliedUser: true },
+			});
+}
