@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.61.1](https://github.com/Dicelette/discord-dicelette/compare/1.61.0...1.61.1) (2025-07-28)
+
+
+### Bug Fixes
+
+* should delete input if ([012ba3f](https://github.com/Dicelette/discord-dicelette/commit/012ba3fedd24db7cc903ce11f29d7e1bedddcb55))
+
 ## [1.61.0](https://github.com/Dicelette/discord-dicelette/compare/1.60.0...1.61.0) (2025-07-27)
 
 
