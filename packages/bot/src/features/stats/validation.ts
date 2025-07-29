@@ -46,12 +46,16 @@ export async function register(
 	interaction: Djs.ModalSubmitInteraction,
 	template: StatisticalTemplate,
 	page: number | undefined = 2,
-	lang: Djs.Locale = Djs.Locale.EnglishGB
+	lang: Djs.Locale = Djs.Locale.EnglishGB,
+	moderation = false
 ) {
 	if (!interaction.message) return;
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id
 	);
+	const isModerator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const ul = ln(lang);
 	const userEmbed = getEmbeds(ul, message, "user");
@@ -132,6 +136,7 @@ export async function register(
 		//retour à l'étape précédente
 		//change the page to 1
 		userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+
 		message.edit({
 			embeds: [userEmbed],
 			components: [continueCancelButtons(ul)],
@@ -153,7 +158,7 @@ export async function register(
 
 		message.edit({
 			embeds: [userEmbed, statEmbeds],
-			components: [Dice.buttons(ul)],
+			components: [Dice.buttons(ul, moderation && !isModerator)],
 		});
 		await reply(interaction, {
 			content: ul("modals.added.stats"),
@@ -464,7 +469,7 @@ export async function validateByModeration(
 	});
 }
 
-export async function couldByValidated(
+export async function couldBeValidated(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	client: EClient,

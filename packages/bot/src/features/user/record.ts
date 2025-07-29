@@ -48,7 +48,9 @@ export async function pageNumber(
 		interaction,
 		template,
 		Number.parseInt(pageNumber, 10),
-		getLangAndConfig(client, interaction).langToUse
+		getLangAndConfig(client, interaction).langToUse,
+		selfRegisterAllowance(client.settings.get(interaction.guild!.id, "allowSelfRegister"))
+			.moderation
 	);
 }
 
@@ -110,14 +112,15 @@ async function createFirstPage(
 	}
 
 	const allowCustomChannel =
-		(!selfRegister.disallowChannel && selfRegister.allowSelfRegister) || moderator;
+		!selfRegister.disallowChannel && selfRegister.allowSelfRegister && moderator;
 
 	const customChannel = allowCustomChannel
 		? interaction.fields.getTextInputValue("channelId")
 		: "";
 	const charName = interaction.fields.getTextInputValue("charName");
+
 	const isPrivate =
-		client.settings.get(interaction.guild!.id, "privateChannel") && allowCustomChannel
+		client.settings.get(interaction.guild!.id, "privateChannel") && moderator // Allow private channel only if the user is a moderator
 			? interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
 			: false;
 	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
@@ -180,7 +183,7 @@ async function createFirstPage(
 		});
 		return;
 	}
-	const allButtons = Dice.buttons(ul);
+	const allButtons = Dice.buttons(ul, selfRegister.moderation && !moderator);
 
 	await reply(interaction, { embeds: [embed], components: [allButtons] });
 }

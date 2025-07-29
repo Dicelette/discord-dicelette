@@ -6,7 +6,13 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import * as Messages from "messages";
-import { addAutoRole, fetchChannel, getLangAndConfig, pingModeratorRole } from "utils";
+import {
+	addAutoRole,
+	fetchChannel,
+	getLangAndConfig,
+	pingModeratorRole,
+	selfRegisterAllowance,
+} from "utils";
 
 /**
  * Interaction to continue to the next page of the statistics when registering a new user
@@ -50,7 +56,13 @@ export async function continuePage(
 		});
 		return;
 	}
-	await Stats.show(interaction, dbTemplate, statsAlreadySet, page + 1);
+	await Stats.show(
+		interaction,
+		dbTemplate,
+		statsAlreadySet,
+		page + 1,
+		selfRegisterAllowance(selfRegister).moderation
+	);
 }
 
 /**

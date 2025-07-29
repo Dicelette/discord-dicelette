@@ -22,7 +22,13 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import { addAutoRole, editUserButtons, getLangAndConfig, selectEditMenu } from "utils";
+import {
+	addAutoRole,
+	editUserButtons,
+	getLangAndConfig,
+	selectEditMenu,
+	selfRegisterAllowance,
+} from "utils";
 
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.
@@ -65,12 +71,20 @@ export async function store(
 /**
  * Button when registering the user, adding the "add dice" button
  * @param ul {Translation}
+ * @param markAsValidated
  */
-export function buttons(ul: Translation) {
+export function buttons(ul: Translation, markAsValidated = false) {
 	const validateButton = new Djs.ButtonBuilder()
 		.setCustomId("validate")
 		.setLabel(ul("button.validate"))
 		.setStyle(Djs.ButtonStyle.Success);
+	if (markAsValidated) {
+		validateButton
+			.setLabel(ul("button.confirm"))
+			.setCustomId("mark_as_valid")
+			.setStyle(Djs.ButtonStyle.Primary)
+			.setEmoji("📤");
+	}
 	const cancelButton = new Djs.ButtonBuilder()
 		.setCustomId("cancel")
 		.setLabel(ul("common.cancel"))
@@ -217,7 +231,13 @@ async function registerDamageDice(
 			embeds: allEmbeds,
 		});
 	} else {
-		components = [buttons(ul)];
+		const isModerator = interaction.guild?.members.cache
+			.get(interaction.user.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+		const selfRegister = selfRegisterAllowance(
+			db.get(interaction.guild!.id, "allowSelfRegister")
+		).moderation;
+		components = [buttons(ul, selfRegister && !isModerator)];
 	}
 
 	await edit(

@@ -15,6 +15,7 @@ import * as Djs from "discord.js";
 import { Avatar, Dice, Move, Rename, Stats, User } from "features";
 import { embedError, interactionError } from "messages";
 import { cancel, getLangAndConfig } from "utils";
+import { sendValidationMessage } from "../features/user";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
@@ -116,6 +117,7 @@ async function buttonSubmit(
 	client: EClient
 ) {
 	const characters = client.characters;
+	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
 	if (interaction.customId === "register")
 		await User.start(
 			interaction,
@@ -123,16 +125,10 @@ async function buttonSubmit(
 			interactionUser,
 			ul,
 			!!client.settings.get(interaction.guild!.id, "privateChannel"),
-			client.settings.get(interaction.guild!.id, "allowSelfRegister")
+			selfRegister
 		);
 	else if (interaction.customId === "continue")
-		await User.continuePage(
-			interaction,
-			template,
-			ul,
-			interactionUser,
-			client.settings.get(interaction.guild!.id, "allowSelfRegister")
-		);
+		await User.continuePage(interaction, template, ul, interactionUser, selfRegister);
 	else if (interaction.customId.includes("add_dice")) {
 		await Dice.add(interaction, interactionUser, client.settings);
 		if (!interaction.customId.includes("first"))
@@ -161,7 +157,26 @@ async function buttonSubmit(
 		else await desktopLink(interaction, ul);
 		await message.edit({ components: [] });
 	} else if (interaction.customId.includes("modo_stats_validation")) {
-		await Stats.couldByValidated(interaction, ul, client, interactionUser);
+		await Stats.couldBeValidated(interaction, ul, client, interactionUser);
+	} else if (interaction.customId.includes("mark_as_valid")) {
+		const isModerator = interaction.guild?.members.cache
+			.get(interactionUser.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+		if (isModerator) {
+			await interaction.reply({
+				content: ul("register.markAsValid"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		} //update the button of the message and send a DM
+		const button = Dice.buttons(ul);
+		await interaction.message.edit({ components: [button] });
+		//send the message
+		await sendValidationMessage(interaction, interactionUser, ul, client);
+		await interaction.reply({
+			content: ul("register.confirm"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 	}
 }
 

@@ -17,10 +17,16 @@ export async function show(
 	interaction: Djs.ButtonInteraction,
 	template: StatisticalTemplate,
 	stats?: string[],
-	page = 1
+	page = 1,
+	moderation = false
 ) {
 	if (!template.statistics) return;
 	const ul = ln(interaction.locale as Djs.Locale);
+	const isModerator =
+		moderation &&
+		!interaction.guild?.members.cache
+			.get(interaction.user.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	const statsWithoutCombinaison =
 		Object.keys(template.statistics).filter((stat) => {
 			return !template.statistics?.[stat]?.combinaison;
@@ -37,7 +43,7 @@ export async function show(
 		statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
 		if (statToDisplay.length === 0) {
 			//remove butto
-			const button = Dice.buttons(ul);
+			const button = Dice.buttons(ul, isModerator);
 			await reply(interaction, {
 				content: ul("modals.alreadySet"),
 				flags: Djs.MessageFlags.Ephemeral,
