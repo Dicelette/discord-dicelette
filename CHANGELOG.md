@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.62.0](https://github.com/Dicelette/discord-dicelette/compare/1.61.1...1.62.0) (2025-07-29)
+
+
+### Features
+
+* prevent quickest moderator to validate until the user mark it as "confirmed" ([220abed](https://github.com/Dicelette/discord-dicelette/commit/220abed2fec90dc2e4e1801365a803f4ad4a351d))
+
+
+### Bug Fixes
+
+* handle JSON parse error when cancellation ([21f085a](https://github.com/Dicelette/discord-dicelette/commit/21f085ae9d6730cd673338359671772b075d970f))
+
 ## [1.61.1](https://github.com/Dicelette/discord-dicelette/compare/1.61.0...1.61.1) (2025-07-28)
 
 
