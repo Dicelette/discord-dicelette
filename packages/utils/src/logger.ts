@@ -33,7 +33,7 @@ const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLAT
 
 const prodSettings: ISettingsParam<ILogObj> = {
 	name: "LOGGER",
-	minLevel: 4,
+	minLevel: 5,
 	stylePrettyLogs: true,
 	prettyLogTemplate: PROD_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
