@@ -83,8 +83,12 @@ export async function cancel(
 		//find the user in the footer
 		const footer = embed.footer?.text;
 		if (footer) {
-			const data: DataToFooter = JSON.parse(footer);
-			user = data.userID === interactionUser.id;
+			try {
+				const data: DataToFooter = JSON.parse(footer);
+				user = data.userID === interactionUser.id;
+			} catch (_e) {
+				user = false;
+			}
 		}
 	}
 	const isModerator = interaction.guild?.members.cache
