@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.62.1](https://github.com/Dicelette/discord-dicelette/compare/1.62.0...1.62.1) (2025-07-30)
+
+
+### Bug Fixes
+
+* **customCritical:** `Invalid left hand side of assignment operator` when using `=` instead of `==` ([0e7851b](https://github.com/Dicelette/discord-dicelette/commit/0e7851bda8f8bb2c09036abb1682a2346a3d6644))
+
 ## [1.62.0](https://github.com/Dicelette/discord-dicelette/compare/1.61.1...1.62.0) (2025-07-29)
 
 
