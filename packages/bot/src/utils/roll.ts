@@ -1,9 +1,9 @@
 import {
+	type ComparedValue,
 	type CustomCritical,
+	DETECT_CRITICAL,
 	generateStatsDice,
 	replaceFormulaInDice,
-	DETECT_CRITICAL,
-	type ComparedValue,
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
@@ -11,6 +11,7 @@ import {
 	getCriticalFromDice,
 	getExpression,
 	getRoll,
+	parseOpposition,
 	ResultAsText,
 	replaceStatInDice,
 	rollCustomCritical,
@@ -18,15 +19,164 @@ import {
 	type Server,
 	skillCustomCritical,
 	trimAll,
-	parseOpposition,
 } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getRightValue } from "database";
+import { getRightValue, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
 import { getLangAndConfig } from "utils";
+
+/**
+ * Calcule la similarité entre deux chaînes en utilisant la distance de Levenshtein normalisée
+ */
+function calculateSimilarity(str1: string, str2: string): number {
+	const longer = str1.length > str2.length ? str1 : str2;
+	const shorter = str1.length > str2.length ? str2 : str1;
+
+	if (longer.length === 0) return 1.0;
+
+	const distance = levenshteinDistance(longer, shorter);
+	return (longer.length - distance) / longer.length;
+}
+
+/**
+ * Calcule la distance de Levenshtein entre deux chaînes
+ */
+function levenshteinDistance(str1: string, str2: string): number {
+	const matrix = Array(str2.length + 1)
+		.fill(null)
+		.map(() => Array(str1.length + 1).fill(null));
+
+	for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
+	for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+
+	for (let j = 1; j <= str2.length; j++) {
+		for (let i = 1; i <= str1.length; i++) {
+			const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+			matrix[j][i] = Math.min(
+				matrix[j][i - 1] + 1, // insertion
+				matrix[j - 1][i] + 1, // deletion
+				matrix[j - 1][i - 1] + cost // substitution
+			);
+		}
+	}
+
+	return matrix[str2.length][str1.length];
+}
+
+/**
+ * Trouve le dé le plus similaire parmi tous les personnages du joueur
+ */
+async function findBestMatchingDice(
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	userId: string,
+	searchTerm: string,
+	charOptions?: string
+): Promise<{
+	dice: string;
+	attackName: string;
+	charName?: string;
+	similarity: number;
+} | null> {
+	const allUserData = client.settings.get(interaction.guild!.id, `user.${userId}`) ?? [];
+
+	let bestMatch: {
+		dice: string;
+		attackName: string;
+		charName?: string;
+		similarity: number;
+	} | null = null;
+	let bestSimilarity = 0;
+	const minSimilarity = 0.2; // Abaissement du seuil minimum de similarité
+
+	for (const userData of allUserData) {
+		if (charOptions) {
+			const charNameMatches =
+				userData.charName?.toLowerCase().includes(charOptions.toLowerCase()) ||
+				userData.charName?.subText(charOptions);
+			if (!charNameMatches) continue;
+		}
+
+		const damageName = userData.damageName ?? [];
+
+		for (const atqName of damageName) {
+			const standardizedAtq = atqName.standardize();
+			const similarity = calculateSimilarity(searchTerm, standardizedAtq);
+
+			if (similarity >= minSimilarity && similarity > bestSimilarity) {
+				try {
+					const specificUserData = await getUserFromMessage(
+						client,
+						userId,
+						interaction,
+						userData.charName?.standardize()
+					);
+
+					if (specificUserData?.damage) {
+						const dice = specificUserData.damage[standardizedAtq];
+						if (dice) {
+							bestMatch = {
+								dice,
+								attackName: atqName,
+								charName: userData.charName ?? undefined,
+								similarity,
+							};
+							bestSimilarity = similarity;
+						}
+					}
+				} catch (error) {
+					logger.warn(`Error getting data for character "${userData.charName}":`, error);
+				}
+			}
+		}
+	}
+
+	// Si aucun match avec charOptions, essayer sans le filtre de personnage
+	if (!bestMatch && charOptions) {
+		for (const userData of allUserData) {
+			const damageName = userData.damageName ?? [];
+
+			for (const atqName of damageName) {
+				const standardizedAtq = atqName.standardize();
+				const similarity = calculateSimilarity(searchTerm, standardizedAtq);
+
+				if (similarity >= minSimilarity && similarity > bestSimilarity) {
+					try {
+						const specificUserData = await getUserFromMessage(
+							client,
+							userId,
+							interaction,
+							userData.charName?.standardize()
+						);
+
+						if (specificUserData?.damage) {
+							const dice = specificUserData.damage[standardizedAtq];
+
+							if (dice) {
+								bestMatch = {
+									dice,
+									attackName: atqName,
+									charName: userData.charName ?? undefined,
+									similarity,
+								};
+								bestSimilarity = similarity;
+							}
+						}
+					} catch (error) {
+						logger.warn(
+							`Error getting fallback data for character "${userData.charName}":`,
+							error
+						);
+					}
+				}
+			}
+		}
+	}
+	return bestMatch;
+}
 
 /**
  * create the roll dice, parse interaction etc... When the slash-commands is used for dice
@@ -118,20 +268,29 @@ export async function rollDice(
 		: undefined;
 	const comments = comm ?? "";
 	let dice = userStatistique.damage?.[atq];
-	// noinspection LoopStatementThatDoesntLoopJS
-	while (!dice) {
-		const userData = client.settings
-			.get(interaction.guild!.id, `user.${user?.id ?? interaction.user.id}`)
-			?.find((char) => {
-				return char.charName?.subText(charOptions);
-			});
-		const damageName = userData?.damageName ?? [];
-		const findAtqInList = damageName.find((atqName) => atqName.subText(atq));
-		if (findAtqInList) {
-			atq = findAtqInList;
-			dice = userStatistique.damage?.[findAtqInList];
+	// Recherche améliorée du dé le plus similaire parmi tous les personnages
+	if (!dice) {
+		const bestMatch = await findBestMatchingDice(
+			client,
+			interaction,
+			user?.id ?? interaction.user.id,
+			atq,
+			charOptions
+		);
+
+		if (bestMatch) {
+			atq = bestMatch.attackName;
+			dice = bestMatch.dice;
+			infoRoll.name = atq;
+			infoRoll.standardized = atq.standardize();
+
+			if (bestMatch.charName && bestMatch.charName !== charOptions) {
+				charOptions = bestMatch.charName;
+			}
 		}
-		if (dice) break;
+	}
+
+	if (!dice) {
 		await reply(interaction, {
 			embeds: [
 				embedError(
