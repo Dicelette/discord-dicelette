@@ -91,7 +91,8 @@ export async function fetchTemplate(
 ): Promise<StatisticalTemplate | undefined> {
 	const template = message?.attachments.first();
 	if (!template) return;
-	if (process.env.NODE_ENV === "development" && process.env.PROXY_DISCORD_CDN) template.url = template.url.replace(
+	if (process.env.NODE_ENV === "development" && process.env.PROXY_DISCORD_CDN)
+		template.url = template.url.replace(
 			"https://cdn.discordapp.com",
 			process.env.PROXY_DISCORD_CDN
 		);

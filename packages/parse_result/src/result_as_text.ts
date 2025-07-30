@@ -251,6 +251,7 @@ export class ResultAsText {
 			for (const [name, custom] of Object.entries(customCritical)) {
 				const valueToCompare = custom.onNaturalDice ? natural : total;
 				let success: unknown;
+
 				if (custom.onNaturalDice) {
 					success = natural.includes(Number.parseInt(custom.value));
 				} else {
