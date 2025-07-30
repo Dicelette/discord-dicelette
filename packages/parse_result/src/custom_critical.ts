@@ -19,12 +19,13 @@ export function parseCustomCritical(
 	const findPart = /(?<sign>([<>=!]+))(?<value>.*)/gi;
 	const match = findPart.exec(customCritical);
 	if (!match) return;
-	const { sign, value } = match.groups || {};
+	let { sign, value } = match.groups || {};
 	if (!name || !sign || !value) return;
 	const onNaturalDice = name.startsWith("(N)");
 	let nameStr = onNaturalDice ? name.replace("(N)", "") : name;
 	const affectSkill = nameStr.includes("(S)");
 	nameStr = nameStr.replace("(S)", "");
+	if (sign === "=") sign = "==";
 	return {
 		[nameStr.trimStart()]: {
 			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
@@ -46,9 +47,10 @@ export function parseOpposition(
 	const match = signRegex.exec(replaced);
 	const comparator = match?.groups?.comparator || replaced;
 	const comp = signRegex.exec(diceComparator);
-	const sign = match?.groups?.sign || comp?.groups?.sign;
+	let sign = match?.groups?.sign || comp?.groups?.sign;
 	if (!sign || !comparator) return;
 	const rolledValue = getRoll(comparator);
+	if (sign === "=") sign = "==";
 	if (rolledValue?.total) {
 		return {
 			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
@@ -141,7 +143,7 @@ export function getCriticalFromDice(
 	const critical = /\{(?<natDice>\*)?(?<type>c[fs]):(?<sign>[<>=!]+)(?<value>.+?)}/gim;
 	const customCritical: Record<string, CustomCritical> = {};
 	for (const match of dice.matchAll(critical)) {
-		const { natDice, type, value, sign } = match.groups ?? {};
+		let { natDice, type, value, sign } = match.groups ?? {};
 		let textType = "";
 		if (type) {
 			switch (type) {
@@ -155,7 +157,7 @@ export function getCriticalFromDice(
 					throw new Error(ul("error.customCritical.type_error", { type }));
 			}
 		} else throw new Error(ul("error.customCritical.type_error", { type }));
-
+		if (sign === "=") sign = "==";
 		customCritical[textType] = {
 			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
 			value: value.standardize(),
