@@ -4,6 +4,7 @@ import {
 	DICE_PATTERNS,
 	type DiceData,
 	type DiceExtractionResult,
+	type UserData,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { trimAll } from "./utils";
@@ -83,15 +84,24 @@ export function applyCommentsToResult(
 	return result;
 }
 
-export function processChainedDiceRoll(content: string): Resultat | undefined {
-	const globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
+export function processChainedDiceRoll(
+	content: string,
+	userData?: UserData
+): Resultat | undefined {
+	// Process stats replacement if userData is available
 	let processedContent = content;
+	if (userData?.stats) {
+		processedContent = replaceStatsInDiceFormula(content, userData.stats);
+	}
+
+	const globalComments = processedContent.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
+	let finalContent = processedContent;
 	if (globalComments)
-		processedContent = content.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "").trim();
+		finalContent = processedContent.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "").trim();
 	try {
-		const rollResult = roll(processedContent);
+		const rollResult = roll(finalContent);
 		if (!rollResult) return undefined;
-		rollResult.dice = processedContent;
+		rollResult.dice = finalContent;
 		if (globalComments) rollResult.comment = globalComments;
 		return rollResult;
 	} catch (e) {
@@ -100,28 +110,40 @@ export function processChainedDiceRoll(content: string): Resultat | undefined {
 	}
 }
 
-export function isRolling(content: string): DiceExtractionResult | undefined {
-	const diceData = extractDiceData(content);
+export function isRolling(
+	content: string,
+	userData?: UserData
+): DiceExtractionResult | undefined {
+	// Process stats replacement if userData is available
+	let processedContent = content;
+	if (userData?.stats) {
+		processedContent = replaceStatsInDiceFormula(content, userData.stats);
+	}
+
+	const diceData = extractDiceData(processedContent);
 	if (diceData.bracketRoll) {
-		const result = performDiceRoll(content, diceData.bracketRoll);
+		const result = performDiceRoll(processedContent, diceData.bracketRoll);
 		if (result) return { result, detectRoll: diceData.bracketRoll };
 	}
 
-	if (content.includes("#") || (content.includes("&") && content.includes(";"))) {
-		const result = processChainedDiceRoll(content);
+	if (
+		processedContent.includes("#") ||
+		(processedContent.includes("&") && processedContent.includes(";"))
+	) {
+		const result = processChainedDiceRoll(processedContent, userData);
 		if (result) return { result, detectRoll: undefined };
 	}
 	if (hasValidDice(diceData)) {
 		let { comments } = diceData;
-		let processedContent = content;
+		let finalContent = processedContent;
 
 		if (comments) {
-			const chained = processChainedComments(content, comments);
-			processedContent = chained.content;
+			const chained = processChainedComments(processedContent, comments);
+			finalContent = chained.content;
 			comments = chained.comments;
 		}
 
-		const result = performDiceRoll(processedContent, undefined);
+		const result = performDiceRoll(finalContent, undefined);
 		if (!result) return undefined;
 		if (result) applyCommentsToResult(result, comments, undefined);
 		return { result, detectRoll: undefined };
@@ -162,4 +184,81 @@ export function getRoll(dice: string): Resultat | undefined {
 		logger.warn(error);
 		return undefined;
 	}
+}
+
+/**
+ * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
+ * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
+ */
+function replaceStatsInDiceFormula(
+	content: string,
+	stats?: Record<string, number>
+): string {
+	if (!stats) return content;
+
+	let comments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
+	let diceFormula = content;
+	const statsFounds: string[] = [];
+	if (comments) diceFormula = diceFormula.replace(comments, "").trim() ?? "";
+	else comments = "";
+
+	let processedFormula = diceFormula;
+
+	const variableMatches = [...processedFormula.matchAll(/\$([a-zA-Z_][a-zA-Z0-9_]*)/gi)];
+
+	for (const match of variableMatches) {
+		const fullMatch = match[0];
+		const searchTerm = match[1].toLowerCase();
+
+		if (!processedFormula.includes(fullMatch)) continue;
+
+		let foundStat: [string, number] | undefined;
+		for (const [statKey, statValue] of Object.entries(stats)) {
+			if (statKey.standardize().toLowerCase() === searchTerm) {
+				foundStat = [statKey, statValue];
+				break;
+			}
+		}
+
+		// If no exact match, try partial matching
+		if (!foundStat) {
+			const candidates: Array<[string, number, number]> = [];
+
+			for (const [statKey, statValue] of Object.entries(stats)) {
+				const normalizedStatKey = statKey.standardize().toLowerCase();
+
+				// Check if the search term matches the beginning of the stat name
+				if (normalizedStatKey.startsWith(searchTerm)) {
+					candidates.push([statKey, statValue, normalizedStatKey.length]);
+				}
+				// Check if the search term matches the end of the stat name
+				else if (normalizedStatKey.endsWith(searchTerm)) {
+					candidates.push([statKey, statValue, normalizedStatKey.length]);
+				} else if (normalizedStatKey.includes(searchTerm)) {
+					candidates.push([statKey, statValue, normalizedStatKey.length]);
+				}
+			}
+
+			if (candidates.length > 0) {
+				candidates.sort((a, b) => a[2] - b[2]);
+				foundStat = [candidates[0][0], candidates[0][1]];
+			}
+		}
+
+		if (foundStat) {
+			const [, statValue] = foundStat;
+			statsFounds.push(foundStat[0].capitalize());
+			const escapedMatch = fullMatch.replace(/\$/g, "\\$");
+			const regex = new RegExp(`${escapedMatch}(?=\\W|$)`, "g");
+			processedFormula = processedFormula.replace(regex, statValue.toString());
+		}
+	}
+
+	const uniqueStats = Array.from(new Set(statsFounds.filter((stat) => stat.length > 0)));
+	if (uniqueStats.length > 0) {
+		const statsList = uniqueStats.join(", ");
+		comments = comments ? ` ⌈__${statsList}__⌋ ${comments} ` : ` ⌈__${statsList}__⌋`;
+	}
+
+	return `${processedFormula} ${comments}`;
 }

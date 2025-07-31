@@ -65,6 +65,13 @@ export function getUserByEmbed(
 	return user as UserData;
 }
 
+export async function firstCharName(client: EClient, guildId: string, userId: string) {
+	const userData = client.settings.get(guildId, `user.${userId}`);
+	if (!userData) return;
+
+	return userData[0];
+}
+
 /**
  * Retrieves the first registered character and associated statistics for the user invoking the interaction.
  *
@@ -82,11 +89,12 @@ export async function getFirstChar(
 	ul: Translation,
 	skipNotFound = false
 ) {
-	const userData = client.settings.get(
+	const firstChar = await firstCharName(
+		client,
 		interaction.guild!.id,
-		`user.${interaction.user.id}`
+		interaction.user.id
 	);
-	if (!userData) {
+	if (!firstChar) {
 		if (skipNotFound) return;
 		await reply(interaction, {
 			embeds: [embedError(ul("error.user.youRegistered"), ul)],
@@ -94,8 +102,6 @@ export async function getFirstChar(
 		});
 		return;
 	}
-
-	const firstChar = userData[0];
 	const optionChar = firstChar.charName?.capitalize();
 	const userStatistique = await getUserFromMessage(
 		client,
@@ -146,6 +152,115 @@ export async function getUser(
 	} catch (_e) {
 		//logger.warn(_e);
 		return;
+	}
+}
+
+/**
+ * Retrieves a user's character data from a Discord message directly.
+ *
+ * This is a simplified version of getUserFromMessage that works with a Discord message instead of an interaction.
+ * Searches in-memory cache first, then fetches the relevant message from the user's character thread if necessary.
+ *
+ * @param {EClient} client
+ * @param {string} userId - The Discord user ID whose character data is being retrieved.
+ * @param {Djs.Message} message - The Discord message context.
+ * @param {string|null|undefined} charName - The character name to search for, if applicable.
+ * @param options - Optional settings to control data integration, access checks, error handling, and additional data fetching.
+ * @returns The user's character data, or `undefined` if not found and `skipNotFound` is enabled.
+ *
+ * @throws {Error} If the user's character thread is missing, access is denied to a private character, or the user is not found (unless `skipNotFound` is true).
+ */
+export async function getUserFromMessageDirect(
+	client: EClient,
+	userId: string,
+	message: Djs.Message,
+	charName?: string | null,
+	options?: {
+		integrateCombinaison?: boolean;
+		allowAccess?: boolean;
+		skipNotFound?: boolean;
+		fetchAvatar?: boolean;
+		fetchChannel?: boolean;
+		fetchMessage?: boolean;
+		guildId?: string;
+	}
+) {
+	const guildId = options?.guildId ?? message.guild!.id;
+	const guildData = client.settings;
+	const characters = client.characters;
+	const getChara = getCharaInMemory(characters, userId, guildId, charName);
+
+	if (
+		getChara &&
+		!options?.fetchAvatar &&
+		!options?.fetchChannel &&
+		!options?.fetchMessage
+	)
+		return getChara;
+
+	if (!options)
+		options = {
+			integrateCombinaison: true,
+			allowAccess: true,
+			skipNotFound: false,
+		};
+	const { integrateCombinaison, allowAccess, skipNotFound } = options;
+	const ul = ln(guildData.get(guildId, "lang") ?? message.guild!.preferredLocale);
+	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {
+		return char.charName?.subText(charName);
+	});
+	if (!user) return;
+	const userMessageId: PersonnageIds = {
+		channelId: user.messageId[1],
+		messageId: user.messageId[0],
+	};
+
+	// For message-based approach, we need to handle channel fetching differently
+	let channel = client.channels.cache.get(userMessageId.channelId);
+	if (!channel && message.guild) {
+		const fetchedChannel = await fetchChannel(message.guild, userMessageId.channelId);
+		if (fetchedChannel) {
+			channel = fetchedChannel;
+		}
+	}
+
+	if (!channel || !("messages" in channel)) {
+		if (!skipNotFound) throw new Error(ul("error.channel.thread"));
+		return;
+	}
+
+	if (
+		user.isPrivate &&
+		!allowAccess &&
+		!(
+			message.author.id === userId ||
+			message.member?.permissions.has(Djs.PermissionFlagsBits.Administrator)
+		)
+	) {
+		throw new Error(ul("error.private"));
+	}
+
+	try {
+		const targetMessage = await channel.messages.fetch(userMessageId.messageId);
+		const userData = getUserByEmbed(
+			{ message: targetMessage },
+			ul,
+			undefined,
+			integrateCombinaison,
+			options.fetchAvatar,
+			options.fetchChannel
+		);
+		//set chara in memory
+		await updateMemory(characters, guildId, userId, ul, {
+			userData,
+		});
+		if (options.fetchMessage) userData!.messageId = targetMessage.id;
+
+		return userData;
+	} catch (error) {
+		logger.warn(error);
+		if (!skipNotFound)
+			throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
 	}
 }
 

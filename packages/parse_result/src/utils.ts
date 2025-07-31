@@ -34,7 +34,7 @@ export function convertExpression(
 	return dice;
 }
 
-export function replaceStatInDice(
+export function replaceStatInDiceName(
 	diceName: string,
 	statistics?: Record<string, number>,
 	customReplacement?: string
@@ -47,30 +47,22 @@ export function replaceStatInDice(
 
 	// Regex pour détecter les parenthèses avec un contenu matchant un des noms dans "statName"
 	const regex = new RegExp(`\\((${statName})\\)`, "gi");
-
-	// Standardiser le texte du dé pour trouver l'emplacement du match
 	const standardizedDice = originalDice.standardize();
 	const match = regex.exec(standardizedDice);
 	if (!match) return originalDice;
-
-	// Calculer l'emplacement du match dans le texte original
 	const startIndex = standardizedDice.indexOf(match[0]);
 	const endIndex = startIndex + match[0].length;
-
-	// Utiliser le remplacement personnalisé ou la valeur statistique
 	const statKey = match[1].removeAccents().toLowerCase().trim();
 	const replacementValue = customReplacement ?? statistics?.[statKey];
 
 	if (replacementValue === undefined) return originalDice;
-
-	// Remplacer uniquement l'emplacement correspondant dans le texte original
 	let result: string;
 	if (replacementValue?.toString().length === 0)
 		result = originalDice.slice(0, startIndex) + originalDice.slice(endIndex);
 	else
 		result = `${originalDice.slice(0, startIndex)}(${replacementValue})${originalDice.slice(endIndex)}`;
 
-	return result.trim(); // Nettoyer les espaces résiduels
+	return result.trim();
 }
 
 export function convertNameToValue(

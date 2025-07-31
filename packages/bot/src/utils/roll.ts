@@ -13,7 +13,7 @@ import {
 	getRoll,
 	parseOpposition,
 	ResultAsText,
-	replaceStatInDice,
+	replaceStatInDiceName,
 	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 	type Server,
@@ -323,12 +323,12 @@ export async function rollDice(
 	if (dollarValue && comparator.length > 0) {
 		const originalName = infoRoll.name;
 		if (dollarValue.diceResult)
-			infoRoll.name = replaceStatInDice(
+			infoRoll.name = replaceStatInDiceName(
 				infoRoll.name,
 				userStatistique.stats,
 				dollarValue.diceResult
 			).trimEnd();
-		else infoRoll.name = replaceStatInDice(infoRoll.name, userStatistique.stats, "");
+		else infoRoll.name = replaceStatInDiceName(infoRoll.name, userStatistique.stats, "");
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
 

@@ -10,6 +10,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
 import { fetchChannel } from "utils";
+import { firstCharName, getUserFromMessageDirect } from "../database";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -20,7 +21,16 @@ export default (client: EClient): void => {
 			if (!message.guild) return;
 			const content = message.content;
 			//detect roll between bracket
-			const isRoll = isRolling(content);
+			const firstChara = await firstCharName(client, message.guild.id, message.author.id);
+			const userData = await getUserFromMessageDirect(
+				client,
+				message.author.id,
+				message,
+				firstChara?.charName,
+				{ skipNotFound: true }
+			);
+
+			const isRoll = isRolling(content, userData);
 			const userLang =
 				client.guildLocale?.get(message.guild.id) ??
 				client.settings.get(message.guild.id, "lang") ??
