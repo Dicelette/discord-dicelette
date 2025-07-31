@@ -2,6 +2,7 @@ import { lError, ln } from "@dicelette/localization";
 import {
 	isRolling,
 	ResultAsText,
+	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
 import type { DiscordTextChannel } from "@dicelette/types";
@@ -10,7 +11,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
 import { fetchChannel } from "utils";
-import { firstCharName, getUserFromMessageDirect } from "../database";
+import { firstCharName, getTemplate, getUserFromMessageDirect } from "../database";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -46,7 +47,11 @@ export default (client: EClient): void => {
 
 			const channel = message.channel;
 			if (!result) return;
-			const critical = rollCustomCriticalsFromDice(content, ul);
+			let critical = rollCustomCriticalsFromDice(content, ul);
+			const serverData = await getTemplate(message.guild, client.settings, ul, true);
+			if (serverData?.customCritical && !critical)
+				critical = rollCustomCritical(serverData.customCritical);
+
 			const resultAsText = new ResultAsText(
 				result,
 				{ lang: userLang },
