@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.63.0](https://github.com/Dicelette/discord-dicelette/compare/1.62.1...1.63.0) (2025-07-31)
+
+
+### Features
+
+* add support for custom critical in template ([80dee14](https://github.com/Dicelette/discord-dicelette/commit/80dee1458092e7e9ecfd49eff6f44673e0fa827d))
+* add user data integration for dice rolls and character retrieval ([7a284d6](https://github.com/Dicelette/discord-dicelette/commit/7a284d6393f95bb08120baae06bf40fe2b78bb4b))
+
 ## [1.62.1](https://github.com/Dicelette/discord-dicelette/compare/1.62.0...1.62.1) (2025-07-30)
 
 
