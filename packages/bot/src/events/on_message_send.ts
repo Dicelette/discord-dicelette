@@ -11,7 +11,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
 import { fetchChannel } from "utils";
-import { firstCharName, getTemplate, getUserFromMessageDirect } from "../database";
+import { getCharFromText, getTemplate, getUserFromMessageDirect } from "../database";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -20,14 +20,20 @@ export default (client: EClient): void => {
 			if (message.author.bot) return;
 			if (message.channel.type === Djs.ChannelType.DM) return;
 			if (!message.guild) return;
-			const content = message.content;
+			let content = message.content;
 			//detect roll between bracket
-			const firstChara = await firstCharName(client, message.guild.id, message.author.id);
+			const firstChara = await getCharFromText(
+				client,
+				message.guild.id,
+				message.author.id,
+				content
+			);
+			if (firstChara) content = content.replace(/ @\w+$/, "").trim();
 			const userData = await getUserFromMessageDirect(
 				client,
 				message.author.id,
 				message,
-				firstChara?.charName,
+				firstChara,
 				{ skipNotFound: true }
 			);
 
@@ -55,8 +61,8 @@ export default (client: EClient): void => {
 			const resultAsText = new ResultAsText(
 				result,
 				{ lang: userLang },
-				undefined,
-				undefined,
+				serverData?.critical,
+				firstChara,
 				undefined,
 				critical
 			);

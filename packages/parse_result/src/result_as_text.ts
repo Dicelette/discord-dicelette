@@ -285,11 +285,10 @@ export class ResultAsText {
 			for (const [, custom] of Object.entries(customCritical)) {
 				const valueToCompare = custom.onNaturalDice ? [] : total;
 				let success: unknown;
-				if (custom.onNaturalDice) {
+				if (custom.onNaturalDice)
 					success = true; // If we arrive here, the custom critical has been triggered.
-				} else {
-					success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
-				}
+				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
+
 				if (success) {
 					testValue = this.convertCustomCriticalToCompare(custom);
 					goodSign = this.goodCompareSign(testValue, total);
@@ -327,8 +326,15 @@ export class ResultAsText {
 	}
 
 	private comment(interaction?: boolean): string {
+		const extractRegex = /%%(.*)%%/;
+		const extractorInfo = extractRegex.exec(this.resultat!.comment || "");
+		let info = "";
+		if (extractorInfo?.[1]) {
+			info = `${extractorInfo[1]} `;
+			this.resultat!.comment = this.resultat!.comment?.replace(extractRegex, "").trim();
+		}
 		return this.resultat!.comment
-			? `*${this.resultat!.comment.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
+			? `${info}*${this.resultat!.comment.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
 					.replaceAll("×", "*")
 					.trim()}*\n `
 			: interaction
@@ -465,7 +471,8 @@ export class ResultAsText {
 		const signMessage = this.resultat?.compare
 			? `${this.resultat.compare.sign} ${this.formatCompare()}`
 			: "";
-		const mention = authorId ? `*<@${authorId}>* ` : "";
+		let mention = authorId ? `*<@${authorId}>* ` : "";
+		if (this.charName) mention = `**__${this.charName.capitalize()}__** (${mention}) `;
 		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "").trim()}${signMessage ? ` ${signMessage}` : ""}\`)`;
 		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
 	}

@@ -90,9 +90,8 @@ export function processChainedDiceRoll(
 ): Resultat | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
-	if (userData?.stats) {
+	if (userData?.stats)
 		processedContent = replaceStatsInDiceFormula(content, userData.stats);
-	}
 
 	const globalComments = processedContent.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
 	let finalContent = processedContent;
@@ -116,9 +115,8 @@ export function isRolling(
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
-	if (userData?.stats) {
+	if (userData?.stats)
 		processedContent = replaceStatsInDiceFormula(content, userData.stats);
-	}
 
 	const diceData = extractDiceData(processedContent);
 	if (diceData.bracketRoll) {
@@ -257,7 +255,9 @@ function replaceStatsInDiceFormula(
 	const uniqueStats = Array.from(new Set(statsFounds.filter((stat) => stat.length > 0)));
 	if (uniqueStats.length > 0) {
 		const statsList = uniqueStats.join(", ");
-		comments = comments ? ` ⌈__${statsList}__⌋ ${comments} ` : ` ⌈__${statsList}__⌋`;
+		comments = comments
+			? ` %%\[__${statsList}__\]%% ${comments} `
+			: ` %%\[__${statsList}__\]%% `;
 	}
 
 	return `${processedFormula} ${comments}`;

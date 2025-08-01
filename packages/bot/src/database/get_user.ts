@@ -69,7 +69,20 @@ export async function firstCharName(client: EClient, guildId: string, userId: st
 	const userData = client.settings.get(guildId, `user.${userId}`);
 	if (!userData) return;
 
-	return userData[0];
+	return userData[0] ?? undefined;
+}
+
+export async function getCharFromText(
+	client: EClient,
+	guildId: string,
+	userId: string,
+	dice: string
+) {
+	const regex = / @(\w+)$/;
+	const match = dice.match(regex);
+	if (!match)
+		return (await firstCharName(client, guildId, userId))?.charName ?? undefined;
+	return match[1].standardize() ?? undefined;
 }
 
 /**
