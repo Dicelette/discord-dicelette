@@ -22,13 +22,15 @@ export default (client: EClient): void => {
 			if (!message.guild) return;
 			let content = message.content;
 			//detect roll between bracket
-			const firstChara = await getCharFromText(
-				client,
-				message.guild.id,
-				message.author.id,
-				content
-			);
-			if (firstChara) content = content.replace(/ @\w+$/, "").trim();
+			let firstChara: string | undefined;
+			if (content.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/))
+				firstChara = await getCharFromText(
+					client,
+					message.guild.id,
+					message.author.id,
+					content
+				);
+			if (firstChara) content = content.replace(/ @\w+/, "").trim();
 			const userData = await getUserFromMessageDirect(
 				client,
 				message.author.id,
@@ -37,7 +39,7 @@ export default (client: EClient): void => {
 				{ skipNotFound: true }
 			);
 
-			const isRoll = isRolling(content, userData, firstChara);
+			const isRoll = isRolling(content, userData);
 			const userLang =
 				client.guildLocale?.get(message.guild.id) ??
 				client.settings.get(message.guild.id, "lang") ??
