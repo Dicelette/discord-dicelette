@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.64.1](https://github.com/Dicelette/discord-dicelette/compare/1.64.0...1.64.1) (2025-08-01)
+
+
+### Bug Fixes
+
+* comments not set when using with stats ([3797521](https://github.com/Dicelette/discord-dicelette/commit/37975216dea0c01138c5a978f59b393b7ddebf2a))
+
 ## [1.64.0](https://github.com/Dicelette/discord-dicelette/compare/1.63.0...1.64.0) (2025-08-01)
 
 
