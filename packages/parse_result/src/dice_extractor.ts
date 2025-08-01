@@ -31,13 +31,19 @@ export function hasValidDice(diceData: DiceData): boolean {
 	return true;
 }
 
-function getComments(content: string) {
+function getComments(content: string, comments?: string) {
 	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
+	if (!globalComments && !comments)
+		globalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
+	if (comments && !globalComments) globalComments = comments;
+
 	const statValue = content.match(DICE_PATTERNS.INFO_STATS_COMMENTS);
-	if (globalComments) content = content.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "").trim();
-	content = content.replace(/%%.*%%/, "").trim(); // Remove %% comments
 	if (statValue)
-		globalComments = statValue[0] + (globalComments ? ` ${globalComments}` : "");
+		globalComments =
+			statValue[0] +
+			(globalComments
+				? ` ${globalComments.replace(DICE_PATTERNS.INFO_STATS_COMMENTS, "").trim()}`
+				: "");
 
 	return globalComments;
 }
@@ -74,7 +80,7 @@ export function processChainedComments(
 
 	return {
 		content: finalContent,
-		comments: getComments(content) ?? comments,
+		comments: getComments(content, comments),
 	};
 }
 
