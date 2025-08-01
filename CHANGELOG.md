@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.64.0](https://github.com/Dicelette/discord-dicelette/compare/1.63.0...1.64.0) (2025-08-01)
+
+
+### Features
+
+* add character name support to dice roll processing ([c18e06d](https://github.com/Dicelette/discord-dicelette/commit/c18e06da698931ca3d3814c79f2b83c608a4e1c1))
+* add support for info stats comments and refactor comment extraction logic ([efa8a64](https://github.com/Dicelette/discord-dicelette/commit/efa8a64a32f8f9333a197daab962cb3bd6395fb9))
+* enhance dice roll processing with infoRoll support and refactor user data handling ([97f8c8d](https://github.com/Dicelette/discord-dicelette/commit/97f8c8d976acf2ff3411e0a7e8dc1f4d0ef9610e))
+* enhance user data handling and improve comment formatting ([666505d](https://github.com/Dicelette/discord-dicelette/commit/666505d79cbf851075d936a830730e49afcfd9da))
+* integrate user data into dice roll processing and result formatting ([7536b0d](https://github.com/Dicelette/discord-dicelette/commit/7536b0df53b135cc771f36ce458293a03dcb7008))
+* remove character name parameter from dice roll functions ([600b934](https://github.com/Dicelette/discord-dicelette/commit/600b934b79ec841f9168f90cfffedb6905df52af))
+* update comment processing logic and improve test assertions for dice rolls ([aaff09a](https://github.com/Dicelette/discord-dicelette/commit/aaff09a91c91290e79c3f75008c134b9179815be))
+
+
+### Bug Fixes
+
+* should not processed dice between code (`1d20`) ([fec2af8](https://github.com/Dicelette/discord-dicelette/commit/fec2af8a05055b7f89e92e1356645dbe75e3bb9a))
+
 ## [1.63.0](https://github.com/Dicelette/discord-dicelette/compare/1.62.1...1.63.0) (2025-07-31)
 
 
