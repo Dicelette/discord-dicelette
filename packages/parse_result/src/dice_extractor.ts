@@ -10,7 +10,9 @@ import { logger } from "@dicelette/utils";
 import { trimAll } from "./utils";
 
 export function extractDiceData(content: string): DiceData {
-	const bracketRoll = content.match(DICE_PATTERNS.BRACKET_ROLL)?.[1];
+	const bracketRoll = content
+		.replace(/%%.*%%/, "")
+		.match(DICE_PATTERNS.BRACKET_ROLL)?.[1];
 	const comments = content
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
 		?.replaceAll("*", "\\*");
@@ -29,6 +31,17 @@ export function hasValidDice(diceData: DiceData): boolean {
 	return true;
 }
 
+function getComments(content: string) {
+	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
+	const statValue = content.match(DICE_PATTERNS.INFO_STATS_COMMENTS);
+	if (globalComments) content = content.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "").trim();
+	content = content.replace(/%%.*%%/, "").trim(); // Remove %% comments
+	if (statValue)
+		globalComments = statValue[0] + (globalComments ? ` ${globalComments}` : "");
+
+	return globalComments;
+}
+
 export function processChainedComments(
 	content: string,
 	comments: string
@@ -41,21 +54,23 @@ export function processChainedComments(
 		content = content.match(DICE_PATTERNS.BRACKETED_CONTENT)
 			? content.replace(DICE_PATTERNS.BRACKETED_CONTENT, "$1").trim()
 			: content;
-		const globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
-		if (globalComments) {
-			content = content.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "").trim();
-			return { content, comments: globalComments };
-		}
+		const globalComments = getComments(content);
+		content = content.replace(/%%.*%%/, "").trim();
 
 		return {
 			content,
-			comments: undefined,
+			comments: globalComments ?? undefined,
 		};
 	}
 
+	const finalContent = content
+		.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1")
+		.replace(/%%.*%%/, "")
+		.trimEnd();
+
 	return {
-		content: content.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1"),
-		comments: content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1] ?? comments,
+		content: finalContent,
+		comments: getComments(content) ?? comments,
 	};
 }
 
@@ -100,15 +115,19 @@ export function processChainedDiceRoll(
 	let processedContent = content;
 	let infoRoll: string | undefined;
 	if (userData?.stats) {
-		const res = replaceStatsInDiceFormula(content, userData.stats);
+		const res = replaceStatsInDiceFormula(content, userData.stats, false, true);
 		processedContent = res.formula;
 		infoRoll = res.infoRoll;
 	}
 
-	const globalComments = processedContent.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
-	let finalContent = processedContent;
-	if (globalComments)
-		finalContent = processedContent.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "").trim();
+	const globalComments = getComments(content);
+
+	const finalContent = processedContent
+		.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
+		.trim()
+		.replace(/%%.*%%/, "")
+		.trim();
+
 	try {
 		const rollResult = roll(finalContent);
 		if (!rollResult) return undefined;
@@ -136,6 +155,7 @@ export function isRolling(
 	processedContent = res.formula;
 
 	const diceData = extractDiceData(processedContent);
+
 	if (diceData.bracketRoll) {
 		const result = performDiceRoll(processedContent, diceData.bracketRoll, userData);
 		if (result?.resultat)
@@ -218,7 +238,8 @@ export function getRoll(dice: string): Resultat | undefined {
 function replaceStatsInDiceFormula(
 	content: string,
 	stats?: Record<string, number>,
-	deleteComments = false
+	deleteComments = false,
+	shared = false
 ): { formula: string; infoRoll?: string } {
 	if (!stats) return { formula: content };
 	//remove secondary opposition
@@ -287,6 +308,7 @@ function replaceStatsInDiceFormula(
 		comments = comments
 			? ` %%\[__${statsList}__\]%% ${comments} `
 			: ` %%\[__${statsList}__\]%% `;
+		if (shared) comments = `#${comments}`;
 	}
 	if (deleteComments) return { formula: processedFormula, infoRoll: uniqueStats[0] };
 	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };

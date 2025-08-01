@@ -33,6 +33,7 @@ export const DICE_PATTERNS = {
 	BRACKETED_COMMENTS: /\[(.*)\]/,
 	BRACKETED_CONTENT: /^\[(.*)\]$/,
 	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,
+	INFO_STATS_COMMENTS: /%%(\[__.*__\])%%/,
 } as const;
 
 const MATH = {

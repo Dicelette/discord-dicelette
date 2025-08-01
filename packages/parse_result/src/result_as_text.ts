@@ -329,6 +329,7 @@ export class ResultAsText {
 		const extractRegex = /%%(.*)%%/;
 		const extractorInfo = extractRegex.exec(this.resultat!.comment || "");
 		let info = "";
+
 		if (extractorInfo?.[1]) {
 			info = `${extractorInfo[1]} `;
 			this.resultat!.comment = this.resultat!.comment?.replace(extractRegex, "").trim();
@@ -338,8 +339,8 @@ export class ResultAsText {
 					.replaceAll("×", "*")
 					.trim()}*\n `
 			: interaction
-				? "\n "
-				: "_ _";
+				? `${info}\n `
+				: `${info ? `${info}\n` : ""}_ _`;
 	}
 
 	private formatMultipleRes(

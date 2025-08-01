@@ -127,7 +127,7 @@ describe("dice_extractor", () => {
 
 	describe("performDiceRoll", () => {
 		it("should roll with bracket content when bracket roll is provided", () => {
-			const result = performDiceRoll("some content", "1d20");
+			const result = performDiceRoll("some content", "1d20")?.resultat;
 
 			expect(result).toBeDefined();
 			expect(result!.dice).toBe("1d20");
@@ -136,7 +136,7 @@ describe("dice_extractor", () => {
 		});
 
 		it("should roll with trimmed content when no bracket roll", () => {
-			const result = performDiceRoll("  1d20  ", undefined);
+			const result = performDiceRoll("  1d20  ", undefined)?.resultat;
 
 			expect(result).toBeDefined();
 			expect(result!.dice).toBe("1d20");
