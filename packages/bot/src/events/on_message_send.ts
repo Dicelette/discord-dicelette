@@ -22,6 +22,13 @@ export default (client: EClient): void => {
 			if (message.channel.type === Djs.ChannelType.DM) return;
 			if (!message.guild) return;
 			let content = message.content;
+			const userLang =
+				client.guildLocale?.get(message.guild.id) ??
+				client.settings.get(message.guild.id, "lang") ??
+				message.guild.preferredLocale ??
+				Djs.Locale.EnglishUS;
+			const ul = ln(userLang);
+			if (message.content.match(/`.*`/)) return await stripOOC(message, client, ul);
 			//detect roll between bracket
 			let firstChara: string | undefined;
 			if (content.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/))
@@ -41,12 +48,7 @@ export default (client: EClient): void => {
 			);
 
 			const isRoll = isRolling(content, userData);
-			const userLang =
-				client.guildLocale?.get(message.guild.id) ??
-				client.settings.get(message.guild.id, "lang") ??
-				message.guild.preferredLocale ??
-				Djs.Locale.EnglishUS;
-			const ul = ln(userLang);
+
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);
 			const { result, detectRoll } = isRoll;
