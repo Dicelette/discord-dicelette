@@ -472,7 +472,8 @@ export class ResultAsText {
 			? `${this.resultat.compare.sign} ${this.formatCompare()}`
 			: "";
 		let mention = authorId ? `*<@${authorId}>* ` : "";
-		if (this.charName) mention = `**__${this.charName.capitalize()}__** (${mention}) `;
+		if (this.charName)
+			mention = `**__${this.charName.capitalize()}__** ${mention.length > 0 ? `(${mention})` : ""}`;
 		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "").trim()}${signMessage ? ` ${signMessage}` : ""}\`)`;
 		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
 	}

@@ -61,10 +61,13 @@ export function processChainedComments(
 
 export function performDiceRoll(
 	content: string,
-	bracketRoll: string | undefined
+	bracketRoll: string | undefined,
+	userData?: UserData
 ): Resultat | undefined {
 	try {
-		const rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
+		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
+		if (userData?.stats)
+			rollContent = replaceStatsInDiceFormula(rollContent, userData.stats, true);
 		return roll(rollContent);
 	} catch (e) {
 		logger.warn(e);
@@ -120,7 +123,7 @@ export function isRolling(
 
 	const diceData = extractDiceData(processedContent);
 	if (diceData.bracketRoll) {
-		const result = performDiceRoll(processedContent, diceData.bracketRoll);
+		const result = performDiceRoll(processedContent, diceData.bracketRoll, userData);
 		if (result) return { result, detectRoll: diceData.bracketRoll };
 	}
 
@@ -141,7 +144,7 @@ export function isRolling(
 			comments = chained.comments;
 		}
 
-		const result = performDiceRoll(finalContent, undefined);
+		const result = performDiceRoll(finalContent, undefined, userData);
 		if (!result) return undefined;
 		if (result) applyCommentsToResult(result, comments, undefined);
 		return { result, detectRoll: undefined };
@@ -190,7 +193,8 @@ export function getRoll(dice: string): Resultat | undefined {
  */
 function replaceStatsInDiceFormula(
 	content: string,
-	stats?: Record<string, number>
+	stats?: Record<string, number>,
+	deleteComments = false
 ): string {
 	if (!stats) return content;
 
@@ -259,6 +263,6 @@ function replaceStatsInDiceFormula(
 			? ` %%\[__${statsList}__\]%% ${comments} `
 			: ` %%\[__${statsList}__\]%% `;
 	}
-
+	if (deleteComments) return processedFormula;
 	return `${processedFormula} ${comments}`;
 }
