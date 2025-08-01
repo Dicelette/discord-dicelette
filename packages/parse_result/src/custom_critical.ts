@@ -6,7 +6,6 @@ import {
 } from "@dicelette/core";
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
-
 import { getRoll } from "./dice_extractor";
 
 /**
@@ -59,10 +58,10 @@ export function parseOpposition(
 			rollValue: rolledValue.result,
 		};
 	}
-	if (!isNumber(replaced)) return undefined;
+	if (!isNumber(comparator)) return undefined;
 	return {
 		sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
-		value: Number(replaced),
+		value: Number(comparator),
 	};
 }
 

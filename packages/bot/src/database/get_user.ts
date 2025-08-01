@@ -623,7 +623,7 @@ export async function getStatistics(
  * @param standardizedStatistic - The primary name of the statistic to retrieve.
  * @param ul - Translation function for error messages.
  * @param client
- * @param interaction - The Discord command interaction context.
+ * @param guild
  * @param optionChar - The character name, if specified.
  * @param statistic - The original statistic name requested.
  * @returns An object containing the statistic value, the resolved standardized statistic name, and the original statistic string.
@@ -635,14 +635,14 @@ export function getRightValue(
 	standardizedStatistic: string,
 	ul: Translation,
 	client: EClient,
-	interaction: Djs.CommandInteraction,
+	guild: Djs.Guild,
 	optionChar: string | undefined,
 	statistic: string
 ) {
 	let userStat = userStatistique.stats?.[standardizedStatistic];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!userStat) {
-		const guildData = client.settings.get(interaction.guild!.id, "templateID.statsName");
+		const guildData = client.settings.get(guild.id, "templateID.statsName");
 		if (userStatistique.stats && guildData) {
 			const findStatInList = guildData.find((stat) =>
 				stat.subText(standardizedStatistic)

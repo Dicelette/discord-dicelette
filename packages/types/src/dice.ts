@@ -6,6 +6,7 @@ import type { Resultat } from "@dicelette/core";
 export interface DiceExtractionResult {
 	result: Resultat;
 	detectRoll: string | undefined;
+	infoRoll?: string;
 }
 
 /**

@@ -421,7 +421,7 @@ export async function rollStatistique(
 			standardizedStatistic,
 			ul,
 			client,
-			interaction,
+			interaction.guild!,
 			optionChar,
 			statistic
 		);

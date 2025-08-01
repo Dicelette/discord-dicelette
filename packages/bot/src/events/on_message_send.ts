@@ -1,6 +1,7 @@
 import { lError, ln } from "@dicelette/localization";
 import {
 	isRolling,
+	parseOpposition,
 	ResultAsText,
 	rollCustomCritical,
 	rollCustomCriticalsFromDice,
@@ -50,9 +51,6 @@ export default (client: EClient): void => {
 				return await stripOOC(message, client, ul);
 			const { result, detectRoll } = isRoll;
 			const deleteInput = !detectRoll;
-
-			//is a valid roll as we are in the function so we can work as always
-
 			const channel = message.channel;
 			if (!result) return;
 			let critical = rollCustomCriticalsFromDice(content, ul);
@@ -60,13 +58,16 @@ export default (client: EClient): void => {
 			if (serverData?.customCritical && !critical)
 				critical = rollCustomCritical(serverData.customCritical);
 
+			const opposition = parseComparator(content, userData?.stats, isRoll.infoRoll);
+
 			const resultAsText = new ResultAsText(
 				result,
 				{ lang: userLang },
 				serverData?.critical,
 				firstChara,
 				undefined,
-				critical
+				critical,
+				opposition
 			);
 			const parser = resultAsText.parser;
 			if (!parser) return;
@@ -149,4 +150,21 @@ async function replyDice(
 				content: resultAsText.onMessageSend(idMessage),
 				allowedMentions: { repliedUser: true },
 			});
+}
+
+function parseComparator(
+	dice: string,
+	userStatistique?: Record<string, number>,
+	userStatStr?: string
+) {
+	const comparatorMatch = /(?<first>([><=!]+)(.+))(?<second>([><=!]+)(.+))/.exec(dice);
+	let comparator = "";
+	let opposition: string | undefined;
+	if (comparatorMatch?.groups) {
+		comparator = comparatorMatch.groups?.first;
+		opposition = comparatorMatch.groups?.second;
+	}
+	if (opposition)
+		return parseOpposition(opposition, comparator, userStatistique, userStatStr);
+	return undefined;
 }

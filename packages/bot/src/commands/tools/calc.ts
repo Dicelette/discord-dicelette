@@ -157,7 +157,7 @@ export async function calculate(
 			statInfo.stat,
 			ul,
 			client,
-			interaction,
+			interaction.guild!,
 			optionChar,
 			statInfo.name
 		);

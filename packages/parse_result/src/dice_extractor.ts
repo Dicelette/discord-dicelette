@@ -63,13 +63,17 @@ export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
 	userData?: UserData
-): Resultat | undefined {
+): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
-		if (userData?.stats)
-			rollContent = replaceStatsInDiceFormula(rollContent, userData.stats, true);
+		let infoRoll: string | undefined;
+		if (userData?.stats) {
+			const res = replaceStatsInDiceFormula(rollContent, userData.stats, true);
+			rollContent = res.formula;
+			infoRoll = res.infoRoll;
+		}
 		rollContent = rollContent.replace(/ @\w+/, "").trimEnd();
-		return roll(rollContent);
+		return { resultat: roll(rollContent), infoRoll };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -91,11 +95,15 @@ export function applyCommentsToResult(
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData
-): Resultat | undefined {
+): { resultat: Resultat; infoRoll?: string } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
-	if (userData?.stats)
-		processedContent = replaceStatsInDiceFormula(content, userData.stats);
+	let infoRoll: string | undefined;
+	if (userData?.stats) {
+		const res = replaceStatsInDiceFormula(content, userData.stats);
+		processedContent = res.formula;
+		infoRoll = res.infoRoll;
+	}
 
 	const globalComments = processedContent.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
 	let finalContent = processedContent;
@@ -106,7 +114,7 @@ export function processChainedDiceRoll(
 		if (!rollResult) return undefined;
 		rollResult.dice = finalContent;
 		if (globalComments) rollResult.comment = globalComments;
-		return rollResult;
+		return { resultat: rollResult, infoRoll };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -118,14 +126,24 @@ export function isRolling(
 	userData?: UserData
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
-	let processedContent = content;
-	if (userData?.stats)
-		processedContent = replaceStatsInDiceFormula(content, userData.stats);
+	let processedContent: string;
+	const reg = /(?<first>([><=!]+)(.+))(?<second>([><=!]+)(.+))/.exec(content);
+	if (reg?.groups) {
+		content = content.replace(reg.groups.second, "").trim();
+	}
+	let res = { formula: content };
+	if (userData?.stats) res = replaceStatsInDiceFormula(content, userData.stats);
+	processedContent = res.formula;
 
 	const diceData = extractDiceData(processedContent);
 	if (diceData.bracketRoll) {
 		const result = performDiceRoll(processedContent, diceData.bracketRoll, userData);
-		if (result) return { result, detectRoll: diceData.bracketRoll };
+		if (result?.resultat)
+			return {
+				result: result.resultat,
+				detectRoll: diceData.bracketRoll,
+				infoRoll: result.infoRoll,
+			};
 	}
 
 	if (
@@ -133,7 +151,12 @@ export function isRolling(
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
 		const result = processChainedDiceRoll(processedContent, userData);
-		if (result) return { result, detectRoll: undefined };
+		if (result)
+			return {
+				result: result.resultat,
+				detectRoll: undefined,
+				infoRoll: result.infoRoll,
+			};
 	}
 	if (hasValidDice(diceData)) {
 		let { comments } = diceData;
@@ -146,9 +169,9 @@ export function isRolling(
 		}
 
 		const result = performDiceRoll(finalContent, undefined, userData);
-		if (!result) return undefined;
-		if (result) applyCommentsToResult(result, comments, undefined);
-		return { result, detectRoll: undefined };
+		if (!result?.resultat) return undefined;
+		if (result) applyCommentsToResult(result.resultat, comments, undefined);
+		return { result: result.resultat, detectRoll: undefined };
 	}
 
 	return undefined;
@@ -196,8 +219,9 @@ function replaceStatsInDiceFormula(
 	content: string,
 	stats?: Record<string, number>,
 	deleteComments = false
-): string {
-	if (!stats) return content;
+): { formula: string; infoRoll?: string } {
+	if (!stats) return { formula: content };
+	//remove secondary opposition
 
 	let comments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
 	let diceFormula = content;
@@ -264,6 +288,6 @@ function replaceStatsInDiceFormula(
 			? ` %%\[__${statsList}__\]%% ${comments} `
 			: ` %%\[__${statsList}__\]%% `;
 	}
-	if (deleteComments) return processedFormula;
-	return `${processedFormula} ${comments}`;
+	if (deleteComments) return { formula: processedFormula, infoRoll: uniqueStats[0] };
+	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };
 }
