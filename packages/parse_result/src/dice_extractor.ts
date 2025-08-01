@@ -62,12 +62,14 @@ export function processChainedComments(
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
-	userData?: UserData
+	userData?: UserData,
+	charName?: string
 ): Resultat | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
 		if (userData?.stats)
 			rollContent = replaceStatsInDiceFormula(rollContent, userData.stats, true);
+		if (charName) rollContent = rollContent.replace(/ @\w+$/, "").trim();
 		return roll(rollContent);
 	} catch (e) {
 		logger.warn(e);
@@ -114,7 +116,8 @@ export function processChainedDiceRoll(
 
 export function isRolling(
 	content: string,
-	userData?: UserData
+	userData?: UserData,
+	charName?: string
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -123,7 +126,12 @@ export function isRolling(
 
 	const diceData = extractDiceData(processedContent);
 	if (diceData.bracketRoll) {
-		const result = performDiceRoll(processedContent, diceData.bracketRoll, userData);
+		const result = performDiceRoll(
+			processedContent,
+			diceData.bracketRoll,
+			userData,
+			charName
+		);
 		if (result) return { result, detectRoll: diceData.bracketRoll };
 	}
 

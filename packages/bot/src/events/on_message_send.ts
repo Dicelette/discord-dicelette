@@ -37,7 +37,7 @@ export default (client: EClient): void => {
 				{ skipNotFound: true }
 			);
 
-			const isRoll = isRolling(content, userData);
+			const isRoll = isRolling(content, userData, firstChara);
 			const userLang =
 				client.guildLocale?.get(message.guild.id) ??
 				client.settings.get(message.guild.id, "lang") ??
