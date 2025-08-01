@@ -55,7 +55,11 @@ export function processChainedComments(
 			? content.replace(DICE_PATTERNS.BRACKETED_CONTENT, "$1").trim()
 			: content;
 		const globalComments = getComments(content);
-		content = content.replace(/%%.*%%/, "").trim();
+		content = content
+			.replace(/%%.*%%/, "")
+			.trim()
+			.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
+			.trim();
 
 		return {
 			content,

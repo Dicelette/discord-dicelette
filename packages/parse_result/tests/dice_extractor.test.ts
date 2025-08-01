@@ -85,7 +85,7 @@ describe("dice_extractor", () => {
 	});
 
 	describe("processChainedComments", () => {
-		it("should not process bracketed comments with ampersand and semicolon", () => {
+		it("should process bracketed comments with ampersand and semicolon", () => {
 			const content = "1d20+5 # & something; [test comment]";
 			const comments = "& something; [test comment]";
 
