@@ -242,6 +242,7 @@ function infoUserCalc(
 	let user = mentionUser;
 	if (time) user += `${timestamp(time)}`;
 	if (user.trim().length > 0) user += `${data.ul("common.space")}:\n`;
+	logger.error(EMOJI_MATH);
 	return `${user}${EMOJI_MATH}[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
 }
 
