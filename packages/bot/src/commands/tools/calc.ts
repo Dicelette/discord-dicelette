@@ -2,7 +2,7 @@ import { generateStatsDice, isNumber } from "@dicelette/core";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { capitalizeBetweenPunct, important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
@@ -242,7 +242,7 @@ function infoUserCalc(
 	let user = mentionUser;
 	if (time) user += `${timestamp(time)}`;
 	if (user.trim().length > 0) user += `${data.ul("common.space")}:\n`;
-	logger.error(EMOJI_MATH);
+	important.error(EMOJI_MATH);
 	return `${user}${EMOJI_MATH}[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
 }
 
