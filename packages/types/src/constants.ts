@@ -41,6 +41,6 @@ const MATH = {
 	prod: "<:math:1394002540143710358>",
 } as const;
 
-export const EMOJI_MATH = process.env.PROD ? MATH.prod : MATH.dev;
+export const EMOJI_MATH = process.env.NODE_ENV === "production" ? MATH.prod : MATH.dev;
 
 export const AND = "&";
