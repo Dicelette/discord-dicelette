@@ -68,7 +68,6 @@ export function getUserByEmbed(
 export async function firstCharName(client: EClient, guildId: string, userId: string) {
 	const userData = client.settings.get(guildId, `user.${userId}`);
 	if (!userData) return;
-
 	return userData[0] ?? undefined;
 }
 
@@ -197,7 +196,7 @@ export async function getUserFromMessageDirect(
 		fetchMessage?: boolean;
 		guildId?: string;
 	}
-) {
+): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	const guildId = options?.guildId ?? message.guild!.id;
 	const guildData = client.settings;
 	const characters = client.characters;
@@ -209,7 +208,7 @@ export async function getUserFromMessageDirect(
 		!options?.fetchChannel &&
 		!options?.fetchMessage
 	)
-		return getChara;
+		return { userData: getChara, charName: charName?.capitalize() };
 
 	if (!options)
 		options = {
@@ -269,7 +268,7 @@ export async function getUserFromMessageDirect(
 		});
 		if (options.fetchMessage) userData!.messageId = targetMessage.id;
 
-		return userData;
+		return { userData, charName: user.charName?.capitalize() };
 	} catch (error) {
 		logger.warn(error);
 		if (!skipNotFound)

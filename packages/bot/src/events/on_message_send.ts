@@ -39,13 +39,15 @@ export default (client: EClient): void => {
 					content
 				);
 			if (firstChara) content = content.replace(/ @\w+/, "").trim();
-			const userData = await getUserFromMessageDirect(
+			const data = await getUserFromMessageDirect(
 				client,
 				message.author.id,
 				message,
 				firstChara,
 				{ skipNotFound: true }
 			);
+			const userData = data?.userData;
+			const charName = data?.charName ?? firstChara;
 
 			const isRoll = isRolling(content, userData);
 
@@ -66,7 +68,7 @@ export default (client: EClient): void => {
 				result,
 				{ lang: userLang },
 				serverData?.critical,
-				firstChara,
+				charName,
 				undefined,
 				critical,
 				opposition
