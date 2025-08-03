@@ -1,8 +1,8 @@
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import * as Djs from "discord.js";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
+import * as Djs from "discord.js";
 import { sendLogs } from "messages";
 import { DB_CMD_NAME } from "../commands";
 
@@ -13,7 +13,7 @@ export const onDeleteChannel = (client: EClient): void => {
 			const guildID = channel.guild.id;
 			await deleteIfChannelOrThread(client, guildID, channel);
 		} catch (error) {
-			logger.error("\n", error);
+			logger.error(error);
 			if (channel.isDMBased()) return;
 			await sendLogs((error as Error).message, channel.guild, client.settings);
 		}
@@ -27,7 +27,7 @@ export const onKick = (client: EClient): void => {
 			client.characters.delete(guild.id);
 			client.template.delete(guild.id);
 		} catch (error) {
-			logger.error("\n", error);
+			logger.error(error);
 		}
 	});
 };
@@ -40,7 +40,7 @@ export const onDeleteThread = (client: EClient): void => {
 			//verify if the user message was in the thread
 			await deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
-			logger.error("\n", error);
+			logger.error(error);
 			if (thread.isDMBased()) return;
 			await sendLogs((error as Error).message, thread.guild, client.settings);
 		}

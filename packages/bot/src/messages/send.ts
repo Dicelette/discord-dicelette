@@ -45,7 +45,7 @@ export async function reply(
 		}
 		return await interaction.reply(options);
 	} catch (e) {
-		logger.error("\n", e);
+		logger.error(e);
 		return await interaction.followUp(options);
 	}
 }
@@ -203,7 +203,7 @@ export async function interactionError(
 	ul: Translation,
 	langToUse?: Djs.Locale
 ) {
-	logger.error("\n", e);
+	logger.warn(e);
 	if (!interaction.guild) return;
 	const msgError = lError(e as Error, interaction, langToUse);
 	if (msgError.length === 0) return;

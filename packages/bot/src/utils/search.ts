@@ -44,7 +44,7 @@ export async function searchUserChannel(
 		}
 		thread = channel as DiscordChannel;
 	} catch (error) {
-		logger.error("\nError while fetching channel", error);
+		logger.error("Error while fetching channel", error);
 		return;
 	}
 	if (!thread) {

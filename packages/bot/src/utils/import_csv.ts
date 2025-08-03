@@ -5,8 +5,8 @@ import { InvalidCsvContent, InvalidURL, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "uniformize";
-import { reply } from "messages";
 import process from "node:process";
+import { reply } from "messages";
 
 export type CSVRow = {
 	user: string;
@@ -62,14 +62,14 @@ export async function parseCSV(
 
 		async complete(results) {
 			if (!results.data) {
-				logger.error("\nError while parsing CSV", results.errors);
+				logger.error("Error while parsing CSV", results.errors);
 				error = "Error while parsing CSV";
 				return;
 			}
 			//throw error if missing header (it shouldn't not throw if a header is added)
 			const dataHeader = results.meta.fields?.map((key) => key.standardize());
 			if (!dataHeader) {
-				logger.error("\nError while parsing CSV, missing header");
+				logger.error("Error while parsing CSV, missing header");
 				if (interaction)
 					await reply(interaction, {
 						content: ul("import.errors.missing_header"),

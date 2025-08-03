@@ -121,7 +121,7 @@ export const displayUser = {
 			if (newDiceEmbed) displayEmbeds.push(newDiceEmbed);
 			await reply(interaction, { embeds: displayEmbeds });
 		} catch (e) {
-			logger.error("\n", e);
+			logger.error(e);
 			await reply(interaction, {
 				embeds: [embedError(ul("error.user.notFound"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,

@@ -65,7 +65,6 @@ export default (client: EClient): void => {
 				await resetButton(interaction.message, ul);
 			}
 		} catch (e) {
-			logger.warn(e);
 			await interactionError(client, interaction, e as Error, ul, langToUse);
 		}
 	});

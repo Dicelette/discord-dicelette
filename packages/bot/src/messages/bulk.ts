@@ -1,5 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { PersonnageIds, Translation } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { updateMemory } from "database";
 import * as Djs from "discord.js";
@@ -10,7 +11,6 @@ import {
 	getEmbedsList,
 } from "messages";
 import { searchUserChannel } from "utils";
-import { logger } from "@dicelette/utils";
 
 /**
  * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
@@ -136,7 +136,7 @@ export async function bulkDeleteCharacters(
 			});
 		} else await rep.edit({ components: [] });
 	} catch (err) {
-		logger.error("\n", err);
+		logger.error(err);
 	}
 	return;
 }

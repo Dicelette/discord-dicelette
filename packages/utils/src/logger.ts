@@ -33,7 +33,7 @@ const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLAT
 
 const prodSettings: ISettingsParam<ILogObj> = {
 	name: "LOGGER",
-	minLevel: 5,
+	minLevel: 6,
 	stylePrettyLogs: true,
 	prettyLogTemplate: PROD_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
@@ -65,7 +65,7 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
 	name: "IMPORTANT",
-	minLevel: 0,
+	minLevel: 1,
 	stylePrettyLogs: true,
 	prettyLogTemplate: IMPORTANT_LOG_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
