@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.64.2](https://github.com/Dicelette/discord-dicelette/compare/1.64.1...1.64.2) (2025-08-03)
+
+
+### Bug Fixes
+
+* bad env for Math constants ([9a01672](https://github.com/Dicelette/discord-dicelette/commit/9a016725015ea683298b9db39282398459e98a2e))
+
 ## [1.64.1](https://github.com/Dicelette/discord-dicelette/compare/1.64.0...1.64.1) (2025-08-01)
 
 
