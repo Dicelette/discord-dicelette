@@ -96,7 +96,7 @@ export async function fetchTemplate(
 			"https://cdn.discordapp.com",
 			process.env.PROXY_DISCORD_CDN
 		);
-	const res = await fetch(template.url).then((res) => res.json());
+	const res = await fetch(template.url).then((res) => res.text());
 	if (!isValidJSON(res)) {
 		logger.fatal(`Invalid JSON format in template attachment: ${template.url}`);
 		return undefined;

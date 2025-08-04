@@ -102,13 +102,12 @@ export function allValuesUndefined(obj: unknown): boolean {
 	return entries.every(([, value]) => allValuesUndefined(value));
 }
 
-export function isValidJSON(jsonString: unknown): boolean {
+export function isValidJSON(jsonString: string): boolean {
 	try {
-		important.info("Validating JSON string", typeof jsonString);
-		if (typeof jsonString !== "string") return false;
 		JSON.parse(jsonString);
 		return true;
 	} catch (e) {
+		logger.fatal(`Invalid JSON format: ${e}`);
 		return false;
 	}
 }
