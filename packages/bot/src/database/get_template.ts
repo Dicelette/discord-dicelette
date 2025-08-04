@@ -96,14 +96,16 @@ export async function fetchTemplate(
 			"https://cdn.discordapp.com",
 			process.env.PROXY_DISCORD_CDN
 		);
-	const res = await fetch(template.url).then((res) => res.text());
-	if (!isValidJSON(res)) {
+	const res = await fetch(template.url);
+	const resContent = await res.text();
+	if (!res.ok || res.status !== 200 || !isValidJSON(resContent)) {
 		logger.fatal(`Invalid JSON format in template attachment: ${template.url}`);
 		return undefined;
 	}
+	const resJson = JSON.parse(resContent) as unknown;
 	if (!enmap.get(message.guild!.id, "templateID.valid")) {
 		enmap.set(message.guild!.id, true, "templateID.valid");
-		return verifyTemplateValue(res);
+		return verifyTemplateValue(resJson);
 	}
-	return verifyTemplateValue(res, false);
+	return verifyTemplateValue(resJson, false);
 }
