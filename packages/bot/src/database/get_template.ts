@@ -2,7 +2,7 @@ import process from "node:process";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { isValidJSON, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
@@ -97,6 +97,10 @@ export async function fetchTemplate(
 			process.env.PROXY_DISCORD_CDN
 		);
 	const res = await fetch(template.url).then((res) => res.json());
+	if (!isValidJSON(res)) {
+		logger.fatal(`Invalid JSON format in template attachment: ${template.url}`);
+		return undefined;
+	}
 	if (!enmap.get(message.guild!.id, "templateID.valid")) {
 		enmap.set(message.guild!.id, true, "templateID.valid");
 		return verifyTemplateValue(res);
