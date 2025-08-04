@@ -231,9 +231,7 @@ export async function getUserFromMessageDirect(
 	let channel = client.channels.cache.get(userMessageId.channelId);
 	if (!channel && message.guild) {
 		const fetchedChannel = await fetchChannel(message.guild, userMessageId.channelId);
-		if (fetchedChannel) {
-			channel = fetchedChannel;
-		}
+		if (fetchedChannel) channel = fetchedChannel;
 	}
 
 	if (!channel || !("messages" in channel)) {

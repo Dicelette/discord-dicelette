@@ -58,7 +58,9 @@ export default (client: EClient): void => {
 			const channel = message.channel;
 			if (!result) return;
 			let critical = rollCustomCriticalsFromDice(content, ul);
-			const serverData = await getTemplate(message.guild, client.settings, ul, true);
+			const serverData =
+				client.template.get(message.guild.id) ??
+				(await getTemplate(message.guild, client.settings, ul, true));
 			if (serverData?.customCritical && !critical)
 				critical = rollCustomCritical(serverData.customCritical);
 
@@ -81,7 +83,7 @@ export default (client: EClient): void => {
 
 			if (client.settings.get(message.guild.id, "disableThread") === true) {
 				await replyDice(deleteInput, message, resultAsText);
-				if (deleteInput) message.delete();
+				if (deleteInput) await message.delete();
 				return;
 			}
 
@@ -109,7 +111,7 @@ export default (client: EClient): void => {
 			const thread = await threadToSend(client.settings, channel, ul);
 			const msgToEdit = await thread.send("_ _");
 			const msg = resultAsText.onMessageSend(context, message.author.id);
-			msgToEdit.edit(msg);
+			await msgToEdit.edit(msg);
 			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
 				? msgToEdit.url
 				: undefined;
@@ -120,7 +122,7 @@ export default (client: EClient): void => {
 			return;
 		} catch (e) {
 			if (!message.guild) return;
-			if (!isApiError(e)) logger.trace(e);
+			if (!isApiError(e)) logger.fatal(e);
 			const userLang =
 				client.settings.get(message.guild.id, "lang") ??
 				message.guild.preferredLocale ??
