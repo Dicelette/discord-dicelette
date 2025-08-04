@@ -104,6 +104,7 @@ export function allValuesUndefined(obj: unknown): boolean {
 
 export function isValidJSON(jsonString: unknown): boolean {
 	try {
+		important.info("Validating JSON string:", jsonString);
 		if (typeof jsonString !== "string") return false;
 		JSON.parse(jsonString);
 		return true;
