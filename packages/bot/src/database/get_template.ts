@@ -98,14 +98,14 @@ export async function fetchTemplate(
 		);
 	const res = await fetch(template.url);
 	const resContent = await res.text();
-	if (!res.ok || res.status !== 200 || !isValidJSON(resContent)) {
+	const validJson = isValidJSON(resContent);
+	if (!res.ok || res.status !== 200 || !validJson) {
 		logger.fatal(`Invalid JSON format in template attachment: ${template.url}`);
 		return undefined;
 	}
-	const resJson = JSON.parse(resContent) as unknown;
 	if (!enmap.get(message.guild!.id, "templateID.valid")) {
 		enmap.set(message.guild!.id, true, "templateID.valid");
-		return verifyTemplateValue(resJson);
+		return verifyTemplateValue(validJson);
 	}
-	return verifyTemplateValue(resJson, false);
+	return verifyTemplateValue(validJson, false);
 }
