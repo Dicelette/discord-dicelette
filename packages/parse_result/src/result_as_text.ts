@@ -183,7 +183,7 @@ export class ResultAsText {
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
-		const tot = r.match(/ = (\d+)/);
+		const tot = r.match(/ = (.+\d+)/);
 		const total = tot ? Number.parseInt(tot[1], 10) : 0;
 
 		const resultOfCompare = evaluate(
