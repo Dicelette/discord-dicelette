@@ -118,7 +118,7 @@ export default (client: EClient): void => {
 			const reply = await replyDice(deleteInput, message, resultAsText, idMessage);
 			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
 			await deleteAfter(reply, timer);
-			if (deleteInput) message.delete();
+			if (deleteInput) await message.delete();
 			return;
 		} catch (e) {
 			if (!message.guild) return;
