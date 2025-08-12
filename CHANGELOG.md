@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.64.4](https://github.com/Dicelette/discord-dicelette/compare/1.64.3...1.64.4) (2025-08-12)
+
+
+### Bug Fixes
+
+* should not be 0 when the number is under 10 ([c0604ab](https://github.com/Dicelette/discord-dicelette/commit/c0604ab968aaff1488ef7170ab2aa23d1aa9fa59))
+
 ## [1.64.3](https://github.com/Dicelette/discord-dicelette/compare/1.64.2...1.64.3) (2025-08-12)
 
 
