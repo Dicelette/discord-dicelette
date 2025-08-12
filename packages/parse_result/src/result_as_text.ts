@@ -183,8 +183,9 @@ export class ResultAsText {
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
-		const tot = r.match(/ = (.*)/);
-		const total = tot ? Number.parseInt(tot[1], 10) : 0;
+		const tot = r.split(" = ");
+		let total = Number.parseInt(tot[tot.length - 1], 10);
+		if (Number.isNaN(total)) total = 0;
 
 		const resultOfCompare = evaluate(
 			`${total} ${this.resultat!.compare!.sign} ${this.resultat!.compare!.value}`
