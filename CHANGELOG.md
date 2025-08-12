@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.64.3](https://github.com/Dicelette/discord-dicelette/compare/1.64.2...1.64.3) (2025-08-12)
+
+
+### Bug Fixes
+
+* can't display negative result ([553ce9f](https://github.com/Dicelette/discord-dicelette/commit/553ce9fc644c01b41c226c68ffa31d59288fd0d5))
+* fetch as text ([71c68c4](https://github.com/Dicelette/discord-dicelette/commit/71c68c4e2e4aaad3f3c0776ff692cc138640b62f))
+
 ## [1.64.2](https://github.com/Dicelette/discord-dicelette/compare/1.64.1...1.64.2) (2025-08-03)
 
 
