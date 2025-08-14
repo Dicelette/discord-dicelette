@@ -69,7 +69,7 @@ function levenshteinDistance(str1: string, str2: string): number {
 /**
  * Traite une attaque spécifique et retourne le résultat ou met à jour le meilleur match
  */
-async function processAttack(
+async function findMacroName(
 	client: EClient,
 	interaction: Djs.CommandInteraction,
 	userId: string,
@@ -196,7 +196,7 @@ async function findBestMatchingDice(
 		const damageName = userData.damageName ?? [];
 
 		for (const atqName of damageName) {
-			const result = await processAttack(
+			const result = await findMacroName(
 				client,
 				interaction,
 				userId,
@@ -225,7 +225,7 @@ async function findBestMatchingDice(
 					`Checking ${atqName.standardize()} against ${searchTerm}: similarity = ${calculateSimilarity(searchTerm, atqName.standardize())}`
 				);
 
-				const result = await processAttack(
+				const result = await findMacroName(
 					client,
 					interaction,
 					userId,
