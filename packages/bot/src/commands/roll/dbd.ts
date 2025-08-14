@@ -110,13 +110,11 @@ export default {
 		let charOptions = options.getString(t("common.character")) ?? undefined;
 		const charName = charOptions?.normalize();
 		try {
-			let userStatistique = await getUserFromMessage(
-				client,
-				interaction.user.id,
-				interaction,
-				charName,
-				{ skipNotFound: true }
-			);
+			let userStatistique = (
+				await getUserFromMessage(client, interaction.user.id, interaction, charName, {
+					skipNotFound: true,
+				})
+			)?.userData;
 			const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
 			if (charOptions && !selectedCharByQueries) {
 				await reply(interaction, {
@@ -133,7 +131,7 @@ export default {
 			charOptions = userStatistique?.userName ? userStatistique.userName : undefined;
 			if (!userStatistique && !charName) {
 				const char = await getFirstChar(client, interaction, ul, true);
-				userStatistique = char?.userStatistique;
+				userStatistique = char?.userStatistique?.userData;
 				charOptions = char?.optionChar ?? undefined;
 			}
 			if (!db.templateID.damageName) {

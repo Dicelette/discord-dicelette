@@ -137,9 +137,11 @@ export const mjRoll = {
 		let charData: undefined | UserData;
 		const template = await getTemplateByInteraction(interaction, client);
 		if (user) {
-			charData = await getUserFromMessage(client, user.id, interaction, charName, {
-				skipNotFound: true,
-			});
+			charData = (
+				await getUserFromMessage(client, user.id, interaction, charName, {
+					skipNotFound: true,
+				})
+			)?.userData;
 
 			const serializedNameQueries = isSerializedNameEquals(charData, charName);
 			if (charName && !serializedNameQueries) {
@@ -158,7 +160,7 @@ export const mjRoll = {
 			optionChar = charData?.userName ?? undefined;
 			if (!charData && !charName) {
 				const char = await getFirstChar(client, interaction, ul);
-				charData = char?.userStatistique;
+				charData = char?.userStatistique?.userData;
 				optionChar = char?.optionChar;
 			}
 			if (!charData) {

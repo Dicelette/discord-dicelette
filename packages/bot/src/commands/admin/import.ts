@@ -147,13 +147,12 @@ export const bulkAdd = {
 				);
 				if (options.getBoolean(t("import.delete.title"))) {
 					//delete old message if it exists
-					const oldChar = await getUserFromMessage(
-						client,
-						member.id,
-						interaction,
-						char.userName,
-						{ fetchChannel: true, fetchMessage: true }
-					);
+					const oldChar = (
+						await getUserFromMessage(client, member.id, interaction, char.userName, {
+							fetchChannel: true,
+							fetchMessage: true,
+						})
+					)?.userData;
 					if (oldChar) {
 						const channelId = oldChar.channel;
 						if (channelId) {

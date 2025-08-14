@@ -245,7 +245,7 @@ export function getRoll(dice: string): Resultat | undefined {
  * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
  * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
  */
-function replaceStatsInDiceFormula(
+export function replaceStatsInDiceFormula(
 	content: string,
 	stats?: Record<string, number>,
 	deleteComments = false,

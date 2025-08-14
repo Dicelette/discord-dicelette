@@ -302,7 +302,7 @@ export async function getUserFromMessage(
 		fetchMessage?: boolean;
 		guildId?: string;
 	}
-) {
+): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	const guildId = options?.guildId ?? interaction.guild!.id;
 	const guildData = client.settings;
 	const characters = client.characters;
@@ -314,7 +314,7 @@ export async function getUserFromMessage(
 		!options?.fetchChannel &&
 		!options?.fetchMessage
 	)
-		return getChara;
+		return { userData: getChara, charName: charName?.capitalize() };
 
 	if (!options)
 		options = {
@@ -362,7 +362,7 @@ export async function getUserFromMessage(
 		});
 		if (options.fetchMessage) userData!.messageId = message.id;
 
-		return userData;
+		return { userData, charName: user.charName?.capitalize() };
 	} catch (error) {
 		logger.warn(error);
 		if (!skipNotFound)
@@ -534,13 +534,11 @@ export async function getStatistics(
 	let optionChar = options.getString(t("common.character")) ?? undefined;
 	const charName = optionChar?.standardize();
 
-	let userStatistique = await getUserFromMessage(
-		client,
-		interaction.user.id,
-		interaction,
-		charName,
-		{ skipNotFound: true }
-	);
+	let userStatistique = (
+		await getUserFromMessage(client, interaction.user.id, interaction, charName, {
+			skipNotFound: true,
+		})
+	)?.userData;
 	const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
 
 	if (optionChar && !selectedCharByQueries) {
@@ -562,7 +560,7 @@ export async function getStatistics(
 	if (!userStatistique && !charName && needStats) {
 		//find the first character registered
 		const char = await getFirstChar(client, interaction, ul);
-		userStatistique = char?.userStatistique;
+		userStatistique = char?.userStatistique?.userData;
 		optionChar = char?.optionChar;
 	}
 
