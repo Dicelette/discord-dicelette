@@ -158,7 +158,7 @@ async function replyDice(
 			});
 }
 
-function parseComparator(
+export function parseComparator(
 	dice: string,
 	userStatistique?: Record<string, number>,
 	userStatStr?: string
