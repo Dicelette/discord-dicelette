@@ -119,7 +119,7 @@ export async function display(
 
 	const baseEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("config.title", { guild: interaction.guild!.name }))
-		.setThumbnail(interaction.guild!.iconURL() ?? "")
+
 		.setColor("Random")
 		.addFields(
 			{
@@ -184,6 +184,8 @@ export async function display(
 					`${dpTitle("config.stripOOC.categories")} ${resOoc}`,
 			}
 		);
+	if (interaction.guild!.iconURL())
+		baseEmbed.setThumbnail(interaction.guild!.iconURL({ size: 128, extension: "png" }));
 	const embeds = [baseEmbed];
 	await interaction.reply({ embeds });
 }
