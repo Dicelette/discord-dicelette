@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.65.0](https://github.com/Dicelette/discord-dicelette/compare/1.64.5...1.65.0) (2025-08-14)
+
+
+### Features
+
+* base roll should works the same as parsing message content ([5fb8c78](https://github.com/Dicelette/discord-dicelette/commit/5fb8c7864ebbac9c6287374b415db52040026a6b))
+
 ## [1.64.5](https://github.com/Dicelette/discord-dicelette/compare/1.64.4...1.64.5) (2025-08-12)
 
 ## [1.64.4](https://github.com/Dicelette/discord-dicelette/compare/1.64.3...1.64.4) (2025-08-12)
