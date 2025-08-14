@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.0.0](https://github.com/Dicelette/discord-dicelette/compare/1.65.0...2.0.0) (2025-08-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* the dbd command doesn't exists anymore, user need to use /macro instead of.
+
+### Features
+
+* rename DBD to macro ([f02f16e](https://github.com/Dicelette/discord-dicelette/commit/f02f16ece60f3d9453407491cf5cb0c161a7ae6b))
+
 ## [1.65.0](https://github.com/Dicelette/discord-dicelette/compare/1.64.5...1.65.0) (2025-08-14)
 
 
