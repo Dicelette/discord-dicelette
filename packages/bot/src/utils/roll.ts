@@ -108,12 +108,14 @@ async function findBestMatchingDice(
 
 			if (similarity >= minSimilarity && similarity > bestSimilarity) {
 				try {
-					const specificUserData = await getUserFromMessage(
-						client,
-						userId,
-						interaction,
-						userData.charName?.standardize()
-					);
+					const specificUserData = (
+						await getUserFromMessage(
+							client,
+							userId,
+							interaction,
+							userData.charName?.standardize()
+						)
+					)?.userData;
 
 					if (specificUserData?.damage) {
 						const dice = specificUserData.damage[standardizedAtq];
@@ -145,12 +147,14 @@ async function findBestMatchingDice(
 
 				if (similarity >= minSimilarity && similarity > bestSimilarity) {
 					try {
-						const specificUserData = await getUserFromMessage(
-							client,
-							userId,
-							interaction,
-							userData.charName?.standardize()
-						);
+						const specificUserData = (
+							await getUserFromMessage(
+								client,
+								userId,
+								interaction,
+								userData.charName?.standardize()
+							)
+						)?.userData;
 
 						if (specificUserData?.damage) {
 							const dice = specificUserData.damage[standardizedAtq];
@@ -193,7 +197,6 @@ export async function rollWithInteraction(
 	customCritical?: Record<string, CustomCritical> | undefined,
 	opposition?: ComparedValue
 ) {
-	//exclude announcement channel
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
 		lang: langToUse,

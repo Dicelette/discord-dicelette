@@ -1,9 +1,14 @@
 import { t } from "@dicelette/localization";
-import { rollCustomCriticalsFromDice } from "@dicelette/parse_result";
+import {
+	replaceStatsInDiceFormula,
+	rollCustomCriticalsFromDice,
+} from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getLangAndConfig, rollWithInteraction } from "utils";
 import "discord_ext";
+import { getCharFromText, getUserFromMessage } from "database";
+import { parseComparator } from "../../events/on_message_send";
 
 export const diceRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -29,20 +34,41 @@ export const diceRoll = {
 		const channel = interaction.channel;
 		if (!channel || !channel.isTextBased()) return;
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
-		const dice = option.getString(t("common.dice"), true);
+		let dice = option.getString(t("common.dice"), true);
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));
 		const { ul } = getLangAndConfig(client, interaction);
+		let firstChara: string | undefined;
+		if (dice.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/))
+			firstChara = await getCharFromText(
+				client,
+				interaction.guild.id,
+				interaction.user.id,
+				dice
+			);
+		if (firstChara) dice = dice.replace(/ @\w+/, "").trim();
+		const data = await getUserFromMessage(
+			client,
+			interaction.user.id,
+			interaction,
+			firstChara,
+			{ skipNotFound: true }
+		);
+		const userData = data?.userData;
+		const charName = data?.charName ?? firstChara;
 		const rCC = rollCustomCriticalsFromDice(dice, ul);
+		const res = replaceStatsInDiceFormula(dice, userData?.stats, true);
+		const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
 		await rollWithInteraction(
 			interaction,
-			dice,
+			res.formula,
 			client,
 			undefined,
 			undefined,
-			undefined,
+			charName,
 			undefined,
 			hidden,
-			rCC
+			rCC,
+			opposition
 		);
 	},
 };
