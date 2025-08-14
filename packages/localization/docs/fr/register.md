@@ -10,7 +10,7 @@ Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous 
 
 ### Aperçu des commandes :
 Après avoir configuré le modèle, vous pouvez utiliser les commandes suivantes pour interagir avec les fiches de personnage :
-- **</dbd:{{-dbd}}>** : Lancez des dés basés sur les données sauvegardées.
+- **</macro:{{-macro}}>** : Lancez des dés basés sur les données sauvegardées.
 - **</dbroll:{{-dbroll}}>** : Effectuez des lancers de dés statistiques.
 - **</graph:{{-graph}}>** : Générez des graphiques à partir des statistiques des personnages.
 - **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.

@@ -1,4 +1,4 @@
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
@@ -79,7 +79,7 @@ export function commonOptions(
 	return builder;
 }
 
-export function dbdOptions(
+export function macroOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
 	builder.addStringOption((option) =>
@@ -89,7 +89,7 @@ export function dbdOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { opposition: true });
+	return commonOptions(builder, { opposition: true, expression: true });
 }
 
 /**
@@ -157,7 +157,7 @@ export function calcOptions(
 
 export function gmCommonOptions(
 	builder: Djs.SlashCommandSubcommandBuilder,
-	type: "dbroll" | "dbd" | "calc"
+	type: "dbroll" | "macro" | "calc"
 ) {
 	let builderCopy = builder;
 	function addHiddenOpts(
@@ -172,9 +172,9 @@ export function gmCommonOptions(
 		return builder;
 	}
 	switch (type) {
-		case "dbd": {
+		case "macro": {
 			builderCopy = addHiddenOpts(
-				dbdOptions(builder) as Djs.SlashCommandSubcommandBuilder
+				macroOptions(builder) as Djs.SlashCommandSubcommandBuilder
 			);
 			break;
 		}

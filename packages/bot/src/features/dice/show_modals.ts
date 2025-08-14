@@ -40,7 +40,7 @@ async function show(
 	const id = first ? "damageDice_first" : "damageDice";
 	const modal = new Djs.ModalBuilder()
 		.setCustomId(id)
-		.setTitle(ul("register.embed.damage"));
+		.setTitle(ul("common.macro").capitalize());
 	const damageDice =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -95,7 +95,7 @@ async function showEdit(interaction: Djs.ButtonInteraction, ul: Translation) {
 	}
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editDice")
-		.setTitle(ul("common.dice").capitalize());
+		.setTitle(ul("common.macro").capitalize());
 	const input =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()

@@ -218,7 +218,7 @@ export async function findLocation(
 		| Djs.PrivateThreadChannel
 		| Djs.TextChannel
 		| Djs.NewsChannel
-		| Djs.PublicThreadChannel<boolean>;
+		| Djs.PublicThreadChannel;
 	sheetLocation: PersonnageIds;
 }> {
 	const sheetLocation: PersonnageIds = {
@@ -405,7 +405,7 @@ export async function threadToSend(
 		| Djs.PrivateThreadChannel
 		| Djs.NewsChannel
 		| Djs.StageChannel
-		| Djs.PublicThreadChannel<boolean>
+		| Djs.PublicThreadChannel
 		| Djs.VoiceChannel,
 	ul: Translation,
 	isHidden?: string

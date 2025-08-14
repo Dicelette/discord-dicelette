@@ -16,7 +16,7 @@ export const commandsList = [
 ];
 export const dbCmd = [...GIMMICK, ...ROLL_DB];
 export const DB_CMD_NAME = [
-	t("rAtq.name"),
+	t("common.macro"),
 	t("dbRoll.name"),
 	t("calc.title"),
 	t("display.title"),

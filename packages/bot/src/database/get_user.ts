@@ -29,7 +29,7 @@ import {
 
 export function getUserByEmbed(
 	data: {
-		message?: Djs.Message<boolean>;
+		message?: Djs.Message;
 		embeds?: Djs.EmbedBuilder[];
 	},
 	ul: Translation,

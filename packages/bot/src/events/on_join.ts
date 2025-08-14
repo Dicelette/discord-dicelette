@@ -7,18 +7,23 @@ export default (client: EClient): void => {
 		try {
 			client.characters.set(guild.id, {});
 			client.template.set(guild.id, {});
-			for (const command of commandsList) {
+
+			const commandPromises = commandsList.map(async (command) => {
 				await guild.commands.create(command.data);
 				logger.trace(`Command ${command.data.name} created in ${guild.name}`);
-				client.settings.set(guild.id, true, "converted");
-			}
+				return command.data.name;
+			});
 
-			for (const contextMenu of contextMenus) {
+			const contextMenuPromises = contextMenus.map(async (contextMenu) => {
 				await guild.commands.create(contextMenu);
-			}
+				return contextMenu.name;
+			});
+			await Promise.all([...commandPromises, ...contextMenuPromises]);
+
+			client.settings.set(guild.id, true, "converted");
+			await helpAtInvit(guild);
 		} catch (e) {
 			logger.fatal(e);
 		}
-		await helpAtInvit(guild);
 	});
 };

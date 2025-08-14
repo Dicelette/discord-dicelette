@@ -84,6 +84,11 @@ export default (client: EClient): void => {
 		await Promise.all(guildPromises);
 
 		important.info("Bot is ready");
+		logger.info(
+			"Invite link: https://discord.com/api/oauth2/authorize?client_id=" +
+				process.env.CLIENT_ID +
+				"&permissions=8&scope=bot%20applications.commands"
+		);
 		cleanData(client);
 		if (process.env.NODE_ENV === "development") client.template = dev(client.template);
 	});

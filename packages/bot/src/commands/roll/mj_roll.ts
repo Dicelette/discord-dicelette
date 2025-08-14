@@ -13,7 +13,7 @@ import {
 	getLangFromInteraction,
 	gmCommonOptions,
 	isSerializedNameEquals,
-	rollDice,
+	rollMacro,
 	rollStatistique,
 } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
@@ -34,10 +34,10 @@ export const mjRoll = {
 		)
 		.addSubcommand(
 			(
-				sub //dbd
+				sub //macro
 			) =>
-				gmCommonOptions(sub, "dbd")
-					.setNames("rAtq.name")
+				gmCommonOptions(sub, "macro")
+					.setNames("common.macro")
 					.setDescriptions("rAtq.description")
 		)
 		.addSubcommand(
@@ -220,8 +220,8 @@ export const mjRoll = {
 				user,
 				hide
 			);
-		if (subcommand === ul("rAtq.name"))
-			return await rollDice(
+		if (subcommand === ul("common.macro"))
+			return await rollMacro(
 				interaction,
 				client,
 				charData,

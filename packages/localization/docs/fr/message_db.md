@@ -6,11 +6,11 @@ Ces commandes permettent l'attribution automatique de rôles lors de la validati
 - **</config auto_role statistics:{{- stat}}>** : Ajoute un rôle lors de la validation des statistiques.
 - **</config auto_role dice:{{- dice}}>** : Ajoute un rôle lors de l'enregistrement d'un dé. 
 
-Cela permet l'utilisation des commandes </dbroll:{{- dbroll}}>, </dbd:{{- dbd}}> et </calc:{{- calc}}> si elles sont restreintes aux utilisateurs ayant ces rôles.
+Cela permet l'utilisation des commandes </dbroll:{{- dbroll}}>, </macro:{{- macro}}> et </calc:{{- calc}}> si elles sont restreintes aux utilisateurs ayant ces rôles.
 
 # Lancers de dés « maître de jeu »
 Ces commandes permettent aux maîtres de jeu de lancer des dés pour tous les joueurs enregistrés :
 - **</gm dbroll:{{- gm.dbRoll}}>** : Lance un dé de statistiques, similaire à </dbroll:{{- dbroll}}>.
-- **</gm dbd:{{- gm.dBd}}>** : Lance un dé enregistré, similaire à </dbd:{{- dbd}}>.
+- **</gm macro:{{- gm.macro}}>** : Lance un dé enregistré, similaire à </macro:{{- macro}}>.
 - **</gm calc:{{- gm.calc}}>** : Lance un dé de calcul, similaire à </calc:{{- calc}}>.
 

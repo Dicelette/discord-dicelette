@@ -10,7 +10,7 @@ The bot allows you to configure a server model, enabling the creation and manage
 
 ### Commands Overview:
 After setting up the model, you can use the following commands to interact with character sheets:
-- **</dbd:{{-dbd}}>**: Roll dice based on saved data.
+- **</macro:{{-macro}}>**: Roll dice based on saved data.
 - **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.
 - **</graph:{{-graph}}>**: Generate graphs from character statistics.
 - **</calc:{{-calc}}>**: Calculate values using character statistics.

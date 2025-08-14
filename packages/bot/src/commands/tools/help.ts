@@ -123,7 +123,7 @@ export const help = {
 				await reply(interaction, {
 					content: dedent(
 						ul("help.register.message", {
-							dbd: helpDBCmd?.[t("rAtq.name")],
+							macro: helpDBCmd?.[t("common.macro")],
 							dbroll: helpDBCmd?.[t("dbRoll.name")],
 							graph: helpDBCmd?.[t("graph.name")],
 							display: helpDBCmd?.[t("display.title")],
@@ -168,12 +168,12 @@ export const help = {
 								stat: idsAdminDB?.["auto_role statistics"],
 								dice: idsAdminDB?.["auto_role dice"],
 								gm: {
-									dBd: idsAdminDB?.["gm dbd"],
+									macro: idsAdminDB?.["gm macro"],
 									dbRoll: idsAdminDB?.["gm dbroll"],
 									calc: idsAdminDB?.["gm calc"],
 								},
 								dbroll: idsAdminDB?.[t("dbRoll.name")],
-								dbd: idsAdminDB?.[t("rAtq.name")],
+								macro: idsAdminDB?.[t("common.macro")],
 								calc: idsAdminDB?.[t("calc.title")],
 							})
 						)
@@ -244,7 +244,7 @@ function getHelpDBCmd(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>
 ) {
 	const commandToFind = [
-		t("rAtq.name"),
+		t("common.macro"),
 		t("dbRoll.name"),
 		t("graph.name"),
 		t("display.title"),
@@ -291,13 +291,13 @@ function getIDForAdminDB(
 		t("config.name"),
 		t("mjRoll.name"),
 		t("dbRoll.name"),
-		t("rAtq.name"),
+		t("common.macro"),
 		t("calc.title"),
 	];
 	const ids = getCommandIds(commandsID, commandToFind);
 
 	if (ids[t("mjRoll.name")]) {
-		ids["gm dbd"] = ids[t("mjRoll.name")];
+		ids["gm macro"] = ids[t("mjRoll.name")];
 		ids["gm dbroll"] = ids[t("mjRoll.name")];
 		ids["gm calc"] = ids[t("mjRoll.name")];
 	}
@@ -319,7 +319,7 @@ function createHelpMessageDB(
 	if (!db.has(guildID, "templateID") || !commandsID) return "";
 	const ids = getHelpDBCmd(commandsID);
 	return ul("help.messageDB", {
-		dbd: ids?.[t("rAtq.name")],
+		macro: ids?.[t("common.macro")],
 		dbroll: ids?.[t("dbRoll.name")],
 		graph: ids?.[t("graph.name")],
 		display: ids?.[t("display.title")],

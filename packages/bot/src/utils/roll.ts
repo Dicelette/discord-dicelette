@@ -67,6 +67,99 @@ function levenshteinDistance(str1: string, str2: string): number {
 }
 
 /**
+ * Traite une attaque spécifique et retourne le résultat ou met à jour le meilleur match
+ */
+async function processAttack(
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	userId: string,
+	userData: { charName?: string | null; damageName?: string[] },
+	atqName: string,
+	searchTerm: string,
+	bestSimilarity: number,
+	minSimilarity: number
+): Promise<{
+	perfectMatch?: {
+		dice: string;
+		attackName: string;
+		charName?: string;
+		similarity: number;
+	};
+	newBestMatch?: {
+		dice: string;
+		attackName: string;
+		charName?: string;
+		similarity: number;
+	};
+	newBestSimilarity?: number;
+}> {
+	const standardizedAtq = atqName.standardize();
+	const similarity = calculateSimilarity(searchTerm, standardizedAtq);
+
+	if (similarity === 1.0) {
+		try {
+			const specificUserData = (
+				await getUserFromMessage(
+					client,
+					userId,
+					interaction,
+					userData.charName?.standardize()
+				)
+			)?.userData;
+
+			if (specificUserData?.damage) {
+				const dice = specificUserData.damage[standardizedAtq];
+				if (dice) {
+					return {
+						perfectMatch: {
+							dice,
+							attackName: atqName,
+							charName: userData.charName ?? undefined,
+							similarity,
+						},
+					};
+				}
+			}
+		} catch (error) {
+			logger.warn(`Error getting data for character "${userData.charName}":`, error);
+		}
+	}
+
+	// Pour les correspondances partielles, on garde la meilleure
+	if (similarity >= minSimilarity && similarity > bestSimilarity) {
+		try {
+			const specificUserData = (
+				await getUserFromMessage(
+					client,
+					userId,
+					interaction,
+					userData.charName?.standardize()
+				)
+			)?.userData;
+
+			if (specificUserData?.damage) {
+				const dice = specificUserData.damage[standardizedAtq];
+				if (dice) {
+					return {
+						newBestMatch: {
+							dice,
+							attackName: atqName,
+							charName: userData.charName ?? undefined,
+							similarity,
+						},
+						newBestSimilarity: similarity,
+					};
+				}
+			}
+		} catch (error) {
+			logger.warn(`Error getting data for character "${userData.charName}":`, error);
+		}
+	}
+
+	return {};
+}
+
+/**
  * Trouve le dé le plus similaire parmi tous les personnages du joueur
  */
 async function findBestMatchingDice(
@@ -90,7 +183,7 @@ async function findBestMatchingDice(
 		similarity: number;
 	} | null = null;
 	let bestSimilarity = 0;
-	const minSimilarity = 0.2; // Abaissement du seuil minimum de similarité
+	const minSimilarity = 0.2;
 
 	for (const userData of allUserData) {
 		if (charOptions) {
@@ -103,82 +196,56 @@ async function findBestMatchingDice(
 		const damageName = userData.damageName ?? [];
 
 		for (const atqName of damageName) {
-			const standardizedAtq = atqName.standardize();
-			const similarity = calculateSimilarity(searchTerm, standardizedAtq);
+			const result = await processAttack(
+				client,
+				interaction,
+				userId,
+				userData,
+				atqName,
+				searchTerm,
+				bestSimilarity,
+				minSimilarity
+			);
 
-			if (similarity >= minSimilarity && similarity > bestSimilarity) {
-				try {
-					const specificUserData = (
-						await getUserFromMessage(
-							client,
-							userId,
-							interaction,
-							userData.charName?.standardize()
-						)
-					)?.userData;
+			if (result.perfectMatch) return result.perfectMatch;
 
-					if (specificUserData?.damage) {
-						const dice = specificUserData.damage[standardizedAtq];
-						if (dice) {
-							bestMatch = {
-								dice,
-								attackName: atqName,
-								charName: userData.charName ?? undefined,
-								similarity,
-							};
-							bestSimilarity = similarity;
-						}
-					}
-				} catch (error) {
-					logger.warn(`Error getting data for character "${userData.charName}":`, error);
-				}
+			if (result.newBestMatch && result.newBestSimilarity) {
+				bestMatch = result.newBestMatch;
+				bestSimilarity = result.newBestSimilarity;
 			}
 		}
 	}
 
-	// Si aucun match avec charOptions, essayer sans le filtre de personnage
-	if (!bestMatch && charOptions) {
+	if (charOptions) {
 		for (const userData of allUserData) {
 			const damageName = userData.damageName ?? [];
 
 			for (const atqName of damageName) {
-				const standardizedAtq = atqName.standardize();
-				const similarity = calculateSimilarity(searchTerm, standardizedAtq);
+				logger.info(
+					`Checking ${atqName.standardize()} against ${searchTerm}: similarity = ${calculateSimilarity(searchTerm, atqName.standardize())}`
+				);
 
-				if (similarity >= minSimilarity && similarity > bestSimilarity) {
-					try {
-						const specificUserData = (
-							await getUserFromMessage(
-								client,
-								userId,
-								interaction,
-								userData.charName?.standardize()
-							)
-						)?.userData;
+				const result = await processAttack(
+					client,
+					interaction,
+					userId,
+					userData,
+					atqName,
+					searchTerm,
+					bestSimilarity,
+					minSimilarity
+				);
 
-						if (specificUserData?.damage) {
-							const dice = specificUserData.damage[standardizedAtq];
+				if (result.perfectMatch) return result.perfectMatch;
 
-							if (dice) {
-								bestMatch = {
-									dice,
-									attackName: atqName,
-									charName: userData.charName ?? undefined,
-									similarity,
-								};
-								bestSimilarity = similarity;
-							}
-						}
-					} catch (error) {
-						logger.warn(
-							`Error getting fallback data for character "${userData.charName}":`,
-							error
-						);
-					}
+				if (result.newBestMatch && result.newBestSimilarity) {
+					bestMatch = result.newBestMatch;
+					bestSimilarity = result.newBestSimilarity;
 				}
 			}
 		}
 	}
+
 	return bestMatch;
 }
 
@@ -248,7 +315,7 @@ export async function rollWithInteraction(
  * @param {Djs.User|undefined} user
  * @param {boolean|null|undefined} hideResult - If true, the roll result is hidden from other users.
  */
-export async function rollDice(
+export async function rollMacro(
 	interaction: Djs.CommandInteraction,
 	client: EClient,
 	userStatistique: UserData,
@@ -271,7 +338,7 @@ export async function rollDice(
 		: undefined;
 	const comments = comm ?? "";
 	let dice = userStatistique.damage?.[atq];
-	// Recherche améliorée du dé le plus similaire parmi tous les personnages
+
 	if (!dice) {
 		const bestMatch = await findBestMatchingDice(
 			client,

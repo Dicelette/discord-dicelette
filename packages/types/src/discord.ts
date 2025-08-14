@@ -2,7 +2,7 @@ import type * as Djs from "discord.js";
 
 export type DiscordChannel =
 	| Djs.PrivateThreadChannel
-	| Djs.PublicThreadChannel<boolean>
+	| Djs.PublicThreadChannel
 	| Djs.TextChannel
 	| Djs.NewsChannel
 	| undefined;
@@ -12,5 +12,5 @@ export type DiscordTextChannel =
 	| Djs.NewsChannel
 	| Djs.StageChannel
 	| Djs.PrivateThreadChannel
-	| Djs.PublicThreadChannel<boolean>
+	| Djs.PublicThreadChannel
 	| Djs.VoiceChannel;

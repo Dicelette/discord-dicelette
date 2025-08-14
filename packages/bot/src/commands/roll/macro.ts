@@ -10,12 +10,12 @@ import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
-import { dbdOptions, getLangAndConfig, isSerializedNameEquals, rollDice } from "utils";
+import { getLangAndConfig, isSerializedNameEquals, macroOptions, rollMacro } from "utils";
 import "discord_ext";
 
 export default {
-	data: (dbdOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setNames("rAtq.name")
+	data: (macroOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
+		.setNames("common.macro")
 		.setDescriptions("rAtq.description")
 		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
@@ -184,7 +184,7 @@ export default {
 					damage,
 				};
 			}
-			return await rollDice(
+			return await rollMacro(
 				interaction,
 				client,
 				userStatistique,

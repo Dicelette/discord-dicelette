@@ -116,7 +116,7 @@ export async function sendResult(
 	channel = channel as
 		| Djs.TextChannel
 		| Djs.PrivateThreadChannel
-		| Djs.PublicThreadChannel<boolean>;
+		| Djs.PublicThreadChannel;
 
 	const disableThread = settings.get(interaction.guild!.id, "disableThread");
 	let rollChannel = settings.get(interaction.guild!.id, "rollChannel");

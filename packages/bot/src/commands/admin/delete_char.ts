@@ -274,7 +274,7 @@ async function deleteNoUserMessage(
 async function deleteOneChar(
 	userChannel:
 		| Djs.PrivateThreadChannel
-		| Djs.PublicThreadChannel<boolean>
+		| Djs.PublicThreadChannel
 		| Djs.TextChannel
 		| Djs.NewsChannel,
 	messageID: string,
