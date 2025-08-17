@@ -1,4 +1,5 @@
 // noinspection ES6MissingAwait
+/** biome-ignore-all lint/suspicious/noTsIgnore: let me alone */
 
 import process from "node:process";
 import { ln } from "@dicelette/localization";
@@ -12,8 +13,6 @@ import dotenv from "dotenv";
 import { VERSION } from "../../index";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
-
-const rest = new Djs.REST().setToken(process.env.DISCORD_TOKEN ?? "0");
 
 export default (client: EClient): void => {
 	client.on("ready", async () => {
@@ -47,38 +46,24 @@ export default (client: EClient): void => {
 			}
 
 			logger.trace(`Registering commands for \`${guild.name}\``);
-			const cmds = await guild.client.application.commands.fetch({
-				guildId: guild.id,
-			});
 
-			const deletePromises = cmds.map(async (command) => {
-				if (guildCommands.find((c) => c.name === command.name)) return;
-				try {
-					await command.delete();
-				} catch (e) {
-					logger.warn(`Error while deleting command ${command.name} in ${guild.name}`);
-				}
-			});
+			try {
+				// Utiliser guild.commands.set() au lieu de rest.put() pour une approche plus efficace
+				// Cela gère automatiquement la création, mise à jour et suppression des commandes
+				await guild.commands.set(guildCommands);
 
-			await Promise.all(deletePromises);
+				const cachePromises = [
+					fetchAllCharacter(client, guild),
+					cacheStatisticalTemplate(client, guild),
+				];
 
-			await rest.put(
-				Djs.Routes.applicationGuildCommands(process.env.CLIENT_ID!, guild.id),
-				{
-					body: guildCommands,
-				}
-			);
+				convertDatabaseUser(client.settings, guild);
 
-			const cachePromises = [
-				fetchAllCharacter(client, guild),
-				cacheStatisticalTemplate(client, guild),
-			];
-
-			convertDatabaseUser(client.settings, guild);
-
-			await Promise.all(cachePromises);
-			logger.info(`User saved in memory for ${guild.name}`);
-			logger.info(`Template saved in memory for ${guild.name}`);
+				await Promise.all(cachePromises);
+				logger.info(`Commands and data processed for ${guild.name}`);
+			} catch (error) {
+				logger.error(`Failed to process guild ${guild.name}:`, error);
+			}
 		});
 
 		await Promise.all(guildPromises);
