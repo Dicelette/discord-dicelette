@@ -1,7 +1,7 @@
 Le bot dispose de différentes commandes d'administration qui vous permettent de personnaliser votre expérience.
 
 Vous trouverez [ici](<https://dicelette.github.io/docs/config>) des explications détaillées sur les commandes présentées ici :
-- </config display:{{- display}}> : Affiche la configuration du serveur
+- </config display general:{{- display}}> : Affiche la configuration du serveur
 - </config logs:{{- logs}}> : Enregistre un canal pour afficher les erreurs et les modifications apportées aux enregistrements.
 - </config result_channel:{{- result}}> : Permet de définir un canal ou d'activer/désactiver la création automatique d'un thread pour recevoir les résultats de tous les jets de dés du serveur.
 - </config delete_after:{{- delete}}> : Permet de modifier le délai avant la suppression des messages de résultats (uniquement si </config result_channel:{{- result}}> est désactivé). Si la valeur est `0`, les messages ne seront pas supprimés. Par défaut, les messages sont supprimés au bout de 3 minutes.

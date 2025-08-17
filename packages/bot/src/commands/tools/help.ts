@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: Discord didn't use camelCase for command name */
 import { ln, t } from "@dicelette/localization";
 import { LINKS, type Settings, type Translation } from "@dicelette/types";
 import {
@@ -265,7 +266,6 @@ function getConfigIds(
 	ids[t("changeThread.name")] = idConfig;
 	ids[t("timer.name")] = idConfig;
 	ids[t("display.title")] = idConfig;
-	ids[t("timestamp.name")] = idConfig;
 	ids[t("config.lang.name")] = idConfig;
 	ids[t("config.selfRegister.name")] = idConfig;
 	ids[t("config.lang.options.name")] = idConfig;
@@ -327,8 +327,8 @@ function createHelpMessageDB(
 	});
 }
 
-export async function helpAtInvit(guild: Djs.Guild) {
-	const commandsId = await guild.commands.fetch();
+export async function helpAtInvit(guild: Djs.Guild): Promise<void> {
+	const cmdsId = guild.commands.cache;
 	const lang = guild.preferredLocale;
 	const ul = ln(lang);
 	const docLinkExt = lang === "fr" ? "" : "en/";
@@ -343,7 +343,7 @@ export async function helpAtInvit(guild: Djs.Guild) {
 	)
 		systemChannel = "dm";
 
-	const ids = getConfigIds(commandsId);
+	const ids = getConfigIds(cmdsId);
 	const commandId = {
 		lang: ids?.[t("config.lang.name")],
 		result: ids?.[t("changeThread.name")],
