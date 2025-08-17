@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.0.2](https://github.com/Dicelette/discord-dicelette/compare/2.0.1...2.0.2) (2025-08-17)
+
+
+### Bug Fixes
+
+* correct templateID check and update documentation formatting ([97e1b52](https://github.com/Dicelette/discord-dicelette/commit/97e1b52dfc449f299de019f7fe694592d0852c84))
+* message broken ([c336a47](https://github.com/Dicelette/discord-dicelette/commit/c336a47b84a60ae87a80c36872526ef66c002f56))
+
 ## [2.0.1](https://github.com/Dicelette/discord-dicelette/compare/2.0.0...2.0.1) (2025-08-14)
 
 ## [2.0.0](https://github.com/Dicelette/discord-dicelette/compare/1.65.0...2.0.0) (2025-08-14)
