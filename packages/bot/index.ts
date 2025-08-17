@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
 import { logger } from "@dicelette/utils";
 import dotenv from "dotenv";
 import "uniformize";

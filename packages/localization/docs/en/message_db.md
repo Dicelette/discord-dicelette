@@ -3,10 +3,10 @@
 
 # Automatic Roles
 These commands allow automatic role assignment during file validation:
-- **</config auto_role statistics:{{- stat}}**: Adds a role when statistics are validated.
-- **</config auto_role dice:{{- dice}}**: Adds a role when a die is registered. 
+- **</config auto_role statistics:{{- stat}}>**: Adds a role when statistics are validated.
+- **</config auto_role dice:{{- dice}}>**: Adds a role when a die is registered. 
 
-# This allows the use of the commands </dbroll:{{- dbroll}}>, </macro:{{- macro}}> and </calc:{{- calc}}> if they are restricted to users with these roles.
+This allows the use of the commands </dbroll:{{- dbroll}}>, </macro:{{- macro}}> and </calc:{{- calc}}> if they are restricted to users with these roles.
 
 # "Game Master" Dice Rolls
 These commands allow game masters to roll dice for all registered players:

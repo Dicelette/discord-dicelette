@@ -285,7 +285,7 @@ function getIDForAdminDB(
 	db: Settings,
 	guildID: Djs.Snowflake
 ) {
-	if (!db.has(guildID, "templateID")) return;
+	if (!db.has(guildID, "templateID.channelId")) return;
 	const commandToFind = [
 		t("deleteChar.name"),
 		t("config.name"),
