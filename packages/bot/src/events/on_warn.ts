@@ -9,6 +9,6 @@ export const onWarn = (client: EClient): void => {
 
 export const onDebug = (client: EClient): void => {
 	client.on("debug", async (message) => {
-		important.debug(message);
+		if (!message.includes("Heartbeat acknowledged, latency of")) important.debug(message);
 	});
 };
