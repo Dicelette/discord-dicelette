@@ -7,7 +7,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getLangAndConfig, rollWithInteraction } from "utils";
 import "discord_ext";
-import { getCharFromText, getUserFromMessage } from "database";
+import { getCharFromText, getUserFromInteraction } from "database";
 import { parseComparator } from "../../events/on_message_send";
 
 export const diceRoll = {
@@ -46,7 +46,7 @@ export const diceRoll = {
 				dice
 			);
 		if (firstChara) dice = dice.replace(/ @\w+/, "").trim();
-		const data = await getUserFromMessage(
+		const data = await getUserFromInteraction(
 			client,
 			interaction.user.id,
 			interaction,

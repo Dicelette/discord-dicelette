@@ -3,7 +3,7 @@
  */
 import { t } from "@dicelette/localization";
 import type { EClient } from "client";
-import { getUserFromMessage } from "database";
+import { getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import { type CSVRow, getLangAndConfig } from "utils";
@@ -71,7 +71,7 @@ async function exportToCsv(
 				: data;
 		for (const char of chara) {
 			const stats = (
-				await getUserFromMessage(client, user, interaction, char.charName, {
+				await getUserFromInteraction(client, user, interaction, char.charName, {
 					skipNotFound: true,
 					fetchAvatar: true,
 					fetchChannel: true,

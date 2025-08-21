@@ -23,7 +23,7 @@ import {
 import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getRightValue, getUserFromMessage } from "database";
+import { getRightValue, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
 import { getLangAndConfig } from "utils";
@@ -99,7 +99,7 @@ async function findMacroName(
 	if (similarity === 1.0) {
 		try {
 			const specificUserData = (
-				await getUserFromMessage(
+				await getUserFromInteraction(
 					client,
 					userId,
 					interaction,
@@ -129,7 +129,7 @@ async function findMacroName(
 	if (similarity >= minSimilarity && similarity > bestSimilarity) {
 		try {
 			const specificUserData = (
-				await getUserFromMessage(
+				await getUserFromInteraction(
 					client,
 					userId,
 					interaction,

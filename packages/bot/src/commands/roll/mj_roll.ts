@@ -6,7 +6,7 @@ import {
 	uniformizeRecords,
 } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import {
@@ -138,7 +138,7 @@ export const mjRoll = {
 		const template = await getTemplateByInteraction(interaction, client);
 		if (user) {
 			charData = (
-				await getUserFromMessage(client, user.id, interaction, charName, {
+				await getUserFromInteraction(client, user.id, interaction, charName, {
 					skipNotFound: true,
 				})
 			)?.userData;

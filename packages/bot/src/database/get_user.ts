@@ -115,7 +115,7 @@ export async function getFirstChar(
 		return;
 	}
 	const optionChar = firstChar.charName?.capitalize();
-	const userStatistique = await getUserFromMessage(
+	const userStatistique = await getUserFromInteraction(
 		client,
 		interaction.user.id,
 		interaction,
@@ -167,26 +167,14 @@ export async function getUser(
 	}
 }
 
-/**
- * Retrieves a user's character data from a Discord message directly.
- *
- * This is a simplified version of getUserFromMessage that works with a Discord message instead of an interaction.
- * Searches in-memory cache first, then fetches the relevant message from the user's character thread if necessary.
- *
- * @param {EClient} client
- * @param {string} userId - The Discord user ID whose character data is being retrieved.
- * @param {Djs.Message} message - The Discord message context.
- * @param {string|null|undefined} charName - The character name to search for, if applicable.
- * @param options - Optional settings to control data integration, access checks, error handling, and additional data fetching.
- * @returns The user's character data, or `undefined` if not found and `skipNotFound` is enabled.
- *
- * @throws {Error} If the user's character thread is missing, access is denied to a private character, or the user is not found (unless `skipNotFound` is true).
- */
-export async function getUserFromMessageDirect(
+// Fonction interne factorisée pour extraire la logique commune aux deux variantes
+async function getUserFrom(
 	client: EClient,
 	userId: string,
-	message: Djs.Message,
-	charName?: string | null,
+	charName: string | null | undefined,
+	context:
+		| { type: "interaction"; interaction: Djs.BaseInteraction }
+		| { type: "message"; message: Djs.Message },
 	options?: {
 		integrateCombinaison?: boolean;
 		allowAccess?: boolean;
@@ -197,11 +185,15 @@ export async function getUserFromMessageDirect(
 		guildId?: string;
 	}
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
-	const guildId = options?.guildId ?? message.guild!.id;
+	const guildId =
+		options?.guildId ??
+		(context.type === "interaction"
+			? context.interaction.guild!.id
+			: context.message.guild!.id);
 	const guildData = client.settings;
 	const characters = client.characters;
-	const getChara = getCharaInMemory(characters, userId, guildId, charName);
 
+	const getChara = getCharaInMemory(characters, userId, guildId, charName);
 	if (
 		getChara &&
 		!options?.fetchAvatar &&
@@ -217,41 +209,72 @@ export async function getUserFromMessageDirect(
 			skipNotFound: false,
 		};
 	const { integrateCombinaison, allowAccess, skipNotFound } = options;
-	const ul = ln(guildData.get(guildId, "lang") ?? message.guild!.preferredLocale);
+
+	const ul = ln(
+		guildData.get(guildId, "lang") ??
+			(context.type === "interaction"
+				? (context.interaction.locale as Djs.Locale)
+				: context.message.guild!.preferredLocale)
+	);
+
 	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {
 		return char.charName?.subText(charName);
 	});
 	if (!user) return;
+
 	const userMessageId: PersonnageIds = {
 		channelId: user.messageId[1],
 		messageId: user.messageId[0],
 	};
 
-	// For message-based approach, we need to handle channel fetching differently
-	let channel = client.channels.cache.get(userMessageId.channelId);
-	if (!channel && message.guild) {
-		const fetchedChannel = await fetchChannel(message.guild, userMessageId.channelId);
-		if (fetchedChannel) channel = fetchedChannel;
-	}
+	// Récupération du salon/thread et vérification d'accès selon le contexte
+	let targetMessage: Djs.Message | undefined;
+	if (context.type === "interaction") {
+		const thread = await searchUserChannel(
+			guildData,
+			context.interaction,
+			ul,
+			userMessageId.channelId
+		);
+		if (!thread) throw new Error(ul("error.channel.thread"));
+		if (
+			user.isPrivate &&
+			!allowAccess &&
+			!(await haveAccess(context.interaction, thread.id, userId))
+		) {
+			throw new Error(ul("error.private"));
+		}
+		targetMessage = await thread.messages.fetch(userMessageId.messageId);
+	} else {
+		// contexte message
+		let channel = client.channels.cache.get(userMessageId.channelId);
+		if (!channel && context.message.guild) {
+			const fetchedChannel = await fetchChannel(
+				context.message.guild,
+				userMessageId.channelId
+			);
+			if (fetchedChannel) channel = fetchedChannel;
+		}
 
-	if (!channel || !("messages" in channel)) {
-		if (!skipNotFound) throw new Error(ul("error.channel.thread"));
-		return;
-	}
+		if (!channel || !("messages" in channel)) {
+			if (!skipNotFound) throw new Error(ul("error.channel.thread"));
+			return;
+		}
 
-	if (
-		user.isPrivate &&
-		!allowAccess &&
-		!(
-			message.author.id === userId ||
-			message.member?.permissions.has(Djs.PermissionFlagsBits.Administrator)
-		)
-	) {
-		throw new Error(ul("error.private"));
+		if (
+			user.isPrivate &&
+			!allowAccess &&
+			!(
+				context.message.author.id === userId ||
+				context.message.member?.permissions.has(Djs.PermissionFlagsBits.Administrator)
+			)
+		) {
+			throw new Error(ul("error.private"));
+		}
+		targetMessage = await channel.messages.fetch(userMessageId.messageId);
 	}
 
 	try {
-		const targetMessage = await channel.messages.fetch(userMessageId.messageId);
 		const userData = getUserByEmbed(
 			{ message: targetMessage },
 			ul,
@@ -260,11 +283,10 @@ export async function getUserFromMessageDirect(
 			options.fetchAvatar,
 			options.fetchChannel
 		);
-		//set chara in memory
 		await updateMemory(characters, guildId, userId, ul, {
 			userData,
 		});
-		if (options.fetchMessage) userData!.messageId = targetMessage.id;
+		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
 		return { userData, charName: user.charName?.capitalize() };
 	} catch (error) {
@@ -272,6 +294,39 @@ export async function getUserFromMessageDirect(
 		if (!skipNotFound)
 			throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
 	}
+}
+
+/**
+ * Retrieves a user's character data from a Discord message directly.
+ *
+ * This is a simplified version of getUserFromInteractiongetUserFromInteraction that works with a Discord message instead of an interaction.
+ * Searches in-memory cache first, then fetches the relevant message from the user's character thread if necessary.
+ *
+ * @param {EClient} client
+ * @param {string} userId - The Discord user ID whose character data is being retrieved.
+ * @param {Djs.Message} message - The Discord message context.
+ * @param {string|null|undefined} charName - The character name to search for, if applicable.
+ * @param options - Optional settings to control data integration, access checks, error handling, and additional data fetching.
+ * @returns The user's character data, or `undefined` if not found and `skipNotFound` is enabled.
+ *
+ * @throws {Error} If the user's character thread is missing, access is denied to a private character, or the user is not found (unless `skipNotFound` is true).
+ */
+export async function getUserFromMessage(
+	client: EClient,
+	userId: string,
+	message: Djs.Message,
+	charName?: string | null,
+	options?: {
+		integrateCombinaison?: boolean;
+		allowAccess?: boolean;
+		skipNotFound?: boolean;
+		fetchAvatar?: boolean;
+		fetchChannel?: boolean;
+		fetchMessage?: boolean;
+		guildId?: string;
+	}
+): Promise<{ userData?: UserData; charName?: string } | undefined> {
+	return getUserFrom(client, userId, charName, { type: "message", message }, options);
 }
 
 /**
@@ -288,7 +343,7 @@ export async function getUserFromMessageDirect(
  *
  * @throws {Error} If the user's character thread is missing, access is denied to a private character, or the user is not found (unless `skipNotFound` is true).
  */
-export async function getUserFromMessage(
+export async function getUserFromInteraction(
 	client: EClient,
 	userId: string,
 	interaction: Djs.BaseInteraction,
@@ -303,71 +358,13 @@ export async function getUserFromMessage(
 		guildId?: string;
 	}
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
-	const guildId = options?.guildId ?? interaction.guild!.id;
-	const guildData = client.settings;
-	const characters = client.characters;
-	const getChara = getCharaInMemory(characters, userId, guildId, charName);
-
-	if (
-		getChara &&
-		!options?.fetchAvatar &&
-		!options?.fetchChannel &&
-		!options?.fetchMessage
-	)
-		return { userData: getChara, charName: charName?.capitalize() };
-
-	if (!options)
-		options = {
-			integrateCombinaison: true,
-			allowAccess: true,
-			skipNotFound: false,
-		};
-	const { integrateCombinaison, allowAccess, skipNotFound } = options;
-	const ul = ln(guildData.get(guildId, "lang") ?? interaction.locale);
-	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {
-		return char.charName?.subText(charName);
-	});
-	if (!user) return;
-	const userMessageId: PersonnageIds = {
-		channelId: user.messageId[1],
-		messageId: user.messageId[0],
-	};
-	const thread = await searchUserChannel(
-		guildData,
-		interaction,
-		ul,
-		userMessageId.channelId
+	return getUserFrom(
+		client,
+		userId,
+		charName,
+		{ type: "interaction", interaction },
+		options
 	);
-	if (!thread) throw new Error(ul("error.channel.thread"));
-	if (
-		user.isPrivate &&
-		!allowAccess &&
-		!(await haveAccess(interaction, thread.id, userId))
-	) {
-		throw new Error(ul("error.private"));
-	}
-	try {
-		const message = await thread.messages.fetch(userMessageId.messageId);
-		const userData = getUserByEmbed(
-			{ message },
-			ul,
-			undefined,
-			integrateCombinaison,
-			options.fetchAvatar,
-			options.fetchChannel
-		);
-		//set chara in memory
-		await updateMemory(characters, guildId, userId, ul, {
-			userData,
-		});
-		if (options.fetchMessage) userData!.messageId = message.id;
-
-		return { userData, charName: user.charName?.capitalize() };
-	} catch (error) {
-		logger.warn(error);
-		if (!skipNotFound)
-			throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
-	}
 }
 
 /**
@@ -426,9 +423,9 @@ export async function getRecordChar(
 		interaction.guild!.id,
 		`user.${user?.id ?? interaction.user.id}`
 	);
-	const findChara = userData?.find((char) => {
-		if (charName) return char.charName?.subText(charName, strict);
-	});
+	const findChara = charName
+		? userData?.find((char) => char.charName?.subText(charName, strict))
+		: undefined;
 	if (!findChara && charName) return undefined;
 
 	if (!findChara) {
@@ -535,7 +532,7 @@ export async function getStatistics(
 	const charName = optionChar?.standardize();
 
 	let userStatistique = (
-		await getUserFromMessage(client, interaction.user.id, interaction, charName, {
+		await getUserFromInteraction(client, interaction.user.id, interaction, charName, {
 			skipNotFound: true,
 		})
 	)?.userData;

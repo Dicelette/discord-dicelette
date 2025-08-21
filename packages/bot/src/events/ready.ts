@@ -15,13 +15,13 @@ import { VERSION } from "../../index";
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 export default (client: EClient): void => {
-	client.on("ready", async () => {
+	client.on("clientReady", async () => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
 		let serializedCommands = commandsList.map((command) => command.data.toJSON());
 		const serializedDbCmds = dbCmd.map((command) => command.data.toJSON());
 
-		client.user.setActivity("Roll Dices 🎲 !", {
+		client.user.setActivity("Bringing chaos !", {
 			type: Djs.ActivityType.Competing,
 		});
 		serializedCommands = serializedCommands.concat(
@@ -30,7 +30,6 @@ export default (client: EClient): void => {
 		);
 
 		const guildPromises = Array.from(client.guilds.cache.values()).map(async (guild) => {
-			//remove admin commands
 			let guildCommands = [...serializedCommands];
 
 			const enabled = client.settings.get(guild.id, "templateID.messageId");
@@ -38,7 +37,6 @@ export default (client: EClient): void => {
 				for (const cmd of serializedDbCmds) {
 					cmd.default_member_permissions = undefined;
 				}
-				//replace in serializedCommands the db commands
 				guildCommands = guildCommands.filter(
 					(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name)
 				);
@@ -48,8 +46,6 @@ export default (client: EClient): void => {
 			logger.trace(`Registering commands for \`${guild.name}\``);
 
 			try {
-				// Utiliser guild.commands.set() au lieu de rest.put() pour une approche plus efficace
-				// Cela gère automatiquement la création, mise à jour et suppression des commandes
 				await guild.commands.set(guildCommands);
 
 				const cachePromises = [

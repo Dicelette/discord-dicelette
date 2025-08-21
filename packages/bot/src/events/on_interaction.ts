@@ -1,6 +1,5 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	autCompleteCmd,

@@ -12,7 +12,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
 import { fetchChannel } from "utils";
-import { getCharFromText, getTemplate, getUserFromMessageDirect } from "../database";
+import { getCharFromText, getTemplate, getUserFromMessage } from "../database";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -39,7 +39,7 @@ export default (client: EClient): void => {
 					content
 				);
 			if (firstChara) content = content.replace(/ @\w+/, "").trim();
-			const data = await getUserFromMessageDirect(
+			const data = await getUserFromMessage(
 				client,
 				message.author.id,
 				message,
@@ -63,8 +63,7 @@ export default (client: EClient): void => {
 				(await getTemplate(message.guild, client.settings, ul, true));
 			if (serverData?.customCritical) {
 				const serverCC = rollCustomCritical(serverData.customCritical);
-				if (serverCC)
-					critical = Object.assign(serverCC, critical);
+				if (serverCC) critical = Object.assign(serverCC, critical);
 			}
 
 			const opposition = parseComparator(content, userData?.stats, isRoll.infoRoll);

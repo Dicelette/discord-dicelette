@@ -2,7 +2,7 @@ import { cmdLn, t } from "@dicelette/localization";
 import type { DiscordChannel } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getTemplateByInteraction, getUserFromMessage } from "database";
+import { getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -148,7 +148,7 @@ export const bulkAdd = {
 				if (options.getBoolean(t("import.delete.title"))) {
 					//delete old message if it exists
 					const oldChar = (
-						await getUserFromMessage(client, member.id, interaction, char.userName, {
+						await getUserFromInteraction(client, member.id, interaction, char.userName, {
 							fetchChannel: true,
 							fetchMessage: true,
 						})

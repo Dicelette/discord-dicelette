@@ -7,7 +7,7 @@ import {
 	uniformizeRecords,
 } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getFirstChar, getTemplateByInteraction, getUserFromMessage } from "database";
+import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { getLangAndConfig, isSerializedNameEquals, macroOptions, rollMacro } from "utils";
@@ -111,7 +111,7 @@ export default {
 		const charName = charOptions?.normalize();
 		try {
 			let userStatistique = (
-				await getUserFromMessage(client, interaction.user.id, interaction, charName, {
+				await getUserFromInteraction(client, interaction.user.id, interaction, charName, {
 					skipNotFound: true,
 				})
 			)?.userData;
