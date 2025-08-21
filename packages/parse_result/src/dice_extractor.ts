@@ -94,6 +94,7 @@ export function performDiceRoll(
 		let infoRoll: string | undefined;
 		if (userData?.stats) {
 			const res = replaceStatsInDiceFormula(rollContent, userData.stats, true);
+			console.log("Replacing stats in dice formula:", res.formula);
 			rollContent = res.formula;
 			infoRoll = res.infoRoll;
 		}
@@ -159,7 +160,9 @@ export function isRolling(
 	const reg = /(?<first>([><=!]+)(.+))(?<second>([><=!]+)(.+))/.exec(content);
 	if (reg?.groups) {
 		content = content.replace(reg.groups.second, "").trim();
+		content = content.replace(/\{c[sf]:[><=!]+/g, "").trim();
 	}
+
 	let res = { formula: content };
 	if (userData?.stats) res = replaceStatsInDiceFormula(content, userData.stats);
 	processedContent = res.formula;
@@ -316,8 +319,8 @@ export function replaceStatsInDiceFormula(
 	if (uniqueStats.length > 0) {
 		const statsList = uniqueStats.join(", ");
 		comments = comments
-			? ` %%\[__${statsList}__\]%% ${comments} `
-			: ` %%\[__${statsList}__\]%% `;
+			? ` %%[__${statsList}__]%% ${comments} `
+			: ` %%[__${statsList}__]%% `;
 		if (shared) comments = `#${comments}`;
 	}
 	if (deleteComments) return { formula: processedFormula, infoRoll: uniqueStats[0] };

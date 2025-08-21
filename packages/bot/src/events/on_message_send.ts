@@ -61,8 +61,11 @@ export default (client: EClient): void => {
 			const serverData =
 				client.template.get(message.guild.id) ??
 				(await getTemplate(message.guild, client.settings, ul, true));
-			if (serverData?.customCritical && !critical)
-				critical = rollCustomCritical(serverData.customCritical);
+			if (serverData?.customCritical) {
+				const serverCC = rollCustomCritical(serverData.customCritical);
+				if (serverCC)
+					critical = Object.assign(serverCC, critical);
+			}
 
 			const opposition = parseComparator(content, userData?.stats, isRoll.infoRoll);
 
