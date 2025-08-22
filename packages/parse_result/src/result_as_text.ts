@@ -254,7 +254,7 @@ export class ResultAsText {
 				let success: unknown;
 
 				if (custom.onNaturalDice) {
-					success = natural.includes(Number.parseInt(custom.value));
+					success = natural.includes(Number.parseInt(custom.value, 10));
 				} else {
 					success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 				}
