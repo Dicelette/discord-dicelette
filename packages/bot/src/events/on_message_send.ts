@@ -165,7 +165,12 @@ export function parseComparator(
 	userStatistique?: Record<string, number>,
 	userStatStr?: string
 ) {
-	const comparatorMatch = /(?<first>([><=!]+)(.+))(?<second>([><=!]+)(.+))/.exec(dice);
+	// Ignore les blocs de critiques personnalisés lors de la détection
+	const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
+	const cleanedDice = dice.replace(criticalBlock, "");
+	const comparatorMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
+		cleanedDice
+	);
 	let comparator = "";
 	let opposition: string | undefined;
 	if (comparatorMatch?.groups) {

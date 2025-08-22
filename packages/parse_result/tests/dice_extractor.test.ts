@@ -231,5 +231,15 @@ describe("dice_extractor", () => {
 
 			expect(result).toBeUndefined();
 		});
+
+		it("should detect dice when custom critical blocks present", () => {
+			const content = "1d100-99<50{cf:<=5}{cs:<=95}";
+
+			const result = isRolling(content);
+
+			expect(result).toBeDefined();
+			expect(result!.result).toBeDefined();
+			expect(result!.result.dice).toContain("1d100");
+		});
 	});
 });

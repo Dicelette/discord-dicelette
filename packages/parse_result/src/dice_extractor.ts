@@ -140,9 +140,12 @@ export function processChainedDiceRoll(
 		.trim();
 
 	try {
-		const rollResult = roll(finalContent);
+		// Retirer les blocs critiques avant le lancer
+		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
+		const cleaned = finalContent.replace(criticalBlock, "");
+		const rollResult = roll(cleaned);
 		if (!rollResult) return undefined;
-		rollResult.dice = finalContent;
+		rollResult.dice = cleaned;
 		if (globalComments) rollResult.comment = globalComments;
 		return { resultat: rollResult, infoRoll };
 	} catch (e) {
@@ -157,10 +160,15 @@ export function isRolling(
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
-	const reg = /(?<first>([><=!]+)(.+))(?<second>([><=!]+)(.+))/.exec(content);
+	// Pré-nettoie uniquement pour la détection afin d'ignorer les blocs {cs|cf:...}
+	const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
+	const contentForOpposition = content.replace(criticalBlock, "");
+	const reg = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
+		contentForOpposition
+	);
 	if (reg?.groups) {
+		// Retire uniquement la seconde opposition détectée (hors blocs critiques)
 		content = content.replace(reg.groups.second, "").trim();
-		content = content.replace(/\{c[sf]:[><=!]+/g, "").trim();
 	}
 
 	let res = { formula: content };
@@ -170,7 +178,9 @@ export function isRolling(
 	const diceData = extractDiceData(processedContent);
 
 	if (diceData.bracketRoll) {
-		const result = performDiceRoll(processedContent, diceData.bracketRoll, userData);
+		// Nettoie les blocs critiques de la formule avant de lancer le dé
+		const cleanedForRoll = processedContent.replace(criticalBlock, "");
+		const result = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
 		if (result?.resultat)
 			return {
 				result: result.resultat,
@@ -183,7 +193,12 @@ export function isRolling(
 		processedContent.includes("#") ||
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
-		const result = processChainedDiceRoll(processedContent, userData);
+		// Nettoie aussi pour les lancers chaînés
+		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
+		const result = processChainedDiceRoll(
+			processedContent.replace(criticalBlock, ""),
+			userData
+		);
 		if (result)
 			return {
 				result: result.resultat,
@@ -200,6 +215,9 @@ export function isRolling(
 			finalContent = chained.content;
 			comments = chained.comments;
 		}
+
+		// Nettoie les blocs critiques avant de passer au lanceur
+		finalContent = finalContent.replace(criticalBlock, "");
 
 		const result = performDiceRoll(finalContent, undefined, userData);
 		if (!result?.resultat) return undefined;
