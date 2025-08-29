@@ -160,16 +160,13 @@ export function isRolling(
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
-	// Pré-nettoie uniquement pour la détection afin d'ignorer les blocs {cs|cf:...}
+	// Preclean to ignore {cs|cf:...} blocs
 	const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
 	const contentForOpposition = content.replace(criticalBlock, "");
 	const reg = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
 		contentForOpposition
 	);
-	if (reg?.groups) {
-		// Retire uniquement la seconde opposition détectée (hors blocs critiques)
-		content = content.replace(reg.groups.second, "").trim();
-	}
+	if (reg?.groups) content = content.replace(reg.groups.second, "").trim();
 
 	let res = { formula: content };
 	if (userData?.stats) res = replaceStatsInDiceFormula(content, userData.stats);
@@ -178,7 +175,6 @@ export function isRolling(
 	const diceData = extractDiceData(processedContent);
 
 	if (diceData.bracketRoll) {
-		// Nettoie les blocs critiques de la formule avant de lancer le dé
 		const cleanedForRoll = processedContent.replace(criticalBlock, "");
 		const result = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
 		if (result?.resultat)
@@ -193,18 +189,17 @@ export function isRolling(
 		processedContent.includes("#") ||
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
-		// Nettoie aussi pour les lancers chaînés
 		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
 		const result = processChainedDiceRoll(
 			processedContent.replace(criticalBlock, ""),
 			userData
 		);
-		if (result)
-			return {
-				result: result.resultat,
-				detectRoll: undefined,
-				infoRoll: result.infoRoll,
-			};
+		if (!result) return;
+		return {
+			result: result.resultat,
+			detectRoll: undefined,
+			infoRoll: result.infoRoll,
+		};
 	}
 	if (hasValidDice(diceData)) {
 		let { comments } = diceData;
@@ -216,7 +211,6 @@ export function isRolling(
 			comments = chained.comments;
 		}
 
-		// Nettoie les blocs critiques avant de passer au lanceur
 		finalContent = finalContent.replace(criticalBlock, "");
 
 		const result = performDiceRoll(finalContent, undefined, userData);
