@@ -176,12 +176,12 @@ export function isRolling(
 
 	if (diceData.bracketRoll) {
 		const cleanedForRoll = processedContent.replace(criticalBlock, "");
-		const result = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
-		if (result?.resultat)
+		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
+		if (diceRoll?.resultat)
 			return {
-				result: result.resultat,
+				result: diceRoll.resultat,
 				detectRoll: diceData.bracketRoll,
-				infoRoll: result.infoRoll,
+				infoRoll: diceRoll.infoRoll,
 			};
 	}
 
@@ -190,16 +190,16 @@ export function isRolling(
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
 		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
-		const result = processChainedDiceRoll(
+		const diceRoll = processChainedDiceRoll(
 			processedContent.replace(criticalBlock, ""),
 			userData
 		);
-		if (!result) return;
-		return {
-			result: result.resultat,
-			detectRoll: undefined,
-			infoRoll: result.infoRoll,
-		};
+		if (diceRoll)
+			return {
+				result: diceRoll.resultat,
+				detectRoll: undefined,
+				infoRoll: diceRoll.infoRoll,
+			};
 	}
 	if (hasValidDice(diceData)) {
 		let { comments } = diceData;
@@ -213,10 +213,10 @@ export function isRolling(
 
 		finalContent = finalContent.replace(criticalBlock, "");
 
-		const result = performDiceRoll(finalContent, undefined, userData);
-		if (!result?.resultat) return undefined;
-		if (result) applyCommentsToResult(result.resultat, comments, undefined);
-		return { result: result.resultat, detectRoll: undefined };
+		const diceRoll = performDiceRoll(finalContent, undefined, userData);
+		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
+		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
+		return { result: diceRoll.resultat, detectRoll: undefined };
 	}
 
 	return undefined;
