@@ -51,6 +51,7 @@ export class ResultAsText {
 		const { dice } = this.data;
 		if (!dice) return this.ul("error.invalidDice.notFound");
 		if (dice?.startsWith("-")) return this.ul("error.invalidDice.minus", { dice });
+
 		return this.ul("error.invalidDice.withDice", { dice });
 	}
 

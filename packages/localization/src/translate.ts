@@ -39,8 +39,7 @@ export function lError(
 ) {
 	const ul = ln(userLang ?? interaction?.locale ?? Djs.Locale.EnglishUS);
 	if (e instanceof DiceTypeError) {
-		if (e.cause !== "noBulkRoll")
-			return ul("error.invalidDice.withDice", { dice: e.dice });
+		if (e.cause !== "noBulkRoll") return diceTypeError(ul, e);
 		return ul("error.noBulkRoll");
 	}
 	if (e instanceof ZodError) {
@@ -62,7 +61,6 @@ export function lError(
 		if (errorMessage.length === 1) return errorMessage[0];
 		return `- ${errorMessage.join("\n- ")}`;
 	}
-	if (e instanceof DiceTypeError) return diceTypeError(ul, e);
 	if (e instanceof FormulaError)
 		return ul("error.invalidFormula", { formula: e.formula });
 
@@ -141,5 +139,8 @@ export function diceTypeError(
 		});
 	if (error.cause === "critical_dice_type")
 		return ul("error.criticalDiceType", { dice: error.dice });
-	return ul("error.invalidDice", { dice: error.dice, error: error.method?.toString() });
+	return ul("error.invalidDice.default", {
+		dice: error.dice,
+		error: error.method?.toString(),
+	});
 }
