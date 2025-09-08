@@ -1,11 +1,10 @@
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
+import { DB_CMD_NAME } from "commands";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import * as Djs from "discord.js";
-import { sendLogs } from "messages";
-import { DB_CMD_NAME } from "../commands";
-import { saveCount } from "../messages/criticalcount";
+import { saveCount, sendLogs } from "messages";
 
 export const onDeleteChannel = (client: EClient): void => {
 	client.on("channelDelete", async (channel) => {
