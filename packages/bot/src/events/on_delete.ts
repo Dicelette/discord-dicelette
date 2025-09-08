@@ -36,7 +36,8 @@ export const onKick = (client: EClient): void => {
 
 export const onUserQuit = (client: EClient): void => {
 	client.on("guildMemberRemove", (member) => {
-		client.criticalCount.delete(member.guild.id, member.id);
+		if (client.criticalCount.has(member.guild.id, member.id))
+			client.criticalCount.delete(member.guild.id, member.id);
 	});
 };
 
