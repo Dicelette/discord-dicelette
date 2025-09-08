@@ -76,11 +76,11 @@ export const displayUser = {
 
 		try {
 			const userMessage = await thread?.messages.fetch(sheetLocation.messageId);
-			const statisticEmbed = getEmbeds(ul, userMessage, "stats");
-			const diceEmbed = getEmbeds(ul, userMessage, "damage");
+			const statisticEmbed = getEmbeds(userMessage, "stats");
+			const diceEmbed = getEmbeds(userMessage, "damage");
 			const statsFields = statisticEmbed?.toJSON().fields;
 			const diceFields = generateDice(diceEmbed?.toJSON().fields, statsFields);
-			const dataUserEmbeds = getEmbeds(ul, userMessage, "user");
+			const dataUserEmbeds = getEmbeds(userMessage, "user");
 			if (!statisticEmbed && !diceEmbed && !diceFields && !statsFields) {
 				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 				return;

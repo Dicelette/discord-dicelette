@@ -183,20 +183,20 @@ async function avatar(
 				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
 		const message = await thread!.messages.fetch(sheetLocation.messageId);
-		const embed = getEmbeds(ul, message, "user");
+		const embed = getEmbeds(message, "user");
 		if (!embed) {
 			// noinspection ExceptionCaughtLocallyJS
 			throw new Error(ul("error.embed.notFound"));
 		}
 		embed.setThumbnail(imageURL);
-		const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
+		const embedsList = getEmbedsList({ which: "user", embed }, message);
 		//update button
 		await generateButton(message, ul, embedsList.list);
 
 		const nameMention = `<@${user?.id ?? interaction.user.id}>${charName ? ` (${charName})` : ""}`;
 		const msgLink = message.url;
 		await reply(interaction, {
-			content: ul("edit_avatar.success", { name: nameMention, link: msgLink }),
+			content: ul("edit.avatar.success", { name: nameMention, link: msgLink }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
@@ -246,7 +246,7 @@ export async function rename(
 	thread: DiscordChannel
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
-	const embed = getEmbeds(ul, message, "user");
+	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed
 		.toJSON()
@@ -254,7 +254,7 @@ export async function rename(
 	if (!n) throw new Error(ul("error.user.rename"));
 	n.value = name;
 	//update the embed
-	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
+	const embedsList = getEmbedsList({ which: "user", embed }, message);
 	//update the database
 	const userRegister: UserRegistration = {
 		userID: user?.id ?? interaction.user.id,
@@ -317,7 +317,7 @@ export async function rename(
 	client.settings.set(interaction.guildId as string, newdata);
 	await generateButton(message, ul, embedsList.list);
 	await reply(interaction, {
-		content: ul("edit_name.success", { url: message.url }),
+		content: ul("edit.name.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
@@ -354,14 +354,14 @@ export async function move(
 	thread: DiscordChannel
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
-	const embed = getEmbeds(ul, message, "user");
+	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const n = embed.toJSON().fields?.find((field) => findln(field.name) === "common.user");
 
 	if (!n) throw new Error(ul("error.embed.old"));
 	n.value = `<@${newUser.id}>`;
 	//update the embed
-	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
+	const embedsList = getEmbedsList({ which: "user", embed }, message);
 	//update the database, with deleting the old data
 
 	//add the new data to the database

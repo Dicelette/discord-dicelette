@@ -25,10 +25,10 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 	if (!verifyAvatarUrl(avatar))
 		return await reply(interaction, { embeds: [embedError(ul("error.avatar.url"), ul)] });
 
-	const embed = getEmbeds(ul, message, "user");
+	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	embed.setThumbnail(avatar);
-	const embedsList = getEmbedsList(ul, { which: "user", embed }, message);
+	const embedsList = getEmbedsList({ which: "user", embed }, message);
 	await message.edit({ embeds: embedsList.list });
 	const user = embed
 		.toJSON()
@@ -40,7 +40,7 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 		!charName || findln(charName) === "common.noSet" ? user : `${user} (${charName})`;
 	const msgLink = message.url;
 	await reply(interaction, {
-		content: ul("edit_avatar.success", { name: nameMention, link: msgLink }),
+		content: ul("edit.avatar.success", { name: nameMention, link: msgLink }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 }

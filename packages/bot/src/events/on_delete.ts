@@ -5,6 +5,7 @@ import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import * as Djs from "discord.js";
 import { sendLogs } from "messages";
 import { DB_CMD_NAME } from "../commands";
+import { saveCount } from "../messages/criticalcount";
 
 export const onDeleteChannel = (client: EClient): void => {
 	client.on("channelDelete", async (channel) => {
@@ -26,9 +27,16 @@ export const onKick = (client: EClient): void => {
 			client.settings.delete(guild.id);
 			client.characters.delete(guild.id);
 			client.template.delete(guild.id);
+			client.criticalCount.delete(guild.id);
 		} catch (error) {
 			logger.error(error);
 		}
+	});
+};
+
+export const onUserQuit = (client: EClient): void => {
+	client.on("guildMemberRemove", (member) => {
+		client.criticalCount.delete(member.guild.id, member.id);
 	});
 };
 
@@ -60,6 +68,9 @@ export const onDeleteMessage = (client: EClient): void => {
 		try {
 			if (!message.guild) return;
 			const messageId = message.id;
+			if (message.author?.bot && message.author.id === client.user?.id)
+				saveCount(message, client.criticalCount, message.guild.id, "remove");
+
 			//search channelID in database and delete it
 			const guildID = message.guild.id;
 			const channel = message.channel;

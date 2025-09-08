@@ -86,7 +86,7 @@ export async function edit(
  * @throws {Error} If no valid dice embed is found in the message.
  */
 async function showEdit(interaction: Djs.ButtonInteraction, ul: Translation) {
-	const diceEmbed = getEmbeds(ul, interaction.message, "damage");
+	const diceEmbed = getEmbeds(interaction.message, "damage");
 	if (!diceEmbed) throw new Error(ul("error.invalidDice.embeds"));
 	const diceFields = parseEmbedFields(diceEmbed.toJSON() as Djs.Embed);
 	let dices = "";

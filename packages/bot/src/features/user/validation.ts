@@ -38,10 +38,10 @@ export async function continuePage(
 	}
 	const pageNumber = interaction.customId.replace("page", "");
 	const page = !isNumber(pageNumber) ? 1 : Number.parseInt(pageNumber, 10);
-	const embed = Messages.getEmbeds(ul, interaction.message, "user");
+	const embed = Messages.getEmbeds(interaction.message, "user");
 	if (!embed || !dbTemplate.statistics) return;
 	const statsEmbed =
-		Messages.getEmbeds(ul, interaction.message, "stats") ?? Messages.createStatsEmbed(ul);
+		Messages.getEmbeds(interaction.message, "stats") ?? Messages.createStatsEmbed(ul);
 	const allTemplateStat = Object.keys(dbTemplate.statistics).map((stat) =>
 		stat.unidecode()
 	);
@@ -158,7 +158,7 @@ export async function validateUser(
 	characters: Characters
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
-	const userEmbed = Messages.getEmbeds(ul, interaction.message, "user");
+	const userEmbed = Messages.getEmbeds(interaction.message, "user");
 	if (!userEmbed) throw new NoEmbed();
 	const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	let userID = oldEmbedsFields?.["common.user"];
@@ -198,8 +198,8 @@ export async function validateUser(
 		userID,
 		charName
 	);
-	const oldDiceEmbeds = Messages.getEmbeds(ul, interaction.message, "damage");
-	const oldStatsEmbed = Messages.getEmbeds(ul, interaction.message, "stats");
+	const oldDiceEmbeds = Messages.getEmbeds(interaction.message, "damage");
+	const oldStatsEmbed = Messages.getEmbeds(interaction.message, "stats");
 	const oldDiceEmbedsFields = oldDiceEmbeds ? (oldDiceEmbeds.toJSON().fields ?? []) : [];
 	const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.toJSON().fields ?? []) : [];
 	let diceEmbed: Djs.EmbedBuilder | undefined;

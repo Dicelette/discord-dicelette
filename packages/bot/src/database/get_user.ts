@@ -40,7 +40,7 @@ export function getUserByEmbed(
 ) {
 	const { message, embeds } = data;
 	const user: Partial<UserData> = {};
-	const userEmbed = first ? ensureEmbed(message) : getEmbeds(ul, message, "user", embeds);
+	const userEmbed = first ? ensureEmbed(message) : getEmbeds(message, "user", embeds);
 	if (!userEmbed) return;
 	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	const charNameFields = [
@@ -50,11 +50,11 @@ export function getUserByEmbed(
 	if (charNameFields && charNameFields.value !== "common.noSet") {
 		user.userName = charNameFields.value;
 	}
-	const statsFields = getEmbeds(ul, message, "stats", embeds)?.toJSON() as Djs.Embed;
+	const statsFields = getEmbeds(message, "stats", embeds)?.toJSON() as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
-	const damageFields = getEmbeds(ul, message, "damage", embeds)?.toJSON() as Djs.Embed;
+	const damageFields = getEmbeds(message, "damage", embeds)?.toJSON() as Djs.Embed;
 	const templateDamage = parseDamageFields(damageFields);
-	const templateEmbed = first ? userEmbed : getEmbeds(ul, message, "template", embeds);
+	const templateEmbed = first ? userEmbed : getEmbeds(message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
 		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
@@ -488,7 +488,7 @@ export async function getUserNameAndChar(
 	ul: Translation,
 	first?: boolean
 ) {
-	let userEmbed = getEmbeds(ul, interaction?.message ?? undefined, "user");
+	let userEmbed = getEmbeds(interaction?.message ?? undefined, "user");
 	if (first) {
 		const firstEmbed = ensureEmbed(interaction?.message ?? undefined);
 		if (firstEmbed) userEmbed = new Djs.EmbedBuilder(firstEmbed.toJSON());

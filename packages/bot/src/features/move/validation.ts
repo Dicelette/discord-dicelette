@@ -30,7 +30,7 @@ export async function validate(
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const userId = interaction.fields.getTextInputValue("user");
 	if (!userId) return;
-	const embed = getEmbeds(ul, message, "user");
+	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const user = await isUserNameOrId(userId, interaction);
 

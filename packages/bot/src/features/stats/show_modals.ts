@@ -104,7 +104,7 @@ async function showEditorStats(
 	ul: Translation,
 	db: Settings
 ) {
-	const statistics = getEmbeds(ul, interaction.message, "stats");
+	const statistics = getEmbeds(interaction.message, "stats");
 	if (!statistics) throw new Error(ul("error.stats.notFound_plural"));
 	const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed);
 	const originalGuildData = db.get(interaction.guild!.id, "templateID.statsName");

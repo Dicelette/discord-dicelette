@@ -32,7 +32,7 @@ export async function validate(
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const newName = interaction.fields.getTextInputValue("newName");
 	if (!newName || !interaction.channel) return;
-	const embed = getEmbeds(ul, message, "user");
+	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const userId = embed
 		.toJSON()

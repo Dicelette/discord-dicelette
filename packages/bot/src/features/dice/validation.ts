@@ -37,7 +37,7 @@ export async function validate(
 		interaction.message.id
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-	const diceEmbeds = getEmbeds(ul, message ?? undefined, "damage");
+	const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 	if (!diceEmbeds) return;
 	const values = interaction.fields.getTextInputValue("allDice");
 	const valuesAsDice = values.split("\n- ").map((dice) => {
@@ -70,7 +70,7 @@ export async function validate(
 			});
 			continue;
 		}
-		const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
+		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 		if (!statsEmbeds) {
 			if (!roll(dice)) {
 				throw new Error(ul("error.invalidDice.withDice", { dice }));
@@ -128,7 +128,7 @@ export async function validate(
 	const messageID = [message.id, message.channelId] as UserMessageId;
 	if (!fieldsToAppend || fieldsToAppend.length === 0) {
 		//dice was removed
-		const embedsList = getEmbedsList(ul, { which: "damage", embed: diceEmbed }, message);
+		const embedsList = getEmbedsList({ which: "damage", embed: diceEmbed }, message);
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
 		message.edit({
@@ -177,7 +177,7 @@ export async function validate(
 		msgId: messageID,
 	};
 	await registerUser(userRegister, interaction, db, false);
-	const embedsList = getEmbedsList(ul, { which: "damage", embed: diceEmbed }, message);
+	const embedsList = getEmbedsList({ which: "damage", embed: diceEmbed }, message);
 	await message.edit({ embeds: embedsList.list });
 	await reply(interaction, {
 		content: ul("embed.edit.dice"),

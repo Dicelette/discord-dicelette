@@ -13,21 +13,24 @@ import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
 import { fetchChannel } from "utils";
 import { getCharFromText, getTemplate, getUserFromMessage } from "../database";
+import { saveCount } from "../messages/criticalcount";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
 		try {
-			if (message.author.bot) return;
 			if (message.channel.type === Djs.ChannelType.DM) return;
 			if (!message.guild) return;
-			let content = message.content;
 			const userLang =
 				client.guildLocale?.get(message.guild.id) ??
 				client.settings.get(message.guild.id, "lang") ??
 				message.guild.preferredLocale ??
 				Djs.Locale.EnglishUS;
 			const ul = ln(userLang);
+
+			if (message.author.bot && message.author.id === client.user?.id)
+				return saveCount(message, client.criticalCount, message.guild.id);
+			let content = message.content;
 			if (message.content.match(/`.*`/)) return await stripOOC(message, client, ul);
 			//detect roll between bracket
 			let firstChara: string | undefined;

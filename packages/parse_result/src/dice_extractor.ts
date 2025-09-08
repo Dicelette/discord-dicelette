@@ -94,7 +94,6 @@ export function performDiceRoll(
 		let infoRoll: string | undefined;
 		if (userData?.stats) {
 			const res = replaceStatsInDiceFormula(rollContent, userData.stats, true);
-			console.log("Replacing stats in dice formula:", res.formula);
 			rollContent = res.formula;
 			infoRoll = res.infoRoll;
 		}

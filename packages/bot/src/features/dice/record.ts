@@ -124,11 +124,7 @@ async function registerDamageDice(
 	if (!interaction.message) throw new Error(ul("error.noMessage"));
 
 	if (name.includes(":")) throw new Error(ul("error.colon"));
-	const oldDiceEmbeds = getEmbeds(
-		ul,
-		interaction.message ?? undefined,
-		"damage"
-	)?.toJSON();
+	const oldDiceEmbeds = getEmbeds(interaction.message ?? undefined, "damage")?.toJSON();
 	const diceEmbed = oldDiceEmbeds
 		? new Djs.EmbedBuilder(oldDiceEmbeds)
 		: createDiceEmbed(ul);
@@ -202,8 +198,8 @@ async function registerDamageDice(
 		| Djs.ActionRowBuilder<Djs.ButtonBuilder>
 		| Djs.ActionRowBuilder<Djs.StringSelectMenuBuilder>
 	)[] = [];
-	const userEmbed = getEmbeds(ul, interaction.message ?? undefined, "user");
-	const statsEmbed = getEmbeds(ul, interaction.message ?? undefined, "stats");
+	const userEmbed = getEmbeds(interaction.message ?? undefined, "user");
+	const statsEmbed = getEmbeds(interaction.message ?? undefined, "stats");
 	if (!userEmbed) throw new NoEmbed();
 	allEmbeds = [userEmbed];
 	if (statsEmbed) allEmbeds.push(statsEmbed);
@@ -212,7 +208,7 @@ async function registerDamageDice(
 		? undefined
 		: displayOldAndNewStats(oldDiceEmbeds?.fields, diceEmbed.toJSON().fields);
 	if (!first) {
-		const templateEmbed = getEmbeds(ul, interaction.message ?? undefined, "template");
+		const templateEmbed = getEmbeds(interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);
 		components = [editUserButtons(ul, !!statsEmbed, true), selectEditMenu(ul)];
 		const userRegister: {

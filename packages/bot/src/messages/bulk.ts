@@ -46,7 +46,7 @@ export async function bulkEditTemplateUser(
 			if (!thread) continue;
 			try {
 				const userMessages = await thread.messages.fetch(sheetLocation.messageId);
-				const templateEmbed = getEmbeds(ul, userMessages, "template");
+				const templateEmbed = getEmbeds(userMessages, "template");
 				if (!templateEmbed) continue;
 				let newEmbed = createTemplateEmbed(ul);
 				if (template.diceType)
@@ -71,7 +71,6 @@ export async function bulkEditTemplateUser(
 					newEmbed = createCustomCritical(newEmbed, template.customCritical);
 				}
 				const listEmbed = getEmbedsList(
-					ul,
 					{ which: "template", embed: newEmbed },
 					userMessages
 				);

@@ -2,6 +2,7 @@ import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { cleanAvatarUrl, logger, NoEmbed, TotalExceededError } from "@dicelette/utils";
+import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 
 export function ensureEmbed(message?: Djs.Message) {
@@ -44,30 +45,25 @@ export function createEmbedsList(
  * Also it returns if the embeds exists or not (useful for the buttons)
  */
 export function getEmbedsList(
-	ul: Translation,
 	embedToReplace: {
 		which: "user" | "stats" | "damage" | "template";
-		embed: Djs.EmbedBuilder;
+		embed: EmbedBuilder;
 	},
-	message?: Djs.Message
+	message?: Message
 ) {
 	const userDataEmbed =
-		embedToReplace.which === "user"
-			? embedToReplace.embed
-			: getEmbeds(ul, message, "user");
+		embedToReplace.which === "user" ? embedToReplace.embed : getEmbeds(message, "user");
 	if (!userDataEmbed) throw new NoEmbed();
 	const statsEmbed =
-		embedToReplace.which === "stats"
-			? embedToReplace.embed
-			: getEmbeds(ul, message, "stats");
+		embedToReplace.which === "stats" ? embedToReplace.embed : getEmbeds(message, "stats");
 	const diceEmbed =
 		embedToReplace.which === "damage"
 			? embedToReplace.embed
-			: getEmbeds(ul, message, "damage");
+			: getEmbeds(message, "damage");
 	const templateEmbed =
 		embedToReplace.which === "template"
 			? embedToReplace.embed
-			: getEmbeds(ul, message, "template");
+			: getEmbeds(message, "template");
 	return {
 		list: createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed),
 		exists: {
@@ -83,10 +79,9 @@ export function getEmbedsList(
  * Get the embeds from the message and recreate it as EmbedBuilder
  */
 export function getEmbeds(
-	ul: Translation,
-	message?: Djs.Message,
+	message?: Message,
 	which?: "user" | "stats" | "damage" | "template",
-	allEmbeds?: Djs.EmbedBuilder[] | Djs.Embed[]
+	allEmbeds?: EmbedBuilder[] | Embed[]
 ) {
 	if (!allEmbeds) {
 		allEmbeds = message?.embeds;
@@ -225,12 +220,18 @@ export function removeEmbedsFromList(
 		const embedTitle = embed.toJSON().title;
 		if (!embedTitle) return false;
 		const title = findln(embedTitle);
-		if (which === "user")
-			return title !== "embed.user" && title !== "embed.add" && title !== "embed.old";
-		if (which === "stats")
-			return title !== "common.statistic" && title !== "common.statistics";
-		if (which === "damage") return title !== "embed.dice";
-		if (which === "template") return title !== "embed.template";
+		switch (which) {
+			case "user":
+				return title !== "embed.user" && title !== "embed.add" && title !== "embed.old";
+			case "stats":
+				return title !== "common.statistic" && title !== "common.statistics";
+			case "damage":
+				return title !== "embed.dice";
+			case "template":
+				return title !== "embed.template";
+			default:
+				return false;
+		}
 	});
 }
 

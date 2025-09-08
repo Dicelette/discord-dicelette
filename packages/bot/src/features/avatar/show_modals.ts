@@ -26,7 +26,7 @@ async function showAvatarEdit(
 	interaction: Djs.StringSelectMenuInteraction,
 	ul: Translation
 ) {
-	const embed = getEmbeds(ul, interaction.message, "user");
+	const embed = getEmbeds(interaction.message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const jsonEmbed = embed.toJSON().thumbnail?.url;
 	const thumbnail = jsonEmbed

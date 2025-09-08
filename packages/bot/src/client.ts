@@ -1,6 +1,6 @@
 import path from "node:path";
 import type { StatisticalTemplate } from "@dicelette/core";
-import type { GuildData, UserDatabase } from "@dicelette/types";
+import type { CriticalCount, GuildData, UserDatabase } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
@@ -29,6 +29,8 @@ export class EClient extends Djs.Client {
 	 */
 	public guildLocale: Enmap<string, Djs.Locale, unknown>;
 
+	public criticalCount: CriticalCount;
+
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
@@ -38,17 +40,25 @@ export class EClient extends Djs.Client {
 			autoFetch: true,
 			cloneLevel: "deep",
 		};
+
+		this.criticalCount = new Enmap({
+			name: "criticalCount",
+			fetchAll: false,
+			autoFetch: true,
+			cloneLevel: "deep",
+		});
+
 		if (process.env.PROD) enmapSettings.dataDir = path.resolve(".\\data_prod");
 
 		this.settings = new Enmap(enmapSettings);
 
 		logger.info(`Settings loaded on ${path.resolve(enmapSettings.dataDir ?? ".\\data")}`);
 
-		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
+		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.characters = new Enmap({ inMemory: true });
-		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
+		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.template = new Enmap({ inMemory: true });
-		//@ts-ignore: Needed because enmap.d.ts issue with inMemory options
+		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.guildLocale = new Enmap({ inMemory: true });
 	}
 }

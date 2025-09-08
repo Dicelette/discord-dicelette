@@ -5,6 +5,15 @@ import type { GuildData, UserDatabase } from "./src/database";
 export type Settings = Enmap<string, GuildData, unknown>;
 export type Translation = TFunction<"translation", undefined>;
 export type Characters = Enmap<string, UserDatabase, unknown>;
+export type CriticalCount = Enmap<string, DBCount, unknown>;
+
+export type Count = {
+	success: number;
+	failure: number;
+	criticalFailure: number;
+	criticalSuccess: number;
+};
+export type DBCount = Record<string, Count>;
 
 export type DataToFooter = {
 	userID: string;

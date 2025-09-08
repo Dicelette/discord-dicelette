@@ -60,9 +60,9 @@ export async function register(
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 	const ul = ln(lang);
-	const userEmbed = getEmbeds(ul, message, "user");
+	const userEmbed = getEmbeds(message, "user");
 	if (!userEmbed) return;
-	const statsEmbed = getEmbeds(ul, message, "stats");
+	const statsEmbed = getEmbeds(message, "stats");
 	const oldStatsTotal = (statsEmbed?.toJSON().fields ?? [])
 		.filter((field) => isNumber(field.value.removeBacktick()))
 		.reduce((sum, field) => sum + Number.parseInt(field.value.removeBacktick(), 10), 0);
@@ -209,7 +209,7 @@ async function getFromModal(
 		interaction.message.id
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
+	const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 	if (!statsEmbeds) return;
 	return {
 		fieldsToAppend: await getFieldsToAppend(ul, interaction, client, statsEmbeds),
@@ -259,7 +259,6 @@ export async function validateEdit(
 	if (!fieldsToAppend || fieldsToAppend.length === 0) {
 		//stats was removed
 		const { list, exists } = getEmbedsList(
-			ul,
 			{ which: "stats", embed: newEmbedStats },
 			message
 		);
@@ -281,7 +280,7 @@ export async function validateEdit(
 		);
 	}
 	//get the other embeds
-	const { list } = getEmbedsList(ul, { which: "stats", embed: newEmbedStats }, message);
+	const { list } = getEmbedsList({ which: "stats", embed: newEmbedStats }, message);
 	await message.edit({ embeds: list });
 
 	await reply(interaction, {
@@ -419,7 +418,7 @@ export async function validateByModeration(
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id
 	);
-	const statsEmbeds = getEmbeds(ul, message ?? undefined, "stats");
+	const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 	if (!statsEmbeds) return;
 	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
 	if (!fieldsToAppend) return;
@@ -511,7 +510,7 @@ export async function couldBeValidated(
 
 	const message = await channel.messages.fetch(messageId);
 	//now we should get the stats embed from the message
-	const oldStatsEmbed = getEmbeds(ul, message ?? undefined, "stats");
+	const oldStatsEmbed = getEmbeds(message ?? undefined, "stats");
 	//we should get the new fields from the embed from the interaction
 	const fieldsToAppend = interaction.message.embeds[0]?.toJSON().fields;
 

@@ -36,6 +36,7 @@ try {
 	event.onDeleteThread(client);
 	event.onReactionAdd(client);
 	event.onReactionRemove(client);
+	event.onUserQuit(client);
 	event.onDisconnect(client);
 	event.onError(client);
 	event.onWarn(client);
