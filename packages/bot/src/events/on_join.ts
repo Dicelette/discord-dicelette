@@ -9,6 +9,7 @@ export default (client: EClient): void => {
 			client.template.set(guild.id, {});
 			client.settings.set(guild.id, true, "converted");
 			client.settings.set(guild.id, true, "disableThread");
+			client.criticalCount.set(guild.id, {});
 
 			const allCommands = [
 				...commandsList.map((command) => command.data),

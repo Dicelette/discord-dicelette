@@ -19,6 +19,7 @@ export async function findMessageBefore(
 }
 
 export * from "./bulk";
+export * from "./criticalcount";
 export * from "./embeds";
 export * from "./send";
 export * from "./strip_ooc";
