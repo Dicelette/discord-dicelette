@@ -6,7 +6,7 @@ import {
 } from "@dicelette/core";
 import { InvalidCsvContent, logger, NoChannel, NoEmbed } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { default as i18next } from "i18next";
+import { default as i18next, type TFunction } from "i18next";
 import { ZodError } from "zod";
 import { ALL_TRANSLATION_KEYS } from "./flattenJson";
 import { resources } from "./types";
@@ -62,6 +62,7 @@ export function lError(
 		if (errorMessage.length === 1) return errorMessage[0];
 		return `- ${errorMessage.join("\n- ")}`;
 	}
+	if (e instanceof DiceTypeError) return diceTypeError(ul, e);
 	if (e instanceof FormulaError)
 		return ul("error.invalidFormula", { formula: e.formula });
 
@@ -95,6 +96,7 @@ export function lError(
 		return ul("error.discord", { code: e.code, stack: e.stack });
 	}
 	if (e.message.includes(":warning:")) return ul("error.generic.e", { e });
+
 	return ul("error.generic.withWarning", { e });
 }
 
@@ -124,4 +126,20 @@ export function findln(translatedText: string) {
 		}
 	}
 	return translatedText;
+}
+
+export function diceTypeError(
+	ul: TFunction<"translation", undefined>,
+	error: DiceTypeError
+): string {
+	if (error.cause === "createCriticalCustom") return ul("error.createCriticalCustom");
+	if (error.cause === "no_dice_type") return ul("error.noDiceType");
+	if (error.message === "no_roll_result" || error.cause === "no_roll_result")
+		return ul("error.noRollResult", {
+			dice: error.dice,
+			formula: error.method?.toString(),
+		});
+	if (error.cause === "critical_dice_type")
+		return ul("error.criticalDiceType", { dice: error.dice });
+	return ul("error.invalidDice", { dice: error.dice, error: error.method?.toString() });
 }

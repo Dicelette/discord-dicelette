@@ -12,9 +12,9 @@ import {
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import { Avatar, Dice, Move, Rename, Stats, User } from "features";
-import { embedError, interactionError } from "messages";
+import { embedError } from "messages";
 import { cancel, getLangAndConfig } from "utils";
-import { sendValidationMessage } from "../features/user";
+import { interactionError } from "./on_error";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
@@ -170,7 +170,7 @@ async function buttonSubmit(
 		const button = Dice.buttons(ul);
 		await interaction.message.edit({ components: [button] });
 		//send the message
-		await sendValidationMessage(interaction, interactionUser, ul, client);
+		await User.sendValidationMessage(interaction, interactionUser, ul, client);
 		await interaction.reply({
 			content: ul("register.confirm"),
 			flags: Djs.MessageFlags.Ephemeral,

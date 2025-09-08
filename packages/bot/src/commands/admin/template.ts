@@ -10,13 +10,13 @@ import {
 	createCustomCritical,
 	createDefaultThread,
 	embedError,
-	interactionError,
 	reply,
 } from "messages";
 import { fetchChannel, getLangAndConfig } from "utils";
 import { DB_CMD_NAME } from "../index";
 import "discord_ext";
 import process from "node:process";
+import { interactionError } from "../../events";
 
 export const templateManager = {
 	data: new Djs.SlashCommandBuilder()
