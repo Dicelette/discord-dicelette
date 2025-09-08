@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.1.0](https://github.com/Dicelette/discord-dicelette/compare/2.0.2...2.1.0) (2025-09-08)
+
+
+### Features
+
+* add tools function: luck_meter ([6bb0b72](https://github.com/Dicelette/discord-dicelette/commit/6bb0b728a00319544e2b894fb071c265df091165))
+
+
+### Bug Fixes
+
+* clean critical blocks from dice content during processing ([b348dba](https://github.com/Dicelette/discord-dicelette/commit/b348dbae32a672233fe5599ff427bd8d4faddd65))
+* ensure proper parsing of custom value in natural dice evaluation ([b6402eb](https://github.com/Dicelette/discord-dicelette/commit/b6402eb82cdc3e4a3b64e929624434725ccefe32))
+* **on_message_send:** text cc not recognized ([f31014b](https://github.com/Dicelette/discord-dicelette/commit/f31014bd5daf9d9bf221eefb430066ef53f6ad6a))
+* should return early when no result found ([1d38bf1](https://github.com/Dicelette/discord-dicelette/commit/1d38bf105b38afc1d765d3c4cb4ab35b16ed44ac))
+* should roll for bulked roll again ([d6c1557](https://github.com/Dicelette/discord-dicelette/commit/d6c1557266c10baaf09344c6026832c12eaf0939))
+
 ## [2.0.2](https://github.com/Dicelette/discord-dicelette/compare/2.0.1...2.0.2) (2025-08-17)
 
 
