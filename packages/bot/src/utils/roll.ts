@@ -481,7 +481,7 @@ export async function rollStatistique(
 		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
-	const override = options.getString(t("dbRoll.options.override.name"));
+	const threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
 	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
 	let userStat: undefined | number;
 	const expression = options.getString(t("common.expression")) ?? "0";
@@ -509,17 +509,17 @@ export async function rollStatistique(
 		});
 		return;
 	}
-	if (override) {
+	if (threshold) {
 		const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
 		const diceMatch = signRegex.exec(dice);
-		const overrideMatch = signRegex.exec(override);
-		if (diceMatch?.groups && overrideMatch?.groups) {
-			dice = dice.replace(diceMatch[0], overrideMatch[0]);
-		} else if (!diceMatch && overrideMatch) {
-			dice += overrideMatch[0];
-		} else if (diceMatch?.groups && !overrideMatch) {
+		const thresholdMatch = signRegex.exec(threshold);
+		if (diceMatch?.groups && thresholdMatch?.groups) {
+			dice = dice.replace(diceMatch[0], thresholdMatch[0]);
+		} else if (!diceMatch && thresholdMatch) {
+			dice += thresholdMatch[0];
+		} else if (diceMatch?.groups && !thresholdMatch) {
 			//search if they are a simple number and not a sign;
-			const simpleNumberMatch = /(?<comparator>(.+))/.exec(override);
+			const simpleNumberMatch = /(?<comparator>(.+))/.exec(threshold);
 			const diceComparator = diceMatch.groups.comparator;
 			if (simpleNumberMatch?.groups) {
 				//if the override is a simple number, we replace the comparator with it
