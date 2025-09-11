@@ -14,7 +14,7 @@ function percentage(partial: number, total: number) {
 /**
  * Gère la sous-commande pour afficher le compteur d'un utilisateur
  */
-async function count(
+async function bilan(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	ul: Translation
@@ -69,7 +69,7 @@ async function count(
 			}
 		)
 		.setColor(Djs.Colors.Blurple)
-		.setFooter({ text: ul("luckMeter.count.total", { total: totalRoll }) })
+		.setFooter({ text: ul("luckMeter.count.total", { count: totalRoll }) })
 		.setTimestamp();
 
 	await interaction.editReply({ embeds: [resultEmbed] });
@@ -86,7 +86,7 @@ async function leaderboard(
 	const option = interaction.options.getString(
 		t("luckMeter.leaderboard.option.title"),
 		true
-	) as "criticalSuccess" | "criticalFailure" | "success" | "failure";
+	) as "criticalSuccess" | "criticalFailure" | "success" | "failure" | "total";
 
 	const guildCount = client.criticalCount.get(interaction.guild!.id);
 	if (!guildCount) {
@@ -94,15 +94,25 @@ async function leaderboard(
 		return;
 	}
 
+	for (const userId in guildCount) {
+		const userCount = guildCount[userId];
+		userCount.total =
+			userCount.success +
+			userCount.failure +
+			userCount.criticalSuccess +
+			userCount.criticalFailure;
+	}
+
 	// Affichage du top 10 des utilisateurs avec le plus haut compteur pour l'option sélectionnée
-	const sorted = Object.entries(guildCount).sort((a, b) => b[1][option] - a[1][option]);
+	const sorted = Object.entries(guildCount).sort((a, b) => b[1][option]! - a[1][option]!);
 	const top10 = sorted.slice(0, 10);
 
 	let description = "";
 	for (let i = 0; i < top10.length; i++) {
 		const userId = top10[i][0];
 		const count = top10[i][1][option];
-		description += `**${i + 1}.** ${Djs.userMention(userId)}: ${count}\n`;
+		const total = top10[i][1].total;
+		description += `**${i + 1}.** ${Djs.userMention(userId)}: ${count}/${total}\n`;
 	}
 
 	const embed = new Djs.EmbedBuilder()
@@ -237,6 +247,11 @@ function leaderBoardChoices() {
 			name_localizations: cmdLn("roll.failure"),
 			value: "failure",
 		},
+		{
+			name: t("luckMeter.leaderboard.option.total"),
+			name_localizations: cmdLn("luckMeter.leaderboard.option.total"),
+			value: "total",
+		},
 	];
 }
 
@@ -280,7 +295,7 @@ export const getCount = {
 
 		switch (subcmd) {
 			case t("luckMeter.count.title"):
-				await count(interaction, client, ul);
+				await bilan(interaction, client, ul);
 				break;
 			case t("luckerMeter.leaderboard.title"):
 				await leaderboard(interaction, client, ul);

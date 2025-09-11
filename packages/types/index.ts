@@ -12,6 +12,7 @@ export type Count = {
 	failure: number;
 	criticalFailure: number;
 	criticalSuccess: number;
+	total?: number;
 };
 export type DBCount = Record<string, Count>;
 

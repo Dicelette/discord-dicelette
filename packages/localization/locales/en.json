@@ -600,7 +600,8 @@
     "count": {
       "desc": "Know results for {{- user}} :",
       "title": "bilan",
-      "total": "Total: {{- total}} rolls"
+      "total_one": "Total: {{count}} roll",
+      "total_other": "Total: {{count}} rolls"
     },
     "description": "Get the number of success, failures (and critical ones) of an user.",
     "error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
@@ -608,7 +609,8 @@
       "noData": "No data available for this server yet!",
       "option": {
         "description": "Type of classification (failure, success, critical, etc.)",
-        "title": "type"
+        "title": "type",
+        "total": "Total"
       }
     },
     "moy": {

@@ -600,7 +600,8 @@
     "count": {
       "desc": "Résultats connus de {{- user}}:",
       "title": "bilan",
-      "total": "Total : {{- total}} jets"
+      "total_one": "Total : {{count}} jet",
+      "total_other": "Total : {{count}} jets"
     },
     "description": "Obtenir le nombre de réussites, d'échecs (et critiques) d'un utilisateur.",
     "error": "Les dés ne connaissent pas encore {{- user}}. Ses résultats ne peuvent donc pas être affichés !",
@@ -608,7 +609,8 @@
       "noData": "Il n'y a pas encore de données pour ce serveur !",
       "option": {
         "description": "Type de classement (échec, succès, critiques...)",
-        "title": "type"
+        "title": "type",
+        "total": "Total"
       }
     },
     "moy": {
