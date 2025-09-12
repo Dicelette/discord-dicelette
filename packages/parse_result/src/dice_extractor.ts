@@ -1,4 +1,4 @@
-import { type Resultat, roll } from "@dicelette/core";
+import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
 import {
 	type ChainedComments,
 	DICE_PATTERNS,
@@ -336,4 +336,26 @@ export function replaceStatsInDiceFormula(
 	}
 	if (deleteComments) return { formula: processedFormula, infoRoll: uniqueStats[0] };
 	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };
+}
+
+export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
+	if (!diceType) return false;
+	if (userStats && diceType.includes("$")) {
+		//replace the $ in the diceType by a regex (like .+?)
+		diceType = diceType.replace("$", ".+?");
+	}
+	if (SIGN_REGEX.test(diceType)) {
+		//remove it from the diceType and the value after it like >=10 or <= 5 to prevent errors
+		const signRegex = /[><=!]+.*$/;
+		diceType = diceType.replace(signRegex, "").trim();
+		dice = dice.replace(signRegex, "").trim();
+	}
+	//also prevent error with the {exp} value
+	if (diceType.includes("{exp")) {
+		const expRegex = /\{exp.*?\}/g;
+		diceType = diceType.replace(expRegex, "").trim();
+		dice = dice.replace(expRegex, "").trim();
+	}
+	const detectDiceType = new RegExp(`\\b${diceType}\\b`, "i");
+	return detectDiceType.test(dice);
 }

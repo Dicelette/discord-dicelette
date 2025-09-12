@@ -1,5 +1,6 @@
 import { lError, ln } from "@dicelette/localization";
 import {
+	includeDiceType,
 	isRolling,
 	parseOpposition,
 	ResultAsText,
@@ -64,7 +65,10 @@ export default (client: EClient): void => {
 			const serverData =
 				client.template.get(message.guild.id) ??
 				(await getTemplate(message.guild, client.settings, ul, true));
-			if (serverData?.customCritical) {
+			if (
+				serverData?.customCritical &&
+				includeDiceType(result.dice, serverData.diceType, !!userData?.stats)
+			) {
 				const serverCC = rollCustomCritical(serverData.customCritical);
 				if (serverCC) critical = Object.assign(serverCC, critical);
 			}
