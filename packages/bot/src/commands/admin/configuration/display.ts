@@ -51,6 +51,41 @@ export async function displayTemplate(
 					value: `- ${damageName.map((value) => capitalizeBetweenPunct(value)).join("\n- ")}`,
 				});
 			}
+			const otherSettings = client.template.get(interaction.guildId!);
+			if (otherSettings) {
+				const diceType = otherSettings.diceType;
+				if (diceType) {
+					templateEmbed.addFields({
+						name: ul("common.dice").toTitle(),
+						value: `\`${diceType}\``,
+					});
+				}
+				const customCriticals = otherSettings.customCritical;
+				if (customCriticals) {
+					const mapped = Object.entries(customCriticals).map(
+						([key, value]) =>
+							`- **${key}**${ul("common.space")}: \`${value.sign} ${value.value}\``
+					);
+					templateEmbed.addFields({
+						name: ul("config.customCritical"),
+						value: mapped.join("\n"),
+					});
+				}
+				const criticals = otherSettings.critical;
+				if (criticals) {
+					const fumbled = criticals.failure;
+					const success = criticals.success;
+					const res = [];
+					if (fumbled) res.push(`**${ul("roll.critical.failure")}**: ${fumbled}`);
+					if (success) res.push(`**${ul("roll.critical.success")}**: ${success}`);
+					if (res.length > 0) {
+						templateEmbed.addFields({
+							name: ul("common.critical").toTitle(),
+							value: res.join("\n"),
+						});
+					}
+				}
+			}
 			await interaction.reply({ embeds: [templateEmbed] });
 		} else {
 			await interaction.reply({
