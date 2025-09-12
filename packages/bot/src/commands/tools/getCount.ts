@@ -3,13 +3,15 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import "discord_ext";
 import { cmdLn } from "@dicelette/localization";
-import type { Count, Translation } from "@dicelette/types";
+import type { Count, DBCount, Translation } from "@dicelette/types";
 import { t } from "i18next";
 import { getLangAndConfig } from "utils";
 
 function percentage(partial: number, total: number) {
 	return total === 0 ? 0 : ((partial / total) * 100).toFixed(2);
 }
+
+type Options = "criticalSuccess" | "criticalFailure" | "success" | "failure" | "total";
 
 /**
  * Gère la sous-commande pour afficher le compteur d'un utilisateur
@@ -75,6 +77,47 @@ async function bilan(
 	await interaction.editReply({ embeds: [resultEmbed] });
 }
 
+function descriptionLeaderBoard(guildCount: DBCount, option: Options) {
+	const sorted = Object.entries(guildCount).sort((a, b) => b[1][option]! - a[1][option]!);
+	const top10 = sorted.slice(0, 10);
+
+	let description = "";
+	for (let i = 0; i < top10.length; i++) {
+		const userId = top10[i][0];
+		const count = top10[i][1][option];
+		const total = top10[i][1].total;
+		description +=
+			option === "total"
+				? `**${i + 1}.** ${Djs.userMention(userId)}: ${count}\n`
+				: `**${i + 1}.** ${Djs.userMention(userId)}: ${count}/${total}\n`;
+	}
+	return description;
+}
+
+function getTitle(option: Options, ul: Translation) {
+	switch (option) {
+		case "criticalSuccess":
+			return ul("roll.critical.success");
+		case "criticalFailure":
+			return ul("roll.critical.failure");
+		case "success":
+			return ul("roll.success");
+		case "failure":
+			return ul("roll.failure");
+		case "total":
+			return ul("common.total");
+	}
+}
+
+function generateRandomColor() {
+	const letters = "0123456789ABCDEF";
+	let color = "#";
+	for (let i = 0; i < 6; i++) {
+		color += letters[Math.floor(Math.random() * 16)];
+	}
+	return Number.parseInt(color.replace("#", ""), 16);
+}
+
 /**
  * Gère la sous-commande pour afficher le classement
  */
@@ -85,8 +128,15 @@ async function leaderboard(
 ) {
 	const option = interaction.options.getString(
 		t("luckMeter.leaderboard.option.title"),
-		true
-	) as "criticalSuccess" | "criticalFailure" | "success" | "failure" | "total";
+		false
+	) as
+		| "criticalSuccess"
+		| "criticalFailure"
+		| "success"
+		| "failure"
+		| "total"
+		| undefined
+		| null;
 
 	const guildCount = client.criticalCount.get(interaction.guild!.id);
 	if (!guildCount) {
@@ -102,18 +152,41 @@ async function leaderboard(
 			userCount.criticalSuccess +
 			userCount.criticalFailure;
 	}
+	if (!option) {
+		//si aucune option, on affiche tout dans un embed
+		const options: Options[] = [
+			"total",
+			"success",
+			"failure",
+			"criticalSuccess",
+			"criticalFailure",
+		];
+		const embeds = [];
+		for (const opt of options) {
+			const description = descriptionLeaderBoard(guildCount, opt);
+			const components = new Djs.ContainerBuilder()
+				.setAccentColor(generateRandomColor())
+				.addTextDisplayComponents(
+					new Djs.TextDisplayBuilder().setContent(
+						`# ${getTitle(opt, ul)}\n\n${description}`
+					)
+				);
+
+			embeds.push(components);
+
+			//use componentV2 to create a cute embed
+		}
+		await interaction.editReply({
+			withComponents: true,
+			components: embeds,
+			flags: Djs.MessageFlags.IsComponentsV2,
+			allowedMentions: { users: [], repliedUser: false, parse: [], roles: [] },
+		});
+		return;
+	}
 
 	// Affichage du top 10 des utilisateurs avec le plus haut compteur pour l'option sélectionnée
-	const sorted = Object.entries(guildCount).sort((a, b) => b[1][option]! - a[1][option]!);
-	const top10 = sorted.slice(0, 10);
-
-	let description = "";
-	for (let i = 0; i < top10.length; i++) {
-		const userId = top10[i][0];
-		const count = top10[i][1][option];
-		const total = top10[i][1].total;
-		description += `**${i + 1}.** ${Djs.userMention(userId)}: ${count}/${total}\n`;
-	}
+	const description = descriptionLeaderBoard(guildCount, option);
 
 	const embed = new Djs.EmbedBuilder()
 		.setTitle(ul("luckerMeter.leaderboard.title").toTitle())
@@ -219,7 +292,10 @@ async function average(
 		.setColor(Djs.Colors.Blurple)
 		.setTimestamp();
 
-	await interaction.editReply({ embeds: [embedResult] });
+	await interaction.editReply({
+		embeds: [embedResult],
+		allowedMentions: { users: [], repliedUser: false, parse: [], roles: [] },
+	});
 }
 
 /**
@@ -278,7 +354,7 @@ export const getCount = {
 						.setNames("luckMeter.leaderboard.option.title")
 						.setDescriptions("luckMeter.leaderboard.option.description")
 						.addChoices(...leaderBoardChoices())
-						.setRequired(true)
+						.setRequired(false)
 				)
 		)
 		.addSubcommand((subcommand) =>
