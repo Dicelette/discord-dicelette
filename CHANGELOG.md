@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.0](https://github.com/Dicelette/discord-dicelette/compare/2.1.0...2.2.0) (2025-09-12)
+
+
+### Features
+
+* add "total" rolls to have the number of roll done in the server ([9320860](https://github.com/Dicelette/discord-dicelette/commit/9320860982f8713d9438a1738091f68e913a45bb))
+* enhance leaderboard functionality to display all options when none selected ([7535426](https://github.com/Dicelette/discord-dicelette/commit/75354263d6031a44a10a7818d4e8836c969b3d3a))
+
+
+### Bug Fixes
+
+* add support for displaying custom critical settings in the embed and diceType ([3b4b8cb](https://github.com/Dicelette/discord-dicelette/commit/3b4b8cb692d0676506667538f476ed9e87a98a7c))
+* ensure critical count is only deleted if it exists on user quit ([5064633](https://github.com/Dicelette/discord-dicelette/commit/506463353ca7100bc3d8d855d2d35e030c16a3ca))
+* export critical count functions and clean up imports ([77e303b](https://github.com/Dicelette/discord-dicelette/commit/77e303bf46f085cf49f0539880851dd34695d18a))
+* should not display the server custom critical if they are not the same as the diceType ([9ad333e](https://github.com/Dicelette/discord-dicelette/commit/9ad333ee7191e72c118c0ae695aaef382bef6841))
+
 ## [2.1.0](https://github.com/Dicelette/discord-dicelette/compare/2.0.2...2.1.0) (2025-09-08)
 
 
