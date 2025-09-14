@@ -31,8 +31,7 @@ async function bilan(
 		return;
 	}
 
-	const totalRoll =
-		count.success + count.failure + count.criticalSuccess + count.criticalFailure;
+	const totalRoll = count.success + count.failure;
 
 	const resultEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("luckMeter.count.title").toTitle())
@@ -146,11 +145,7 @@ async function leaderboard(
 
 	for (const userId in guildCount) {
 		const userCount = guildCount[userId];
-		userCount.total =
-			userCount.success +
-			userCount.failure +
-			userCount.criticalSuccess +
-			userCount.criticalFailure;
+		userCount.total = userCount.success + userCount.failure;
 	}
 	if (!option) {
 		//si aucune option, on affiche tout dans un embed
@@ -213,11 +208,7 @@ function calculateServerStats(guildCount: Record<string, Count>) {
 
 	for (const userId in guildCount) {
 		const userCount = guildCount[userId];
-		const totalRolls =
-			userCount.success +
-			userCount.failure +
-			userCount.criticalSuccess +
-			userCount.criticalFailure;
+		const totalRolls = userCount.success + userCount.failure;
 
 		if (totalRolls > 0) {
 			totalCount.success += userCount.success;
