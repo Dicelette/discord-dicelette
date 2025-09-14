@@ -600,6 +600,7 @@
   "luckMeter": {
     "count": {
       "desc": "Résultats connus de {{- user}}:",
+      "including": "Dont",
       "note": "Les critiques sont inclus dans le décompte des jets normaux.",
       "title": "bilan",
       "total_one": "Total : {{count}} jet",

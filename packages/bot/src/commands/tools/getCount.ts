@@ -65,9 +65,7 @@ async function bilan(
 				interaction.user.avatarURL() ??
 				interaction.guild!.iconURL()
 		)
-		.setDescription(
-			`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}\n-# ${ul("luckMeter.count.note")}`
-		)
+		.setDescription(`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}`)
 		.addFields(
 			{
 				name: ul("roll.success"),
@@ -75,22 +73,22 @@ async function bilan(
 				inline: true,
 			},
 			{
-				name: ul("roll.failure"),
-				value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
+				name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
+				value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
 				inline: true,
 			},
 			{
 				name: "\u200B",
 				value: "\u200B",
+				inline: false,
+			},
+			{
+				name: ul("roll.failure"),
+				value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
 				inline: true,
 			},
 			{
-				name: ul("roll.critical.success"),
-				value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
-				inline: true,
-			},
-			{
-				name: ul("roll.critical.failure"),
+				name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
 				value: `${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`,
 				inline: true,
 			}
@@ -99,7 +97,9 @@ async function bilan(
 		.setFooter({ text: ul("luckMeter.count.total", { count: totalRoll }) })
 		.setTimestamp();
 
-	await interaction.editReply({ embeds: [resultEmbed] });
+	await interaction.editReply({
+		embeds: [resultEmbed],
+	});
 }
 
 function descriptionLeaderBoard(guildCount: DBCount, option: Options) {
