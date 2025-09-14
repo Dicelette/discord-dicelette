@@ -8,10 +8,34 @@ import { t } from "i18next";
 import { getLangAndConfig } from "utils";
 
 function percentage(partial: number, total: number) {
-	return total === 0 ? 0 : ((partial / total) * 100).toFixed(2);
+	return total === 0 ? "0.00" : ((partial / total) * 100).toFixed(2);
+}
+
+function averageValue(total: number, count: number) {
+	return count === 0 ? "0.00" : (total / count).toFixed(2);
 }
 
 type Options = "criticalSuccess" | "criticalFailure" | "success" | "failure" | "total";
+
+const ALL_OPTIONS: Options[] = [
+	"total",
+	"success",
+	"failure",
+	"criticalSuccess",
+	"criticalFailure",
+];
+
+// Map des titres pour éviter le switch répétitif
+function getTitle(option: Options, ul: Translation) {
+	const titles: Record<Options, string> = {
+		criticalSuccess: ul("roll.critical.success"),
+		criticalFailure: ul("roll.critical.failure"),
+		success: ul("roll.success"),
+		failure: ul("roll.failure"),
+		total: ul("common.total"),
+	};
+	return titles[option];
+}
 
 /**
  * Gère la sous-commande pour afficher le compteur d'un utilisateur
@@ -41,7 +65,9 @@ async function bilan(
 				interaction.user.avatarURL() ??
 				interaction.guild!.iconURL()
 		)
-		.setDescription(ul("luckMeter.count.desc", { user: Djs.userMention(user.id) }))
+		.setDescription(
+			`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}\n-# ${ul("luckMeter.count.note")}`
+		)
 		.addFields(
 			{
 				name: ul("roll.success"),
@@ -80,32 +106,15 @@ function descriptionLeaderBoard(guildCount: DBCount, option: Options) {
 	const sorted = Object.entries(guildCount).sort((a, b) => b[1][option]! - a[1][option]!);
 	const top10 = sorted.slice(0, 10);
 
-	let description = "";
-	for (let i = 0; i < top10.length; i++) {
-		const userId = top10[i][0];
-		const count = top10[i][1][option];
-		const total = top10[i][1].total;
-		description +=
-			option === "total"
-				? `**${i + 1}.** ${Djs.userMention(userId)}: ${count}\n`
-				: `**${i + 1}.** ${Djs.userMention(userId)}: ${count}/${total}\n`;
-	}
-	return description;
-}
-
-function getTitle(option: Options, ul: Translation) {
-	switch (option) {
-		case "criticalSuccess":
-			return ul("roll.critical.success");
-		case "criticalFailure":
-			return ul("roll.critical.failure");
-		case "success":
-			return ul("roll.success");
-		case "failure":
-			return ul("roll.failure");
-		case "total":
-			return ul("common.total");
-	}
+	return top10
+		.map(([userId, data], i) => {
+			const value = data[option];
+			const total = data.total;
+			return option === "total"
+				? `**${i + 1}.** ${Djs.userMention(userId)}: ${value}`
+				: `**${i + 1}.** ${Djs.userMention(userId)}: ${value}/${total}`;
+		})
+		.join("\n");
 }
 
 function generateRandomColor() {
@@ -148,44 +157,32 @@ async function leaderboard(
 		userCount.total = userCount.success + userCount.failure;
 	}
 	if (!option) {
-		//si aucune option, on affiche tout dans un embed
-		const options: Options[] = [
-			"total",
-			"success",
-			"failure",
-			"criticalSuccess",
-			"criticalFailure",
-		];
-		const embeds = [];
-		for (const opt of options) {
+		// aucune option: créer un composant par catégorie
+		const components = ALL_OPTIONS.map((opt) => {
 			const description = descriptionLeaderBoard(guildCount, opt);
-			const components = new Djs.ContainerBuilder()
+			return new Djs.ContainerBuilder()
 				.setAccentColor(generateRandomColor())
 				.addTextDisplayComponents(
 					new Djs.TextDisplayBuilder().setContent(
 						`# ${getTitle(opt, ul)}\n\n${description}`
 					)
 				);
-
-			embeds.push(components);
-
-			//use componentV2 to create a cute embed
-		}
+		});
 		await interaction.editReply({
 			withComponents: true,
-			components: embeds,
+			components,
 			flags: Djs.MessageFlags.IsComponentsV2,
 			allowedMentions: { users: [], repliedUser: false, parse: [], roles: [] },
 		});
 		return;
 	}
 
-	// Affichage du top 10 des utilisateurs avec le plus haut compteur pour l'option sélectionnée
+	// Affichage du top 10 pour l'option choisie
 	const description = descriptionLeaderBoard(guildCount, option);
 
 	const embed = new Djs.EmbedBuilder()
 		.setTitle(ul("luckerMeter.leaderboard.title").toTitle())
-		.setDescription(description)
+		.setDescription(description || ul("luckMeter.leaderboard.noData"))
 		.setColor(Djs.Colors.Blurple)
 		.setTimestamp();
 
@@ -251,11 +248,11 @@ async function average(
 		criticalFailure: percentage(totalCount.criticalFailure, rollTotal),
 	};
 
-	const result = {
-		success: percentage(totalCount.success, rollTotal),
-		failure: percentage(totalCount.failure, rollTotal),
-		criticalSuccess: percentage(totalCount.criticalSuccess, rollTotal),
-		criticalFailure: percentage(totalCount.criticalFailure, rollTotal),
+	const avg = {
+		success: averageValue(totalCount.success, usersWithCounts),
+		failure: averageValue(totalCount.failure, usersWithCounts),
+		criticalSuccess: averageValue(totalCount.criticalSuccess, usersWithCounts),
+		criticalFailure: averageValue(totalCount.criticalFailure, usersWithCounts),
 	};
 
 	const embedResult = new Djs.EmbedBuilder()
@@ -265,19 +262,19 @@ async function average(
 		.addFields(
 			{
 				name: ul("roll.success"),
-				value: `[${totalCount.success}] ${result.success} (${percent.success}%)`,
+				value: `[${totalCount.success}] ${avg.success} (${percent.success}%)`,
 			},
 			{
 				name: ul("roll.failure"),
-				value: `[${totalCount.failure}] ${result.failure} (${percent.failure}%)`,
+				value: `[${totalCount.failure}] ${avg.failure} (${percent.failure}%)`,
 			},
 			{
 				name: ul("roll.critical.success"),
-				value: `[${totalCount.criticalSuccess}] ${result.criticalSuccess} (${percent.criticalSuccess}%)`,
+				value: `[${totalCount.criticalSuccess}] ${avg.criticalSuccess} (${percent.criticalSuccess}%)`,
 			},
 			{
 				name: ul("roll.critical.failure"),
-				value: `[${totalCount.criticalFailure}] ${result.criticalFailure} (${percent.criticalFailure}%)`,
+				value: `[${totalCount.criticalFailure}] ${avg.criticalFailure} (${percent.criticalFailure}%)`,
 			}
 		)
 		.setColor(Djs.Colors.Blurple)
