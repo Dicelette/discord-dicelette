@@ -25,7 +25,12 @@ const ALL_OPTIONS: Options[] = [
 	"criticalFailure",
 ];
 
-// Map des titres pour éviter le switch répétitif
+/**
+ * Get the title for a given option
+ * @param option The option to get the title for
+ * @param ul The translation function
+ * @returns The title for the option
+ */
 function getTitle(option: Options, ul: Translation) {
 	const titles: Record<Options, string> = {
 		criticalSuccess: ul("roll.critical.success"),
@@ -37,8 +42,43 @@ function getTitle(option: Options, ul: Translation) {
 	return titles[option];
 }
 
+function generateFieldsForBilan(count: Count, ul: Translation) {
+	const totalRoll = count.success + count.failure;
+	const fields: Djs.EmbedField[] = [
+		{
+			name: ul("roll.success"),
+			value: `${count.success} (${percentage(count.success, totalRoll)}%)`,
+			inline: true,
+		},
+	];
+	if (count.criticalSuccess > 0) {
+		fields.push({
+			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
+			value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
+			inline: true,
+		});
+	}
+	fields.push({ name: "\u200B", value: "\u200B", inline: false });
+	fields.push({
+		name: ul("roll.failure"),
+		value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
+		inline: true,
+	});
+	if (count.criticalFailure > 0) {
+		fields.push({
+			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
+			value: `${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`,
+			inline: true,
+		});
+	}
+	return fields;
+}
+
 /**
- * Gère la sous-commande pour afficher le compteur d'un utilisateur
+ * Display the count of successes and failures for a user
+ * @param interaction The interaction that triggered the command
+ * @param client The bot client
+ * @param ul The translation function
  */
 async function bilan(
 	interaction: Djs.ChatInputCommandInteraction,
@@ -66,33 +106,7 @@ async function bilan(
 				interaction.guild!.iconURL()
 		)
 		.setDescription(`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}`)
-		.addFields(
-			{
-				name: ul("roll.success"),
-				value: `${count.success} (${percentage(count.success, totalRoll)}%)`,
-				inline: true,
-			},
-			{
-				name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
-				value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
-				inline: true,
-			},
-			{
-				name: "\u200B",
-				value: "\u200B",
-				inline: false,
-			},
-			{
-				name: ul("roll.failure"),
-				value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
-				inline: true,
-			},
-			{
-				name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
-				value: `${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`,
-				inline: true,
-			}
-		)
+		.addFields(generateFieldsForBilan(count, ul))
 		.setColor(Djs.Colors.Blurple)
 		.setFooter({ text: ul("luckMeter.count.total", { count: totalRoll }) })
 		.setTimestamp();
@@ -107,6 +121,7 @@ function descriptionLeaderBoard(guildCount: DBCount, option: Options) {
 	const top10 = sorted.slice(0, 10);
 
 	return top10
+		.filter(([, data]) => data[option]! > 0)
 		.map(([userId, data], i) => {
 			const value = data[option];
 			const total = data.total;
@@ -126,8 +141,41 @@ function generateRandomColor() {
 	return Number.parseInt(color.replace("#", ""), 16);
 }
 
+function componentServerStats(
+	server: { totalCount: Count; usersWithCounts: number; rollTotal: number },
+	ul: Translation
+) {
+	const { totalCount, usersWithCounts, rollTotal } = server;
+	const { percent, avg } = serverStats(totalCount, rollTotal, usersWithCounts);
+	const descriptions = [`# ${ul("luckMeter.moy.title").toTitle()}`];
+	descriptions.push(
+		`- __${ul("roll.success")}__${ul("common.space")}: [${totalCount.success}] ${avg.success} (${percent.success}%)`
+	);
+	if (totalCount.criticalSuccess > 0) {
+		descriptions.push(
+			`  - ${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}${ul("common.space")}: [${totalCount.criticalSuccess}] ${avg.criticalSuccess} (${percent.criticalSuccess}%)`
+		);
+	}
+	descriptions.push(
+		`- __${ul("roll.failure")}__${ul("common.space")}: [${totalCount.failure}] ${avg.failure} (${percent.failure}%)`
+	);
+	if (totalCount.criticalFailure > 0) {
+		descriptions.push(
+			`  - ${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}${ul("common.space")}: [${totalCount.criticalFailure}] ${avg.criticalFailure} (${percent.criticalFailure}%)`
+		);
+	}
+	descriptions.push(`-# ${ul("luckMeter.moy.result", { rollTotal, usersWithCounts })}`);
+	const component = new Djs.TextDisplayBuilder().setContent(descriptions.join("\n"));
+	return new Djs.ContainerBuilder()
+		.setAccentColor(generateRandomColor())
+		.addTextDisplayComponents(component);
+}
+
 /**
- * Gère la sous-commande pour afficher le classement
+ * Display the leaderboard for the specified option or all options if none is specified
+ * @param interaction The interaction that triggered the command
+ * @param client The bot client
+ * @param ul The translation function
  */
 async function leaderboard(
 	interaction: Djs.ChatInputCommandInteraction,
@@ -157,9 +205,10 @@ async function leaderboard(
 		userCount.total = userCount.success + userCount.failure;
 	}
 	if (!option) {
-		// aucune option: créer un composant par catégorie
+		// Display all leaderboards if no specific option is chosen
 		const components = ALL_OPTIONS.map((opt) => {
 			const description = descriptionLeaderBoard(guildCount, opt);
+			if (!description.length) return undefined;
 			return new Djs.ContainerBuilder()
 				.setAccentColor(generateRandomColor())
 				.addTextDisplayComponents(
@@ -167,7 +216,15 @@ async function leaderboard(
 						`# ${getTitle(opt, ul)}\n\n${description}`
 					)
 				);
-		});
+		}).filter((c): c is Djs.ContainerBuilder => !!c);
+		if (components.length === 0) {
+			await interaction.editReply({ content: ul("luckMeter.leaderboard.noData") });
+			return;
+		}
+		const serverStats = calculateServerStats(guildCount);
+		const serverComponents = componentServerStats(serverStats, ul);
+		components.unshift(serverComponents);
+
 		await interaction.editReply({
 			withComponents: true,
 			components,
@@ -177,13 +234,13 @@ async function leaderboard(
 		return;
 	}
 
-	// Affichage du top 10 pour l'option choisie
+	// Display the top 10 for the selected option
 	const description = descriptionLeaderBoard(guildCount, option);
 
 	const embed = new Djs.EmbedBuilder()
 		.setTitle(ul("luckerMeter.leaderboard.title").toTitle())
 		.setDescription(description || ul("luckMeter.leaderboard.noData"))
-		.setColor(Djs.Colors.Blurple)
+		.setColor(generateRandomColor())
 		.setTimestamp();
 
 	await interaction.editReply({ embeds: [embed] });
@@ -220,10 +277,84 @@ function calculateServerStats(guildCount: Record<string, Count>) {
 	return { totalCount, usersWithCounts, rollTotal };
 }
 
+function generateServerFields(
+	ul: Translation,
+	totalCount: Count,
+	avg: Record<string, string>,
+	percent: Record<string, string>
+) {
+	const fields: Djs.EmbedField[] = [
+		{
+			name: ul("roll.success"),
+			value: `[${totalCount.success}] ${avg.success} (${percent.success}%)`,
+			inline: true,
+		},
+	];
+	if (totalCount.criticalSuccess > 0) {
+		fields.push({
+			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
+			value: `[${totalCount.criticalSuccess}] ${avg.criticalSuccess} (${percent.criticalSuccess}%)`,
+			inline: true,
+		});
+	}
+	fields.push({ name: "\u200B", value: "\u200B", inline: false });
+	fields.push({
+		name: ul("roll.failure"),
+		value: `[${totalCount.failure}] ${avg.failure} (${percent.failure}%)`,
+		inline: true,
+	});
+	if (totalCount.criticalFailure > 0) {
+		fields.push({
+			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
+			value: `[${totalCount.criticalFailure}] ${avg.criticalFailure} (${percent.criticalFailure}%)`,
+			inline: true,
+		});
+	}
+	return fields;
+}
+
+function serverStats(totalCount: Count, rollTotal: number, usersWithCounts: number) {
+	const percent = {
+		success: percentage(totalCount.success, rollTotal),
+		failure: percentage(totalCount.failure, rollTotal),
+		criticalSuccess: percentage(totalCount.criticalSuccess, rollTotal),
+		criticalFailure: percentage(totalCount.criticalFailure, rollTotal),
+	};
+
+	const avg = {
+		success: averageValue(totalCount.success, usersWithCounts),
+		failure: averageValue(totalCount.failure, usersWithCounts),
+		criticalSuccess: averageValue(totalCount.criticalSuccess, usersWithCounts),
+		criticalFailure: averageValue(totalCount.criticalFailure, usersWithCounts),
+	};
+	return { percent, avg };
+}
+
+function serverStatsEmbed(
+	ul: Translation,
+	interaction: Djs.ChatInputCommandInteraction,
+	totalCount: Count,
+	usersWithCounts: number,
+	rollTotal: number
+) {
+	const { percent, avg } = serverStats(totalCount, rollTotal, usersWithCounts);
+
+	return new Djs.EmbedBuilder()
+		.setTitle(ul("luckMeter.moy.title").toTitle())
+		.setThumbnail((interaction.guild!.iconURL() as string) ?? undefined)
+		.setDescription(ul("luckMeter.moy.result", { rollTotal, usersWithCounts }))
+		.addFields(generateServerFields(ul, totalCount, avg, percent))
+		.setColor(Djs.Colors.Blurple)
+		.setTimestamp();
+}
+
 /**
- * Gère la sous-commande pour afficher les moyennes du serveur
+ * Display the average stats for the server
+ * @param interaction The interaction that triggered the command
+ * @param client The bot client
+ * @param ul The translation function
  */
-async function average(
+async function server(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	ul: Translation
@@ -241,44 +372,13 @@ async function average(
 		return;
 	}
 
-	const percent = {
-		success: percentage(totalCount.success, rollTotal),
-		failure: percentage(totalCount.failure, rollTotal),
-		criticalSuccess: percentage(totalCount.criticalSuccess, rollTotal),
-		criticalFailure: percentage(totalCount.criticalFailure, rollTotal),
-	};
-
-	const avg = {
-		success: averageValue(totalCount.success, usersWithCounts),
-		failure: averageValue(totalCount.failure, usersWithCounts),
-		criticalSuccess: averageValue(totalCount.criticalSuccess, usersWithCounts),
-		criticalFailure: averageValue(totalCount.criticalFailure, usersWithCounts),
-	};
-
-	const embedResult = new Djs.EmbedBuilder()
-		.setTitle(ul("luckMeter.moy.title").toTitle())
-		.setThumbnail((interaction.guild!.iconURL() as string) ?? undefined)
-		.setDescription(ul("luckMeter.moy.result", { rollTotal, usersWithCounts }))
-		.addFields(
-			{
-				name: ul("roll.success"),
-				value: `[${totalCount.success}] ${avg.success} (${percent.success}%)`,
-			},
-			{
-				name: ul("roll.failure"),
-				value: `[${totalCount.failure}] ${avg.failure} (${percent.failure}%)`,
-			},
-			{
-				name: ul("roll.critical.success"),
-				value: `[${totalCount.criticalSuccess}] ${avg.criticalSuccess} (${percent.criticalSuccess}%)`,
-			},
-			{
-				name: ul("roll.critical.failure"),
-				value: `[${totalCount.criticalFailure}] ${avg.criticalFailure} (${percent.criticalFailure}%)`,
-			}
-		)
-		.setColor(Djs.Colors.Blurple)
-		.setTimestamp();
+	const embedResult = serverStatsEmbed(
+		ul,
+		interaction,
+		totalCount,
+		usersWithCounts,
+		rollTotal
+	);
 
 	await interaction.editReply({
 		embeds: [embedResult],
@@ -365,7 +465,7 @@ export const getCount = {
 				await leaderboard(interaction, client, ul);
 				break;
 			case t("luckMeter.moy.title"):
-				await average(interaction, client, ul);
+				await server(interaction, client, ul);
 				break;
 		}
 	},

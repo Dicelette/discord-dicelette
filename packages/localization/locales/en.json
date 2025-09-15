@@ -617,9 +617,9 @@
       }
     },
     "moy": {
-      "desc": "Get mean of each roll type in the server",
+      "desc": "Get number and mean of each roll type in the server",
       "result": "Total rolls: {{- rollTotal}} by {{- usersWithCounts}} users",
-      "title": "average"
+      "title": "server"
     },
     "title": "luck_meter",
     "user": "{{- user}}'s throwing results:",

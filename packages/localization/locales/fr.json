@@ -617,9 +617,9 @@
       }
     },
     "moy": {
-      "desc": "Obtenir la moyenne de chaque type de lancer dans le serveur",
+      "desc": "Obtenir le total et la moyenne de chaque type de lancer dans le serveur",
       "result": "Total lancés : {{- rollTotal}} jets par {{- usersWithCounts}} utilisateurs",
-      "title": "moyenne"
+      "title": "serveur"
     },
     "title": "barometre_chance",
     "user": "Bilan des lancers de {{- user}} :",
