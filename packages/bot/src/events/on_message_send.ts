@@ -11,10 +11,15 @@ import type { DiscordTextChannel } from "@dicelette/types";
 import { allValuesUndefined, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, stripOOC, threadToSend } from "messages";
+import {
+	deleteAfter,
+	findMessageBefore,
+	saveCount,
+	stripOOC,
+	threadToSend,
+} from "messages";
 import { fetchChannel } from "utils";
 import { getCharFromText, getTemplate, getUserFromMessage } from "../database";
-import { saveCount } from "../messages/criticalcount";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -138,7 +143,9 @@ export default (client: EClient): void => {
 				Djs.Locale.EnglishUS;
 			const msgError = lError(e as Error, undefined, userLang);
 			if (msgError.length === 0) return;
-			await message.channel.send({ content: msgError });
+			//await message.channel.send({ content: msgError });
+			await message.author.send({ content: msgError });
+
 			const logsId = client.settings.get(message.guild.id, "logs");
 			if (logsId) {
 				const logs = await fetchChannel(message.guild, logsId);
