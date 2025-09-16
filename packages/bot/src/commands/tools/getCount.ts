@@ -430,7 +430,7 @@ export const getCount = {
 				.addUserOption((option) =>
 					option
 						.setNames("edit.user.title")
-						.setDescription("luckMeter.userOption.description")
+						.setDescriptions("luckMeter.userOption.description")
 				)
 		)
 		.addSubcommand((subcommand) =>
