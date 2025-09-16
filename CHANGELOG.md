@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.2](https://github.com/Dicelette/discord-dicelette/compare/2.2.1...2.2.2) (2025-09-16)
+
+
+### Bug Fixes
+
+* should send error in DM to not flood the channels when an error appear ([3de2478](https://github.com/Dicelette/discord-dicelette/commit/3de2478dd0321f99e2fea0d768b88fcd538ea12e))
+
 ## [2.2.1](https://github.com/Dicelette/discord-dicelette/compare/2.2.0...2.2.1) (2025-09-16)
 
 
