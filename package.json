@@ -1,72 +1,72 @@
 {
-  "name": "dicelette",
-  "version": "2.2.1",
-  "engineStrict": true,
-  "private": true,
-  "scripts": {
-    "lint": "biome format --write packages",
-    "build": "pnpm run --recursive build",
-    "predev": "pnpm run --recursive prebuild",
-    "dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-    "dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-    "prerelease": "pnpm run --recursive tsc",
-    "release": "commit-and-tag-version",
-    "pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
-    "pm2:restart": "pnpm run build && pm2 restart dicelette",
-    "pm2:stop": "pm2 stop dicelette",
-    "pm2:delete": "pm2 delete dicelette",
-    "test": "pnpm --filter @dicelette/parse_result run test",
-    "prepare": "husky"
-  },
-  "engines": {
-    "node": "^20.0.0"
-  },
-  "commit-and-tag-version": {
-    "t": "",
-    "bumpFiles": [
-      {
-        "filename": "packages/bot/package.json",
-        "type": "json"
-      },
-      {
-        "filename": "package.json",
-        "type": "json"
-      }
-    ]
-  },
-  "keywords": [],
-  "author": "",
-  "license": "GNU GPLv3",
-  "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
-    "commit-and-tag-version": "^12.5.2",
-    "cross-env": "^7.0.3",
-    "husky": "^9.1.7",
-    "i18next": "^25.3.5",
-    "rimraf": "^6.0.1",
-    "ts-loader": "^9.5.2",
-    "tsc-alias": "^1.8.16",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.2",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
-  },
-  "dependencies": {
-    "@dicelette/core": "latest",
-    "@types/node": "^22.17.1",
-    "dedent": "^1.6.0",
-    "discord.js": "14.22.1",
-    "dotenv": "^17.2.1",
-    "tslog": "^4.9.3",
-    "tsx": "^4.20.4",
-    "uniformize": "^2.4.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "better-sqlite3",
-      "canvas",
-      "esbuild"
-    ]
-  }
+	"name": "dicelette",
+	"version": "2.2.1",
+	"engineStrict": true,
+	"private": true,
+	"scripts": {
+		"lint": "biome format --write packages",
+		"build": "pnpm run --recursive build",
+		"predev": "pnpm run --recursive prebuild",
+		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+		"prerelease": "pnpm run --recursive tsc",
+		"release": "commit-and-tag-version",
+		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
+		"pm2:restart": "pnpm run build && pm2 restart dicelette",
+		"pm2:stop": "pm2 stop dicelette",
+		"pm2:delete": "pm2 delete dicelette",
+		"test": "pnpm --filter @dicelette/parse_result run test",
+		"prepare": "husky"
+	},
+	"engines": {
+		"node": "^20.0.0"
+	},
+	"commit-and-tag-version": {
+		"t": "",
+		"bumpFiles": [
+			{
+				"filename": "packages/bot/package.json",
+				"type": "json"
+			},
+			{
+				"filename": "package.json",
+				"type": "json"
+			}
+		]
+	},
+	"keywords": [],
+	"author": "",
+	"license": "GNU GPLv3",
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.0",
+		"commit-and-tag-version": "^12.5.2",
+		"cross-env": "^7.0.3",
+		"husky": "^9.1.7",
+		"i18next": "^25.3.5",
+		"rimraf": "^6.0.1",
+		"ts-loader": "^9.5.2",
+		"tsc-alias": "^1.8.16",
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^5.9.2",
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^3.2.4"
+	},
+	"dependencies": {
+		"@dicelette/core": "^1.18.5",
+		"@types/node": "^22.17.1",
+		"dedent": "^1.6.0",
+		"discord.js": "14.22.1",
+		"dotenv": "^17.2.1",
+		"tslog": "^4.9.3",
+		"tsx": "^4.20.4",
+		"uniformize": "^2.4.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"better-sqlite3",
+			"canvas",
+			"esbuild"
+		]
+	}
 }
