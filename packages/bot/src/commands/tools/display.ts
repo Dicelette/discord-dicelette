@@ -154,7 +154,7 @@ function generateDice(fields?: Djs.APIEmbedField[], statsFields?: Djs.APIEmbedFi
 	const stats = statsFields?.reduce(
 		(acc, field) => {
 			const stat = field.name.toLowerCase();
-			const value = Number.parseInt(field.value.removeBacktick() as string);
+			const value = Number.parseInt(field.value.removeBacktick() as string, 10);
 			if (stat && value) acc[field.name.standardize()] = value;
 			return acc;
 		},
