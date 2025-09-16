@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.1](https://github.com/Dicelette/discord-dicelette/compare/2.2.0...2.2.1) (2025-09-16)
+
+
+### Bug Fixes
+
+* add fetchAvatarUrl utility and update avatar handling across modules ([8540560](https://github.com/Dicelette/discord-dicelette/commit/854056019d43b26d7d18ca40af4a447070ad26d0))
+* total should not includes critical as they are already counted in they respective things ([431460b](https://github.com/Dicelette/discord-dicelette/commit/431460b39670fd384226084429d8135ffc65a017))
+* total should not includes critical as they are already counted in they respective things ([cfb149e](https://github.com/Dicelette/discord-dicelette/commit/cfb149e2d8caf542366845109287f8c2bfcb0578))
+* typo that broke translation description in user ([be42cdb](https://github.com/Dicelette/discord-dicelette/commit/be42cdb67b98815b9c6a51f58f65931e15ecac1c))
+
 ## [2.2.0](https://github.com/Dicelette/discord-dicelette/compare/2.1.0...2.2.0) (2025-09-12)
 
 
