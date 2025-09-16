@@ -13,7 +13,13 @@ import {
 	getEmbeds,
 	reply,
 } from "messages";
-import { autoComplete, charUserOptions, haveAccess, optionInteractions } from "utils";
+import {
+	autoComplete,
+	charUserOptions,
+	fetchAvatarUrl,
+	haveAccess,
+	optionInteractions,
+} from "utils";
 import "discord_ext";
 
 export const displayUser = {
@@ -94,7 +100,7 @@ export const displayUser = {
 			const thumbnailJson = dataUserEmbeds?.toJSON().thumbnail?.url;
 			const avatar = thumbnailJson
 				? cleanAvatarUrl(thumbnailJson)
-				: (user?.displayAvatarURL() ?? interaction.user.displayAvatarURL());
+				: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
 			const displayEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("embed.display"))
 				.setThumbnail(avatar)

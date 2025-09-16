@@ -1,6 +1,7 @@
 import { ln } from "@dicelette/localization";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
+import type { Guild, GuildMember, User } from "discord.js";
 import type { EClient } from "../client";
 
 export function getLangAndConfig(
@@ -64,4 +65,11 @@ export async function fetchMember(
 		logger.warn(`Failed to fetch member with ID ${memberId}:`, error);
 		return undefined;
 	}
+}
+
+export async function fetchAvatarUrl(guild: Guild, user: User, member?: GuildMember) {
+	if (member) return member.avatarURL() ?? user.displayAvatarURL();
+	const userId = user.id;
+	member = await fetchMember(guild, userId);
+	return member?.avatarURL() ?? user.displayAvatarURL();
 }

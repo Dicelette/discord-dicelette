@@ -2,7 +2,7 @@ import type { Settings, Translation } from "@dicelette/types";
 import { cleanAvatarUrl } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
-import { allowEdit } from "utils";
+import { allowEdit, fetchAvatarUrl } from "utils";
 
 export async function start(
 	interaction: Djs.StringSelectMenuInteraction,
@@ -31,7 +31,7 @@ async function showAvatarEdit(
 	const jsonEmbed = embed.toJSON().thumbnail?.url;
 	const thumbnail = jsonEmbed
 		? cleanAvatarUrl(jsonEmbed)
-		: interaction.user.displayAvatarURL();
+		: await fetchAvatarUrl(interaction.guild!, interaction.user);
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editAvatar")
 		.setTitle(ul("button.avatar.description"));

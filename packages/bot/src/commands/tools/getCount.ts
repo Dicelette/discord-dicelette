@@ -5,7 +5,7 @@ import "discord_ext";
 import { cmdLn } from "@dicelette/localization";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import { t } from "i18next";
-import { getLangAndConfig } from "utils";
+import { fetchAvatarUrl, getLangAndConfig } from "utils";
 
 function percentage(partial: number, total: number) {
 	return total === 0 ? "0.00" : ((partial / total) * 100).toFixed(2);
@@ -99,12 +99,7 @@ async function bilan(
 
 	const resultEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("luckMeter.count.title").toTitle())
-		.setThumbnail(
-			user.displayAvatarURL() ??
-				user.avatarURL() ??
-				interaction.user.avatarURL() ??
-				interaction.guild!.iconURL()
-		)
+		.setThumbnail(await fetchAvatarUrl(interaction.guild!, user))
 		.setDescription(`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}`)
 		.addFields(generateFieldsForBilan(count, ul))
 		.setColor(Djs.Colors.Blurple)

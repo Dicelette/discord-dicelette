@@ -12,7 +12,7 @@ import {
 	reply,
 	repostInThread,
 } from "messages";
-import { addAutoRole, getLangAndConfig, parseCSV } from "utils";
+import { addAutoRole, fetchAvatarUrl, getLangAndConfig, parseCSV } from "utils";
 import "discord_ext";
 
 /**
@@ -78,7 +78,7 @@ export const bulkAdd = {
 			for (const char of data) {
 				const userDataEmbed = createUserEmbed(
 					ul,
-					char.avatar ?? member.avatarURL() ?? member.defaultAvatarURL,
+					char.avatar ?? (await fetchAvatarUrl(interaction.guild!, member)),
 					member.id,
 					char.userName ?? undefined
 				);
