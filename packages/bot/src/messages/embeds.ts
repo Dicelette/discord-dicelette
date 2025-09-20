@@ -93,11 +93,12 @@ export function getEmbeds(
 		const titleKey = findln(embedJSON.title ?? "");
 		const userKeys = ["embed.user", "embed.add", "embed.old"];
 		const statsKeys = ["common.statistic", "common.statistics"];
+		const diceKeys = ["embed.dice", "legacy.dice", "common.macro"];
 		if (userKeys.includes(titleKey) && which === "user")
 			return new Djs.EmbedBuilder(embedJSON);
 		if (statsKeys.includes(titleKey) && which === "stats")
 			return new Djs.EmbedBuilder(embedJSON);
-		if (titleKey === "embed.dice" && which === "damage")
+		if (diceKeys.includes(titleKey) && which === "damage")
 			return new Djs.EmbedBuilder(embedJSON);
 		if (["embed.template", "common.template"].includes(titleKey) && which === "template")
 			return new Djs.EmbedBuilder(embedJSON);

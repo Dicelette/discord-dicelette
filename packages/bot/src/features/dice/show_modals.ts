@@ -91,7 +91,8 @@ async function showEdit(interaction: Djs.ButtonInteraction, ul: Translation) {
 	const diceFields = parseEmbedFields(diceEmbed.toJSON() as Djs.Embed);
 	let dices = "";
 	for (const [skill, dice] of Object.entries(diceFields)) {
-		dices += `- ${skill}${ul("common.space")}: ${dice}\n`;
+		if (dice === "common.space") dices += `- ${skill}: _ _\n`;
+		else dices += `- ${skill}${ul("common.space")}: ${dice}\n`;
 	}
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editDice")

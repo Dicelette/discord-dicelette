@@ -100,7 +100,7 @@ export const bulkAdd = {
 				for (const [name, dice] of Object.entries(guildTemplate.damage ?? {})) {
 					diceEmbed!.addFields({
 						name: name.capitalize(),
-						value: `\`${dice}\``,
+						value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
 						inline: true,
 					});
 				}
@@ -109,7 +109,7 @@ export const bulkAdd = {
 					if (!diceEmbed) diceEmbed = createDiceEmbed(ul);
 					diceEmbed!.addFields({
 						name: name.capitalize(),
-						value: `\`${dice}\``,
+						value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
 						inline: true,
 					});
 				}

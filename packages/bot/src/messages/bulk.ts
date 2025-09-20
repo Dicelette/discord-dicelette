@@ -49,7 +49,7 @@ export async function bulkEditTemplateUser(
 				const templateEmbed = getEmbeds(userMessages, "template");
 				if (!templateEmbed) continue;
 				let newEmbed = createTemplateEmbed(ul);
-				if (template.diceType)
+				if (template.diceType && template.diceType.length > 0)
 					newEmbed.addFields({
 						name: ul("common.dice"),
 						value: `\`${template.diceType}\``,

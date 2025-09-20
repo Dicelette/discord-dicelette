@@ -309,7 +309,7 @@ async function createEmbed(
 			});
 		}
 	}
-	if (templateData.diceType)
+	if (templateData.diceType && templateData.diceType.trim().length > 0)
 		embedTemplate.addFields({
 			name: ul("common.dice").capitalize(),
 			value: `\`${capitalizeBetweenPunct(templateData.diceType)}\``,
@@ -350,7 +350,7 @@ async function createEmbed(
 		for (const [dice, value] of Object.entries(templateData.damage))
 			diceEmbed.addFields({
 				name: dice.capitalize(),
-				value: `\`${value}\``,
+				value: value.trim().length > 0 ? `\`${value}\`` : "_ _",
 				inline: true,
 			});
 	}

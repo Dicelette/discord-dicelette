@@ -1,7 +1,13 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
-import { cleanAvatarUrl, logger, NoEmbed } from "@dicelette/utils";
+import {
+	allValuesUndefined,
+	allValueUndefOrEmptyString,
+	cleanAvatarUrl,
+	logger,
+	NoEmbed,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
@@ -210,7 +216,7 @@ export async function validateUser(
 		}
 		diceEmbed.addFields({
 			name: field.name.unidecode(true).capitalize(),
-			value: `\`${field.value}\``,
+			value: field.value && field.value.trim().length > 0 ? `\`${field.value}\`` : "_ _",
 			inline: true,
 		});
 	}
@@ -240,19 +246,20 @@ export async function validateUser(
 		stats[name] = statValue;
 	}
 
-	const damageFields = diceEmbed?.toJSON().fields ?? [];
-	let templateDamage: Record<string, string> | undefined;
-	if (damageFields.length > 0) {
-		templateDamage = {};
+	const macroFields = diceEmbed?.toJSON().fields ?? [];
+	let templateMacro: Record<string, string> | undefined;
+	if (macroFields.length > 0) {
+		templateMacro = {};
 
-		for (const damage of damageFields) {
-			templateDamage[damage.name.unidecode(true)] = damage.value;
+		for (const damage of macroFields) {
+			if (damage.value.trim().length === 0) continue;
+			templateMacro[damage.name.unidecode(true)] = damage.value;
 		}
 	}
 	// Add the template damage to the user if exists
 	for (const [name, dice] of Object.entries(template.damage ?? {})) {
-		if (!templateDamage) templateDamage = {};
-		templateDamage[name] = dice;
+		if (!templateMacro) templateMacro = {};
+		templateMacro[name] = dice;
 		if (!diceEmbed) {
 			diceEmbed = Messages.createDiceEmbed(ul);
 		}
@@ -261,7 +268,7 @@ export async function validateUser(
 		//why i forgot this????
 		diceEmbed.addFields({
 			name: `${name}`,
-			value: `\`${dice}\``,
+			value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
 			inline: true,
 		});
 	}
@@ -274,14 +281,18 @@ export async function validateUser(
 			critical: template.critical,
 			customCritical: template.customCritical,
 		},
-		damage: templateDamage,
+		damage: templateMacro,
 		private: isPrivate,
 		avatar: jsonThumbnail ? cleanAvatarUrl(jsonThumbnail) : undefined,
 	};
 	let templateEmbed: Djs.EmbedBuilder | undefined;
-	if (template.diceType || template.critical || template.customCritical) {
+	if (
+		(template.diceType && template.diceType.length > 0) ||
+		!allValueUndefOrEmptyString(template.critical) ||
+		!allValueUndefOrEmptyString(template.customCritical)
+	) {
 		templateEmbed = Messages.createTemplateEmbed(ul);
-		if (template.diceType)
+		if (template.diceType && template.diceType.length > 0)
 			templateEmbed.addFields({
 				name: ul("common.dice").capitalize(),
 				value: `\`${template.diceType}\``,

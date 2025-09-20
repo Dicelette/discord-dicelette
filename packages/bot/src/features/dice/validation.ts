@@ -99,7 +99,7 @@ export async function validate(
 				//register the old value
 				newEmbedDice.push({
 					name: name.capitalize(),
-					value: `${field.value}`,
+					value: field.value,
 					inline: true,
 				});
 			}

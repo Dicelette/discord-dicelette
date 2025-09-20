@@ -72,8 +72,15 @@ export function capitalizeBetweenPunct(input: string) {
 		}
 	}
 	remainingText = remainingText.toTitle();
-	result = result.replace(new RegExp(`\\b${remainingText}\\b`, "gi"), remainingText);
+	result = result.replace(
+		new RegExp(`\\b${escapeRegex(remainingText)}\\b`, "gi"),
+		remainingText
+	);
 	return result;
+}
+
+function escapeRegex(string: string) {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export * from "./src/errors";
@@ -109,4 +116,20 @@ export function isValidJSON(jsonString: string): unknown | false {
 		logger.fatal(`Invalid JSON format: ${e}`);
 		return false;
 	}
+}
+
+export function allValueUndefOrEmptyString(obj: unknown): boolean {
+	if (obj === null || obj === undefined) return true;
+
+	if (typeof obj !== "object") return false;
+	if (Array.isArray(obj)) {
+		return obj.every((item) => allValueUndefOrEmptyString(item));
+	}
+	return Object.values(obj).every(
+		(value) =>
+			value === undefined ||
+			value === null ||
+			(typeof value === "string" && value.trim() === "") ||
+			(typeof value === "object" && allValueUndefOrEmptyString(value))
+	);
 }

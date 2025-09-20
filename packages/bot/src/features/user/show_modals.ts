@@ -60,7 +60,7 @@ async function show(
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
 				.setCustomId("userID")
-				.setLabel(ul("edit.user.title"))
+				.setLabel(ul("common.user"))
 				.setPlaceholder(ul("modals.user.description"))
 				.setRequired(true)
 				.setValue(interaction.user.username ?? interaction.user.id)
