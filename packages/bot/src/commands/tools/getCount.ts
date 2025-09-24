@@ -414,7 +414,7 @@ function leaderBoardChoices() {
 	];
 }
 
-export const getCount = {
+const getCount = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("luckMeter.title")
 		.setDescriptions("luckMeter.description")
@@ -426,6 +426,9 @@ export const getCount = {
 					option
 						.setNames("edit.user.title")
 						.setDescriptions("luckMeter.userOption.description")
+				)
+				.addBooleanOption((option) =>
+					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
 				)
 		)
 		.addSubcommand((subcommand) =>
@@ -439,9 +442,17 @@ export const getCount = {
 						.addChoices(...leaderBoardChoices())
 						.setRequired(false)
 				)
+				.addBooleanOption((option) =>
+					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
+				)
 		)
 		.addSubcommand((subcommand) =>
-			subcommand.setNames("luckMeter.moy.title").setDescriptions("luckMeter.moy.desc")
+			subcommand
+				.setNames("luckMeter.moy.title")
+				.setDescriptions("luckMeter.moy.desc")
+				.addBooleanOption((option) =>
+					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
+				)
 		),
 
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -449,8 +460,13 @@ export const getCount = {
 
 		const subcmd = interaction.options.getSubcommand();
 		const { ul } = getLangAndConfig(client, interaction, interaction.guild.id);
+		const flags = interaction.options.getBoolean(t("common.ephemeral"));
 
-		await interaction.deferReply();
+		console.log(`flags: ${flags}`);
+
+		await interaction.deferReply(
+			flags ? { flags: Djs.MessageFlags.Ephemeral } : undefined
+		);
 
 		switch (subcmd) {
 			case t("luckMeter.count.title"):
@@ -465,3 +481,4 @@ export const getCount = {
 		}
 	},
 };
+export default getCount;
