@@ -168,7 +168,6 @@ export function processChainedDiceRoll(
 
 	try {
 		// Remove critical blocks before rolling
-		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
 		const cleaned = finalContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
 		const rollResult = roll(cleaned);
 		if (!rollResult) return undefined;
@@ -188,8 +187,7 @@ export function isRolling(
 	// Process stats replacement if userData is available
 	let processedContent: string;
 	// Preclean to ignore {cs|cf:...} blocs
-	const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
-	const contentForOpposition = content.replace(criticalBlock, "");
+	const contentForOpposition = content.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
 	const reg = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
 		contentForOpposition
 	);
@@ -202,7 +200,7 @@ export function isRolling(
 	const diceData = extractDiceData(processedContent);
 
 	if (diceData.bracketRoll) {
-		const cleanedForRoll = processedContent.replace(criticalBlock, "");
+		const cleanedForRoll = processedContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
 		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
 		if (diceRoll?.resultat)
 			return {
@@ -216,9 +214,8 @@ export function isRolling(
 		processedContent.includes("#") ||
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
-		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
 		const diceRoll = processChainedDiceRoll(
-			processedContent.replace(criticalBlock, ""),
+			processedContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, ""),
 			userData
 		);
 		if (diceRoll)
@@ -238,7 +235,7 @@ export function isRolling(
 			comments = chained.comments;
 		}
 
-		finalContent = finalContent.replace(criticalBlock, "");
+		finalContent = finalContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
 
 		const diceRoll = performDiceRoll(finalContent, undefined, userData);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
