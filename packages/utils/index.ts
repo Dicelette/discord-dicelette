@@ -6,6 +6,16 @@ export { logger, important };
 export * from "./src/changelog";
 export { default as dev } from "./src/dev";
 
+// Pre-compiled regex patterns for better performance
+const COMPILED_PATTERNS = {
+	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
+	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
+	QUERY_PARAMS: /\?.*$/g,
+	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,
+	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
+	REGEX_ESCAPE: /[.*+?^${}()|[\]\\]/g,
+} as const;
+
 /**
  * filter the choices by removing the accents and check if it includes the removedAccents focused
  * @param choices {string[]}
@@ -36,13 +46,15 @@ function uniqueValues(array: string[]) {
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
-	if (url.match(/^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi))
-		return url;
+	// Reset lastIndex for global regex to avoid issues
+	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
+	if (url.match(COMPILED_PATTERNS.AVATAR_URL)) return url;
 	return false;
 }
 
 export function cleanAvatarUrl(url: string) {
-	if (url.match(/(cdn|media)\.discordapp\.(net|com)/gi)) return url.replace(/\?.*$/g, "");
+	if (url.match(COMPILED_PATTERNS.DISCORD_CDN))
+		return url.replace(COMPILED_PATTERNS.QUERY_PARAMS, "");
 	return url;
 }
 
@@ -60,10 +72,9 @@ export function isArrayEqual(array1: string[] | undefined, array2: string[] | un
 }
 export function capitalizeBetweenPunct(input: string) {
 	// Regex to find sections enclosed by punctuation marks
-	const regex = /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu;
 	let remainingText = input;
 	let result = input;
-	for (const match of input.matchAll(regex)) {
+	for (const match of input.matchAll(COMPILED_PATTERNS.PUNCTUATION_ENCLOSED)) {
 		const { open, enclosed, close } = match.groups ?? {};
 		if (open && enclosed && close) {
 			const capitalized = enclosed.capitalize();
@@ -72,15 +83,12 @@ export function capitalizeBetweenPunct(input: string) {
 		}
 	}
 	remainingText = remainingText.toTitle();
-	result = result.replace(
-		new RegExp(`\\b${escapeRegex(remainingText)}\\b`, "gi"),
-		remainingText
-	);
+	result = result.replace(COMPILED_PATTERNS.WORD_BOUNDARY(remainingText), remainingText);
 	return result;
 }
 
 function escapeRegex(string: string) {
-	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	return string.replace(COMPILED_PATTERNS.REGEX_ESCAPE, "\\$&");
 }
 
 export * from "./src/errors";

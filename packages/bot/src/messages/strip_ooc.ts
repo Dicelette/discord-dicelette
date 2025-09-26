@@ -6,6 +6,22 @@ import { fetchChannel } from "../utils";
 import { deleteAfter } from "./send";
 import { fetchThread, setTags } from "./thread";
 
+// Cache for compiled regex patterns to avoid recompilation
+const regexCache = new Map<string, RegExp>();
+
+/**
+ * Get or create a cached regex pattern
+ */
+function getCachedRegex(pattern: string, flags: string): RegExp {
+	const key = `${pattern}|${flags}`;
+	let regex = regexCache.get(key);
+	if (!regex) {
+		regex = new RegExp(pattern, flags);
+		regexCache.set(key, regex);
+	}
+	return regex;
+}
+
 export async function stripOOC(message: Djs.Message, client: EClient, ul: Translation) {
 	if (message.author.bot) return;
 	if (!message.guild) return;
@@ -26,7 +42,7 @@ export async function stripOOC(message: Djs.Message, client: EClient, ul: Transl
 	if (!stripOoc || stripOoc?.timer === 0 || !stripOoc?.regex) return;
 	const timer = stripOoc.timer;
 	if (!timer) return;
-	const regex = new RegExp(stripOoc.regex, "i");
+	const regex = getCachedRegex(stripOoc.regex, "i");
 	logger.trace(regex.source, regex.test(message.content));
 	if (regex.test(message.content)) {
 		logger.trace("OOC detected, stripping message");
