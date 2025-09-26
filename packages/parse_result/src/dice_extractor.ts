@@ -9,6 +9,34 @@ import {
 import { logger } from "@dicelette/utils";
 import { trimAll } from "./utils";
 
+// Cache for compiled regex patterns to improve performance
+const regexCache = new Map<string, RegExp>();
+
+/**
+ * Get or create a cached regex pattern
+ */
+function getCachedRegex(pattern: string, flags = ""): RegExp {
+	const key = `${pattern}|${flags}`;
+	let regex = regexCache.get(key);
+	if (!regex) {
+		regex = new RegExp(pattern, flags);
+		regexCache.set(key, regex);
+	}
+	return regex;
+}
+
+// Pre-compiled frequently used regex patterns
+const COMPILED_PATTERNS = {
+	VARIABLE_MATCHER: /\$([a-zA-Z_][a-zA-Z0-9_]*)/gi,
+	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
+	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
+	ASTERISK_ESCAPE: /\*/g,
+	STAT_COMMENTS_REMOVER: /%%.*%%/,
+	AT_MENTION_REMOVER: / @\w+/,
+	SIGN_REMOVER: /[><=!]+.*$/,
+	EXP_REMOVER: /\{exp.*?\}/g,
+} as const;
+
 export function extractDiceData(content: string): DiceData {
 	const bracketRoll = content
 		.replace(/%%.*%%/, "")
@@ -139,9 +167,9 @@ export function processChainedDiceRoll(
 		.trim();
 
 	try {
-		// Retirer les blocs critiques avant le lancer
+		// Remove critical blocks before rolling
 		const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
-		const cleaned = finalContent.replace(criticalBlock, "");
+		const cleaned = finalContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
 		const rollResult = roll(cleaned);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
@@ -276,7 +304,16 @@ export function replaceStatsInDiceFormula(
 
 	let processedFormula = diceFormula;
 
-	const variableMatches = [...processedFormula.matchAll(/\$([a-zA-Z_][a-zA-Z0-9_]*)/gi)];
+	const variableMatches = [
+		...processedFormula.matchAll(COMPILED_PATTERNS.VARIABLE_MATCHER),
+	];
+
+	// Pre-process stats for better performance
+	const normalizedStats = new Map<string, [string, number]>();
+	for (const [key, value] of Object.entries(stats)) {
+		const normalized = key.standardize().toLowerCase();
+		normalizedStats.set(normalized, [key, value]);
+	}
 
 	for (const match of variableMatches) {
 		const fullMatch = match[0];
@@ -284,30 +321,21 @@ export function replaceStatsInDiceFormula(
 
 		if (!processedFormula.includes(fullMatch)) continue;
 
-		let foundStat: [string, number] | undefined;
-		for (const [statKey, statValue] of Object.entries(stats)) {
-			if (statKey.standardize().toLowerCase() === searchTerm) {
-				foundStat = [statKey, statValue];
-				break;
-			}
-		}
+		// First try exact match
+		let foundStat = normalizedStats.get(searchTerm);
 
 		// If no exact match, try partial matching
 		if (!foundStat) {
 			const candidates: Array<[string, number, number]> = [];
 
-			for (const [statKey, statValue] of Object.entries(stats)) {
-				const normalizedStatKey = statKey.standardize().toLowerCase();
-
-				// Check if the search term matches the beginning of the stat name
-				if (normalizedStatKey.startsWith(searchTerm)) {
-					candidates.push([statKey, statValue, normalizedStatKey.length]);
-				}
-				// Check if the search term matches the end of the stat name
-				else if (normalizedStatKey.endsWith(searchTerm)) {
-					candidates.push([statKey, statValue, normalizedStatKey.length]);
-				} else if (normalizedStatKey.includes(searchTerm)) {
-					candidates.push([statKey, statValue, normalizedStatKey.length]);
+			for (const [normalizedKey, [originalKey, value]] of normalizedStats) {
+				// Optimized: Check if the search term matches the beginning/end/contains of the stat name
+				if (normalizedKey.startsWith(searchTerm)) {
+					candidates.push([originalKey, value, normalizedKey.length]);
+				} else if (normalizedKey.endsWith(searchTerm)) {
+					candidates.push([originalKey, value, normalizedKey.length]);
+				} else if (normalizedKey.includes(searchTerm)) {
+					candidates.push([originalKey, value, normalizedKey.length]);
 				}
 			}
 
@@ -321,7 +349,7 @@ export function replaceStatsInDiceFormula(
 			const [, statValue] = foundStat;
 			statsFounds.push(foundStat[0].capitalize());
 			const escapedMatch = fullMatch.replace(/\$/g, "\\$");
-			const regex = new RegExp(`${escapedMatch}(?=\\W|$)`, "g");
+			const regex = getCachedRegex(`${escapedMatch}(?=\\W|$)`, "g");
 			processedFormula = processedFormula.replace(regex, statValue.toString());
 		}
 	}
@@ -346,16 +374,14 @@ export function includeDiceType(dice: string, diceType?: string, userStats?: boo
 	}
 	if (SIGN_REGEX.test(diceType)) {
 		//remove it from the diceType and the value after it like >=10 or <= 5 to prevent errors
-		const signRegex = /[><=!]+.*$/;
-		diceType = diceType.replace(signRegex, "").trim();
-		dice = dice.replace(signRegex, "").trim();
+		diceType = diceType.replace(COMPILED_PATTERNS.SIGN_REMOVER, "").trim();
+		dice = dice.replace(COMPILED_PATTERNS.SIGN_REMOVER, "").trim();
 	}
 	//also prevent error with the {exp} value
 	if (diceType.includes("{exp")) {
-		const expRegex = /\{exp.*?\}/g;
-		diceType = diceType.replace(expRegex, "").trim();
-		dice = dice.replace(expRegex, "").trim();
+		diceType = diceType.replace(COMPILED_PATTERNS.EXP_REMOVER, "").trim();
+		dice = dice.replace(COMPILED_PATTERNS.EXP_REMOVER, "").trim();
 	}
-	const detectDiceType = new RegExp(`\\b${diceType}\\b`, "i");
+	const detectDiceType = getCachedRegex(`\\b${diceType}\\b`, "i");
 	return detectDiceType.test(dice);
 }
