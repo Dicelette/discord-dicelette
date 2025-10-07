@@ -18,7 +18,7 @@ import {
 	stripOOC,
 	threadToSend,
 } from "messages";
-import { fetchChannel } from "utils";
+import { fetchChannel, getCritical } from "utils";
 import { getCharFromText, getTemplate, getUserFromMessage } from "../database";
 import { isApiError } from "./on_error";
 
@@ -66,17 +66,14 @@ export default (client: EClient): void => {
 			const deleteInput = !detectRoll;
 			const channel = message.channel;
 			if (!result) return;
-			let critical = rollCustomCriticalsFromDice(content, ul);
-			const serverData =
-				client.template.get(message.guild.id) ??
-				(await getTemplate(message.guild, client.settings, ul, true));
-			if (
-				serverData?.customCritical &&
-				includeDiceType(result.dice, serverData.diceType, !!userData?.stats)
-			) {
-				const serverCC = rollCustomCritical(serverData.customCritical);
-				if (serverCC) critical = Object.assign(serverCC, critical);
-			}
+			const { criticalsFromDice, serverData } = await getCritical(
+				client,
+				message.guild,
+				ul,
+				result.dice,
+				userData,
+				rollCustomCriticalsFromDice(content, ul)
+			);
 
 			const opposition = parseComparator(content, userData?.stats, isRoll.infoRoll);
 
@@ -86,7 +83,7 @@ export default (client: EClient): void => {
 				serverData?.critical,
 				charName,
 				undefined,
-				critical,
+				criticalsFromDice,
 				opposition
 			);
 			const parser = resultAsText.parser;

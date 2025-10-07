@@ -11,6 +11,7 @@ import {
 	getCriticalFromDice,
 	getExpression,
 	getRoll,
+	includeDiceType,
 	parseOpposition,
 	ResultAsText,
 	replaceStatInDiceName,
@@ -23,7 +24,7 @@ import {
 import type { Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getRightValue, getUserFromInteraction } from "database";
+import { getRightValue, getTemplate, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
 import { getLangAndConfig } from "utils";
@@ -565,4 +566,29 @@ export async function rollStatistique(
 		customCritical,
 		opposition
 	);
+}
+
+export async function getCritical(
+	client: EClient,
+	guild: Djs.Guild,
+	ul: Translation,
+	dice: string,
+	userData?: UserData,
+	criticalsFromDice?: Record<string, CustomCritical>
+) {
+	const serverData =
+		client.template.get(guild.id) ??
+		(await getTemplate(guild, client.settings, ul, true));
+	if (
+		serverData?.customCritical &&
+		includeDiceType(dice, serverData.diceType, !!userData?.stats)
+	) {
+		const serverCriticals = rollCustomCritical(serverData.customCritical);
+		if (serverCriticals)
+			return {
+				criticalsFromDice: Object.assign(serverCriticals, criticalsFromDice),
+				serverData,
+			};
+	}
+	return { criticalsFromDice, serverData };
 }
