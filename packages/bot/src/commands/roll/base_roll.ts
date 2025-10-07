@@ -1,13 +1,15 @@
 import { t } from "@dicelette/localization";
 import {
+	includeDiceType,
 	replaceStatsInDiceFormula,
+	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { getLangAndConfig, rollWithInteraction } from "utils";
+import { getCritical, getLangAndConfig, rollWithInteraction } from "utils";
 import "discord_ext";
-import { getCharFromText, getUserFromInteraction } from "database";
+import { getCharFromText, getTemplate, getUserFromInteraction } from "database";
 import { parseComparator } from "../../events/on_message_send";
 
 export const diceRoll = {
@@ -55,19 +57,26 @@ export const diceRoll = {
 		);
 		const userData = data?.userData;
 		const charName = data?.charName ?? firstChara;
-		const rCC = rollCustomCriticalsFromDice(dice, ul);
 		const res = replaceStatsInDiceFormula(dice, userData?.stats, true);
 		const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
+		const { criticalsFromDice, serverData } = await getCritical(
+			client,
+			interaction.guild,
+			ul,
+			res.formula,
+			userData,
+			rollCustomCriticalsFromDice(dice, ul)
+		);
 		await rollWithInteraction(
 			interaction,
 			res.formula,
 			client,
-			undefined,
+			serverData?.critical,
 			undefined,
 			charName,
 			undefined,
 			hidden,
-			rCC,
+			criticalsFromDice,
 			opposition
 		);
 	},
