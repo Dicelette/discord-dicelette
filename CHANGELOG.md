@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.2](https://github.com/Dicelette/discord-dicelette/compare/2.3.1...2.3.2) (2025-10-07)
+
+
+### Bug Fixes
+
+* **roll:** should get the critical roll when available in /roll ([6ff921f](https://github.com/Dicelette/discord-dicelette/commit/6ff921f236fd39cde711aaf23c92e125ac4505f0))
+
 ## [2.3.1](https://github.com/Dicelette/discord-dicelette/compare/2.3.0...2.3.1) (2025-09-26)
 
 ## [2.3.0](https://github.com/Dicelette/discord-dicelette/compare/2.2.3...2.3.0) (2025-09-24)
