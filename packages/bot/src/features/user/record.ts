@@ -99,7 +99,8 @@ async function createFirstPage(
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 	const userFromField =
 		!selfRegister.allowSelfRegister || moderator
-			? interaction.fields.getTextInputValue("userID")
+			? (interaction.fields.getSelectedUsers("userID", true)?.map((u) => u.id)[0] ??
+				interaction.user.id)
 			: interaction.user.id;
 
 	const user = await isUserNameOrId(userFromField, interaction);
@@ -115,7 +116,7 @@ async function createFirstPage(
 		!selfRegister.disallowChannel && selfRegister.allowSelfRegister && moderator;
 
 	const customChannel = allowCustomChannel
-		? interaction.fields.getTextInputValue("channelId")
+		? (interaction.fields.getSelectedChannels("channelId")?.map((c) => c.id)[0] ?? "")
 		: "";
 	const charName = interaction.fields.getTextInputValue("charName");
 

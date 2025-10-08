@@ -45,7 +45,7 @@ async function show(
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("firstPage")
 		.setTitle(ul("modals.firstPage", { page: nbOfPages + 1 }));
-	const charNameInput =
+	/*const charNameInput =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
 				.setCustomId("charName")
@@ -55,7 +55,20 @@ async function show(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short)
 		);
+*/
+	//create a new Label builder component with a text input for the character name
+	const charNameInput: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("common.charName"))
+		.setTextInputComponent(
+			new Djs.TextInputBuilder()
+				.setCustomId("charName")
+				.setPlaceholder(ul("modals.charName.description"))
+				.setRequired(template.charName || false)
+				.setValue("")
+				.setStyle(Djs.TextInputStyle.Short)
+		);
 
+	/*
 	const userIdInputs =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -66,7 +79,20 @@ async function show(
 				.setValue(interaction.user.username ?? interaction.user.id)
 				.setStyle(Djs.TextInputStyle.Short)
 		);
+		*/
+	//we will use the new LabelBuilder component to create a label with a user select for the user!
+	const userIdInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("common.user"))
+		.setUserSelectMenuComponent(
+			new Djs.UserSelectMenuBuilder()
+				.setCustomId("userID")
+				.setPlaceholder(ul("modals.user.description"))
+				.setRequired(true)
+				.setDefaultUsers([interaction.user.id])
+				.setMaxValues(1)
+		);
 
+	/*
 	const avatarInputs =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -77,9 +103,22 @@ async function show(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short)
 		);
+	*/
+	//we will use the new LabelBuilder component to create a label with a text input for the avatar!
+	const avatarInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("modals.avatar.name"))
+		.setTextInputComponent(
+			new Djs.TextInputBuilder()
+				.setCustomId("avatar")
+				.setPlaceholder(ul("modals.avatar.description"))
+				.setRequired(false)
+				.setValue("")
+				.setStyle(Djs.TextInputStyle.Short)
+		);
+	/*
 	const channelIdInput =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
+			new Djs.ChannelSelectMenuBuilder()
 				.setCustomId("channelId")
 				.setLabel(ul("modals.channel.name"))
 				.setPlaceholder(ul("modals.channel.description"))
@@ -87,12 +126,24 @@ async function show(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short)
 		);
+	 */
+	//we will use the new LabelBuilder component to create a label with a channel select for the channel!
+	const channelIdInput: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("modals.channel.name"))
+		.setChannelSelectMenuComponent(
+			new Djs.ChannelSelectMenuBuilder()
+				.setCustomId("channelId")
+				.setPlaceholder(ul("modals.channel.description"))
+				.setRequired(false)
+				.setMaxValues(1)
+		);
 	const components = [charNameInput, avatarInputs];
 	if (!selfRegister || isModerator) components.push(userIdInputs);
 	if (!selfRegister?.toString().endsWith("_channel") || isModerator)
 		components.push(channelIdInput);
 
 	if (havePrivate && isModerator) {
+		/*
 		const privateInput =
 			new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 				new Djs.TextInputBuilder()
@@ -103,8 +154,19 @@ async function show(
 					.setValue("")
 					.setStyle(Djs.TextInputStyle.Short)
 			);
+		*/
+		const privateInput: Djs.LabelBuilder = new Djs.LabelBuilder()
+			.setLabel(ul("modals.private.name"))
+			.setTextInputComponent(
+				new Djs.TextInputBuilder()
+					.setCustomId("private")
+					.setPlaceholder(ul("modals.private.description"))
+					.setRequired(false)
+					.setValue("")
+					.setStyle(Djs.TextInputStyle.Short)
+			);
 		components.push(privateInput);
 	}
-	modal.addComponents(components);
+	modal.setLabelComponents(components);
 	await interaction.showModal(modal);
 }
