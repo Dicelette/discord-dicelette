@@ -3,6 +3,7 @@ import type { Translation } from "@dicelette/types";
 import { cleanAvatarUrl, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
+import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import { embedError, reply } from "messages";
@@ -97,13 +98,11 @@ async function createFirstPage(
 	const moderator = interaction.guild?.members.cache
 		.get(interaction.user.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-	const userFromField =
+	const user =
 		!selfRegister.allowSelfRegister || moderator
-			? (interaction.fields.getSelectedUsers("userID", true)?.map((u) => u.id)[0] ??
-				interaction.user.id)
-			: interaction.user.id;
+			? interaction.fields.getSelectedUsers("userID", true)?.first()
+			: interaction.user;
 
-	const user = await isUserNameOrId(userFromField, interaction);
 	if (!user) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.user.notFound"), ul)],
@@ -116,8 +115,15 @@ async function createFirstPage(
 		!selfRegister.disallowChannel && selfRegister.allowSelfRegister && moderator;
 
 	const customChannel = allowCustomChannel
-		? (interaction.fields.getSelectedChannels("channelId")?.map((c) => c.id)[0] ?? "")
-		: "";
+		? interaction.fields
+				.getSelectedChannels("channelId", false, [
+					Djs.ChannelType.PublicThread,
+					Djs.ChannelType.GuildText,
+					Djs.ChannelType.PrivateThread,
+					Djs.ChannelType.GuildForum,
+				])
+				?.first()
+		: undefined;
 	const charName = interaction.fields.getTextInputValue("charName");
 
 	const isPrivate =
@@ -128,11 +134,11 @@ async function createFirstPage(
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 	if (isPrivate && privateChannel) sheetId = privateChannel;
-	if (customChannel.length > 0) sheetId = customChannel;
+	if (customChannel) sheetId = customChannel.id;
 
 	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : "";
 	const existChannel = sheetId
-		? await fetchChannel(interaction.guild!, sheetId)
+		? await fetchChannel(interaction.guild!, sheetId, customChannel as GuildBasedChannel)
 		: undefined;
 	if (!existChannel) {
 		await reply(interaction, {

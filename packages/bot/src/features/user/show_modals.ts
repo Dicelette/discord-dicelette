@@ -136,6 +136,12 @@ async function show(
 				.setPlaceholder(ul("modals.channel.description"))
 				.setRequired(false)
 				.setMaxValues(1)
+				.setChannelTypes(
+					Djs.ChannelType.PublicThread,
+					Djs.ChannelType.GuildText,
+					Djs.ChannelType.PrivateThread,
+					Djs.ChannelType.GuildForum
+				)
 		);
 	const components = [charNameInput, avatarInputs];
 	if (!selfRegister || isModerator) components.push(userIdInputs);

@@ -1,4 +1,5 @@
 import { ln } from "@dicelette/localization";
+import { DiscordChannel, DiscordTextChannel } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import type { Guild, GuildMember, User } from "discord.js";
@@ -33,9 +34,11 @@ export function getLangFromInteraction(
 
 export async function fetchChannel(
 	guild: Djs.Guild,
-	channelId: Djs.Snowflake
+	channelId: Djs.Snowflake,
+	channel?: Djs.GuildBasedChannel
 ): Promise<Djs.GuildBasedChannel | null> {
 	try {
+		if (channel) return channel;
 		return guild.channels.cache.get(channelId) ?? (await guild.channels.fetch(channelId));
 	} catch (error) {
 		logger.warn(
