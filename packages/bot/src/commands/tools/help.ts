@@ -37,6 +37,9 @@ export const help = {
 			sub.setNames("register.name").setDescriptions("help.register.description")
 		)
 		.addSubcommand((sub) =>
+			sub.setNames("help.docs.name").setDescriptions("help.docs.description")
+		)
+		.addSubcommand((sub) =>
 			sub
 				.setNames("help.changelog.name")
 				.setDescriptions("help.changelog.description")
@@ -74,6 +77,12 @@ export const help = {
 		const commandsID = await interaction.guild?.commands.fetch();
 		if (!commandsID) return;
 		switch (subcommand) {
+			case t("help.docs.name"):
+				await reply(interaction, {
+					content: dedent(`→  **__${ul("help.docs.message", { link: link.docs })}__**`),
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+				break;
 			case t("help.info.name"): {
 				const rollID = commandsID.findKey((command) => command.name === "roll");
 				const sceneID = commandsID.findKey((command) => command.name === "scene");
@@ -100,11 +109,12 @@ export const help = {
 				const end = dedent(ul("help.diceNotation"));
 
 				await interaction.reply({
-					flags: Djs.MessageFlags.IsComponentsV2,
+					flags: [Djs.MessageFlags.IsComponentsV2, Djs.MessageFlags.Ephemeral],
 					components: replySection,
 				});
 				await interaction.followUp({
 					content: end,
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 
 				break;
@@ -112,11 +122,13 @@ export const help = {
 			case t("help.bug.name"):
 				await reply(interaction, {
 					content: dedent(ul("help.bug.message", { link: link.bug })),
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 				break;
 			case t("help.fr.name"):
 				await reply(interaction, {
 					content: dedent(ul("help.fr.message", { link: link.fr })),
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 				break;
 			case t("register.name"): {
@@ -132,6 +144,7 @@ export const help = {
 							register: helpDBCmd?.[t("register.name")],
 						})
 					),
+					flags: Djs.MessageFlags.Ephemeral,
 				});
 				break;
 			}
@@ -182,12 +195,12 @@ export const help = {
 				);
 				await interaction.reply({
 					components: replySection,
-					flags: Djs.MessageFlags.IsComponentsV2,
+					flags: [Djs.MessageFlags.IsComponentsV2, Djs.MessageFlags.Ephemeral],
 				});
 				break;
 			}
 			case t("help.changelog.name"): {
-				await interaction.deferReply();
+				await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 				const options = interaction.options as Djs.CommandInteractionOptionResolver;
 				let version = options.getString(t("help.changelog.version.name"), false);
 				const allVersion = getAllVersions();
@@ -221,7 +234,7 @@ export const help = {
 					);
 					await interaction.followUp({
 						components: [msg],
-						flags: Djs.MessageFlags.IsComponentsV2,
+						flags: [Djs.MessageFlags.IsComponentsV2, Djs.MessageFlags.Ephemeral],
 					});
 				}
 				break;
