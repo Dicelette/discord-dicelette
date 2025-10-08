@@ -76,6 +76,5 @@ export const client = new EClient({
 		Djs.Partials.GuildMember,
 		Djs.Partials.User,
 		Djs.Partials.Reaction,
-		Djs.Partials.User,
 	],
 });
