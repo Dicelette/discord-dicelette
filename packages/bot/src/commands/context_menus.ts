@@ -46,12 +46,12 @@ export async function commandMenu(
 
 async function finalLink(message: string, messageUrl: string, ul: Translation) {
 	const regexResultForRoll = /= `(?<result>.*)`/gi;
-	const successFail = / {2}(?<compare>.*) — /gi;
+	const successFail = /( {2}|_ _ )(?<compare>.*) — /gi;
 
 	const list = message.split("\n");
 	const res: string[] = [];
 	for (const line of list) {
-		if (!line.match(/^\s+/)) continue;
+		if (!line.match(/^[\s_]+/)) continue;
 		const match = regexResultForRoll.exec(line)?.groups?.result;
 		const compare = successFail.exec(line)?.groups?.compare;
 		if (match && compare) res.push(`${compare.trim()} — \`${match.trim()}\``);
