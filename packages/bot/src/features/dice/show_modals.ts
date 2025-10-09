@@ -42,30 +42,6 @@ async function show(
 		.setCustomId(id)
 		.setTitle(ul("common.macro").capitalize());
 
-	/*
-	const damageDice =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("damageName")
-				.setLabel(ul("modals.dice.name"))
-				.setPlaceholder(ul("modals.dice.placeholder"))
-				.setRequired(true)
-				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short)
-		);
-	const diceValue =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("damageValue")
-				.setLabel(ul("modals.dice.value"))
-				.setPlaceholder("1d5")
-				.setRequired(true)
-				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short)
-		);
-	modal.addComponents(damageDice);
-	modal.addComponents(diceValue);
-	 */
 	const damageDice: Djs.LabelBuilder = new Djs.LabelBuilder()
 		.setLabel(ul("modals.dice.name"))
 		.setTextInputComponent(
