@@ -14,7 +14,7 @@ export default (client: EClient): void => {
 			});
 		}
 		await sendErrorToWebhook(`Shard disconnected: ${event.toString()}`);
-		important.error(`Shard ${shardId} disconnected:`, event);
+		console.error(`Shard ${shardId} disconnected:`, event);
 		process.exit(1); // Optionally exit the process to restart the bot by pm2
 	});
 };

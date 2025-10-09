@@ -122,6 +122,7 @@ async function buttonSubmit(
 			template,
 			interactionUser,
 			ul,
+			client,
 			!!client.settings.get(interaction.guild!.id, "privateChannel"),
 			selfRegister
 		);

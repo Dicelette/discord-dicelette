@@ -3,7 +3,7 @@ import type { EClient } from "../client";
 
 export const onWarn = (client: EClient): void => {
 	client.on("warn", async (error) => {
-		important.warn(error);
+		console.warn(error);
 	});
 };
 

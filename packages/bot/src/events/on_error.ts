@@ -62,7 +62,7 @@ export async function interactionError(
 	ul: Translation,
 	langToUse?: Djs.Locale
 ) {
-	logger.warn(e);
+	console.error(e);
 	if (!interaction.guild) return;
 	const msgError = lError(e as Error, interaction, langToUse);
 	if (msgError.length === 0) return;

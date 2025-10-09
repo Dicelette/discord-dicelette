@@ -12,13 +12,13 @@ dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 process.on("unhandledRejection", async (reason) => {
 	await event.sendErrorToWebhook(reason);
-	important.error(reason);
+	console.error(reason);
 	process.exit(1);
 });
 
 process.on("uncaughtException", async (err) => {
 	await event.sendErrorToWebhook(err);
-	important.error(err);
+	console.error(err);
 	process.exit(1);
 });
 
@@ -51,5 +51,5 @@ client
 		important.info("Bot started");
 	})
 	.catch((error) => {
-		important.fatal(error);
+		console.error(error);
 	});
