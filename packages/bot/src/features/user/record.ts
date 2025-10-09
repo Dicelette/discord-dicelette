@@ -141,7 +141,7 @@ async function createFirstPage(
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel) sheetId = customChannel.id;
 
-	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : false;
+	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : null;
 	const existChannel = sheetId
 		? await fetchChannel(
 				interaction.guild!,
