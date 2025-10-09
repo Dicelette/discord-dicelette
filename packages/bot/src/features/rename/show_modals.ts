@@ -18,15 +18,17 @@ export async function showRename(
 ) {
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("rename")
-		.setTitle(ul("button.edit.name"));
-	const input =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("newName")
-				.setLabel(ul("common.character"))
-				.setRequired(true)
-				.setStyle(Djs.TextInputStyle.Short)
+		.setTitle(ul("button.edit.name"))
+		.addLabelComponents((label) =>
+			label
+				.setLabel(ul("common.charName"))
+				.setTextInputComponent(
+					new Djs.TextInputBuilder()
+						.setCustomId("newName")
+						.setStyle(Djs.TextInputStyle.Short)
+						.setRequired(true)
+				)
 		);
-	modal.addComponents(input);
+
 	await interaction.showModal(modal);
 }

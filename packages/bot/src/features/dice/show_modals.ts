@@ -41,6 +41,8 @@ async function show(
 	const modal = new Djs.ModalBuilder()
 		.setCustomId(id)
 		.setTitle(ul("common.macro").capitalize());
+
+	/*
 	const damageDice =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -63,6 +65,27 @@ async function show(
 		);
 	modal.addComponents(damageDice);
 	modal.addComponents(diceValue);
+	 */
+	const damageDice: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("modals.dice.name"))
+		.setTextInputComponent(
+			new Djs.TextInputBuilder()
+				.setCustomId("damageName")
+				.setRequired(true)
+				.setStyle(Djs.TextInputStyle.Short)
+		);
+	const diceValue: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("modals.dice.value"))
+		.setDescription(ul("modals.dice.placeholder"))
+		.setTextInputComponent(
+			new Djs.TextInputBuilder()
+				.setCustomId("damageValue")
+				.setPlaceholder("1d5")
+				.setRequired(true)
+				.setStyle(Djs.TextInputStyle.Short)
+		);
+
+	modal.addLabelComponents(damageDice, diceValue);
 	await interaction.showModal(modal);
 }
 
@@ -96,16 +119,18 @@ async function showEdit(interaction: Djs.ButtonInteraction, ul: Translation) {
 	}
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editDice")
-		.setTitle(ul("common.macro").capitalize());
-	const input =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("allDice")
+		.setTitle(ul("common.macro").capitalize())
+		.addLabelComponents((label) =>
+			label
 				.setLabel(ul("modals.edit.dice"))
-				.setRequired(true)
-				.setStyle(Djs.TextInputStyle.Paragraph)
-				.setValue(dices)
+				.setTextInputComponent((input) =>
+					input
+						.setCustomId("allDice")
+						.setRequired(true)
+						.setStyle(Djs.TextInputStyle.Paragraph)
+						.setValue(dices)
+				)
 		);
-	modal.addComponents(input);
+
 	await interaction.showModal(modal);
 }

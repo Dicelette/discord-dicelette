@@ -34,16 +34,18 @@ async function showAvatarEdit(
 		: await fetchAvatarUrl(interaction.guild!, interaction.user);
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editAvatar")
-		.setTitle(ul("button.avatar.description"));
-	const input =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("avatar")
+		.setTitle(ul("button.avatar.description"))
+		.addLabelComponents((label) =>
+			label
 				.setLabel(ul("modals.avatar.name"))
-				.setRequired(true)
-				.setStyle(Djs.TextInputStyle.Short)
-				.setValue(thumbnail)
+				.setTextInputComponent((input) =>
+					input
+						.setCustomId("avatar")
+						.setValue(thumbnail)
+						.setRequired(true)
+						.setStyle(Djs.TextInputStyle.Short)
+				)
 		);
-	modal.addComponents(input);
+
 	await interaction.showModal(modal);
 }

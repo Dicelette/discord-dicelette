@@ -18,15 +18,18 @@ export async function start(
 }
 
 async function showMove(interaction: Djs.StringSelectMenuInteraction, ul: Translation) {
-	const modal = new Djs.ModalBuilder().setCustomId("move").setTitle(ul("button.user"));
-	const input =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("user")
+	const modal = new Djs.ModalBuilder()
+		.setCustomId("move")
+		.setTitle(ul("button.user"))
+		.addLabelComponents((label) =>
+			label
 				.setLabel(ul("common.user"))
-				.setRequired(true)
-				.setStyle(Djs.TextInputStyle.Short)
+				.setTextInputComponent(
+					new Djs.TextInputBuilder()
+						.setCustomId("user")
+						.setStyle(Djs.TextInputStyle.Short)
+						.setRequired(true)
+				)
 		);
-	modal.addComponents(input);
 	await interaction.showModal(modal);
 }

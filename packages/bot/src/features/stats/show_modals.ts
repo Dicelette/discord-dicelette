@@ -55,6 +55,7 @@ export async function show(
 	const statisticsLowerCase = Object.fromEntries(
 		Object.entries(template.statistics).map(([key, value]) => [key.standardize(), value])
 	);
+	const inputs = [];
 	for (const stat of statsToDisplay) {
 		const cleanedName = stat.unidecode();
 		const value = statisticsLowerCase[cleanedName];
@@ -64,18 +65,19 @@ export async function show(
 			msg = ul("modals.enterValue.minAndMax", { min: value.min, max: value.max });
 		else if (value.min) msg = ul("modals.enterValue.minOnly", { min: value.min });
 		else if (value.max) msg = ul("modals.enterValue.maxOnly", { max: value.max });
-		const input =
-			new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
+
+		const input: Djs.LabelBuilder = new Djs.LabelBuilder()
+			.setLabel(stat)
+			.setTextInputComponent(
 				new Djs.TextInputBuilder()
 					.setCustomId(cleanedName)
-					.setLabel(stat)
-					.setPlaceholder(msg)
 					.setRequired(true)
-					.setValue("")
 					.setStyle(Djs.TextInputStyle.Short)
 			);
-		modal.addComponents(input);
+		if (msg.length) input.setDescription(msg);
+		inputs.push(input);
 	}
+	modal.setLabelComponents(...inputs);
 	await interaction.showModal(modal);
 }
 
@@ -136,6 +138,7 @@ async function showEditorStats(
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editStats")
 		.setTitle(ul("common.statistics").capitalize());
+	/*
 	const input =
 		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
 			new Djs.TextInputBuilder()
@@ -146,5 +149,17 @@ async function showEditorStats(
 				.setValue(statsStrings)
 		);
 	modal.addComponents(input);
+	 */
+	const input: Djs.LabelBuilder = new Djs.LabelBuilder()
+		.setLabel(ul("common.statistics").capitalize())
+		.setDescription(ul("modals.edit.stats"))
+		.setTextInputComponent(
+			new Djs.TextInputBuilder()
+				.setCustomId("allStats")
+				.setRequired(true)
+				.setStyle(Djs.TextInputStyle.Paragraph)
+				.setValue(statsStrings)
+		);
+	modal.setLabelComponents(input);
 	await interaction.showModal(modal);
 }
