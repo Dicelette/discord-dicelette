@@ -9,6 +9,7 @@ import { Dice, Stats } from "features";
 import { embedError, reply } from "messages";
 import {
 	continueCancelButtons,
+	fetchAvatarUrl,
 	fetchChannel,
 	getLangAndConfig,
 	isUserNameOrId,
@@ -112,7 +113,7 @@ async function createFirstPage(
 	}
 
 	const allowCustomChannel =
-		!selfRegister.disallowChannel && selfRegister.allowSelfRegister && moderator;
+		(!selfRegister.disallowChannel && selfRegister.allowSelfRegister) || moderator;
 
 	const customChannel = allowCustomChannel
 		? interaction.fields
@@ -124,6 +125,7 @@ async function createFirstPage(
 				])
 				?.first()
 		: undefined;
+
 	const charName = interaction.fields.getTextInputValue("charName");
 
 	const isPrivate =
@@ -136,9 +138,13 @@ async function createFirstPage(
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel) sheetId = customChannel.id;
 
-	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : "";
+	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : false;
 	const existChannel = sheetId
-		? await fetchChannel(interaction.guild!, sheetId, customChannel as GuildBasedChannel)
+		? await fetchChannel(
+				interaction.guild!,
+				sheetId,
+				customChannel as GuildBasedChannel | undefined
+			)
 		: undefined;
 	if (!existChannel) {
 		await reply(interaction, {
@@ -149,7 +155,9 @@ async function createFirstPage(
 	}
 	const embed = new Djs.EmbedBuilder()
 		.setTitle(ul("embed.add"))
-		.setThumbnail(verifiedAvatar ? avatar : user.displayAvatarURL())
+		.setThumbnail(
+			verifiedAvatar ? avatar : await fetchAvatarUrl(interaction.guild!, user)
+		)
 		.setFooter({ text: ul("common.page", { nb: 1 }) })
 		.addFields(
 			{
