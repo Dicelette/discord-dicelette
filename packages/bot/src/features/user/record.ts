@@ -112,6 +112,9 @@ async function createFirstPage(
 		return;
 	}
 
+	//TODO: Verify that it works properly depending of the settings
+	// If self register is not allowed, or if the user is a moderator, allow to select other channel
+	// This part should be ignored if self register is not allowed or changing the channel is disallowed
 	const allowCustomChannel =
 		(!selfRegister.disallowChannel && selfRegister.allowSelfRegister) || moderator;
 

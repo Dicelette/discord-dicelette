@@ -57,17 +57,7 @@ async function show(
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("firstPage")
 		.setTitle(ul("modals.firstPage", { page: nbOfPages + 1 }));
-	/*const charNameInput =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("charName")
-				.setLabel(ul("common.charName"))
-				.setPlaceholder(ul("modals.charName.description"))
-				.setRequired(template.charName || false)
-				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short)
-		);
-*/
+
 	//create a new Label builder component with a text input for the character name
 	const charNameInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 		.setLabel(ul("common.charName"))
@@ -80,18 +70,6 @@ async function show(
 				.setStyle(Djs.TextInputStyle.Short)
 		);
 
-	/*
-	const userIdInputs =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("userID")
-				.setLabel(ul("common.user"))
-				.setPlaceholder(ul("modals.user.description"))
-				.setRequired(true)
-				.setValue(interaction.user.username ?? interaction.user.id)
-				.setStyle(Djs.TextInputStyle.Short)
-		);
-		*/
 	//we will use the new LabelBuilder component to create a label with a user select for the user!
 	const userIdInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 		.setLabel(ul("common.user"))
@@ -104,18 +82,6 @@ async function show(
 				.setMaxValues(1)
 		);
 
-	/*
-	const avatarInputs =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.TextInputBuilder()
-				.setCustomId("avatar")
-				.setLabel(ul("modals.avatar.name"))
-				.setPlaceholder(ul("modals.avatar.description"))
-				.setRequired(false)
-				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short)
-		);
-	*/
 	//we will use the new LabelBuilder component to create a label with a text input for the avatar!
 	const avatarInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 		.setLabel(ul("modals.avatar.name"))
@@ -127,18 +93,7 @@ async function show(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short)
 		);
-	/*
-	const channelIdInput =
-		new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-			new Djs.ChannelSelectMenuBuilder()
-				.setCustomId("channelId")
-				.setLabel(ul("modals.channel.name"))
-				.setPlaceholder(ul("modals.channel.description"))
-				.setRequired(false)
-				.setValue("")
-				.setStyle(Djs.TextInputStyle.Short)
-		);
-	 */
+
 	const sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	let defaultChannel: Djs.GuildBasedChannel | null = null;
 	if (sheetId) defaultChannel = await fetchChannel(interaction.guild!, sheetId);
@@ -160,23 +115,13 @@ async function show(
 				)
 		);
 	const components = [charNameInput, avatarInputs];
-	if (!selfRegister || isModerator) components.push(userIdInputs);
+	if (!selfRegister || isModerator)
+		//set the userIdInput in the first position if selfRegister is false or the user is a moderator
+		components.unshift(userIdInputs);
 	if (!selfRegister?.toString().endsWith("_channel") || isModerator)
 		components.push(channelIdInput);
 
 	if (havePrivate && isModerator) {
-		/*
-		const privateInput =
-			new Djs.ActionRowBuilder<Djs.ModalActionRowComponentBuilder>().addComponents(
-				new Djs.TextInputBuilder()
-					.setCustomId("private")
-					.setLabel(ul("modals.private.name"))
-					.setPlaceholder(ul("modals.private.description"))
-					.setRequired(false)
-					.setValue("")
-					.setStyle(Djs.TextInputStyle.Short)
-			);
-		*/
 		const privateInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(ul("modals.private.name"))
 			.setTextInputComponent(
