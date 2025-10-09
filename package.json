@@ -55,7 +55,7 @@
 		"@dicelette/core": "^1.18.5",
 		"@types/node": "^22.17.1",
 		"dedent": "^1.6.0",
-		"discord.js": "14.23.0",
+		"discord.js": "14.23.2",
 		"dotenv": "^17.2.1",
 		"tslog": "^4.9.3",
 		"tsx": "^4.20.4",
