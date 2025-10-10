@@ -10,7 +10,10 @@ export function getCharaInMemory(
 	charName?: string | null
 ) {
 	const getChara = characters.get(guildID, userID);
-	return getChara?.find((char) => char.userName?.subText(charName, true));
+	return getChara?.find((char) => {
+		if (!charName) return char?.userName == null;
+		return char?.userName?.subText(charName, true);
+	});
 }
 
 export async function updateMemory(
@@ -33,8 +36,10 @@ export async function updateMemory(
 		userData.stats = uniformizeRecords(userData.stats) as Record<string, number>;
 	const userChar = characters.get(guildId, userID);
 	if (userChar) {
-		const findChar = userChar.find((char) =>
-			char.userName?.subText(userData.userName, true)
+		const findChar = userChar.find(
+			(char) =>
+				char?.userName?.subText(userData.userName, true) ||
+				(char.userName == null && userData.userName == null)
 		);
 		if (findChar) {
 			const index = userChar.indexOf(findChar);

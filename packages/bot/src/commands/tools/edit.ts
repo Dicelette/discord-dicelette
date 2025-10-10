@@ -231,7 +231,7 @@ async function generateButton(
  * @throws {Error} If the embed or character field is not found in the message.
  */
 export async function rename(
-	name: string,
+	name: string | null,
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
 	ul: Translation,
 	user: Djs.User | null,
@@ -245,6 +245,8 @@ export async function rename(
 	},
 	thread: DiscordChannel
 ) {
+	if (name === "/" || name?.toLowerCase() === ul("common.default").toLowerCase())
+		name = null;
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
@@ -252,7 +254,7 @@ export async function rename(
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character");
 	if (!n) throw new Error(ul("error.user.rename"));
-	n.value = name;
+	n.value = name ? name : ul("common.noSet");
 	//update the embed
 	const embedsList = getEmbedsList({ which: "user", embed }, message);
 	//update the database
@@ -276,8 +278,10 @@ export async function rename(
 			user?.id ?? interaction.user.id
 		);
 	} else {
-		const oldCharData = oldChar.find((char) =>
-			char.userName?.subText(oldData.charName, true)
+		const oldCharData = oldChar.find(
+			(char) =>
+				char.userName?.subText(oldData?.charName, true) ||
+				(char.userName == null && oldData?.charName == null)
 		);
 		if (!oldCharData) {
 			const userData = getUserByEmbed({ message }, ul);

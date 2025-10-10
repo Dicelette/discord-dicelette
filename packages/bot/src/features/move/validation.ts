@@ -28,11 +28,11 @@ export async function validate(
 		interaction.message.id
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-	const userId = interaction.fields.getTextInputValue("user");
-	if (!userId) return;
+	const user = interaction.fields.getSelectedUsers("user")?.first();
+	if (!user) return;
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
-	const user = await isUserNameOrId(userId, interaction);
+	//const user = await isUserNameOrId(userId, interaction);
 
 	if (!user) {
 		await interaction.reply({
@@ -75,22 +75,23 @@ export async function validate(
 		return await resetButton(message, ul);
 	}
 	//update the characters in the database characters
-	const allCharsNewUser = client.characters.get(interaction.guild!.id, userId);
+	const allCharsNewUser = client.characters.get(interaction.guild!.id, user.id);
 	const allCharsOldUser = client.characters.get(interaction.guild!.id, oldUserId);
+	console.log(allCharsNewUser, allCharsOldUser);
 	if (allCharsOldUser)
 		//remove the character from the old user
 		client.characters.set(
 			interaction.guild!.id,
-			allCharsOldUser.filter((char) => char.userName !== charData.userName),
+			allCharsOldUser.filter((char) => char?.userName !== charData?.userName),
 			oldUserId
 		);
 	if (allCharsNewUser) {
 		//prevent duplicate
-		if (!allCharsNewUser.find((char) => char.userName === charData.userName))
+		if (!allCharsNewUser.find((char) => char?.userName === charData?.userName))
 			client.characters.set(
 				interaction.guild!.id,
 				[...allCharsNewUser, charData],
-				userId
+				user.id
 			);
 	}
 
@@ -108,7 +109,7 @@ export async function validate(
 	const guildData = client.settings.get(interaction.guild.id);
 	if (!guildData) return;
 	await move(
-		user.user,
+		user,
 		interaction,
 		ul,
 		oldUser.user,

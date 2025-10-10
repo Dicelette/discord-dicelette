@@ -554,6 +554,7 @@ export async function rollStatistique(
 		statistic && standardizedStatistic
 			? { name: statistic, standardized: standardizedStatistic }
 			: undefined;
+
 	await rollWithInteraction(
 		interaction,
 		roll,

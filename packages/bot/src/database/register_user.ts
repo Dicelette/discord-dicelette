@@ -104,16 +104,16 @@ export async function moveUserInDatabase(
 		//remove the character from the old user
 		characters.set(
 			guildId,
-			allCharsOldUser.filter((char) => !char.userName?.subText(charName, true)),
+			allCharsOldUser.filter((char) => !char?.userName?.subText(charName, true)),
 			oldUserId
 		);
 	let char: UserData | undefined;
 	if (allCharsOldUser)
-		char = allCharsOldUser.find((char) => char.userName?.subText(charName, true));
+		char = allCharsOldUser.find((char) => char?.userName?.subText(charName, true));
 	else char = await getUser(location, guild, client);
 	if (allCharsNewUser) {
 		//prevent duplicate
-		if (!allCharsNewUser.find((char) => char.userName?.subText(charName, true))) {
+		if (!allCharsNewUser.find((char) => char?.userName?.subText(charName, true))) {
 			characters.set(guildId, [...allCharsNewUser, char], userId);
 		}
 	} else characters.set(guildId, [char], userId);

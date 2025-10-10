@@ -24,11 +24,8 @@ async function showMove(interaction: Djs.StringSelectMenuInteraction, ul: Transl
 		.addLabelComponents((label) =>
 			label
 				.setLabel(ul("common.user"))
-				.setTextInputComponent(
-					new Djs.TextInputBuilder()
-						.setCustomId("user")
-						.setStyle(Djs.TextInputStyle.Short)
-						.setRequired(true)
+				.setUserSelectMenuComponent((select) =>
+					select.setCustomId("user").setRequired(true).setMaxValues(1)
 				)
 		);
 	await interaction.showModal(modal);

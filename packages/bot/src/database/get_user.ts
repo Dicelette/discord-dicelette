@@ -218,8 +218,9 @@ async function getUserFrom(
 	);
 
 	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {
-		return char.charName?.subText(charName);
+		return char.charName?.subText(charName) || (!charName && char.charName == null);
 	});
+
 	if (!user) return;
 
 	const userMessageId: PersonnageIds = {

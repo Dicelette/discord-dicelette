@@ -462,8 +462,6 @@ const getCount = {
 		const { ul } = getLangAndConfig(client, interaction, interaction.guild.id);
 		const flags = interaction.options.getBoolean(t("common.ephemeral"));
 
-		console.log(`flags: ${flags}`);
-
 		await interaction.deferReply(
 			flags ? { flags: Djs.MessageFlags.Ephemeral } : undefined
 		);
