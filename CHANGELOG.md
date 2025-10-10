@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.5](https://github.com/Dicelette/discord-dicelette/compare/2.3.4...2.3.5) (2025-10-10)
+
+
+### Bug Fixes
+
+* **modals:** use modals from discord 14.23 ([cc4d71d](https://github.com/Dicelette/discord-dicelette/commit/cc4d71da68a30cff1a7e530d9e192b8a9be0432d))
+* **record:** improve avatar fetching logic and channel selection (should be used when the user is a moderator) ([f5b7990](https://github.com/Dicelette/discord-dicelette/commit/f5b7990c4e6945f876c6043f7c2996ed7a3b2f2e))
+* **record:** update avatar verification to return null for empty avatar ([a9d6e8f](https://github.com/Dicelette/discord-dicelette/commit/a9d6e8fdbea754ef5c76a51b4ffc97acacb859ba))
+* **record:** update user and channel input handling in modals ([f005670](https://github.com/Dicelette/discord-dicelette/commit/f0056707ecbe4e65b5ada79e37adeec6d2c89efe))
+* **user:** they are too much condition where we want to get the user if we can ([03affbc](https://github.com/Dicelette/discord-dicelette/commit/03affbce36ecb25aac4b87e6b6485691489b6fa5))
+
 ## [2.3.4](https://github.com/Dicelette/discord-dicelette/compare/2.3.3...2.3.4) (2025-10-08)
 
 
