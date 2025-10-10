@@ -15,6 +15,11 @@ export async function start(
 		await showRename(interaction, ul);
 }
 
+/**
+ * Extracts the current character name from the message embed associated with the interaction.
+ * @param interaction - The Discord StringSelectMenuInteraction containing the message and embeds.
+ * @returns The character name as a string, or null if not found or not set.
+ */
 function getCurrentName(interaction: Djs.StringSelectMenuInteraction): string | null {
 	if (!interaction.message) return null;
 	const embeds = getEmbeds(interaction.message, "user", interaction.message.embeds);
