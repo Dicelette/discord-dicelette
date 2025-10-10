@@ -555,7 +555,7 @@ export async function getStatistics(
 		? template?.diceType
 		: userStatistique.template.diceType;
 	const needStats = diceType?.includes("$");
-	if (!userStatistique && !charName && needStats) {
+	if (!userStatistique && !charName) {
 		//find the first character registered
 		const char = await getFirstChar(client, interaction, ul);
 		userStatistique = char?.userStatistique?.userData;
