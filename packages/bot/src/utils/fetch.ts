@@ -1,5 +1,4 @@
 import { ln } from "@dicelette/localization";
-import { DiscordChannel, DiscordTextChannel } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import type { Guild, GuildMember, User } from "discord.js";

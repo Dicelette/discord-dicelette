@@ -51,8 +51,7 @@ export const mjRoll = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
-		const ul = getLangFromInteraction(interaction, client);
-		const transform = autofocusTransform(interaction, ul);
+		const transform = autofocusTransform(interaction, interaction.locale);
 		if (transform) return await interaction.respond(transform);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);

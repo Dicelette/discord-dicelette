@@ -18,10 +18,7 @@ export const math = {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
-		const transform = autofocusTransform(
-			interaction,
-			getLangFromInteraction(interaction, client)
-		);
+		const transform = autofocusTransform(interaction, interaction.locale);
 		if (transform) return await interaction.respond(transform);
 		return await interaction.respond(
 			filter.map((result) => ({
