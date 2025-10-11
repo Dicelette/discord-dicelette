@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.7](https://github.com/Dicelette/discord-dicelette/compare/2.3.6...2.3.7) (2025-10-11)
+
+
+### Bug Fixes
+
+* the autocomplete should be based on the client instead of the guild lang ([243b566](https://github.com/Dicelette/discord-dicelette/commit/243b566741570b0ee6adcfe2d4d29109669e5abd))
+
 ## [2.3.6](https://github.com/Dicelette/discord-dicelette/compare/2.3.5...2.3.6) (2025-10-11)
 
 
