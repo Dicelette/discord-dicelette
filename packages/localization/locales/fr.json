@@ -52,7 +52,13 @@
     "statistic": "Statistiques à utiliser",
     "title": "calc",
     "transform": {
+      "abs": "Absolue",
+      "ceil": "Arrondi supérieur",
       "desc": "Arrondir, plafonner, plancher ou élever au cube le résultat.",
+      "floor": "Arrondi inférieur",
+      "round": "Arrondir",
+      "sqrt": "Racine carrée",
+      "square": "Carré",
       "title": "transformer"
     }
   },

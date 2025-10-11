@@ -52,7 +52,13 @@
     "statistic": "Statistic to use",
     "title": "calc",
     "transform": {
+      "abs": "Absolute",
+      "ceil": "Ceil",
       "desc": "round, ceil, floor or cube the result",
+      "floor": "Floor",
+      "round": "Round",
+      "sqrt": "Square root",
+      "square": "Square",
       "title": "transform"
     }
   },
