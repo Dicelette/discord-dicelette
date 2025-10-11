@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.6](https://github.com/Dicelette/discord-dicelette/compare/2.3.5...2.3.6) (2025-10-11)
+
+
+### Bug Fixes
+
+* translation for transform ([bdc8bba](https://github.com/Dicelette/discord-dicelette/commit/bdc8bbae19b36d387c0fa1dedcd7609be8e2395c))
+
 ## [2.3.5](https://github.com/Dicelette/discord-dicelette/compare/2.3.4...2.3.5) (2025-10-10)
 
 
