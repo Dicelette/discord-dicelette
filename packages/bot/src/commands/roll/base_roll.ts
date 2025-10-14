@@ -35,7 +35,6 @@ export const diceRoll = {
 		interaction: Djs.ChatInputCommandInteraction,
 		client: EClient
 	): Promise<void> {
-		console.log("Dice Roll command used");
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		let dice = option.getString(t("common.dice"), true);
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));

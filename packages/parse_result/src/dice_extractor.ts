@@ -348,7 +348,6 @@ export function replaceStatsInDiceFormula(
 			statsFounds.push(original.capitalize());
 			const escapedMatch = fullMatch.replace(/\$/g, "\\$");
 			const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
-			console.log({ regex, escapedMatch, processedFormula, statValue });
 			processedFormula = processedFormula.replace(regex, statValue.toString());
 		}
 	}
