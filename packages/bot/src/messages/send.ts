@@ -109,14 +109,8 @@ export async function sendResult(
 	user: Djs.User = interaction.user,
 	hide?: boolean | null
 ) {
-	let channel = interaction.channel;
-	if (!isValidChannel(channel, interaction)) {
-		await interaction.reply({
-			content: "bruh, channel not found",
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-	}
-	channel = channel as
+	const channel = interaction.channel as
+		| null
 		| Djs.DMChannel
 		| Djs.TextChannel
 		| Djs.PrivateThreadChannel
@@ -147,6 +141,13 @@ export async function sendResult(
 				allowedMentions,
 			});
 		}
+	}
+	if (!channel) {
+		return await interaction.reply({
+			content: output,
+			allowedMentions,
+			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
+		});
 	}
 	if (
 		channel.isDMBased() ||
