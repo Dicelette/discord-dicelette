@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: variable */
 import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
 import {
 	type ChainedComments,
@@ -27,7 +28,7 @@ function getCachedRegex(pattern: string, flags = ""): RegExp {
 
 // Pre-compiled frequently used regex patterns
 const COMPILED_PATTERNS = {
-	VARIABLE_MATCHER: /\$([a-zA-Z_][a-zA-Z0-9_]*)/gi,
+	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
 	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
 	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
 	ASTERISK_ESCAPE: /\*/g,
@@ -314,7 +315,7 @@ export function replaceStatsInDiceFormula(
 
 	for (const match of variableMatches) {
 		const fullMatch = match[0];
-		const searchTerm = match[1].toLowerCase();
+		const searchTerm = match[1].standardize().toLowerCase();
 
 		if (!processedFormula.includes(fullMatch)) continue;
 
@@ -343,10 +344,11 @@ export function replaceStatsInDiceFormula(
 		}
 
 		if (foundStat) {
-			const [, statValue] = foundStat;
-			statsFounds.push(foundStat[0].capitalize());
+			const [original, statValue] = foundStat;
+			statsFounds.push(original.capitalize());
 			const escapedMatch = fullMatch.replace(/\$/g, "\\$");
-			const regex = getCachedRegex(`${escapedMatch}(?=\\W|$)`, "g");
+			const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
+			console.log({ regex, escapedMatch, processedFormula, statValue });
 			processedFormula = processedFormula.replace(regex, statValue.toString());
 		}
 	}
