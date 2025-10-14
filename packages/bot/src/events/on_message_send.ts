@@ -66,9 +66,9 @@ export default (client: EClient): void => {
 			if (!result) return;
 			const { criticalsFromDice, serverData } = await getCritical(
 				client,
-				message.guild,
 				ul,
 				result.dice,
+				message.guild,
 				userData,
 				rollCustomCriticalsFromDice(content, ul)
 			);
@@ -167,26 +167,4 @@ async function replyDice(
 				content: resultAsText.onMessageSend(idMessage),
 				allowedMentions: { repliedUser: true },
 			});
-}
-
-export function parseComparator(
-	dice: string,
-	userStatistique?: Record<string, number>,
-	userStatStr?: string
-) {
-	// Ignore les blocs de critiques personnalisés lors de la détection
-	const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
-	const cleanedDice = dice.replace(criticalBlock, "");
-	const comparatorMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
-		cleanedDice
-	);
-	let comparator = "";
-	let opposition: string | undefined;
-	if (comparatorMatch?.groups) {
-		comparator = comparatorMatch.groups?.first;
-		opposition = comparatorMatch.groups?.second;
-	}
-	if (opposition)
-		return parseOpposition(opposition, comparator, userStatistique, userStatStr);
-	return undefined;
 }

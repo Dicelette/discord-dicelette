@@ -110,18 +110,27 @@ export async function sendResult(
 	hide?: boolean | null
 ) {
 	let channel = interaction.channel;
-	if (!isValidChannel(channel, interaction)) return;
+	if (!isValidChannel(channel, interaction)) {
+		await interaction.reply({
+			content: "bruh, channel not found",
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+	}
 	channel = channel as
+		| Djs.DMChannel
 		| Djs.TextChannel
 		| Djs.PrivateThreadChannel
 		| Djs.PublicThreadChannel;
 
-	const disableThread = settings.get(interaction.guild!.id, "disableThread");
-	let rollChannel = settings.get(interaction.guild!.id, "rollChannel");
-	const hideResultConfig = settings.get(interaction.guild!.id, "hiddenRoll") as
-		| string
-		| boolean
-		| undefined;
+	const disableThread = interaction.guild
+		? settings.get(interaction.guild.id, "disableThread")
+		: undefined;
+	let rollChannel = interaction.guild
+		? settings.get(interaction.guild.id, "rollChannel")
+		: undefined;
+	const hideResultConfig = interaction.guild
+		? (settings.get(interaction.guild.id, "hiddenRoll") as string | boolean | undefined)
+		: undefined;
 	const hidden = hide && hideResultConfig;
 	let isHidden: undefined | string;
 	const allowedMentions = { users: user ? [user.id] : [] };
@@ -140,6 +149,7 @@ export async function sendResult(
 		}
 	}
 	if (
+		channel.isDMBased() ||
 		channel.name.decode().startsWith("🎲") ||
 		disableThread ||
 		rollChannel === channel.id
@@ -151,45 +161,47 @@ export async function sendResult(
 		});
 	}
 
-	const thread = await threadToSend(
-		settings,
-		interaction.channel as Djs.TextChannel,
-		ul,
-		isHidden
-	);
-	const forwarded = await thread.send("_ _");
-	const linkToLog = settings.get(interaction.guild!.id, "linkToLogs");
-	const logUrl = linkToLog ? forwarded.url : undefined;
-	const outputWithUrl =
-		result.roll?.logUrl(logUrl)?.result ??
-		`${result.expression}${createUrl(ul, undefined, logUrl)}`;
-	const replyInteraction = await reply(interaction, {
-		content: outputWithUrl,
-		allowedMentions,
-		flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
-	});
-	const anchor = settings.get(interaction.guild!.id, "context");
-	const dbTime = settings.get(interaction.guild!.id, "deleteAfter");
-	const timer = dbTime ? dbTime : 180000;
-	let messageId: string | undefined;
-	if (anchor) {
-		messageId = replyInteraction.id;
-		if (timer && timer > 0) {
-			const messageBefore = await findMessageBefore(
-				channel,
-				replyInteraction,
-				interaction.client
-			);
-			if (messageBefore) messageId = messageBefore.id;
-		}
-		const ctx = {
-			guildId: interaction.guild!.id,
-			channelId: channel.id,
-			messageId,
-		};
-		const res =
-			result.roll?.context(ctx).result ?? `${result.expression}${createUrl(ul, ctx)}`;
-		await forwarded.edit(res);
-	} else await forwarded.edit(output as string);
-	if (!disableThread) await deleteAfter(replyInteraction, timer);
+	if (interaction.guild) {
+		const thread = await threadToSend(
+			settings,
+			interaction.channel as Djs.TextChannel,
+			ul,
+			isHidden
+		);
+		const forwarded = await thread.send("_ _");
+		const linkToLog = settings.get(interaction.guild!.id, "linkToLogs");
+		const logUrl = linkToLog ? forwarded.url : undefined;
+		const outputWithUrl =
+			result.roll?.logUrl(logUrl)?.result ??
+			`${result.expression}${createUrl(ul, undefined, logUrl)}`;
+		const replyInteraction = await reply(interaction, {
+			content: outputWithUrl,
+			allowedMentions,
+			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
+		});
+		const anchor = settings.get(interaction.guild!.id, "context");
+		const dbTime = settings.get(interaction.guild!.id, "deleteAfter");
+		const timer = dbTime ? dbTime : 180000;
+		let messageId: string | undefined;
+		if (anchor && !channel.isDMBased()) {
+			messageId = replyInteraction.id;
+			if (timer && timer > 0) {
+				const messageBefore = await findMessageBefore(
+					channel,
+					replyInteraction,
+					interaction.client
+				);
+				if (messageBefore) messageId = messageBefore.id;
+			}
+			const ctx = {
+				guildId: interaction.guild!.id,
+				channelId: channel.id,
+				messageId,
+			};
+			const res =
+				result.roll?.context(ctx).result ?? `${result.expression}${createUrl(ul, ctx)}`;
+			await forwarded.edit(res);
+		} else await forwarded.edit(output as string);
+		if (!disableThread) await deleteAfter(replyInteraction, timer);
+	}
 }

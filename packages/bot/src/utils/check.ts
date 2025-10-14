@@ -124,14 +124,12 @@ export async function optionInteractions(
 
 export function isValidChannel(
 	channel: Djs.GuildBasedChannel | null | undefined | Djs.TextBasedChannel,
-	interaction: Djs.CommandInteraction | Djs.BaseInteraction
+	_interaction: Djs.CommandInteraction | Djs.BaseInteraction
 ) {
 	return (
 		channel &&
 		!channel.isVoiceBased() &&
-		!channel.isDMBased() &&
 		channel.isTextBased() &&
-		interaction.guild &&
 		channel.type !== Djs.ChannelType.GuildAnnouncement &&
 		channel.type !== Djs.ChannelType.AnnouncementThread
 	);

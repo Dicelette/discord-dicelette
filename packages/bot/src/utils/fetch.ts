@@ -11,8 +11,11 @@ export function getLangAndConfig(
 ) {
 	const langToUse = getLangFromInteraction(interaction, client, guildId);
 	const ul = ln(langToUse);
-	const config = client.settings.get(guildId ?? interaction.guild!.id);
-	return { langToUse, ul, config };
+	if (interaction.guild) {
+		const config = client.settings.get(guildId ?? interaction.guild!.id);
+		return { langToUse, ul, config };
+	}
+	return { langToUse, ul, config: {} };
 }
 
 export function getLangFromInteraction(
@@ -20,7 +23,8 @@ export function getLangFromInteraction(
 	client: EClient,
 	guildId?: string
 ): Djs.Locale {
-	if (!guildId) guildId = interaction.guild!.id;
+	if (!interaction.guild) return interaction.locale;
+	if (!guildId) guildId = interaction.guild.id;
 	const guildLocale = client.guildLocale?.get(guildId);
 	if (guildLocale) return guildLocale;
 	const locale =

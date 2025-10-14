@@ -4,6 +4,7 @@ import {
 	DETECT_CRITICAL,
 	generateStatsDice,
 	replaceFormulaInDice,
+	type StatisticalTemplate,
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
@@ -571,15 +572,17 @@ export async function rollStatistique(
 
 export async function getCritical(
 	client: EClient,
-	guild: Djs.Guild,
 	ul: Translation,
 	dice: string,
+	guild?: Djs.Guild,
 	userData?: UserData,
 	criticalsFromDice?: Record<string, CustomCritical>
 ) {
-	const serverData =
-		client.template.get(guild.id) ??
-		(await getTemplate(guild, client.settings, ul, true));
+	let serverData: StatisticalTemplate | undefined;
+	if (guild)
+		serverData =
+			client.template.get(guild.id) ??
+			(await getTemplate(guild, client.settings, ul, true));
 	if (
 		serverData?.customCritical &&
 		includeDiceType(dice, serverData.diceType, !!userData?.stats)
