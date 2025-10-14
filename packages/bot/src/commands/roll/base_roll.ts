@@ -1,5 +1,6 @@
 import { t } from "@dicelette/localization";
 import {
+	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";

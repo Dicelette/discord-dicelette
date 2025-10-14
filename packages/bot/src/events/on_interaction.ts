@@ -24,12 +24,12 @@ export default (client: EClient): void => {
 		try {
 			if (interaction.isMessageContextMenuCommand()) {
 				await commandMenu(interaction, client);
-			} else if (interaction.isCommand()) {
+			} else if (interaction.isChatInputCommand()) {
 				const command = commandsList.find(
 					(cmd) => cmd.data.name === interaction.commandName
 				);
 				if (!command) return;
-				await command.execute(interaction as Djs.ChatInputCommandInteraction, client);
+				await command.execute(interaction, client);
 			} else if (interaction.isAutocomplete()) {
 				const autocompleteInteraction = interaction as Djs.AutocompleteInteraction;
 				const command = autCompleteCmd.find(

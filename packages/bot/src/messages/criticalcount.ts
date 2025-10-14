@@ -1,5 +1,5 @@
 import { findln } from "@dicelette/localization";
-import type { Count, CriticalCount, DBCount, Translation } from "@dicelette/types";
+import type { Count, CriticalCount } from "@dicelette/types";
 import type * as Djs from "discord.js";
 
 /**

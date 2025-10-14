@@ -1,10 +1,8 @@
 import { lError, ln } from "@dicelette/localization";
 import {
-	includeDiceType,
 	isRolling,
-	parseOpposition,
+	parseComparator,
 	ResultAsText,
-	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
 import type { DiscordTextChannel } from "@dicelette/types";
@@ -19,7 +17,7 @@ import {
 	threadToSend,
 } from "messages";
 import { fetchChannel, getCritical } from "utils";
-import { getCharFromText, getTemplate, getUserFromMessage } from "../database";
+import { getCharFromText, getUserFromMessage } from "../database";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {

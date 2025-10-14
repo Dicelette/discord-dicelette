@@ -3,6 +3,7 @@ import type { Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
+import { parseOpposition } from "./custom_critical";
 import { getRoll } from "./dice_extractor";
 
 // Pre-compiled regex patterns for better performance
@@ -181,4 +182,26 @@ export function filterStatsInDamage(
 	const regex = getStatsRegex(statistics);
 	//remove all damage value that match the regex and return the key
 	return Object.keys(damages).filter((key) => !damages[key].standardize().match(regex));
+}
+
+export function parseComparator(
+	dice: string,
+	userStatistique?: Record<string, number>,
+	userStatStr?: string
+) {
+	// Ignore les blocs de critiques personnalisés lors de la détection
+	const criticalBlock = /\{\*?c[fs]:[<>=!]+.+?}/gim;
+	const cleanedDice = dice.replace(criticalBlock, "");
+	const comparatorMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
+		cleanedDice
+	);
+	let comparator = "";
+	let opposition: string | undefined;
+	if (comparatorMatch?.groups) {
+		comparator = comparatorMatch.groups?.first;
+		opposition = comparatorMatch.groups?.second;
+	}
+	if (opposition)
+		return parseOpposition(opposition, comparator, userStatistique, userStatStr);
+	return undefined;
 }
