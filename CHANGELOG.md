@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.4.0](https://github.com/Dicelette/discord-dicelette/compare/2.3.7...2.4.0) (2025-10-14)
+
+
+### Features
+
+* allow simple roll in DM ([00451d7](https://github.com/Dicelette/discord-dicelette/commit/00451d7f1acc78942b9dea516fb52775893a4f85))
+
+
+### Bug Fixes
+
+* enhance variable matching regex and improve formula processing ([cbf2e62](https://github.com/Dicelette/discord-dicelette/commit/cbf2e62f413c5c259f6696920487207ee9a5a72e))
+* implement parseComparator function and update interaction handling ([eb9d6a9](https://github.com/Dicelette/discord-dicelette/commit/eb9d6a91dfffd8cd0485f04bd34756815d70bd59))
+* remove debug console logs from base_roll and dice_extractor ([424da9a](https://github.com/Dicelette/discord-dicelette/commit/424da9af795129af3b72a1429134919a874d1580))
+* remove unnecessary config object from fetch function return ([bb9578a](https://github.com/Dicelette/discord-dicelette/commit/bb9578aba67f0aec4ea1e7776c94a1e9811d7eca))
+
 ## [2.3.7](https://github.com/Dicelette/discord-dicelette/compare/2.3.6...2.3.7) (2025-10-11)
 
 
