@@ -16,7 +16,7 @@ import { fetchChannel, getLangAndConfig } from "utils";
 import { DB_CMD_NAME } from "../index";
 import "discord_ext";
 import process from "node:process";
-import { interactionError } from "../../events";
+import { interactionError } from "event";
 
 export const templateManager = {
 	data: new Djs.SlashCommandBuilder()

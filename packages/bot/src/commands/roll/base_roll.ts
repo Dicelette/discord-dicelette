@@ -1,16 +1,14 @@
 import { t } from "@dicelette/localization";
 import {
-	includeDiceType,
 	replaceStatsInDiceFormula,
-	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getCritical, getLangAndConfig, rollWithInteraction } from "utils";
 import "discord_ext";
-import { getCharFromText, getTemplate, getUserFromInteraction } from "database";
-import { parseComparator } from "../../events/on_message_send";
+import { getCharFromText, getUserFromInteraction } from "database";
+import { parseComparator } from "event/on_message_send";
 
 export const diceRoll = {
 	data: new Djs.SlashCommandBuilder()

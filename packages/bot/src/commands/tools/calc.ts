@@ -8,7 +8,7 @@ import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
-import { autoCompleteCharacters, calcOptions, getLangFromInteraction } from "utils";
+import { autoCompleteCharacters, calcOptions } from "utils";
 import "discord_ext";
 
 export const calc = {

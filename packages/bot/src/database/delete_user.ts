@@ -2,8 +2,8 @@ import type { GuildData, UserMessageId } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import type * as Djs from "discord.js";
+import { addRestriction } from "event";
 import { deleteUserInChar } from "./memory";
-import { addRestriction } from "../events";
 
 export function deleteUser(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,

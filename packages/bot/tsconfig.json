@@ -19,7 +19,8 @@
 			"features": ["packages/bot/src/features/index.js"],
 			"commands": ["packages/bot/src/commands/index.js"],
 			"event": ["packages/bot/src/events/index.js"],
-			"locales": ["packages/bot/src/locales.js"]
+			"locales": ["packages/bot/src/locales.js"],
+			"event/*": ["packages/bot/src/events/*"]
 		}
 	},
 	"include": ["src", "index.ts", "package.json"],
