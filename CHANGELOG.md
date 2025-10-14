@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.4.1](https://github.com/Dicelette/discord-dicelette/compare/2.4.0...2.4.1) (2025-10-14)
+
+
+### Bug Fixes
+
+* improve channel validation and response handling in send function ([32e79b8](https://github.com/Dicelette/discord-dicelette/commit/32e79b8a0de5713421750c7dc74ee6426a75dfc9))
+
 ## [2.4.0](https://github.com/Dicelette/discord-dicelette/compare/2.3.7...2.4.0) (2025-10-14)
 
 
