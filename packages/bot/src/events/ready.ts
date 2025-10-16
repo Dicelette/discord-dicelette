@@ -51,10 +51,6 @@ export default (client: EClient): void => {
 
 			try {
 				await guild.commands.set(guildCommands);
-				await client.application?.commands.set(
-					GLOBAL_CMD.map((cmd) => cmd.data.toJSON())
-				);
-
 				const cachePromises = [
 					fetchAllCharacter(client, guild),
 					cacheStatisticalTemplate(client, guild),
@@ -70,6 +66,7 @@ export default (client: EClient): void => {
 		});
 
 		await Promise.all(guildPromises);
+		await client.application?.commands.set(GLOBAL_CMD.map((cmd) => cmd.data.toJSON()));
 
 		important.info("Bot is ready");
 		logger.info(

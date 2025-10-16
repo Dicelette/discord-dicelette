@@ -20,11 +20,7 @@ export const diceRoll = {
 				.setDescriptions("roll.option.description")
 				.setRequired(true)
 		)
-		.setContexts(
-			Djs.InteractionContextType.Guild,
-			Djs.InteractionContextType.BotDM,
-			Djs.InteractionContextType.PrivateChannel
-		)
+		.setContexts(Djs.InteractionContextType.Guild)
 		.addBooleanOption((option) =>
 			option
 				.setNames("dbRoll.options.hidden.name")

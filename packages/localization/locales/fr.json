@@ -770,6 +770,7 @@
 		},
 		"description": "Lancer un dé",
 		"failure": "Échec",
+		"mp_name": "r",
 		"name": "roll",
 		"opposition": " (__opposition__) ",
 		"option": {

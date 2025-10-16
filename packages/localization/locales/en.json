@@ -770,6 +770,7 @@
 		},
 		"description": "Roll a die",
 		"failure": "Failure",
+		"mp_name": "r",
 		"name": "roll",
 		"opposition": " (__opposition__) ",
 		"option": {
