@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.5.0](https://github.com/Dicelette/discord-dicelette/compare/2.4.1...2.5.0) (2025-10-16)
+
+
+### Features
+
+* add mp_roll command for private channel usage and update roll command contexts ([3f9638f](https://github.com/Dicelette/discord-dicelette/commit/3f9638fa37aed226813aece500fc01d37201d7ee))
+
 ## [2.4.1](https://github.com/Dicelette/discord-dicelette/compare/2.4.0...2.4.1) (2025-10-14)
 
 
