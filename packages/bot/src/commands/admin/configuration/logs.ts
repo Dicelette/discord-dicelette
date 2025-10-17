@@ -29,7 +29,7 @@ export async function setErrorLogs(
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "logs");
 	await reply(interaction, {
-		content: ul("logs.set", { channel: channel.name }),
+		content: ul("logs.set", { channel: Djs.channelMention(channel.id) }),
 	});
 }
 

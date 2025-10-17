@@ -11,6 +11,7 @@ import { deleteAfter, linkToLog, setContextLink, timestamp } from "./results";
 import { allowSelfRegistration } from "./self_registration";
 import { stripOOC } from "./strip_ooc";
 import "discord_ext";
+import { editMeCommand } from "./editMe";
 
 export const configuration = {
 	data: new Djs.SlashCommandBuilder()
@@ -77,7 +78,7 @@ export const configuration = {
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setNames("timer.name")
-				.setDescription("timer.description")
+				.setDescriptions("timer.description")
 				.addNumberOption((option) =>
 					option
 						.setNames("timer.option.name")
@@ -266,6 +267,40 @@ export const configuration = {
 						.setNames("config.stripOOC.thread_mode.name")
 						.setDescriptions("config.stripOOC.thread_mode.description")
 				)
+		)
+		/**
+		 * EditMe : Change the bot avatar, name, bio, banner
+		 * @param interaction
+		 * @param client
+		 */
+		.addSubcommand((sub) =>
+			sub
+				.setNames("editMe.name")
+				.setDescriptions("editMe.description")
+				.addStringOption((option) =>
+					option
+						.setNames("editMe.nick.name")
+						.setDescriptions("editMe.nick.description")
+						.setRequired(false)
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("editMe.bio.name")
+						.setDescriptions("editMe.bio.description")
+						.setRequired(false)
+				)
+				.addAttachmentOption((att) =>
+					att
+						.setNames("editMe.asset.name")
+						.setDescriptions("editMe.asset.description")
+						.setRequired(false)
+				)
+				.addAttachmentOption((att) =>
+					att
+						.setNames("editMe.banner.name")
+						.setDescriptions("editMe.banner.description")
+						.setRequired(false)
+				)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
@@ -313,6 +348,8 @@ export const configuration = {
 				return await allowSelfRegistration(client, interaction, ul, options);
 			case t("config.stripOOC.name"):
 				return await stripOOC(options, client, interaction, ul);
+			case t("editMe.name"):
+				return await editMeCommand(interaction, ul);
 		}
 	},
 };
