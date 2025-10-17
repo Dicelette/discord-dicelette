@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.6.0](https://github.com/Dicelette/discord-dicelette/compare/2.5.0...2.6.0) (2025-10-17)
+
+
+### Features
+
+* add editMe command to update bot profile information ([8d7f68d](https://github.com/Dicelette/discord-dicelette/commit/8d7f68d0fa8e8b6b2fef2fb483183c8bf1ca2692))
+
 ## [2.5.0](https://github.com/Dicelette/discord-dicelette/compare/2.4.1...2.5.0) (2025-10-16)
 
 
