@@ -444,6 +444,7 @@ async function updateTemplateFile(
 	const guildId = interaction.guild!.id;
 	const oldData = client.settings.get(guildId);
 	if (!oldData) {
+		logger.warn(`No old template data found for guild ${guildId}`);
 		await reply(interaction, {
 			embeds: [embedError(ul("error.template.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
@@ -454,6 +455,7 @@ async function updateTemplateFile(
 	const channelId = templateId.channelId;
 	const publicChannelId = oldData.managerId;
 	if (!publicChannelId) {
+		logger.warn(`No public channel found for guild ${guildId}`);
 		await reply(interaction, {
 			embeds: [embedError(ul("error.template.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
@@ -465,7 +467,8 @@ async function updateTemplateFile(
 	const channel = (await fetchChannel(interaction.guild!, channelId)) as
 		| Djs.AnyThreadChannel
 		| Djs.TextChannel;
-	if (!channel || !(channel instanceof Djs.BaseGuildTextChannel)) {
+	if (!channel) {
+		logger.warn(`Channel ${channelId} not found in guild ${guildId}`);
 		await reply(interaction, {
 			embeds: [embedError(ul("error.template.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,

@@ -471,7 +471,7 @@
     "template": {
       "id": "Aucun message trouvé avec les données sauvegardée dans la base de données:\n- Channel : `{{- channelId}}`\n- ID du message : `{{- messageId}}`",
       "json": "Vous devez fournir un fichier JSON valide.",
-      "notFound": "Aucun modèle ou channel configuré"
+      "notFound": "Aucun modèle ou channel configuré."
     },
     "tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",
     "totalExceededBy": "Le total des points est dépassé de `{{- max}}`.",

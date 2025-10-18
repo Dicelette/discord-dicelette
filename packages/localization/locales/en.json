@@ -471,7 +471,7 @@
     "template": {
       "id": "No messages found with data saved in database:\n- Channel: `{{-channelId}}`\n- Message ID: `{{- messageId}}`",
       "json": "You must provide a JSON file.",
-      "notFound": "No template or channel configured for {{- guildId}}."
+      "notFound": "No template or channel configured."
     },
     "tooMuchDice": "Too many dice have been saved! You cannot have more than 25 dice saved.",
     "totalExceededBy": "The total of points is exceeded by `{{- max}}`.",
