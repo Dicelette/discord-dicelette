@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.6.1](https://github.com/Dicelette/discord-dicelette/compare/2.6.0...2.6.1) (2025-10-18)
+
+
+### Bug Fixes
+
+* update error messages for template not found scenarios ([183e50d](https://github.com/Dicelette/discord-dicelette/commit/183e50d78400a1467cf1c2640d9cae03c679a19d))
+
 ## [2.6.0](https://github.com/Dicelette/discord-dicelette/compare/2.5.0...2.6.0) (2025-10-17)
 
 
