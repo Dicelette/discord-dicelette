@@ -1,6 +1,5 @@
 import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { allValueUndefOrEmptyString } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 export async function editMeCommand(
