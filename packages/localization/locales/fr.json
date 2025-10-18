@@ -369,7 +369,7 @@
     "name": "éditer_moi",
     "nick": {
       "description": "Le pseudo à mettre",
-      "name": "nick"
+      "name": "pseudo"
     },
     "success": "Le bot a été modifié."
   },
