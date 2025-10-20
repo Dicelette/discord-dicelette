@@ -16,7 +16,8 @@
 		"pm2:stop": "pm2 stop dicelette",
 		"pm2:delete": "pm2 delete dicelette",
 		"test": "pnpm --filter @dicelette/parse_result run test",
-		"prepare": "husky"
+		"prepare": "husky",
+		"analyze": "pnpm --filter @testing/analyzeRoll run test"
 	},
 	"engines": {
 		"node": "^20.0.0"
