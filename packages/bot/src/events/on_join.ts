@@ -1,6 +1,6 @@
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { commandsList, contextMenus, helpAtInvit } from "commands";
+import { COMMANDS, contextMenus, helpAtInvit } from "commands";
 
 export default (client: EClient): void => {
 	client.on("guildCreate", async (guild) => {
@@ -12,7 +12,7 @@ export default (client: EClient): void => {
 			client.criticalCount.set(guild.id, {});
 
 			const allCommands = [
-				...commandsList.map((command) => command.data),
+				...COMMANDS.map((command) => command.data),
 				...contextMenus,
 			];
 

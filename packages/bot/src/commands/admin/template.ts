@@ -13,7 +13,7 @@ import {
 	reply,
 } from "messages";
 import { fetchChannel, getLangAndConfig } from "utils";
-import { DB_CMD_NAME } from "../index";
+import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";
 import { interactionError } from "event";
@@ -126,7 +126,7 @@ export const templateManager = {
 
 async function removeRestriction(guildId: string, client: EClient): Promise<void> {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
-	const cmds = guildCommmands?.filter((cmd) => DB_CMD_NAME.includes(cmd.name));
+	const cmds = guildCommmands?.filter((cmd) => DATABASE_NAMES.includes(cmd.name));
 	for (const cmd of cmds?.values() ?? []) {
 		logger.trace("Removing defaultMemberPermissions from command", cmd.name);
 		await cmd.edit({ defaultMemberPermissions: null });

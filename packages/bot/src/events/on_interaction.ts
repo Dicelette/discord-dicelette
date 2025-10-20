@@ -2,9 +2,9 @@ import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
 import type { EClient } from "client";
 import {
-	autCompleteCmd,
+	ALL_COMMANDS,
+	AUTOCOMPLETE_COMMANDS,
 	commandMenu,
-	commandsList,
 	desktopLink,
 	mobileLink,
 	resetButton,
@@ -25,14 +25,14 @@ export default (client: EClient): void => {
 			if (interaction.isMessageContextMenuCommand()) {
 				await commandMenu(interaction, client);
 			} else if (interaction.isChatInputCommand()) {
-				const command = commandsList.find(
+				const command = ALL_COMMANDS.find(
 					(cmd) => cmd.data.name === interaction.commandName
 				);
 				if (!command) return;
 				await command.execute(interaction, client);
 			} else if (interaction.isAutocomplete()) {
 				const autocompleteInteraction = interaction as Djs.AutocompleteInteraction;
-				const command = autCompleteCmd.find(
+				const command = AUTOCOMPLETE_COMMANDS.find(
 					(cmd) => cmd.data.name === autocompleteInteraction.commandName
 				);
 				if (!command) return;

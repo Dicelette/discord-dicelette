@@ -1,7 +1,7 @@
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { DB_CMD_NAME } from "commands";
+import { DATABASE_NAMES } from "commands";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import * as Djs from "discord.js";
 import { saveCount, sendLogs } from "messages";
@@ -57,7 +57,7 @@ export const onDeleteThread = (client: EClient): void => {
 
 export async function addRestriction(client: EClient, guildId: string) {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
-	const cmds = guildCommmands?.filter((cmd) => DB_CMD_NAME.includes(cmd.name));
+	const cmds = guildCommmands?.filter((cmd) => DATABASE_NAMES.includes(cmd.name));
 	for (const cmd of cmds?.values() ?? []) {
 		await cmd.edit({ defaultMemberPermissions: Djs.PermissionFlagsBits.Administrator });
 	}

@@ -25,6 +25,7 @@ process.on("uncaughtException", async (err) => {
 important.info("Starting bot...");
 //@ts-ignore
 export const VERSION = packageJson.version ?? "/";
+export const PRIVATE_ID = process.env.PRIVATE_ID ?? "453162143668371456";
 try {
 	event.ready(client);
 	event.onInteraction(client);

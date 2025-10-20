@@ -6,11 +6,17 @@ import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { dev, important, logger } from "@dicelette/utils";
 import type { EClient } from "client";
-import { commandsList, contextMenus, dbCmd, GLOBAL_CMD } from "commands";
+import {
+	COMMANDS,
+	contextMenus,
+	DATABASE_COMMANDS,
+	GLOBAL_CMD,
+	PRIVATES_COMMANDS,
+} from "commands";
 import { getTemplate, getUser } from "database";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
-import { VERSION } from "../../index";
+import { PRIVATE_ID, VERSION } from "../../index";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
@@ -18,12 +24,10 @@ export default (client: EClient): void => {
 	client.on("clientReady", async () => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
-		let serializedCommands = commandsList
-			.map((command) => command.data.toJSON())
-			.filter((x) =>
-				x.contexts ? x.contexts.includes(Djs.InteractionContextType.Guild) : true
-			);
-		const serializedDbCmds = dbCmd.map((command) => command.data.toJSON());
+		let serializedCommands = COMMANDS.map((command) => command.data.toJSON()).filter(
+			(x) => (x.contexts ? x.contexts.includes(Djs.InteractionContextType.Guild) : true)
+		);
+		const serializedDbCmds = DATABASE_COMMANDS.map((command) => command.data.toJSON());
 
 		client.user.setActivity("Bringing chaos !", {
 			type: Djs.ActivityType.Playing,
@@ -48,9 +52,14 @@ export default (client: EClient): void => {
 			}
 
 			logger.trace(`Registering commands for \`${guild.name}\``);
-
+			if (guild.id === PRIVATE_ID) {
+				guildCommands = guildCommands.concat(
+					PRIVATES_COMMANDS.map((x) => x.data.toJSON())
+				);
+			}
 			try {
 				await guild.commands.set(guildCommands);
+
 				const cachePromises = [
 					fetchAllCharacter(client, guild),
 					cacheStatisticalTemplate(client, guild),
