@@ -95,6 +95,7 @@ export function rollCustomCritical(
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
 		value.value = generateStatsDice(value.value, statistics, statValue?.toString());
+		if (value.value.includes("$")) continue;
 		customCritical[name] = rollOneCustomCritical(value);
 	}
 	return customCritical;
