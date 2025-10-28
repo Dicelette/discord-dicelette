@@ -1,8 +1,6 @@
 {
 	"ts-node": {
-		"require": [
-			"tsconfig-paths/register"
-		],
+		"require": ["tsconfig-paths/register"],
 		"esm": true,
 		"transpileOnly": true,
 		"experimentalSpecifierResolution": "node"
@@ -11,12 +9,9 @@
 		"resolveFullPaths": true
 	},
 	"compilerOptions": {
-		"ignoreDeprecations": "6.0",
 		"target": "ESNext",
 		"module": "esnext",
-		"lib": [
-			"ESNext"
-		],
+		"lib": ["ESNext"],
 		"rootDir": "./",
 		"outDir": "./dist/",
 		"strict": true,
@@ -32,55 +27,25 @@
 		"resolveJsonModule": true,
 		"forceConsistentCasingInFileNames": true,
 		"removeComments": true,
-		"typeRoots": [
-			"packages/@types",
-			"node_modules/@types"
-		],
+		"typeRoots": ["packages/@types", "node_modules/@types"],
 		"sourceMap": false,
 		"composite": false,
 		"baseUrl": ".",
 		"declaration": false,
 		"declarationMap": false,
 		"paths": {
-			"client": [
-				"packages/bot/src/client.js"
-			],
-			"messages": [
-				"packages/bot/src/messages/index.js"
-			],
-			"utils": [
-				"packages/bot/src/utils/index.js"
-			],
-			"database": [
-				"packages/bot/src/database/index.js"
-			],
-			"features": [
-				"packages/bot/src/features/index.js"
-			],
-			"commands": [
-				"packages/bot/src/commands/index.js"
-			],
-			"event": [
-				"packages/bot/src/events/index.js"
-			],
-			"locales": [
-				"packages/bot/src/locales.js"
-			],
-			"discord_ext": [
-				"packages/bot/src/discord_ext.js"
-			],
-			"event/*": [
-				"packages/bot/src/events/*"
-			]
+			"client": ["packages/bot/src/client.js"],
+			"messages": ["packages/bot/src/messages/index.js"],
+			"utils": ["packages/bot/src/utils/index.js"],
+			"database": ["packages/bot/src/database/index.js"],
+			"features": ["packages/bot/src/features/index.js"],
+			"commands": ["packages/bot/src/commands/index.js"],
+			"event": ["packages/bot/src/events/index.js"],
+			"locales": ["packages/bot/src/locales.js"],
+			"discord_ext": ["packages/bot/src/discord_ext.js"],
+			"event/*": ["packages/bot/src/events/*"]
 		}
 	},
-	"exclude": [
-		"node_modules",
-		"dist"
-	],
-	"include": [
-		"packages/**/*.ts",
-		"packages/**/*.d.ts",
-		"package.json"
-	]
+	"exclude": ["node_modules", "dist"],
+	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"]
 }
