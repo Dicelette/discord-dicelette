@@ -5,7 +5,7 @@ import type { Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { findMessageBefore, threadToSend } from "messages";
-import { fetchChannel, isValidChannel } from "utils";
+import { fetchChannel } from "utils";
 
 export async function sendLogs(
 	message: string,

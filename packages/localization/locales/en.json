@@ -240,7 +240,8 @@
 			},
 			"timeOut": "Timeout! Cancellation.",
 			"timer": {
-				"description": "Time before OOC deletion",
+				"description": "Time before OOC deletion (in seconds)",
+				"error": "",
 				"name": "timer"
 			},
 			"title": "OOC's message deletion"

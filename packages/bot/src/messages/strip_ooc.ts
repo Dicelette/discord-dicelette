@@ -1,8 +1,8 @@
 import type { DiscordTextChannel, StripOOC, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
+import type { EClient } from "client";
 import * as Djs from "discord.js";
-import type { EClient } from "../client";
-import { fetchChannel } from "../utils";
+import { fetchChannel } from "utils";
 import { deleteAfter } from "./send";
 import { fetchThread, setTags } from "./thread";
 
@@ -36,16 +36,14 @@ export async function stripOOC(message: Djs.Message, client: EClient, ul: Transl
 		![message.channel.id, parent?.id, grandParent?.id].some(
 			(id) => id && channelsAllowed?.includes(id)
 		)
-	) {
+	)
 		return;
-	}
+
 	if (!stripOoc || stripOoc?.timer === 0 || !stripOoc?.regex) return;
 	const timer = stripOoc.timer;
 	if (!timer) return;
 	const regex = getCachedRegex(stripOoc.regex, "i");
-	logger.trace(regex.source, regex.test(message.content));
 	if (regex.test(message.content)) {
-		logger.trace("OOC detected, stripping message");
 		if (stripOoc.forwardId || stripOoc.threadMode)
 			await forwardOoc(message, stripOoc, regex, ul);
 

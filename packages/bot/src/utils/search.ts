@@ -27,13 +27,18 @@ export async function searchUserChannel(
 	const embeds = [embedError(msg, ul)];
 	try {
 		const channel = await fetchChannel(interaction.guild!, channelId);
-		if (channel?.type === Djs.ChannelType.GuildForum && register) return;
+		if (register && channel instanceof Djs.ForumChannel) return;
 		if (!isValidChannel(channel, interaction)) {
-			if (isValidInteraction(interaction) && interaction.channel?.isSendable())
-				await interaction?.channel?.send({
+			// Avoid using `any`: rely on runtime class to detect forum channels
+			if (register && channel instanceof Djs.ForumChannel) {
+				return;
+			}
+
+			if (isValidInteraction(interaction) && interaction.channel?.isSendable()) {
+				await interaction.channel.send({
 					embeds,
 				});
-			else {
+			} else {
 				await interaction.user.send({
 					embeds,
 				});

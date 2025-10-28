@@ -38,17 +38,25 @@ export function getLangFromInteraction(
 export async function fetchChannel(
 	guild: Djs.Guild,
 	channelId: Djs.Snowflake,
-	channel?: Djs.TextBasedChannel
-): Promise<Djs.TextBasedChannel | null> {
+	channel?: Djs.GuildBasedChannel
+): Promise<Djs.GuildBasedChannel | null> {
 	try {
+		// If a channel instance is provided, trust it (must be guild-based for our usage)
 		if (channel) return channel;
+
+		// Try guild cache first (returns GuildBasedChannel when present)
 		const cached = guild.channels.cache.get(channelId);
-		if (cached?.isTextBased()) return cached;
+		if (cached) return cached as Djs.GuildBasedChannel;
+
+		// Fetch from the guild API (also returns GuildBasedChannel when present)
 		const fetched = await guild.channels.fetch(channelId);
-		if (fetched?.isTextBased()) return fetched as unknown as Djs.TextBasedChannel;
-		// Fallback for threads or non-guild cached channels
+		if (fetched) return fetched as Djs.GuildBasedChannel;
+
+		// Fallback for threads or non-guild cached channels accessible via the global client cache
 		const any = await guild.client.channels.fetch(channelId);
-		if (any?.isTextBased()) return any as Djs.TextBasedChannel;
+		// Only return if it's a guild-based channel (e.g., threads) to avoid DM channels
+		if (!any?.isDMBased()) 
+			return any as Djs.GuildBasedChannel;
 		return null;
 	} catch (error) {
 		logger.warn(

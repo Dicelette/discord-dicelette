@@ -17,8 +17,7 @@ export async function stripOOC(
 	const timer = options.getNumber(t("config.stripOOC.timer.name"), false);
 	let channel = options.getChannel(t("common.channel"), false);
 	const threadMode = options.getBoolean(t("config.stripOOC.thread_mode.name"), false);
-
-	if ((!prefix && !suffix && !regex) || timer === 0) {
+	if ((!prefix && !suffix && !regex && !timer) || timer === 0) {
 		//delete
 		client.settings.delete(interaction.guild!.id, "stripOOC");
 		await reply(interaction, {
@@ -28,6 +27,9 @@ export async function stripOOC(
 	}
 	if (!prefix && !suffix && !regex) {
 		throw new Error(ul("config.stripOOC.error"));
+	}
+	if (!timer || timer <= 0) {
+		throw new Error(ul("config.stripOOC.timer.error"));
 	}
 	if (regex) {
 		//validate regex
@@ -125,8 +127,7 @@ function escapeRegex(str: string) {
 async function isCatOrChannel(channel: string, guild: Djs.Guild) {
 	const fetched = await fetchChannel(guild, channel);
 	if (!fetched) return undefined;
-	if (fetched.isTextBased()) {
-		return Djs.channelMention(channel);
-	}
+	if (fetched.isTextBased()) return Djs.channelMention(channel);
 	if (fetched.type === Djs.ChannelType.GuildCategory) return `📂 ${fetched.name}`;
+	if (fetched.type === Djs.ChannelType.GuildForum) return `<#${fetched.id}>`;
 }

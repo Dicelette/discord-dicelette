@@ -8,6 +8,7 @@ import {
 import type { DiscordTextChannel } from "@dicelette/types";
 import { allValuesUndefined, logger } from "@dicelette/utils";
 import type { EClient } from "client";
+import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import {
 	deleteAfter,
@@ -17,7 +18,6 @@ import {
 	threadToSend,
 } from "messages";
 import { fetchChannel, getCritical } from "utils";
-import { getCharFromText, getUserFromMessage } from "../database";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {

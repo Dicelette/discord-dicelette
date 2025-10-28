@@ -240,7 +240,8 @@
 			},
 			"timeOut": "Temps écoulé ! Annulation.",
 			"timer": {
-				"description": "Temps avant la suppression du HRP.",
+				"description": "Temps avant la suppression du HRP (en seconde).",
+				"error": "Vous devez fournir un timer pour la suppression du HRP.",
 				"name": "timer"
 			},
 			"title": "Suppression des messages HRP"
