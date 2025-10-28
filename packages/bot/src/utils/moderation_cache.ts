@@ -108,3 +108,26 @@ export function getModerationFooter(
 		return undefined;
 	}
 }
+
+export function getUserId(interaction: Djs.ButtonInteraction) {
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.cancel, customId);
+	let userId: string | undefined;
+	let url: string | undefined;
+	if (embedKey) {
+		const meta = getModerationCache(embedKey)?.meta;
+		userId = meta?.userID;
+		if (meta)
+			url = `https://discord.com/channels/${interaction.guild!.id}/${meta.channelId}/${meta.messageId}`;
+	}
+	if (userId) return { userId, url };
+
+	//get footer to find userId
+	const apiEmbed = interaction.message.embeds[0];
+	if (apiEmbed) {
+		const data = getModerationFooter(new Djs.EmbedBuilder(apiEmbed.toJSON()));
+		userId = data?.userID;
+		url = `https://discord.com/channels/${interaction.guild!.id}/${data?.channelId}/${data?.messageId}`;
+	}
+	return { userId, url };
+}

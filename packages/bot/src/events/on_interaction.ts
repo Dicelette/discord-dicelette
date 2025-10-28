@@ -158,15 +158,15 @@ async function buttonSubmit(
 	} else if (interaction.customId.includes("modo_stats_validation")) {
 		await Stats.couldBeValidated(interaction, ul, client, interactionUser);
 	} else if (interaction.customId.includes("modo_stats_cancel_")) {
-		await Stats.cancelStatsModeration(interaction, ul);
+		await Stats.cancelStatsModeration(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_validation_")) {
 		await Dice.couldBeValidatedDice(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_cancel_")) {
-		await Dice.cancelDiceModeration(interaction, ul);
+		await Dice.cancelDiceModeration(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_add_validation_")) {
 		await Dice.couldBeValidatedDiceAdd(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_add_cancel_")) {
-		await Dice.cancelDiceAddModeration(interaction, ul);
+		await Dice.cancelDiceAddModeration(interaction, ul, client);
 	} else if (interaction.customId.includes("mark_as_valid")) {
 		const isModerator = interaction.guild?.members.cache
 			.get(interactionUser.id)

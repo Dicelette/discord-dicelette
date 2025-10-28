@@ -22,7 +22,9 @@ import {
 	deleteModerationCache,
 	editUserButtons,
 	fetchChannel,
+	fetchUser,
 	getModerationCache,
+	getUserId,
 	makeEmbedKey,
 	parseEmbedKey,
 	parseKeyFromCustomId,
@@ -485,16 +487,24 @@ export async function couldBeValidatedDice(
 /** Annulation d'une demande de validation par modération (bouton). */
 export async function cancelDiceModeration(
 	interaction: Djs.ButtonInteraction,
-	ul: Translation
+	ul: Translation,
+	client: EClient
 ) {
 	const customId = interaction.customId;
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
-	if (embedKey) deleteModerationCache(embedKey);
+	const { userId, url } = getUserId(interaction);
+	if (embedKey) {
+		deleteModerationCache(embedKey);
+	}
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("common.cancel"),
+		content: ul("modals.cancelled"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
+	if (userId) {
+		const user = await fetchUser(client, userId);
+		if (user) await user.send(ul("modals.cancelled", { url }));
+	}
 }
 
 /**
@@ -636,14 +646,23 @@ export async function couldBeValidatedDiceAdd(
 
 export async function cancelDiceAddModeration(
 	interaction: Djs.ButtonInteraction,
-	ul: Translation
+	ul: Translation,
+	client: EClient
 ) {
 	const customId = interaction.customId;
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.cancel, customId);
+	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
+
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("common.cancel"),
+		content: ul("modals.cancelled"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
+	//send a message to the user that the edition has been cancelled
+	if (userId) {
+		const user = await fetchUser(client, userId);
+		console.log("Cancelling dice add moderation for user:", userId);
+		if (user) await user.send(ul("modals.cancelled", { url }));
+	}
 }
