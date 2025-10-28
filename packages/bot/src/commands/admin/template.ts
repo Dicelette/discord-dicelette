@@ -127,10 +127,19 @@ export const templateManager = {
 async function removeRestriction(guildId: string, client: EClient): Promise<void> {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
 	const cmds = guildCommmands?.filter((cmd) => DATABASE_NAMES.includes(cmd.name));
+	/*
 	for (const cmd of cmds?.values() ?? []) {
 		logger.trace("Removing defaultMemberPermissions from command", cmd.name);
 		await cmd.edit({ defaultMemberPermissions: null });
 	}
+	*/
+	//convert to promise to be faster
+	await Promise.all(
+		cmds?.map(async (cmd) => {
+			logger.trace("Removing defaultMemberPermissions from command", cmd.name);
+			await cmd.edit({ defaultMemberPermissions: null });
+		}) ?? []
+	);
 }
 
 function downloadTutorialImages() {
