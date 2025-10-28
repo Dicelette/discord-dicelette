@@ -1,9 +1,16 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"ignoreDeprecations": "6.0",
 		"outDir": "./dist",
 		"rootDir": "./"
 	},
-	"include": ["./src/**/*", "./src/**/*.json", "index.ts"],
-	"exclude": ["./dist"]
+	"include": [
+		"./src/**/*",
+		"./src/**/*.json",
+		"index.ts"
+	],
+	"exclude": [
+		"./dist"
+	]
 }

@@ -6,6 +6,7 @@ import {
 	type StatisticalTemplate,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
+import { parseEmbedFields } from "@dicelette/parse_result";
 import type { DataToFooter, Translation } from "@dicelette/types";
 import { logger, TotalExceededError } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -24,10 +25,19 @@ import {
 	sendLogs,
 } from "messages";
 import {
+	buildModerationButtons,
+	CUSTOM_ID_PREFIX,
 	continueCancelButtons,
+	deleteModerationCache,
 	editUserButtons,
 	fetchChannel,
+	getModerationCache,
+	makeEmbedKey,
+	parseEmbedKey,
+	parseKeyFromCustomId,
+	putModerationCache,
 	selfRegisterAllowance,
+	setModerationFooter,
 } from "utils";
 import * as Messages from "../../messages";
 import { sendValidationMessage } from "../user";
@@ -437,37 +447,33 @@ export async function validateByModeration(
 	);
 	//add a new message embed in the channel with the new stats for the future validation
 	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
-	//we should add the original message as channelId: message.id
 	const user = await getUserNameAndChar(interaction, ul);
-	const footer = JSON.stringify({
+	// Footer de secours pour la demande de validation
+	setModerationFooter(newEmbedStats, {
 		userID: user.userID,
 		userName: user.userName,
 		channelId: interaction.message.channelId,
 		messageId: interaction.message.id,
 	});
-	newEmbedStats.setFooter({
-		text: footer,
+
+	const embedKey = makeEmbedKey(
+		interaction.guild!.id,
+		interaction.message.channelId,
+		interaction.message.id
+	);
+	putModerationCache(embedKey, {
+		kind: "stats-edit",
+		embed: newEmbedStats,
+		meta: {
+			userID: user.userID,
+			userName: user.userName,
+			channelId: interaction.message.channelId,
+			messageId: interaction.message.id,
+		},
 	});
 
-	const button = new Djs.ButtonBuilder()
-		.setCustomId("modo_stats_validation")
-		.setLabel(ul("button.validate"))
-		.setStyle(Djs.ButtonStyle.Success)
-		.setEmoji("✅")
-		.setDisabled(false);
-
-	const cancel = new Djs.ButtonBuilder()
-		.setCustomId("cancel")
-		.setLabel(ul("common.cancel"))
-		.setStyle(Djs.ButtonStyle.Secondary)
-		.setEmoji("❌");
-
-	await interaction.reply({
-		embeds: [newEmbedStats],
-		components: [
-			new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents([button, cancel]),
-		],
-	});
+	const row = buildModerationButtons("stats-edit", ul, embedKey);
+	await interaction.reply({ embeds: [newEmbedStats], components: [row] });
 }
 
 export async function couldBeValidated(
@@ -493,43 +499,89 @@ export async function couldBeValidated(
 		});
 		return;
 	}
-	//now we should get the message from the footer
-	const replyIds = interaction.message.embeds[0]?.footer?.text;
-	if (!replyIds) throw new Error(ul("error.embed.notFound"));
-	const data: DataToFooter = JSON.parse(replyIds);
-	const { channelId, messageId } = data;
-	const userData = {
-		userID: data.userID,
-		userName: data.userName,
-	};
-	logger.trace("Data from footer:", channelId, messageId);
-	if (!channelId || !messageId) throw new Error(ul("error.embed.notFound"));
-	const channel = await fetchChannel(interaction.guild!, channelId);
-	if (!channel || !(channel instanceof Djs.TextChannel))
-		throw new Error(ul("error.channel.notFound"));
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.stats.validate, customId);
 
-	const message = await channel.messages.fetch(messageId);
-	//now we should get the stats embed from the message
-	const oldStatsEmbed = getEmbeds(message ?? undefined, "stats");
-	//we should get the new fields from the embed from the interaction
-	const fieldsToAppend = interaction.message.embeds[0]?.toJSON().fields;
+	if (!embedKey) {
+		// rétrocompatibilité: ancien flux basé sur footer
+		const replyIds = interaction.message.embeds[0]?.footer?.text;
+		if (!replyIds) throw new Error(ul("error.embed.notFound"));
+		const data: DataToFooter = JSON.parse(replyIds);
+		const { channelId, messageId } = data;
+		const userData = { userID: data.userID, userName: data.userName };
+		logger.trace("Data from footer:", channelId, messageId);
+		if (!channelId || !messageId) throw new Error(ul("error.embed.notFound"));
+		const channel = await fetchChannel(interaction.guild!, channelId);
+		if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
 
-	//set data to undefined if one of the fields is undefined
-	if (!fieldsToAppend || !message || !oldStatsEmbed)
-		throw new Error(ul("error.embed.notFound"));
+		const message = await channel.messages.fetch(messageId);
+		const oldStatsEmbed =
+			getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(ul);
+		const fieldsToAppend = interaction.message.embeds[0]?.toJSON().fields;
+		if (!fieldsToAppend || !message) throw new Error(ul("error.embed.notFound"));
+		await validateEdit(
+			interaction,
+			ul,
+			client,
+			{ fieldsToAppend, statsEmbeds: oldStatsEmbed, message },
+			userData
+		);
+		await interaction.message.delete();
+		return;
+	}
 
+	const cached = getModerationCache(embedKey);
+	let embed = cached && cached.kind === "stats-edit" ? cached.embed : undefined;
+
+	// Fallback: si cache manquant après redémarrage, reconstruire depuis l'embed du message de modération
+	if (!embed) {
+		const apiEmbed = interaction.message.embeds[0];
+		if (!apiEmbed) throw new Error(ul("error.embed.notFound"));
+		embed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
+	}
+	if (!embed) throw new Error(ul("error.embed.notFound"));
+
+	const keyParts = parseEmbedKey(embedKey);
+	if (!keyParts) throw new Error(ul("error.embed.notFound"));
+	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
+	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+	const message = await channel.messages.fetch(keyParts.messageId);
+	const oldStatsEmbed = getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(ul);
+	const fieldsToAppend = embed.toJSON().fields;
+	if (!fieldsToAppend || !message) throw new Error(ul("error.embed.notFound"));
+	// Extraire l'utilisateur cible depuis le message d'origine
+	const userEmbed = getEmbeds(message ?? undefined, "user");
+	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
+	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
+	const mention = parsedFields["common.user"]; // <@id>
+	const match = mention?.match(/<@(?<id>\d+)>/);
+	const ownerId = match?.groups?.id ?? mention?.replace(/<@|>/g, "");
+	const charNameRaw = parsedFields["common.character"];
+	const ownerName =
+		charNameRaw && charNameRaw.toLowerCase() !== ul("common.noSet").toLowerCase()
+			? charNameRaw
+			: undefined;
 	await validateEdit(
 		interaction,
 		ul,
 		client,
-		{
-			fieldsToAppend: fieldsToAppend,
-			statsEmbeds: oldStatsEmbed,
-			message: message,
-		},
-		userData
+		{ fieldsToAppend, statsEmbeds: oldStatsEmbed, message },
+		ownerId ? { userID: ownerId, userName: ownerName } : undefined
 	);
-
-	//delete the message
+	deleteModerationCache(embedKey);
 	await interaction.message.delete();
+}
+
+export async function cancelStatsModeration(
+	interaction: Djs.ButtonInteraction,
+	ul: Translation
+) {
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.stats.cancel, customId);
+	if (embedKey) deleteModerationCache(embedKey);
+	await interaction.message.delete();
+	await reply(interaction, {
+		content: ul("common.cancel"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 }

@@ -10,7 +10,6 @@ import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import {
-	getLangFromInteraction,
 	gmCommonOptions,
 	isSerializedNameEquals,
 	rollMacro,

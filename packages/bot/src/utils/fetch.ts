@@ -38,11 +38,18 @@ export function getLangFromInteraction(
 export async function fetchChannel(
 	guild: Djs.Guild,
 	channelId: Djs.Snowflake,
-	channel?: Djs.GuildBasedChannel
-): Promise<Djs.GuildBasedChannel | null> {
+	channel?: Djs.TextBasedChannel
+): Promise<Djs.TextBasedChannel | null> {
 	try {
 		if (channel) return channel;
-		return guild.channels.cache.get(channelId) ?? (await guild.channels.fetch(channelId));
+		const cached = guild.channels.cache.get(channelId);
+		if (cached?.isTextBased()) return cached;
+		const fetched = await guild.channels.fetch(channelId);
+		if (fetched?.isTextBased()) return fetched as unknown as Djs.TextBasedChannel;
+		// Fallback for threads or non-guild cached channels
+		const any = await guild.client.channels.fetch(channelId);
+		if (any?.isTextBased()) return any as Djs.TextBasedChannel;
+		return null;
 	} catch (error) {
 		logger.warn(
 			`Failed to fetch channel with ID ${channelId}:`,

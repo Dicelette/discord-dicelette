@@ -51,6 +51,7 @@ export function getEmbedsList(
 	},
 	message?: Message
 ) {
+	embedToReplace.embed.setFooter(null);
 	const userDataEmbed =
 		embedToReplace.which === "user" ? embedToReplace.embed : getEmbeds(message, "user");
 	if (!userDataEmbed) throw new NoEmbed();
@@ -169,6 +170,15 @@ export function createDiceEmbed(ul: Translation) {
 }
 
 /**
+ * Remove the footer from an EmbedBuilder by cloning its JSON data without the footer field.
+ */
+export function stripFooter(embed: Djs.EmbedBuilder) {
+	const data = embed.toJSON() as Djs.APIEmbed;
+	const { footer: _ignored, ...rest } = data;
+	return new Djs.EmbedBuilder(rest);
+}
+
+/**
  * Get the statistiques fields from the modals and verify if all value are correct and if the total is not exceeded
  */
 export function getStatistiqueFields(
@@ -227,9 +237,9 @@ export function removeEmbedsFromList(
 			case "stats":
 				return title !== "common.statistic" && title !== "common.statistics";
 			case "damage":
-				return title !== "embed.dice";
+				return title !== "embed.dice" && title !== "common.macro";
 			case "template":
-				return title !== "embed.template";
+				return title !== "embed.template" && title !== "common.template";
 			default:
 				return false;
 		}

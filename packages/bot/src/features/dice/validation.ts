@@ -14,8 +14,23 @@ import {
 	removeEmbedsFromList,
 	reply,
 	sendLogs,
+	stripFooter,
 } from "messages";
-import { editUserButtons, selectEditMenu } from "utils";
+import {
+	buildModerationButtons,
+	CUSTOM_ID_PREFIX,
+	deleteModerationCache,
+	editUserButtons,
+	fetchChannel,
+	getModerationCache,
+	makeEmbedKey,
+	parseEmbedKey,
+	parseKeyFromCustomId,
+	putModerationCache,
+	selectEditMenu,
+	selfRegisterAllowance,
+	setModerationFooter,
+} from "utils";
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.
@@ -29,170 +44,106 @@ export async function validate(
 	ul: Translation,
 	client: EClient
 ) {
-	const compareUnidecode = (a: string, b: string) =>
-		a.unidecode().standardize() === b.unidecode().standardize();
 	const db = client.settings;
 	if (!interaction.message) return;
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id
 	);
-	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+	const allowance = selfRegisterAllowance(
+		client.settings.get(interaction.guild!.id, "allowSelfRegister")
+	);
+	const isModerator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+
+	/**
+	 * Set the flags ephemeral only if we DONT HAVE to go through moderation
+	 */
+	const flags =
+		allowance.moderation && allowance.allowSelfRegister && !isModerator
+			? undefined
+			: Djs.MessageFlags.Ephemeral;
+	await interaction.deferReply({ flags });
 	const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 	if (!diceEmbeds) return;
+	// 1) Création + validation des embeds
 	const values = interaction.fields.getTextInputValue("allDice");
-	const valuesAsDice = values.split("\n- ").map((dice) => {
-		const match = dice.match(/^([^:]+):(.*)$/s);
-		if (match) {
-			return {
-				name: match[1].trim().replace(/^- /, "").toLowerCase(),
-				value: match[2].trim(),
-			};
-		} //fallback for old format
-		const [name, value] = dice.split(/ ?: ?/);
-		return { name: name.replace(/^- /, "").trim().toLowerCase(), value };
-	});
-	const dices = valuesAsDice.reduce(
-		(acc, { name, value }) => {
-			acc[name] = value;
-			return acc;
-		},
-		{} as Record<string, string>
+	const { fieldsToAppend, diceEmbed, oldFields, removed } = createAndValidateDiceEmbed(
+		values,
+		message,
+		ul
 	);
-	const newEmbedDice: Djs.APIEmbedField[] = [];
-	for (const [skill, dice] of Object.entries(dices)) {
-		//test if dice is valid
-		if (newEmbedDice.find((field) => compareUnidecode(field.name, skill))) continue;
-		if (dice === "X" || dice.trim().length === 0 || dice === "0") {
-			newEmbedDice.push({
-				name: skill.capitalize(),
-				value: "X",
-				inline: true,
-			});
-			continue;
-		}
-		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
-		if (!statsEmbeds) {
-			if (!roll(dice)) {
-				throw new Error(ul("error.invalidDice.withDice", { dice }));
-			}
-			continue;
-		}
-		const statsValues = parseStatsString(statsEmbeds);
-		try {
-			evalStatsDice(dice, statsValues);
-		} catch (error) {
-			logger.warn(error);
-			throw new Error(ul("error.invalidDice.eval", { dice }));
-		}
-		newEmbedDice.push({
-			name: skill.capitalize(),
-			value: `\`${dice}\``,
-			inline: true,
-		});
-	}
-	const oldDice = diceEmbeds.toJSON().fields;
-	if (oldDice) {
-		for (const field of oldDice) {
-			const name = field.name.toLowerCase();
-			const newValue = newEmbedDice.find((f) => compareUnidecode(f.name, name));
-			if (!newValue) {
-				//register the old value
-				newEmbedDice.push({
-					name: name.capitalize(),
-					value: field.value,
-					inline: true,
-				});
-			}
-		}
-	}
-	//remove duplicate
-	const fieldsToAppend: Djs.APIEmbedField[] = [];
-	for (const field of newEmbedDice) {
-		const name = field.name.toLowerCase();
-		const dice = field.value;
-		if (
-			fieldsToAppend.find((f) => compareUnidecode(f.name, name)) ||
-			dice.toLowerCase() === "x" ||
-			dice.trim().length === 0 ||
-			dice === "0"
-		)
-			continue;
-		fieldsToAppend.push({
-			name: capitalizeBetweenPunct(name.capitalize()),
-			value: dice,
-			inline: true,
-		});
-	}
-	const diceEmbed = createDiceEmbed(ul).addFields(fieldsToAppend);
+	// Permission/Modération: basculer en validation par modération si nécessaire
 	const { userID, userName } = await getUserNameAndChar(interaction, ul);
 	const messageID = [message.id, message.channelId] as UserMessageId;
-	if (!fieldsToAppend || fieldsToAppend.length === 0) {
-		//dice was removed
-		const embedsList = getEmbedsList({ which: "damage", embed: diceEmbed }, message);
-		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
-		const components = editUserButtons(ul, embedsList.exists.stats, false);
-		message.edit({
-			embeds: toAdd,
-			components: [components, selectEditMenu(ul)],
+
+	if (allowance.moderation && allowance.allowSelfRegister && !isModerator) {
+		// Stocker l'embed dans le cache et publier un message pour approbation
+		const embedKey = makeEmbedKey(interaction.guild!.id, message.channelId, message.id);
+		// Footer de secours: conserve un minimum de métadonnées si le cache disparaît
+		setModerationFooter(diceEmbed, {
+			userID,
+			userName,
+			channelId: message.channelId,
+			messageId: message.id,
 		});
-		await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
-			embeds: toAdd,
-		});
-		await reply(interaction, {
-			content: ul("modals.removed.dice"),
-			flags: Djs.MessageFlags.Ephemeral,
+		putModerationCache(embedKey, {
+			kind: "dice-edit",
+			embed: diceEmbed,
+			meta: { userID, userName, channelId: message.channelId, messageId: message.id },
 		});
 
-		const userRegister: UserRegistration = {
-			userID,
-			charName: userName,
-			damage: undefined,
-			msgId: messageID,
-		};
-		await registerUser(userRegister, interaction, db, false);
-		await sendLogs(
-			ul("logs.dice.remove", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: message.url,
-				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-			}),
-			interaction.guild as Djs.Guild,
-			db
-		);
-		return;
+		const row = buildModerationButtons("dice-edit", ul, embedKey);
+		// Si l'embed est vide (suppression de toutes les macros), afficher un petit message plutôt qu'un embed vide
+		if (!fieldsToAppend || fieldsToAppend.length === 0) {
+			await interaction.editReply({
+				content: ul("modals.removed.dice"),
+				components: [row],
+			});
+		} else {
+			await interaction.editReply({ embeds: [diceEmbed], components: [row] });
+		}
+		return; // ne pas appliquer directement
 	}
-	const skillDiceName = Object.keys(
-		fieldsToAppend.reduce(
-			(acc, field) => {
-				acc[field.name] = field.value;
-				return acc;
-			},
-			{} as Record<string, string>
-		)
-	);
-	const userRegister = {
+
+	// 2) Édit du message d'embeds
+	const edited = await editMessageDiceEmbeds(message, ul, diceEmbed, removed);
+
+	// 3) Persistance mémoire + sauvegarde utilisateur
+	const damageNames = removed
+		? undefined
+		: Object.keys(
+				fieldsToAppend.reduce(
+					(acc, field) => {
+						acc[field.name] = field.value;
+						return acc;
+					},
+					{} as Record<string, string>
+				)
+			);
+	await persistUserAndMemory(
+		client,
+		interaction,
 		userID,
-		charName: userName,
-		damage: skillDiceName,
-		msgId: messageID,
-	};
-	await registerUser(userRegister, interaction, db, false);
-	const embedsList = getEmbedsList({ which: "damage", embed: diceEmbed }, message);
-	await message.edit({ embeds: embedsList.list });
-	await reply(interaction, {
-		content: ul("embed.edit.dice"),
-		flags: Djs.MessageFlags.Ephemeral,
+		userName,
+		messageID,
+		ul,
+		edited.embeds,
+		damageNames
+	);
+
+	// 4) Envoi des messages de validation (réponse + logs)
+	await sendValidationResponses({
+		interaction,
+		ul,
+		removed,
+		oldFields,
+		newFields: fieldsToAppend,
+		userID,
+		userName,
+		message,
+		db,
 	});
-	const compare = displayOldAndNewStats(diceEmbeds.toJSON().fields, fieldsToAppend);
-	const logMessage = ul("logs.dice.edit", {
-		user: Djs.userMention(interaction.user.id),
-		fiche: message.url,
-		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-	});
-	await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
-		embeds: embedsList.list,
-	});
-	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
 }
 
 /**
@@ -210,4 +161,489 @@ function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
 		parsedStats[name] = number;
 	}
 	return parsedStats;
+}
+
+/**
+ * Compare deux libellés en neutralisant accents/variantes.
+ */
+const compareUnidecode = (a: string, b: string) =>
+	a.unidecode().standardize() === b.unidecode().standardize();
+
+// Caches centralisés: voir utils/moderation_cache
+
+/**
+ * 1) Création et validation de l'embed de dés à partir de la saisie utilisateur.
+ */
+function createAndValidateDiceEmbed(
+	values: string,
+	message: Djs.Message,
+	ul: Translation
+) {
+	const diceEmbeds = getEmbeds(message ?? undefined, "damage");
+	if (!diceEmbeds)
+		return {
+			fieldsToAppend: [],
+			diceEmbed: createDiceEmbed(ul),
+			oldFields: [],
+			removed: true,
+		};
+
+	const valuesAsDice = values.split("\n- ").map((dice) => {
+		const match = dice.match(/^([^:]+):(.*)$/s);
+		if (match) {
+			return {
+				name: match[1].trim().replace(/^- /, "").toLowerCase(),
+				value: match[2].trim(),
+			};
+		}
+		const [name, value] = dice.split(/ ?: ?/);
+		return { name: name.replace(/^- /, "").trim().toLowerCase(), value };
+	});
+
+	const dices = valuesAsDice.reduce(
+		(acc, { name, value }) => {
+			acc[name] = value;
+			return acc;
+		},
+		{} as Record<string, string>
+	);
+
+	const newEmbedDice: Djs.APIEmbedField[] = [];
+	for (const [skill, dice] of Object.entries(dices)) {
+		if (newEmbedDice.find((field) => compareUnidecode(field.name, skill))) continue;
+		if (dice.toLowerCase() === "x" || dice.trim().length === 0 || dice === "0") {
+			newEmbedDice.push({ name: skill.capitalize(), value: "X", inline: true });
+			continue;
+		}
+		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
+		if (!statsEmbeds) {
+			if (!roll(dice)) {
+				throw new Error(ul("error.invalidDice.withDice", { dice }));
+			}
+			continue;
+		}
+		const statsValues = parseStatsString(statsEmbeds);
+		try {
+			evalStatsDice(dice, statsValues);
+		} catch (error) {
+			logger.warn(error);
+			throw new Error(ul("error.invalidDice.eval", { dice }));
+		}
+		newEmbedDice.push({ name: skill.capitalize(), value: `\`${dice}\``, inline: true });
+	}
+
+	const oldDice = diceEmbeds.toJSON().fields;
+	if (oldDice) {
+		for (const field of oldDice) {
+			const name = field.name.toLowerCase();
+			const newValue = newEmbedDice.find((f) => compareUnidecode(f.name, name));
+			if (!newValue) {
+				newEmbedDice.push({ name: name.capitalize(), value: field.value, inline: true });
+			}
+		}
+	}
+
+	const fieldsToAppend: Djs.APIEmbedField[] = [];
+	for (const field of newEmbedDice) {
+		const name = field.name.toLowerCase();
+		const dice = field.value;
+		if (
+			fieldsToAppend.find((f) => compareUnidecode(f.name, name)) ||
+			dice.toLowerCase() === "x" ||
+			dice.trim().length === 0 ||
+			dice === "0"
+		)
+			continue;
+		fieldsToAppend.push({
+			name: capitalizeBetweenPunct(name.capitalize()),
+			value: dice,
+			inline: true,
+		});
+	}
+
+	const diceEmbed = createDiceEmbed(ul).addFields(fieldsToAppend);
+	const removed = !fieldsToAppend || fieldsToAppend.length === 0;
+	return { fieldsToAppend, diceEmbed, oldFields: oldDice ?? [], removed };
+}
+
+/**
+ * 2) Édite le message avec les bons embeds (et composants si suppression).
+ */
+async function editMessageDiceEmbeds(
+	message: Djs.Message,
+	ul: Translation,
+	diceEmbed: Djs.EmbedBuilder,
+	removed: boolean
+): Promise<{ embeds: Djs.EmbedBuilder[] }> {
+	const embedsList = getEmbedsList({ which: "damage", embed: diceEmbed }, message);
+	if (removed) {
+		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
+		const components = editUserButtons(ul, embedsList.exists.stats, false);
+		await message.edit({ embeds: toAdd, components: [components, selectEditMenu(ul)] });
+		return { embeds: toAdd };
+	}
+	await message.edit({ embeds: embedsList.list });
+	return { embeds: embedsList.list };
+}
+
+/**
+ * 3) Persistance de la mémoire et sauvegarde de l'utilisateur.
+ */
+async function persistUserAndMemory(
+	client: EClient,
+	interaction: Djs.BaseInteraction,
+	userID: string,
+	userName: string | undefined,
+	messageID: UserMessageId,
+	ul: Translation,
+	embeds: Djs.EmbedBuilder[],
+	damage: string[] | undefined
+) {
+	await updateMemory(client.characters, interaction.guild!.id, userID, ul, { embeds });
+	const userRegister: UserRegistration = {
+		userID,
+		charName: userName,
+		damage,
+		msgId: messageID,
+	};
+	await registerUser(userRegister, interaction, client.settings, false);
+}
+
+/**
+ * 4) Envoi des messages de validation (réponse éphémère + logs).
+ */
+async function sendValidationResponses(args: {
+	interaction: Djs.ModalSubmitInteraction | Djs.ButtonInteraction;
+	ul: Translation;
+	removed: boolean;
+	oldFields: Djs.APIEmbedField[] | undefined;
+	newFields: Djs.APIEmbedField[];
+	userID: string;
+	userName?: string;
+	message: Djs.Message;
+	db: EClient["settings"];
+}) {
+	const {
+		interaction,
+		ul,
+		removed,
+		oldFields,
+		newFields,
+		userID,
+		userName,
+		message,
+		db,
+	} = args;
+	if (removed) {
+		await reply(interaction, {
+			content: ul("modals.removed.dice"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		await sendLogs(
+			ul("logs.dice.remove", {
+				user: Djs.userMention(interaction.user.id),
+				fiche: message.url,
+				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+			}),
+			interaction.guild as Djs.Guild,
+			db
+		);
+		return;
+	}
+
+	await reply(interaction, {
+		content: ul("embed.edit.dice"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
+	const logMessage = ul("logs.dice.edit", {
+		user: Djs.userMention(interaction.user.id),
+		fiche: message.url,
+		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+	});
+	await sendLogs(`${logMessage}\n${compare}`.trim(), interaction.guild as Djs.Guild, db);
+}
+
+/**
+ * Validation par un modérateur pour les dés (via bouton).
+ */
+export async function couldBeValidatedDice(
+	interaction: Djs.ButtonInteraction,
+	ul: Translation,
+	client: EClient
+) {
+	// Vérifier droits modération
+	const moderator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	if (!moderator) {
+		await reply(interaction, {
+			content: ul("modals.onlyModerator"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.validate, customId);
+	if (!embedKey) throw new Error(ul("error.embed.notFound"));
+
+	// Tenter le cache (chemin nominal)
+	const cached = getModerationCache(embedKey);
+	let workingEmbed: Djs.EmbedBuilder | undefined =
+		cached && cached.kind === "dice-edit" ? cached.embed : undefined;
+
+	// Fallback si le bot a redémarré et que le cache est vide: utiliser l'embed du message de modération
+	if (!workingEmbed) {
+		const apiEmbed = interaction.message.embeds[0];
+		// Si le message de modération n'a pas d'embed (cas suppression), simuler un embed de dés vide
+		if (!apiEmbed) {
+			workingEmbed = createDiceEmbed(ul);
+		} else {
+			// Convertit l'embed du message en EmbedBuilder compatible
+			workingEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
+		}
+	}
+	if (!workingEmbed) throw new Error(ul("error.embed.notFound"));
+
+	// Récupération du message original via la clé (pas de footer nécessaire)
+	const keyParts = parseEmbedKey(embedKey);
+	if (!keyParts) throw new Error(ul("error.embed.notFound"));
+	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
+	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+	const message = await channel.messages.fetch(keyParts.messageId);
+
+	// Préparation des champs/flags
+	const newFields = workingEmbed.toJSON().fields ?? [];
+	const removed = newFields.length === 0;
+
+	// 1) Sauvegarder l'état précédent puis éditer le message
+	const oldDamage = getEmbeds(message ?? undefined, "damage");
+	const oldFields = oldDamage?.toJSON().fields ?? [];
+	workingEmbed = workingEmbed.setFooter(null);
+	const edited = await editMessageDiceEmbeds(
+		message,
+		ul,
+		stripFooter(workingEmbed),
+		removed
+	);
+
+	// 2) Persistance mémoire + user (damageNames à partir des champs du nouvel embed)
+	const damageNames = removed
+		? undefined
+		: Object.keys(
+				(newFields as Djs.APIEmbedField[]).reduce(
+					(acc, field) => {
+						acc[field.name] = field.value;
+						return acc;
+					},
+					{} as Record<string, string>
+				)
+			);
+	// Récupération de l'utilisateur cible depuis l'embed "user"
+	const userEmbed = getEmbeds(message ?? undefined, "user");
+	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
+	const parsedUser = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
+	const mention = parsedUser["common.user"]; // e.g., <@123>
+	const idMatch = mention?.match(/<@(?<id>\d+)>/);
+	const ownerId = idMatch?.groups?.id ?? mention?.replace(/<@|>/g, "");
+	const charNameRaw = parsedUser["common.character"];
+	const ownerName =
+		charNameRaw && charNameRaw.toLowerCase() !== ul("common.noSet").toLowerCase()
+			? charNameRaw
+			: undefined;
+
+	await persistUserAndMemory(
+		client,
+		interaction,
+		ownerId!,
+		ownerName,
+		[message.id, message.channelId],
+		ul,
+		edited.embeds,
+		damageNames
+	);
+
+	// 3) Réponses/logs
+	await sendValidationResponses({
+		interaction,
+		ul,
+		removed,
+		oldFields,
+		newFields: newFields as Djs.APIEmbedField[],
+		userID: ownerId!,
+		userName: ownerName,
+		message,
+		db: client.settings,
+	});
+
+	// 4) Nettoyage: supprimer message de demande et cache (si présent)
+	deleteModerationCache(embedKey);
+	await interaction.message.delete();
+}
+
+/** Annulation d'une demande de validation par modération (bouton). */
+export async function cancelDiceModeration(
+	interaction: Djs.ButtonInteraction,
+	ul: Translation
+) {
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
+	if (embedKey) deleteModerationCache(embedKey);
+	await interaction.message.delete();
+	await reply(interaction, {
+		content: ul("common.cancel"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+}
+
+/**
+ * Validation par un modérateur pour un ajout de dés (via bouton).
+ */
+export async function couldBeValidatedDiceAdd(
+	interaction: Djs.ButtonInteraction,
+	ul: Translation,
+	client: EClient
+) {
+	const moderator = interaction.guild?.members.cache
+		.get(interaction.user.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+	if (!moderator) {
+		await reply(interaction, {
+			content: ul("modals.onlyModerator"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.validate, customId);
+	if (!embedKey) throw new Error(ul("error.embed.notFound"));
+	const cachedRaw = getModerationCache(embedKey);
+	const cached = cachedRaw && cachedRaw.kind === "dice-add" ? cachedRaw : undefined;
+
+	let targetChannelId: string | undefined;
+	let targetMessageId: string | undefined;
+	let userID: string | undefined;
+	let userName: string | undefined;
+	let moderationDiceEmbed: Djs.EmbedBuilder | undefined;
+
+	if (cached) {
+		targetChannelId = cached.meta.channelId;
+		targetMessageId = cached.meta.messageId;
+		userID = cached.meta.userID;
+		userName = cached.meta.userName;
+	} else {
+		// Fallback: utiliser la clé encodée dans le customId pour retrouver le message d'origine
+		const apiEmbed = interaction.message.embeds[0];
+		if (!apiEmbed) throw new Error(ul("error.embed.notFound"));
+		moderationDiceEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
+		const keyParts = parseEmbedKey(embedKey);
+		if (!keyParts) throw new Error(ul("error.embed.notFound"));
+		targetChannelId = keyParts.channelId;
+		targetMessageId = keyParts.messageId;
+	}
+
+	const channel = await fetchChannel(interaction.guild!, targetChannelId!);
+	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+	const message = await channel.messages.fetch(targetMessageId!);
+
+	// Garder les anciens champs pour logs
+	const oldDamage = getEmbeds(message ?? undefined, "damage");
+	const oldFields = oldDamage?.toJSON().fields ?? [];
+
+	// Préparer la nouvelle liste d'embeds et les composants attendus (boutons d'édition)
+	let embedsApplied: Djs.EmbedBuilder[];
+	let hasStats = false;
+	if (cached) {
+		embedsApplied = cached.embeds;
+		hasStats = !!getEmbeds(undefined, "stats", cached.embeds);
+		// Assainir le footer de l'embed des macros si présent
+		const damage = getEmbeds(undefined, "damage", embedsApplied);
+		if (damage?.toJSON().footer) {
+			const damageTitle = damage.toJSON().title ?? "";
+			const sanitized = stripFooter(damage);
+			embedsApplied = embedsApplied.map((e) =>
+				(e.toJSON().title ?? "") === damageTitle ? sanitized : e
+			);
+		}
+	} else {
+		// Fallback: fusionner l'embed de dés avec les embeds existants
+		const diceEmbedToApply = stripFooter(moderationDiceEmbed!);
+		const edited = getEmbedsList({ which: "damage", embed: diceEmbedToApply }, message);
+		embedsApplied = edited.list;
+		hasStats = edited.exists.stats;
+	}
+	const components = [editUserButtons(ul, hasStats, true), selectEditMenu(ul)];
+	await message.edit({ embeds: embedsApplied, components });
+
+	// Persistance mémoire + user
+	const newDamage = getEmbeds(message ?? undefined, "damage");
+	const newFields = newDamage?.toJSON().fields ?? [];
+	const damageNames = newFields.length
+		? Object.keys(
+				(newFields as Djs.APIEmbedField[]).reduce(
+					(acc, f) => {
+						acc[f.name] = f.value;
+						return acc;
+					},
+					{} as Record<string, string>
+				)
+			)
+		: undefined;
+
+	// Déterminer l'utilisateur cible (depuis cache, sinon depuis l'embed user du message)
+	if (!userID) {
+		const userEmbed2 = getEmbeds(message ?? undefined, "user");
+		if (!userEmbed2) throw new Error(ul("error.embed.notFound"));
+		const parsedUser2 = parseEmbedFields(userEmbed2.toJSON() as Djs.Embed);
+		const mention2 = parsedUser2["common.user"]; // <@id>
+		const idMatch2 = mention2?.match(/<@(?<id>\d+)>/);
+		userID = idMatch2?.groups?.id ?? mention2?.replace(/<@|>/g, "");
+		const charNameRaw2 = parsedUser2["common.character"];
+		userName =
+			charNameRaw2 && charNameRaw2.toLowerCase() !== ul("common.noSet").toLowerCase()
+				? charNameRaw2
+				: undefined;
+	}
+
+	await persistUserAndMemory(
+		client,
+		interaction,
+		userID!,
+		userName,
+		[message.id, message.channelId],
+		ul,
+		embedsApplied,
+		damageNames
+	);
+
+	// Réponses/logs
+	await sendValidationResponses({
+		interaction,
+		ul,
+		removed: !(newFields.length > 0),
+		oldFields,
+		newFields: newFields as Djs.APIEmbedField[],
+		userID: userID!,
+		userName,
+		message,
+		db: client.settings,
+	});
+
+	deleteModerationCache(embedKey);
+	await interaction.message.delete();
+}
+
+export async function cancelDiceAddModeration(
+	interaction: Djs.ButtonInteraction,
+	ul: Translation
+) {
+	const customId = interaction.customId;
+	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.cancel, customId);
+	if (embedKey) deleteModerationCache(embedKey);
+	await interaction.message.delete();
+	await reply(interaction, {
+		content: ul("common.cancel"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 }

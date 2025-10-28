@@ -24,10 +24,14 @@ import {
 } from "messages";
 import {
 	addAutoRole,
+	buildModerationButtons,
 	editUserButtons,
 	getLangAndConfig,
+	makeEmbedKey,
+	putModerationCache,
 	selectEditMenu,
 	selfRegisterAllowance,
+	setModerationFooter,
 } from "utils";
 
 /**
@@ -211,6 +215,41 @@ async function registerDamageDice(
 		const templateEmbed = getEmbeds(interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);
 		components = [editUserButtons(ul, !!statsEmbed, true), selectEditMenu(ul)];
+		// Branche modération pour ajout de dés
+		const isModerator = interaction.guild?.members.cache
+			.get(interaction.user.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+		const allowance = selfRegisterAllowance(
+			db.get(interaction.guild!.id, "allowSelfRegister")
+		);
+		if (allowance.moderation && allowance.allowSelfRegister && !isModerator) {
+			const embedKey = makeEmbedKey(
+				interaction.guild!.id,
+				interaction.message.channelId,
+				interaction.message.id
+			);
+			// Footer de secours pour robustesse post-redémarrage
+			setModerationFooter(diceEmbed, {
+				userID,
+				userName,
+				channelId: interaction.message.channelId,
+				messageId: interaction.message.id,
+			});
+			putModerationCache(embedKey, {
+				kind: "dice-add",
+				embeds: allEmbeds,
+				meta: {
+					userID,
+					userName,
+					channelId: interaction.message.channelId,
+					messageId: interaction.message.id,
+				},
+			});
+
+			const row = buildModerationButtons("dice-add", ul, embedKey);
+			await reply(interaction, { embeds: [diceEmbed], components: [row] });
+			return; // ne pas appliquer directement
+		}
 		const userRegister: {
 			userID: string;
 			charName: string | undefined;
