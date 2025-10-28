@@ -55,8 +55,7 @@ export async function fetchChannel(
 		// Fallback for threads or non-guild cached channels accessible via the global client cache
 		const any = await guild.client.channels.fetch(channelId);
 		// Only return if it's a guild-based channel (e.g., threads) to avoid DM channels
-		if (!any?.isDMBased()) 
-			return any as Djs.GuildBasedChannel;
+		if (!any?.isDMBased()) return any as Djs.GuildBasedChannel;
 		return null;
 	} catch (error) {
 		logger.warn(

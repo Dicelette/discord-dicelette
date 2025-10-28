@@ -11,10 +11,7 @@ export default (client: EClient): void => {
 			client.settings.set(guild.id, true, "disableThread");
 			client.criticalCount.set(guild.id, {});
 
-			const allCommands = [
-				...COMMANDS.map((command) => command.data),
-				...contextMenus,
-			];
+			const allCommands = [...COMMANDS.map((command) => command.data), ...contextMenus];
 
 			await guild.commands.set(allCommands);
 
