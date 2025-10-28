@@ -21,6 +21,7 @@ export class ResultAsText {
 	private readonly charName?: string;
 	private readonly infoRoll?: { name: string; standardized: string };
 	private readonly resultat?: Resultat;
+	private headerCompare?: ComparedValue;
 
 	constructor(
 		result: Resultat | undefined,
@@ -69,7 +70,13 @@ export class ResultAsText {
 		if (mention) user = mentionUser;
 		else if (this.charName) user = titleCharName;
 		if (time) user += `${timestamp(this.data?.config?.timestamp)}`;
-		if (user.trim().length > 0) user += `${this.ul("common.space")}:\n`;
+		// Afficher la comparaison principale à côté du pseudo: ("sign value")
+		let compareHint = "";
+		const header = this.headerCompare ?? this.resultat?.compare;
+		if (header) {
+			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
+		}
+		if (user.trim().length > 0) user += `${this.ul("common.space")}${compareHint}:\n`;
 		if (this.infoRoll) return `${user}[__${this.infoRoll.name.capitalize()}__] `;
 		return user;
 	}
@@ -107,6 +114,9 @@ export class ResultAsText {
 		opposition?: ComparedValue
 	) {
 		if (!this.resultat) return "";
+
+		// Reset hint comparison for header at the beginning of parsing
+		this.headerCompare = undefined;
 
 		const messageResult = this.resultat.result.split(";");
 		let msgSuccess: string;
@@ -280,8 +290,8 @@ export class ResultAsText {
 		successOrFailure?: string,
 		customCritical?: Record<string, CustomCritical>
 	): string {
-		let testValue = this.resultat!.compare;
-		let goodSign = this.goodCompareSign(testValue!, total);
+		const testValue = this.resultat!.compare;
+		const goodSign = this.goodCompareSign(testValue!, total);
 
 		if (isCritical === "custom" && customCritical) {
 			for (const [, custom] of Object.entries(customCritical)) {
@@ -292,8 +302,9 @@ export class ResultAsText {
 				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 
 				if (success) {
-					testValue = this.convertCustomCriticalToCompare(custom);
-					goodSign = this.goodCompareSign(testValue, total);
+					// Conserver la comparaison de CC pour l'afficher près du pseudo,
+					// mais garder l'affichage du message sur la stat (comparaison de base)
+					this.headerCompare = this.convertCustomCriticalToCompare(custom);
 					break;
 				}
 			}
