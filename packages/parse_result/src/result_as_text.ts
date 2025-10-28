@@ -1,10 +1,4 @@
-import {
-	COMMENT_REGEX,
-	type Compare,
-	type ComparedValue,
-	type CustomCritical,
-	type Resultat,
-} from "@dicelette/core";
+import type { Compare, ComparedValue, CustomCritical, Resultat } from "@dicelette/core";
 import { AND, type CustomCriticalRoll, type Translation } from "@dicelette/types";
 import { evaluate } from "mathjs";
 import type { Server } from "./interfaces";
@@ -482,14 +476,21 @@ export class ResultAsText {
 		} else if (context) {
 			linkToOriginal = this.createUrl(undefined, context);
 		}
-		const signMessage = this.resultat?.compare
-			? `${this.resultat.compare.sign} ${this.formatCompare()}`
-			: "";
-		let mention = authorId ? `*<@${authorId}>* ` : "";
+
+		// Construire la mention (personnage > auteur si disponible)
+		let mention = authorId ? `*<@${authorId}>*` : "";
 		if (this.charName)
-			mention = `**__${this.charName.capitalize()}__** ${mention.length > 0 ? `(${mention})` : ""}`;
-		const authorMention = `${mention}(🎲 \`${this.resultat?.dice.replace(COMMENT_REGEX, "").trim()}${signMessage ? ` ${signMessage}` : ""}\`)`;
-		return `${authorMention}${timestamp(this.data.config?.timestamp)}\n${this.parser}${linkToOriginal}`;
+			mention = `**__${this.charName.capitalize()}__**${mention.length > 0 ? ` (${mention})` : ""}`;
+
+		// Afficher uniquement la comparaison à côté du pseudo
+		let compareHint = "";
+		const header = this.headerCompare ?? this.resultat?.compare;
+		if (header) {
+			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
+		}
+
+		const headerLine = `${mention}${compareHint}${timestamp(this.data.config?.timestamp)}`;
+		return `${headerLine}\n${this.parser}${linkToOriginal}`;
 	}
 
 	private convertCustomCriticalToCompare(custom: CustomCriticalRoll): ComparedValue {
