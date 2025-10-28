@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.8.0](https://github.com/Dicelette/discord-dicelette/compare/2.7.0...2.8.0) (2025-10-28)
+
+
+### Features
+
+* adjust the display of "simple send dice" ([b5ef01a](https://github.com/Dicelette/discord-dicelette/commit/b5ef01a5d93d8691c7ef0064baedb7d9f6146305))
+* better processing of custom critical and display value ([0aab83b](https://github.com/Dicelette/discord-dicelette/commit/0aab83b94fdd41ad35661184d9b3a8cdf596418b))
+* implement moderation for dice edits and validations ([feb56fb](https://github.com/Dicelette/discord-dicelette/commit/feb56fb885a2cc101277bfd501e0d3ddc33ebefb))
+
+
+### Bug Fixes
+
+* enhance timer descriptions and error handling in translations ([0b4950d](https://github.com/Dicelette/discord-dicelette/commit/0b4950d788e471a6a3bc6d146347446e6c41d074))
+* should not keep the CC that continue to contains `$` ([48fed51](https://github.com/Dicelette/discord-dicelette/commit/48fed51ff7ad379893d73e5e683418c43acf3fae))
+
 ## [2.7.0](https://github.com/Dicelette/discord-dicelette/compare/2.6.3...2.7.0) (2025-10-20)
 
 
