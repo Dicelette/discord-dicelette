@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.8.1](https://github.com/Dicelette/discord-dicelette/compare/2.8.0...2.8.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* enhance moderation cancellation with user notification and utility functions ([f3c0ef8](https://github.com/Dicelette/discord-dicelette/commit/f3c0ef89c75a820233e0fbef2331519632964e6a))
+
 ## [2.8.0](https://github.com/Dicelette/discord-dicelette/compare/2.7.0...2.8.0) (2025-10-28)
 
 
