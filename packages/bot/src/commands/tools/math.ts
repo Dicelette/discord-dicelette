@@ -6,7 +6,7 @@ import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
-import { autoCompleteCharacters, calcOptions, getLangFromInteraction } from "utils";
+import { autoCompleteCharacters, calcOptions } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
 import "discord_ext";
 

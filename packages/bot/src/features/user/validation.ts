@@ -2,7 +2,6 @@ import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
 import {
-	allValuesUndefined,
 	allValueUndefOrEmptyString,
 	cleanAvatarUrl,
 	logger,

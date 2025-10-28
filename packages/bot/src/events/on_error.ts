@@ -2,7 +2,6 @@ import process from "node:process";
 
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import { DiscordAPIError } from "@discordjs/rest";
 import type { EClient } from "client";
 import dedent from "dedent";

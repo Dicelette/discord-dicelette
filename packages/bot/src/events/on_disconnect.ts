@@ -1,7 +1,6 @@
-import { important } from "@dicelette/utils";
+import { MATCH_API_ERROR } from "@dicelette/types";
 import * as Djs from "discord.js";
 import type { EClient } from "../client";
-import { MATCH_API_ERROR } from "@dicelette/types";
 
 export default (client: EClient): void => {
 	client.on("shardDisconnect", async (event, shardId) => {

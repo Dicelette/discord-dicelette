@@ -12,7 +12,6 @@ import {
 	fetchAvatarUrl,
 	fetchChannel,
 	getLangAndConfig,
-	isUserNameOrId,
 	selfRegisterAllowance,
 } from "utils";
 

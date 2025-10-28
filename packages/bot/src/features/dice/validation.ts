@@ -553,7 +553,7 @@ export async function couldBeValidatedDiceAdd(
 
 	// Préparer la nouvelle liste d'embeds et les composants attendus (boutons d'édition)
 	let embedsApplied: Djs.EmbedBuilder[];
-	let hasStats = false;
+	let hasStats: boolean;
 	if (cached) {
 		embedsApplied = cached.embeds;
 		hasStats = !!getEmbeds(undefined, "stats", cached.embeds);
