@@ -40,22 +40,28 @@ async function chart(
 		finalMax = finalMax - autoMin;
 	}
 	const data = {
-		labels: labels.map((key) => key.capitalize()),
 		datasets: [
 			{
-				data: statsValues,
-				fill: true,
 				backgroundColor: fillColor,
 				borderColor: lineColor,
+				data: statsValues,
+				fill: true,
 				pointStyle: "cross",
 			},
 		],
+		labels: labels.map((key) => key.capitalize()),
 	};
 	const steps = 4;
 	const options = {
+		aspectRatio: 1,
 		elements: {
 			line: {
 				borderWidth: 1,
+			},
+		},
+		plugins: {
+			legend: {
+				display: false,
 			},
 		},
 		scales: {
@@ -66,54 +72,48 @@ async function chart(
 					lineWidth: 2,
 				},
 				grid: {
-					color: "darkgrey",
-					circular: true,
-					lineWidth: 1,
 					borderDash: [10, 10],
-				},
-				ticks: {
-					stepSize: steps,
-					display: false,
+					circular: true,
 					color: "darkgrey",
-					showLabelBackdrop: false,
+					lineWidth: 1,
+				},
+				pointLabels: {
+					centerPointLabels: false,
+					color: "darkgrey",
+					display: true,
+					font: {
+						family: "Jost",
+						size: 30,
+						weight: "700",
+					},
+				},
+				suggestedMax: finalMax,
+				suggestedMin: finalMin,
+				ticks: {
 					centerPointLabels: true,
+					color: "darkgrey",
+					display: false,
 					font: {
 						family: "Ubuntu",
 						size: 30,
 					},
+					showLabelBackdrop: false,
+					stepSize: steps,
 					z: 100,
 				},
-				pointLabels: {
-					color: "darkgrey",
-					font: {
-						size: 30,
-						family: "Jost",
-						weight: "700",
-					},
-					display: true,
-					centerPointLabels: false,
-				},
-				suggestedMin: finalMin,
-				suggestedMax: finalMax,
 			},
 		},
-		plugins: {
-			legend: {
-				display: false,
-			},
-		},
-		aspectRatio: 1,
 	};
-	const renderer = new ChartJSNodeCanvas({ width: 800, height: 800 });
+	const renderer = new ChartJSNodeCanvas({ height: 800, width: 800 });
 	renderer.registerFont(fontPath("Jost-Regular"), {
 		family: "Jost",
 		weight: "700",
 	});
 	renderer.registerFont(fontPath("Ubuntu-Regular"), { family: "Ubuntu" });
 	return await renderer.renderToBuffer({
-		type: "radar",
 		data,
 		options,
+		type: "radar",
 	});
 }
 
@@ -122,6 +122,36 @@ function fontPath(fontName: string) {
 }
 
 export const graph = {
+	async autocomplete(
+		interaction: Djs.AutocompleteInteraction,
+		client: EClient
+	): Promise<void> {
+		const options = interaction.options as Djs.CommandInteractionOptionResolver;
+		const fixed = options.getFocused(true);
+		const guildData = client.settings.get(interaction.guild!.id);
+		const { ul } = getLangAndConfig(client, interaction);
+		if (!guildData) return;
+		const choices: string[] = [];
+		let user = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
+		if (typeof user !== "string") {
+			user = interaction.user.id;
+		}
+		if (fixed.name === t("common.character")) {
+			const guildChars = guildData.user[user as string];
+			if (!guildChars) return;
+			for (const data of guildChars) {
+				const allowed = await haveAccess(interaction, data.messageId[1], user);
+				const toPush = data.charName ? data.charName : ul("common.default");
+				if (!data.isPrivate) choices.push(toPush);
+				else if (allowed) choices.push(toPush);
+			}
+		}
+		if (choices.length === 0) return;
+		const filter = filterChoices(choices, interaction.options.getFocused());
+		await interaction.respond(
+			filter.map((result) => ({ name: result.capitalize(), value: result }))
+		);
+	},
 	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("graph.name")
 		.setDefaultMemberPermissions(0)
@@ -156,36 +186,6 @@ export const graph = {
 				.setDescriptions("graph.bg.description")
 				.setRequired(false)
 		),
-	async autocomplete(
-		interaction: Djs.AutocompleteInteraction,
-		client: EClient
-	): Promise<void> {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const fixed = options.getFocused(true);
-		const guildData = client.settings.get(interaction.guild!.id);
-		const { ul } = getLangAndConfig(client, interaction);
-		if (!guildData) return;
-		const choices: string[] = [];
-		let user = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
-		if (typeof user !== "string") {
-			user = interaction.user.id;
-		}
-		if (fixed.name === t("common.character")) {
-			const guildChars = guildData.user[user as string];
-			if (!guildChars) return;
-			for (const data of guildChars) {
-				const allowed = await haveAccess(interaction, data.messageId[1], user);
-				const toPush = data.charName ? data.charName : ul("common.default");
-				if (!data.isPrivate) choices.push(toPush);
-				else if (allowed) choices.push(toPush);
-			}
-		}
-		if (choices.length === 0) return;
-		const filter = filterChoices(choices, interaction.options.getFocused());
-		await interaction.respond(
-			filter.map((result) => ({ name: result.capitalize(), value: result }))
-		);
-	},
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		if (!interaction.guild) return;
@@ -258,7 +258,7 @@ export const graph = {
 			}
 
 			const message = await thread.messages.fetch(sheetLocation.messageId);
-			const userStatistique = getUserByEmbed({ message }, ul, undefined, false);
+			const userStatistique = getUserByEmbed({ message }, undefined, false);
 			if (!userStatistique) {
 				await reply(interaction, {
 					embeds: [embedError(ul("error.user.notFound"), ul)],
@@ -312,9 +312,9 @@ export const graph = {
 				return;
 			}
 			await reply(interaction, {
+				allowedMentions: { repliedUser: true, users: [] },
 				content: titleUser(),
 				files: [image],
-				allowedMentions: { repliedUser: true, users: [] },
 			});
 		} catch (error) {
 			await reply(interaction, {
@@ -341,7 +341,7 @@ function generateColor(line: string | null, background: string | null) {
 	}
 	line = convertHexToRGBA(line as string, 1);
 	background = convertHexToRGBA(background as string, 0.5);
-	return { line, background };
+	return { background, line };
 }
 
 function convertHexToRGBA(color: string, alpha?: number) {

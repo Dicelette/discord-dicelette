@@ -94,7 +94,7 @@ export const deleteChar = {
 				});
 			} else if (allCharacters.length > 1) {
 				const allChars = allCharacters.join("\n- ");
-				msg = ul("deleteChar.allMany", { user: mention, chara: allChars });
+				msg = ul("deleteChar.allMany", { chara: allChars, user: mention });
 			}
 			const rep = await confirmToDelete(interaction, ul, user ?? interaction.user, msg);
 
@@ -109,23 +109,23 @@ export const deleteChar = {
 					await deleteAllUserData(allDataUser, client, interaction, user, ul);
 					await confirm.update({
 						content: ul("deleteChar.allSuccess", {
-							user: mention,
 							components: [],
 							embeds: [],
+							user: mention,
 						}),
 					});
 				} else {
 					await confirm.update({
-						content: ul("common.cancelled"),
 						components: [],
+						content: ul("common.cancelled"),
 						embeds: [],
 					});
 				}
 			} catch (e) {
 				logger.warn(e, "Timeout");
 				await interaction.editReply({
-					content: ul("common.cancelled"),
 					components: [],
+					content: ul("common.cancelled"),
 					embeds: [],
 				});
 			}
@@ -180,22 +180,22 @@ export const deleteChar = {
 					msg
 				);
 				await confirm.update({
-					content: ul("deleteChar.success", { user: msg }),
 					components: [],
+					content: ul("deleteChar.success", { user: msg }),
 					embeds: [],
 				});
 			} else {
 				await confirm.update({
-					content: ul("common.cancelled"),
 					components: [],
+					content: ul("common.cancelled"),
 					embeds: [],
 				});
 			}
 		} catch (e) {
 			logger.warn(e, "Timeout");
 			await interaction.editReply({
-				content: ul("common.cancelled"),
 				components: [],
+				content: ul("common.cancelled"),
 				embeds: [],
 			});
 		}
@@ -324,7 +324,7 @@ async function confirmToDelete(
 		confirm,
 		cancel
 	);
-	return await reply(interaction, { embeds: [embed], components: [row] });
+	return await reply(interaction, { components: [row], embeds: [embed] });
 }
 
 async function deleteUserByLocation(

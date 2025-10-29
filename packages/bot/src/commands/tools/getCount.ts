@@ -33,10 +33,10 @@ const ALL_OPTIONS: Options[] = [
  */
 function getTitle(option: Options, ul: Translation) {
 	const titles: Record<Options, string> = {
-		criticalSuccess: ul("roll.critical.success"),
 		criticalFailure: ul("roll.critical.failure"),
-		success: ul("roll.success"),
+		criticalSuccess: ul("roll.critical.success"),
 		failure: ul("roll.failure"),
+		success: ul("roll.success"),
 		total: ul("common.total"),
 	};
 	return titles[option];
@@ -46,29 +46,29 @@ function generateFieldsForBilan(count: Count, ul: Translation) {
 	const totalRoll = count.success + count.failure;
 	const fields: Djs.EmbedField[] = [
 		{
+			inline: true,
 			name: ul("roll.success"),
 			value: `${count.success} (${percentage(count.success, totalRoll)}%)`,
-			inline: true,
 		},
 	];
 	if (count.criticalSuccess > 0) {
 		fields.push({
+			inline: true,
 			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
 			value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
-			inline: true,
 		});
 	}
-	fields.push({ name: "\u200B", value: "\u200B", inline: false });
+	fields.push({ inline: false, name: "\u200B", value: "\u200B" });
 	fields.push({
+		inline: true,
 		name: ul("roll.failure"),
 		value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
-		inline: true,
 	});
 	if (count.criticalFailure > 0) {
 		fields.push({
+			inline: true,
 			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
 			value: `${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`,
-			inline: true,
 		});
 	}
 	return fields;
@@ -221,10 +221,10 @@ async function leaderboard(
 		components.unshift(serverComponents);
 
 		await interaction.editReply({
-			withComponents: true,
+			allowedMentions: { parse: [], repliedUser: false, roles: [], users: [] },
 			components,
 			flags: Djs.MessageFlags.IsComponentsV2,
-			allowedMentions: { users: [], repliedUser: false, parse: [], roles: [] },
+			withComponents: true,
 		});
 		return;
 	}
@@ -246,10 +246,10 @@ async function leaderboard(
  */
 function calculateServerStats(guildCount: Record<string, Count>) {
 	const totalCount: Count = {
-		success: 0,
-		failure: 0,
 		criticalFailure: 0,
 		criticalSuccess: 0,
+		failure: 0,
+		success: 0,
 	};
 
 	let usersWithCounts = 0;
@@ -269,7 +269,7 @@ function calculateServerStats(guildCount: Record<string, Count>) {
 		}
 	}
 
-	return { totalCount, usersWithCounts, rollTotal };
+	return { rollTotal, totalCount, usersWithCounts };
 }
 
 function generateServerFields(
@@ -280,29 +280,29 @@ function generateServerFields(
 ) {
 	const fields: Djs.EmbedField[] = [
 		{
+			inline: true,
 			name: ul("roll.success"),
 			value: `[${totalCount.success}] ${avg.success} (${percent.success}%)`,
-			inline: true,
 		},
 	];
 	if (totalCount.criticalSuccess > 0) {
 		fields.push({
+			inline: true,
 			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
 			value: `[${totalCount.criticalSuccess}] ${avg.criticalSuccess} (${percent.criticalSuccess}%)`,
-			inline: true,
 		});
 	}
-	fields.push({ name: "\u200B", value: "\u200B", inline: false });
+	fields.push({ inline: false, name: "\u200B", value: "\u200B" });
 	fields.push({
+		inline: true,
 		name: ul("roll.failure"),
 		value: `[${totalCount.failure}] ${avg.failure} (${percent.failure}%)`,
-		inline: true,
 	});
 	if (totalCount.criticalFailure > 0) {
 		fields.push({
+			inline: true,
 			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
 			value: `[${totalCount.criticalFailure}] ${avg.criticalFailure} (${percent.criticalFailure}%)`,
-			inline: true,
 		});
 	}
 	return fields;
@@ -310,19 +310,19 @@ function generateServerFields(
 
 function serverStats(totalCount: Count, rollTotal: number, usersWithCounts: number) {
 	const percent = {
-		success: percentage(totalCount.success, rollTotal),
-		failure: percentage(totalCount.failure, rollTotal),
-		criticalSuccess: percentage(totalCount.criticalSuccess, rollTotal),
 		criticalFailure: percentage(totalCount.criticalFailure, rollTotal),
+		criticalSuccess: percentage(totalCount.criticalSuccess, rollTotal),
+		failure: percentage(totalCount.failure, rollTotal),
+		success: percentage(totalCount.success, rollTotal),
 	};
 
 	const avg = {
-		success: averageValue(totalCount.success, usersWithCounts),
-		failure: averageValue(totalCount.failure, usersWithCounts),
-		criticalSuccess: averageValue(totalCount.criticalSuccess, usersWithCounts),
 		criticalFailure: averageValue(totalCount.criticalFailure, usersWithCounts),
+		criticalSuccess: averageValue(totalCount.criticalSuccess, usersWithCounts),
+		failure: averageValue(totalCount.failure, usersWithCounts),
+		success: averageValue(totalCount.success, usersWithCounts),
 	};
-	return { percent, avg };
+	return { avg, percent };
 }
 
 function serverStatsEmbed(
@@ -376,8 +376,8 @@ async function server(
 	);
 
 	await interaction.editReply({
+		allowedMentions: { parse: [], repliedUser: false, roles: [], users: [] },
 		embeds: [embedResult],
-		allowedMentions: { users: [], repliedUser: false, parse: [], roles: [] },
 	});
 }
 

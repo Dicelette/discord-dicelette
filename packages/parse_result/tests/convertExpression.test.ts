@@ -33,7 +33,7 @@ describe("convertExpression", () => {
 	});
 	it("should correctly be converted to a number", () => {
 		const result = convertExpression("2+5");
-		expect(Number.parseInt(result)).toBe(7);
+		expect(Number.parseInt(result, 10)).toBe(7);
 	});
 	it("Should return the default value with {exp||2}", () => {
 		const dice = "1d{exp||2}";

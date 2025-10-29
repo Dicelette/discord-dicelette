@@ -38,9 +38,9 @@ export async function sendErrorToWebhook(error: unknown) {
 				? `<@${ownerId}> : ${error.name}: ${error.message}\n\`\`\`\n${error.stack}\n\`\`\``
 				: `<@${ownerId}>\n\`\`\`json\n${JSON.stringify(error)}\n\`\`\``;
 	const params = {
-		username: "Dicelette - Uncaught Exception",
 		avatarURL:
 			"https://github.com/Dicelette/discord-dicelette/blob/main/assets/warning.png?raw=true",
+		username: "Dicelette - Uncaught Exception",
 	};
 	if (content.length > 2000) {
 		for (let i = 0; i < content.length; i += 2000) {

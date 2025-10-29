@@ -14,10 +14,6 @@ import { getLangAndConfig, isSerializedNameEquals, macroOptions, rollMacro } fro
 import "discord_ext";
 
 export default {
-	data: (macroOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setNames("common.macro")
-		.setDescriptions("rAtq.description")
-		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const focused = options.getFocused(true);
@@ -94,6 +90,10 @@ export default {
 			}))
 		);
 	},
+	data: (macroOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
+		.setNames("common.macro")
+		.setDescriptions("rAtq.description")
+		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const db = client.settings.get(interaction.guild!.id);
@@ -174,14 +174,14 @@ export default {
 
 				//create the userStatistique with the value got from the template & the commands
 				userStatistique = {
+					damage,
 					isFromTemplate: true,
-					userName: charName,
 					template: {
-						diceType: template.diceType,
 						critical: template.critical,
 						customCritical: template.customCritical,
+						diceType: template.diceType,
 					},
-					damage,
+					userName: charName,
 				};
 			}
 			return await rollMacro(

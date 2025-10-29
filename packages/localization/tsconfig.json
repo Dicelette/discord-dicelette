@@ -1,9 +1,9 @@
 {
-	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./"
 	},
-	"include": ["./src/**/*", "locales/**/*.json", "index.ts"],
-	"exclude": ["./dist"]
+	"exclude": ["./dist"],
+	"extends": "../../tsconfig.json",
+	"include": ["./src/**/*", "locales/**/*.json", "index.ts"]
 }

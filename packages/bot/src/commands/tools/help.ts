@@ -18,6 +18,20 @@ import { VERSION } from "../../../index";
 import "discord_ext";
 
 export const help = {
+	async autocomplete(interaction: Djs.AutocompleteInteraction): Promise<void> {
+		const options = interaction.options as Djs.CommandInteractionOptionResolver;
+		const subcommand = options.getSubcommand(true);
+		if (subcommand !== t("help.changelog.name")) return;
+		const focused = options.getFocused(true);
+		if (focused.name !== t("help.changelog.version.name")) return;
+		const versions = getOptionsVersion();
+		const filteredVersions = versions.filter((v) =>
+			v.name.toLowerCase().includes(focused.value.toLowerCase())
+		);
+		await interaction.respond(
+			filteredVersions.slice(0, 25).map((v) => ({ name: v.name, value: v.value }))
+		);
+	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("help.name")
 		.setDescriptions("help.description")
@@ -51,20 +65,6 @@ export const help = {
 						.setAutocomplete(true)
 				)
 		),
-	async autocomplete(interaction: Djs.AutocompleteInteraction): Promise<void> {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const subcommand = options.getSubcommand(true);
-		if (subcommand !== t("help.changelog.name")) return;
-		const focused = options.getFocused(true);
-		if (focused.name !== t("help.changelog.version.name")) return;
-		const versions = getOptionsVersion();
-		const filteredVersions = versions.filter((v) =>
-			v.name.toLowerCase().includes(focused.value.toLowerCase())
-		);
-		await interaction.respond(
-			filteredVersions.slice(0, 25).map((v) => ({ name: v.name, value: v.value }))
-		);
-	},
 
 	async execute(
 		interaction: Djs.ChatInputCommandInteraction,
@@ -88,9 +88,9 @@ export const help = {
 				const sceneID = commandsID.findKey((command) => command.name === "scene");
 				const mathId = commandsID.findKey((command) => command.name === "math");
 				const msg = ul("help.message", {
+					mathId,
 					rollId: rollID,
 					sceneId: sceneID,
-					mathId,
 					version: VERSION,
 				});
 				const dbCMD = createHelpMessageDB(
@@ -109,8 +109,8 @@ export const help = {
 				const end = dedent(ul("help.diceNotation"));
 
 				await interaction.reply({
-					flags: [Djs.MessageFlags.IsComponentsV2, Djs.MessageFlags.Ephemeral],
 					components: replySection,
+					flags: [Djs.MessageFlags.IsComponentsV2, Djs.MessageFlags.Ephemeral],
 				});
 				await interaction.followUp({
 					content: end,
@@ -136,11 +136,11 @@ export const help = {
 				await reply(interaction, {
 					content: dedent(
 						ul("help.register.message", {
-							macro: helpDBCmd?.[t("common.macro")],
-							dbroll: helpDBCmd?.[t("dbRoll.name")],
-							graph: helpDBCmd?.[t("graph.name")],
-							display: helpDBCmd?.[t("display.title")],
 							calc: helpDBCmd?.[t("calc.title")],
+							dbroll: helpDBCmd?.[t("dbRoll.name")],
+							display: helpDBCmd?.[t("display.title")],
+							graph: helpDBCmd?.[t("graph.name")],
+							macro: helpDBCmd?.[t("common.macro")],
 							register: helpDBCmd?.[t("register.name")],
 						})
 					),
@@ -156,14 +156,14 @@ export const help = {
 					new Djs.TextDisplayBuilder().setContent(
 						dedent(
 							ul("help.admin.messageNoDB", {
-								logs: idsAdmin?.[t("logs.name")],
-								disable: idsAdmin?.[t("disableThread.name")],
-								result: idsAdmin?.[t("changeThread.name")],
 								delete: idsAdmin?.[t("timer.name")],
+								disable: idsAdmin?.[t("disableThread.name")],
 								display: idsAdmin?.[t("display.title")],
-								timestamp: idsAdmin?.[t("timestamp.name")],
-								self_register: idsAdmin?.[t("config.selfRegister.name")],
 								language: idsAdmin?.[t("config.lang.options.name")],
+								logs: idsAdmin?.[t("logs.name")],
+								result: idsAdmin?.[t("changeThread.name")],
+								self_register: idsAdmin?.[t("config.selfRegister.name")],
+								timestamp: idsAdmin?.[t("timestamp.name")],
 							})
 						)
 					)
@@ -178,17 +178,17 @@ export const help = {
 					new Djs.TextDisplayBuilder().setContent(
 						dedent(
 							ul("help.admin.messageDB", {
+								calc: idsAdminDB?.[t("calc.title")],
+								dbroll: idsAdminDB?.[t("dbRoll.name")],
 								delete_char: idsAdminDB?.[t("deleteChar.name")],
-								stat: idsAdminDB?.["auto_role statistics"],
 								dice: idsAdminDB?.["auto_role dice"],
 								gm: {
-									macro: idsAdminDB?.["gm macro"],
-									dbRoll: idsAdminDB?.["gm dbroll"],
 									calc: idsAdminDB?.["gm calc"],
+									dbRoll: idsAdminDB?.["gm dbroll"],
+									macro: idsAdminDB?.["gm macro"],
 								},
-								dbroll: idsAdminDB?.[t("dbRoll.name")],
 								macro: idsAdminDB?.[t("common.macro")],
-								calc: idsAdminDB?.[t("calc.title")],
+								stat: idsAdminDB?.["auto_role statistics"],
 							})
 						)
 					)
@@ -225,8 +225,8 @@ export const help = {
 				}
 				//edit reply with the first part of the changelog
 				await interaction.editReply({
-					flags: Djs.MessageFlags.IsComponentsV2,
 					components: [firstMessage],
+					flags: Djs.MessageFlags.IsComponentsV2,
 				});
 				for (const split of splittedChangelog.slice(1)) {
 					const msg = new Djs.TextDisplayBuilder().setContent(
@@ -332,11 +332,11 @@ function createHelpMessageDB(
 	if (!db.has(guildID, "templateID") || !commandsID) return "";
 	const ids = getHelpDBCmd(commandsID);
 	return ul("help.messageDB", {
-		macro: ids?.[t("common.macro")],
-		dbroll: ids?.[t("dbRoll.name")],
-		graph: ids?.[t("graph.name")],
-		display: ids?.[t("display.title")],
 		calc: ids?.[t("calc.title")],
+		dbroll: ids?.[t("dbRoll.name")],
+		display: ids?.[t("display.title")],
+		graph: ids?.[t("graph.name")],
+		macro: ids?.[t("common.macro")],
 	});
 }
 
@@ -358,9 +358,9 @@ export async function helpAtInvit(guild: Djs.Guild): Promise<void> {
 
 	const ids = getConfigIds(cmdsId);
 	const commandId = {
+		delete: ids?.[t("timer.name")],
 		lang: ids?.[t("config.lang.name")],
 		result: ids?.[t("changeThread.name")],
-		delete: ids?.[t("timer.name")],
 	};
 	if (!ids) return;
 	const msg = dedent(`

@@ -16,8 +16,8 @@ export const embedError = (error: string, ul: Translation, cause?: string) => {
 		.setDescription(error)
 		.setColor("Red")
 		.setAuthor({
-			name: ul("common.error"),
 			iconURL: "https://i.imgur.com/2ulUJCc.png",
+			name: ul("common.error"),
 		})
 		.setTimestamp();
 	if (cause) embed.setFooter({ text: cause });
@@ -66,13 +66,13 @@ export function getEmbedsList(
 			? embedToReplace.embed
 			: getEmbeds(message, "template");
 	return {
-		list: createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed),
 		exists: {
-			user: !!userDataEmbed,
-			stats: !!statsEmbed,
 			damage: !!diceEmbed,
+			stats: !!statsEmbed,
 			template: !!templateEmbed,
+			user: !!userDataEmbed,
 		},
+		list: createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed),
 	};
 }
 
@@ -124,21 +124,21 @@ export function createUserEmbed(
 		.setColor("Random")
 		.setThumbnail(thumbnail ? cleanAvatarUrl(thumbnail) : null)
 		.addFields({
+			inline: true,
 			name: ul("common.user").capitalize(),
 			value: `<@${user}>`,
-			inline: true,
 		});
 	if (charName)
 		userEmbed.addFields({
+			inline: true,
 			name: ul("common.character").capitalize(),
 			value: charName.capitalize(),
-			inline: true,
 		});
 	else
 		userEmbed.addFields({
+			inline: true,
 			name: ul("common.character").capitalize(),
 			value: ul("common.noSet").capitalize(),
-			inline: true,
 		});
 	return userEmbed;
 }
@@ -203,15 +203,15 @@ export function getStatistiqueFields(
 		if (!statValue) continue;
 		const num = Number.parseInt(statValue, 10);
 		if (value.min && num < value.min)
-			throw new Error(ul("error.mustBeGreater", { value: name, min: value.min }));
+			throw new Error(ul("error.mustBeGreater", { min: value.min, value: name }));
 		if (value.max && num > value.max)
-			throw new Error(ul("error.mustBeLower", { value: name, max: value.max }));
+			throw new Error(ul("error.mustBeLower", { max: value.max, value: name }));
 		if (total) {
 			logger.trace("oldStatsTotal", oldStatsTotal, "total", total, "num", num);
 			total -= num;
 			if (total < 0) {
 				const exceeded = Math.abs(total);
-				const errorMessage = ul("error.totalExceededBy", { value: name, max: exceeded });
+				const errorMessage = ul("error.totalExceededBy", { max: exceeded, value: name });
 				throw new TotalExceededError(errorMessage, name, exceeded);
 			}
 			stats[key] = num;
@@ -256,9 +256,9 @@ export function createCustomCritical(
 		const tags = `${effectOnSkill}${onNaturalDice}`;
 		const nameCritical = `${tags}${name.capitalize()}`;
 		templateEmbed.addFields({
+			inline: true,
 			name: nameCritical,
 			value: `\`${value.sign} ${value.value}\``,
-			inline: true,
 		});
 	}
 	return templateEmbed;

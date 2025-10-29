@@ -184,7 +184,7 @@ export class ResultAsText {
 			total = 0;
 		}
 
-		return { msgSuccess, criticalState: { isCritical, successOrFailure } };
+		return { criticalState: { isCritical, successOrFailure }, msgSuccess };
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
@@ -220,7 +220,7 @@ export class ResultAsText {
 			}
 		}
 
-		return { total, successOrFailure, oldCompare };
+		return { oldCompare, successOrFailure, total };
 	}
 
 	private naturalDice(r: string, natural: number[]) {
@@ -241,14 +241,14 @@ export class ResultAsText {
 		if (critical) {
 			if (critical.failure && natural.includes(critical.failure)) {
 				return {
-					successOrFailure: `**${this.ul("roll.critical.failure")}**`,
 					isCritical: "failure",
+					successOrFailure: `**${this.ul("roll.critical.failure")}**`,
 				};
 			}
 			if (critical.success && natural.includes(critical.success)) {
 				return {
-					successOrFailure: `**${this.ul("roll.critical.success")}**`,
 					isCritical: "success",
+					successOrFailure: `**${this.ul("roll.critical.success")}**`,
 				};
 			}
 		}
@@ -265,8 +265,8 @@ export class ResultAsText {
 				}
 				if (success) {
 					return {
-						successOrFailure: `**${name}**`,
 						isCritical: "custom",
+						successOrFailure: `**${name}**`,
 					};
 				}
 			}
@@ -469,8 +469,8 @@ export class ResultAsText {
 		let linkToOriginal = "";
 		if (typeof context === "object") {
 			linkToOriginal = this.createUrl({
-				guildId: context.guildId,
 				channelId: context.channelId,
+				guildId: context.guildId,
 				messageId: context.messageId,
 			});
 		} else if (context) {

@@ -1,25 +1,49 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"files": {
-		"includes": ["**", "!**/node_modules", "!**/dist"]
-	},
 	"assist": {
 		"actions": {
 			"source": {
-				"organizeImports": "on"
+				"organizeImports": "on",
+				"useSortedKeys": "on"
 			}
 		}
 	},
+	"files": {
+		"includes": ["**", "!**/node_modules", "!**/dist"]
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": true,
+		"includes": ["**", "!**/node_modules/**"],
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+		"lineWidth": 90
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"semicolons": "always",
+			"trailingCommas": "es5"
+		}
+	},
+	"json": {
+		"formatter": {
+			"trailingCommas": "none"
+		}
+	},
 	"linter": {
+		"domains": {
+			"project": "recommended"
+		},
 		"rules": {
-			"recommended": true,
 			"complexity": {
-				"noExtraBooleanCast": "error",
 				"noAdjacentSpacesInRegex": "error",
-				"noUselessCatch": "error",
+				"noArguments": "error",
 				"noCommaOperator": "error",
-				"useNumericLiterals": "error",
-				"noArguments": "error"
+				"noExtraBooleanCast": "error",
+				"noUselessCatch": "error",
+				"useNumericLiterals": "error"
 			},
 			"correctness": {
 				"noConstAssign": "error",
@@ -28,10 +52,10 @@
 				"noEmptyPattern": "error",
 				"noGlobalObjectCalls": "error",
 				"noInnerDeclarations": "error",
-				"noInvalidConstructorSuper": "error",
 				"noInvalidBuiltinInstantiation": {
 					"level": "error"
 				},
+				"noInvalidConstructorSuper": "error",
 				"noNonoctalDecimalEscape": "error",
 				"noPrecisionLoss": "error",
 				"noSelfAssign": "error",
@@ -47,12 +71,52 @@
 				"noUnusedVariables": "off",
 				"useIsNan": "error",
 				"useValidForDirection": "error",
-				"useYield": "error",
-				"useValidTypeof": "error"
+				"useValidTypeof": "error",
+				"useYield": "error"
+			},
+			"recommended": true,
+			"style": {
+				"noInferrableTypes": "error",
+				"noNonNullAssertion": "off",
+				"noParameterAssign": "off",
+				"noUnusedTemplateLiteral": "error",
+				"noUselessElse": "error",
+				"useAsConstAssertion": "error",
+				"useConst": "error",
+				"useDefaultParameterLast": "error",
+
+				"useEnumInitializers": "error",
+				"useExponentiationOperator": "error",
+
+				"useExportType": "error",
+				"useFilenamingConvention": "error",
+				"useImportType": "error",
+				"useLiteralEnumMembers": "error",
+				"useNamingConvention": {
+					"level": "warn",
+					"options": {
+						"conventions": [
+							{
+								"formats": ["CONSTANT_CASE", "camelCase"],
+								"selector": {
+									"kind": "const",
+									"scope": "global"
+								}
+							}
+						],
+						"strictCase": false
+					}
+				},
+
+				"useNodejsImportProtocol": "error",
+				"useNumberNamespace": "error",
+				"useSelfClosingElements": "error",
+				"useShorthandFunctionType": "error",
+				"useSingleVarDeclarator": "error",
+				"useTemplate": "warn"
 			},
 			"suspicious": {
 				"noAssignInExpressions": "off",
-				"noWith": "error",
 				"noAsyncPromiseExecutor": "error",
 				"noCatchAssign": "error",
 				"noClassAssign": "error",
@@ -73,39 +137,9 @@
 				"noRedeclare": "error",
 				"noShadowRestrictedNames": "error",
 				"noUnsafeNegation": "error",
-				"useGetterReturn": "error",
-				"noVar": "error"
-			},
-			"style": {
-				"useFilenamingConvention": "error",
-				"useImportType": "error",
-				"noParameterAssign": "off",
-				"useNamingConvention": {
-					"level": "warn",
-					"options": {
-						"strictCase": false
-					}
-				},
-				"useTemplate": "warn",
-				"useConst": "error",
-				"noNonNullAssertion": "off",
-				"useLiteralEnumMembers": "error",
-
-				"useNodejsImportProtocol": "error",
-				"useAsConstAssertion": "error",
-
-				"useEnumInitializers": "error",
-				"useSelfClosingElements": "error",
-				"useSingleVarDeclarator": "error",
-				"noUnusedTemplateLiteral": "error",
-				"useNumberNamespace": "error",
-				"noInferrableTypes": "error",
-				"useExponentiationOperator": "error",
-				"useDefaultParameterLast": "error",
-
-				"useExportType": "error",
-				"noUselessElse": "error",
-				"useShorthandFunctionType": "error"
+				"noVar": "error",
+				"noWith": "error",
+				"useGetterReturn": "error"
 			}
 		}
 	},
@@ -133,26 +167,5 @@
 				}
 			}
 		}
-	],
-	"formatter": {
-		"enabled": true,
-		"formatWithErrors": true,
-		"includes": ["**", "!**/node_modules/**"],
-		"indentStyle": "tab",
-		"indentWidth": 2,
-		"lineEnding": "lf",
-		"lineWidth": 90
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double",
-			"semicolons": "always",
-			"trailingCommas": "es5"
-		}
-	},
-	"json": {
-		"formatter": {
-			"trailingCommas": "none"
-		}
-	}
+	]
 }

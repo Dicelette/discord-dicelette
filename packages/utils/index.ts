@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: Until biome support this kind of configuration, we need to ignore the naming rules */
 import { important, logger } from "./src/logger";
 import "uniformize";
 import { standardizeDice } from "@dicelette/core";
@@ -10,10 +11,10 @@ export { default as dev } from "./src/dev";
 const COMPILED_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
 	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
-	QUERY_PARAMS: /\?.*$/g,
 	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,
-	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
+	QUERY_PARAMS: /\?.*$/g,
 	REGEX_ESCAPE: /[.*+?^${}()|[\]\\]/g,
+	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
 } as const;
 
 /**
@@ -46,6 +47,7 @@ function uniqueValues(array: string[]) {
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
+	if (url.startsWith("attachment://")) return url;
 	// Reset lastIndex for global regex to avoid issues
 	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
 	if (url.match(COMPILED_PATTERNS.AVATAR_URL)) return url;

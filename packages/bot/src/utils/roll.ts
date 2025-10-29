@@ -114,9 +114,9 @@ async function findMacroName(
 				if (dice) {
 					return {
 						perfectMatch: {
-							dice,
 							attackName: atqName,
 							charName: userData.charName ?? undefined,
+							dice,
 							similarity,
 						},
 					};
@@ -144,9 +144,9 @@ async function findMacroName(
 				if (dice) {
 					return {
 						newBestMatch: {
-							dice,
 							attackName: atqName,
 							charName: userData.charName ?? undefined,
+							dice,
 							similarity,
 						},
 						newBestSimilarity: similarity,
@@ -268,10 +268,10 @@ export async function rollWithInteraction(
 ) {
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
-		lang: langToUse,
-		userId: user?.id ?? interaction.user.id,
 		config,
 		dice,
+		lang: langToUse,
+		userId: user?.id ?? interaction.user.id,
 	};
 	const result = getRoll(dice);
 

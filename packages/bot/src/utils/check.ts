@@ -119,7 +119,7 @@ export async function optionInteractions(
 		return;
 	}
 	const user = options.getUser(t("display.userLowercase"));
-	return { options, guildData, lang, ul, user };
+	return { guildData, lang, options, ul, user };
 }
 
 export function isValidChannel(
@@ -146,15 +146,15 @@ export function isValidInteraction(interaction: Djs.BaseInteraction) {
 export function selfRegisterAllowance(value?: string | boolean) {
 	if (typeof value === "boolean")
 		return {
-			moderation: false,
-			disallowChannel: false,
 			allowSelfRegister: value,
+			disallowChannel: false,
+			moderation: false,
 		};
 	if (typeof value === "string") {
 		const res = {
-			moderation: false,
-			disallowChannel: false,
 			allowSelfRegister: true,
+			disallowChannel: false,
+			moderation: false,
 		};
 		if (value.startsWith("moderation")) res.moderation = true;
 		if (value.endsWith("_channel")) {
@@ -167,8 +167,8 @@ export function selfRegisterAllowance(value?: string | boolean) {
 		return res;
 	}
 	return {
-		moderation: false,
-		disallowChannel: false,
 		allowSelfRegister: false,
+		disallowChannel: false,
+		moderation: false,
 	};
 }

@@ -51,27 +51,27 @@ export async function bulkEditTemplateUser(
 				let newEmbed = createTemplateEmbed(ul);
 				if (template.diceType && template.diceType.length > 0)
 					newEmbed.addFields({
+						inline: true,
 						name: ul("common.dice"),
 						value: `\`${template.diceType}\``,
-						inline: true,
 					});
 				if (template.critical?.success)
 					newEmbed.addFields({
+						inline: true,
 						name: ul("roll.critical.success"),
 						value: `\`${template.critical.success}\``,
-						inline: true,
 					});
 				if (template.critical?.failure)
 					newEmbed.addFields({
+						inline: true,
 						name: ul("roll.critical.failure"),
 						value: `\`${template.critical.failure}\``,
-						inline: true,
 					});
 				if (template.customCritical) {
 					newEmbed = createCustomCritical(newEmbed, template.customCritical);
 				}
 				const listEmbed = getEmbedsList(
-					{ which: "template", embed: newEmbed },
+					{ embed: newEmbed, which: "template" },
 					userMessages
 				);
 				await userMessages.edit({ embeds: listEmbed.list });
@@ -116,7 +116,7 @@ export async function bulkDeleteCharacters(
 		cancel
 	);
 	const channel = interaction.channel as Djs.TextChannel;
-	const rep = await channel.send({ embeds: [embed], components: [row] });
+	const rep = await channel.send({ components: [row], embeds: [embed] });
 	const collectorFilter = (i: { user: { id: string | undefined } }) =>
 		i.user.id === interaction.user.id;
 	try {

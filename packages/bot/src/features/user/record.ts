@@ -1,6 +1,6 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { cleanAvatarUrl, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import { NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
@@ -131,13 +131,21 @@ async function createFirstPage(
 		client.settings.get(interaction.guild!.id, "privateChannel") && moderator // Allow private channel only if the user is a moderator
 			? interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
 			: false;
-	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
+	//const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
+	const avatar = interaction.fields.getUploadedFiles("avatarFile")?.first();
+	const files = [];
+	let avatarStr = "";
+	if (avatar) {
+		const avatarAttachment = new Djs.AttachmentBuilder(avatar.url, { name: avatar.name });
+		files.push(avatarAttachment);
+		avatarStr = `attachment://${avatarAttachment.name}`;
+	}
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel) sheetId = customChannel.id;
 
-	const verifiedAvatar = avatar.length > 0 ? verifyAvatarUrl(avatar) : null;
+	const verifiedAvatar = avatarStr.length > 0 ? verifyAvatarUrl(avatarStr) : null;
 	const existChannel = sheetId
 		? await fetchChannel(
 				interaction.guild!,
@@ -155,49 +163,49 @@ async function createFirstPage(
 	const embed = new Djs.EmbedBuilder()
 		.setTitle(ul("embed.add"))
 		.setThumbnail(
-			verifiedAvatar ? avatar : await fetchAvatarUrl(interaction.guild!, user)
+			verifiedAvatar ? avatarStr : await fetchAvatarUrl(interaction.guild!, user)
 		)
 		.setFooter({ text: ul("common.page", { nb: 1 }) })
 		.addFields(
 			{
+				inline: true,
 				name: ul("common.charName"),
 				value: charName.length > 0 ? charName : ul("common.noSet"),
-				inline: true,
 			},
 			{
+				inline: true,
 				name: ul("common.user"),
 				value: Djs.userMention(user.id),
-				inline: true,
 			},
 			{
+				inline: true,
 				name: ul("common.isPrivate"),
 				value: isPrivate ? "✓" : "✕",
-				inline: true,
 			}
 		);
 	if (sheetId) {
-		embed.addFields({ name: "_ _", value: "_ _", inline: true });
+		embed.addFields({ inline: true, name: "_ _", value: "_ _" });
 		embed.addFields({
+			inline: true,
 			name: ul("common.channel").capitalize(),
 			value: `${Djs.channelMention(sheetId as string)}`,
-			inline: true,
 		});
-		embed.addFields({ name: "_ _", value: "_ _", inline: true });
+		embed.addFields({ inline: true, name: "_ _", value: "_ _" });
 	}
 
 	//add continue button
 	if (template.statistics) {
 		await reply(interaction, {
-			content:
-				verifiedAvatar !== false
-					? ""
-					: `:warning: **${ul("error.avatar.url")}** \n-# *${ul("edit_avatar.default")}*`,
-			embeds: [embed],
 			components: [continueCancelButtons(ul)],
+			content: verifiedAvatar
+				? ""
+				: `:warning: **${ul("error.avatar.url")}** \n-# *${ul("edit_avatar.default")}*`,
+			embeds: [embed],
+			files,
 		});
 		return;
 	}
 	const allButtons = Dice.buttons(ul, selfRegister.moderation && !moderator);
 
-	await reply(interaction, { embeds: [embed], components: [allButtons] });
+	await reply(interaction, { components: [allButtons], embeds: [embed] });
 }

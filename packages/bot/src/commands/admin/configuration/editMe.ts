@@ -10,10 +10,10 @@ export async function editMeCommand(
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 
 	const editOptions: Djs.GuildMemberEditMeOptions = {
-		nick: options.getString(t("editMe.nick.name")) ?? null,
-		bio: options.getString(t("editMe.bio.name")) ?? null,
 		avatar: await convertToBase64(options.getAttachment(t("editMe.asset.name"))),
 		banner: await convertToBase64(options.getAttachment(t("editMe.banner.name"))),
+		bio: options.getString(t("editMe.bio.name")) ?? null,
+		nick: options.getString(t("editMe.nick.name")) ?? null,
 	};
 
 	await interaction.guild!.members.editMe(editOptions);

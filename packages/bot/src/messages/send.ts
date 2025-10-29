@@ -18,7 +18,7 @@ export async function sendLogs(
 		if (!channel) return;
 		const channelToSend = (await fetchChannel(guild, channel)) as Djs.TextChannel;
 		const allowedMentions = allowMentions ? undefined : {};
-		await channelToSend.send({ content: message, allowedMentions });
+		await channelToSend.send({ allowedMentions, content: message });
 	} catch (error) {
 		logger.warn(error);
 		return;
@@ -136,16 +136,16 @@ export async function sendResult(
 			isHidden = hideResultConfig;
 		} else if (typeof hideResultConfig === "boolean") {
 			return await reply(interaction, {
+				allowedMentions,
 				content: output,
 				flags: Djs.MessageFlags.Ephemeral,
-				allowedMentions,
 			});
 		}
 	}
 	if (!channel) {
 		return await interaction.reply({
-			content: output,
 			allowedMentions,
+			content: output,
 			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
 		});
 	}
@@ -156,8 +156,8 @@ export async function sendResult(
 		rollChannel === channel.id
 	) {
 		return await reply(interaction, {
-			content: output,
 			allowedMentions,
+			content: output,
 			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
 		});
 	}
@@ -176,8 +176,8 @@ export async function sendResult(
 			result.roll?.logUrl(logUrl)?.result ??
 			`${result.expression}${createUrl(ul, undefined, logUrl)}`;
 		const replyInteraction = await reply(interaction, {
-			content: outputWithUrl,
 			allowedMentions,
+			content: outputWithUrl,
 			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
 		});
 		const anchor = settings.get(interaction.guild!.id, "context");
@@ -195,8 +195,8 @@ export async function sendResult(
 				if (messageBefore) messageId = messageBefore.id;
 			}
 			const ctx = {
-				guildId: interaction.guild!.id,
 				channelId: channel.id,
+				guildId: interaction.guild!.id,
 				messageId,
 			};
 			const res =

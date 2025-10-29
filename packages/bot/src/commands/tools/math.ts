@@ -11,9 +11,6 @@ import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
 import "discord_ext";
 
 export const math = {
-	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
-		.setNames("math.title")
-		.setDescriptions("math.description"),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
@@ -27,6 +24,9 @@ export const math = {
 			}))
 		);
 	},
+	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
+		.setNames("math.title")
+		.setDescriptions("math.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const { options, ul, optionChar } = (await getStatistics(interaction, client)) ?? {};

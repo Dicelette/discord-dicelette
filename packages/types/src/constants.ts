@@ -11,15 +11,15 @@ export const TUTORIAL_IMAGES = [
 ];
 
 export const LINKS = {
-	fr: {
-		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=bug%2Ctriage%2Cfrench&projects=&template=bug_french.yml&title=%5BBug%5D%3A+",
-		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=enhancement%2Ctriage%2Cfrench&projects=&template=Request_french.yml&title=%5BFR%5D%3A+",
-		docs: "https://dicelette.github.io/",
-	},
 	en: {
 		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=bug%2Ctriage%2Cenglish&projects=&template=bug_english.yml&title=%5BBug%5D%3A+",
-		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=enhancement%2Ctriage%2Cenglish&projects=&template=request_english.yml&title=%5BFR%5D%3A+",
 		docs: "https://dicelette.github.io/en/",
+		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=enhancement%2Ctriage%2Cenglish&projects=&template=request_english.yml&title=%5BFR%5D%3A+",
+	},
+	fr: {
+		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=bug%2Ctriage%2Cfrench&projects=&template=bug_french.yml&title=%5BBug%5D%3A+",
+		docs: "https://dicelette.github.io/",
+		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=enhancement%2Ctriage%2Cfrench&projects=&template=Request_french.yml&title=%5BFR%5D%3A+",
 	},
 } as const;
 
@@ -28,12 +28,12 @@ export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
 
 // Regex patterns for dice detection
 export const DICE_PATTERNS = {
-	DETECT_DICE_MESSAGE: /([\w.]+|(\{.*\})) (.*)/i,
 	BRACKET_ROLL: /\[(.*)\]/,
-	DICE_VALUE: /^\S*#?d\S+|\{.*\}/i,
-	GLOBAL_COMMENTS: /# ?(.*)/,
 	BRACKETED_COMMENTS: /\[(.*)\]/,
 	BRACKETED_CONTENT: /^\[(.*)\]$/,
+	DETECT_DICE_MESSAGE: /([\w.]+|(\{.*\})) (.*)/i,
+	DICE_VALUE: /^\S*#?d\S+|\{.*\}/i,
+	GLOBAL_COMMENTS: /# ?(.*)/,
 	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,
 	INFO_STATS_COMMENTS: /%%(\[__.*__\])%%/,
 } as const;

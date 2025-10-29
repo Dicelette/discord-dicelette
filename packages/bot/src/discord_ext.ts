@@ -1,3 +1,5 @@
+//biome-ignore-all lint/suspicious/noExplicitAny: Allow explicit any for this extension file because it's simpler.
+
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 
@@ -65,61 +67,61 @@ declare module "discord.js" {
 }
 
 // Implémentations avec typage explicite
-const setNamesImpl = function (this: any, key: string) {
+const SET_NAMES_IMPL = function (this: any, key: string) {
 	return this.setName(t(key)).setNameLocalizations(cmdLn(key));
 };
 
-const setDescriptionsImpl = function (this: any, key: string) {
+const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
 	return this.setDescription(t(key)).setDescriptionLocalizations(cmdLn(key));
 };
 
 // Extension des prototypes
 Object.defineProperty(Djs.SlashCommandBuilder.prototype, "setNames", {
-	value: setNamesImpl,
+	value: SET_NAMES_IMPL,
 });
 
 Object.defineProperty(Djs.SlashCommandBuilder.prototype, "setDescriptions", {
-	value: setDescriptionsImpl,
+	value: SET_DESCRIPTIONS_IMPL,
 });
 
 Object.defineProperty(Djs.SlashCommandSubcommandBuilder.prototype, "setNames", {
-	value: setNamesImpl,
+	value: SET_NAMES_IMPL,
 });
 
 Object.defineProperty(Djs.SlashCommandSubcommandBuilder.prototype, "setDescriptions", {
-	value: setDescriptionsImpl,
+	value: SET_DESCRIPTIONS_IMPL,
 });
 
 // Ajout du support pour les groupes de sous-commandes
 Object.defineProperty(Djs.SlashCommandSubcommandGroupBuilder.prototype, "setNames", {
-	value: setNamesImpl,
+	value: SET_NAMES_IMPL,
 });
 
 Object.defineProperty(
 	Djs.SlashCommandSubcommandGroupBuilder.prototype,
 	"setDescriptions",
 	{
-		value: setDescriptionsImpl,
+		value: SET_DESCRIPTIONS_IMPL,
 	}
 );
 
 // Extension des options avec accès sécurisé
-const optionTypes = [
-	{ name: "String", class: Djs.SlashCommandStringOption },
-	{ name: "Boolean", class: Djs.SlashCommandBooleanOption },
-	{ name: "Channel", class: Djs.SlashCommandChannelOption },
-	{ name: "Role", class: Djs.SlashCommandRoleOption },
-	{ name: "Number", class: Djs.SlashCommandNumberOption },
-	{ name: "Mentionable", class: Djs.SlashCommandMentionableOption },
-	{ name: "User", class: Djs.SlashCommandUserOption },
-	{ name: "Attachment", class: Djs.SlashCommandAttachmentOption },
+const OPTION_TYPES = [
+	{ class: Djs.SlashCommandStringOption, name: "String" },
+	{ class: Djs.SlashCommandBooleanOption, name: "Boolean" },
+	{ class: Djs.SlashCommandChannelOption, name: "Channel" },
+	{ class: Djs.SlashCommandRoleOption, name: "Role" },
+	{ class: Djs.SlashCommandNumberOption, name: "Number" },
+	{ class: Djs.SlashCommandMentionableOption, name: "Mentionable" },
+	{ class: Djs.SlashCommandUserOption, name: "User" },
+	{ class: Djs.SlashCommandAttachmentOption, name: "Attachment" },
 ];
 
-optionTypes.forEach(({ class: optionClass }) => {
+OPTION_TYPES.forEach(({ class: optionClass }) => {
 	if (optionClass?.prototype) {
-		Object.defineProperty(optionClass.prototype, "setNames", { value: setNamesImpl });
+		Object.defineProperty(optionClass.prototype, "setNames", { value: SET_NAMES_IMPL });
 		Object.defineProperty(optionClass.prototype, "setDescriptions", {
-			value: setDescriptionsImpl,
+			value: SET_DESCRIPTIONS_IMPL,
 		});
 	}
 });

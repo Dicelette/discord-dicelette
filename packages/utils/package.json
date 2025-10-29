@@ -1,26 +1,26 @@
 {
-	"name": "@dicelette/utils",
-	"version": "1.0.0",
+	"dependencies": {
+		"@types/semver": "^7.7.0",
+		"enmap": "^6.0.4"
+	},
 	"description": "",
-	"type": "module",
-	"main": "dist/index.js",
-	"scripts": {
-		"prebuild": "rimraf dist",
-		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json",
-		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Mara-Li/discord-dicelette.git"
-	},
-	"private": true,
 	"devDependencies": {
 		"@types/papaparse": "^5.3.15",
 		"papaparse": "^5.4.1",
 		"semver": "^7.7.2"
 	},
-	"dependencies": {
-		"@types/semver": "^7.7.0",
-		"enmap": "^6.0.4"
-	}
+	"main": "dist/index.js",
+	"name": "@dicelette/utils",
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Mara-Li/discord-dicelette.git"
+	},
+	"scripts": {
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+		"prebuild": "rimraf dist",
+		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
+	},
+	"type": "module",
+	"version": "1.0.0"
 }

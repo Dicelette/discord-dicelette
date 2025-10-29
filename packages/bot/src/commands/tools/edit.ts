@@ -27,6 +27,27 @@ import {
 import "discord_ext";
 
 export const editAvatar = {
+	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+		const param = autoComplete(interaction, client);
+		if (!param) return;
+		const { guildData, ul, userID, fixed, choices } = param;
+
+		if (fixed.name === t("common.character")) {
+			const guildChars = guildData.user[userID];
+			if (!guildChars) return;
+			for (const data of guildChars) {
+				const allowed = await haveAccess(interaction, data.messageId[1], userID);
+				const toPush = data.charName ? data.charName : ul("common.default");
+				if (!data.isPrivate) choices.push(toPush);
+				else if (allowed) choices.push(toPush);
+			}
+		}
+		if (choices.length === 0) return;
+		const filter = filterChoices(choices, interaction.options.getFocused());
+		await interaction.respond(
+			filter.map((result) => ({ name: result.capitalize(), value: result }))
+		);
+	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("edit.title")
 		.setDescriptions("edit.desc")
@@ -73,27 +94,6 @@ export const editAvatar = {
 						)
 				) as Djs.SlashCommandSubcommandBuilder
 		),
-	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const param = autoComplete(interaction, client);
-		if (!param) return;
-		const { guildData, ul, userID, fixed, choices } = param;
-
-		if (fixed.name === t("common.character")) {
-			const guildChars = guildData.user[userID];
-			if (!guildChars) return;
-			for (const data of guildChars) {
-				const allowed = await haveAccess(interaction, data.messageId[1], userID);
-				const toPush = data.charName ? data.charName : ul("common.default");
-				if (!data.isPrivate) choices.push(toPush);
-				else if (allowed) choices.push(toPush);
-			}
-		}
-		if (choices.length === 0) return;
-		const filter = filterChoices(choices, interaction.options.getFocused());
-		await interaction.respond(
-			filter.map((result) => ({ name: result.capitalize(), value: result }))
-		);
-	},
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const int = await optionInteractions(interaction, client);
 		if (!int) return;
@@ -189,14 +189,14 @@ async function avatar(
 			throw new Error(ul("error.embed.notFound"));
 		}
 		embed.setThumbnail(imageURL);
-		const embedsList = getEmbedsList({ which: "user", embed }, message);
+		const embedsList = getEmbedsList({ embed, which: "user" }, message);
 		//update button
 		await generateButton(message, ul, embedsList.list);
 
 		const nameMention = `<@${user?.id ?? interaction.user.id}>${charName ? ` (${charName})` : ""}`;
 		const msgLink = message.url;
 		await reply(interaction, {
-			content: ul("edit.avatar.success", { name: nameMention, link: msgLink }),
+			content: ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
@@ -211,7 +211,7 @@ async function generateButton(
 	embedsList: Djs.EmbedBuilder[]
 ) {
 	const { buttons, select } = getButton(message, ul);
-	await message.edit({ embeds: embedsList, components: [buttons, select] });
+	await message.edit({ components: [buttons, select], embeds: embedsList });
 }
 
 /**
@@ -256,20 +256,20 @@ export async function rename(
 	if (!n) throw new Error(ul("error.user.rename"));
 	n.value = name ? name : ul("common.noSet");
 	//update the embed
-	const embedsList = getEmbedsList({ which: "user", embed }, message);
+	const embedsList = getEmbedsList({ embed, which: "user" }, message);
 	//update the database
 	const userRegister: UserRegistration = {
-		userID: user?.id ?? interaction.user.id,
 		charName: name,
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
+		userID: user?.id ?? interaction.user.id,
 	};
 	const oldChar = client.characters.get(
 		interaction.guild!.id,
 		user?.id ?? interaction.user.id
 	);
 	if (!oldChar) {
-		const userData = getUserByEmbed({ message }, ul);
+		const userData = getUserByEmbed({ message });
 		if (!userData) return;
 		userData.userName = name;
 		client.characters.set(
@@ -284,7 +284,7 @@ export async function rename(
 				(char.userName == null && oldData?.charName == null)
 		);
 		if (!oldCharData) {
-			const userData = getUserByEmbed({ message }, ul);
+			const userData = getUserByEmbed({ message });
 			if (!userData) return;
 			userData.userName = name;
 			client.characters.set(
@@ -365,15 +365,15 @@ export async function move(
 	if (!n) throw new Error(ul("error.embed.old"));
 	n.value = `<@${newUser.id}>`;
 	//update the embed
-	const embedsList = getEmbedsList({ which: "user", embed }, message);
+	const embedsList = getEmbedsList({ embed, which: "user" }, message);
 	//update the database, with deleting the old data
 
 	//add the new data to the database
 	const userRegister: UserRegistration = {
-		userID: newUser.id,
 		charName: oldData.charName,
 		damage: oldData.damageName,
 		msgId: oldData.messageId,
+		userID: newUser.id,
 	};
 	await moveUserInDatabase(
 		client,

@@ -23,10 +23,6 @@ import {
 import "discord_ext";
 
 export const displayUser = {
-	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setNames("display.title")
-		.setDescriptions("display.description")
-		.setDefaultMemberPermissions(0),
 	async autocomplete(
 		interaction: Djs.AutocompleteInteraction,
 		client: EClient
@@ -50,12 +46,22 @@ export const displayUser = {
 			filter.map((result) => ({ name: result.capitalize(), value: result }))
 		);
 	},
+	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
+		.setNames("display.title")
+		.setDescriptions("display.description")
+		.setDefaultMemberPermissions(0)
+		.addBooleanOption((input) =>
+			input
+				.setName(t("display.persistant.name"))
+				.setDescription(t("display.persistant.description"))
+		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const int = await optionInteractions(interaction, client);
 		if (!int) return;
 		const { options, user, ul } = int;
 		const charData = await getRecordChar(interaction, client, t, false);
 		const charName = options.getString(t("common.character"))?.toLowerCase();
+		const persist = options.getBoolean(t("display.persistant.name")) ?? false;
 		if (!charData) {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
@@ -98,23 +104,37 @@ export const displayUser = {
 				.toJSON()
 				.fields!.find((x) => findln(x.name) === findln("common.character"));
 			const thumbnailJson = dataUserEmbeds?.toJSON().thumbnail?.url;
-			const avatar = thumbnailJson
-				? cleanAvatarUrl(thumbnailJson)
-				: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
+			let avatar = "";
+			const files = [];
+			if (!persist) {
+				avatar = thumbnailJson
+					? cleanAvatarUrl(thumbnailJson)
+					: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
+			} else {
+				//get the attachment if exists
+				const attachment = userMessage?.attachments.first();
+				if (attachment) {
+					avatar = `attachment://${attachment.name}`;
+					const newAttachment = new Djs.AttachmentBuilder(attachment.url, {
+						name: attachment.name,
+					});
+					files.push(newAttachment);
+				}
+			}
 			const displayEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("embed.display"))
 				.setThumbnail(avatar)
 				.setColor("Gold")
 				.addFields({
+					inline: true,
 					name: ul("common.user"),
 					value: jsonDataUser?.value ?? `<@${user?.id ?? interaction.user.id}>`,
-					inline: true,
 				})
 				.addFields({
+					inline: true,
 					name: ul("common.character").capitalize(),
 					value:
 						jsonDataChar?.value ?? userData.charName?.capitalize() ?? ul("common.noSet"),
-					inline: true,
 				});
 			const newStatEmbed: Djs.EmbedBuilder | undefined = statsFields
 				? createStatsEmbed(ul).addFields(keepResultOnlyInFormula(statsFields))
@@ -125,7 +145,7 @@ export const displayUser = {
 			const displayEmbeds: Djs.EmbedBuilder[] = [displayEmbed];
 			if (newStatEmbed) displayEmbeds.push(newStatEmbed);
 			if (newDiceEmbed) displayEmbeds.push(newDiceEmbed);
-			await reply(interaction, { embeds: displayEmbeds });
+			await reply(interaction, { embeds: displayEmbeds, files });
 		} catch (e) {
 			logger.error(e);
 			await reply(interaction, {

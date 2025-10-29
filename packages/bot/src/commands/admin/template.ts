@@ -247,8 +247,8 @@ async function registerTemplate(
 		interaction,
 		{
 			channel: channel.id,
-			publicChannel: publicChannel.id,
 			privateChannel: privateChannel?.id,
+			publicChannel: publicChannel.id,
 		},
 		msg
 	);
@@ -312,9 +312,9 @@ async function createEmbed(
 			msg += `- __${ul("register.embed.exclude")}__${ul("common.space")}: ${exclude ? ul("common.yes") : ul("common.no")}\n`;
 			if (msg.length === 0) msg = ul("register.embed.noValue");
 			statisticsEmbed.addFields({
+				inline: true,
 				name: stat.capitalize(),
 				value: msg,
-				inline: true,
 			});
 		}
 	}
@@ -339,14 +339,14 @@ async function createEmbed(
 		embedTemplate = createCustomCritical(embedTemplate, templateData.customCritical);
 	if (templateData.total) {
 		embedTemplate.addFields({
+			inline: true,
 			name: ul("common.total"),
 			value: `\`${templateData.total}\``,
-			inline: true,
 		});
 		embedTemplate.addFields({
+			inline: true,
 			name: ul("register.embed.forceDistrib"),
 			value: `\`${templateData.forceDistrib ? ul("common.yes") : ul("common.no")}\``,
-			inline: true,
 		});
 	}
 	let diceEmbed: undefined | Djs.EmbedBuilder;
@@ -358,15 +358,16 @@ async function createEmbed(
 			);
 		for (const [dice, value] of Object.entries(templateData.damage))
 			diceEmbed.addFields({
+				inline: true,
 				name: dice.capitalize(),
 				value: value.trim().length > 0 ? `\`${value}\`` : "_ _",
-				inline: true,
 			});
 	}
 	const embeds = [embedTemplate, statisticsEmbed, diceEmbed].filter(
 		(embed) => embed !== undefined
 	);
 	const msg = await channel.send({
+		components: [components],
 		content: "",
 		embeds: embeds as Djs.EmbedBuilder[],
 		files: [
@@ -375,7 +376,6 @@ async function createEmbed(
 				name: "template.json",
 			},
 		],
-		components: [components],
 	});
 	await msg.pin();
 	return msg;
@@ -412,10 +412,10 @@ async function updateMemory(
 		await deleteOldTemplate(json, interaction);
 		json.templateID = {
 			channelId: channel,
-			messageId: msg.id,
-			statsName: statsName ?? [],
 			damageName: damageName ?? [],
 			excludedStats: excludedStats ?? [],
+			messageId: msg.id,
+			statsName: statsName ?? [],
 			valid: true,
 		};
 		json.managerId = publicChannel;
@@ -428,11 +428,11 @@ async function updateMemory(
 			managerId: undefined,
 			templateID: {
 				channelId: channel,
+				damageName: damageName ?? [],
+				excludedStats: excludedStats ?? [],
 				messageId: msg.id,
 				statsName: statsName ?? [],
-				damageName: damageName ?? [],
 				valid: true,
-				excludedStats: excludedStats ?? [],
 			},
 			user: {},
 		};
@@ -492,8 +492,8 @@ async function updateTemplateFile(
 		interaction,
 		{
 			channel: channel.id,
-			publicChannel: publicChannelId,
 			privateChannel: privateChannelId,
+			publicChannel: publicChannelId,
 		},
 		msg
 	);

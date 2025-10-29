@@ -46,9 +46,9 @@ export async function registerUser(
 
 	const newChar = {
 		charName,
-		messageId: msgId,
 		damageName: damage,
 		isPrivate,
+		messageId: msgId,
 	};
 	if (!charName) delete newChar.charName;
 	if (!damage) delete newChar.damageName;

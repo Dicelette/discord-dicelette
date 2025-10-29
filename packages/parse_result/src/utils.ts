@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: Until biome allow to set a specific rules for property of a global object, we stick against the naming convention */
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -9,8 +10,8 @@ import { getRoll } from "./dice_extractor";
 // Pre-compiled regex patterns for better performance
 const COMPILED_PATTERNS = {
 	COMMENTS_REGEX: /\[([^\]]*)\]/,
-	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
+	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 } as const;
 
 /**
@@ -105,8 +106,8 @@ export function convertNameToValue(
 	const isRoll = getRoll(result);
 	if (isRoll?.total)
 		return {
-			total: isRoll.total.toString(),
 			diceResult: isRoll.result,
+			total: isRoll.total.toString(),
 		};
 	return { total: result };
 }

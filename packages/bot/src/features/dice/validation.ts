@@ -84,26 +84,26 @@ export async function validate(
 		const embedKey = makeEmbedKey(interaction.guild!.id, message.channelId, message.id);
 		// Footer de secours: conserve un minimum de métadonnées si le cache disparaît
 		setModerationFooter(diceEmbed, {
-			userID,
-			userName,
 			channelId: message.channelId,
 			messageId: message.id,
+			userID,
+			userName,
 		});
 		putModerationCache(embedKey, {
-			kind: "dice-edit",
 			embed: diceEmbed,
-			meta: { userID, userName, channelId: message.channelId, messageId: message.id },
+			kind: "dice-edit",
+			meta: { channelId: message.channelId, messageId: message.id, userID, userName },
 		});
 
 		const row = buildModerationButtons("dice-edit", ul, embedKey);
 		// Si l'embed est vide (suppression de toutes les macros), afficher un petit message plutôt qu'un embed vide
 		if (!fieldsToAppend || fieldsToAppend.length === 0) {
 			await interaction.editReply({
-				content: ul("modals.removed.dice"),
 				components: [row],
+				content: ul("modals.removed.dice"),
 			});
 		} else {
-			await interaction.editReply({ embeds: [diceEmbed], components: [row] });
+			await interaction.editReply({ components: [row], embeds: [diceEmbed] });
 		}
 		return; // ne pas appliquer directement
 	}
@@ -136,15 +136,15 @@ export async function validate(
 
 	// 4) Envoi des messages de validation (réponse + logs)
 	await sendValidationResponses({
+		db,
 		interaction,
-		ul,
-		removed,
-		oldFields,
+		message,
 		newFields: fieldsToAppend,
+		oldFields,
+		removed,
+		ul,
 		userID,
 		userName,
-		message,
-		db,
 	});
 }
 
@@ -168,7 +168,7 @@ function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
 /**
  * Compare deux libellés en neutralisant accents/variantes.
  */
-const compareUnidecode = (a: string, b: string) =>
+const COMPARE_UNIDECODE = (a: string, b: string) =>
 	a.unidecode().standardize() === b.unidecode().standardize();
 
 // Caches centralisés: voir utils/moderation_cache
@@ -184,8 +184,8 @@ function createAndValidateDiceEmbed(
 	const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 	if (!diceEmbeds)
 		return {
-			fieldsToAppend: [],
 			diceEmbed: createDiceEmbed(ul),
+			fieldsToAppend: [],
 			oldFields: [],
 			removed: true,
 		};
@@ -212,9 +212,9 @@ function createAndValidateDiceEmbed(
 
 	const newEmbedDice: Djs.APIEmbedField[] = [];
 	for (const [skill, dice] of Object.entries(dices)) {
-		if (newEmbedDice.find((field) => compareUnidecode(field.name, skill))) continue;
+		if (newEmbedDice.find((field) => COMPARE_UNIDECODE(field.name, skill))) continue;
 		if (dice.toLowerCase() === "x" || dice.trim().length === 0 || dice === "0") {
-			newEmbedDice.push({ name: skill.capitalize(), value: "X", inline: true });
+			newEmbedDice.push({ inline: true, name: skill.capitalize(), value: "X" });
 			continue;
 		}
 		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
@@ -231,16 +231,16 @@ function createAndValidateDiceEmbed(
 			logger.warn(error);
 			throw new Error(ul("error.invalidDice.eval", { dice }));
 		}
-		newEmbedDice.push({ name: skill.capitalize(), value: `\`${dice}\``, inline: true });
+		newEmbedDice.push({ inline: true, name: skill.capitalize(), value: `\`${dice}\`` });
 	}
 
 	const oldDice = diceEmbeds.toJSON().fields;
 	if (oldDice) {
 		for (const field of oldDice) {
 			const name = field.name.toLowerCase();
-			const newValue = newEmbedDice.find((f) => compareUnidecode(f.name, name));
+			const newValue = newEmbedDice.find((f) => COMPARE_UNIDECODE(f.name, name));
 			if (!newValue) {
-				newEmbedDice.push({ name: name.capitalize(), value: field.value, inline: true });
+				newEmbedDice.push({ inline: true, name: name.capitalize(), value: field.value });
 			}
 		}
 	}
@@ -250,22 +250,22 @@ function createAndValidateDiceEmbed(
 		const name = field.name.toLowerCase();
 		const dice = field.value;
 		if (
-			fieldsToAppend.find((f) => compareUnidecode(f.name, name)) ||
+			fieldsToAppend.find((f) => COMPARE_UNIDECODE(f.name, name)) ||
 			dice.toLowerCase() === "x" ||
 			dice.trim().length === 0 ||
 			dice === "0"
 		)
 			continue;
 		fieldsToAppend.push({
+			inline: true,
 			name: capitalizeBetweenPunct(name.capitalize()),
 			value: dice,
-			inline: true,
 		});
 	}
 
 	const diceEmbed = createDiceEmbed(ul).addFields(fieldsToAppend);
 	const removed = !fieldsToAppend || fieldsToAppend.length === 0;
-	return { fieldsToAppend, diceEmbed, oldFields: oldDice ?? [], removed };
+	return { diceEmbed, fieldsToAppend, oldFields: oldDice ?? [], removed };
 }
 
 /**
@@ -277,11 +277,11 @@ async function editMessageDiceEmbeds(
 	diceEmbed: Djs.EmbedBuilder,
 	removed: boolean
 ): Promise<{ embeds: Djs.EmbedBuilder[] }> {
-	const embedsList = getEmbedsList({ which: "damage", embed: diceEmbed }, message);
+	const embedsList = getEmbedsList({ embed: diceEmbed, which: "damage" }, message);
 	if (removed) {
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
-		await message.edit({ embeds: toAdd, components: [components, selectEditMenu(ul)] });
+		await message.edit({ components: [components, selectEditMenu(ul)], embeds: toAdd });
 		return { embeds: toAdd };
 	}
 	await message.edit({ embeds: embedsList.list });
@@ -303,10 +303,10 @@ async function persistUserAndMemory(
 ) {
 	await updateMemory(client.characters, interaction.guild!.id, userID, ul, { embeds });
 	const userRegister: UserRegistration = {
-		userID,
 		charName: userName,
 		damage,
 		msgId: messageID,
+		userID,
 	};
 	await registerUser(userRegister, interaction, client.settings, false);
 }
@@ -343,9 +343,9 @@ async function sendValidationResponses(args: {
 		});
 		await sendLogs(
 			ul("logs.dice.remove", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: message.url,
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				fiche: message.url,
+				user: Djs.userMention(interaction.user.id),
 			}),
 			interaction.guild as Djs.Guild,
 			db
@@ -359,9 +359,9 @@ async function sendValidationResponses(args: {
 	});
 	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
 	const logMessage = ul("logs.dice.edit", {
-		user: Djs.userMention(interaction.user.id),
-		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		fiche: message.url,
+		user: Djs.userMention(interaction.user.id),
 	});
 	await sendLogs(`${logMessage}\n${compare}`.trim(), interaction.guild as Djs.Guild, db);
 }
@@ -468,15 +468,15 @@ export async function couldBeValidatedDice(
 
 	// 3) Réponses/logs
 	await sendValidationResponses({
+		db: client.settings,
 		interaction,
-		ul,
-		removed,
-		oldFields,
+		message,
 		newFields: newFields as Djs.APIEmbedField[],
+		oldFields,
+		removed,
+		ul,
 		userID: ownerId!,
 		userName: ownerName,
-		message,
-		db: client.settings,
 	});
 
 	// 4) Nettoyage: supprimer message de demande et cache (si présent)
@@ -579,12 +579,12 @@ export async function couldBeValidatedDiceAdd(
 	} else {
 		// Fallback: fusionner l'embed de dés avec les embeds existants
 		const diceEmbedToApply = stripFooter(moderationDiceEmbed!);
-		const edited = getEmbedsList({ which: "damage", embed: diceEmbedToApply }, message);
+		const edited = getEmbedsList({ embed: diceEmbedToApply, which: "damage" }, message);
 		embedsApplied = edited.list;
 		hasStats = edited.exists.stats;
 	}
 	const components = [editUserButtons(ul, hasStats, true), selectEditMenu(ul)];
-	await message.edit({ embeds: embedsApplied, components });
+	await message.edit({ components, embeds: embedsApplied });
 
 	// Persistance mémoire + user
 	const newDamage = getEmbeds(message ?? undefined, "damage");
@@ -629,15 +629,15 @@ export async function couldBeValidatedDiceAdd(
 
 	// Réponses/logs
 	await sendValidationResponses({
+		db: client.settings,
 		interaction,
-		ul,
-		removed: !(newFields.length > 0),
-		oldFields,
+		message,
 		newFields: newFields as Djs.APIEmbedField[],
+		oldFields,
+		removed: !(newFields.length > 0),
+		ul,
 		userID: userID!,
 		userName,
-		message,
-		db: client.settings,
 	});
 
 	deleteModerationCache(embedKey);

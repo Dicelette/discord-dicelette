@@ -19,34 +19,6 @@ import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 import "discord_ext";
 
 export const mjRoll = {
-	data: new Djs.SlashCommandBuilder()
-		.setNames("mjRoll.name")
-		.setDescriptions("mjRoll.description")
-		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.addSubcommand(
-			(
-				sub //dbRoll
-			) =>
-				gmCommonOptions(sub, "dbroll")
-					.setNames("dbRoll.name")
-					.setDescriptions("dbRoll.description")
-		)
-		.addSubcommand(
-			(
-				sub //macro
-			) =>
-				gmCommonOptions(sub, "macro")
-					.setNames("common.macro")
-					.setDescriptions("rAtq.description")
-		)
-		.addSubcommand(
-			(
-				sub //calc
-			) =>
-				gmCommonOptions(sub, "calc")
-					.setNames("calc.title")
-					.setDescriptions("calc.description")
-		),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const sign = autoFocuseSign(interaction);
 		if (sign) return await interaction.respond(sign);
@@ -122,6 +94,34 @@ export const mjRoll = {
 			}))
 		);
 	},
+	data: new Djs.SlashCommandBuilder()
+		.setNames("mjRoll.name")
+		.setDescriptions("mjRoll.description")
+		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
+		.addSubcommand(
+			(
+				sub //dbRoll
+			) =>
+				gmCommonOptions(sub, "dbroll")
+					.setNames("dbRoll.name")
+					.setDescriptions("dbRoll.description")
+		)
+		.addSubcommand(
+			(
+				sub //macro
+			) =>
+				gmCommonOptions(sub, "macro")
+					.setNames("common.macro")
+					.setDescriptions("rAtq.description")
+		)
+		.addSubcommand(
+			(
+				sub //calc
+			) =>
+				gmCommonOptions(sub, "calc")
+					.setNames("calc.title")
+					.setDescriptions("calc.description")
+		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -186,15 +186,15 @@ export const mjRoll = {
 				return;
 			}
 			charData = {
-				isFromTemplate: true,
-				template: {
-					diceType: template.diceType,
-					critical: template.critical,
-					customCritical: template.customCritical,
-				},
 				damage: template.damage
 					? (uniformizeRecords(template.damage) as Record<string, string>)
 					: undefined,
+				isFromTemplate: true,
+				template: {
+					critical: template.critical,
+					customCritical: template.customCritical,
+					diceType: template.diceType,
+				},
 			};
 		}
 		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));

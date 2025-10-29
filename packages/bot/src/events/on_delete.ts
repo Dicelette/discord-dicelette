@@ -95,8 +95,8 @@ export const onDeleteMessage = (client: EClient): void => {
 				for (const [user, values] of Object.entries(dbUser)) {
 					for (const [index, value] of values.entries()) {
 						const persoId: PersonnageIds = {
-							messageId: value.messageId[0],
 							channelId: value.messageId[1],
+							messageId: value.messageId[0],
 						};
 						if (persoId.messageId === messageId && persoId.channelId === channel.id) {
 							logger.info(`Deleted character ${value.charName} for user ${user}`);

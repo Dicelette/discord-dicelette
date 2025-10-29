@@ -6,7 +6,7 @@ import { getRoll } from "../src/dice_extractor";
 import type { Server } from "../src/interfaces";
 import { ResultAsText } from "../src/result_as_text";
 
-const data: Server = {
+const DATA: Server = {
 	lang: Djs.Locale.EnglishUS,
 	userId: "mara__li",
 };
@@ -18,20 +18,20 @@ describe("roll", () => {
 	});
 	it("A result within a simple roll", () => {
 		const dice = getRoll("1d20+6d2");
-		const res = new ResultAsText(dice, data).parser;
+		const res = new ResultAsText(dice, DATA).parser;
 		expect(res).toContain("d20");
 	});
 	it("A result with a roll + custom success", () => {
 		const customCritical: CustomCritical = {
 			onNaturalDice: false,
-			value: "1d8+{{round($/2)}}+force",
 			sign: ">",
+			value: "1d8+{{round($/2)}}+force",
 		};
 		const dice = getRoll("1d20+6d2");
 		const res = new ResultAsText(
 			dice,
-			data,
-			{ success: 20, failure: 1 },
+			DATA,
+			{ failure: 1, success: 20 },
 			"test",
 			undefined,
 			{ t: customCritical }
@@ -43,8 +43,8 @@ describe("roll", () => {
 describe("custom critical roll", () => {
 	const customCritical: CustomCritical = {
 		onNaturalDice: false,
-		value: "round($/2)+1d8",
 		sign: "<=",
+		value: "round($/2)+1d8",
 	};
 	it("replace the value with the stats", () => {
 		const result = rollCustomCritical({ test: customCritical }, 6);
@@ -56,27 +56,27 @@ describe("custom critical roll", () => {
 		const statValue = 5;
 		const customCritical: CustomCritical = {
 			onNaturalDice: false,
-			value: "round($/2)+test",
 			sign: "<",
+			value: "round($/2)+test",
 		};
 		const result = rollCustomCritical({ test: customCritical }, statValue, userStats);
 		expect(result?.test.dice?.originalDice).toBe("round(5/2)+6");
 	}
 	it("should display the name of critical roll", () => {
 		const result: Resultat = {
-			dice: "1d20>25",
 			compare: {
 				sign: ">",
 				value: 3,
 			},
+			dice: "1d20>25",
 			result: "1d20: [2] = 2",
 			total: 2,
 		};
 		const critical = rollCustomCritical({ test: customCritical }, 6);
 		const res = new ResultAsText(
 			result,
-			data,
-			{ success: 20, failure: 1 },
+			DATA,
+			{ failure: 1, success: 20 },
 			undefined,
 			undefined,
 			critical

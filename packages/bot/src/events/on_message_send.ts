@@ -98,22 +98,22 @@ export default (client: EClient): void => {
 
 			if (isRollChannel) {
 				return await message.reply({
-					content: parser,
 					allowedMentions: { repliedUser: true },
+					content: parser,
 				});
 			}
 
 			let context = {
-				guildId: message.guildId ?? "",
 				channelId: channel.id,
+				guildId: message.guildId ?? "",
 				messageId: message.id,
 			};
 			if (deleteInput && client.settings.get(message.guild.id, "context")) {
 				const messageBefore = await findMessageBefore(channel, message, client);
 				if (messageBefore)
 					context = {
-						guildId: message.guildId ?? "",
 						channelId: channel.id,
+						guildId: message.guildId ?? "",
 						messageId: messageBefore.id,
 					};
 			}
@@ -164,7 +164,7 @@ async function replyDice(
 				content: resultAsText.onMessageSend(idMessage, message.author.id),
 			})
 		: await message.reply({
-				content: resultAsText.onMessageSend(idMessage),
 				allowedMentions: { repliedUser: true },
+				content: resultAsText.onMessageSend(idMessage),
 			});
 }

@@ -72,9 +72,9 @@ async function exportToCsv(
 		for (const char of chara) {
 			const stats = (
 				await getUserFromInteraction(client, user, interaction, char.charName, {
-					skipNotFound: true,
 					fetchAvatar: true,
 					fetchChannel: true,
+					skipNotFound: true,
 				})
 			)?.userData;
 			if (!stats) continue;
@@ -92,17 +92,17 @@ async function exportToCsv(
 			} else if (stats.stats) newStats = stats.stats;
 			const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
 			csv.push({
-				user: `'${user}`,
-				charName: char.charName,
+				avatar: stats.avatar,
 				channel: statChannelAsString,
+				charName: char.charName,
+				dice,
 				isPrivate:
 					char.isPrivate !== undefined
 						? char.isPrivate
 						: isPrivateAllowed
 							? false
 							: undefined,
-				avatar: stats.avatar,
-				dice,
+				user: `'${user}`,
 				...newStats,
 			});
 		}
@@ -113,11 +113,11 @@ async function exportToCsv(
 	if (statsName) columns.push(...statsName);
 	columns.push("dice");
 	const csvText = Papa.unparse(csv, {
-		delimiter: ";",
-		skipEmptyLines: true,
 		columns,
+		delimiter: ";",
 		header: true,
 		quotes: false,
+		skipEmptyLines: true,
 	});
 	return Buffer.from(`\ufeff${csvText}`, "utf-8");
 }

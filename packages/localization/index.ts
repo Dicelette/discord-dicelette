@@ -7,10 +7,10 @@ export * from "./src/types";
 import i18next from "i18next";
 
 await i18next.init({
-	lng: "en",
 	fallbackLng: "en",
-	returnNull: false,
+	lng: "en",
 	resources,
+	returnNull: false,
 });
 
 i18next?.services?.formatter?.add("optional", (value, _lng, _options) => {

@@ -4,11 +4,11 @@ import path from "node:path";
 
 type Target = Record<string, string>;
 
-const sourcePath = path.resolve("./docs/");
+const SOURCE_PATH = path.resolve("./docs/");
 
-const languages = ["en", "fr"];
+const LANGUAGES = ["en", "fr"];
 
-const pathToReplace: Target = {
+const PATH_TO_REPLACE: Target = {
 	"help.admin.messageDB": "message_db",
 	"help.admin.messageNoDB": "message_no_db",
 	"help.bug.message": "bug_report",
@@ -32,10 +32,10 @@ function setNestedKey(obj: any, keyPath: string, value: string) {
 }
 
 function replaceInLocales(dryRun?: boolean) {
-	for (const lang of languages) {
+	for (const lang of LANGUAGES) {
 		const output: Target = {};
-		for (const [key, value] of Object.entries(pathToReplace)) {
-			const filePath = path.join(sourcePath, lang, `${value}.md`);
+		for (const [key, value] of Object.entries(PATH_TO_REPLACE)) {
+			const filePath = path.join(SOURCE_PATH, lang, `${value}.md`);
 			if (fs.existsSync(filePath)) output[key] = fs.readFileSync(filePath, "utf-8");
 			else console.warn(`File not found: ${filePath}`);
 		}

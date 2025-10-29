@@ -1,21 +1,21 @@
 {
-	"name": "@dicelette/types",
-	"version": "1.0.0",
-	"description": "",
-	"type": "module",
-	"main": "dist/index.js",
-	"scripts": {
-		"prebuild": "rimraf dist",
-		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json",
-		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
+	"dependencies": {
+		"@dicelette/utils": "workspace:*",
+		"enmap": "^6.0.3"
 	},
+	"description": "",
+	"main": "dist/index.js",
+	"name": "@dicelette/types",
+	"private": true,
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Dicelette/discord-dicelette.git"
 	},
-	"private": true,
-	"dependencies": {
-		"enmap": "^6.0.3",
-		"@dicelette/utils": "workspace:*"
-	}
+	"scripts": {
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+		"prebuild": "rimraf dist",
+		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
+	},
+	"type": "module",
+	"version": "1.0.0"
 }

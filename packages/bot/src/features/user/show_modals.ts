@@ -85,6 +85,15 @@ async function show(
 	//we will use the new LabelBuilder component to create a label with a text input for the avatar!
 	const avatarInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 		.setLabel(ul("modals.avatar.name"))
+		.setDescription(ul("modals.avatar.file.description"))
+		.setFileUploadComponent(
+			new Djs.FileUploadBuilder()
+				.setCustomId("avatarFile")
+				.setRequired(false)
+				.setMaxValues(1)
+		);
+	//I think an upload is better here. At last we support url in the edit avatar modal
+	/*
 		.setTextInputComponent(
 			new Djs.TextInputBuilder()
 				.setCustomId("avatar")
@@ -93,6 +102,7 @@ async function show(
 				.setValue("")
 				.setStyle(Djs.TextInputStyle.Short)
 		);
+		*/
 
 	const sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	let defaultChannel: Djs.GuildBasedChannel | null = null;

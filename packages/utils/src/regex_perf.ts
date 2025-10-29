@@ -41,10 +41,10 @@ class RegexPerformanceMonitor {
 			.slice(0, 10);
 
 		return sorted.map(([key, stats]) => ({
-			operation: key,
-			count: stats.count,
-			totalTime: Math.round(stats.totalTime * 100) / 100,
 			avgTime: Math.round((stats.totalTime / stats.count) * 100) / 100,
+			count: stats.count,
+			operation: key,
+			totalTime: Math.round(stats.totalTime * 100) / 100,
 		}));
 	}
 
@@ -62,7 +62,7 @@ class RegexPerformanceMonitor {
 	}
 }
 
-export const regexPerfMonitor = RegexPerformanceMonitor.getInstance();
+export const REGEX_PERF_MONITOR = RegexPerformanceMonitor.getInstance();
 
 // Export for testing
 export { RegexPerformanceMonitor };

@@ -27,10 +27,10 @@ export function parseCustomCritical(
 	if (sign === "=") sign = "==";
 	return {
 		[nameStr.trimStart()]: {
+			affectSkill,
+			onNaturalDice,
 			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
 			value: value.standardize().trimAll(),
-			onNaturalDice,
-			affectSkill,
 		},
 	};
 }
@@ -52,10 +52,10 @@ export function parseOpposition(
 	if (sign === "=") sign = "==";
 	if (rolledValue?.total) {
 		return {
-			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
-			value: rolledValue.total,
 			originalDice: rolledValue.dice,
 			rollValue: rolledValue.result,
+			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
+			value: rolledValue.total,
 		};
 	}
 	if (!isNumber(comparator)) return undefined;
@@ -69,20 +69,20 @@ function rollOneCustomCritical(critical: CustomCritical) {
 	const rolledValue = getRoll(critical.value);
 	if (rolledValue?.total)
 		return {
-			onNaturalDice: critical.onNaturalDice,
-			sign: critical.sign,
-			value: rolledValue.total.toString(),
+			affectSkill: critical.affectSkill,
 			dice: {
 				originalDice: rolledValue.dice,
 				rollValue: rolledValue.result,
 			},
-			affectSkill: critical.affectSkill,
+			onNaturalDice: critical.onNaturalDice,
+			sign: critical.sign,
+			value: rolledValue.total.toString(),
 		};
 	return {
+		affectSkill: critical.affectSkill,
 		onNaturalDice: critical.onNaturalDice,
 		sign: critical.sign,
 		value: evaluate(critical.value).toString(),
-		affectSkill: critical.affectSkill,
 	};
 }
 
@@ -159,10 +159,10 @@ export function getCriticalFromDice(
 		} else throw new Error(ul("error.customCritical.type_error", { type }));
 		if (sign === "=") sign = "==";
 		customCritical[textType] = {
+			affectSkill: true,
+			onNaturalDice: !!natDice,
 			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
 			value: value.standardize(),
-			onNaturalDice: !!natDice,
-			affectSkill: true,
 		};
 	}
 	return Object.keys(customCritical).length > 0 ? customCritical : undefined;

@@ -89,7 +89,7 @@ export function macroOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { opposition: true, expression: true });
+	return commonOptions(builder, { expression: true, opposition: true });
 }
 
 /**
@@ -107,7 +107,7 @@ export function dbRollOptions(
 			.setRequired(false)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { expression: true, threshold: true, opposition: true });
+	return commonOptions(builder, { expression: true, opposition: true, threshold: true });
 }
 
 /**
@@ -209,7 +209,7 @@ export function autoComplete(interaction: Djs.AutocompleteInteraction, client: E
 	const choices: string[] = [];
 	let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
 	if (typeof userID !== "string") userID = interaction.user.id;
-	return { fixed, guildData, choices, ul, userID };
+	return { choices, fixed, guildData, ul, userID };
 }
 
 export function autoCompleteCharacters(

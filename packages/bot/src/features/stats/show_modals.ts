@@ -37,7 +37,7 @@ export async function show(
 			: page;
 	const modal = new Djs.ModalBuilder()
 		.setCustomId(`page${page}`)
-		.setTitle(ul("modals.steps", { page, max: nbOfPages + 1 }));
+		.setTitle(ul("modals.steps", { max: nbOfPages + 1, page }));
 	let statToDisplay = statsWithoutCombinaison;
 	if (stats && stats.length > 0) {
 		statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
@@ -62,7 +62,7 @@ export async function show(
 		if (value.combinaison) continue;
 		let msg = "";
 		if (value.min && value.max)
-			msg = ul("modals.enterValue.minAndMax", { min: value.min, max: value.max });
+			msg = ul("modals.enterValue.minAndMax", { max: value.max, min: value.min });
 		else if (value.min) msg = ul("modals.enterValue.minOnly", { min: value.min });
 		else if (value.max) msg = ul("modals.enterValue.maxOnly", { max: value.max });
 

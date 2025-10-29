@@ -20,7 +20,7 @@ export function getChangelogSince(version: string, inclusive = false): string {
 		const start = matches[i].index ?? 0;
 		const end =
 			i + 1 < matches.length ? (matches[i + 1].index ?? content.length) : content.length;
-		entries.push({ version: matches[i][1], start, end });
+		entries.push({ end, start, version: matches[i][1] });
 	}
 
 	// Inclusif ou strict selon le flag
@@ -72,7 +72,7 @@ export function splitChangelogByVersion(fullChangelog: string, limit = 4000): st
 
 		const section = fullChangelog.slice(start, end).trim();
 
-		if ((current + "\n\n" + section).length > limit) {
+		if (`${current}\n\n${section}`.length > limit) {
 			if (current.length > 0) slices.push(current.trim());
 			current = section;
 		} else {

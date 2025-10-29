@@ -7,17 +7,17 @@ import { deleteAfter } from "./send";
 import { fetchThread, setTags } from "./thread";
 
 // Cache for compiled regex patterns to avoid recompilation
-const regexCache = new Map<string, RegExp>();
+const REGEX_CACHE = new Map<string, RegExp>();
 
 /**
  * Get or create a cached regex pattern
  */
 function getCachedRegex(pattern: string, flags: string): RegExp {
 	const key = `${pattern}|${flags}`;
-	let regex = regexCache.get(key);
+	let regex = REGEX_CACHE.get(key);
 	if (!regex) {
 		regex = new RegExp(pattern, flags);
-		regexCache.set(key, regex);
+		REGEX_CACHE.set(key, regex);
 	}
 	return regex;
 }
@@ -66,8 +66,8 @@ async function findOrCreateOoc(msgChannel: DiscordTextChannel, ul: Translation) 
 			const thread = await fetchThread(msgChannel.parent);
 			if (thread) return thread;
 			return await msgChannel.parent.threads.create({
-				name: `📄 ${ul("common.ooc")}`,
 				autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneDay,
+				name: `📄 ${ul("common.ooc")}`,
 				reason: "Creating OOC thread",
 			});
 		}
@@ -77,11 +77,11 @@ async function findOrCreateOoc(msgChannel: DiscordTextChannel, ul: Translation) 
 			if (thread) return thread;
 			const tags = await setTags(msgChannel.parent, ul("common.ooc"), "📄");
 			return await msgChannel.parent.threads.create({
-				name: `📄 ${ul("common.ooc")} - ${msgChannel.name}`,
-				autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneDay,
-				reason: "Creating OOC thread",
 				appliedTags: [tags.id as string],
+				autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneDay,
 				message: { content: `${ul("common.ooc")} - ${msgChannel.name}` },
+				name: `📄 ${ul("common.ooc")} - ${msgChannel.name}`,
+				reason: "Creating OOC thread",
 			});
 		}
 	}
@@ -89,8 +89,8 @@ async function findOrCreateOoc(msgChannel: DiscordTextChannel, ul: Translation) 
 		const thread = await fetchThread(msgChannel);
 		if (thread) return thread;
 		return await msgChannel.threads.create({
-			name: `📄${ul("common.ooc")}`,
 			autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneDay,
+			name: `📄${ul("common.ooc")}`,
 			reason: "Creating OOC thread",
 		});
 	}
@@ -105,11 +105,11 @@ async function forwardOoc(
 	logger.trace("Forwarding OOC message", message.content);
 	const forward = new Djs.EmbedBuilder()
 		.setAuthor({
+			iconURL: message.member?.displayAvatarURL() ?? message.author.displayAvatarURL(),
 			name:
 				message.member?.displayName ??
 				message.author.globalName ??
 				message.author.username,
-			iconURL: message.member?.displayAvatarURL() ?? message.author.displayAvatarURL(),
 		})
 		.setDescription(
 			replaceOOC(regex, message.content) +

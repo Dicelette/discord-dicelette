@@ -13,7 +13,7 @@ export function getLangAndConfig(
 	const ul = ln(langToUse);
 	if (interaction.guild) {
 		const config = client.settings.get(guildId ?? interaction.guild.id);
-		return { langToUse, ul, config };
+		return { config, langToUse, ul };
 	}
 	return { langToUse, ul };
 }

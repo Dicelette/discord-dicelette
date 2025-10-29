@@ -12,10 +12,6 @@ import { autoCompleteCharacters, calcOptions } from "utils";
 import "discord_ext";
 
 export const calc = {
-	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setNames("calc.title")
-		.setDescriptions("calc.description")
-		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
 		const sign = autoFocuseSign(interaction);
@@ -29,6 +25,10 @@ export const calc = {
 			}))
 		);
 	},
+	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
+		.setNames("calc.title")
+		.setDescriptions("calc.description")
+		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const { userStatistique, options, ul, optionChar } =
@@ -147,9 +147,9 @@ export async function calculate(
 			return await interaction.reply({ embeds: [embed] });
 		}
 		statInfo = {
-			value: undefined,
-			stat: options.getString(t("common.statistic"), true).standardize(),
 			name: options.getString(t("common.statistic"), true),
+			stat: options.getString(t("common.statistic"), true).standardize(),
+			value: undefined,
 		};
 		const rightValue = getRightValue(
 			userStatistique,
@@ -195,8 +195,8 @@ export async function calculate(
 			client.settings.get(interaction.guildId!, "timestamp") ?? false,
 			{
 				guildId: interaction.guildId!,
-				userId: interaction.user.id,
 				ul,
+				userId: interaction.user.id,
 			},
 			statInfo?.name,
 			comments,

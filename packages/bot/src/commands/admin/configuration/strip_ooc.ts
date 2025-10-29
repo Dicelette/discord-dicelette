@@ -61,8 +61,8 @@ export async function stripOOC(
 			.setMaxValues(25)
 	);
 	const response = await interaction.reply({
-		content: ul("config.stripOOC.select"),
 		components: [row],
+		content: ul("config.stripOOC.select"),
 		withResponse: true,
 	});
 	try {
@@ -75,8 +75,8 @@ export async function stripOOC(
 			throw new Error(ul("error.failedReply"));
 		}
 		const selection = response.resource.message.createMessageComponentCollector({
-			filter: collectorFilter,
 			componentType: Djs.ComponentType.ChannelSelect,
+			filter: collectorFilter,
 			time: 60_000, // Timeout en ms
 		});
 		selection.on("collect", async (i) => {
@@ -85,11 +85,11 @@ export async function stripOOC(
 			if (values.length > 0) {
 				if (threadMode) channel = null;
 				const stripOOC: Partial<StripOOC> = {
-					regex: regex,
-					timer: timer ? timer * 1000 : 0,
-					forwardId: channel?.id ?? undefined,
-					threadMode: threadMode ?? false,
 					categoryId: values,
+					forwardId: channel?.id ?? undefined,
+					regex: regex,
+					threadMode: threadMode ?? false,
+					timer: timer ? timer * 1000 : 0,
 				};
 				const categories = (
 					await Promise.all(values.map((v) => isCatOrChannel(v, interaction.guild!)))
@@ -101,11 +101,11 @@ export async function stripOOC(
 				await interaction.editReply({
 					components: [],
 					content: ul("config.stripOOC.success", {
-						regex: regex ?? ul("common.no"),
-						timer: timer ? `${timer}s` : ul("common.no"),
-						channel: channel ? Djs.channelMention(channel.id) : ul("common.no"),
-						threadMode: threadMode ? ul("common.yes") : ul("common.no"),
 						categories,
+						channel: channel ? Djs.channelMention(channel.id) : ul("common.no"),
+						regex: regex ?? ul("common.no"),
+						threadMode: threadMode ? ul("common.yes") : ul("common.no"),
+						timer: timer ? `${timer}s` : ul("common.no"),
 					}),
 				});
 			}
@@ -113,8 +113,8 @@ export async function stripOOC(
 	} catch (e) {
 		console.error("Error in stripOOC selection:", e);
 		await interaction.editReply({
-			content: ul("config.stripOOC.timeOut"),
 			components: [],
+			content: ul("config.stripOOC.timeOut"),
 		});
 		return;
 	}

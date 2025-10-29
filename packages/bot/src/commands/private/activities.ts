@@ -2,7 +2,7 @@
 import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { getLangAndConfig } from "../../utils";
+import { getLangAndConfig } from "utils";
 
 export default {
 	data: new Djs.SlashCommandBuilder()
@@ -23,33 +23,33 @@ export default {
 				.setChoices(
 					{
 						name: t("activities.playing"),
-						value: Djs.ActivityType.Playing,
 						name_localizations: cmdLn("activities.playing"),
+						value: Djs.ActivityType.Playing,
 					},
 					{
 						name: t("activities.streaming"),
-						value: Djs.ActivityType.Streaming,
 						name_localizations: cmdLn("activities.streaming"),
+						value: Djs.ActivityType.Streaming,
 					},
 					{
 						name: t("activities.listening"),
-						value: Djs.ActivityType.Listening,
 						name_localizations: cmdLn("activities.listening"),
+						value: Djs.ActivityType.Listening,
 					},
 					{
 						name: t("activities.watching"),
-						value: Djs.ActivityType.Watching,
 						name_localizations: cmdLn("activities.watching"),
+						value: Djs.ActivityType.Watching,
 					},
 					{
 						name: t("activities.competing"),
-						value: Djs.ActivityType.Competing,
 						name_localizations: cmdLn("activities.competing"),
+						value: Djs.ActivityType.Competing,
 					},
 					{
 						name: t("activities.custom"),
-						value: Djs.ActivityType.Custom,
 						name_localizations: cmdLn("activities.custom"),
+						value: Djs.ActivityType.Custom,
 					}
 				)
 		),

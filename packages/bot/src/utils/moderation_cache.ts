@@ -15,7 +15,7 @@ export type ModerationCacheValue =
 			meta: { userID: string; userName?: string; channelId: string; messageId: string };
 	  };
 
-const cache = new Map<string, ModerationCacheValue>();
+const CACHE = new Map<string, ModerationCacheValue>();
 
 export function makeEmbedKey(guildId: string, channelId: string, messageId: string) {
 	return `${guildId}:${channelId}:${messageId}`;
@@ -28,26 +28,26 @@ export function parseEmbedKey(
 	if (parts.length !== 3) return undefined;
 	const [guildId, channelId, messageId] = parts;
 	if (!guildId || !channelId || !messageId) return undefined;
-	return { guildId, channelId, messageId };
+	return { channelId, guildId, messageId };
 }
 
 export function putModerationCache(key: string, value: ModerationCacheValue) {
-	cache.set(key, value);
+	CACHE.set(key, value);
 }
 
 export function getModerationCache(key: string) {
-	return cache.get(key);
+	return CACHE.get(key);
 }
 
 export function deleteModerationCache(key: string) {
-	cache.delete(key);
+	CACHE.delete(key);
 }
 
 // CustomId helpers (prefixes remain aligned with current routing)
 export const CUSTOM_ID_PREFIX = {
-	stats: { validate: "modo_stats_validation_", cancel: "modo_stats_cancel_" },
-	diceEdit: { validate: "modo_dice_validation_", cancel: "modo_dice_cancel_" },
-	diceAdd: { validate: "modo_dice_add_validation_", cancel: "modo_dice_add_cancel_" },
+	diceAdd: { cancel: "modo_dice_add_cancel_", validate: "modo_dice_add_validation_" },
+	diceEdit: { cancel: "modo_dice_cancel_", validate: "modo_dice_validation_" },
+	stats: { cancel: "modo_stats_cancel_", validate: "modo_stats_validation_" },
 } as const;
 
 export function buildCustomId(prefix: string, key: string) {
@@ -120,7 +120,7 @@ export function getUserId(interaction: Djs.ButtonInteraction) {
 		if (meta)
 			url = `https://discord.com/channels/${interaction.guild!.id}/${meta.channelId}/${meta.messageId}`;
 	}
-	if (userId) return { userId, url };
+	if (userId) return { url, userId };
 
 	//get footer to find userId
 	const apiEmbed = interaction.message.embeds[0];
@@ -129,5 +129,5 @@ export function getUserId(interaction: Djs.ButtonInteraction) {
 		userId = data?.userID;
 		url = `https://discord.com/channels/${interaction.guild!.id}/${data?.channelId}/${data?.messageId}`;
 	}
-	return { userId, url };
+	return { url, userId };
 }

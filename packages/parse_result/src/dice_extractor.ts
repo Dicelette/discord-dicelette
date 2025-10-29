@@ -28,14 +28,14 @@ function getCachedRegex(pattern: string, flags = ""): RegExp {
 
 // Pre-compiled frequently used regex patterns
 const COMPILED_PATTERNS = {
-	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
-	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
-	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
 	ASTERISK_ESCAPE: /\*/g,
-	STAT_COMMENTS_REMOVER: /%%.*%%/,
 	AT_MENTION_REMOVER: / @\w+/,
-	SIGN_REMOVER: /[><=!]+.*$/,
+	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
 	EXP_REMOVER: /\{exp.*?\}/g,
+	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
+	SIGN_REMOVER: /[><=!]+.*$/,
+	STAT_COMMENTS_REMOVER: /%%.*%%/,
+	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
 } as const;
 
 export function extractDiceData(content: string): DiceData {
@@ -97,8 +97,8 @@ export function processChainedComments(
 			.trim();
 
 		return {
-			content,
 			comments: globalComments ?? undefined,
+			content,
 		};
 	}
 
@@ -108,8 +108,8 @@ export function processChainedComments(
 		.trimEnd();
 
 	return {
-		content: finalContent,
 		comments: getComments(content, comments),
+		content: finalContent,
 	};
 }
 
@@ -127,7 +127,7 @@ export function performDiceRoll(
 			infoRoll = res.infoRoll;
 		}
 		rollContent = rollContent.replace(/ @\w+/, "").trimEnd();
-		return { resultat: roll(rollContent), infoRoll };
+		return { infoRoll, resultat: roll(rollContent) };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -174,7 +174,7 @@ export function processChainedDiceRoll(
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
 		if (globalComments) rollResult.comment = globalComments;
-		return { resultat: rollResult, infoRoll };
+		return { infoRoll, resultat: rollResult };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -205,9 +205,9 @@ export function isRolling(
 		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
 		if (diceRoll?.resultat)
 			return {
-				result: diceRoll.resultat,
 				detectRoll: diceData.bracketRoll,
 				infoRoll: diceRoll.infoRoll,
+				result: diceRoll.resultat,
 			};
 	}
 
@@ -221,9 +221,9 @@ export function isRolling(
 		);
 		if (diceRoll)
 			return {
-				result: diceRoll.resultat,
 				detectRoll: undefined,
 				infoRoll: diceRoll.infoRoll,
+				result: diceRoll.resultat,
 			};
 	}
 	if (hasValidDice(diceData)) {
@@ -241,7 +241,7 @@ export function isRolling(
 		const diceRoll = performDiceRoll(finalContent, undefined, userData);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
-		return { result: diceRoll.resultat, detectRoll: undefined };
+		return { detectRoll: undefined, result: diceRoll.resultat };
 	}
 
 	return undefined;

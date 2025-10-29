@@ -57,12 +57,12 @@ export function parseTemplateField(embed: Record<string, string>): {
 	const success = embed?.["roll.critical.success"];
 	const failure = embed?.["roll.critical.failure"];
 	return {
-		diceType: embed?.["common.dice"] || undefined,
 		critical: {
-			success: isNumber(success) ? Number.parseInt(success, 10) : undefined,
 			failure: isNumber(failure) ? Number.parseInt(failure, 10) : undefined,
+			success: isNumber(success) ? Number.parseInt(success, 10) : undefined,
 		},
 		customCritical: parseEmbedToCritical(embed),
+		diceType: embed?.["common.dice"] || undefined,
 	};
 }
 

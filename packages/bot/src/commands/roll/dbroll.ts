@@ -6,10 +6,6 @@ import { autoCompleteCharacters, dbRollOptions, rollStatistique } from "utils";
 import "discord_ext";
 
 export const dbRoll = {
-	data: (dbRollOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
-		.setNames("dbRoll.name")
-		.setDescriptions("dbRoll.description")
-		.setDefaultMemberPermissions(0),
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const filter = autoCompleteCharacters(interaction, client) ?? [];
 		await interaction.respond(
@@ -19,6 +15,10 @@ export const dbRoll = {
 			}))
 		);
 	},
+	data: (dbRollOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
+		.setNames("dbRoll.name")
+		.setDescriptions("dbRoll.description")
+		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { userStatistique, options, ul, optionChar } =
 			(await getStatistics(interaction, client)) ?? {};

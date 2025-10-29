@@ -1,7 +1,7 @@
 import type { Settings } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { fetchChannel, fetchMember } from "./fetch";
-import { logger } from "@dicelette/utils";
 
 async function fetchDiceRole(diceEmbed: boolean, guild: Djs.Guild, role?: string) {
 	if (!diceEmbed || !role) return;

@@ -34,8 +34,8 @@ export async function createDefaultThread(
 	) as Djs.AnyThreadChannel | undefined;
 	if (!thread) {
 		thread = (await parent.threads.create({
-			name: "📝 • [STATS]",
 			autoArchiveDuration: 10080,
+			name: "📝 • [STATS]",
 		})) as Djs.AnyThreadChannel;
 		if (save) setDefaultManagerId(guildData, interaction, thread.id);
 	}
@@ -46,7 +46,7 @@ export async function fetchThread(
 	parent: Djs.TextChannel | Djs.NewsChannel | Djs.ForumChannel
 ): Promise<Djs.AnyThreadChannel | undefined> {
 	const threads: Djs.Collection<string, Djs.AnyThreadChannel> =
-		//@ts-ignore
+		//@ts-expect-error
 		parent.threads.cache.filter(
 			(thread: Djs.ThreadChannel) =>
 				thread.name.startsWith("📄") && thread.parentId === parent.id
@@ -79,15 +79,15 @@ export async function setTags(
 
 	const availableTags: Djs.GuildForumTagData[] = allTags.map((tag) => {
 		return {
+			emoji: tag.emoji,
 			id: tag.id,
 			moderated: tag.moderated,
 			name: tag.name,
-			emoji: tag.emoji,
 		};
 	});
 	availableTags.push({
-		name: tagName,
 		emoji: { id: null, name: tagEmoji },
+		name: tagName,
 	});
 	await forum.setAvailableTags(availableTags);
 
@@ -111,6 +111,7 @@ export async function setTags(
  * @param threadId - The ID of the thread or channel to repost in.
  * @param characters - Character data for the guild.
  *
+ * @param files
  * @throws {Error} If the target thread or starter message cannot be found or created.
  */
 export async function repostInThread(
@@ -122,7 +123,8 @@ export async function repostInThread(
 	which: { stats?: boolean; dice?: boolean; template?: boolean },
 	guildData: Settings,
 	threadId: string,
-	characters: Characters
+	characters: Characters,
+	files: Djs.AttachmentBuilder[] = []
 ) {
 	userTemplate.userName = userTemplate.userName
 		? userTemplate.userName.toLowerCase()
@@ -138,8 +140,9 @@ export async function repostInThread(
 			})
 		);
 	const dataToSend = {
-		embeds: embed,
 		components: [editUserButtons(ul, which.stats, which.dice), selectEditMenu(ul)],
+		embeds: embed,
+		files,
 	};
 	let isForumThread = false;
 	let thread = await searchUserChannel(guildData, interaction, ul, threadId, true);
@@ -153,9 +156,9 @@ export async function repostInThread(
 				(await fetchMember(interaction.guild!, userId))?.displayName;
 			//create a new thread in the forum
 			const newThread = await channel.threads.create({
-				name: userName ?? `${ul("common.sheet")} ${ul("common.character").toUpperCase()}`,
 				autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneWeek,
 				message: dataToSend,
+				name: userName ?? `${ul("common.sheet")} ${ul("common.character").toUpperCase()}`,
 			});
 			thread = newThread as Djs.AnyThreadChannel;
 			isForumThread = true;
@@ -180,11 +183,11 @@ export async function repostInThread(
 	if (!isForumThread) msg = await thread.send(dataToSend);
 	if (!msg) throw new Error(ul("error.channel.thread"));
 	const userRegister: UserRegistration = {
-		userID: userId,
-		isPrivate: userTemplate.private,
 		charName: userTemplate.userName,
 		damage: damageName,
+		isPrivate: userTemplate.private,
 		msgId: [msg.id, thread.id],
+		userID: userId,
 	};
 	const userData = await updateMemory(characters, interaction.guild!.id, userId, ul, {
 		userData: userTemplate,
@@ -246,7 +249,7 @@ export async function findLocation(
 		await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
 		return { sheetLocation };
 	}
-	return { thread, sheetLocation };
+	return { sheetLocation, thread };
 }
 
 /**
@@ -392,9 +395,9 @@ export async function findForumChannel(
 	}
 	//create new forum thread
 	return await forum.threads.create({
-		name: `🎲 ${topic}`,
-		message: { content: ul("roll.reason") },
 		appliedTags: [tags.id as string],
+		message: { content: ul("roll.reason") },
+		name: `🎲 ${topic}`,
 	});
 }
 

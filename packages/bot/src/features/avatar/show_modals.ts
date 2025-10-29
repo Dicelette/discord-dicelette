@@ -38,12 +38,21 @@ async function showAvatarEdit(
 		.addLabelComponents((label) =>
 			label
 				.setLabel(ul("modals.avatar.name"))
+				.setDescription(ul("modals.avatar.description"))
 				.setTextInputComponent((input) =>
 					input
 						.setCustomId("avatar")
 						.setValue(thumbnail)
-						.setRequired(true)
+						.setRequired(false)
 						.setStyle(Djs.TextInputStyle.Short)
+				)
+		)
+		.addLabelComponents((label) =>
+			label
+				.setLabel(ul("modals.avatar.name"))
+				.setDescription(ul("modals.avatar.file.description"))
+				.setFileUploadComponent((file) =>
+					file.setCustomId("avatarFile").setRequired(false).setMaxValues(1)
 				)
 		);
 

@@ -21,15 +21,29 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 		interaction.message.id
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-	const avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
-	if (!verifyAvatarUrl(avatar))
-		return await reply(interaction, { embeds: [embedError(ul("error.avatar.url"), ul)] });
-
+	const avatarFile = interaction.fields.getUploadedFiles("avatarFile");
+	let avatar = "";
+	const files = [];
+	if (avatarFile) {
+		const file = avatarFile.first();
+		if (file) {
+			const attachment = new Djs.AttachmentBuilder(file.url, { name: file.name });
+			avatar = `attachment://${attachment.name}`;
+			files.push(attachment);
+		}
+	} else {
+		avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
+		if (!verifyAvatarUrl(avatar))
+			return await reply(interaction, {
+				embeds: [embedError(ul("error.avatar.url"), ul)],
+			});
+	}
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	embed.setThumbnail(avatar);
-	const embedsList = getEmbedsList({ which: "user", embed }, message);
-	await message.edit({ embeds: embedsList.list });
+	const embedsList = getEmbedsList({ embed, which: "user" }, message);
+
+	await message.edit({ embeds: embedsList.list, files });
 	const user = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")?.value;
@@ -40,7 +54,7 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 		!charName || findln(charName) === "common.noSet" ? user : `${user} (${charName})`;
 	const msgLink = message.url;
 	await reply(interaction, {
-		content: ul("edit.avatar.success", { name: nameMention, link: msgLink }),
+		content: ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 }

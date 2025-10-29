@@ -111,9 +111,9 @@ export async function sendValidationMessage(
 	if (logChannel)
 		await Messages.sendLogs(
 			ul("logs.validationWaiting", {
-				user: `${interactionUser.id}`,
-				url: interaction.message.url,
 				role: `\n -# ${pingModeratorRole(interaction.guild!)}`,
+				url: interaction.message.url,
+				user: `${interactionUser.id}`,
 			}),
 			interaction.guild!,
 			client.settings,
@@ -125,9 +125,9 @@ export async function sendValidationMessage(
 		if (systemChannel?.isSendable()) {
 			await systemChannel.send({
 				content: ul("logs.validationWaiting", {
-					user: `${interactionUser.id}`,
-					url: interaction.message.url,
 					role: `\n -# ${pingModeratorRole(interaction.guild!)}`,
+					url: interaction.message.url,
+					user: `${interactionUser.id}`,
 				}),
 			});
 		} else {
@@ -137,9 +137,9 @@ export async function sendValidationMessage(
 				try {
 					await owner.send({
 						content: ul("logs.validationWaiting", {
-							user: `${interactionUser.id}`,
-							url: interaction.message.url,
 							role: "",
+							url: interaction.message.url,
+							user: `${interactionUser.id}`,
 						}),
 					});
 				} catch (e) {
@@ -214,9 +214,9 @@ export async function validateUser(
 			diceEmbed = Messages.createDiceEmbed(ul);
 		}
 		diceEmbed.addFields({
+			inline: true,
 			name: field.name.unidecode(true).capitalize(),
 			value: field.value && field.value.trim().length > 0 ? `\`${field.value}\`` : "_ _",
-			inline: true,
 		});
 	}
 	for (const field of statEmbedsFields) {
@@ -224,9 +224,9 @@ export async function validateUser(
 			statsEmbed = Messages.createStatsEmbed(ul);
 		}
 		statsEmbed.addFields({
+			inline: true,
 			name: field.name.unidecode(true).capitalize(),
 			value: field.value,
-			inline: true,
 		});
 	}
 
@@ -266,23 +266,23 @@ export async function validateUser(
 		if (Dice.findDuplicate(diceEmbed, name)) continue;
 		//why i forgot this????
 		diceEmbed.addFields({
+			inline: true,
 			name: `${name}`,
 			value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
-			inline: true,
 		});
 	}
 	const jsonThumbnail = userEmbed.toJSON().thumbnail?.url;
 	const userStatistique: UserData = {
-		userName: charName,
-		stats,
-		template: {
-			diceType: template.diceType,
-			critical: template.critical,
-			customCritical: template.customCritical,
-		},
+		avatar: jsonThumbnail ? cleanAvatarUrl(jsonThumbnail) : undefined,
 		damage: templateMacro,
 		private: isPrivate,
-		avatar: jsonThumbnail ? cleanAvatarUrl(jsonThumbnail) : undefined,
+		stats,
+		template: {
+			critical: template.critical,
+			customCritical: template.customCritical,
+			diceType: template.diceType,
+		},
+		userName: charName,
 	};
 	let templateEmbed: Djs.EmbedBuilder | undefined;
 	if (
@@ -293,22 +293,22 @@ export async function validateUser(
 		templateEmbed = Messages.createTemplateEmbed(ul);
 		if (template.diceType && template.diceType.length > 0)
 			templateEmbed.addFields({
+				inline: true,
 				name: ul("common.dice").capitalize(),
 				value: `\`${template.diceType}\``,
-				inline: true,
 			});
 		if (template.critical?.success) {
 			templateEmbed.addFields({
+				inline: true,
 				name: ul("roll.critical.success"),
 				value: `\`${template.critical.success}\``,
-				inline: true,
 			});
 		}
 		if (template.critical?.failure) {
 			templateEmbed.addFields({
+				inline: true,
 				name: ul("roll.critical.failure"),
 				value: `\`${template.critical.failure}\``,
-				inline: true,
 			});
 		}
 		const criticalTemplate = template.customCritical ?? {};
@@ -320,16 +320,20 @@ export async function validateUser(
 		diceEmbed,
 		templateEmbed
 	);
+	const files = interaction.message.attachments.map(
+		(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
+	);
 	await Messages.repostInThread(
 		allEmbeds,
 		interaction,
 		userStatistique,
 		userID,
 		ul,
-		{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
+		{ dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
 		client.settings,
 		channelToPost.replace("<#", "").replace(">", ""),
-		characters
+		characters,
+		files
 	);
 	try {
 		await interaction.message.delete();

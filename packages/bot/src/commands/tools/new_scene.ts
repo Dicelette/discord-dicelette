@@ -72,11 +72,11 @@ export default {
 						reason: ul("scene.reason"),
 					})
 				: await (channel.parent as Djs.ForumChannel).threads.create({
-						name: threadName,
-						message: { content: ul("scene.reason") },
 						appliedTags: [
 							(await setTags(channel.parent as Djs.ForumChannel)).id as string,
 						],
+						message: { content: ul("scene.reason") },
+						name: threadName,
 					});
 
 			const threadMention = Djs.channelMention(newThread.id);

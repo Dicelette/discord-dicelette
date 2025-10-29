@@ -135,9 +135,9 @@ async function registerDamageDice(
 	if (oldDiceEmbeds?.fields)
 		for (const field of oldDiceEmbeds.fields) {
 			const newField = {
+				inline: field.inline,
 				name: capitalizeBetweenPunct(field.name),
 				value: field.value,
-				inline: field.inline,
 			};
 			//add fields only if not already in the diceEmbed
 			if (
@@ -149,15 +149,15 @@ async function registerDamageDice(
 				diceEmbed.addFields(newField);
 			}
 		}
-	const user = getUserByEmbed({ message: interaction.message }, ul, first);
+	const user = getUserByEmbed({ message: interaction.message }, first);
 	if (!user) throw new Error(ul("error.user.notFound")); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
 	if (!findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {
 		diceEmbed.addFields({
+			inline: true,
 			name: capitalizeBetweenPunct(name),
 			value: `\`${value}\``,
-			inline: true,
 		});
 	} else {
 		const allFieldWithoutDuplicate = diceEmbed
@@ -167,9 +167,9 @@ async function registerDamageDice(
 			diceEmbed.setFields([
 				...allFieldWithoutDuplicate,
 				{
+					inline: true,
 					name: capitalizeBetweenPunct(name),
 					value: `\`${value}\``,
-					inline: true,
 				},
 			]);
 		}
@@ -230,24 +230,24 @@ async function registerDamageDice(
 			);
 			// Footer de secours pour robustesse post-redémarrage
 			setModerationFooter(diceEmbed, {
-				userID,
-				userName,
 				channelId: interaction.message.channelId,
 				messageId: interaction.message.id,
+				userID,
+				userName,
 			});
 			putModerationCache(embedKey, {
-				kind: "dice-add",
 				embeds: allEmbeds,
+				kind: "dice-add",
 				meta: {
-					userID,
-					userName,
 					channelId: interaction.message.channelId,
 					messageId: interaction.message.id,
+					userID,
+					userName,
 				},
 			});
 
 			const row = buildModerationButtons("dice-add", ul, embedKey);
-			await reply(interaction, { embeds: [diceEmbed], components: [row] });
+			await reply(interaction, { components: [row], embeds: [diceEmbed] });
 			return; // ne pas appliquer directement
 		}
 		const userRegister: {
@@ -256,10 +256,10 @@ async function registerDamageDice(
 			damage: string[] | undefined;
 			msgId: UserMessageId;
 		} = {
-			userID,
 			charName: userName,
 			damage: damageName ? Object.keys(damageName) : undefined,
 			msgId: [interaction.message.id, interaction.message.channel.id],
+			userID,
 		};
 		await registerUser(userRegister, interaction, db, false);
 		await updateMemory(client.characters, interaction.guild.id, userID, ul, {
@@ -302,7 +302,7 @@ async function edit(
 	compare?: string,
 	first?: boolean
 ) {
-	await interaction?.message?.edit({ embeds: allEmbeds, components });
+	await interaction?.message?.edit({ components, embeds: allEmbeds });
 	await reply(interaction, {
 		content: ul("modals.added.dice"),
 		flags: Djs.MessageFlags.Ephemeral,
@@ -311,17 +311,17 @@ async function edit(
 	if (!compare)
 		return await sendLogs(
 			ul("logs.dice.add", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: interaction.message?.url ?? "no url",
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				fiche: interaction.message?.url ?? "no url",
+				user: Djs.userMention(interaction.user.id),
 			}),
 			interaction.guild as Djs.Guild,
 			db
 		);
 	const msg = ul("logs.dice.add", {
-		user: Djs.userMention(interaction.user.id),
-		fiche: interaction.message?.url ?? "no url",
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		fiche: interaction.message?.url ?? "no url",
+		user: Djs.userMention(interaction.user.id),
 	});
 	return await sendLogs(`${msg}\n${compare}`, interaction.guild as Djs.Guild, db);
 }

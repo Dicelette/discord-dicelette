@@ -11,13 +11,13 @@ import type * as Djs from "discord.js";
  */
 function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 	if (!message.content)
-		return { success: 0, failure: 0, criticalFailure: 0, criticalSuccess: 0 };
+		return { criticalFailure: 0, criticalSuccess: 0, failure: 0, success: 0 };
 	const msgs = message.content.split("\n");
 	const count: Count = {
-		success: 0,
-		failure: 0,
 		criticalFailure: 0,
 		criticalSuccess: 0,
+		failure: 0,
+		success: 0,
 	};
 	if (!msgs.length) return count;
 	for (const msg of msgs) {
@@ -69,10 +69,10 @@ function addCount(
 	}
 
 	const newCount: Count = {
-		success: existingCount.success + messageCount.success,
-		failure: existingCount.failure + messageCount.failure,
 		criticalFailure: existingCount.criticalFailure + messageCount.criticalFailure,
 		criticalSuccess: existingCount.criticalSuccess + messageCount.criticalSuccess,
+		failure: existingCount.failure + messageCount.failure,
+		success: existingCount.success + messageCount.success,
 	};
 	criticalCount.set(guildId, newCount, userId);
 }
@@ -87,8 +87,6 @@ function removeCount(
 	if (!existingCount) return; //we can't remove what doesn't exist
 
 	const newCount: Count = {
-		success: Math.max(0, existingCount.success - messageCount.success),
-		failure: Math.max(0, existingCount.failure - messageCount.failure),
 		criticalFailure: Math.max(
 			0,
 			existingCount.criticalFailure - messageCount.criticalFailure
@@ -97,6 +95,8 @@ function removeCount(
 			0,
 			existingCount.criticalSuccess - messageCount.criticalSuccess
 		),
+		failure: Math.max(0, existingCount.failure - messageCount.failure),
+		success: Math.max(0, existingCount.success - messageCount.success),
 	};
 	criticalCount.set(guildId, newCount, userId);
 }

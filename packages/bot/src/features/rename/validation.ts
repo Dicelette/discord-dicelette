@@ -46,7 +46,7 @@ export async function validate(
 		messageId: message.id,
 	};
 	if (!user) throw new Error(ul("error.user.notFound"));
-	const charData = getUserByEmbed({ message: message }, ul);
+	const charData = getUserByEmbed({ message: message });
 	if (!charData) throw new Error(ul("error.user.youRegistered"));
 	const oldData: {
 		charName?: string | null;
@@ -55,9 +55,9 @@ export async function validate(
 		isPrivate?: boolean;
 	} = {
 		charName: charData.userName,
-		messageId: [sheetLocation.messageId, sheetLocation.channelId],
 		damageName: Object.keys(charData.damage ?? {}),
 		isPrivate: charData.private,
+		messageId: [sheetLocation.messageId, sheetLocation.channelId],
 	};
 	const guildData = client.settings.get(interaction.guildId as string);
 	if (!guildData) return;

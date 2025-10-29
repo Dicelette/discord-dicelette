@@ -20,13 +20,13 @@ export async function updateMemory(
 	characters: Characters,
 	guildId: string,
 	userID: string,
-	ul: Translation,
+	_ul: Translation,
 	data: Partial<{ userData: UserData; message: Djs.Message; embeds: Djs.EmbedBuilder[] }>
 ) {
 	let { userData, message, embeds } = data;
 	if (!userData) {
-		if (embeds) userData = getUserByEmbed({ embeds }, ul);
-		else if (message) userData = getUserByEmbed({ message }, ul);
+		if (embeds) userData = getUserByEmbed({ embeds });
+		else if (message) userData = getUserByEmbed({ message });
 		else return;
 		if (!userData) return;
 	}

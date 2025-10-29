@@ -7,10 +7,10 @@ import * as Djs from "discord.js";
 import { klona } from "klona";
 import { diceRoll } from "./base_roll";
 
-const copyDiceRoll = klona(diceRoll);
+const COPY_DICE_ROLL = klona(diceRoll);
 
 export const mpDiceRoll = {
-	data: (copyDiceRoll.data as Djs.SlashCommandBuilder)
+	data: (COPY_DICE_ROLL.data as Djs.SlashCommandBuilder)
 		.setNames("roll.mp_name")
 		.setContexts(
 			Djs.InteractionContextType.BotDM,
@@ -20,6 +20,6 @@ export const mpDiceRoll = {
 		interaction: Djs.ChatInputCommandInteraction,
 		client: EClient
 	): Promise<void> {
-		return await copyDiceRoll.execute(interaction, client);
+		return await COPY_DICE_ROLL.execute(interaction, client);
 	},
 };

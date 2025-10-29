@@ -17,6 +17,7 @@ import type {
 import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
+import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import {
@@ -28,11 +29,7 @@ import {
 } from "utils";
 
 export function getUserByEmbed(
-	data: {
-		message?: Djs.Message;
-		embeds?: Djs.EmbedBuilder[];
-	},
-	ul: Translation,
+	data: { message?: Message; embeds?: EmbedBuilder[] },
 	first: boolean | undefined = false,
 	integrateCombinaison = true,
 	fetchAvatar = false,
@@ -159,7 +156,7 @@ export async function getUser(
 				return;
 			}
 			const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
-			return getUserByEmbed({ message }, ul);
+			return getUserByEmbed({ message });
 		}
 	} catch (_e) {
 		//logger.warn(_e);
@@ -200,12 +197,12 @@ async function getUserFrom(
 		!options?.fetchChannel &&
 		!options?.fetchMessage
 	)
-		return { userData: getChara, charName: charName?.capitalize() };
+		return { charName: charName?.capitalize(), userData: getChara };
 
 	if (!options)
 		options = {
-			integrateCombinaison: true,
 			allowAccess: true,
+			integrateCombinaison: true,
 			skipNotFound: false,
 		};
 	const { integrateCombinaison, allowAccess, skipNotFound } = options;
@@ -278,7 +275,6 @@ async function getUserFrom(
 	try {
 		const userData = getUserByEmbed(
 			{ message: targetMessage },
-			ul,
 			undefined,
 			integrateCombinaison,
 			options.fetchAvatar,
@@ -289,7 +285,7 @@ async function getUserFrom(
 		});
 		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
-		return { userData, charName: user.charName?.capitalize() };
+		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
 		logger.warn(error);
 		if (!skipNotFound)
@@ -327,7 +323,7 @@ export async function getUserFromMessage(
 		guildId?: string;
 	}
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
-	return getUserFrom(client, userId, charName, { type: "message", message }, options);
+	return getUserFrom(client, userId, charName, { message, type: "message" }, options);
 }
 
 /**
@@ -363,7 +359,7 @@ export async function getUserFromInteraction(
 		client,
 		userId,
 		charName,
-		{ type: "interaction", interaction },
+		{ interaction, type: "interaction" },
 		options
 	);
 }
@@ -465,8 +461,8 @@ export function verifyIfEmbedInDB(
 		messageId: charName.messageId[0],
 	};
 	return {
-		isInDb: message.channel.id === ids.channelId && message.id === ids.messageId,
 		coord: ids,
+		isInDb: message.channel.id === ids.channelId && message.id === ids.messageId,
 	};
 }
 
@@ -511,7 +507,7 @@ export async function getUserNameAndChar(
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
-	return { userID, userName, thread: interaction.channel };
+	return { thread: interaction.channel, userID, userName };
 }
 
 /**
@@ -566,12 +562,12 @@ export async function getStatistics(
 		optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
 		userStatistique = {
+			damage: template?.damage,
 			template: {
-				diceType: template?.diceType,
 				critical: template?.critical,
 				customCritical: template?.customCritical,
+				diceType: template?.diceType,
 			},
-			damage: template?.damage,
 		};
 	}
 	if (!userStatistique) {
@@ -604,7 +600,7 @@ export async function getStatistics(
 		);
 	}
 	*/
-	return { userStatistique, ul, optionChar, options };
+	return { optionChar, options, ul, userStatistique };
 }
 
 /**
@@ -656,17 +652,17 @@ export function getRightValue(
 				);
 			throw new Error(
 				ul("error.stats.char", {
-					stat: standardizedStatistic,
 					char: optionChar.capitalize(),
+					stat: standardizedStatistic,
 				})
 			);
 		}
 		throw new Error(
 			ul("error.stats.notFound_singular", {
-				stat: standardizedStatistic,
 				char: optionChar ? ` ${optionChar.capitalize()}` : "",
+				stat: standardizedStatistic,
 			})
 		);
 	}
-	return { userStat, standardizedStatistic, statistic };
+	return { standardizedStatistic, statistic, userStat };
 }

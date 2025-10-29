@@ -35,17 +35,17 @@ export class EClient extends Djs.Client {
 		super(options);
 
 		const enmapSettings: EnmapOptions<GuildData, unknown> = {
-			name: "settings",
-			fetchAll: false,
 			autoFetch: true,
 			cloneLevel: "deep",
+			fetchAll: false,
+			name: "settings",
 		};
 
 		this.criticalCount = new Enmap({
-			name: "criticalCount",
-			fetchAll: false,
 			autoFetch: true,
 			cloneLevel: "deep",
+			fetchAll: false,
+			name: "criticalCount",
 		});
 
 		if (process.env.PROD) enmapSettings.dataDir = path.resolve(".\\data_prod");

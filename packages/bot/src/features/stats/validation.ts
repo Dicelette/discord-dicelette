@@ -98,8 +98,8 @@ export async function register(
 			//change the page to 1
 			userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
 			message.edit({
-				embeds: [userEmbed],
 				components: [continueCancelButtons(ul)],
+				embeds: [userEmbed],
 			});
 			return;
 		}
@@ -114,9 +114,9 @@ export async function register(
 	const statEmbeds = statsEmbed ?? createStatsEmbed(ul);
 	for (const [stat, value] of Object.entries(stats)) {
 		statEmbeds.addFields({
+			inline: true,
 			name: stat.capitalize(),
 			value: `\`${value}\``,
-			inline: true,
 		});
 	}
 	const statsWithoutCombinaison = template.statistics
@@ -152,8 +152,8 @@ export async function register(
 		userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
 
 		message.edit({
-			embeds: [userEmbed],
 			components: [continueCancelButtons(ul)],
+			embeds: [userEmbed],
 		});
 		return;
 	}
@@ -164,15 +164,15 @@ export async function register(
 		//add combinaison to the embed
 		for (const stat of Object.keys(combinaison)) {
 			statEmbeds.addFields({
+				inline: true,
 				name: stat.capitalize(),
 				value: `\`${combinaisonFields[stat]}\` = ${combinaison[stat]}`,
-				inline: true,
 			});
 		}
 
 		message.edit({
-			embeds: [userEmbed, statEmbeds],
 			components: [Dice.buttons(ul, moderation && !isModerator)],
+			embeds: [userEmbed, statEmbeds],
 		});
 		await reply(interaction, {
 			content: ul("modals.added.stats"),
@@ -181,12 +181,12 @@ export async function register(
 		return;
 	}
 	const restePoints = ilReste
-		? `\n${ul("modals.stats.reste", { reste: ilReste, total: template.total, nbStats: statsWithoutCombinaison.length - nbStats })}`
+		? `\n${ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: ilReste, total: template.total })}`
 		: "";
 
 	message.edit({
-		embeds: [userEmbed, statEmbeds],
 		components: [continueCancelButtons(ul)],
+		embeds: [userEmbed, statEmbeds],
 	});
 	await reply(interaction, {
 		content: `${ul("modals.added.stats")}${restePoints}`,
@@ -225,8 +225,8 @@ async function getFromModal(
 	if (!statsEmbeds) return;
 	return {
 		fieldsToAppend: await getFieldsToAppend(ul, interaction, client, statsEmbeds),
-		statsEmbeds,
 		message,
+		statsEmbeds,
 	};
 }
 
@@ -271,28 +271,28 @@ export async function validateEdit(
 	if (!fieldsToAppend || fieldsToAppend.length === 0) {
 		//stats was removed
 		const { list, exists } = getEmbedsList(
-			{ which: "stats", embed: newEmbedStats },
+			{ embed: newEmbedStats, which: "stats" },
 			message
 		);
 		const toAdd = removeEmbedsFromList(list, "stats");
 		const components = editUserButtons(ul, false, exists.damage);
-		await message.edit({ embeds: toAdd, components: [components] });
+		await message.edit({ components: [components], embeds: toAdd });
 		await reply(interaction, {
 			content: ul("modals.removed.stats"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		await sendLogs(
 			ul("logs.stats.removed", {
-				user: Djs.userMention(interaction.user.id),
-				fiche: message.url,
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				fiche: message.url,
+				user: Djs.userMention(interaction.user.id),
 			}),
 			interaction.guild as Djs.Guild,
 			db
 		);
 	}
 	//get the other embeds
-	const { list } = getEmbedsList({ which: "stats", embed: newEmbedStats }, message);
+	const { list } = getEmbedsList({ embed: newEmbedStats, which: "stats" }, message);
 	await message.edit({ embeds: list });
 
 	await reply(interaction, {
@@ -301,9 +301,9 @@ export async function validateEdit(
 	});
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
-		user: Djs.userMention(interaction.user.id),
-		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		fiche: message.url,
+		user: Djs.userMention(interaction.user.id),
 	});
 	//send logs
 	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
@@ -361,20 +361,20 @@ async function getFieldsToAppend(
 				throw new FormulaError(value);
 			}
 			embedsStatsFields.push({
+				inline: true,
 				name: name.capitalize(),
 				value: `\`${value}\` = ${combinaison}`,
-				inline: true,
 			});
 			continue;
 		}
 		const num = Number.parseInt(value, 10);
 		if (stat.min && num < stat.min) {
-			throw new Error(ul("error.mustBeGreater", { value: name, min: stat.min }));
+			throw new Error(ul("error.mustBeGreater", { min: stat.min, value: name }));
 		} //skip register total + max because leveling can be done here
 		embedsStatsFields.push({
+			inline: true,
 			name: name.capitalize(),
 			value: `\`${num}\``,
-			inline: true,
 		});
 	}
 	//verify if stats are all set from the old embed
@@ -390,9 +390,9 @@ async function getFieldsToAppend(
 			) {
 				//register the old value
 				embedsStatsFields.push({
+					inline: true,
 					name: name.capitalize(),
 					value: field.value,
-					inline: true,
 				});
 			}
 		}
@@ -437,9 +437,9 @@ export async function validateByModeration(
 	const { userID, userName } = await getUserNameAndChar(interaction, ul);
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
-		user: Djs.userMention(interaction.user.id),
-		fiche: message.url,
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		fiche: message.url,
+		user: Djs.userMention(interaction.user.id),
 	});
 	//send logs
 	await sendLogs(
@@ -452,10 +452,10 @@ export async function validateByModeration(
 	const user = await getUserNameAndChar(interaction, ul);
 	// Footer de secours pour la demande de validation
 	setModerationFooter(newEmbedStats, {
-		userID: user.userID,
-		userName: user.userName,
 		channelId: interaction.message.channelId,
 		messageId: interaction.message.id,
+		userID: user.userID,
+		userName: user.userName,
 	});
 
 	const embedKey = makeEmbedKey(
@@ -464,18 +464,18 @@ export async function validateByModeration(
 		interaction.message.id
 	);
 	putModerationCache(embedKey, {
-		kind: "stats-edit",
 		embed: newEmbedStats,
+		kind: "stats-edit",
 		meta: {
-			userID: user.userID,
-			userName: user.userName,
 			channelId: interaction.message.channelId,
 			messageId: interaction.message.id,
+			userID: user.userID,
+			userName: user.userName,
 		},
 	});
 
 	const row = buildModerationButtons("stats-edit", ul, embedKey);
-	await interaction.reply({ embeds: [newEmbedStats], components: [row] });
+	await interaction.reply({ components: [row], embeds: [newEmbedStats] });
 }
 
 export async function couldBeValidated(
@@ -525,7 +525,7 @@ export async function couldBeValidated(
 			interaction,
 			ul,
 			client,
-			{ fieldsToAppend, statsEmbeds: oldStatsEmbed, message },
+			{ fieldsToAppend, message, statsEmbeds: oldStatsEmbed },
 			userData
 		);
 		await interaction.message.delete();
@@ -567,7 +567,7 @@ export async function couldBeValidated(
 		interaction,
 		ul,
 		client,
-		{ fieldsToAppend, statsEmbeds: oldStatsEmbed, message },
+		{ fieldsToAppend, message, statsEmbeds: oldStatsEmbed },
 		ownerId ? { userID: ownerId, userName: ownerName } : undefined
 	);
 	deleteModerationCache(embedKey);

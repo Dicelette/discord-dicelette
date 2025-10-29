@@ -66,7 +66,7 @@ export async function validate(
 		channelId: interaction.channel!.id,
 		messageId: message.id,
 	};
-	const charData = getUserByEmbed({ message: message }, ul);
+	const charData = getUserByEmbed({ message: message });
 	if (!charData) {
 		await interaction.reply({
 			embeds: [embedError(ul("error.user.notFound"), ul)],
@@ -102,9 +102,9 @@ export async function validate(
 		isPrivate?: boolean;
 	} = {
 		charName: charData.userName,
-		messageId: [message.id, interaction.channel.id],
 		damageName: Object.keys(charData.damage ?? {}),
 		isPrivate: charData.private,
+		messageId: [message.id, interaction.channel.id],
 	};
 	const guildData = client.settings.get(interaction.guild.id);
 	if (!guildData) return;

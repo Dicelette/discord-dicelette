@@ -1,28 +1,28 @@
 {
+	"compilerOptions": {
+		"outDir": "./dist",
+		"paths": {
+			"client": ["packages/bot/src/client.js"],
+			"commands": ["packages/bot/src/commands/index.js"],
+			"database": ["packages/bot/src/database/index.js"],
+			"discord_ext": ["packages/bot/src/discord_ext.js"],
+			"event": ["packages/bot/src/events/index.js"],
+			"event/*": ["packages/bot/src/events/*"],
+			"features": ["packages/bot/src/features/index.js"],
+			"locales": ["packages/bot/src/locales.js"],
+			"messages": ["packages/bot/src/messages/index.js"],
+			"utils": ["packages/bot/src/utils/index.js"]
+		},
+		"rootDir": "./"
+	},
+	"exclude": ["./dist"],
+	"extends": "../../tsconfig.json",
+	"include": ["src", "index.ts", "package.json"],
 	"ts-node": {
-		"require": ["tsconfig-paths/register"],
-		"esm": true
+		"esm": true,
+		"require": ["tsconfig-paths/register"]
 	},
 	"tsc-alias": {
 		"resolveFullPaths": true
-	},
-	"extends": "../../tsconfig.json",
-	"compilerOptions": {
-		"outDir": "./dist",
-		"rootDir": "./",
-		"paths": {
-			"client": ["packages/bot/src/client.js"],
-			"discord_ext": ["packages/bot/src/discord_ext.js"],
-			"messages": ["packages/bot/src/messages/index.js"],
-			"utils": ["packages/bot/src/utils/index.js"],
-			"database": ["packages/bot/src/database/index.js"],
-			"features": ["packages/bot/src/features/index.js"],
-			"commands": ["packages/bot/src/commands/index.js"],
-			"event": ["packages/bot/src/events/index.js"],
-			"locales": ["packages/bot/src/locales.js"],
-			"event/*": ["packages/bot/src/events/*"]
-		}
-	},
-	"include": ["src", "index.ts", "package.json"],
-	"exclude": ["./dist"]
+	}
 }

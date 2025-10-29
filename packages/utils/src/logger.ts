@@ -7,22 +7,22 @@ dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
 
 const LOG_LEVEL_COLORS = {
 	"*": ["bold", "black", "bgWhiteBright", "dim"],
-	SILLY: ["bold", "white"],
-	TRACE: ["bold", "whiteBright"],
 	DEBUG: ["bold", "green"],
-	INFO: ["bold", "blue"],
-	WARN: ["bold", "yellow"],
 	ERROR: ["bold", "red"],
 	FATAL: ["bold", "redBright"],
+	INFO: ["bold", "blue"],
+	SILLY: ["bold", "white"],
+	TRACE: ["bold", "whiteBright"],
+	WARN: ["bold", "yellow"],
 };
 
 const BASE_STYLE: ISettingsParam<ILogObj>["prettyLogStyles"] = {
-	logLevelName: LOG_LEVEL_COLORS,
 	dateIsoStr: ["dim"],
-	filePathWithLine: ["dim"],
-	name: ["white", "bold"],
 	errorName: ["bold", "bgRedBright", "whiteBright"],
 	fileName: ["yellow"],
+	filePathWithLine: ["dim"],
+	logLevelName: LOG_LEVEL_COLORS,
+	name: ["white", "bold"],
 };
 
 const BASE_ERROR_TEMPLATE = "\n{{errorName}} {{errorMessage}}\nStack:\n{{errorStack}}";
@@ -32,26 +32,26 @@ const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
 const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
 const prodSettings: ISettingsParam<ILogObj> = {
-	name: "LOGGER",
-	minLevel: 6,
-	stylePrettyLogs: true,
-	prettyLogTemplate: PROD_TEMPLATE,
-	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
-	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
-	prettyLogStyles: BASE_STYLE,
 	hideLogPositionForProduction: true,
+	minLevel: 6,
+	name: "LOGGER",
+	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
+	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
+	prettyLogStyles: BASE_STYLE,
+	prettyLogTemplate: PROD_TEMPLATE,
 	prettyLogTimeZone: "local",
+	stylePrettyLogs: true,
 };
 
 const devSettings: ISettingsParam<ILogObj> = {
 	minLevel: 0, // everything
-	stylePrettyLogs: true,
+	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
+	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
+	prettyLogStyles: BASE_STYLE,
 	prettyLogTemplate:
 		"{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} {{logLevelName}} [{{filePathWithLine}}{{name}}] ",
-	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
-	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
-	prettyLogStyles: BASE_STYLE,
 	prettyLogTimeZone: "local",
+	stylePrettyLogs: true,
 };
 
 export const logger: Logger<ILogObj> = new Logger(
@@ -64,16 +64,16 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
-	name: "IMPORTANT",
+	hideLogPositionForProduction: true,
 	minLevel: 1,
-	stylePrettyLogs: true,
-	prettyLogTemplate: IMPORTANT_LOG_TEMPLATE,
-	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
+	name: "IMPORTANT",
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
+	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
 	prettyLogStyles: {
 		...BASE_STYLE,
 		logLevelName: LOG_LEVEL_COLORS,
 	},
-	hideLogPositionForProduction: true,
+	prettyLogTemplate: IMPORTANT_LOG_TEMPLATE,
 	prettyLogTimeZone: "local",
+	stylePrettyLogs: true,
 });

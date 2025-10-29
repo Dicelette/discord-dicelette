@@ -158,9 +158,9 @@ export async function display(
 		.setColor("Random")
 		.addFields(
 			{
+				inline: true,
 				name: ul("config.lang.options.name").capitalize(),
 				value: userLocale.capitalize(),
-				inline: true,
 			},
 			{
 				name: ul("config.logs"),
@@ -220,7 +220,7 @@ export async function display(
 			}
 		);
 	if (interaction.guild!.iconURL())
-		baseEmbed.setThumbnail(interaction.guild!.iconURL({ size: 128, extension: "png" }));
+		baseEmbed.setThumbnail(interaction.guild!.iconURL({ extension: "png", size: 128 }));
 	const embeds = [baseEmbed];
 	await interaction.reply({ embeds });
 }

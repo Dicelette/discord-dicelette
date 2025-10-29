@@ -92,25 +92,25 @@ export const bulkAdd = {
 						? `\`${validateValue.combinaison}\` = ${value}`
 						: `\`${value}\``;
 					statsEmbed!.addFields({
+						inline: true,
 						name: name.capitalize(),
 						value: fieldValue,
-						inline: true,
 					});
 				}
 				for (const [name, dice] of Object.entries(guildTemplate.damage ?? {})) {
 					diceEmbed!.addFields({
+						inline: true,
 						name: name.capitalize(),
 						value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
-						inline: true,
 					});
 				}
 
 				for (const [name, dice] of Object.entries(char.damage ?? {})) {
 					if (!diceEmbed) diceEmbed = createDiceEmbed(ul);
 					diceEmbed!.addFields({
+						inline: true,
 						name: name.capitalize(),
 						value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
-						inline: true,
 					});
 				}
 
@@ -120,22 +120,22 @@ export const bulkAdd = {
 						.setTitle(ul("embed.template"))
 						.setColor("DarkerGrey");
 					templateEmbed.addFields({
+						inline: true,
 						name: ul("common.dice").capitalize(),
 						value: `\`${guildTemplate.diceType}\``,
-						inline: true,
 					});
 					if (guildTemplate.critical?.success) {
 						templateEmbed.addFields({
+							inline: true,
 							name: ul("roll.critical.success"),
 							value: `\`${guildTemplate.critical.success}\``,
-							inline: true,
 						});
 					}
 					if (guildTemplate.critical?.failure) {
 						templateEmbed.addFields({
+							inline: true,
 							name: ul("roll.critical.failure"),
 							value: `\`${guildTemplate.critical.failure}\``,
-							inline: true,
 						});
 					}
 				}
@@ -179,7 +179,7 @@ export const bulkAdd = {
 					char,
 					member.id,
 					ul,
-					{ stats: !!statsEmbed, dice: !!diceEmbed, template: !!templateEmbed },
+					{ dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
 					client.settings,
 					char.channel ??
 						(char.private && privateChannel ? privateChannel : defaultChannel),

@@ -55,9 +55,6 @@ export async function parseCSV(
 	let error: string | undefined;
 	let csvData: CSVRow[] = [];
 	Papa.parse(csvText.replaceAll(/\s+;\s*/gi, ";"), {
-		header: true,
-		dynamicTyping: true,
-		skipEmptyLines: true,
 		//in case the file was wrongly parsed, we need to trim the space before and after the key
 
 		async complete(results) {
@@ -94,6 +91,9 @@ export async function parseCSV(
 			}
 			csvData = results.data as CSVRow[];
 		},
+		dynamicTyping: true,
+		header: true,
+		skipEmptyLines: true,
 	});
 	if (error) {
 		throw new Error(error);
@@ -193,8 +193,8 @@ async function step(
 		) {
 			if (interaction) {
 				const msg = ul("import.errors.duplicate_charName", {
-					user: Djs.userMention(userID),
 					charName: charName ?? ul("common.default"),
+					user: Djs.userMention(userID),
 				});
 				await reply(interaction, { content: msg });
 				errors.push(msg);
@@ -211,8 +211,8 @@ async function step(
 			if (emptyStats.length > 0) {
 				if (interaction) {
 					const msg = ul("import.errors.missing_stats", {
-						user: Djs.userMention(userID),
 						stats: emptyStats.join("\n- "),
+						user: Djs.userMention(userID),
 					});
 					await reply(interaction, { content: msg });
 					errors.push(msg);
@@ -239,21 +239,21 @@ async function step(
 				)
 			: undefined;
 		const newChar: UserData = {
-			userName: charName,
-			stats,
-			template: {
-				diceType: guildTemplate.diceType,
-				critical: guildTemplate.critical,
-			},
-			private: allowPrivate ? isPrivate : undefined,
-			damage: dice,
 			avatar: data.avatar ?? undefined,
 			channel,
+			damage: dice,
+			private: allowPrivate ? isPrivate : undefined,
+			stats,
+			template: {
+				critical: guildTemplate.critical,
+				diceType: guildTemplate.diceType,
+			},
+			userName: charName,
 		};
 		logger.trace("Adding character", newChar);
 		if (!newChar.private) delete newChar.private;
 		if (!newChar.avatar) delete newChar.avatar;
 		members[userID].push(newChar);
 	}
-	return { members, errors };
+	return { errors, members };
 }
