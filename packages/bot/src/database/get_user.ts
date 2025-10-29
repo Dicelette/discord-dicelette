@@ -33,7 +33,8 @@ export function getUserByEmbed(
 	first: boolean | undefined = false,
 	integrateCombinaison = true,
 	fetchAvatar = false,
-	fetchChannel = false
+	fetchChannel = false,
+	cleanUrl = true
 ) {
 	const { message, embeds } = data;
 	const user: Partial<UserData> = {};
@@ -57,7 +58,8 @@ export function getUserByEmbed(
 		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
 	);
 	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
-	if (user.avatar) user.avatar = cleanAvatarUrl(user.avatar);
+
+	if (user.avatar && cleanUrl) user.avatar = cleanAvatarUrl(user.avatar);
 	if (fetchChannel && message) user.channel = message.channel.id;
 	return user as UserData;
 }
@@ -179,6 +181,7 @@ async function getUserFrom(
 		fetchChannel?: boolean;
 		fetchMessage?: boolean;
 		guildId?: string;
+		cleanUrl?: boolean;
 	}
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	const guildId =
@@ -238,9 +241,9 @@ async function getUserFrom(
 			user.isPrivate &&
 			!allowAccess &&
 			!(await haveAccess(context.interaction, thread.id, userId))
-		) {
+		)
 			throw new Error(ul("error.private"));
-		}
+
 		targetMessage = await thread.messages.fetch(userMessageId.messageId);
 	} else {
 		// contexte message
@@ -265,9 +268,9 @@ async function getUserFrom(
 				context.message.author.id === userId ||
 				context.message.member?.permissions.has(Djs.PermissionFlagsBits.Administrator)
 			)
-		) {
+		)
 			throw new Error(ul("error.private"));
-		}
+
 		targetMessage = await channel.messages.fetch(userMessageId.messageId);
 	}
 
@@ -277,7 +280,8 @@ async function getUserFrom(
 			undefined,
 			integrateCombinaison,
 			options.fetchAvatar,
-			options.fetchChannel
+			options.fetchChannel,
+			options.cleanUrl
 		);
 		await updateMemory(characters, guildId, userId, ul, {
 			userData,
@@ -352,6 +356,7 @@ export async function getUserFromInteraction(
 		fetchChannel?: boolean;
 		fetchMessage?: boolean;
 		guildId?: string;
+		cleanUrl?: boolean;
 	}
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	return getUserFrom(

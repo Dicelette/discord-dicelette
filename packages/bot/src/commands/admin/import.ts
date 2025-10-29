@@ -1,5 +1,6 @@
+import type { StatisticalTemplate } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
-import type { DiscordChannel } from "@dicelette/types";
+import type { DiscordChannel, UserData } from "@dicelette/types";
 import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserFromInteraction } from "database";
@@ -20,6 +21,260 @@ import {
 	reuploadAvatar,
 } from "utils";
 import "discord_ext";
+
+// Small helpers to reduce repetition and control concurrency
+// getFileExtension: safer/more readable than chaining split/pop
+const getFileExtension = (name: string): string => {
+	const idx = name.lastIndexOf(".");
+	return idx >= 0 ? name.slice(idx + 1).toLowerCase() : "";
+};
+
+// Tiny p-limit implementation to cap parallel work and avoid rate-limit bursts
+function pLimit(concurrency: number) {
+	let activeCount = 0;
+	const queue: Array<() => void> = [];
+
+	const next = () => {
+		activeCount--;
+		queue.shift()?.();
+	};
+
+	return function limit<T>(fn: () => Promise<T>): Promise<T> {
+		if (activeCount >= concurrency) {
+			return new Promise<T>((resolve, reject) => {
+				queue.push(() => {
+					activeCount++;
+					fn().then(resolve).catch(reject).finally(next);
+				});
+			});
+		}
+		activeCount++;
+		return fn().finally(next);
+	};
+}
+
+type UlTranslator = ReturnType<typeof getLangAndConfig>["ul"];
+
+// buildEmbedsForCharacter: centralize embed construction for user, stats, dice and template
+async function buildEmbedsForCharacter(
+	ul: UlTranslator,
+	char: UserData,
+	member: Djs.User,
+	interaction: Djs.ChatInputCommandInteraction,
+	guildTemplate: StatisticalTemplate
+) {
+	const files: Djs.AttachmentBuilder[] = [];
+
+	// Re-upload avatar if it's a Discord CDN link
+	if (char.avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+		const res = await reuploadAvatar({
+			name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",
+			url: char.avatar,
+		});
+		files.push(res.newAttachment);
+		char.avatar = res.name;
+	}
+
+	const avatarUrl =
+		char.avatar ?? (await fetchAvatarUrl(interaction.guild!, member as Djs.User));
+
+	const userDataEmbed = createUserEmbed(
+		ul,
+		avatarUrl,
+		member.id,
+		char.userName ?? undefined
+	);
+
+	char.avatar = userDataEmbed.toJSON()?.thumbnail?.url;
+
+	const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
+	let diceEmbed = guildTemplate.damage ? createDiceEmbed(ul) : undefined;
+
+	// Statistics fields (no bounds validation here by design for bulk imports)
+	for (const [name, value] of Object.entries(char.stats ?? {})) {
+		const validateValue = guildTemplate.statistics?.[name];
+		const fieldValue = validateValue?.combinaison
+			? `\`${validateValue.combinaison}\` = ${value}`
+			: `\`${value}\``;
+		statsEmbed?.addFields({ inline: true, name: name.capitalize(), value: fieldValue });
+	}
+
+	// Default dice from template
+	for (const [name, dice] of Object.entries(guildTemplate.damage ?? {})) {
+		diceEmbed?.addFields({
+			inline: true,
+			name: name.capitalize(),
+			value: (dice as string).trim().length > 0 ? `\`${dice}\`` : "_ _",
+		});
+	}
+
+	// Character-specific dice override/additions
+	for (const [name, dice] of Object.entries(char.damage ?? {})) {
+		if (!diceEmbed) diceEmbed = createDiceEmbed(ul);
+		diceEmbed.addFields({
+			inline: true,
+			name: name.capitalize(),
+			value: (dice as string).trim().length > 0 ? `\`${dice}\`` : "_ _",
+		});
+	}
+
+	// Template embed (diceType / critical rules)
+	let templateEmbed: Djs.EmbedBuilder | undefined;
+	if (guildTemplate.diceType || guildTemplate.critical) {
+		templateEmbed = new Djs.EmbedBuilder()
+			.setTitle(ul("embed.template"))
+			.setColor("DarkerGrey");
+		templateEmbed.addFields({
+			inline: true,
+			name: ul("common.dice").capitalize(),
+			value: `\`${guildTemplate.diceType}\``,
+		});
+		if (guildTemplate.critical?.success) {
+			templateEmbed.addFields({
+				inline: true,
+				name: ul("roll.critical.success"),
+				value: `\`${guildTemplate.critical.success}\``,
+			});
+		}
+		if (guildTemplate.critical?.failure) {
+			templateEmbed.addFields({
+				inline: true,
+				name: ul("roll.critical.failure"),
+				value: `\`${guildTemplate.critical.failure}\``,
+			});
+		}
+	}
+
+	const embeds = createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed);
+	return {
+		embeds,
+		files,
+		flags: { dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
+	};
+}
+
+// deleteOldMessageIfNeeded: attempts to remove previous message tied to this character
+async function deleteOldMessageIfNeeded(
+	shouldDelete: boolean,
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction,
+	memberId: string,
+	charName?: string,
+	oldUserData?: UserData
+) {
+	if (!shouldDelete) return;
+	// If the caller provided the previous stored user data (fetched before creating a new message),
+	// prefer that to avoid racing with the freshly created message which is already registered.
+	const oldChar =
+		oldUserData ??
+		(
+			await getUserFromInteraction(client, memberId, interaction, charName, {
+				fetchChannel: true,
+				fetchMessage: true,
+			})
+		)?.userData;
+	if (!oldChar) return;
+	const channelId = oldChar.channel;
+	if (!channelId) return;
+	const channel = interaction.guild?.channels.cache.get(channelId);
+	const messageId = oldChar.messageId;
+	if (channel && messageId) {
+		try {
+			const oldMessage = await (channel as DiscordChannel)?.messages.fetch(messageId);
+			if (oldMessage) await oldMessage.delete();
+		} catch (error) {
+			// Skip unknown message errors quietly during bulk operations
+			logger.warn(error);
+		}
+	}
+}
+
+// processCharacter: single-character import workflow wrapped for batching/concurrency
+async function processCharacter(params: {
+	interaction: Djs.ChatInputCommandInteraction;
+	client: EClient;
+	ul: UlTranslator;
+	guildTemplate: StatisticalTemplate;
+	member: Djs.User;
+	char: UserData;
+	shouldDelete: boolean;
+	defaultChannel: string;
+	privateChannel?: string;
+	errorsRef: string[];
+}) {
+	const {
+		interaction,
+		client,
+		ul,
+		guildTemplate,
+		member,
+		char,
+		shouldDelete,
+		defaultChannel,
+		privateChannel,
+		errorsRef,
+	} = params;
+
+	try {
+		const { embeds, files, flags } = await buildEmbedsForCharacter(
+			ul,
+			char,
+			member,
+			interaction,
+			guildTemplate
+		);
+
+		const targetChannel =
+			char.channel ?? (char.private && privateChannel ? privateChannel : defaultChannel);
+
+		// Fetch previous stored user data before creating a new message. This prevents a race where
+		// the newly posted message is immediately considered the "old" one and deleted.
+		const previous = (
+			await getUserFromInteraction(
+				client,
+				member.id,
+				interaction,
+				char.userName ?? undefined,
+				{
+					fetchChannel: true,
+					fetchMessage: true,
+				}
+			)
+		)?.userData;
+
+		await repostInThread(
+			embeds,
+			interaction,
+			char,
+			member.id,
+			ul,
+			flags,
+			client.settings,
+			targetChannel,
+			client.characters,
+			files
+		);
+
+		await addAutoRole(interaction, member.id, flags.dice, flags.stats, client.settings);
+		await deleteOldMessageIfNeeded(
+			shouldDelete,
+			client,
+			interaction,
+			member.id,
+			char.userName ?? undefined,
+			previous
+		);
+		await reply(interaction, {
+			content: ul("import.success", { user: Djs.userMention(member.id) }),
+		});
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		logger.warn(
+			`[import] Failed for user ${member.id} (${char?.userName ?? "?"}): ${message}`
+		);
+		errorsRef.push(`${member.username}: ${message}`);
+	}
+}
 
 /**
  * ! Note: Bulk data doesn't allow to register dice-per-user, as each user can have different dice
@@ -44,7 +299,7 @@ export const bulkAdd = {
 		const csvFile = options.getAttachment(t("csv_generation.name"), true);
 		const { langToUse, ul } = getLangAndConfig(client, interaction);
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-		const ext = csvFile.name.split(".").pop()?.toLowerCase() ?? "";
+		const ext = getFileExtension(csvFile.name);
 		if (!ext || ext !== "csv") {
 			return reply(interaction, {
 				content: ul("import.errors.invalid_file", { ext }),
@@ -68,153 +323,49 @@ export const bulkAdd = {
 		);
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
 		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
-		if (!defaultChannel) {
+		if (!defaultChannel)
 			return reply(interaction, {
 				content: ul("error.channel.defaultChannel"),
 			});
-		}
+
 		const guildMembers = await interaction.guild?.members.fetch();
-		for (const [user, data] of Object.entries(members)) {
-			//we already parsed the user, so the cache should be up to date
-			let member: Djs.GuildMember | Djs.User | undefined = guildMembers!.get(user);
-			if (!member || !member.user) {
-				continue;
-			}
-			member = member.user as Djs.User;
-			for (const char of data) {
-				const files = [];
-				if (char.avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
-					const res = await reuploadAvatar({
-						name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",
-						url: char.avatar,
-					});
-					char.avatar = res.name;
-					files.push(res.newAttachment);
-				}
-				const userDataEmbed = createUserEmbed(
-					ul,
-					char.avatar ?? (await fetchAvatarUrl(interaction.guild!, member)),
-					member.id,
-					char.userName ?? undefined
-				);
 
-				const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
-				let diceEmbed = guildTemplate.damage ? createDiceEmbed(ul) : undefined;
-				//! important: As the bulk add can be for level upped characters, the value is not verified (min/max) & total points
-				for (const [name, value] of Object.entries(char.stats ?? {})) {
-					const validateValue = guildTemplate.statistics?.[name];
-					const fieldValue = validateValue?.combinaison
-						? `\`${validateValue.combinaison}\` = ${value}`
-						: `\`${value}\``;
-					statsEmbed!.addFields({
-						inline: true,
-						name: name.capitalize(),
-						value: fieldValue,
-					});
-				}
-				for (const [name, dice] of Object.entries(guildTemplate.damage ?? {})) {
-					diceEmbed!.addFields({
-						inline: true,
-						name: name.capitalize(),
-						value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
-					});
-				}
+		const toDelete = !!options.getBoolean(t("import.delete.title"));
+		const limit = pLimit(3); // Keep a low concurrency to respect Discord rate limits
+		const asyncJobs: Promise<unknown>[] = [];
+		const collectedErrors = [...errors];
 
-				for (const [name, dice] of Object.entries(char.damage ?? {})) {
-					if (!diceEmbed) diceEmbed = createDiceEmbed(ul);
-					diceEmbed!.addFields({
-						inline: true,
-						name: name.capitalize(),
-						value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
-					});
-				}
+		for (const [userId, chars] of Object.entries(members)) {
+			// We already parsed the user, so the cache should be up to date
+			const gm = guildMembers!.get(userId);
+			const memberUser = gm?.user as Djs.User | undefined;
+			if (!memberUser) continue;
 
-				let templateEmbed: Djs.EmbedBuilder | undefined;
-				if (guildTemplate.diceType || guildTemplate.critical) {
-					templateEmbed = new Djs.EmbedBuilder()
-						.setTitle(ul("embed.template"))
-						.setColor("DarkerGrey");
-					templateEmbed.addFields({
-						inline: true,
-						name: ul("common.dice").capitalize(),
-						value: `\`${guildTemplate.diceType}\``,
-					});
-					if (guildTemplate.critical?.success) {
-						templateEmbed.addFields({
-							inline: true,
-							name: ul("roll.critical.success"),
-							value: `\`${guildTemplate.critical.success}\``,
-						});
-					}
-					if (guildTemplate.critical?.failure) {
-						templateEmbed.addFields({
-							inline: true,
-							name: ul("roll.critical.failure"),
-							value: `\`${guildTemplate.critical.failure}\``,
-						});
-					}
-				}
-				const allEmbeds = createEmbedsList(
-					userDataEmbed,
-					statsEmbed,
-					diceEmbed,
-					templateEmbed
-				);
-				if (options.getBoolean(t("import.delete.title"))) {
-					//delete old message if it exists
-					const oldChar = (
-						await getUserFromInteraction(client, member.id, interaction, char.userName, {
-							fetchChannel: true,
-							fetchMessage: true,
+			for (const char of chars) {
+				asyncJobs.push(
+					limit(() =>
+						processCharacter({
+							char,
+							client,
+							defaultChannel,
+							errorsRef: collectedErrors,
+							guildTemplate,
+							interaction,
+							member: memberUser,
+							privateChannel,
+							shouldDelete: toDelete,
+							ul,
 						})
-					)?.userData;
-					if (oldChar) {
-						const channelId = oldChar.channel;
-						if (channelId) {
-							const channel = interaction.guild?.channels.cache.get(channelId);
-							const messageId = oldChar.messageId;
-							if (channel && messageId) {
-								try {
-									const oldMessage = await (channel as DiscordChannel)?.messages.fetch(
-										messageId
-									);
-									if (oldMessage) await oldMessage.delete();
-								} catch (error) {
-									//skip unknown message
-									logger.warn(error);
-								}
-							}
-						}
-					}
-				}
-
-				await repostInThread(
-					allEmbeds,
-					interaction,
-					char,
-					member.id,
-					ul,
-					{ dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
-					client.settings,
-					char.channel ??
-						(char.private && privateChannel ? privateChannel : defaultChannel),
-					client.characters,
-					files
+					)
 				);
-				await addAutoRole(
-					interaction,
-					member.id,
-					!!diceEmbed,
-					!!statsEmbed,
-					client.settings
-				);
-				await reply(interaction, {
-					content: ul("import.success", { user: Djs.userMention(member.id) }),
-				});
 			}
 		}
+
+		await Promise.allSettled(asyncJobs);
+
 		let msg = ul("import.all_success");
-		if (errors.length > 0) msg += `\n${ul("import.errors.global")}\n${errors.join("\n")}`;
+		if (collectedErrors.length > 0)
+			msg += `\n${ul("import.errors.global")}\n${collectedErrors.join("\n")}`;
 		await reply(interaction, { content: msg });
 		return;
 	},

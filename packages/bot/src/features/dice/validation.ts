@@ -658,7 +658,7 @@ export async function cancelDiceAddModeration(
 	//send a message to the user that the edition has been cancelled
 	if (userId) {
 		const user = await fetchUser(client, userId);
-		console.log("Cancelling dice add moderation for user:", userId);
+		logger.trace("Cancelling dice add moderation for user:", userId);
 		if (user) await user.send(ul("modals.cancelled", { url }));
 	}
 }

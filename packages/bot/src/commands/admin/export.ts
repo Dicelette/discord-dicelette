@@ -9,6 +9,29 @@ import Papa from "papaparse";
 import { type CSVRow, getLangAndConfig } from "utils";
 import "discord_ext";
 
+// small p-limit helper to avoid concurrent bursts against Discord API
+function pLimit(concurrency: number) {
+	let active = 0;
+	const queue: Array<() => void> = [];
+	const next = () => {
+		active--;
+		const job = queue.shift();
+		if (job) job();
+	};
+	return <T>(fn: () => Promise<T>): Promise<T> => {
+		if (active >= concurrency) {
+			return new Promise<T>((resolve, reject) => {
+				queue.push(() => {
+					active++;
+					fn().then(resolve).catch(reject).finally(next);
+				});
+			});
+		}
+		active++;
+		return fn().finally(next);
+	};
+}
+
 export const exportData = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("export.name")
@@ -61,52 +84,75 @@ async function exportToCsv(
 	const { ul } = getLangAndConfig(client, interaction);
 	const csv: CSVRow[] = [];
 	const statsName = client.settings.get(guildId, "templateID.statsName");
-	const isPrivateAllowed = client.settings.get(guildId, "privateChannel");
-	//filter the allUser to get only the private characters
+	const isPrivateAllowed = !!client.settings.get(guildId, "privateChannel");
+
+	// precompute normalized stat keys if template provides names
+	const statsNameNormalized: string[] | undefined = statsName
+		? statsName.map((n: string) => n.unidecode())
+		: undefined;
+
+	// build a list of tasks to run with limited concurrency
+	const limit = pLimit(3);
+	const tasks: Promise<void>[] = [];
+
 	for (const [user, data] of Object.entries(allUser)) {
 		const chara = isPrivate
 			? data.filter((char) => char.isPrivate)
 			: isPrivate === false
 				? data.filter((char) => !char.isPrivate)
 				: data;
+
 		for (const char of chara) {
-			const stats = (
-				await getUserFromInteraction(client, user, interaction, char.charName, {
-					fetchAvatar: true,
-					fetchChannel: true,
-					skipNotFound: true,
+			tasks.push(
+				limit(async () => {
+					const stats = (
+						await getUserFromInteraction(client, user, interaction, char.charName, {
+							fetchAvatar: true,
+							fetchChannel: true,
+							skipNotFound: true,
+							cleanUrl: false
+						})
+					)?.userData;
+					if (!stats) return;
+
+					// dice lines with localized separator/space
+					const dice: undefined | string = stats.damage
+						? `'${Object.keys(stats.damage)
+								.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
+								.join("\n")}`
+						: undefined;
+
+					// map stats according to template names (preserve accented names in CSV header)
+					let newStats: Record<string, number | undefined> = {};
+					if (statsNameNormalized && stats.stats) {
+						for (let i = 0; i < statsNameNormalized.length; i++) {
+							const name = statsName![i];
+							const norm = statsNameNormalized[i];
+							newStats[name] = stats.stats?.[norm];
+						}
+					} else if (stats.stats) newStats = stats.stats;
+
+					const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
+					csv.push({
+						avatar: stats.avatar,
+						channel: statChannelAsString,
+						charName: char.charName,
+						dice,
+						isPrivate:
+							char.isPrivate !== undefined
+								? char.isPrivate
+								: isPrivateAllowed
+									? false
+									: undefined,
+						user: `'${user}`,
+						...newStats,
+					});
 				})
-			)?.userData;
-			if (!stats) continue;
-			//reparse the statsName to get the name with accented characters
-			const dice: undefined | string = stats.damage
-				? `'${Object.keys(stats.damage)
-						.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
-						.join("\n")}`
-				: undefined;
-			let newStats: Record<string, number | undefined> = {};
-			if (statsName && stats.stats) {
-				for (const name of statsName) {
-					newStats[name] = stats.stats?.[name.unidecode()];
-				}
-			} else if (stats.stats) newStats = stats.stats;
-			const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
-			csv.push({
-				avatar: stats.avatar,
-				channel: statChannelAsString,
-				charName: char.charName,
-				dice,
-				isPrivate:
-					char.isPrivate !== undefined
-						? char.isPrivate
-						: isPrivateAllowed
-							? false
-							: undefined,
-				user: `'${user}`,
-				...newStats,
-			});
+			);
 		}
 	}
+
+	await Promise.allSettled(tasks);
 
 	const columns = ["user", "charName", "avatar", "channel"];
 	if (client.settings.get(guildId, "privateChannel")) columns.push("isPrivate");

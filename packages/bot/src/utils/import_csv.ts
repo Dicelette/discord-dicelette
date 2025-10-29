@@ -49,9 +49,8 @@ export async function parseCSV(
 	//papaparse can't be used in Node, we need first to create a readable stream
 
 	const csvText = url.startsWith("https://") ? await readCSV(url) : url;
-	if (!csvText || csvText.length === 0) {
-		throw new InvalidCsvContent("url");
-	}
+	if (!csvText || csvText.length === 0) throw new InvalidCsvContent("url");
+
 	let error: string | undefined;
 	let csvData: CSVRow[] = [];
 	Papa.parse(csvText.replaceAll(/\s+;\s*/gi, ";"), {
@@ -95,12 +94,8 @@ export async function parseCSV(
 		header: true,
 		skipEmptyLines: true,
 	});
-	if (error) {
-		throw new Error(error);
-	}
-	if (csvData.length === 0) {
-		throw new InvalidCsvContent("url");
-	}
+	if (error) throw new Error(error);
+	if (csvData.length === 0) throw new InvalidCsvContent("url");
 	return await step(csvData, guildTemplate, interaction, allowPrivate, lang);
 }
 

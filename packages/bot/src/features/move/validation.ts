@@ -77,7 +77,6 @@ export async function validate(
 	//update the characters in the database characters
 	const allCharsNewUser = client.characters.get(interaction.guild!.id, user.id);
 	const allCharsOldUser = client.characters.get(interaction.guild!.id, oldUserId);
-	console.log(allCharsNewUser, allCharsOldUser);
 	if (allCharsOldUser)
 		//remove the character from the old user
 		client.characters.set(

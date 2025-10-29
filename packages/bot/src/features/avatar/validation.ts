@@ -1,6 +1,6 @@
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { cleanAvatarUrl, verifyAvatarUrl } from "@dicelette/utils";
+import { COMPILED_PATTERNS, cleanAvatarUrl, verifyAvatarUrl } from "@dicelette/utils";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, getEmbedsList, reply } from "messages";
@@ -33,6 +33,12 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 		}
 	} else {
 		avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
+		if (avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+			//should not be acceptable as direct cdn links can be temporary
+			return await reply(interaction, {
+				embeds: [embedError(ul("error.avatar.cdn"), ul)],
+			});
+		}
 		if (!verifyAvatarUrl(avatar))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.url"), ul)],

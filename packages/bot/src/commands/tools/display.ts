@@ -110,7 +110,6 @@ export const displayUser = {
 			let avatar = thumbnailJson
 				? cleanAvatarUrl(thumbnailJson)
 				: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
-			console.log(thumbnailJson?.match(COMPILED_PATTERNS.DISCORD_CDN));
 			if (persist && thumbnailJson?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
 				//get the attachment if exists
 				const result = await reuploadAvatar({

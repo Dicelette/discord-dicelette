@@ -177,9 +177,8 @@ export async function repostInThread(
 		if (!thread && channel instanceof Djs.TextChannel)
 			thread = await createDefaultThread(channel, guildData, interaction);
 	}
-	if (!thread) {
-		throw new Error(ul("error.channel.thread"));
-	}
+	if (!thread) throw new Error(ul("error.channel.thread"));
+
 	if (!isForumThread) msg = await thread.send(dataToSend);
 	if (!msg) throw new Error(ul("error.channel.thread"));
 	const userRegister: UserRegistration = {

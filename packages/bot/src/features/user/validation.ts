@@ -3,6 +3,7 @@ import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
 import {
 	allValueUndefOrEmptyString,
+	COMPILED_PATTERNS,
 	cleanAvatarUrl,
 	logger,
 	NoEmbed,
@@ -16,6 +17,7 @@ import {
 	fetchChannel,
 	getLangAndConfig,
 	pingModeratorRole,
+	reuploadAvatar,
 	selfRegisterAllowance,
 } from "utils";
 
@@ -166,6 +168,7 @@ export async function validateUser(
 	const userEmbed = Messages.getEmbeds(interaction.message, "user");
 	if (!userEmbed) throw new NoEmbed();
 	const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
+	const jsonThumbnail = userEmbed.toJSON().thumbnail?.url;
 	let userID = oldEmbedsFields?.["common.user"];
 	let charName: string | undefined = oldEmbedsFields?.["common.charName"];
 	const isPrivate = oldEmbedsFields["common.isPrivate"] === "common.yes";
@@ -197,12 +200,21 @@ export async function validateUser(
 		return;
 	}
 	userID = userID.replace("<@", "").replace(">", "");
-	const userDataEmbed = Messages.createUserEmbed(
-		ul,
-		userEmbed.toJSON().thumbnail?.url || "",
-		userID,
-		charName
+	const files = interaction.message.attachments.map(
+		(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 	);
+	let avatarStr = jsonThumbnail || "";
+	if (jsonThumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+		const fileName = jsonThumbnail.split("?")[0].split("/").pop() || `${userID}_avatar`;
+		const result = await reuploadAvatar({ name: fileName, url: jsonThumbnail });
+		avatarStr = result.name;
+		files.push(result.newAttachment);
+	}
+	//prevent duplicate files
+	const uniqueFiles = Array.from(new Set(files.map((f) => f.name))).map(
+		(name) => files.find((f) => f.name === name)!
+	);
+	const userDataEmbed = Messages.createUserEmbed(ul, avatarStr, userID, charName);
 	const oldDiceEmbeds = Messages.getEmbeds(interaction.message, "damage");
 	const oldStatsEmbed = Messages.getEmbeds(interaction.message, "stats");
 	const oldDiceEmbedsFields = oldDiceEmbeds ? (oldDiceEmbeds.toJSON().fields ?? []) : [];
@@ -210,9 +222,8 @@ export async function validateUser(
 	let diceEmbed: Djs.EmbedBuilder | undefined;
 	let statsEmbed: Djs.EmbedBuilder | undefined;
 	for (const field of oldDiceEmbedsFields) {
-		if (!diceEmbed) {
-			diceEmbed = Messages.createDiceEmbed(ul);
-		}
+		if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(ul);
+
 		diceEmbed.addFields({
 			inline: true,
 			name: field.name.unidecode(true).capitalize(),
@@ -271,7 +282,6 @@ export async function validateUser(
 			value: dice.trim().length > 0 ? `\`${dice}\`` : "_ _",
 		});
 	}
-	const jsonThumbnail = userEmbed.toJSON().thumbnail?.url;
 	const userStatistique: UserData = {
 		avatar: jsonThumbnail ? cleanAvatarUrl(jsonThumbnail) : undefined,
 		damage: templateMacro,
@@ -320,9 +330,7 @@ export async function validateUser(
 		diceEmbed,
 		templateEmbed
 	);
-	const files = interaction.message.attachments.map(
-		(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
-	);
+
 	await Messages.repostInThread(
 		allEmbeds,
 		interaction,
@@ -333,7 +341,7 @@ export async function validateUser(
 		client.settings,
 		channelToPost.replace("<#", "").replace(">", ""),
 		characters,
-		files
+		uniqueFiles
 	);
 	try {
 		await interaction.message.delete();

@@ -8,7 +8,7 @@ import {
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { DataToFooter, Translation } from "@dicelette/types";
-import { logger, TotalExceededError } from "@dicelette/utils";
+import { COMPILED_PATTERNS, logger, TotalExceededError } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -36,9 +36,9 @@ import {
 	getModerationCache,
 	getUserId,
 	makeEmbedKey,
-	parseEmbedKey,
 	parseKeyFromCustomId,
 	putModerationCache,
+	reuploadAvatar,
 	selfRegisterAllowance,
 	setModerationFooter,
 } from "utils";
@@ -75,6 +75,20 @@ export async function register(
 	const ul = ln(lang);
 	const userEmbed = getEmbeds(message, "user");
 	if (!userEmbed) return;
+	const thumbnail = userEmbed.toJSON().thumbnail?.url;
+	const files = message.attachments.map(
+		(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
+	);
+	if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+		const fileName = thumbnail.split("?")[0].split("/").pop() || "avatar.png";
+		const result = await reuploadAvatar({ name: fileName, url: thumbnail });
+		userEmbed.setThumbnail(result.name);
+		files.push(result.newAttachment);
+	}
+	//prevent duplicate files
+	const uniqueFiles = Array.from(new Set(files.map((f) => f.name))).map(
+		(name) => files.find((f) => f.name === name)!
+	);
 	const statsEmbed = getEmbeds(message, "stats");
 	const oldStatsTotal = (statsEmbed?.toJSON().fields ?? [])
 		.filter((field) => isNumber(field.value.removeBacktick()))
@@ -155,6 +169,7 @@ export async function register(
 		message.edit({
 			components: [continueCancelButtons(ul)],
 			embeds: [userEmbed],
+			files: uniqueFiles,
 		});
 		return;
 	}
@@ -174,6 +189,7 @@ export async function register(
 		message.edit({
 			components: [Dice.buttons(ul, moderation && !isModerator)],
 			embeds: [userEmbed, statEmbeds],
+			files: uniqueFiles,
 		});
 		await reply(interaction, {
 			content: ul("modals.added.stats"),
@@ -188,6 +204,7 @@ export async function register(
 	message.edit({
 		components: [continueCancelButtons(ul)],
 		embeds: [userEmbed, statEmbeds],
+		files: uniqueFiles,
 	});
 	await reply(interaction, {
 		content: `${ul("modals.added.stats")}${restePoints}`,
