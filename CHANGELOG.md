@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.9.0](https://github.com/Dicelette/discord-dicelette/compare/2.8.1...2.9.0) (2025-10-29)
+
+
+### Features
+
+* allow to upload avatar instead to use a link outside of discord ([2562a92](https://github.com/Dicelette/discord-dicelette/commit/2562a921c8f8ef258e1c04dc3bcbd39c3fbf7d6f))
+* implement avatar reupload functionality and improve avatar handling in display logic ([e001718](https://github.com/Dicelette/discord-dicelette/commit/e001718e3eb7411720508eed3b63c98134e8cd26))
+
 ## [2.8.1](https://github.com/Dicelette/discord-dicelette/compare/2.8.0...2.8.1) (2025-10-28)
 
 

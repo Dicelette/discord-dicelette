@@ -1,6 +1,6 @@
 {
 	"name": "dicelette",
-	"version": "2.8.1",
+	"version": "2.9.0",
 	"engineStrict": true,
 	"private": true,
 	"scripts": {
