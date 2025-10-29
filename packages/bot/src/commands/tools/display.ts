@@ -1,7 +1,7 @@
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
-import { cleanAvatarUrl, filterChoices, logger } from "@dicelette/utils";
+import { COMPILED_PATTERNS, cleanAvatarUrl, filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
@@ -19,6 +19,7 @@ import {
 	fetchAvatarUrl,
 	haveAccess,
 	optionInteractions,
+	reuploadAvatar,
 } from "utils";
 import "discord_ext";
 
@@ -56,6 +57,7 @@ export const displayUser = {
 				.setDescription(t("display.persistant.description"))
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
+		await interaction.deferReply();
 		const int = await optionInteractions(interaction, client);
 		if (!int) return;
 		const { options, user, ul } = int;
@@ -104,22 +106,19 @@ export const displayUser = {
 				.toJSON()
 				.fields!.find((x) => findln(x.name) === findln("common.character"));
 			const thumbnailJson = dataUserEmbeds?.toJSON().thumbnail?.url;
-			let avatar = "";
 			const files = [];
-			if (!persist) {
-				avatar = thumbnailJson
-					? cleanAvatarUrl(thumbnailJson)
-					: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
-			} else {
+			let avatar = thumbnailJson
+				? cleanAvatarUrl(thumbnailJson)
+				: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
+			console.log(thumbnailJson?.match(COMPILED_PATTERNS.DISCORD_CDN));
+			if (persist && thumbnailJson?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
 				//get the attachment if exists
-				const attachment = userMessage?.attachments.first();
-				if (attachment) {
-					avatar = `attachment://${attachment.name}`;
-					const newAttachment = new Djs.AttachmentBuilder(attachment.url, {
-						name: attachment.name,
-					});
-					files.push(newAttachment);
-				}
+				const result = await reuploadAvatar({
+					name: thumbnailJson.split("?")[0].split("/").pop() ?? "avatar.png",
+					url: thumbnailJson,
+				});
+				avatar = result.name;
+				files.push(result.newAttachment);
 			}
 			const displayEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("embed.display"))
@@ -147,7 +146,7 @@ export const displayUser = {
 			if (newDiceEmbed) displayEmbeds.push(newDiceEmbed);
 			await reply(interaction, { embeds: displayEmbeds, files });
 		} catch (e) {
-			logger.error(e);
+			console.error(e);
 			await reply(interaction, {
 				embeds: [embedError(ul("error.user.notFound"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,

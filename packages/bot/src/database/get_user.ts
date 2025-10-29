@@ -155,7 +155,6 @@ export async function getUser(
 				logger.warn(`Message ${sheetLocation.messageId} not found`);
 				return;
 			}
-			const ul = ln(client.settings.get(guild.id, "lang") ?? guild.preferredLocale);
 			return getUserByEmbed({ message });
 		}
 	} catch (_e) {

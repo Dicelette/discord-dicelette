@@ -1,6 +1,6 @@
 import { cmdLn, t } from "@dicelette/localization";
 import type { DiscordChannel } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
@@ -12,7 +12,13 @@ import {
 	reply,
 	repostInThread,
 } from "messages";
-import { addAutoRole, fetchAvatarUrl, getLangAndConfig, parseCSV } from "utils";
+import {
+	addAutoRole,
+	fetchAvatarUrl,
+	getLangAndConfig,
+	parseCSV,
+	reuploadAvatar,
+} from "utils";
 import "discord_ext";
 
 /**
@@ -76,6 +82,15 @@ export const bulkAdd = {
 			}
 			member = member.user as Djs.User;
 			for (const char of data) {
+				const files = [];
+				if (char.avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+					const res = await reuploadAvatar({
+						name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",
+						url: char.avatar,
+					});
+					char.avatar = res.name;
+					files.push(res.newAttachment);
+				}
 				const userDataEmbed = createUserEmbed(
 					ul,
 					char.avatar ?? (await fetchAvatarUrl(interaction.guild!, member)),
@@ -183,7 +198,8 @@ export const bulkAdd = {
 					client.settings,
 					char.channel ??
 						(char.private && privateChannel ? privateChannel : defaultChannel),
-					client.characters
+					client.characters,
+					files
 				);
 				await addAutoRole(
 					interaction,

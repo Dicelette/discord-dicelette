@@ -32,6 +32,7 @@ import {
 	editUserButtons,
 	fetchChannel,
 	fetchUser,
+	getMessageWithKeyPart,
 	getModerationCache,
 	getUserId,
 	makeEmbedKey,
@@ -542,12 +543,7 @@ export async function couldBeValidated(
 		embed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 	}
 	if (!embed) throw new Error(ul("error.embed.notFound"));
-
-	const keyParts = parseEmbedKey(embedKey);
-	if (!keyParts) throw new Error(ul("error.embed.notFound"));
-	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
-	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
-	const message = await channel.messages.fetch(keyParts.messageId);
+	const message = await getMessageWithKeyPart(ul, interaction, embedKey);
 	const oldStatsEmbed = getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(ul);
 	const fieldsToAppend = embed.toJSON().fields;
 	if (!fieldsToAppend || !message) throw new Error(ul("error.embed.notFound"));

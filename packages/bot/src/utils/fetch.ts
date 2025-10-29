@@ -1,7 +1,7 @@
 import { ln } from "@dicelette/localization";
 import { logger } from "@dicelette/utils";
-import type * as Djs from "discord.js";
 import type { Guild, GuildMember, User } from "discord.js";
+import * as Djs from "discord.js";
 import type { EClient } from "../client";
 
 export function getLangAndConfig(
@@ -92,4 +92,15 @@ export async function fetchAvatarUrl(guild: Guild, user: User, member?: GuildMem
 	const userId = user.id;
 	member = await fetchMember(guild, userId);
 	return member?.avatarURL() ?? user.displayAvatarURL();
+}
+
+export async function reuploadAvatar(avatar: { name: string; url: string }) {
+	//we have only a link so we need to fetch the attachment again
+	const fetched = await fetch(avatar.url);
+	const newAttachment = new Djs.AttachmentBuilder(
+		Buffer.from(await fetched.arrayBuffer()),
+		{ name: avatar.name }
+	);
+	const name = `attachment://${avatar.name}`;
+	return { name, newAttachment };
 }

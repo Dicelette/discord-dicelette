@@ -8,7 +8,7 @@ export * from "./src/changelog";
 export { default as dev } from "./src/dev";
 
 // Pre-compiled regex patterns for better performance
-const COMPILED_PATTERNS = {
+export const COMPILED_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
 	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
 	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,

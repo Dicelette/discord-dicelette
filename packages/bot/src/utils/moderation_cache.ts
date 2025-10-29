@@ -1,5 +1,6 @@
 import type { Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
+import { fetchChannel } from "./fetch";
 
 export type ModerationKind = "stats-edit" | "dice-edit" | "dice-add";
 
@@ -130,4 +131,16 @@ export function getUserId(interaction: Djs.ButtonInteraction) {
 		url = `https://discord.com/channels/${interaction.guild!.id}/${data?.channelId}/${data?.messageId}`;
 	}
 	return { url, userId };
+}
+
+export async function getMessageWithKeyPart(
+	ul: Translation,
+	interaction: Djs.ButtonInteraction,
+	embedKey: string
+) {
+	const keyParts = parseEmbedKey(embedKey);
+	if (!keyParts) throw new Error(ul("error.embed.notFound"));
+	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
+	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+	return await channel.messages.fetch(keyParts.messageId);
 }

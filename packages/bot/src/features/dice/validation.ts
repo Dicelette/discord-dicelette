@@ -23,6 +23,7 @@ import {
 	editUserButtons,
 	fetchChannel,
 	fetchUser,
+	getMessageWithKeyPart,
 	getModerationCache,
 	getUserId,
 	makeEmbedKey,
@@ -409,12 +410,7 @@ export async function couldBeValidatedDice(
 	if (!workingEmbed) throw new Error(ul("error.embed.notFound"));
 
 	// Récupération du message original via la clé (pas de footer nécessaire)
-	const keyParts = parseEmbedKey(embedKey);
-	if (!keyParts) throw new Error(ul("error.embed.notFound"));
-	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
-	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
-	const message = await channel.messages.fetch(keyParts.messageId);
-
+	const message = await getMessageWithKeyPart(ul, interaction, embedKey);
 	// Préparation des champs/flags
 	const newFields = workingEmbed.toJSON().fields ?? [];
 	const removed = newFields.length === 0;
