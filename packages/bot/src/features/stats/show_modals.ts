@@ -33,7 +33,7 @@ export async function show(
 		}) ?? [];
 	const nbOfPages =
 		Math.ceil(statsWithoutCombinaison.length / 5) >= 1
-			? Math.ceil(statsWithoutCombinaison.length / 5)
+			? Math.ceil(statsWithoutCombinaison.length / 5) + 1
 			: page;
 	const modal = new Djs.ModalBuilder()
 		.setCustomId(`page${page}`)

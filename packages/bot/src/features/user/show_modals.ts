@@ -51,7 +51,8 @@ async function show(
 	let nbOfPages = 1;
 	if (template.statistics) {
 		const nbOfStatistique = Object.keys(template.statistics).length;
-		nbOfPages = Math.ceil(nbOfStatistique / 5) > 0 ? Math.ceil(nbOfStatistique / 5) : 2;
+		nbOfPages =
+			Math.ceil(nbOfStatistique / 5) > 0 ? Math.ceil(nbOfStatistique / 5) + 1 : 2;
 	}
 
 	const modal = new Djs.ModalBuilder()

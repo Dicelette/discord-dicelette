@@ -185,6 +185,8 @@ export async function register(
 				value: `\`${combinaisonFields[stat]}\` = ${combinaison[stat]}`,
 			});
 		}
+		//update footer to last page as all stats are set
+		userEmbed.setFooter({ text: ul("common.page", { nb: page + 1 }) });
 
 		message.edit({
 			components: [Dice.buttons(ul, moderation && !isModerator)],
