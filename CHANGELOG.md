@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.4](https://github.com/Dicelette/discord-dicelette/compare/2.10.3...2.10.4) (2025-10-30)
+
+
+### Bug Fixes
+
+* update avatar thumbnail handling to clear if links include discord CDN ([5db3917](https://github.com/Dicelette/discord-dicelette/commit/5db391777ebb9d0af070bfd148647c5df292c46d))
+
 ## [2.10.3](https://github.com/Dicelette/discord-dicelette/compare/2.10.2...2.10.3) (2025-10-30)
 
 
