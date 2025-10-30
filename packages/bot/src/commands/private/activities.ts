@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/style/useNamingConvention: bruh */
+
+import * as fs from "node:fs";
 import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
@@ -65,5 +67,11 @@ export default {
 		await interaction.reply({
 			content: ul("activities.set"),
 		});
+		//update client status
+		client.status.text = text;
+		client.status.type = activities;
+		//update the file
+		if (fs.existsSync(client.statusPath))
+			fs.writeFileSync(client.statusPath, JSON.stringify(client.status), "utf-8");
 	},
 };

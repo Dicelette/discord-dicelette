@@ -14,3 +14,8 @@ export type DiscordTextChannel =
 	| Djs.PrivateThreadChannel
 	| Djs.PublicThreadChannel
 	| Djs.VoiceChannel;
+
+export type BotStatus = {
+	text: string;
+	type?: Djs.ActivityType;
+};

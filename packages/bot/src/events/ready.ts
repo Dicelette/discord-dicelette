@@ -29,8 +29,8 @@ export default (client: EClient): void => {
 		);
 		const serializedDbCmds = DATABASE_COMMANDS.map((command) => command.data.toJSON());
 
-		client.user.setActivity("Bringing chaos !", {
-			type: Djs.ActivityType.Playing,
+		client.user.setActivity(client.status.text, {
+			type: client.status.type,
 		});
 		serializedCommands = serializedCommands.concat(
 			//@ts-ignore
