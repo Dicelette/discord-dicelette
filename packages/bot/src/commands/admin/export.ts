@@ -107,10 +107,10 @@ async function exportToCsv(
 				limit(async () => {
 					const stats = (
 						await getUserFromInteraction(client, user, interaction, char.charName, {
+							cleanUrl: false,
 							fetchAvatar: true,
 							fetchChannel: true,
 							skipNotFound: true,
-							cleanUrl: false
 						})
 					)?.userData;
 					if (!stats) return;
