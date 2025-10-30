@@ -1,5 +1,5 @@
 import type { Settings, Translation } from "@dicelette/types";
-import { cleanAvatarUrl } from "@dicelette/utils";
+import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit, fetchAvatarUrl } from "utils";
@@ -29,9 +29,10 @@ async function showAvatarEdit(
 	const embed = getEmbeds(interaction.message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	const jsonEmbed = embed.toJSON().thumbnail?.url;
-	const thumbnail = jsonEmbed
+	let thumbnail = jsonEmbed
 		? cleanAvatarUrl(jsonEmbed)
 		: await fetchAvatarUrl(interaction.guild!, interaction.user);
+	if (thumbnail.match(COMPILED_PATTERNS.DISCORD_CDN)) thumbnail = "";
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editAvatar")
 		.setTitle(ul("button.avatar.description"))
