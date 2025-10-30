@@ -6,7 +6,7 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import { cleanAvatarUrl, filterChoices, logger, verifyAvatarUrl } from "@dicelette/utils";
+import { filterChoices, logger, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	deleteUser,
@@ -23,6 +23,7 @@ import {
 	getButton,
 	haveAccess,
 	optionInteractions,
+	reuploadAvatar,
 } from "utils";
 import "discord_ext";
 
@@ -62,7 +63,13 @@ export const editAvatar = {
 							option
 								.setNames("edit_avatar.url.name")
 								.setDescriptions("edit_avatar.url.desc")
-								.setRequired(true)
+								.setRequired(false)
+						)
+						.addAttachmentOption((option) =>
+							option
+								.setNames("edit_avatar.attachment.name")
+								.setDescriptions("edit_avatar.attachment.desc")
+								.setRequired(false)
 						)
 				) as Djs.SlashCommandSubcommandBuilder
 		)
@@ -177,21 +184,48 @@ async function avatar(
 	thread: DiscordChannel
 ) {
 	try {
-		const imageURL = cleanAvatarUrl(options.getString(t("edit_avatar.url.name"), true));
-		if (!verifyAvatarUrl(imageURL))
+		const fileUrl = options.getString(t("edit_avatar.url.name"), false);
+		const fileAttachment = options.getAttachment(t("edit_avatar.attachment.name"), false);
+		const message = await thread!.messages.fetch(sheetLocation.messageId);
+		let files = message.attachments.map(
+			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
+		);
+		if (!fileUrl && !fileAttachment) {
+			await reply(interaction, {
+				embeds: [embedError(ul("error.avatar.missing"), ul)],
+			});
+			return;
+		}
+		let avatarURL: string | null = null;
+		if (fileUrl) avatarURL = fileUrl;
+		else if (fileAttachment) {
+			//we need to reupload in the cache
+			const { name, newAttachment } = await reuploadAvatar({
+				name: fileAttachment.name,
+				url: fileAttachment.url,
+			});
+			avatarURL = name;
+
+			files.push(newAttachment);
+			//prevent duplicate attachments with filter
+			files = Array.from(new Set(files.map((f) => f.name))).map(
+				(name) => files.find((f) => f.name === name)!
+			);
+		}
+		if (!avatarURL || !verifyAvatarUrl(avatarURL))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
-		const message = await thread!.messages.fetch(sheetLocation.messageId);
 		const embed = getEmbeds(message, "user");
 		if (!embed) {
 			// noinspection ExceptionCaughtLocallyJS
 			throw new Error(ul("error.embed.notFound"));
 		}
-		embed.setThumbnail(imageURL);
+		embed.setThumbnail(avatarURL);
+
 		const embedsList = getEmbedsList({ embed, which: "user" }, message);
 		//update button
-		await generateButton(message, ul, embedsList.list);
+		await generateButton(message, ul, embedsList.list, files);
 
 		const nameMention = `<@${user?.id ?? interaction.user.id}>${charName ? ` (${charName})` : ""}`;
 		const msgLink = message.url;
@@ -208,10 +242,11 @@ async function avatar(
 async function generateButton(
 	message: Djs.Message,
 	ul: Translation,
-	embedsList: Djs.EmbedBuilder[]
+	embedsList: Djs.EmbedBuilder[],
+	files: Djs.AttachmentBuilder[] = []
 ) {
 	const { buttons, select } = getButton(message, ul);
-	await message.edit({ components: [buttons, select], embeds: embedsList });
+	await message.edit({ components: [buttons, select], embeds: embedsList, files });
 }
 
 /**
