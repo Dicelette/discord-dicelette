@@ -199,16 +199,10 @@ async function avatar(
 		let files = message.attachments.map(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
-		if (!fileUrl && !fileAttachment) {
-			throw new Error(ul("error.avatar.missing"));
-		}
-		let avatarURL: string | null = null;
-		if (fileUrl) {
-			if (fileUrl.match(COMPILED_PATTERNS.DISCORD_CDN))
-				throw new Error(ul("error.avatar.cdn"));
+		if (!fileUrl && !fileAttachment) throw new Error(ul("error.avatar.missing"));
 
-			avatarURL = fileUrl;
-		} else if (fileAttachment) {
+		let avatarURL: string | null = null;
+		if (fileAttachment) {
 			//we need to reupload in the cache
 			const { name, newAttachment } = await reuploadAvatar(
 				{
@@ -224,6 +218,10 @@ async function avatar(
 			files = Array.from(new Set(files.map((f) => f.name))).map(
 				(name) => files.find((f) => f.name === name)!
 			);
+		} else if (fileUrl) {
+			if (fileUrl.match(COMPILED_PATTERNS.DISCORD_CDN))
+				throw new Error(ul("error.avatar.cdn"));
+			avatarURL = fileUrl;
 		}
 		if (!avatarURL || !verifyAvatarUrl(avatarURL))
 			return await reply(interaction, {
