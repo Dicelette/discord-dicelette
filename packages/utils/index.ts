@@ -50,7 +50,10 @@ export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
 	// Reset lastIndex for global regex to avoid issues
 	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
+	COMPILED_PATTERNS.VALID_EXTENSIONS.lastIndex = 0;
 	if (url.match(COMPILED_PATTERNS.AVATAR_URL)) return url;
+	if (url.match(COMPILED_PATTERNS.VALID_EXTENSIONS) && url.startsWith("attachment://"))
+		return url;
 	return false;
 }
 

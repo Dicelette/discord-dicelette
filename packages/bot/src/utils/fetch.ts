@@ -100,7 +100,7 @@ export async function reuploadAvatar(
 	ul: Translation
 ) {
 	if (!avatar.name.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
-		throw new Error(ul("error.avatar.url"));
+		throw new Error(ul("error.avatar.format"));
 	//we have only a link so we need to fetch the attachment again
 	const fetched = await fetch(avatar.url);
 	const newAttachment = new Djs.AttachmentBuilder(
