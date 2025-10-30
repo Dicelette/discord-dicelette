@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.0](https://github.com/Dicelette/discord-dicelette/compare/2.9.0...2.10.0) (2025-10-30)
+
+
+### Features
+
+* enhance avatar handling by allowing attachment uploads and improving error handling ([684baeb](https://github.com/Dicelette/discord-dicelette/commit/684baeb5d6c61938d4f6a393727b9df7c10caf09))
+
+
+### Bug Fixes
+
+* improve avatar error handling by updating error messages and refining URL validation ([3fbfeac](https://github.com/Dicelette/discord-dicelette/commit/3fbfeac05ca094f3d0d2c48645ffd1e8981b1c61))
+* remove redundant cleanUrl option in getUserFromInteraction call ([aa2484f](https://github.com/Dicelette/discord-dicelette/commit/aa2484f00fd73395347a9551a291d4f908e8ab6f))
+* update charUserOptions and edit command to improve option descriptions and error handling ([1874ef9](https://github.com/Dicelette/discord-dicelette/commit/1874ef96ba6e41dcd9176a6e9715265de0ecf2fe))
+* update reuploadAvatar function to include translation support and enhance error avatar handling ([65a1316](https://github.com/Dicelette/discord-dicelette/commit/65a1316fd28e4d238d3a2a649200626da7190337))
+
 ## [2.9.0](https://github.com/Dicelette/discord-dicelette/compare/2.8.1...2.9.0) (2025-10-29)
 
 
