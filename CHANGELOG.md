@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.3](https://github.com/Dicelette/discord-dicelette/compare/2.10.2...2.10.3) (2025-10-30)
+
+
+### Bug Fixes
+
+* adjust pagination logic and update footer for last page in modals ([783eb61](https://github.com/Dicelette/discord-dicelette/commit/783eb61e03053760d531f703d9a6abc8b97202fb))
+
 ## [2.10.2](https://github.com/Dicelette/discord-dicelette/compare/2.10.1...2.10.2) (2025-10-30)
 
 ## [2.10.1](https://github.com/Dicelette/discord-dicelette/compare/2.10.0...2.10.1) (2025-10-30)
