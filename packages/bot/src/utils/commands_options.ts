@@ -7,19 +7,21 @@ import "discord_ext";
 import { getLangAndConfig } from "./fetch";
 
 export function charUserOptions(
-	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
+	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
+	type: "display" | "edit" = "display"
 ) {
+	const keysPrefix = type === "display" ? "display" : "edit.opts";
 	buider
 		.addUserOption((option) =>
 			option
 				.setNames("display.userLowercase")
-				.setDescriptions("display.user")
+				.setDescriptions(`${keysPrefix}.user`)
 				.setRequired(false)
 		)
 		.addStringOption((option) =>
 			option
 				.setNames("common.character")
-				.setDescriptions("display.character")
+				.setDescriptions(`${keysPrefix}.character`)
 				.setRequired(false)
 				.setAutocomplete(true)
 		);

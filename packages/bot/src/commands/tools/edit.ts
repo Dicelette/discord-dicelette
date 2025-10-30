@@ -75,7 +75,8 @@ export const editAvatar = {
 								.setNames("edit_avatar.attachment.name")
 								.setDescriptions("edit_avatar.attachment.desc")
 								.setRequired(false)
-						)
+						),
+					"edit"
 				) as Djs.SlashCommandSubcommandBuilder
 		)
 		.addSubcommand(
@@ -89,7 +90,8 @@ export const editAvatar = {
 								.setNames("edit.rename.option.title")
 								.setDescriptions("edit.rename.option.desc")
 								.setRequired(true)
-						)
+						),
+					"edit"
 				) as Djs.SlashCommandSubcommandBuilder
 		)
 		.addSubcommand(
@@ -103,7 +105,8 @@ export const editAvatar = {
 								.setNames("edit.user.option.title")
 								.setDescriptions("edit.user.option.desc")
 								.setRequired(true)
-						)
+						),
+					"edit"
 				) as Djs.SlashCommandSubcommandBuilder
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -189,6 +192,7 @@ async function avatar(
 	thread: DiscordChannel
 ) {
 	try {
+		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const fileUrl = options.getString(t("edit_avatar.url.name"), false);
 		const fileAttachment = options.getAttachment(t("edit_avatar.attachment.name"), false);
 		const message = await thread!.messages.fetch(sheetLocation.messageId);
@@ -220,6 +224,7 @@ async function avatar(
 			files = Array.from(new Set(files.map((f) => f.name))).map(
 				(name) => files.find((f) => f.name === name)!
 			);
+			console.log(avatarURL);
 		}
 		if (!avatarURL || !verifyAvatarUrl(avatarURL))
 			return await reply(interaction, {
@@ -243,8 +248,11 @@ async function avatar(
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
-		await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
+		//send the correct error message
 		logger.warn(error);
+		await reply(interaction, {
+			embeds: [embedError((error as Error).message, ul)],
+		});
 	}
 }
 
