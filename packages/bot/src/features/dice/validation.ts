@@ -652,7 +652,7 @@ export async function cancelDiceAddModeration(
 
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled"),
+		content: ul("modals.cancelled_moderator"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	//send a message to the user that the edition has been cancelled

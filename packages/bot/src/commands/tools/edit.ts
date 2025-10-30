@@ -224,17 +224,14 @@ async function avatar(
 			files = Array.from(new Set(files.map((f) => f.name))).map(
 				(name) => files.find((f) => f.name === name)!
 			);
-			console.log(avatarURL);
 		}
 		if (!avatarURL || !verifyAvatarUrl(avatarURL))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
 		const embed = getEmbeds(message, "user");
-		if (!embed) {
-			// noinspection ExceptionCaughtLocallyJS
-			throw new Error(ul("error.embed.notFound"));
-		}
+		if (!embed) throw new Error(ul("error.embed.notFound"));
+
 		embed.setThumbnail(avatarURL);
 
 		const embedsList = getEmbedsList({ embed, which: "user" }, message);
