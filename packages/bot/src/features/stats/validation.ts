@@ -81,7 +81,7 @@ export async function register(
 	);
 	if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
 		const fileName = thumbnail.split("?")[0].split("/").pop() || "avatar.png";
-		const result = await reuploadAvatar({ name: fileName, url: thumbnail });
+		const result = await reuploadAvatar({ name: fileName, url: thumbnail }, ul);
 		userEmbed.setThumbnail(result.name);
 		files.push(result.newAttachment);
 	}

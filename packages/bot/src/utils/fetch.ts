@@ -1,5 +1,6 @@
 import { ln } from "@dicelette/localization";
-import { logger } from "@dicelette/utils";
+import type { Translation } from "@dicelette/types";
+import { COMPILED_PATTERNS, logger, verifyAvatarUrl } from "@dicelette/utils";
 import type { Guild, GuildMember, User } from "discord.js";
 import * as Djs from "discord.js";
 import type { EClient } from "../client";
@@ -94,7 +95,12 @@ export async function fetchAvatarUrl(guild: Guild, user: User, member?: GuildMem
 	return member?.avatarURL() ?? user.displayAvatarURL();
 }
 
-export async function reuploadAvatar(avatar: { name: string; url: string }) {
+export async function reuploadAvatar(
+	avatar: { name: string; url: string },
+	ul: Translation
+) {
+	if (!avatar.name.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
+		throw new Error(ul("error.avatar.url"));
 	//we have only a link so we need to fetch the attachment again
 	const fetched = await fetch(avatar.url);
 	const newAttachment = new Djs.AttachmentBuilder(

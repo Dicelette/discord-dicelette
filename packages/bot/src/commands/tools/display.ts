@@ -112,10 +112,13 @@ export const displayUser = {
 				: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
 			if (persist && thumbnailJson?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
 				//get the attachment if exists
-				const result = await reuploadAvatar({
-					name: thumbnailJson.split("?")[0].split("/").pop() ?? "avatar.png",
-					url: thumbnailJson,
-				});
+				const result = await reuploadAvatar(
+					{
+						name: thumbnailJson.split("?")[0].split("/").pop() ?? "avatar.png",
+						url: thumbnailJson,
+					},
+					ul
+				);
 				avatar = result.name;
 				files.push(result.newAttachment);
 			}

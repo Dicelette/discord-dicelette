@@ -6,7 +6,12 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import { filterChoices, logger, verifyAvatarUrl } from "@dicelette/utils";
+import {
+	COMPILED_PATTERNS,
+	filterChoices,
+	logger,
+	verifyAvatarUrl,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import {
 	deleteUser,
@@ -191,19 +196,23 @@ async function avatar(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
 		if (!fileUrl && !fileAttachment) {
-			await reply(interaction, {
-				embeds: [embedError(ul("error.avatar.missing"), ul)],
-			});
-			return;
+			throw new Error(ul("error.avatar.missing"));
 		}
 		let avatarURL: string | null = null;
-		if (fileUrl) avatarURL = fileUrl;
-		else if (fileAttachment) {
+		if (fileUrl) {
+			if (fileUrl.match(COMPILED_PATTERNS.DISCORD_CDN))
+				throw new Error(ul("error.avatar.cdn"));
+
+			avatarURL = fileUrl;
+		} else if (fileAttachment) {
 			//we need to reupload in the cache
-			const { name, newAttachment } = await reuploadAvatar({
-				name: fileAttachment.name,
-				url: fileAttachment.url,
-			});
+			const { name, newAttachment } = await reuploadAvatar(
+				{
+					name: fileAttachment.name,
+					url: fileAttachment.url,
+				},
+				ul
+			);
 			avatarURL = name;
 
 			files.push(newAttachment);

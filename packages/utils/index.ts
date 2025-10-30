@@ -14,6 +14,7 @@ export const COMPILED_PATTERNS = {
 	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,
 	QUERY_PARAMS: /\?.*$/g,
 	REGEX_ESCAPE: /[.*+?^${}()|[\]\\]/g,
+	VALID_EXTENSIONS: /\.(jpe?g|gifv?|png|webp)$/gi,
 	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
 } as const;
 
@@ -47,7 +48,6 @@ function uniqueValues(array: string[]) {
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
-	if (url.startsWith("attachment://")) return url;
 	// Reset lastIndex for global regex to avoid issues
 	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
 	if (url.match(COMPILED_PATTERNS.AVATAR_URL)) return url;

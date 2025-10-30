@@ -67,10 +67,13 @@ async function buildEmbedsForCharacter(
 
 	// Re-upload avatar if it's a Discord CDN link
 	if (char.avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
-		const res = await reuploadAvatar({
-			name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",
-			url: char.avatar,
-		});
+		const res = await reuploadAvatar(
+			{
+				name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",
+				url: char.avatar,
+			},
+			ul
+		);
 		files.push(res.newAttachment);
 		char.avatar = res.name;
 	}

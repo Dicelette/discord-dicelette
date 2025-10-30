@@ -206,7 +206,7 @@ export async function validateUser(
 	let avatarStr = jsonThumbnail || "";
 	if (jsonThumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
 		const fileName = jsonThumbnail.split("?")[0].split("/").pop() || `${userID}_avatar`;
-		const result = await reuploadAvatar({ name: fileName, url: jsonThumbnail });
+		const result = await reuploadAvatar({ name: fileName, url: jsonThumbnail }, ul);
 		avatarStr = result.name;
 		files.push(result.newAttachment);
 	}
