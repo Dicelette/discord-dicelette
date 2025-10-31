@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.11.0](https://github.com/Dicelette/discord-dicelette/compare/2.10.8...2.11.0) (2025-10-31)
+
+
+### Features
+
+* enhance interaction handling and button functionality with new moderation options ([ed444c9](https://github.com/Dicelette/discord-dicelette/commit/ed444c90ebdf2d0a6986bc4d3fa3899374bc5c0d))
+
+
+### Bug Fixes
+
+* correct import path for localization module in button functionality ([649cda3](https://github.com/Dicelette/discord-dicelette/commit/649cda39e0d044343f131fe9d09b0d06627e345e))
+* improve avatar file handling and validation in user interactions ([3e8c184](https://github.com/Dicelette/discord-dicelette/commit/3e8c184053d442c8093ae9e111a169c2a9514ad0))
+
 ## [2.10.8](https://github.com/Dicelette/discord-dicelette/compare/2.10.7...2.10.8) (2025-10-31)
 
 
