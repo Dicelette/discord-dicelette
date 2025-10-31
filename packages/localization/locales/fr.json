@@ -717,8 +717,8 @@
 	},
 	"modals": {
 		"added": {
-			"dice": "Dés ajoutés",
-			"stats": "Statistiques ajoutés"
+			"dice": "Macro ajoutée",
+			"stats": "Statistiques ajoutées"
 		},
 		"alreadySet": "Toutes les statistiques sont déjà définies",
 		"avatar": {
