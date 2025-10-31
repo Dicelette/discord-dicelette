@@ -327,7 +327,6 @@ export class ResultAsText {
 		if (resMsg.match(/^[✕✓※]/)) {
 			return `${this.message(r, totalSuccess).replace(/^[✕✓※]/, `${successOrFailure} — `)}\n`;
 		}
-		console.log(resMsg);
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
 

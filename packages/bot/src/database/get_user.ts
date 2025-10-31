@@ -14,11 +14,12 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { allValuesUndefined, cleanAvatarUrl, logger } from "@dicelette/utils";
+import { cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
+import equal from "fast-deep-equal";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import {
 	fetchChannel,
@@ -590,7 +591,10 @@ export async function getStatistics(
 		return;
 	}
 
-	if (userStatistique && allValuesUndefined(userStatistique.template) && template) {
+	// If we have a template from guild/settings and the user's template is either empty or differs,
+	// update the in-memory user data so it stays in sync with current template configuration.
+	if (userStatistique && template && !equal(userStatistique.template, template)) {
+		logger.trace("Updating user template to match guild template settings.");
 		userStatistique.template = template;
 		await updateMemory(
 			client.characters,
