@@ -127,7 +127,7 @@ export async function sendValidationMessage(
 		if (systemChannel?.isSendable()) {
 			await systemChannel.send({
 				content: ul("logs.validationWaiting", {
-					role: `\n -# ${pingModeratorRole(interaction.guild!)}`,
+					role: `\n-# ${pingModeratorRole(interaction.guild!)}`,
 					url: interaction.message.url,
 					user: `${interactionUser.id}`,
 				}),
