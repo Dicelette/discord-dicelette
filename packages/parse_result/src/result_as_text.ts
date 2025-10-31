@@ -123,9 +123,7 @@ export class ResultAsText {
 			const result = this.compare(messageResult, critical, customCritical, opposition);
 			msgSuccess = result.msgSuccess;
 			criticalState = result.criticalState;
-		} else {
-			msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
-		}
+		} else msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
 
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
@@ -322,13 +320,14 @@ export class ResultAsText {
 		const text = opposition && oldCompareStr.length > 0 ? first : "";
 
 		const totalSuccess = testValue
-			? ` = \`[${total}] ${goodSign} ${this.formatCompare(testValue, "`")}${text}${oldCompareStr}`
+			? ` = \`[${total}] ${this.asciiSign(goodSign)} ${this.formatCompare(testValue, "`")}${text}${oldCompareStr}`
 			: `= \`[${total}]\``;
 
 		const resMsg = this.message(r, totalSuccess);
 		if (resMsg.match(/^[✕✓※]/)) {
 			return `${this.message(r, totalSuccess).replace(/^[✕✓※]/, `${successOrFailure} — `)}\n`;
 		}
+		console.log(resMsg);
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
 
@@ -413,7 +412,7 @@ export class ResultAsText {
 	): string {
 		const goodSignOld = this.goodCompareSign(oldCompare, total);
 		const text = this.ul(`roll.${is}`);
-		return ` ${AND} \`${goodSignOld} ${this.formatCompare(oldCompare, "`")}${text}`;
+		return ` ${AND} \`${this.asciiSign(goodSignOld)} ${this.formatCompare(oldCompare, "`")}${text}`;
 	}
 
 	private formatCompare(compare?: ComparedValue, lastChar?: string) {
@@ -452,11 +451,11 @@ export class ResultAsText {
 			case "<=":
 				return "⩾";
 			case "=":
-				return "=";
-			case "!=":
 				return "!=";
-			case "==":
+			case "!=":
 				return "==";
+			case "==":
+				return "!=";
 			default:
 				return "";
 		}
@@ -467,15 +466,13 @@ export class ResultAsText {
 		authorId?: string
 	) {
 		let linkToOriginal = "";
-		if (typeof context === "object") {
+		if (typeof context === "object")
 			linkToOriginal = this.createUrl({
 				channelId: context.channelId,
 				guildId: context.guildId,
 				messageId: context.messageId,
 			});
-		} else if (context) {
-			linkToOriginal = this.createUrl(undefined, context);
-		}
+		else if (context) linkToOriginal = this.createUrl(undefined, context);
 
 		// Construire la mention (personnage > auteur si disponible)
 		let mention = authorId ? `*<@${authorId}>*` : "";
@@ -486,11 +483,19 @@ export class ResultAsText {
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
 		if (header) {
-			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
+			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
 		}
 
 		const headerLine = `${mention}${compareHint}${timestamp(this.data.config?.timestamp)}`;
 		return `${headerLine}\n${this.parser}${linkToOriginal}`;
+	}
+
+	private asciiSign(sign: string) {
+		if (sign === "!=") return "≠";
+		if (sign === "==") return "═";
+		if (sign === ">=") return "⩾";
+		if (sign === "<=") return "⩽";
+		return sign;
 	}
 
 	private convertCustomCriticalToCompare(custom: CustomCriticalRoll): ComparedValue {
