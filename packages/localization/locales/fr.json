@@ -56,6 +56,7 @@
 			"stats": "Modifier les statistiques"
 		},
 		"name": "Modifier le nom du personnage",
+		"refuse": "Refuser",
 		"user": "Modifier l'utilisateur associé",
 		"validate": "Valider"
 	},
@@ -782,6 +783,7 @@
 	"refresh": "Suite à une mise à jour, les boutons ont été modifié ! Vous devez maintenant sélectionner l'option \"Avatar\" du menu déroulant pour modifier l'image.\nDe nouvelles options y ont aussi été rajouté !",
 	"register": {
 		"button": "Enregistrer un personnage",
+		"cancelled": "L'enregistrement a été annulé.",
 		"confirm": "La fiche a été envoyé dans le processus de validation, merci d'attendre.",
 		"delete": {
 			"confirm": "Êtes vous sûr.e de vouloir supprimer **toutes** les fiches ?",
@@ -820,7 +822,8 @@
 				"description": "Mettre à jour les anciennes fiches de personnages",
 				"name": "maj_personnages"
 			}
-		}
+		},
+		"refusalSent": "Votre fiche sur {{- guild}} a été refusée par {{- mention}}."
 	},
 	"roll": {
 		"base": " (__base__)",

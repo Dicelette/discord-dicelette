@@ -1,6 +1,9 @@
 import type { DataToFooter, Translation } from "@dicelette/types";
+import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { ensureEmbed, reply } from "messages";
+import { findln } from "packages/localization";
+import { fetchUser } from "utils";
 
 /**
  * Button to edit the user embed character sheet
@@ -71,35 +74,77 @@ export function selectEditMenu(ul: Translation) {
 export async function cancel(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
-	interactionUser: Djs.User
+	client: EClient,
+	interactionUser: Djs.User,
+	sendRefusal = false,
+	cancelByUser = false
 ) {
 	const embed = ensureEmbed(interaction.message);
-	let user =
-		embed.fields
-			.find((field) => field.name === ul("common.user"))
-			?.value.replace("<@", "")
-			.replace(">", "") === interactionUser.id;
-	if (!user) {
-		//find the user in the footer
-		const footer = embed.footer?.text;
-		if (footer) {
-			try {
-				const data: DataToFooter = JSON.parse(footer);
-				user = data.userID === interactionUser.id;
-			} catch (_e) {
-				user = false;
-			}
+	const userFieldId = embed.fields
+		.find((field) => findln(field.name) === "common.user")
+		?.value.replace("<@", "")
+		.replace(">", "");
+
+	// Détermine si l'interaction vient du propriétaire (via champ ou via footer de secours)
+	const isOwnerFromField = userFieldId === interactionUser.id;
+	const footerText = embed.footer?.text;
+	let isOwner = isOwnerFromField;
+	if (!isOwner && footerText) {
+		try {
+			const data: DataToFooter = JSON.parse(footerText);
+			isOwner = data.userID === interactionUser.id;
+		} catch {
+			isOwner = false;
 		}
 	}
+
 	const isModerator = interaction.guild?.members.cache
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-	if (user || isModerator) await interaction.message.delete();
-	else
+
+	// Cas d'annulation par l'utilisateur lui-même
+	if (cancelByUser) {
+		if (isOwner) {
+			await interaction.message.delete();
+			await reply(interaction, {
+				content: ul("register.cancelled"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
+		// Toute autre personne (y compris un modérateur) ne peut pas annuler 'au nom de' l'utilisateur
 		await reply(interaction, {
 			content: ul("modals.noPermission"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+		return;
+	}
+
+	// Cas principal: annulation standard (modérateur ou propriétaire sans envoi de refus)
+	const canDelete = isModerator || (isOwner && !sendRefusal);
+	if (!canDelete) {
+		await reply(interaction, {
+			content: ul("modals.noPermission"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+
+	await interaction.message.delete();
+	// Envoi du refus en MP si demandé et effectué par un modérateur sur un autre utilisateur
+	if (sendRefusal && isModerator && userFieldId && userFieldId !== interactionUser.id) {
+		const userFetch = await fetchUser(client, userFieldId);
+		await userFetch?.send({
+			content: ul("register.refusalSent", {
+				guild: interaction.guild?.name,
+				mention: `<@${interaction.user.id}>`,
+			}),
+		});
+	}
+	await reply(interaction, {
+		content: ul("register.cancelled"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 }
 
 /**

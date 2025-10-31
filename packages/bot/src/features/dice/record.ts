@@ -78,7 +78,11 @@ export async function store(
  * @param ul {Translation}
  * @param markAsValidated
  */
-export function buttons(ul: Translation, markAsValidated = false) {
+export function buttons(
+	ul: Translation,
+	markAsValidated = false,
+	moderationSent = false
+) {
 	const validateButton = new Djs.ButtonBuilder()
 		.setCustomId("validate")
 		.setLabel(ul("button.validate"))
@@ -91,18 +95,24 @@ export function buttons(ul: Translation, markAsValidated = false) {
 			.setEmoji("📤");
 	}
 	const cancelButton = new Djs.ButtonBuilder()
-		.setCustomId("cancel")
-		.setLabel(ul("common.cancel"))
+		.setCustomId(moderationSent ? "moderation_refuse" : "cancel")
+		.setLabel(moderationSent ? ul("button.refuse") : ul("common.cancel"))
 		.setStyle(Djs.ButtonStyle.Danger);
+	let cancelBut: Djs.ButtonBuilder | null = null;
+	if (moderationSent) {
+		//add a new button
+		cancelBut = new Djs.ButtonBuilder()
+			.setCustomId("cancel_by_user")
+			.setLabel(ul("common.cancel"))
+			.setStyle(Djs.ButtonStyle.Danger);
+	}
 	const registerDmgButton = new Djs.ButtonBuilder()
 		.setCustomId("add_dice_first")
 		.setLabel(ul("button.dice"))
 		.setStyle(Djs.ButtonStyle.Primary);
-	return new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents([
-		registerDmgButton,
-		validateButton,
-		cancelButton,
-	]);
+	const actionRow = [registerDmgButton, validateButton, cancelButton];
+	if (cancelBut) actionRow.push(cancelBut);
+	return new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(actionRow);
 }
 
 /**

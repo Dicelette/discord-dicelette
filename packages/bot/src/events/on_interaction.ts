@@ -138,7 +138,7 @@ async function buttonSubmit(
 	} else if (interaction.customId === "validate") {
 		await User.button(interaction, interactionUser, template, ul, client, characters);
 	} else if (interaction.customId === "cancel")
-		await cancel(interaction, ul, interactionUser);
+		await cancel(interaction, ul, client, interactionUser);
 	else if (interaction.customId === "edit_dice") {
 		await Dice.edit(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
@@ -178,7 +178,7 @@ async function buttonSubmit(
 			});
 			return;
 		} //update the button of the message and send a DM
-		const button = Dice.buttons(ul);
+		const button = Dice.buttons(ul, false, true);
 		await interaction.message.edit({ components: [button] });
 		//send the message
 		await User.sendValidationMessage(interaction, interactionUser, ul, client);
@@ -186,7 +186,11 @@ async function buttonSubmit(
 			content: ul("register.confirm"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-	}
+	} else if (interaction.customId === "moderation_refuse")
+		// Aligne le comportement sur le cancel standard mais avec un libellé différent
+		await cancel(interaction, ul, client, interactionUser, true);
+	else if (interaction.customId === "cancel_by_user")
+		await cancel(interaction, ul, client, interactionUser, false, true);
 }
 
 async function selectSubmit(

@@ -200,7 +200,6 @@ async function avatar(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
 		if (!fileUrl && !fileAttachment) throw new Error(ul("error.avatar.missing"));
-
 		let avatarURL: string | null = null;
 		if (fileAttachment) {
 			//we need to reupload in the cache

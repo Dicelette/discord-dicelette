@@ -113,7 +113,7 @@ export async function sendValidationMessage(
 	if (logChannel)
 		await Messages.sendLogs(
 			ul("logs.validationWaiting", {
-				role: `\n -# ${pingModeratorRole(interaction.guild!)}`,
+				role: `\n-# ${pingModeratorRole(interaction.guild!)}`,
 				url: interaction.message.url,
 				user: `${interactionUser.id}`,
 			}),

@@ -56,6 +56,7 @@
 			"stats": "Edit statistics"
 		},
 		"name": "Change character name",
+		"refuse": "Refuse",
 		"user": "Edit associated user",
 		"validate": "Validate"
 	},
@@ -782,6 +783,7 @@
 	"refresh": "Following an update, the buttons have been modified! \nNow you need to select the “Avatar” option from the drop-down menu to edit the image.\n\nNew options have also been added!",
 	"register": {
 		"button": "Register a character",
+		"cancelled": "The registration has been canceled.",
 		"confirm": "The sheet was send into the validation process.",
 		"delete": {
 			"confirm": "Are you sure do you want to delete **all** users data ?",
@@ -820,7 +822,8 @@
 				"description": "Update old character sheets",
 				"name": "update_characters"
 			}
-		}
+		},
+		"refusalSent": "Your sheet on {{- guild}} was refused by {{- mention}}."
 	},
 	"roll": {
 		"base": " (__base__)",
