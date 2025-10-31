@@ -93,8 +93,8 @@
 		"cancel": "Cancel",
 		"cancelled": "Deletion has been canceled.",
 		"channel": "channel",
-		"charName": "Character name",
 		"character": "character",
+		"charName": "Character name",
 		"comments": "comments",
 		"confirm": "Confirm deletion",
 		"context": "Context",
@@ -192,9 +192,9 @@
 			"disable": "The self-registration is disabled: player need a moderator to register their characters.",
 			"disableChannel": "User can't send their sheet in any channel : it will be sent into the default configured channel.",
 			"enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n> 💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
-			"enableModeration": "Only moderators can validate the self-registered sheet or the statistics or macro editions.",
+			"enableModeration": "Only moderators can validate the self-registered sheet or the statistics and macro editions.",
 			"moderation": {
-				"desc": "Only the moderation can validate a self registered sheet or a stats edit.",
+				"desc": "Only the moderation can validate a self registered sheet or an edition.",
 				"name": "validation_moderation"
 			},
 			"name": "self_register"
@@ -380,6 +380,19 @@
 			"title": "user"
 		}
 	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Host a file rather than using a link.",
+			"name": "file"
+		},
+		"default": "The image used will be your actual avatar !",
+		"desc": "Edit the avatar of a character sheet",
+		"name": "avatar",
+		"url": {
+			"desc": "Link to the image to put (no discord link!)",
+			"name": "url"
+		}
+	},
 	"editMe": {
 		"asset": {
 			"description": "The avatar to set",
@@ -400,19 +413,6 @@
 			"name": "nick"
 		},
 		"success": "The bot was edited successfully."
-	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Host a file rather than using a link.",
-			"name": "file"
-		},
-		"default": "The image used will be your actual avatar !",
-		"desc": "Edit the avatar of a character sheet",
-		"name": "avatar",
-		"url": {
-			"desc": "Link to the image to put (no discord link!)",
-			"name": "url"
-		}
 	},
 	"embed": {
 		"add": "User registration",
@@ -668,6 +668,12 @@
 		},
 		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
 	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Player leaderboard",
+			"title": "leaderboard"
+		}
+	},
 	"luckMeter": {
 		"count": {
 			"desc": "Know results for {{- user}} :",
@@ -697,12 +703,6 @@
 		"user": "{{- user}}'s throwing results:",
 		"userOption": {
 			"description": "Displays another user's throw results."
-		}
-	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Player leaderboard",
-			"title": "leaderboard"
 		}
 	},
 	"math": {

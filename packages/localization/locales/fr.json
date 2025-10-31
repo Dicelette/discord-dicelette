@@ -93,8 +93,8 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"charName": "Nom du personnage",
 		"character": "personnage",
+		"charName": "Nom du personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -192,10 +192,10 @@
 			"disable": "L'auto-enregistrement est désactivé : les joueurs ont besoin d'un modérateur pour enregistrer leurs personnages.",
 			"disableChannel": "L'utilisateur ne peut envoyer sa fiche dans aucun channel : elle sera envoyée dans le channel configuré par défaut.",
 			"enable": "L'auto-enregistrement est activé : les joueurs peuvent maintenant enregistrer leurs personnages librement, s'ils ont accès au message modèle{{- url}}.\n\n> 💡 Vous pouvez limiter l’accès au canal/fil contenant le modèle à un rôle spécifique, afin que seuls les utilisateurs autorisés puissent y accéder.  ",
-			"enableModeration": "Seul les modérateurs pourront valider la fiche ou les modifications de statistiques ou macro.",
+			"enableModeration": "Seuls les modérateurs pourront valider la fiche ou les modifications de statistiques et macros.",
 			"moderation": {
-				"desc": "Seulement les modérateurs peuvent valider une fiche auto-enregistrée ou une modification de stats.",
-				"name": "moderation_validation"
+				"desc": "Seulement les modérateurs peuvent valider une fiche auto-enregistrée ou une modification.",
+				"name": "validation_modération"
 			},
 			"name": "auto_enregistrement"
 		},
@@ -380,6 +380,19 @@
 			"title": "user"
 		}
 	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
+	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -400,19 +413,6 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
-	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -668,6 +668,12 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
+		}
+	},
 	"luckMeter": {
 		"count": {
 			"desc": "Résultats connus de {{- user}}:",
@@ -697,12 +703,6 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
-		}
-	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
 		}
 	},
 	"math": {
