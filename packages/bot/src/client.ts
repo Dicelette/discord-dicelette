@@ -44,7 +44,7 @@ export class EClient extends Djs.Client {
 	 * Used to store the status when the bot restarts
 	 * Allow to quicker set the status on bot restart & update it
 	 */
-	public statusPath = path.resolve(".\\data\\status.json");
+	public statusPath = path.resolve("./data/status.json");
 
 	constructor(options: Djs.ClientOptions) {
 		super(options);
