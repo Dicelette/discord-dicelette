@@ -236,7 +236,7 @@ async function getUserFrom(
 			ul,
 			userMessageId.channelId
 		);
-		if (!thread) throw new Error(ul("error.channel.thread"));
+		if (!thread) throw new Error(ul("error.user.notFound"));
 		if (
 			user.isPrivate &&
 			!allowAccess &&
