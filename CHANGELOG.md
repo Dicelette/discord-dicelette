@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.8](https://github.com/Dicelette/discord-dicelette/compare/2.10.7...2.10.8) (2025-10-31)
+
+
+### Bug Fixes
+
+* synchronize user template with guild settings and remove unused utility ([d083553](https://github.com/Dicelette/discord-dicelette/commit/d0835535b68c8409f74eec3b46b4f8c6f13af2e1))
+
 ## [2.10.7](https://github.com/Dicelette/discord-dicelette/compare/2.10.6...2.10.7) (2025-10-31)
 
 ## [2.10.6](https://github.com/Dicelette/discord-dicelette/compare/2.10.5...2.10.6) (2025-10-31)
