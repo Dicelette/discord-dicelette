@@ -21,6 +21,7 @@ import {
 	getEmbeds,
 	reply,
 	sendLogs,
+	updateUserEmbedThumbnail,
 } from "messages";
 import {
 	addAutoRole,
@@ -302,7 +303,15 @@ async function edit(
 	compare?: string,
 	first?: boolean
 ) {
-	await interaction?.message?.edit({ components, embeds: allEmbeds });
+	if (interaction.message) {
+		const { files, userDataEmbed } = await updateUserEmbedThumbnail(
+			interaction.message,
+			allEmbeds[0],
+			ul
+		);
+		allEmbeds[0] = userDataEmbed;
+		await interaction?.message?.edit({ components, embeds: allEmbeds, files });
+	}
 	await reply(interaction, {
 		content: ul("modals.added.dice"),
 		flags: Djs.MessageFlags.Ephemeral,

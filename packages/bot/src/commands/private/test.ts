@@ -10,7 +10,6 @@ export default {
 		.setDefaultMemberPermissions(0),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, _client: EClient) => {
 		const f = path.resolve("N:/Documents/Github/dicelette/discord-bot/assets/dice.png");
-		console.log(f);
 		const attachment = new Djs.AttachmentBuilder(f, { name: "image1.png" });
 
 		const embed = new Djs.EmbedBuilder()

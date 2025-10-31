@@ -3,7 +3,7 @@ import type { Translation } from "@dicelette/types";
 import { COMPILED_PATTERNS, cleanAvatarUrl, verifyAvatarUrl } from "@dicelette/utils";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
-import { embedError, getEmbeds, getEmbedsList, reply } from "messages";
+import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
 
 /**
  * Handles a Discord modal submission to update a user's avatar in an embed message.
@@ -47,7 +47,7 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	embed.setThumbnail(avatar);
-	const embedsList = getEmbedsList({ embed, which: "user" }, message);
+	const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
 
 	await message.edit({ embeds: embedsList.list, files });
 	const user = embed

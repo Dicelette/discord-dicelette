@@ -1,9 +1,16 @@
 import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { cleanAvatarUrl, logger, NoEmbed, TotalExceededError } from "@dicelette/utils";
+import {
+	COMPILED_PATTERNS,
+	cleanAvatarUrl,
+	logger,
+	NoEmbed,
+	TotalExceededError,
+} from "@dicelette/utils";
 import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
+import { reuploadAvatar } from "../utils";
 
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];
@@ -44,7 +51,8 @@ export function createEmbedsList(
  * Get the embeds from the message and replace based on the embed to replace
  * Also it returns if the embeds exists or not (useful for the buttons)
  */
-export function getEmbedsList(
+export async function replaceEmbedInList(
+	ul: Translation,
 	embedToReplace: {
 		which: "user" | "stats" | "damage" | "template";
 		embed: EmbedBuilder;
@@ -65,15 +73,49 @@ export function getEmbedsList(
 		embedToReplace.which === "template"
 			? embedToReplace.embed
 			: getEmbeds(message, "template");
+	const { files, userDataEmbed: updatedUserDataEmbed } = await updateUserEmbedThumbnail(
+		message!,
+		userDataEmbed,
+		ul
+	);
 	return {
 		exists: {
 			damage: !!diceEmbed,
 			stats: !!statsEmbed,
 			template: !!templateEmbed,
-			user: !!userDataEmbed,
+			user: !!updatedUserDataEmbed,
 		},
-		list: createEmbedsList(userDataEmbed, statsEmbed, diceEmbed, templateEmbed),
+		files,
+		list: createEmbedsList(updatedUserDataEmbed, statsEmbed, diceEmbed, templateEmbed),
 	};
+}
+
+export async function updateUserEmbedThumbnail(
+	message: Djs.Message,
+	userDataEmbed: Djs.EmbedBuilder,
+	ul: Translation
+) {
+	let files =
+		message?.attachments.map(
+			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
+		) ?? [];
+
+	const thumbnail = userDataEmbed.data.thumbnail?.url;
+	if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+		const res = await reuploadAvatar(
+			{
+				name: thumbnail.split("?")[0].split("/").pop() ?? "avatar.png",
+				url: thumbnail,
+			},
+			ul
+		);
+		userDataEmbed.setThumbnail(res.name);
+		files.push(res.newAttachment);
+	}
+	files = Array.from(new Set(files.map((f) => f.name))).map(
+		(name) => files.find((f) => f.name === name)!
+	);
+	return { files, userDataEmbed };
 }
 
 /**
@@ -84,9 +126,8 @@ export function getEmbeds(
 	which?: "user" | "stats" | "damage" | "template",
 	allEmbeds?: EmbedBuilder[] | Embed[]
 ) {
-	if (!allEmbeds) {
-		allEmbeds = message?.embeds;
-	}
+	if (!allEmbeds) allEmbeds = message?.embeds;
+
 	if (!allEmbeds) return;
 
 	const allEmbedsJson = allEmbeds?.map((embed) => embed.toJSON()) ?? [];

@@ -18,9 +18,9 @@ import {
 	createStatsEmbed,
 	displayOldAndNewStats,
 	getEmbeds,
-	getEmbedsList,
 	getStatistiqueFields,
 	removeEmbedsFromList,
+	replaceEmbedInList,
 	reply,
 	sendLogs,
 } from "messages";
@@ -290,13 +290,14 @@ export async function validateEdit(
 	const { userID, userName } = userData;
 	if (!fieldsToAppend || fieldsToAppend.length === 0) {
 		//stats was removed
-		const { list, exists } = getEmbedsList(
+		const { list, exists, files } = await replaceEmbedInList(
+			ul,
 			{ embed: newEmbedStats, which: "stats" },
 			message
 		);
 		const toAdd = removeEmbedsFromList(list, "stats");
 		const components = editUserButtons(ul, false, exists.damage);
-		await message.edit({ components: [components], embeds: toAdd });
+		await message.edit({ components: [components], embeds: toAdd, files });
 		await reply(interaction, {
 			content: ul("modals.removed.stats"),
 			flags: Djs.MessageFlags.Ephemeral,
@@ -312,8 +313,12 @@ export async function validateEdit(
 		);
 	}
 	//get the other embeds
-	const { list } = getEmbedsList({ embed: newEmbedStats, which: "stats" }, message);
-	await message.edit({ embeds: list });
+	const { list, files } = await replaceEmbedInList(
+		ul,
+		{ embed: newEmbedStats, which: "stats" },
+		message
+	);
+	await message.edit({ embeds: list, files });
 
 	await reply(interaction, {
 		content: ul("embed.edit.stats"),

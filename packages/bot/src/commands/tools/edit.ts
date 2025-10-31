@@ -21,7 +21,7 @@ import {
 	registerUser,
 } from "database";
 import * as Djs from "discord.js";
-import { embedError, findLocation, getEmbeds, getEmbedsList, reply } from "messages";
+import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "messages";
 import {
 	autoComplete,
 	charUserOptions,
@@ -232,7 +232,7 @@ async function avatar(
 
 		embed.setThumbnail(avatarURL);
 
-		const embedsList = getEmbedsList({ embed, which: "user" }, message);
+		const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
 		//update button
 		await generateButton(message, ul, embedsList.list, files);
 
@@ -303,7 +303,7 @@ export async function rename(
 	if (!n) throw new Error(ul("error.user.rename"));
 	n.value = name ? name : ul("common.noSet");
 	//update the embed
-	const embedsList = getEmbedsList({ embed, which: "user" }, message);
+	const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
 	//update the database
 	const userRegister: UserRegistration = {
 		charName: name,
@@ -412,7 +412,7 @@ export async function move(
 	if (!n) throw new Error(ul("error.embed.old"));
 	n.value = `<@${newUser.id}>`;
 	//update the embed
-	const embedsList = getEmbedsList({ embed, which: "user" }, message);
+	const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
 	//update the database, with deleting the old data
 
 	//add the new data to the database

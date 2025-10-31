@@ -1,7 +1,7 @@
 import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { COMPILED_PATTERNS, capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -10,8 +10,8 @@ import {
 	createDiceEmbed,
 	displayOldAndNewStats,
 	getEmbeds,
-	getEmbedsList,
 	removeEmbedsFromList,
+	replaceEmbedInList,
 	reply,
 	sendLogs,
 	stripFooter,
@@ -30,6 +30,7 @@ import {
 	parseEmbedKey,
 	parseKeyFromCustomId,
 	putModerationCache,
+	reuploadAvatar,
 	selectEditMenu,
 	selfRegisterAllowance,
 	setModerationFooter,
@@ -103,9 +104,8 @@ export async function validate(
 				components: [row],
 				content: ul("modals.removed.dice"),
 			});
-		} else {
-			await interaction.editReply({ components: [row], embeds: [diceEmbed] });
-		}
+		} else await interaction.editReply({ components: [row], embeds: [diceEmbed] });
+
 		return; // ne pas appliquer directement
 	}
 
@@ -220,9 +220,7 @@ function createAndValidateDiceEmbed(
 		}
 		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 		if (!statsEmbeds) {
-			if (!roll(dice)) {
-				throw new Error(ul("error.invalidDice.withDice", { dice }));
-			}
+			if (!roll(dice)) throw new Error(ul("error.invalidDice.withDice", { dice }));
 			continue;
 		}
 		const statsValues = parseStatsString(statsEmbeds);
@@ -240,9 +238,8 @@ function createAndValidateDiceEmbed(
 		for (const field of oldDice) {
 			const name = field.name.toLowerCase();
 			const newValue = newEmbedDice.find((f) => COMPARE_UNIDECODE(f.name, name));
-			if (!newValue) {
+			if (!newValue)
 				newEmbedDice.push({ inline: true, name: name.capitalize(), value: field.value });
-			}
 		}
 	}
 
@@ -278,14 +275,22 @@ async function editMessageDiceEmbeds(
 	diceEmbed: Djs.EmbedBuilder,
 	removed: boolean
 ): Promise<{ embeds: Djs.EmbedBuilder[] }> {
-	const embedsList = getEmbedsList({ embed: diceEmbed, which: "damage" }, message);
+	const embedsList = await replaceEmbedInList(
+		ul,
+		{ embed: diceEmbed, which: "damage" },
+		message
+	);
 	if (removed) {
 		const toAdd = removeEmbedsFromList(embedsList.list, "damage");
 		const components = editUserButtons(ul, embedsList.exists.stats, false);
-		await message.edit({ components: [components, selectEditMenu(ul)], embeds: toAdd });
+		await message.edit({
+			components: [components, selectEditMenu(ul)],
+			embeds: toAdd,
+			files: embedsList.files,
+		});
 		return { embeds: toAdd };
 	}
-	await message.edit({ embeds: embedsList.list });
+	await message.edit({ embeds: embedsList.list, files: embedsList.files });
 	return { embeds: embedsList.list };
 }
 
@@ -489,9 +494,8 @@ export async function cancelDiceModeration(
 	const customId = interaction.customId;
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
 	const { userId, url } = getUserId(interaction);
-	if (embedKey) {
-		deleteModerationCache(embedKey);
-	}
+	if (embedKey) deleteModerationCache(embedKey);
+
 	await interaction.message.delete();
 	await reply(interaction, {
 		content: ul("modals.cancelled"),
@@ -552,6 +556,8 @@ export async function couldBeValidatedDiceAdd(
 	const channel = await fetchChannel(interaction.guild!, targetChannelId!);
 	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
 	const message = await channel.messages.fetch(targetMessageId!);
+	const userEmbed = getEmbeds(message ?? undefined, "user");
+	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
 
 	// Garder les anciens champs pour logs
 	const oldDamage = getEmbeds(message ?? undefined, "damage");
@@ -560,6 +566,7 @@ export async function couldBeValidatedDiceAdd(
 	// Préparer la nouvelle liste d'embeds et les composants attendus (boutons d'édition)
 	let embedsApplied: Djs.EmbedBuilder[];
 	let hasStats: boolean;
+	let files: Djs.AttachmentBuilder[] | undefined;
 	if (cached) {
 		embedsApplied = cached.embeds;
 		hasStats = !!getEmbeds(undefined, "stats", cached.embeds);
@@ -571,16 +578,41 @@ export async function couldBeValidatedDiceAdd(
 			embedsApplied = embedsApplied.map((e) =>
 				(e.toJSON().title ?? "") === damageTitle ? sanitized : e
 			);
+			//update the thumbnail in the user embed
+			const userEmbed = getEmbeds(undefined, "user", embedsApplied);
+			const thumbnail = userEmbed?.data.thumbnail?.url;
+			if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+				const res = await reuploadAvatar(
+					{
+						name: thumbnail.split("?")[0].split("/").pop() ?? "avatar.png",
+						url: thumbnail,
+					},
+					ul
+				);
+				const sanitizedUserEmbed = userEmbed!.setThumbnail(res.name);
+				embedsApplied = embedsApplied.map((e) =>
+					(e.toJSON().title ?? "") === (userEmbed!.toJSON().title ?? "")
+						? sanitizedUserEmbed
+						: e
+				);
+				files = [res.newAttachment];
+			}
 		}
 	} else {
 		// Fallback: fusionner l'embed de dés avec les embeds existants
 		const diceEmbedToApply = stripFooter(moderationDiceEmbed!);
-		const edited = getEmbedsList({ embed: diceEmbedToApply, which: "damage" }, message);
+		const edited = await replaceEmbedInList(
+			ul,
+			{ embed: diceEmbedToApply, which: "damage" },
+			message
+		);
 		embedsApplied = edited.list;
 		hasStats = edited.exists.stats;
+		files = edited.files;
 	}
 	const components = [editUserButtons(ul, hasStats, true), selectEditMenu(ul)];
-	await message.edit({ components, embeds: embedsApplied });
+
+	await message.edit({ components, embeds: embedsApplied, files });
 
 	// Persistance mémoire + user
 	const newDamage = getEmbeds(message ?? undefined, "damage");
@@ -599,9 +631,7 @@ export async function couldBeValidatedDiceAdd(
 
 	// Déterminer l'utilisateur cible (depuis cache, sinon depuis l'embed user du message)
 	if (!userID) {
-		const userEmbed2 = getEmbeds(message ?? undefined, "user");
-		if (!userEmbed2) throw new Error(ul("error.embed.notFound"));
-		const parsedUser2 = parseEmbedFields(userEmbed2.toJSON() as Djs.Embed);
+		const parsedUser2 = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 		const mention2 = parsedUser2["common.user"]; // <@id>
 		const idMatch2 = mention2?.match(/<@(?<id>\d+)>/);
 		userID = idMatch2?.groups?.id ?? mention2?.replace(/<@|>/g, "");

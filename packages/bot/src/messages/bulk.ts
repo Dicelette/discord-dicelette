@@ -8,7 +8,7 @@ import {
 	createCustomCritical,
 	createTemplateEmbed,
 	getEmbeds,
-	getEmbedsList,
+	replaceEmbedInList,
 } from "messages";
 import { searchUserChannel } from "utils";
 
@@ -70,11 +70,12 @@ export async function bulkEditTemplateUser(
 				if (template.customCritical) {
 					newEmbed = createCustomCritical(newEmbed, template.customCritical);
 				}
-				const listEmbed = getEmbedsList(
+				const listEmbed = await replaceEmbedInList(
+					ul,
 					{ embed: newEmbed, which: "template" },
 					userMessages
 				);
-				await userMessages.edit({ embeds: listEmbed.list });
+				await userMessages.edit({ embeds: listEmbed.list, files: listEmbed.files });
 				await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
 					embeds: listEmbed.list,
 				});

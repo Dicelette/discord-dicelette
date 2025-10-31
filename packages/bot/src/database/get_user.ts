@@ -14,7 +14,7 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { cleanAvatarUrl, logger } from "@dicelette/utils";
+import { allValuesUndefined, cleanAvatarUrl, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
@@ -589,8 +589,7 @@ export async function getStatistics(
 		});
 		return;
 	}
-	/*
-	Comments this because it defenitly not needed as it shouldn't be happend NEVER
+
 	if (userStatistique && allValuesUndefined(userStatistique.template) && template) {
 		userStatistique.template = template;
 		await updateMemory(
@@ -603,7 +602,7 @@ export async function getStatistics(
 			}
 		);
 	}
-	*/
+
 	return { optionChar, options, ul, userStatistique };
 }
 
