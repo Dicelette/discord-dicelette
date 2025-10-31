@@ -21,29 +21,35 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 		interaction.message.id
 	);
 	await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-	const avatarFile = interaction.fields.getUploadedFiles("avatarFile");
+	const files: Djs.AttachmentBuilder[] = [];
+	const uploaded = interaction.fields.getUploadedFiles("avatarFile")?.first();
 	let avatar = "";
-	const files = [];
-	if (avatarFile) {
-		const file = avatarFile.first();
-		if (file) {
-			const attachment = new Djs.AttachmentBuilder(file.url, { name: file.name });
-			avatar = `attachment://${attachment.name}`;
-			files.push(attachment);
-		}
+
+	if (uploaded) {
+		if (!uploaded.contentType?.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
+			return await reply(interaction, {
+				embeds: [embedError(ul("error.avatar.format"), ul)],
+			});
+		const attachment = new Djs.AttachmentBuilder(uploaded.url, { name: uploaded.name });
+		files.push(attachment);
+		avatar = `attachment://${attachment.name}`;
 	} else {
-		avatar = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
-		if (avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
-			//should not be acceptable as direct cdn links can be temporary
+		const input = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
+		if (!input)
+			return await reply(interaction, {
+				embeds: [embedError(ul("error.avatar.missing"), ul)],
+			});
+		if (input.match(COMPILED_PATTERNS.DISCORD_CDN))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.cdn"), ul)],
 			});
-		}
-		if (!verifyAvatarUrl(avatar))
+		if (!verifyAvatarUrl(input))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
+		avatar = input;
 	}
+
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
 	embed.setThumbnail(avatar);

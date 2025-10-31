@@ -1,6 +1,6 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import { COMPILED_PATTERNS, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
@@ -89,9 +89,8 @@ async function createFirstPage(
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const channel = interaction.channel;
-	if (!channel) {
-		throw new NoChannel();
-	}
+	if (!channel) throw new NoChannel();
+
 	const selfRegister = selfRegisterAllowance(
 		client.settings.get(interaction.guild!.id, "allowSelfRegister")
 	);
@@ -135,17 +134,20 @@ async function createFirstPage(
 	const avatar = interaction.fields.getUploadedFiles("avatarFile")?.first();
 	const files = [];
 	let avatarStr = "";
-	if (avatar) {
+	if (avatar?.contentType?.match(COMPILED_PATTERNS.VALID_EXTENSIONS)) {
 		const avatarAttachment = new Djs.AttachmentBuilder(avatar.url, { name: avatar.name });
 		files.push(avatarAttachment);
 		avatarStr = `attachment://${avatarAttachment.name}`;
-	}
+	} else if (avatar && !avatar.contentType?.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
+		avatarStr = "error";
+
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
 	const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
 	if (isPrivate && privateChannel) sheetId = privateChannel;
 	if (customChannel) sheetId = customChannel.id;
 
-	const verifiedAvatar = avatarStr.length > 0 ? verifyAvatarUrl(avatarStr) : null;
+	let verifiedAvatar = avatarStr.length > 0 ? verifyAvatarUrl(avatarStr) : null;
+	if (avatarStr === "error") verifiedAvatar = false;
 	const existChannel = sheetId
 		? await fetchChannel(
 				interaction.guild!,
@@ -197,9 +199,10 @@ async function createFirstPage(
 	if (template.statistics) {
 		await reply(interaction, {
 			components: [continueCancelButtons(ul)],
-			content: verifiedAvatar
-				? ""
-				: `:warning: **${ul("error.avatar.url")}** \n-# *${ul("edit_avatar.default")}*`,
+			content:
+				verifiedAvatar !== false
+					? ""
+					: `:warning: **${ul("error.avatar.url")}** \n-# *${ul("edit_avatar.default")}*`,
 			embeds: [embed],
 			files,
 		});

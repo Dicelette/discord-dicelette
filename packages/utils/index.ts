@@ -14,7 +14,7 @@ export const COMPILED_PATTERNS = {
 	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,
 	QUERY_PARAMS: /\?.*$/g,
 	REGEX_ESCAPE: /[.*+?^${}()|[\]\\]/g,
-	VALID_EXTENSIONS: /\.(jpe?g|gifv?|png|webp)$/gi,
+	VALID_EXTENSIONS: /\.?(jpe?g|gifv?|png|webp)$/gi,
 	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
 } as const;
 
