@@ -25,8 +25,7 @@ export async function haveAccess(
 	if (!user) return false;
 	if (user === interaction.user.id) return true;
 	//verify if the user have access to the channel/thread, like reading the channel
-	const member = await fetchMember(interaction.guild!, user);
-	if (!member || !thread) return false;
+	const member = interaction.member as Djs.GuildMember;
 	return (
 		member.permissions.has(Djs.PermissionFlagsBits.ManageRoles) ||
 		member.permissionsIn(thread).has(Djs.PermissionFlagsBits.ViewChannel)

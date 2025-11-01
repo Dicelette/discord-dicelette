@@ -79,6 +79,19 @@ export const displayUser = {
 			await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
 			return;
 		}
+
+		if (userData.isPrivate) {
+			const allowed = await haveAccess(
+				interaction,
+				userData.messageId[1],
+				user?.id ?? interaction.user.id
+			);
+			if (!allowed)
+				return await reply(interaction, {
+					embeds: [embedError(ul("error.user.notAccess"), ul)],
+				});
+		}
+
 		const { thread, sheetLocation } = await findLocation(
 			userData,
 			interaction,
