@@ -524,7 +524,8 @@ export async function getUserNameAndChar(
  */
 export async function getStatistics(
 	interaction: Djs.ChatInputCommandInteraction,
-	client: EClient
+	client: EClient,
+	skipNotFound = false
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -551,14 +552,14 @@ export async function getStatistics(
 	}
 	const originalOptionChar = optionChar;
 	optionChar = userStatistique?.userName ? userStatistique.userName : undefined;
-	const template = await getTemplateByInteraction(interaction, client);
+	const template = await getTemplateByInteraction(interaction, client, skipNotFound);
 	const diceType = !userStatistique
 		? template?.diceType
 		: userStatistique.template.diceType;
 	const needStats = diceType?.includes("$");
 	if (!userStatistique && !charName) {
 		//find the first character registered
-		const char = await getFirstChar(client, interaction, ul);
+		const char = await getFirstChar(client, interaction, ul, skipNotFound);
 		userStatistique = char?.userStatistique?.userData;
 		optionChar = char?.optionChar;
 	}
@@ -575,7 +576,7 @@ export async function getStatistics(
 			},
 		};
 	}
-	if (!userStatistique) {
+	if (!userStatistique && !skipNotFound) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.user.youRegistered"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
@@ -583,7 +584,7 @@ export async function getStatistics(
 		return;
 	}
 
-	if (!userStatistique.stats && !template?.statistics && needStats) {
+	if (!userStatistique?.stats && !template?.statistics && needStats) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,

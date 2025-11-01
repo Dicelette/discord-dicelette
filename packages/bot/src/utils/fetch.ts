@@ -30,8 +30,8 @@ export function getLangFromInteraction(
 	if (guildLocale) return guildLocale;
 	const locale =
 		client.settings.get(guildId, "lang") ??
-		interaction.guild?.preferredLocale ??
-		interaction.locale;
+		interaction.locale ??
+		interaction.guild?.preferredLocale;
 	client.guildLocale.set(guildId, locale);
 	return locale;
 }

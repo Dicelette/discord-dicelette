@@ -6,7 +6,7 @@ import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
-import { autoCompleteCharacters, calcOptions } from "utils";
+import { autoCompleteCharacters, calcOptions, getLangAndConfig } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
 import "discord_ext";
 
@@ -29,8 +29,12 @@ export const math = {
 		.setDescriptions("math.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
-		const { options, ul, optionChar } = (await getStatistics(interaction, client)) ?? {};
-		if (!ul || !options) return;
+		let { options, ul, optionChar } =
+			(await getStatistics(interaction, client, true)) ?? {};
+		if (!ul || !options) {
+			ul = getLangAndConfig(client, interaction).ul;
+			options = interaction.options as Djs.CommandInteractionOptionResolver;
+		}
 		return await calculate(options, ul, interaction, client, undefined, optionChar);
 	},
 };

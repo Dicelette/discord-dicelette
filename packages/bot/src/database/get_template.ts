@@ -19,13 +19,14 @@ import { fetchChannel } from "../utils";
  */
 export async function getTemplateByInteraction(
 	interaction: Djs.BaseInteraction,
-	client: EClient
+	client: EClient,
+	skipNoFound = false
 ) {
 	if (!interaction.guild) return;
 	const guild = interaction.guild;
 	const ul = ln(interaction.locale);
 	const hasCache = client.template.get(guild.id);
-	if (!hasCache) return await getTemplate(guild, client.settings, ul);
+	if (!hasCache) return await getTemplate(guild, client.settings, ul, skipNoFound);
 	return hasCache;
 }
 
