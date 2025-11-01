@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.11.1](https://github.com/Dicelette/discord-dicelette/compare/2.11.0...2.11.1) (2025-11-01)
+
+
+### Bug Fixes
+
+* update member access verification and handle private user data in interactions ([d33c55f](https://github.com/Dicelette/discord-dicelette/commit/d33c55ff093a1800e727557d3d2f24d444f60623))
+* wrong path for linux ([07fc061](https://github.com/Dicelette/discord-dicelette/commit/07fc0615be98ecaabdfe3e96a19fab17c1d8ff20))
+
 ## [2.11.0](https://github.com/Dicelette/discord-dicelette/compare/2.10.8...2.11.0) (2025-10-31)
 
 
