@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.11.2](https://github.com/Dicelette/discord-dicelette/compare/2.11.1...2.11.2) (2025-11-01)
+
+
+### Bug Fixes
+
+* crash when config is not found ([33d9d48](https://github.com/Dicelette/discord-dicelette/commit/33d9d480688cf3bc2e6102fe1ead59b50b0c7783))
+
 ## [2.11.1](https://github.com/Dicelette/discord-dicelette/compare/2.11.0...2.11.1) (2025-11-01)
 
 
