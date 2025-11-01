@@ -111,13 +111,12 @@ async function show(
 	//we will use the new LabelBuilder component to create a label with a channel select for the channel!
 	const channelIdInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 		.setLabel(ul("modals.channel.name"))
+		.setDescription(ul("modals.channel.description"))
 		.setChannelSelectMenuComponent(
 			new Djs.ChannelSelectMenuBuilder()
 				.setCustomId("channelId")
-				.setPlaceholder(ul("modals.channel.description"))
 				.setRequired(false)
 				.setMaxValues(1)
-				.setDefaultChannels(defaultChannel ? [defaultChannel.id] : [])
 				.setChannelTypes(
 					Djs.ChannelType.PublicThread,
 					Djs.ChannelType.GuildText,
@@ -131,20 +130,20 @@ async function show(
 		components.unshift(userIdInputs);
 	if (!selfRegister?.toString().endsWith("_channel") || isModerator)
 		components.push(channelIdInput);
-
 	if (havePrivate && isModerator) {
 		const privateInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(ul("modals.private.name"))
+			.setDescription(ul("modals.private.description"))
 			.setTextInputComponent(
 				new Djs.TextInputBuilder()
 					.setCustomId("private")
-					.setPlaceholder(ul("modals.private.description"))
 					.setRequired(false)
 					.setValue("")
 					.setStyle(Djs.TextInputStyle.Short)
 			);
 		components.push(privateInput);
 	}
+
 	modal.setLabelComponents(components);
 	await interaction.showModal(modal);
 }
