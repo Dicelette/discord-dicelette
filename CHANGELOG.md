@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.11.3](https://github.com/Dicelette/discord-dicelette/compare/2.11.2...2.11.3) (2025-11-02)
+
+
+### Bug Fixes
+
+* correct page number in modal title ([52312c5](https://github.com/Dicelette/discord-dicelette/commit/52312c54ce42409901a7685ef0af29cbc49492a8))
+
 ## [2.11.2](https://github.com/Dicelette/discord-dicelette/compare/2.11.1...2.11.2) (2025-11-01)
 
 
