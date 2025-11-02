@@ -57,7 +57,7 @@ async function show(
 
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("firstPage")
-		.setTitle(ul("modals.firstPage", { page: nbOfPages + 1 }));
+		.setTitle(ul("modals.firstPage", { page: nbOfPages }));
 
 	//create a new Label builder component with a text input for the character name
 	const charNameInput: Djs.LabelBuilder = new Djs.LabelBuilder()
