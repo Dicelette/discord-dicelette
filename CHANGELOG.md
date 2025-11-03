@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.12.0](https://github.com/Dicelette/discord-dicelette/compare/2.11.3...2.12.0) (2025-11-03)
+
+
+### Features
+
+* remove followup with the commands, as you can copy codeblock in mobile ([1c60fed](https://github.com/Dicelette/discord-dicelette/commit/1c60fedda03de2e95f37cf80d16f0c5217d2217f))
+
 ## [2.11.3](https://github.com/Dicelette/discord-dicelette/compare/2.11.2...2.11.3) (2025-11-02)
 
 
