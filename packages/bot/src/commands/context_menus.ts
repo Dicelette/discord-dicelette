@@ -34,14 +34,17 @@ export async function commandMenu(
 		return;
 	}
 	await interaction.reply({
-		content: `${ul("copyRollResult.info")}\n\n\`\`${link}\`\``,
+		content: `\`\`${link}\`\``,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 
+	/**
+	 * Not needed anymore as mobile support copy in codeblocks
 	await interaction.followUp({
 		content: `${link}`,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
+	*/
 }
 
 async function finalLink(message: string, messageUrl: string, ul: Translation) {
