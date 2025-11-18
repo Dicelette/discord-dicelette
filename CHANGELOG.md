@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.13.0](https://github.com/Dicelette/discord-dicelette/compare/2.12.0...2.13.0) (2025-11-18)
+
+
+### Features
+
+* add a select/choose in a list commands ([6b2a84f](https://github.com/Dicelette/discord-dicelette/commit/6b2a84f68bec52933088e97435717d257654d81c))
+* update to node crypto engine for better number generation ([5e6a543](https://github.com/Dicelette/discord-dicelette/commit/5e6a543da86f29ae648ab119a1cb45c840ed73d3))
+
 ## [2.12.0](https://github.com/Dicelette/discord-dicelette/compare/2.11.3...2.12.0) (2025-11-03)
 
 
