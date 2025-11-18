@@ -8,7 +8,7 @@ import {
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { DataToFooter, Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, logger, TotalExceededError } from "@dicelette/utils";
+import { logger, TotalExceededError } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -44,6 +44,7 @@ import {
 } from "utils";
 import * as Messages from "../../messages";
 import { sendValidationMessage } from "../user";
+import {COMPILED_PATTERNS} from "@dicelette/utils";
 
 /**
  * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.

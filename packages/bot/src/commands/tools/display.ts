@@ -1,7 +1,7 @@
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
-import { COMPILED_PATTERNS, cleanAvatarUrl, filterChoices } from "@dicelette/utils";
+import { filterChoices } from "@dicelette/utils";
 import type { EClient } from "client";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
@@ -22,6 +22,7 @@ import {
 	reuploadAvatar,
 } from "utils";
 import "discord_ext";
+import {cleanAvatarUrl, COMPILED_PATTERNS} from "@dicelette/utils";
 
 export const displayUser = {
 	async autocomplete(

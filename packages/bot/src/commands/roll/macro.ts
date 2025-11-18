@@ -1,7 +1,6 @@
 import { t } from "@dicelette/localization";
 import { filterStatsInDamage } from "@dicelette/parse_result";
 import {
-	capitalizeBetweenPunct,
 	filterChoices,
 	logger,
 	uniformizeRecords,
@@ -12,6 +11,7 @@ import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { getLangAndConfig, isSerializedNameEquals, macroOptions, rollMacro } from "utils";
 import "discord_ext";
+import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

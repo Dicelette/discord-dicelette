@@ -1,7 +1,7 @@
 import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Settings, Translation, UserMessageId } from "@dicelette/types";
-import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
+import { NoEmbed } from "@dicelette/utils";
 
 import type { EClient } from "client";
 import {
@@ -34,6 +34,7 @@ import {
 	selfRegisterAllowance,
 	setModerationFooter,
 } from "utils";
+import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.

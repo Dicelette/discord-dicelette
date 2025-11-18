@@ -23,12 +23,13 @@ import {
 	trimAll,
 } from "@dicelette/parse_result";
 import type { Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getTemplate, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
 import { getLangAndConfig } from "utils";
+import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 /**
  * Calcule la similarité entre deux chaînes en utilisant la distance de Levenshtein normalisée

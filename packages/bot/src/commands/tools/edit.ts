@@ -7,10 +7,9 @@ import type {
 	UserRegistration,
 } from "@dicelette/types";
 import {
-	COMPILED_PATTERNS,
 	filterChoices,
 	logger,
-	verifyAvatarUrl,
+	
 } from "@dicelette/utils";
 import type { EClient } from "client";
 import {
@@ -31,6 +30,7 @@ import {
 	reuploadAvatar,
 } from "utils";
 import "discord_ext";
+import {COMPILED_PATTERNS, verifyAvatarUrl} from "@dicelette/utils";
 
 export const editAvatar = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

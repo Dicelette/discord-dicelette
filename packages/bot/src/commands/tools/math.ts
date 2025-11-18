@@ -2,13 +2,13 @@
  * Same as calc but without statistics
  */
 
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { autoCompleteCharacters, calcOptions, getLangAndConfig } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
 import "discord_ext";
+import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 export const math = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

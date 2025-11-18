@@ -1,9 +1,10 @@
 import { ln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
+import { logger } from "@dicelette/utils";
 import type { Guild, GuildMember, User } from "discord.js";
 import * as Djs from "discord.js";
 import type { EClient } from "../client";
+import {COMPILED_PATTERNS} from "@dicelette/utils";
 
 export function getLangAndConfig(
 	client: EClient,

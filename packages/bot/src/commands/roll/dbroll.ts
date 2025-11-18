@@ -1,9 +1,9 @@
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { autoCompleteCharacters, dbRollOptions, rollStatistique } from "utils";
 import "discord_ext";
+import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 export const dbRoll = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

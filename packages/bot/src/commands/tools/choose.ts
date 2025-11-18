@@ -1,7 +1,7 @@
 import * as Djs from "discord.js";
 import "discord_ext";
 import { t } from "@dicelette/localization";
-import {random} from "@dicelette/parse_result";
+import {random} from "@dicelette/utils";
 import type { EClient } from "client";
 import { getLangAndConfig } from "utils";
 

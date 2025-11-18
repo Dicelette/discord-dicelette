@@ -1,8 +1,8 @@
 import type { Settings, Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit, fetchAvatarUrl } from "utils";
+import {cleanAvatarUrl, COMPILED_PATTERNS} from "@dicelette/utils";
 
 export async function start(
 	interaction: Djs.StringSelectMenuInteraction,

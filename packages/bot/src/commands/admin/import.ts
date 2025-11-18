@@ -1,7 +1,7 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
 import type { DiscordChannel, UserData } from "@dicelette/types";
-import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
@@ -21,6 +21,7 @@ import {
 	reuploadAvatar,
 } from "utils";
 import "discord_ext";
+import {COMPILED_PATTERNS} from "@dicelette/utils";
 
 // Small helpers to reduce repetition and control concurrency
 // getFileExtension: safer/more readable than chaining split/pop

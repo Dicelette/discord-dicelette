@@ -1,7 +1,7 @@
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import {
@@ -17,6 +17,7 @@ import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";
 import { interactionError } from "event";
+import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 export const templateManager = {
 	data: new Djs.SlashCommandBuilder()

@@ -1,7 +1,8 @@
 {
 	"dependencies": {
 		"@types/semver": "^7.7.0",
-		"enmap": "^6.0.4"
+		"enmap": "^6.0.4",
+		"random-js": "^2.1.0"
 	},
 	"description": "",
 	"devDependencies": {

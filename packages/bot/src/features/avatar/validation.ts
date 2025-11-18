@@ -1,9 +1,9 @@
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, cleanAvatarUrl, verifyAvatarUrl } from "@dicelette/utils";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
+import {cleanAvatarUrl, COMPILED_PATTERNS, verifyAvatarUrl} from "@dicelette/utils";
 
 /**
  * Handles a Discord modal submission to update a user's avatar in an embed message.

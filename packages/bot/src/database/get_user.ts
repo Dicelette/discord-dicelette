@@ -14,7 +14,7 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { cleanAvatarUrl, logger } from "@dicelette/utils";
+import { logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
@@ -28,6 +28,7 @@ import {
 	isSerializedNameEquals,
 	searchUserChannel,
 } from "utils";
+import {cleanAvatarUrl} from "@dicelette/utils";
 
 export function getUserByEmbed(
 	data: { message?: Message; embeds?: EmbedBuilder[] },

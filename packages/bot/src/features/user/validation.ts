@@ -3,8 +3,6 @@ import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
 import {
 	allValueUndefOrEmptyString,
-	COMPILED_PATTERNS,
-	cleanAvatarUrl,
 	logger,
 	NoEmbed,
 } from "@dicelette/utils";
@@ -20,6 +18,7 @@ import {
 	reuploadAvatar,
 	selfRegisterAllowance,
 } from "utils";
+import {cleanAvatarUrl, COMPILED_PATTERNS} from "@dicelette/utils";
 
 /**
  * Interaction to continue to the next page of the statistics when registering a new user
