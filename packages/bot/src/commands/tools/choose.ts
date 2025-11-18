@@ -34,7 +34,7 @@ export const select = {
 			Djs.InteractionContextType.BotDM,
 			Djs.InteractionContextType.PrivateChannel
 		)
-		.setDescription("choose.description")
+		.setDescriptions("choose.description")
 		.addStringOption((option) =>
 			option
 				.setNames("choose.list.name")
