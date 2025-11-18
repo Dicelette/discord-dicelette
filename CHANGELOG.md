@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.13.2](https://github.com/Dicelette/discord-dicelette/compare/2.13.1...2.13.2) (2025-11-18)
+
+
+### Bug Fixes
+
+* typo in choose description ([8799e95](https://github.com/Dicelette/discord-dicelette/commit/8799e951c0cf2e35b44051b6433c36f6df902868))
+
 ## [2.13.1](https://github.com/Dicelette/discord-dicelette/compare/2.13.0...2.13.1) (2025-11-18)
 
 ## [2.13.0](https://github.com/Dicelette/discord-dicelette/compare/2.12.0...2.13.0) (2025-11-18)
