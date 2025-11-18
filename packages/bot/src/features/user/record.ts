@@ -1,6 +1,6 @@
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { NoChannel } from "@dicelette/utils";
+import { COMPILED_PATTERNS, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
@@ -14,7 +14,6 @@ import {
 	getLangAndConfig,
 	selfRegisterAllowance,
 } from "utils";
-import {COMPILED_PATTERNS, verifyAvatarUrl} from "@dicelette/utils";
 
 /**
  * Handles a modal submission to register user statistics for a specific page, validating the page number and template existence.

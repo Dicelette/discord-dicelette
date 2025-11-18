@@ -22,7 +22,7 @@ import {
 	reuploadAvatar,
 } from "utils";
 import "discord_ext";
-import {cleanAvatarUrl, COMPILED_PATTERNS} from "@dicelette/utils";
+import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
 
 export const displayUser = {
 	async autocomplete(

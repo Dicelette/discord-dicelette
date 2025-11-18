@@ -158,7 +158,7 @@
 			}
 		},
 		{
-			"includes": ["**/tests/constant.ts", "!**/node_modules/**"],
+			"includes": ["**/tests/constant.ts", "!**/node_modules/**", "**/src/regex.ts"],
 			"linter": {
 				"rules": {
 					"style": {

@@ -1,9 +1,6 @@
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
-import {
-	filterChoices,
-	uniformizeRecords,
-} from "@dicelette/utils";
+import { filterChoices, uniformizeRecords } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
@@ -16,7 +13,7 @@ import {
 } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 import "discord_ext";
-import {capitalizeBetweenPunct} from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export const mjRoll = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

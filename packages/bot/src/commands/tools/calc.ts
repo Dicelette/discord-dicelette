@@ -10,7 +10,7 @@ import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
 import { autoCompleteCharacters, calcOptions } from "utils";
 import "discord_ext";
-import {capitalizeBetweenPunct} from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export const calc = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

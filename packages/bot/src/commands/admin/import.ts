@@ -21,7 +21,7 @@ import {
 	reuploadAvatar,
 } from "utils";
 import "discord_ext";
-import {COMPILED_PATTERNS} from "@dicelette/utils";
+import { COMPILED_PATTERNS } from "@dicelette/utils";
 
 // Small helpers to reduce repetition and control concurrency
 // getFileExtension: safer/more readable than chaining split/pop

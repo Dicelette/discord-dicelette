@@ -1,10 +1,10 @@
 import type { Translation } from "@dicelette/types";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { selfRegisterAllowance } from "utils";
 import { findLocale, formatDuration } from "./utils";
-import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 export async function displayTemplate(
 	interaction: Djs.CommandInteraction,

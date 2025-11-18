@@ -1,7 +1,7 @@
 import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { COMPILED_PATTERNS, capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -35,7 +35,6 @@ import {
 	selfRegisterAllowance,
 	setModerationFooter,
 } from "utils";
-import {capitalizeBetweenPunct, COMPILED_PATTERNS} from "@dicelette/utils";
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.

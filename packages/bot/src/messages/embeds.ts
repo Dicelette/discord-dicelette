@@ -2,6 +2,8 @@ import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import {
+	COMPILED_PATTERNS,
+	cleanAvatarUrl,
 	logger,
 	NoEmbed,
 	TotalExceededError,
@@ -9,7 +11,6 @@ import {
 import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import { reuploadAvatar } from "../utils";
-import {cleanAvatarUrl, COMPILED_PATTERNS} from "@dicelette/utils";
 
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];

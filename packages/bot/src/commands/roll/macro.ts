@@ -1,17 +1,13 @@
 import { t } from "@dicelette/localization";
 import { filterStatsInDamage } from "@dicelette/parse_result";
-import {
-	filterChoices,
-	logger,
-	uniformizeRecords,
-} from "@dicelette/utils";
+import { filterChoices, logger, uniformizeRecords } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { getLangAndConfig, isSerializedNameEquals, macroOptions, rollMacro } from "utils";
 import "discord_ext";
-import {capitalizeBetweenPunct} from "@dicelette/utils";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

@@ -16,8 +16,8 @@ import { fetchChannel, getLangAndConfig } from "utils";
 import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import { interactionError } from "event";
-import {capitalizeBetweenPunct} from "@dicelette/utils";
 
 export const templateManager = {
 	data: new Djs.SlashCommandBuilder()

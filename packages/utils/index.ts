@@ -1,12 +1,12 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome support this kind of configuration, we need to ignore the naming rules */
-import {important, logger} from "./src/logger";
+import { important, logger } from "./src/logger";
 import "uniformize";
-import {getEngine, standardizeDice} from "@dicelette/core";
-import {Random} from "random-js";
+import { getEngine, standardizeDice } from "@dicelette/core";
+import { Random } from "random-js";
 export { logger, important };
-export { default as dev } from "./src/dev";
 export * from "./src/changelog";
-export * from "./src/regex"
+export { default as dev } from "./src/dev";
+export * from "./src/regex";
 
 /**
  * Get the random engine using node's crypto module
@@ -104,4 +104,3 @@ export function allValueUndefOrEmptyString(obj: unknown): boolean {
 			(typeof value === "object" && allValueUndefOrEmptyString(value))
 	);
 }
-

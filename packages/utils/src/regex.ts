@@ -31,7 +31,7 @@ export function capitalizeBetweenPunct(input: string) {
 	let remainingText = input;
 	let result = input;
 	for (const match of input.matchAll(COMPILED_PATTERNS.PUNCTUATION_ENCLOSED)) {
-		const {open, enclosed, close} = match.groups ?? {};
+		const { open, enclosed, close } = match.groups ?? {};
 		if (open && enclosed && close) {
 			const capitalized = enclosed.capitalize();
 			result = result.replace(match[0], `${open}${capitalized}${close}`);
