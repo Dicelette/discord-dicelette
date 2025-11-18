@@ -8,7 +8,7 @@ import { getLangAndConfig } from "../../utils";
 export const choose = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("choose.name")
-		.setDescription("choose.description")
+		.setDescriptions("choose.description")
 		.addStringOption((option) =>
 			option
 				.setNames("choose.list.name")
