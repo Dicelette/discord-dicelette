@@ -55,7 +55,7 @@ async function command(interaction: Djs.ChatInputCommandInteraction, client: ECl
 	const list = interaction.options.getString(t("choose.list.name"), true);
 	const nbItemsToSelect = interaction.options.getInteger(t("choose.number.name"), false);
 	const { ul } = getLangAndConfig(client, interaction);
-	const items = list.split(/[, ]+/).filter((item) => item.trim().length > 0);
+	const items = list.split(/[, ;]+/).filter((item) => item.trim().length > 0);
 	const selected = shuffle(items, nbItemsToSelect ?? 1);
 	await interaction.reply({
 		content: ul("choose.result", {

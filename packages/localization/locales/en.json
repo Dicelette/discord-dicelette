@@ -93,7 +93,7 @@
   "choose": {
     "description": "Choose a random value in a list",
     "list": {
-      "description": "Separate value by a space and/or comma",
+      "description": "Separate value by a space, comma and/or semicolon",
       "name": "list"
     },
     "name": "choose",

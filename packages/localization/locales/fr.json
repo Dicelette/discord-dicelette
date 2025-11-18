@@ -93,7 +93,7 @@
   "choose": {
     "description": "Choisir une valeur aléatoire dans une liste",
     "list": {
-      "description": "Séparer les valeurs par un espace et/ou une virgule",
+      "description": "Séparer les valeurs par un espace, une virgule et/ou un point virgule",
       "name": "liste"
     },
     "name": "choisir",
