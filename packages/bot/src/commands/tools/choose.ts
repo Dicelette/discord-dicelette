@@ -1,9 +1,9 @@
 import * as Djs from "discord.js";
 import "discord_ext";
 import { t } from "@dicelette/localization";
-import { shuffle } from "@dicelette/parse_result";
-import type { EClient } from "../../client";
-import { getLangAndConfig } from "../../utils";
+import {random} from "@dicelette/parse_result";
+import type { EClient } from "client";
+import { getLangAndConfig } from "utils";
 
 export const choose = {
 	data: new Djs.SlashCommandBuilder()
@@ -34,7 +34,7 @@ export const select = {
 			Djs.InteractionContextType.BotDM,
 			Djs.InteractionContextType.PrivateChannel
 		)
-		.setDescription("choose.description")
+		.setDescriptions("choose.description")
 		.addStringOption((option) =>
 			option
 				.setNames("choose.list.name")
@@ -53,10 +53,10 @@ export const select = {
 };
 async function command(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 	const list = interaction.options.getString(t("choose.list.name"), true);
-	const nbItemsToSelect = interaction.options.getInteger(t("choose.number.name"), false);
+	const howMany = interaction.options.getInteger(t("choose.number.name"), false);
 	const { ul } = getLangAndConfig(client, interaction);
 	const items = list.split(/[, ;]+/).filter((item) => item.trim().length > 0);
-	const selected = shuffle(items, nbItemsToSelect ?? 1);
+	const selected = random.sample(items, howMany ?? 1);
 	await interaction.reply({
 		content: ul("choose.result", {
 			items: selected.map((x) => `\`${x}\``).join(", "),
