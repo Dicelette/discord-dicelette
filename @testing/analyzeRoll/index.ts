@@ -1,6 +1,8 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { Resultat } from "@dicelette/core";
+// biome-ignore lint/suspicious/noTsIgnore: bruh
+// @ts-ignore
 import { getRoll } from "@dicelette/parse_result";
 import { Command } from "commander";
 
