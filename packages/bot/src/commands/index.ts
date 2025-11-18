@@ -2,9 +2,8 @@ import { t } from "@dicelette/localization";
 import { ADMIN } from "./admin";
 import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
-import { ROLL_AUTO, ROLL_CMDLIST, ROLL_DB } from "./roll";
-import { mpDiceRoll } from "./roll/mp_roll";
-import { GIMMICK, getCount, help } from "./tools";
+import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST, ROLL_DB } from "./roll";
+import { choose, GIMMICK, getCount, help } from "./tools";
 import newScene from "./tools/new_scene";
 
 export const AUTOCOMPLETE_COMMANDS = [...ROLL_AUTO, ...GIMMICK, deleteChar, help];
@@ -17,7 +16,8 @@ export const COMMANDS = [
 	help,
 	newScene,
 	getCount,
-	mpDiceRoll,
+	...GLOBAL_CMD,
+	choose,
 ];
 
 export const DATABASE_COMMANDS = [...GIMMICK, ...ROLL_DB];

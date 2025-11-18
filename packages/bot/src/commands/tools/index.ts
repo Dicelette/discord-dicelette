@@ -6,6 +6,7 @@ import { math } from "./math";
 
 export const GIMMICK = [displayUser, graph, editAvatar, calc, math];
 export * from "./calc";
+export * from "./choose";
 export * from "./display";
 export * from "./edit";
 export { default as getCount } from "./getCount";
