@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
 
 import process from "node:process";
+import type { GuildData } from "./database";
 
 export const TUTORIAL_IMAGES = [
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_1.png?raw=true",
@@ -46,3 +47,26 @@ const MATH = {
 export const EMOJI_MATH = process.env.NODE_ENV === "production" ? MATH.prod : MATH.dev;
 
 export const AND = "&";
+
+export enum LinksVariables {
+	NAME = "{{name}}",
+	INFO = "{{info}}",
+	DICE = "{{dice}}",
+	RESULTS = "{{results}}",
+	LINK = "{{link}}",
+	NAME_SHORT = "{{name:short}}",
+	NAME_LONG = "{{name:long}}",
+	INFO_SHORT = "{{info:short}}",
+	INFO_LONG = "{{info:long}}",
+}
+
+export const DEFAULT_TEMPLATE: GuildData["createLinkTemplate"] = {
+	final: `[[${LinksVariables.NAME}${LinksVariables.RESULTS}]](<${LinksVariables.LINK}>)`,
+	format: {
+		dice: `${LinksVariables.DICE}`,
+		info: `${LinksVariables.INFO} -`,
+		name: `__${LinksVariables.NAME}__: `,
+	},
+	joinResult: "; ",
+	results: `${LinksVariables.INFO} \`${LinksVariables.RESULTS}\``,
+};

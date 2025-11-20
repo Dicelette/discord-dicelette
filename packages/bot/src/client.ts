@@ -1,7 +1,13 @@
 import * as fs from "node:fs";
 import path from "node:path";
 import type { StatisticalTemplate } from "@dicelette/core";
-import type { BotStatus, CriticalCount, GuildData, UserDatabase } from "@dicelette/types";
+import type {
+	BotStatus,
+	CriticalCount,
+	GuildData,
+	UserDatabase,
+	UserSettings,
+} from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
@@ -46,6 +52,8 @@ export class EClient extends Djs.Client {
 	 */
 	public statusPath = path.resolve("./data/status.json");
 
+	public userSettings: Enmap<string, UserSettings, unknown>;
+
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
@@ -61,6 +69,13 @@ export class EClient extends Djs.Client {
 			cloneLevel: "deep",
 			fetchAll: false,
 			name: "criticalCount",
+		});
+
+		this.userSettings = new Enmap({
+			autoFetch: true,
+			cloneLevel: "deep",
+			fetchAll: false,
+			name: "userSettings",
 		});
 
 		//read status from files in ./data folder

@@ -152,8 +152,8 @@ async function buttonSubmit(
 		const isMobile = interaction.customId.includes("mobile");
 		//remove button from the message
 		const message = await interaction.message.fetch();
-		if (isMobile) await mobileLink(interaction, ul);
-		else await desktopLink(interaction, ul);
+		if (isMobile) await mobileLink(interaction, ul, client);
+		else await desktopLink(interaction, ul, client);
 		await message.edit({ components: [] });
 	} else if (interaction.customId.includes("modo_stats_validation")) {
 		await Stats.couldBeValidated(interaction, ul, client, interactionUser);

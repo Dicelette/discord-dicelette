@@ -11,6 +11,11 @@ import { deleteAfter, linkToLog, setContextLink, timestamp } from "./results";
 import { allowSelfRegistration } from "./self_registration";
 import { stripOOC } from "./strip_ooc";
 import "discord_ext";
+import {
+	createLinksCmdOptions,
+	getTemplateValues,
+	setTemplate,
+} from "../../userSettings";
 import { editMeCommand } from "./editMe";
 
 export const configuration = {
@@ -301,6 +306,16 @@ export const configuration = {
 						.setDescriptions("editMe.banner.description")
 						.setRequired(false)
 				)
+		)
+		/**
+		 * Create links
+		 */
+		.addSubcommandGroup((group) =>
+			createLinksCmdOptions(
+				group
+					.setNames("userSettings.createLink.title")
+					.setDescriptions("userSettings.createLink.description")
+			)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
@@ -325,6 +340,12 @@ export const configuration = {
 						case t("common.dice"):
 							return dice(options, client, ul, interaction);
 					}
+					break;
+				case t("userSettings.createLink.title"):
+					if (subcommand === t("userSettings.createLink.format.name"))
+						return await setTemplate(client, interaction, true);
+					if (subcommand === t("userSettings.createLink.display.name"))
+						return await getTemplateValues(client, ul, interaction, true);
 					break;
 			}
 		switch (subcommand) {

@@ -5,6 +5,7 @@ import { PRIVATES_COMMANDS } from "./private";
 import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST, ROLL_DB } from "./roll";
 import { choose, GIMMICK, getCount, help } from "./tools";
 import newScene from "./tools/new_scene";
+import { userSettings } from "./userSettings";
 
 export const AUTOCOMPLETE_COMMANDS = [...ROLL_AUTO, ...GIMMICK, deleteChar, help];
 export const COMMANDS = [
@@ -18,6 +19,7 @@ export const COMMANDS = [
 	getCount,
 	...GLOBAL_CMD,
 	choose,
+	userSettings,
 ];
 
 export const DATABASE_COMMANDS = [...GIMMICK, ...ROLL_DB];

@@ -78,7 +78,43 @@ export interface GuildData {
 	user: Record<string, UserGuildData[]>;
 	allowSelfRegister?: boolean | string;
 	stripOOC?: Partial<StripOOC>;
+	/**
+	 * If set, will take that format when using the menu to export the result as text
+	 * @defaultValue `[[__{{stats}}__: **{{info}}** — {{result}}]](<{{link}}>)`
+	 * @see LinksVariables
+	 */
+	createLinkTemplate?: {
+		/**
+		 * @default {{info}} {{result}}
+		 */
+		results: string;
+		/**
+		 * @default [[{{stats}} {{results}}]](<{{link}}>)
+		 */
+		final: string;
+		/*
+		 * @default: `; `
+		 */
+		joinResult: string;
+		format: {
+			/**
+			 * The format to use when no statistics is used
+			 * @default __{{stat}}__:
+			 */
+			name: string;
+			/**
+			 * @default {{info}} -
+			 */
+			info: string;
+			/**
+			 * @default {{dice}}
+			 */
+			dice: string;
+		};
+	};
 }
+
+export type TemplateResult = GuildData["createLinkTemplate"];
 
 export type StripOOC = {
 	regex: string;
@@ -182,3 +218,10 @@ export type CustomCriticalRoll = CustomCritical & {
 		rollValue: string;
 	};
 };
+
+export type UserSettings = Record<
+	string,
+	{
+		createLinkTemplate: TemplateResult;
+	}
+>;
