@@ -69,7 +69,7 @@ export function resetTemplate(
 }
 
 export function getTemplatePreview(ul: Translation, template?: TemplateResult) {
-	const diceletteText = `__**Private3**__ (<@189390243676422144>)  (\`>= 11\`):
+	const diceletteText = `__**${ul("common.character").toTitle()}**__ (<@000000000000000000>)  (\`>= 11\`):
 [__${ul("common.name").toTitle()}__]
   **${ul("roll.critical.failure")}** — \`1d100\` ⟶ \`[29]\` = \`[29] ⩾ 10\``;
 	return finalLink(
