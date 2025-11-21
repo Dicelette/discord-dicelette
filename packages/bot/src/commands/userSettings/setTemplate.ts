@@ -115,7 +115,7 @@ export async function getTemplateValues(
 	- __${ul("userSettings.createLink.joinResult.name").toTitle()}__${s}: \`${template!.joinResult}\`
 	- __${ul("common.dice").toTitle()}__${s}: \`${template!.format.dice}\`
 	- __${ul("userSettings.createLink.info.name").toTitle()}__${s}: \`${template!.format.info}\`
-	- __${ul("common.statistics").toTitle()}__${s}: \`${template!.format.name}\`
+	- __${ul("common.name").toTitle()}__${s}: \`${template!.format.name}\`
 	- __${ul("userSettings.createLink.originalDice.name").toTitle()}__${s}: \`${template!.format.originalDice}\`
 	- __${ul("common.character").toTitle()}__${s}: \`${template!.format.character}\`
 

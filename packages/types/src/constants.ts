@@ -54,13 +54,7 @@ export enum LinksVariables {
 	DICE = "{{dice}}",
 	RESULTS = "{{results}}",
 	LINK = "{{link}}",
-	NAME_SHORT = "{{name:short}}",
-	NAME_LONG = "{{name:long}}",
-	INFO_SHORT = "{{info:short}}",
-	INFO_LONG = "{{info:long}}",
 	CHARACTER = "{{character}}",
-	CHARACTER_SHORT = "{{character:short}}",
-	CHARACTER_LONG = "{{character:long}}",
 	ORIGINAL_DICE = "{{original_dice}}",
 }
 

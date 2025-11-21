@@ -1,7 +1,6 @@
 import { cmdLn, t } from "@dicelette/localization";
 import {
 	DEFAULT_TEMPLATE,
-	LinksVariables,
 	type TemplateResult,
 	type Translation,
 } from "@dicelette/types";
@@ -62,8 +61,51 @@ export async function commandMenu(
 	});
 }
 
-function replaceAllTokens(text: string, map: Record<string, string>) {
-	return Object.entries(map).reduce((acc, [k, v]) => acc.replaceAll(k, v), text);
+function renderTemplate(template: string, context: Record<string, unknown>) {
+	return template.replace(/\{\{([^}]+)\}\}/g, (_, inner: string) => {
+		const parts = inner.split(":").map((p) => p.trim());
+		if (!parts.length) return "";
+
+		let [rawVar, ...mods] = parts;
+		let varName = rawVar.toLowerCase();
+
+		// Aliases legacy possibles (ex: NAME, NAME_SHORT, etc.)
+		if (varName.endsWith("_short")) {
+			varName = varName.replace(/_short$/, "");
+			mods = ["short", ...mods];
+		}
+		if (varName.endsWith("_long")) {
+			varName = varName.replace(/_long$/, "");
+			mods = ["long", ...mods];
+		}
+
+		// Alias anciens noms
+		const aliasMap: Record<string, string> = {
+			result: "results",
+			stats: "name",
+		};
+		if (aliasMap[varName]) varName = aliasMap[varName];
+
+		const valueRaw = (context as Record<string, unknown>)[varName];
+		if (valueRaw == null) return "";
+
+		let value: string;
+		if (typeof valueRaw === "object" && "long" in (valueRaw as Record<string, unknown>)) {
+			const v = valueRaw as { long: string; short: string };
+			const useShort = mods.some((m) => m.toLowerCase() === "short");
+			value = useShort ? v.short : v.long;
+		} else value = String(valueRaw);
+
+		for (const mod of mods) {
+			const m = mod.toLowerCase();
+			if (m === "short" || m === "long") continue;
+			if (m === "uppercase") value = value.toUpperCase();
+			else if (m === "lowercase") value = value.toLowerCase();
+			else if (m === "title") value = value.toTitle();
+			else if (m === "standardize") value = value.standardize();
+		}
+		return value;
+	});
 }
 
 export function finalLink(
@@ -77,54 +119,29 @@ export function finalLink(
 
 	const resultsText = createResultFromTemplate(template, variables);
 
-	let finalText = replaceAllTokens(template!.final, {
-		[LinksVariables.LINK]: variables.link,
-		[LinksVariables.RESULTS]: resultsText,
-	});
+	// Construit le contexte global pour le template final
+	const context: Record<string, unknown> = {
+		link: variables.link,
+		results: resultsText,
+	};
 
+	// Comme avant : on applique d'abord le format.name pour produire une chaîne finale
 	if (variables.name) {
-		const statText = getShortLong(variables.name);
-		const statFinal = replaceAllTokens(template!.format.name, {
-			[LinksVariables.NAME]: statText.long,
-			[LinksVariables.NAME_LONG]: statText.long,
-			[LinksVariables.NAME_SHORT]: statText.short,
-		});
-		finalText = replaceAllTokens(finalText, {
-			[LinksVariables.NAME]: statFinal,
-			[LinksVariables.NAME_LONG]: statFinal,
-			[LinksVariables.NAME_SHORT]: statFinal,
-		});
-	} else {
-		finalText = replaceAllTokens(finalText, {
-			[LinksVariables.NAME]: "",
-			[LinksVariables.NAME_LONG]: "",
-			[LinksVariables.NAME_SHORT]: "",
-		});
-	}
+		const nameCtx: Record<string, unknown> = {
+			name: getShortLong(variables.name),
+		};
+		context.name = renderTemplate(template.format.name, nameCtx);
+	} else context.name = "";
 
+	// Idem pour le personnage, en appliquant format.character
 	if (variables.character) {
-		const charText = getShortLong(variables.character);
+		const charCtx: Record<string, unknown> = {
+			character: getShortLong(variables.character),
+		};
+		context.character = renderTemplate(template.format.character, charCtx);
+	} else context.character = "";
 
-		const formattedCharacter = replaceAllTokens(template!.format.character, {
-			[LinksVariables.CHARACTER]: charText.long,
-			[LinksVariables.CHARACTER_LONG]: charText.long,
-			[LinksVariables.CHARACTER_SHORT]: charText.short,
-		});
-
-		finalText = replaceAllTokens(finalText, {
-			[LinksVariables.CHARACTER]: formattedCharacter,
-			[LinksVariables.CHARACTER_LONG]: formattedCharacter,
-			[LinksVariables.CHARACTER_SHORT]: formattedCharacter,
-		});
-	} else {
-		finalText = replaceAllTokens(finalText, {
-			[LinksVariables.CHARACTER]: "",
-			[LinksVariables.CHARACTER_LONG]: "",
-			[LinksVariables.CHARACTER_SHORT]: "",
-		});
-	}
-
-	return finalText;
+	return renderTemplate(template.final, context);
 }
 
 function createResultFromTemplate(
@@ -139,34 +156,29 @@ function createResultFromTemplate(
 		const diceTrim = dice.trim();
 		const originalTrim = original ? original.trim() : "";
 
-		const infoFinal = infoTrim
-			? (() => {
-					const c = getShortLong(infoTrim);
-					return replaceAllTokens(fmt.info, {
-						[LinksVariables.INFO]: c.long,
-						[LinksVariables.INFO_LONG]: c.long,
-						[LinksVariables.INFO_SHORT]: c.short,
-					}).trim();
-				})()
-			: "";
+		const infoContext = infoTrim ? getShortLong(infoTrim) : { long: "", short: "" };
 
-		const resultFinal = diceTrim
-			? fmt.dice.replace(LinksVariables.DICE, diceTrim).trim()
-			: "";
+		const baseContext: Record<string, unknown> = {
+			dice: diceTrim,
+			info: infoContext,
+			originalDice: originalTrim,
+		};
 
+		const infoFinal = infoTrim ? renderTemplate(fmt.info, baseContext).trim() : "";
+		const resultFinal = diceTrim ? renderTemplate(fmt.dice, baseContext).trim() : "";
 		const originalDiceText = originalTrim
 			? fmt.originalDice
-				? fmt.originalDice.replace(LinksVariables.ORIGINAL_DICE, originalTrim).trim()
+				? renderTemplate(fmt.originalDice, baseContext).trim()
 				: ""
 			: "";
 
-		return template!.results
-			.replace(LinksVariables.INFO, infoFinal)
-			.replaceAll(LinksVariables.INFO_LONG, infoFinal)
-			.replaceAll(LinksVariables.INFO_SHORT, infoFinal)
-			.replace(LinksVariables.DICE, resultFinal)
-			.replaceAll(LinksVariables.ORIGINAL_DICE, originalDiceText)
-			.trim();
+		const lineContext: Record<string, unknown> = {
+			dice: resultFinal,
+			info: infoFinal,
+			originalDice: originalDiceText,
+		};
+
+		return renderTemplate(template!.results, lineContext).trim();
 	});
 
 	return rollsText.join(template!.joinResult);
