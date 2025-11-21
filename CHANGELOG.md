@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.16.0](https://github.com/Dicelette/discord-dicelette/compare/2.15.0...2.16.0) (2025-11-21)
+
+
+### Features
+
+* implement template rendering with improved token replacement and context handling ([7829572](https://github.com/Dicelette/discord-dicelette/commit/7829572c7d8b1207c4902aa5648eef4b2568a791))
+
 ## [2.15.0](https://github.com/Dicelette/discord-dicelette/compare/2.14.3...2.15.0) (2025-11-21)
 
 
