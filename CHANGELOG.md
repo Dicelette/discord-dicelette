@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.14.0](https://github.com/Dicelette/discord-dicelette/compare/2.13.3...2.14.0) (2025-11-21)
+
+
+### Features
+
+* add user settings command for creating and displaying the link created by the context menu ([5eb6ccb](https://github.com/Dicelette/discord-dicelette/commit/5eb6ccb92efc052a1fd58cc3cba65d74123bc66c))
+
 ## [2.13.3](https://github.com/Dicelette/discord-dicelette/compare/2.13.2...2.13.3) (2025-11-18)
 
 
