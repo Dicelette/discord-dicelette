@@ -2,7 +2,12 @@ import { t } from "@dicelette/localization";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getLangAndConfig } from "utils";
-import { createLinksCmdOptions, getTemplateValues, setTemplate } from "./setTemplate";
+import {
+	createLinksCmdOptions,
+	getTemplateValues,
+	resetTemplate,
+	setTemplate,
+} from "./setTemplate";
 
 export const userSettings = {
 	data: new Djs.SlashCommandBuilder()
@@ -24,6 +29,8 @@ export const userSettings = {
 				return await setTemplate(client, interaction);
 			if (subcommand === t("userSettings.createLink.display.name"))
 				return await getTemplateValues(client, ul, interaction);
+			if (subcommand === t("userSettings.createLink.reset.name"))
+				return resetTemplate(client, interaction);
 		}
 	},
 };

@@ -52,6 +52,24 @@ export async function setTemplate(
 	});
 }
 
+export function resetTemplate(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction,
+	guildOverride = false
+) {
+	if (!guildOverride) {
+		const userKeys = `${interaction.user.id}.createLinkTemplate`;
+		client.userSettings.delete(interaction.guildId!, userKeys);
+	} else {
+		client.settings.delete(interaction.guildId!, "createLinkTemplate");
+	}
+	const { ul } = getLangAndConfig(client, interaction);
+	return interaction.reply({
+		content: ul("userSettings.createLink.reset.success"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+}
+
 export function getTemplatePreview(ul: Translation, template?: TemplateResult) {
 	const diceletteText = `__**Private3**__ (<@189390243676422144>)  (\`>= 11\`):
 [__Force__]
@@ -138,6 +156,11 @@ export function createLinksCmdOptions(builder: Djs.SlashCommandSubcommandGroupBu
 						.setDescriptions("userSettings.createLink.joinResult.description")
 						.setRequired(true)
 				)
+		)
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setNames("userSettings.createLink.reset.name")
+				.setDescriptions("userSettings.createLink.reset.description")
 		)
 		.addSubcommand((subcommand) =>
 			subcommand

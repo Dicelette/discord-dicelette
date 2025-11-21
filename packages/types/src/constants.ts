@@ -68,5 +68,5 @@ export const DEFAULT_TEMPLATE: GuildData["createLinkTemplate"] = {
 		name: `__${LinksVariables.NAME}__: `,
 	},
 	joinResult: "; ",
-	results: `${LinksVariables.INFO} \`${LinksVariables.RESULTS}\``,
+	results: `${LinksVariables.INFO} \`${LinksVariables.DICE}\``,
 };

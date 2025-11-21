@@ -165,10 +165,10 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 	const variables: Results[] = [];
 	for (const line of list) {
 		if (!line.match(/^[\s_]+/)) continue;
-		const match = regexResultForRoll.exec(line)?.groups?.result;
+		const dice = regexResultForRoll.exec(line)?.groups?.result;
 		const info = successFail.exec(line)?.groups?.info;
-		if (match && info) variables.push({ dice: match.trim(), info: info.trim() });
-		else if (match) variables.push({ dice: match.trim(), info: "" });
+		if (dice && info) variables.push({ dice: dice.trim(), info: info.trim() });
+		else if (dice) variables.push({ dice: dice.trim(), info: "" });
 	}
 	if (variables.length === 0) return undefined;
 

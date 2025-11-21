@@ -16,6 +16,7 @@ import {
 	getTemplateValues,
 	setTemplate,
 } from "../../userSettings";
+import { resetTemplate } from "../../userSettings/setTemplate";
 import { editMeCommand } from "./editMe";
 
 export const configuration = {
@@ -346,6 +347,8 @@ export const configuration = {
 						return await setTemplate(client, interaction, true);
 					if (subcommand === t("userSettings.createLink.display.name"))
 						return await getTemplateValues(client, ul, interaction, true);
+					if (subcommand === t("userSettings.createLink.reset.name"))
+						return resetTemplate(client, interaction, true);
 					break;
 			}
 		switch (subcommand) {
