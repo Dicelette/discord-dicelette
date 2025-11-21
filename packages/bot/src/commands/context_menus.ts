@@ -12,12 +12,14 @@ import { getLangAndConfig } from "../utils";
 type Results = {
 	info: string;
 	dice: string;
+	original?: string;
 };
 
 type Variables = {
 	rolls: Results[];
 	stats?: string;
 	link: string;
+	character?: string;
 };
 
 export const contextMenus = [
@@ -100,6 +102,28 @@ export function finalLink(
 		});
 	}
 
+	if (variables.character) {
+		const charText = getShortLong(variables.character);
+
+		const formattedCharacter = replaceAllTokens(template!.format.character, {
+			[LinksVariables.CHARACTER]: charText.long,
+			[LinksVariables.CHARACTER_LONG]: charText.long,
+			[LinksVariables.CHARACTER_SHORT]: charText.short,
+		});
+
+		finalText = replaceAllTokens(finalText, {
+			[LinksVariables.CHARACTER]: formattedCharacter,
+			[LinksVariables.CHARACTER_LONG]: formattedCharacter,
+			[LinksVariables.CHARACTER_SHORT]: formattedCharacter,
+		});
+	} else {
+		finalText = replaceAllTokens(finalText, {
+			[LinksVariables.CHARACTER]: "",
+			[LinksVariables.CHARACTER_LONG]: "",
+			[LinksVariables.CHARACTER_SHORT]: "",
+		});
+	}
+
 	return finalText;
 }
 
@@ -110,9 +134,10 @@ function createResultFromTemplate(
 	template = template ?? DEFAULT_TEMPLATE;
 	const fmt = template!.format;
 
-	const rollsText = variables.rolls.map(({ info, dice }) => {
+	const rollsText = variables.rolls.map(({ info, dice, original }) => {
 		const infoTrim = info.trim();
 		const diceTrim = dice.trim();
+		const originalTrim = original ? original.trim() : "";
 
 		const infoFinal = infoTrim
 			? (() => {
@@ -129,11 +154,18 @@ function createResultFromTemplate(
 			? fmt.dice.replace(LinksVariables.DICE, diceTrim).trim()
 			: "";
 
+		const originalDiceText = originalTrim
+			? fmt.originalDice
+				? fmt.originalDice.replace(LinksVariables.ORIGINAL_DICE, originalTrim).trim()
+				: ""
+			: "";
+
 		return template!.results
 			.replace(LinksVariables.INFO, infoFinal)
 			.replaceAll(LinksVariables.INFO_LONG, infoFinal)
 			.replaceAll(LinksVariables.INFO_SHORT, infoFinal)
 			.replace(LinksVariables.DICE, resultFinal)
+			.replaceAll(LinksVariables.ORIGINAL_DICE, originalDiceText)
 			.trim();
 	});
 
@@ -160,6 +192,7 @@ function getShortLong(text: string) {
 function getVariablesTemplate(message: string, messageUrl: string) {
 	const regexResultForRoll = /= `(?<result>.*)`/gi;
 	const successFail = /( {2}|_ _ )(?<info>.*) — /gi;
+	const originalDice = /`(?<orig>.*?)` ⟶/gi;
 
 	const list = message.split("\n");
 	const variables: Results[] = [];
@@ -167,8 +200,14 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 		if (!line.match(/^[\s_]+/)) continue;
 		const dice = regexResultForRoll.exec(line)?.groups?.result;
 		const info = successFail.exec(line)?.groups?.info;
-		if (dice && info) variables.push({ dice: dice.trim(), info: info.trim() });
-		else if (dice) variables.push({ dice: dice.trim(), info: "" });
+		const original = originalDice.exec(line)?.groups?.orig;
+		const vars: Results = {
+			dice: dice ? dice.trim() : "",
+			info: info ? info.trim() : "",
+			original: original ? original.trim() : undefined,
+		};
+		if (vars.dice === "") continue;
+		variables.push(vars);
 	}
 	if (variables.length === 0) return undefined;
 
@@ -178,7 +217,11 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 		/-# ↪ (?<saved>https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+)/gi;
 	const savedDice = regexSavedDice.exec(message)?.groups?.saved;
 
+	const characterReg = /__\*\*(?<character>.*)\*\*__/gi;
+	const character = characterReg.exec(message)?.groups?.character;
+
 	return {
+		character: character ? character : undefined,
 		link: savedDice ?? messageUrl,
 		rolls: variables,
 		stats: stats ? stats : undefined,

@@ -7,6 +7,7 @@ import {
 import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
+import { merge } from "ts-deepmerge";
 import { getLangAndConfig } from "utils";
 import { finalLink } from "../context_menus";
 
@@ -16,36 +17,47 @@ export async function setTemplate(
 	guildOverride = false
 ) {
 	const options = interaction.options;
+	const getOpt = (name: string, required = false, def?: string) =>
+		(options.getString(name, required) ?? def ?? "").replaceAll("\\s", " ");
+
 	const template: TemplateResult = {
-		final: options
-			.getString(t("userSettings.createLink.final.name"), true)
-			.replaceAll("\\s", " "),
+		final: getOpt(t("userSettings.createLink.final.name"), true),
 		format: {
-			dice: options.getString(t("common.dice"), true).replaceAll("\\s", " "),
-			info: options
-				.getString(t("userSettings.createLink.info.name"), true)
-				.replaceAll("\\s", " "),
-			name: options.getString(t("common.name"), true).replaceAll("\\s", " "),
+			character: getOpt(t("common.character"), false, DEFAULT_TEMPLATE.format.character),
+			dice: getOpt(t("common.dice"), false, DEFAULT_TEMPLATE.format.dice),
+			info: getOpt(
+				t("userSettings.createLink.info.name"),
+				false,
+				DEFAULT_TEMPLATE.format.info
+			),
+			name: getOpt(t("common.name"), false, DEFAULT_TEMPLATE.format.name),
+			originalDice: getOpt(
+				t("userSettings.createLink.originalDice.name"),
+				false,
+				DEFAULT_TEMPLATE.format.originalDice
+			),
 		},
-		joinResult: options
-			.getString(t("userSettings.createLink.joinResult.name"), true)
-			.replaceAll("\\s", " "),
-		results: options
-			.getString(t("userSettings.createLink.result.name"), true)
-			.replaceAll("\\s", " "),
+		joinResult: getOpt(
+			t("userSettings.createLink.joinResult.name"),
+			false,
+			DEFAULT_TEMPLATE.joinResult
+		),
+		results: getOpt(
+			t("userSettings.createLink.result.name"),
+			false,
+			DEFAULT_TEMPLATE.results
+		),
 	};
+
 	if (!guildOverride) {
 		const userKeys = `${interaction.user.id}.createLinkTemplate`;
 		client.userSettings.set(interaction.guildId!, template, userKeys);
-	} else {
-		client.settings.set(interaction.guildId!, template, "createLinkTemplate");
-	}
+	} else client.settings.set(interaction.guildId!, template, "createLinkTemplate");
+
 	const { ul } = getLangAndConfig(client, interaction);
 	const preview = `\`\`${getTemplatePreview(ul, template)}\`\``;
 	await interaction.reply({
-		content: ul("userSettings.createLink.success", {
-			preview,
-		}),
+		content: ul("userSettings.createLink.success", { preview }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 }
@@ -86,14 +98,16 @@ export async function getTemplateValues(
 	guildOverride = false
 ) {
 	const s = ul("common.space");
-	let template: TemplateResult;
+	let template: TemplateResult | undefined;
 	if (!guildOverride)
 		template = client.userSettings.get(
 			interaction.guildId!,
 			interaction.user.id
 		)?.createLinkTemplate;
 	else template = client.settings.get(interaction.guildId!, "createLinkTemplate");
-	if (!template) template = DEFAULT_TEMPLATE;
+	if (template) template = merge(DEFAULT_TEMPLATE, template);
+	else template = DEFAULT_TEMPLATE;
+
 	const preview = getTemplatePreview(ul, template);
 	const content = dedent(`
 	- __${ul("userSettings.createLink.final.name").toTitle()}__${s}: \`${template!.final}\`
@@ -102,6 +116,8 @@ export async function getTemplateValues(
 	- __${ul("common.dice").toTitle()}__${s}: \`${template!.format.dice}\`
 	- __${ul("userSettings.createLink.info.name").toTitle()}__${s}: \`${template!.format.info}\`
 	- __${ul("common.statistics").toTitle()}__${s}: \`${template!.format.name}\`
+	- __${ul("userSettings.createLink.originalDice.name").toTitle()}__${s}: \`${template!.format.originalDice}\`
+	- __${ul("common.character").toTitle()}__${s}: \`${template!.format.character}\`
 
 	**__${ul("userSettings.createLink.display.name").toTitle()}__**${s}: \`\`${preview}\`\`
 	`);
@@ -128,31 +144,43 @@ export function createLinksCmdOptions(builder: Djs.SlashCommandSubcommandGroupBu
 					option
 						.setNames("userSettings.createLink.result.name")
 						.setDescriptions("userSettings.createLink.result.description")
-						.setRequired(true)
+						.setRequired(false)
 				)
 				.addStringOption((option) =>
 					option
 						.setNames("common.dice")
 						.setDescriptions("userSettings.createLink.dice")
-						.setRequired(true)
+						.setRequired(false)
 				)
 				.addStringOption((option) =>
 					option
 						.setNames("userSettings.createLink.info.name")
 						.setDescriptions("userSettings.createLink.info.description")
-						.setRequired(true)
+						.setRequired(false)
 				)
 				.addStringOption((option) =>
 					option
 						.setNames("common.name")
 						.setDescriptions("userSettings.createLink.name")
-						.setRequired(true)
+						.setRequired(false)
 				)
 				.addStringOption((option) =>
 					option
 						.setNames("userSettings.createLink.joinResult.name")
 						.setDescriptions("userSettings.createLink.joinResult.description")
-						.setRequired(true)
+						.setRequired(false)
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("userSettings.createLink.originalDice.name")
+						.setDescriptions("userSettings.createLink.originalDice.description")
+						.setRequired(false)
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("common.character")
+						.setDescriptions("userSettings.createLink.character")
+						.setRequired(false)
 				)
 		)
 		.addSubcommand((subcommand) =>

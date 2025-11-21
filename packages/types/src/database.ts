@@ -83,38 +83,46 @@ export interface GuildData {
 	 * @defaultValue `[[__{{stats}}__: **{{info}}** — {{result}}]](<{{link}}>)`
 	 * @see LinksVariables
 	 */
-	createLinkTemplate?: {
-		/**
-		 * @default {{info}} {{result}}
-		 */
-		results: string;
-		/**
-		 * @default [[{{stats}} {{results}}]](<{{link}}>)
-		 */
-		final: string;
-		/*
-		 * @default: `; `
-		 */
-		joinResult: string;
-		format: {
-			/**
-			 * The format to use when no statistics is used
-			 * @default __{{stat}}__:
-			 */
-			name: string;
-			/**
-			 * @default {{info}} -
-			 */
-			info: string;
-			/**
-			 * @default {{dice}}
-			 */
-			dice: string;
-		};
-	};
+	createLinkTemplate?: TemplateResult;
 }
 
-export type TemplateResult = GuildData["createLinkTemplate"];
+export interface TemplateResult {
+	/**
+	 * @default {{info}} {{result}}
+	 */
+	results: string;
+	/**
+	 * @default [[{{stats}} {{results}}]](<{{link}}>)
+	 */
+	final: string;
+	/*
+	 * @default: `; `
+	 */
+	joinResult: string;
+	format: {
+		/**
+		 * The format to use when no statistics is used
+		 * @default __{{stat}}__:
+		 */
+		name: string;
+		/**
+		 * @default {{info}} -
+		 */
+		info: string;
+		/**
+		 * @default {{dice}}
+		 */
+		dice: string;
+		/*
+		 * @default {{original_dice}}
+		 */
+		originalDice: string;
+		/*
+		 * @default {{character}}
+		 */
+		character: string;
+	};
+}
 
 export type StripOOC = {
 	regex: string;
