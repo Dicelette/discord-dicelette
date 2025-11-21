@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
 
 import process from "node:process";
-import type { GuildData, TemplateResult } from "./database";
+import type { TemplateResult } from "./database";
 
 export const TUTORIAL_IMAGES = [
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_1.png?raw=true",
