@@ -54,7 +54,12 @@ export default (client: EClient): void => {
 				{ skipNotFound: true }
 			);
 			const userData = data?.userData;
-			const charName = data?.charName ?? firstChara;
+			let charName = data?.charName ?? firstChara;
+
+			if (!charName && content.match(/ @\w+/)) {
+				charName = content.match(/ @(\w+)/)![1];
+				content = content.replace(/ @\w+/, "").trim();
+			}
 
 			const isRoll = isRolling(content, userData);
 
