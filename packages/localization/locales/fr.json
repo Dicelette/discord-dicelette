@@ -926,10 +926,7 @@
         "description": "Jointure entre les résultats lorsqu'ils sont une liste",
         "name": "jointure_résultats"
       },
-      "name": {
-        "description": "Format du texte des statistiques/macro si présent",
-        "name": "nom"
-      },
+      "name": "Format du texte des statistiques/macro si présent",
       "reset": {
         "description": "Réinitialiser aux paramètres par défaut",
         "name": "reset",

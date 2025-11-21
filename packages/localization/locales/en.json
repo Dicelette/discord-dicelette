@@ -926,10 +926,7 @@
         "description": "Joining results when they are a list",
         "name": "join_results"
       },
-      "name": {
-        "description": "Format of statistical/macro text, if present",
-        "name": "name"
-      },
+      "name": "Format of statistical/macro text, if present",
       "reset": {
         "description": "Reset to the default settings",
         "name": "reset",

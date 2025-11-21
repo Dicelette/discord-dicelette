@@ -25,9 +25,7 @@ export async function setTemplate(
 			info: options
 				.getString(t("userSettings.createLink.info.name"), true)
 				.replaceAll("\\s", " "),
-			name: options
-				.getString(t("userSettings.createLink.name.name"), true)
-				.replaceAll("\\s", " "),
+			name: options.getString(t("common.name"), true).replaceAll("\\s", " "),
 		},
 		joinResult: options
 			.getString(t("userSettings.createLink.joinResult.name"), true)
@@ -72,7 +70,7 @@ export function resetTemplate(
 
 export function getTemplatePreview(ul: Translation, template?: TemplateResult) {
 	const diceletteText = `__**Private3**__ (<@189390243676422144>)  (\`>= 11\`):
-[__Force__]
+[__${ul("common.name").toTitle()}__]
   **${ul("roll.critical.failure")}** — \`1d100\` ⟶ \`[29]\` = \`[29] ⩾ 10\``;
 	return finalLink(
 		template,
@@ -146,8 +144,8 @@ export function createLinksCmdOptions(builder: Djs.SlashCommandSubcommandGroupBu
 				)
 				.addStringOption((option) =>
 					option
-						.setNames("userSettings.createLink.name.name")
-						.setDescriptions("userSettings.createLink.name.description")
+						.setNames("common.name")
+						.setDescriptions("userSettings.createLink.name")
 						.setRequired(true)
 				)
 				.addStringOption((option) =>
