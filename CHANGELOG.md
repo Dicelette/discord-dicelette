@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.15.0](https://github.com/Dicelette/discord-dicelette/compare/2.14.3...2.15.0) (2025-11-21)
+
+
+### Features
+
+* enhance template functionality with character and original dice support ([e4fff64](https://github.com/Dicelette/discord-dicelette/commit/e4fff643c79023b2c1adeaf3955ca98481c74026))
+
 ## [2.14.3](https://github.com/Dicelette/discord-dicelette/compare/2.14.2...2.14.3) (2025-11-21)
 
 ## [2.14.2](https://github.com/Dicelette/discord-dicelette/compare/2.14.1...2.14.2) (2025-11-21)
