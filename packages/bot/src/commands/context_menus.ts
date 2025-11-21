@@ -17,7 +17,7 @@ type Results = {
 
 type Variables = {
 	rolls: Results[];
-	stats?: string;
+	name?: string;
 	link: string;
 	character?: string;
 };
@@ -82,8 +82,8 @@ export function finalLink(
 		[LinksVariables.RESULTS]: resultsText,
 	});
 
-	if (variables.stats) {
-		const statText = getShortLong(variables.stats);
+	if (variables.name) {
+		const statText = getShortLong(variables.name);
 		const statFinal = replaceAllTokens(template!.format.name, {
 			[LinksVariables.NAME]: statText.long,
 			[LinksVariables.NAME_LONG]: statText.long,
@@ -211,8 +211,8 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 	}
 	if (variables.length === 0) return undefined;
 
-	const statsReg = /\[__(?<stats>.*)__]/gi;
-	const stats = statsReg.exec(message)?.groups?.stats;
+	const nameReg = /\[__(?<name>.*)__]/gi;
+	const name = nameReg.exec(message)?.groups?.name;
 	const regexSavedDice =
 		/-# ↪ (?<saved>https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+)/gi;
 	const savedDice = regexSavedDice.exec(message)?.groups?.saved;
@@ -223,8 +223,8 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 	return {
 		character: character ? character : undefined,
 		link: savedDice ?? messageUrl,
+		name: name ? name : undefined,
 		rolls: variables,
-		stats: stats ? stats : undefined,
 	};
 }
 
