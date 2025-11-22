@@ -17,7 +17,7 @@ it("Should keep everything", () => {
 it("Should remove the unwanted", () => {
 	const statistics = ["Agility"];
 	const res = filterStatsInDamage(DAMAGES, statistics);
-	expect(res).toEqual(["perception", "bludgeoning", "cutting", "coffee"]);
+	expect(res).toEqual(["bludgeoning", "coffee", "cutting", "perception"]);
 });
 
 it("Should remove all damages stats", () => {
