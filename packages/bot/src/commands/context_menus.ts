@@ -68,41 +68,17 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 		const parts = inner.split(":").map((p) => p.trim());
 		if (!parts.length) return "";
 
-		let [rawVar, ...mods] = parts;
-		let varName = rawVar.toLowerCase();
+		const [rawVar, ...mods] = parts;
+		const varName = rawVar.toLowerCase();
 
-		// Aliases legacy possibles (ex: NAME, NAME_SHORT, etc.)
-		if (varName.endsWith("_short")) {
-			varName = varName.replace(/_short$/, "");
-			mods = ["short", ...mods];
-		}
-		if (varName.endsWith("_long")) {
-			varName = varName.replace(/_long$/, "");
-			mods = ["long", ...mods];
-		}
-
-		// Alias anciens noms
-		const aliasMap: Record<string, string> = {
-			result: "results",
-			stats: "name",
-		};
-		if (aliasMap[varName]) varName = aliasMap[varName];
-
-		const valueRaw = (context as Record<string, unknown>)[varName];
+		const valueRaw = context[varName];
 		if (valueRaw == null) return "";
 
-		// La valeur peut rester { long, short } tant qu'aucun mod ne la transforme en string
 		let value: string | ShortLong;
 
-		if (
-			typeof valueRaw === "object" &&
-			"long" in (valueRaw as Record<string, unknown>) &&
-			"short" in (valueRaw as Record<string, unknown>)
-		) {
+		if (typeof valueRaw === "object" && "long" in valueRaw && "short" in valueRaw)
 			value = valueRaw as ShortLong;
-		} else {
-			value = String(valueRaw);
-		}
+		else value = String(valueRaw);
 
 		const ensureString = (): string => {
 			if (typeof value === "string") return value;
