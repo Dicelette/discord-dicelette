@@ -1,7 +1,6 @@
 import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
-import { expEval, getExpression } from "@dicelette/parse_result";
-import { COMPILED_PATTERNS } from "@dicelette/utils";
+import { getExpression } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { embedError } from "messages";
@@ -16,10 +15,7 @@ export async function register(
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
 	const macroName = interaction.options.getString(t("common.name"), true);
-	const diceValue = interaction.options.getString(
-		t("userSettings.snippets.create.content.name"),
-		true
-	);
+	const diceValue = interaction.options.getString(t("common.dice"), true);
 	try {
 		await baseRoll(getExpression(diceValue, "0").dice, interaction, client, false, true);
 		const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};

@@ -14,6 +14,7 @@ export const AUTOCOMPLETE_COMMANDS = [
 	deleteChar,
 	help,
 	snippets,
+	userSettings,
 ];
 export const COMMANDS = [
 	...ROLL_AUTO,
@@ -25,8 +26,8 @@ export const COMMANDS = [
 	newScene,
 	getCount,
 	...GLOBAL_CMD,
-	choose,
 	userSettings,
+	choose,
 ];
 
 export const DATABASE_COMMANDS = [...GIMMICK, ...ROLL_DB];

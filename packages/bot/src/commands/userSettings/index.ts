@@ -1,7 +1,9 @@
 import { t } from "@dicelette/localization";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getLangAndConfig } from "utils";
+import { getSnippetAutocomplete } from "../roll/snippets";
 import {
 	createLinksCmdOptions,
 	getTemplateValues,
@@ -11,6 +13,21 @@ import {
 import * as snippets from "./snippets";
 
 export const userSettings = {
+	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
+		const group = interaction.options.getSubcommandGroup(true);
+		const subcommand = interaction.options.getSubcommand(true);
+		if (group === t("common.snippets")) {
+			if (subcommand === t("userSettings.snippets.delete.title")) {
+				const choices = getSnippetAutocomplete(interaction, client);
+				await interaction.respond(
+					choices.slice(0, 25).map((choice) => ({
+						name: capitalizeBetweenPunct(choice.capitalize()),
+						value: choice,
+					}))
+				);
+			}
+		}
+	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("userSettings.name")
 		.setDescriptions("userSettings.description")
@@ -37,7 +54,7 @@ export const userSettings = {
 						)
 						.addStringOption((option) =>
 							option
-								.setNames("userSettings.snippets.create.content.name")
+								.setNames("common.dice")
 								.setDescriptions("userSettings.snippets.create.content.description")
 								.setRequired(true)
 						)
@@ -51,6 +68,7 @@ export const userSettings = {
 								.setNames("common.name")
 								.setDescriptions("userSettings.snippets.delete.name")
 								.setRequired(true)
+								.setAutocomplete(true)
 						)
 				)
 				.addSubcommand((subcommand) =>

@@ -21,18 +21,26 @@ import {
 	rollWithInteraction,
 } from "utils";
 
+export function getSnippetAutocomplete(
+	interaction: Djs.AutocompleteInteraction,
+	client: EClient
+) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const focused = options.getFocused(true);
+	const userId = interaction.user.id;
+	const guildId = interaction.guild!.id;
+	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	let choices: string[] = [];
+	if (focused.name === "name") {
+		const input = options.getString("name")?.standardize() ?? "";
+		choices = Object.keys(macros).filter((macroName) => macroName.subText(input));
+	}
+	return choices;
+}
+
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const focused = options.getFocused(true);
-		const userId = interaction.user.id;
-		const guildId = interaction.guild!.id;
-		const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
-		let choices: string[] = [];
-		if (focused.name === "name") {
-			const input = options.getString("name")?.standardize() ?? "";
-			choices = Object.keys(macros).filter((macroName) => macroName.subText(input));
-		}
+		const choices = getSnippetAutocomplete(interaction, client);
 		await interaction.respond(
 			choices.slice(0, 25).map((choice) => ({
 				name: capitalizeBetweenPunct(choice.capitalize()),
@@ -40,12 +48,9 @@ export default {
 			}))
 		);
 	},
-	data: macroOptions(
-		new Djs.SlashCommandBuilder()
-			.setNames("common.snippets")
-			.setDescriptions("snippets.description"),
-		false
-	),
+	data: (macroOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
+		.setNames("common.snippets")
+		.setDescriptions("snippets.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { ul } = getLangAndConfig(client, interaction);
 		const userId = interaction.user.id;

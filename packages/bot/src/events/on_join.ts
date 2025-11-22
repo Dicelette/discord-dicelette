@@ -10,6 +10,7 @@ export default (client: EClient): void => {
 			client.settings.set(guild.id, true, "converted");
 			client.settings.set(guild.id, true, "disableThread");
 			client.criticalCount.set(guild.id, {});
+			client.userSettings.set(guild.id, {});
 
 			const allCommands = [...COMMANDS.map((command) => command.data), ...contextMenus];
 
