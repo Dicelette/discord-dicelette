@@ -88,8 +88,8 @@ export default {
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
 
 			const opts: RollOptions = {
-				user: interaction.user,
 				customCritical: skillCustomCritical(rCCShared),
+				user: interaction.user,
 			};
 			await rollWithInteraction(interaction, dice, client, opts);
 			return;
@@ -126,10 +126,10 @@ export default {
 		}`.trim();
 		if (roll.includes(";") && roll.includes("&")) roll = fixSharedBracketSpacing(roll);
 		const opts: RollOptions = {
-			user: interaction.user,
 			charName: charOptions,
 			customCritical: skillCustomCritical(rCC),
 			opposition,
+			user: interaction.user,
 		};
 		await rollWithInteraction(interaction, roll, client, opts);
 	},

@@ -79,10 +79,10 @@ export async function baseRoll(
 		rollCustomCriticalsFromDice(dice, ul)
 	);
 	const opts: RollOptions = {
-		critical: serverData?.critical,
 		charName,
-		hideResult: hidden,
+		critical: serverData?.critical,
 		customCritical: criticalsFromDice,
+		hideResult: hidden,
 		opposition,
 		silent,
 	};

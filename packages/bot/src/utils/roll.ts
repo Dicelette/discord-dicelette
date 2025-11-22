@@ -423,16 +423,16 @@ export async function rollMacro(
 		: undefined;
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
 	const opts: RollOptions = {
-		user,
 		charName: charOptions,
-		infoRoll,
-		hideResult,
 		customCritical: skillCustomCritical(
 			rCC || userStatistique.template.customCritical,
 			userStatistique.stats,
 			dollarValue?.total
 		),
+		hideResult,
+		infoRoll,
 		opposition,
+		user,
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
 }
@@ -562,13 +562,13 @@ export async function rollStatistique(
 			: undefined;
 
 	const opts: RollOptions = {
-		critical: template.critical,
-		user,
 		charName: optionChar,
-		infoRoll,
-		hideResult,
+		critical: template.critical,
 		customCritical,
+		hideResult,
+		infoRoll,
 		opposition,
+		user,
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
 }
