@@ -21,6 +21,8 @@ type Variables = {
 	character?: string;
 };
 
+type ShortLong = { long: string; short: string };
+
 export const contextMenus = [
 	new Djs.ContextMenuCommandBuilder()
 		.setName(t("copyRollResult.name"))
@@ -89,22 +91,78 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 		const valueRaw = (context as Record<string, unknown>)[varName];
 		if (valueRaw == null) return "";
 
-		let value: string;
-		if (typeof valueRaw === "object" && "long" in (valueRaw as Record<string, unknown>)) {
-			const v = valueRaw as { long: string; short: string };
-			const useShort = mods.some((m) => m.toLowerCase() === "short");
-			value = useShort ? v.short : v.long;
-		} else value = String(valueRaw);
+		// La valeur peut rester { long, short } tant qu'aucun mod ne la transforme en string
+		let value: string | ShortLong;
 
+		if (
+			typeof valueRaw === "object" &&
+			"long" in (valueRaw as Record<string, unknown>) &&
+			"short" in (valueRaw as Record<string, unknown>)
+		) {
+			value = valueRaw as ShortLong;
+		} else {
+			value = String(valueRaw);
+		}
+
+		// Helpers
+		const toShortFromString = (text: string): string => {
+			const cleaned = text.replaceAll("**", "").trim();
+			if (!cleaned) return "";
+			const parts = cleaned.split(/\s+/);
+			if (parts.length === 1) return cleaned;
+			return parts.map((w) => w.charAt(0).toUpperCase()).join("");
+		};
+
+		const ensureString = (): string => {
+			if (typeof value === "string") return value;
+			// Si on est encore sur { long, short } et qu'on doit appliquer un mod texte,
+			// on choisit long par défaut.
+			return (value as { long: string; short: string }).long;
+		};
+
+		// Application séquentielle des mods dans l'ordre d'écriture
 		for (const mod of mods) {
 			const m = mod.toLowerCase();
-			if (m === "short" || m === "long") continue;
-			if (m === "uppercase") value = value.toUpperCase();
-			else if (m === "lowercase") value = value.toLowerCase();
-			else if (m === "title") value = value.toTitle();
-			else if (m === "standardize") value = value.standardize();
+
+			if (m === "short") {
+				if (typeof value === "string") {
+					value = toShortFromString(value);
+				} else {
+					// value est encore { long, short } → on choisit la variante short
+					value = (value as ShortLong).short;
+				}
+				continue;
+			}
+
+			if (m === "long") {
+				if (typeof value === "object") {
+					// value est encore { long, short } → on choisit la variante long
+					value = (value as ShortLong).long;
+				}
+				continue;
+			}
+
+			// À partir d'ici, tous les autres mods sont des mods texte sur string
+			let str = ensureString();
+
+			if (m === "upper") str = str.toUpperCase();
+			else if (m === "lower") str = str.toLowerCase();
+			else if (m === "title") str = str.toTitle();
+			else if (m === "standardize") str = str.removeAccents();
+			else if (m.startsWith("trunc=")) {
+				const truncMatch = m.match(/trunc=(\d+)/);
+				if (truncMatch) {
+					const maxLength = Number.parseInt(truncMatch[1], 10);
+					if (str.length > maxLength) str = str.slice(0, maxLength);
+				}
+			}
+
+			value = str;
 		}
-		return value;
+
+		return typeof value === "string"
+			? value
+			: (value as { long: string; short: string }).long;
 	});
 }
 
