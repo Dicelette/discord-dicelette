@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.18.1](https://github.com/Dicelette/discord-dicelette/compare/2.18.0...2.18.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* **expr:** should not display the `+0` or `-0` ([4887dd2](https://github.com/Dicelette/discord-dicelette/commit/4887dd281e73867ee1c8106ae175ee64433f6da4))
+
 ## [2.18.0](https://github.com/Dicelette/discord-dicelette/compare/2.17.2...2.18.0) (2025-11-22)
 
 
