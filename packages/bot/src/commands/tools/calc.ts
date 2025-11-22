@@ -12,19 +12,26 @@ import { autoCompleteCharacters, calcOptions } from "utils";
 import "discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 
+export async function autocompleteCalc(
+	interaction: Djs.AutocompleteInteraction,
+	client: EClient
+) {
+	const filter = autoCompleteCharacters(interaction, client, false) ?? [];
+	const sign = autoFocuseSign(interaction);
+	if (sign) return await interaction.respond(sign);
+	const transform = autofocusTransform(interaction, interaction.locale);
+	if (transform) return await interaction.respond(transform);
+	return await interaction.respond(
+		filter.map((result) => ({
+			name: capitalizeBetweenPunct(result.capitalize()),
+			value: result,
+		}))
+	);
+}
+
 export const calc = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
-		const sign = autoFocuseSign(interaction);
-		if (sign) return await interaction.respond(sign);
-		const transform = autofocusTransform(interaction, interaction.locale);
-		if (transform) return await interaction.respond(transform);
-		return await interaction.respond(
-			filter.map((result) => ({
-				name: capitalizeBetweenPunct(result.capitalize()),
-				value: result,
-			}))
-		);
+		return await autocompleteCalc(interaction, client);
 	},
 	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("calc.title")

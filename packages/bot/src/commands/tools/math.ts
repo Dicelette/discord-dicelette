@@ -5,24 +5,13 @@
 import type { EClient } from "client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
-import { autoCompleteCharacters, calcOptions, getLangAndConfig } from "utils";
-import { autoFocuseSign, autofocusTransform, calculate } from "./calc";
+import { calcOptions, getLangAndConfig } from "utils";
+import { autocompleteCalc, calculate } from "./calc";
 import "discord_ext";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export const math = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const filter = autoCompleteCharacters(interaction, client, false) ?? [];
-		const sign = autoFocuseSign(interaction);
-		if (sign) return await interaction.respond(sign);
-		const transform = autofocusTransform(interaction, interaction.locale);
-		if (transform) return await interaction.respond(transform);
-		return await interaction.respond(
-			filter.map((result) => ({
-				name: capitalizeBetweenPunct(result.capitalize()),
-				value: result,
-			}))
-		);
+		return await autocompleteCalc(interaction, client);
 	},
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("math.title")
