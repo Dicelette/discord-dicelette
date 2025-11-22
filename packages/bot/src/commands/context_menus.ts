@@ -104,15 +104,6 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 			value = String(valueRaw);
 		}
 
-		// Helpers
-		const toShortFromString = (text: string): string => {
-			const cleaned = text.replaceAll("**", "").trim();
-			if (!cleaned) return "";
-			const parts = cleaned.split(/\s+/);
-			if (parts.length === 1) return cleaned;
-			return parts.map((w) => w.charAt(0).toUpperCase()).join("");
-		};
-
 		const ensureString = (): string => {
 			if (typeof value === "string") return value;
 			return (value as ShortLong).long;
@@ -122,7 +113,7 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 			const m = mod.toLowerCase();
 
 			if (m === "short") {
-				if (typeof value === "string") value = toShortFromString(value);
+				if (typeof value === "string") value = short(value);
 				else value = (value as ShortLong).short;
 				continue;
 			}
@@ -226,20 +217,20 @@ function createResultFromTemplate(
 	return rollsText.join(template!.joinResult);
 }
 
+function short(text: string): string {
+	const cleaned = text.replaceAll("**", "").trim();
+	if (!cleaned) return "";
+	const parts = cleaned.split(/\W+/);
+	if (parts.length === 1) return cleaned;
+	return parts.map((w) => w.charAt(0).toUpperCase()).join("");
+}
+
 function getShortLong(text: string): ShortLong {
-	text = text.replaceAll("**", "").trim();
-	const short =
-		text.split(" ").length > 1
-			? text
-					.split(" ")
-					.map((word) => word.charAt(0).toUpperCase())
-					.join("")
-			: text;
 	return {
 		/** Complet */
 		long: text,
-		/** Initial only if word > 1, like Foo Bar = FB and Foo will be Foo*/
-		short,
+		/** Initial only if word > 1, like Foo Bar = FB and Foo will be Foo */
+		short: short(text),
 	};
 }
 
