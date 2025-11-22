@@ -72,6 +72,14 @@ export default {
 			await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 			return;
 		}
+		let charOptions: undefined | string;
+		if (dice.match(/ @\w+/)) {
+			charOptions = dice.match(/ @(\w+)/)![1];
+			dice = dice.replace(/ @\w+/, "").trim();
+		}
+		const expr = getExpression(dice, expressionOpt);
+		dice = expr.dice;
+		const expressionStr = expr.expressionStr;
 		if (dice.includes("&") && dice.includes(";")) {
 			if (userComments) {
 				if (!dice.includes("#")) dice = `${dice} # ${userComments}`;
@@ -95,14 +103,6 @@ export default {
 			return;
 		}
 
-		let charOptions: undefined | string;
-		if (dice.match(/ @\w+/)) {
-			charOptions = dice.match(/ @(\w+)/)![1];
-			dice = dice.replace(/ @\w+/, "").trim();
-		}
-		const expr = getExpression(dice, expressionOpt);
-		dice = expr.dice;
-		const expressionStr = expr.expressionStr;
 		const { cleanedDice: diceWithoutComments, mergedComments } = extractAndMergeComments(
 			dice,
 			userComments
@@ -121,10 +121,9 @@ export default {
 		const opposition = oppositionVal
 			? parseOpposition(oppositionVal, comparator)
 			: undefined;
-		let roll = `${trimAll(processedDice)}${expressionStr}${comparator}${
+		const roll = `${trimAll(processedDice)}${expressionStr}${comparator}${
 			mergedComments ? ` ${mergedComments}` : ""
 		}`.trim();
-		if (roll.includes(";") && roll.includes("&")) roll = fixSharedBracketSpacing(roll);
 		const opts: RollOptions = {
 			charName: charOptions,
 			customCritical: skillCustomCritical(rCC),
