@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.18.0](https://github.com/Dicelette/discord-dicelette/compare/2.17.2...2.18.0) (2025-11-22)
+
+
+### Features
+
+* add snippets functionality for creating, deleting, and listing user-defined macros ([b721657](https://github.com/Dicelette/discord-dicelette/commit/b721657eef0a4fa658f57a053411aef115b99e09))
+* autodelete usersettings when needed ([29805f1](https://github.com/Dicelette/discord-dicelette/commit/29805f17143c503c339aff0616e31e01a0c55660))
+
+
+### Bug Fixes
+
+* sanitize string values in context menus ([158d64e](https://github.com/Dicelette/discord-dicelette/commit/158d64e29c11361232ef92127fda79f2d383218b))
+
 ## [2.17.2](https://github.com/Dicelette/discord-dicelette/compare/2.17.1...2.17.2) (2025-11-22)
 
 
