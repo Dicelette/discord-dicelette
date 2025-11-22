@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.17.0](https://github.com/Dicelette/discord-dicelette/compare/2.16.0...2.17.0) (2025-11-22)
+
+
+### Features
+
+* allow to set char even if not registered using the `[@tag](https://github.com/tag)` ([9a0a36d](https://github.com/Dicelette/discord-dicelette/commit/9a0a36dfb3ce54581c77c8b61fb14ee1869a52b7))
+
 ## [2.16.0](https://github.com/Dicelette/discord-dicelette/compare/2.15.0...2.16.0) (2025-11-21)
 
 
