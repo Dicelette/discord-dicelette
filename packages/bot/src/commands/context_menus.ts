@@ -78,7 +78,11 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 
 		if (typeof valueRaw === "object" && "long" in valueRaw && "short" in valueRaw)
 			value = valueRaw as ShortLong;
-		else value = String(valueRaw);
+		else
+			value = String(valueRaw)
+				.replaceAll("`", "")
+				.replaceAll("*", "")
+				.replaceAll("_", "");
 
 		const ensureString = (): string => {
 			if (typeof value === "string") return value;
