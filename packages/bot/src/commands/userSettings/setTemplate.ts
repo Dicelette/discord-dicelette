@@ -112,11 +112,11 @@ export async function getTemplateValues(
 	const content = dedent(`
 	- __${ul("userSettings.createLink.final.name").toTitle()}__${s}: \`${template!.final}\`
 	- __${ul("userSettings.createLink.result.name").toTitle()}__${s}: \`\`${template!.results} \`\`
-	- __${ul("userSettings.createLink.joinResult.name").toTitle()}__${s}: \`${template!.joinResult}\`
+	- __${ul("userSettings.createLink.joinResult.name").replaceAll("_", "").trim().toTitle()}__${s}: \`${template!.joinResult}\`
 	- __${ul("common.dice").toTitle()}__${s}: \`${template!.format.dice}\`
 	- __${ul("userSettings.createLink.info.name").toTitle()}__${s}: \`${template!.format.info}\`
 	- __${ul("common.name").toTitle()}__${s}: \`${template!.format.name}\`
-	- __${ul("userSettings.createLink.originalDice.name").toTitle()}__${s}: \`${template!.format.originalDice}\`
+	- __${ul("userSettings.createLink.originalDice.name").replaceAll("_", "").toTitle()}__${s}: \`${template!.format.originalDice}\`
 	- __${ul("common.character").toTitle()}__${s}: \`${template!.format.character}\`
 
 	**__${ul("userSettings.createLink.display.name").toTitle()}__**${s}: \`\`${preview}\`\`
