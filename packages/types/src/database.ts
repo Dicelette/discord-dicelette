@@ -227,9 +227,11 @@ export type CustomCriticalRoll = CustomCritical & {
 	};
 };
 
-export type UserSettings = Record<
-	string,
-	{
-		createLinkTemplate: TemplateResult;
-	}
->;
+export type Snippets = Record<string, string>;
+
+export type UserSettings = Record<string, UserSettingsData>;
+
+export type UserSettingsData = {
+	createLinkTemplate: TemplateResult;
+	snippets: Snippets;
+};

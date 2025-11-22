@@ -134,6 +134,7 @@
     "page": "Page {{- nb}}",
     "role": "role",
     "sheet": "[ SHEET ]",
+    "snippets": "snippets",
     "space": "",
     "statistic": "statistic",
     "statistics": "statistics",
@@ -878,6 +879,9 @@
     },
     "underscore": "__New scene__:"
   },
+  "snippets": {
+    "description": "Roll a snippet"
+  },
   "template": {
     "description": "Configure server template"
   },
@@ -945,6 +949,31 @@
       "title": "create_link"
     },
     "description": "Allows users to configure certain non-critical functions of the bot.",
-    "name": "user_config"
+    "name": "user_config",
+    "snippets": {
+      "create": {
+        "content": {
+          "description": "Dice that will be throw",
+          "name": "content"
+        },
+        "description": "Add a new snippet",
+        "name": "Snippet's name",
+        "success": "The snippet **{{- name}}** was successfully saved.",
+        "title": "create"
+      },
+      "delete": {
+        "description": "Delete a snippet",
+        "name": "Snippet name to delete",
+        "notFound": "The macro {{- name}} was not found.",
+        "success": "The macro {{- name}} was successfully deleted.",
+        "title": "delete"
+      },
+      "description": "Add macro not linked to a template or a sheet",
+      "list": {
+        "description": "Display all registered snippet",
+        "empty": "No saved snippets.",
+        "title": "list"
+      }
+    }
   }
 }

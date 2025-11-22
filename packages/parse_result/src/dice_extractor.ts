@@ -31,7 +31,7 @@ const COMPILED_PATTERNS = {
 	ASTERISK_ESCAPE: /\*/g,
 	AT_MENTION_REMOVER: / @\w+/,
 	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
-	EXP_REMOVER: /\{exp.*?\}/g,
+	EXP_REMOVER: /\{exp(.*?)\}/g,
 	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
 	SIGN_REMOVER: /[><=!]+.*$/,
 	STAT_COMMENTS_REMOVER: /%%.*%%/,
@@ -60,7 +60,7 @@ export function hasValidDice(diceData: DiceData): boolean {
 	return true;
 }
 
-function getComments(content: string, comments?: string) {
+export function getComments(content: string, comments?: string) {
 	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
 	if (!globalComments && !comments)
 		globalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];

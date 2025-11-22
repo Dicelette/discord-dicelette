@@ -8,6 +8,7 @@ import {
 	resetTemplate,
 	setTemplate,
 } from "./setTemplate";
+import * as snippets from "./snippets";
 
 export const userSettings = {
 	data: new Djs.SlashCommandBuilder()
@@ -19,6 +20,44 @@ export const userSettings = {
 					.setNames("userSettings.createLink.title")
 					.setDescriptions("userSettings.createLink.description")
 			)
+		)
+		.addSubcommandGroup((group) =>
+			group
+				.setNames("common.snippets")
+				.setDescriptions("userSettings.snippets.description")
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("userSettings.snippets.create.title")
+						.setDescriptions("userSettings.snippets.create.description")
+						.addStringOption((option) =>
+							option
+								.setNames("common.name")
+								.setDescriptions("userSettings.snippets.create.name")
+								.setRequired(true)
+						)
+						.addStringOption((option) =>
+							option
+								.setNames("userSettings.snippets.create.content.name")
+								.setDescriptions("userSettings.snippets.create.content.description")
+								.setRequired(true)
+						)
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("userSettings.snippets.delete.title")
+						.setDescriptions("userSettings.snippets.delete.description")
+						.addStringOption((option) =>
+							option
+								.setNames("common.name")
+								.setDescriptions("userSettings.snippets.delete.name")
+								.setRequired(true)
+						)
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("userSettings.snippets.list.title")
+						.setDescriptions("userSettings.snippets.list.description")
+				)
 		),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		const group = interaction.options.getSubcommandGroup(true);
@@ -31,6 +70,13 @@ export const userSettings = {
 				return await getTemplateValues(client, ul, interaction);
 			if (subcommand === t("userSettings.createLink.reset.name"))
 				return resetTemplate(client, interaction);
+		} else if (group === t("common.snippets")) {
+			if (subcommand === t("userSettings.snippets.create.title"))
+				return await snippets.register(client, interaction);
+			if (subcommand === t("userSettings.snippets.delete.title"))
+				return await snippets.remove(client, interaction);
+			if (subcommand === t("userSettings.snippets.list.title"))
+				return await snippets.displayList(client, interaction);
 		}
 	},
 };

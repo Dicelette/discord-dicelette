@@ -134,6 +134,7 @@
     "page": "Page {{- nb}}",
     "role": "rôle",
     "sheet": "[ FICHE ]",
+    "snippets": "snippets",
     "space": " ",
     "statistic": "statistique",
     "statistics": "statistiques",
@@ -878,6 +879,9 @@
     },
     "underscore": "__Nouvelle scène__ :"
   },
+  "snippets": {
+    "description": "Lancer un snippet"
+  },
   "template": {
     "description": "Configurer le modèle du serveur"
   },
@@ -945,6 +949,31 @@
       "title": "créer_lien"
     },
     "description": "Permets de configurer certaines fonctions non-critique du bot par les utilisateurs.",
-    "name": "user_config"
+    "name": "user_config",
+    "snippets": {
+      "create": {
+        "content": {
+          "description": "Dé qui sera lancé",
+          "name": "contenu"
+        },
+        "description": "Ajouter un nouveau snippet",
+        "name": "Nom du snippet",
+        "success": "Le snippet **{{- name}}** a été correctement sauvegardé.",
+        "title": "créer"
+      },
+      "delete": {
+        "description": "Supprimer un snippet",
+        "name": "Nom du snippet à supprimer",
+        "notFound": "La macro {{- name}} n'a pas été trouvée.",
+        "success": "La macro {{-name}} a bien été supprimée.",
+        "title": "supprimer"
+      },
+      "description": "Ajouter une macro non lié à un modèle ou une fiche",
+      "list": {
+        "description": "Afficher tous snippets enregistrés",
+        "empty": "Aucun snippet n'est sauvegardé.",
+        "title": "lister"
+      }
+    }
   }
 }

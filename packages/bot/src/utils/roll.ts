@@ -2,6 +2,7 @@ import {
 	type ComparedValue,
 	type CustomCritical,
 	DETECT_CRITICAL,
+	DiceTypeError,
 	generateStatsDice,
 	replaceFormulaInDice,
 	type StatisticalTemplate,
@@ -33,7 +34,7 @@ import { getLangAndConfig } from "utils";
 /**
  * Calcule la similarité entre deux chaînes en utilisant la distance de Levenshtein normalisée
  */
-function calculateSimilarity(str1: string, str2: string): number {
+export function calculateSimilarity(str1: string, str2: string): number {
 	const longer = str1.length > str2.length ? str1 : str2;
 	const shorter = str1.length > str2.length ? str2 : str1;
 
@@ -264,7 +265,8 @@ export async function rollWithInteraction(
 	infoRoll?: { name: string; standardized: string },
 	hideResult?: false | true | null,
 	customCritical?: Record<string, CustomCritical> | undefined,
-	opposition?: ComparedValue
+	opposition?: ComparedValue,
+	silent?: boolean
 ) {
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
@@ -285,22 +287,26 @@ export async function rollWithInteraction(
 		opposition
 	);
 	const output = defaultMsg.defaultMessage();
-	if (defaultMsg.error) {
-		await reply(interaction, {
-			embeds: [embedError(output, ul)],
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		return;
-	}
+	if (!silent) {
+		if (defaultMsg.error) {
+			await reply(interaction, {
+				embeds: [embedError(output, ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
 
-	return await sendResult(
-		interaction,
-		{ roll: defaultMsg },
-		client.settings,
-		ul,
-		user,
-		hideResult
-	);
+		return await sendResult(
+			interaction,
+			{ roll: defaultMsg },
+			client.settings,
+			ul,
+			user,
+			hideResult
+		);
+	}
+	if (defaultMsg.error) throw new DiceTypeError(dice, output);
+	return;
 }
 
 /**

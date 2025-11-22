@@ -37,41 +37,48 @@ export function charUserOptions(
  */
 export function commonOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
-	opts: Partial<{ expression: boolean; threshold: boolean; opposition: boolean }> = {
+	opts: Partial<{
+		expression: boolean;
+		threshold: boolean;
+		opposition: boolean;
+		character: boolean;
+	}> = {
+		character: true,
 		expression: true,
 	}
 ) {
-	builder.addStringOption((option) =>
-		option
-			.setNames("common.character")
-			.setDescriptions("dbRoll.options.character")
-			.setRequired(false)
-			.setAutocomplete(true)
-	);
-	if (opts.expression) {
+	if (opts.character)
+		builder.addStringOption((option) =>
+			option
+				.setNames("common.character")
+				.setDescriptions("dbRoll.options.character")
+				.setRequired(false)
+				.setAutocomplete(true)
+		);
+	if (opts.expression)
 		builder.addStringOption((option) =>
 			option
 				.setNames("common.expression")
 				.setDescriptions("dbRoll.options.modificator.description")
 				.setRequired(false)
 		);
-	}
-	if (opts.opposition) {
+
+	if (opts.opposition)
 		builder.addStringOption((option) =>
 			option
 				.setNames("dbRoll.options.opposition.name")
 				.setDescriptions("dbRoll.options.opposition.description")
 				.setRequired(false)
 		);
-	}
-	if (opts.threshold) {
+
+	if (opts.threshold)
 		builder.addStringOption((option) =>
 			option
 				.setNames("dbRoll.options.override.name")
 				.setDescriptions("dbRoll.options.override.description")
 				.setRequired(false)
 		);
-	}
+
 	builder.addStringOption((option) =>
 		option
 			.setNames("common.comments")
@@ -82,7 +89,8 @@ export function commonOptions(
 }
 
 export function macroOptions(
-	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
+	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
+	character = true
 ): Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder {
 	builder.addStringOption((option) =>
 		option
@@ -91,7 +99,7 @@ export function macroOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { expression: true, opposition: true });
+	return commonOptions(builder, { character, expression: true, opposition: true });
 }
 
 /**
@@ -109,7 +117,12 @@ export function dbRollOptions(
 			.setRequired(false)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { expression: true, opposition: true, threshold: true });
+	return commonOptions(builder, {
+		character: true,
+		expression: true,
+		opposition: true,
+		threshold: true,
+	});
 }
 
 /**
@@ -154,7 +167,7 @@ export function calcOptions(
 				.setRequired(false)
 				.setAutocomplete(true)
 		);
-	return commonOptions(builder, { expression: false });
+	return commonOptions(builder, { character: true, expression: false });
 }
 
 export function gmCommonOptions(
