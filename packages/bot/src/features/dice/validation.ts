@@ -70,21 +70,21 @@ export async function validate(
 	await interaction.deferReply({ flags });
 	const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 	if (!diceEmbeds) return;
-	// 1) Création + validation des embeds
+	// 1) Creation + validation of embeds
 	const values = interaction.fields.getTextInputValue("allDice");
 	const { fieldsToAppend, diceEmbed, oldFields, removed } = createAndValidateDiceEmbed(
 		values,
 		message,
 		ul
 	);
-	// Permission/Modération: basculer en validation par modération si nécessaire
+	// Permission/Moderation: switch to moderation flow if needed
 	const { userID, userName } = await getUserNameAndChar(interaction, ul);
 	const messageID = [message.id, message.channelId] as UserMessageId;
 
 	if (allowance.moderation && allowance.allowSelfRegister && !isModerator) {
-		// Stocker l'embed dans le cache et publier un message pour approbation
+		// Store the embed in the cache and publish a message for approval
 		const embedKey = makeEmbedKey(interaction.guild!.id, message.channelId, message.id);
-		// Footer de secours: conserve un minimum de métadonnées si le cache disparaît
+		// Fallback footer: retains a minimum amount of metadata if the cache disappears
 		setModerationFooter(diceEmbed, {
 			channelId: message.channelId,
 			messageId: message.id,
@@ -98,7 +98,7 @@ export async function validate(
 		});
 
 		const row = buildModerationButtons("dice-edit", ul, embedKey);
-		// Si l'embed est vide (suppression de toutes les macros), afficher un petit message plutôt qu'un embed vide
+		// If the embed is empty (all macros removed), display a small message rather than an empty embed.
 		if (!fieldsToAppend || fieldsToAppend.length === 0) {
 			await interaction.editReply({
 				components: [row],
@@ -106,13 +106,13 @@ export async function validate(
 			});
 		} else await interaction.editReply({ components: [row], embeds: [diceEmbed] });
 
-		return; // ne pas appliquer directement
+		return; // do not apply changes directly
 	}
 
-	// 2) Édit du message d'embeds
+	// 2) Edit the message with the new embeds
 	const edited = await editMessageDiceEmbeds(message, ul, diceEmbed, removed);
 
-	// 3) Persistance mémoire + sauvegarde utilisateur
+	// 3) Persist memory + user
 	const damageNames = removed
 		? undefined
 		: Object.keys(
@@ -135,7 +135,7 @@ export async function validate(
 		damageNames
 	);
 
-	// 4) Envoi des messages de validation (réponse + logs)
+	// 4) Responses/logs
 	await sendValidationResponses({
 		db,
 		interaction,
@@ -167,15 +167,13 @@ function parseStatsString(statsEmbed: Djs.EmbedBuilder) {
 }
 
 /**
- * Compare deux libellés en neutralisant accents/variantes.
+ * Compare two strings after unidecode and standardize them
  */
 const COMPARE_UNIDECODE = (a: string, b: string) =>
 	a.unidecode().standardize() === b.unidecode().standardize();
 
-// Caches centralisés: voir utils/moderation_cache
-
 /**
- * 1) Création et validation de l'embed de dés à partir de la saisie utilisateur.
+ * 1) Creation and validation of dice embeds based on user input.
  */
 function createAndValidateDiceEmbed(
 	values: string,
@@ -267,7 +265,7 @@ function createAndValidateDiceEmbed(
 }
 
 /**
- * 2) Édite le message avec les bons embeds (et composants si suppression).
+ * 2) Edit the message with the correct embeds (and components if deleted).
  */
 async function editMessageDiceEmbeds(
 	message: Djs.Message,
@@ -295,7 +293,7 @@ async function editMessageDiceEmbeds(
 }
 
 /**
- * 3) Persistance de la mémoire et sauvegarde de l'utilisateur.
+ * 3) Persistence of memory and user backup.
  */
 async function persistUserAndMemory(
 	client: EClient,
@@ -318,7 +316,7 @@ async function persistUserAndMemory(
 }
 
 /**
- * 4) Envoi des messages de validation (réponse éphémère + logs).
+ * 4) Send validation responses and logs.
  */
 async function sendValidationResponses(args: {
 	interaction: Djs.ModalSubmitInteraction | Djs.ButtonInteraction;
@@ -373,14 +371,14 @@ async function sendValidationResponses(args: {
 }
 
 /**
- * Validation par un modérateur pour les dés (via bouton).
+ *  Validation by a moderator for dice editing (via button).
  */
 export async function couldBeValidatedDice(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
 	client: EClient
 ) {
-	// Vérifier droits modération
+	// Check moderator permissions
 	const moderator = interaction.guild?.members.cache
 		.get(interaction.user.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
@@ -396,31 +394,31 @@ export async function couldBeValidatedDice(
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.validate, customId);
 	if (!embedKey) throw new Error(ul("error.embed.notFound"));
 
-	// Tenter le cache (chemin nominal)
+	// Retrieve the embed from cache or message
 	const cached = getModerationCache(embedKey);
 	let workingEmbed: Djs.EmbedBuilder | undefined =
 		cached && cached.kind === "dice-edit" ? cached.embed : undefined;
 
-	// Fallback si le bot a redémarré et que le cache est vide: utiliser l'embed du message de modération
+	// Fallback: reconstruct from the message if cache is missing
 	if (!workingEmbed) {
 		const apiEmbed = interaction.message.embeds[0];
-		// Si le message de modération n'a pas d'embed (cas suppression), simuler un embed de dés vide
+		// If no embed found, create a new one
 		if (!apiEmbed) {
 			workingEmbed = createDiceEmbed(ul);
 		} else {
-			// Convertit l'embed du message en EmbedBuilder compatible
+			// Rebuild the embed from the message
 			workingEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 		}
 	}
 	if (!workingEmbed) throw new Error(ul("error.embed.notFound"));
 
-	// Récupération du message original via la clé (pas de footer nécessaire)
+	// Get the original message to edit
 	const message = await getMessageWithKeyPart(ul, interaction, embedKey);
-	// Préparation des champs/flags
+	// Prepare new fields/flags
 	const newFields = workingEmbed.toJSON().fields ?? [];
 	const removed = newFields.length === 0;
 
-	// 1) Sauvegarder l'état précédent puis éditer le message
+	// 1) Save and edit the message
 	const oldDamage = getEmbeds(message ?? undefined, "damage");
 	const oldFields = oldDamage?.toJSON().fields ?? [];
 	workingEmbed = workingEmbed.setFooter(null);
@@ -431,7 +429,7 @@ export async function couldBeValidatedDice(
 		removed
 	);
 
-	// 2) Persistance mémoire + user (damageNames à partir des champs du nouvel embed)
+	// 2) Memory persistence + user (damageNames from the fields of the new embed)
 	const damageNames = removed
 		? undefined
 		: Object.keys(
@@ -443,7 +441,7 @@ export async function couldBeValidatedDice(
 					{} as Record<string, string>
 				)
 			);
-	// Récupération de l'utilisateur cible depuis l'embed "user"
+	// Get user ID and name from the user embed
 	const userEmbed = getEmbeds(message ?? undefined, "user");
 	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
 	const parsedUser = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
@@ -467,7 +465,7 @@ export async function couldBeValidatedDice(
 		damageNames
 	);
 
-	// 3) Réponses/logs
+	// 3) Responses/logs
 	await sendValidationResponses({
 		db: client.settings,
 		interaction,
@@ -480,12 +478,12 @@ export async function couldBeValidatedDice(
 		userName: ownerName,
 	});
 
-	// 4) Nettoyage: supprimer message de demande et cache (si présent)
+	// 4) Cleanup
 	deleteModerationCache(embedKey);
 	await interaction.message.delete();
 }
 
-/** Annulation d'une demande de validation par modération (bouton). */
+/** Canceling a validation request through moderation (button). */
 export async function cancelDiceModeration(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
@@ -508,7 +506,7 @@ export async function cancelDiceModeration(
 }
 
 /**
- * Validation par un modérateur pour un ajout de dés (via bouton).
+ * Validation by a moderator for adding dice (via button).
  */
 export async function couldBeValidatedDiceAdd(
 	interaction: Djs.ButtonInteraction,
@@ -543,7 +541,7 @@ export async function couldBeValidatedDiceAdd(
 		userID = cached.meta.userID;
 		userName = cached.meta.userName;
 	} else {
-		// Fallback: utiliser la clé encodée dans le customId pour retrouver le message d'origine
+		// Fallback: use the key encoded in the customId to retrieve the original message
 		const apiEmbed = interaction.message.embeds[0];
 		if (!apiEmbed) throw new Error(ul("error.embed.notFound"));
 		moderationDiceEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
@@ -559,18 +557,18 @@ export async function couldBeValidatedDiceAdd(
 	const userEmbed = getEmbeds(message ?? undefined, "user");
 	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
 
-	// Garder les anciens champs pour logs
+	// Keep field in case of cache miss
 	const oldDamage = getEmbeds(message ?? undefined, "damage");
 	const oldFields = oldDamage?.toJSON().fields ?? [];
 
-	// Préparer la nouvelle liste d'embeds et les composants attendus (boutons d'édition)
+	// Prepare the new list of embeds and expected components (edit buttons)
 	let embedsApplied: Djs.EmbedBuilder[];
 	let hasStats: boolean;
 	let files: Djs.AttachmentBuilder[] | undefined;
 	if (cached) {
 		embedsApplied = cached.embeds;
 		hasStats = !!getEmbeds(undefined, "stats", cached.embeds);
-		// Assainir le footer de l'embed des macros si présent
+		// Clean up the footer of the macro embed, if present
 		const damage = getEmbeds(undefined, "damage", embedsApplied);
 		if (damage?.toJSON().footer) {
 			const damageTitle = damage.toJSON().title ?? "";
@@ -578,7 +576,7 @@ export async function couldBeValidatedDiceAdd(
 			embedsApplied = embedsApplied.map((e) =>
 				(e.toJSON().title ?? "") === damageTitle ? sanitized : e
 			);
-			//update the thumbnail in the user embed
+			// Update files if an avatar reupload is needed
 			const userEmbed = getEmbeds(undefined, "user", embedsApplied);
 			const thumbnail = userEmbed?.data.thumbnail?.url;
 			if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
@@ -599,7 +597,7 @@ export async function couldBeValidatedDiceAdd(
 			}
 		}
 	} else {
-		// Fallback: fusionner l'embed de dés avec les embeds existants
+		// Fallback: merge the dice embed with existing embeds
 		const diceEmbedToApply = stripFooter(moderationDiceEmbed!);
 		const edited = await replaceEmbedInList(
 			ul,
@@ -614,7 +612,7 @@ export async function couldBeValidatedDiceAdd(
 
 	await message.edit({ components, embeds: embedsApplied, files });
 
-	// Persistance mémoire + user
+	// Persist memory + user
 	const newDamage = getEmbeds(message ?? undefined, "damage");
 	const newFields = newDamage?.toJSON().fields ?? [];
 	const damageNames = newFields.length
@@ -629,7 +627,7 @@ export async function couldBeValidatedDiceAdd(
 			)
 		: undefined;
 
-	// Déterminer l'utilisateur cible (depuis cache, sinon depuis l'embed user du message)
+	// Determine the target user (from cache, otherwise from the message's embedded user)
 	if (!userID) {
 		const parsedUser2 = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 		const mention2 = parsedUser2["common.user"]; // <@id>
@@ -653,7 +651,7 @@ export async function couldBeValidatedDiceAdd(
 		damageNames
 	);
 
-	// Réponses/logs
+	// Reply and logs
 	await sendValidationResponses({
 		db: client.settings,
 		interaction,

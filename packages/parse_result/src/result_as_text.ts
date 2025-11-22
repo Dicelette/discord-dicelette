@@ -294,8 +294,8 @@ export class ResultAsText {
 				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 
 				if (success) {
-					// Conserver la comparaison de CC pour l'afficher près du pseudo,
-					// mais garder l'affichage du message sur la stat (comparaison de base)
+					// Keep the CC comparison to display it next to the username,
+					// but keep the message displayed on the stat (basic comparison)
 					this.headerCompare = this.convertCustomCriticalToCompare(custom);
 					break;
 				}
@@ -473,12 +473,12 @@ export class ResultAsText {
 			});
 		else if (context) linkToOriginal = this.createUrl(undefined, context);
 
-		// Construire la mention (personnage > auteur si disponible)
+		// Build the reference (character > author if available)
 		let mention = authorId ? `*<@${authorId}>*` : "";
 		if (this.charName)
 			mention = `**__${this.charName.capitalize()}__**${mention.length > 0 ? ` (${mention})` : ""}`;
 
-		// Afficher uniquement la comparaison à côté du pseudo
+		// Display only the comparison next to the username
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
 		if (header) {

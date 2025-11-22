@@ -85,7 +85,7 @@ export async function cancel(
 		?.value.replace("<@", "")
 		.replace(">", "");
 
-	// Détermine si l'interaction vient du propriétaire (via champ ou via footer de secours)
+	// Determines whether the interaction comes from the owner (via field or via backup footer)
 	const isOwnerFromField = userFieldId === interactionUser.id;
 	const footerText = embed.footer?.text;
 	let isOwner = isOwnerFromField;
@@ -102,7 +102,7 @@ export async function cancel(
 		.get(interactionUser.id)
 		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 
-	// Cas d'annulation par l'utilisateur lui-même
+	// Cases of cancellation by the user himself
 	if (cancelByUser) {
 		if (isOwner) {
 			await interaction.message.delete();
@@ -112,7 +112,7 @@ export async function cancel(
 			});
 			return;
 		}
-		// Toute autre personne (y compris un modérateur) ne peut pas annuler 'au nom de' l'utilisateur
+		// No other person (including a moderator) may cancel "on behalf of" the user.
 		await reply(interaction, {
 			content: ul("modals.noPermission"),
 			flags: Djs.MessageFlags.Ephemeral,
@@ -120,7 +120,7 @@ export async function cancel(
 		return;
 	}
 
-	// Cas principal: annulation standard (modérateur ou propriétaire sans envoi de refus)
+	// Main case: standard cancellation (moderator or owner without sending a rejection)
 	const canDelete = isModerator || (isOwner && !sendRefusal);
 	if (!canDelete) {
 		await reply(interaction, {
@@ -131,7 +131,7 @@ export async function cancel(
 	}
 
 	await interaction.message.delete();
-	// Envoi du refus en MP si demandé et effectué par un modérateur sur un autre utilisateur
+	// Send the rejection via PM if requested and carried out by a moderator on another user.
 	if (sendRefusal && isModerator && userFieldId && userFieldId !== interactionUser.id) {
 		const userFetch = await fetchUser(client, userFieldId);
 		await userFetch?.send({

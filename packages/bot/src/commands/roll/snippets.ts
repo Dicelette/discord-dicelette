@@ -11,16 +11,10 @@ import {
 } from "@dicelette/parse_result";
 import type { RollOptions, Snippets } from "@dicelette/types";
 import { DICE_PATTERNS } from "@dicelette/types"; // ajout patterns pour nettoyage
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { calculateSimilarity, capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import {
-	calculateSimilarity,
-	getLangAndConfig,
-	getThreshold,
-	macroOptions,
-	rollWithInteraction,
-} from "utils";
+import { getLangAndConfig, getThreshold, macroOptions, rollWithInteraction } from "utils";
 
 export function getSnippetAutocomplete(
 	interaction: Djs.AutocompleteInteraction,

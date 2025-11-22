@@ -23,7 +23,7 @@ export function getChangelogSince(version: string, inclusive = false): string {
 		entries.push({ end, start, version: matches[i][1] });
 	}
 
-	// Inclusif ou strict selon le flag
+	// Inclusive or strict depending on the flag
 	const filtered = entries.filter((e) =>
 		inclusive ? semver.gte(e.version, version) : semver.gt(e.version, version)
 	);

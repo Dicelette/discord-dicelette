@@ -103,13 +103,13 @@ export async function register(
 		combinaisonFields = result.combinaisonFields;
 		stats = result.stats;
 	} catch (error) {
-		// Si le total est dépassé et que forceDistrib est activé, reset le modal
+		// If the total is exceeded and forceDistrib is enabled, reset the modal
 		if (error instanceof TotalExceededError && template.forceDistrib) {
 			await reply(interaction, {
 				content: error.message,
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			//retour à l'étape précédente
+			// back to the previous step
 			//change the page to 1
 			userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
 			message.edit({
@@ -118,7 +118,7 @@ export async function register(
 			});
 			return;
 		}
-		// Si ce n'est pas une erreur de dépassement ou si forceDistrib n'est pas activé, relancer l'erreur
+		// If this is not an overflow error or if forceDistrib is not enabled, re-throw the error.
 		throw error;
 	}
 
@@ -162,7 +162,7 @@ export async function register(
 			content: ul("modals.stats.forceDistrib", { reste: ilReste }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		//retour à l'étape précédente
+		//back to the previous step
 		//change the page to 1
 		userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
 
@@ -530,7 +530,7 @@ export async function couldBeValidated(
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.stats.validate, customId);
 
 	if (!embedKey) {
-		// rétrocompatibilité: ancien flux basé sur footer
+		// backward compatibility: old feed based on footer
 		const replyIds = interaction.message.embeds[0]?.footer?.text;
 		if (!replyIds) throw new Error(ul("error.embed.notFound"));
 		const data: DataToFooter = JSON.parse(replyIds);
@@ -560,7 +560,7 @@ export async function couldBeValidated(
 	const cached = getModerationCache(embedKey);
 	let embed = cached && cached.kind === "stats-edit" ? cached.embed : undefined;
 
-	// Fallback: si cache manquant après redémarrage, reconstruire depuis l'embed du message de modération
+	// Fallback: if cache missing after restart, rebuild from moderation message embed
 	if (!embed) {
 		const apiEmbed = interaction.message.embeds[0];
 		if (!apiEmbed) throw new Error(ul("error.embed.notFound"));
@@ -571,7 +571,7 @@ export async function couldBeValidated(
 	const oldStatsEmbed = getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(ul);
 	const fieldsToAppend = embed.toJSON().fields;
 	if (!fieldsToAppend || !message) throw new Error(ul("error.embed.notFound"));
-	// Extraire l'utilisateur cible depuis le message d'origine
+	// Extract the target user from the original message
 	const userEmbed = getEmbeds(message ?? undefined, "user");
 	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
 	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);

@@ -225,7 +225,7 @@ async function registerDamageDice(
 		const templateEmbed = getEmbeds(interaction.message ?? undefined, "template");
 		if (templateEmbed) allEmbeds.push(templateEmbed);
 		components = [editUserButtons(ul, !!statsEmbed, true), selectEditMenu(ul)];
-		// Branche modération pour ajout de dés
+		// Moderation branching to add dice
 		const isModerator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
@@ -238,7 +238,7 @@ async function registerDamageDice(
 				interaction.message.channelId,
 				interaction.message.id
 			);
-			// Footer de secours pour robustesse post-redémarrage
+			// Footer for restart when needed
 			setModerationFooter(diceEmbed, {
 				channelId: interaction.message.channelId,
 				messageId: interaction.message.id,
@@ -258,7 +258,7 @@ async function registerDamageDice(
 
 			const row = buildModerationButtons("dice-add", ul, embedKey);
 			await reply(interaction, { components: [row], embeds: [diceEmbed] });
-			return; // ne pas appliquer directement
+			return; // do not apply changes directly
 		}
 		const userRegister: {
 			userID: string;

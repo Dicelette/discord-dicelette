@@ -187,7 +187,7 @@ async function buttonSubmit(
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} else if (interaction.customId === "moderation_refuse")
-		// Aligne le comportement sur le cancel standard mais avec un libellé différent
+		// Follow the cancel process but with another name
 		await cancel(interaction, ul, client, interactionUser, true);
 	else if (interaction.customId === "cancel_by_user")
 		await cancel(interaction, ul, client, interactionUser, false, true);

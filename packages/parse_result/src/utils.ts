@@ -70,7 +70,7 @@ export function replaceStatInDiceName(
 		.join("|");
 	if (!statName) return originalDice;
 
-	// Regex pour détecter les parenthèses avec un contenu matchant un des noms dans "statName"
+	// Regex to detect parentheses with content matching one of the names in “statName”
 	const regex = new RegExp(`\\((${statName})\\)`, "gi");
 	const standardizedDice = originalDice.standardize();
 	const match = regex.exec(standardizedDice);

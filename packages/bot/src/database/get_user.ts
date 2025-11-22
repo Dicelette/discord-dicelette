@@ -228,7 +228,7 @@ async function getUserFrom(
 		messageId: user.messageId[0],
 	};
 
-	// Récupération du salon/thread et vérification d'accès selon le contexte
+	// Get channel/thread and access check following the context
 	let targetMessage: Djs.Message | undefined;
 	if (context.type === "interaction") {
 		const thread = await searchUserChannel(

@@ -58,7 +58,7 @@ for (let i = 0; i < iterations; i++) {
 	occurrences.set(total, (occurrences.get(total) ?? 0) + 1);
 }
 
-// Génération du CSV
+// Generate CSV content
 let csv = "valeur;occurences;pourcentage\n";
 const sortedKeys = [...occurrences.keys()].sort((a, b) => a - b);
 for (const key of sortedKeys) {

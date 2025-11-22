@@ -3,7 +3,6 @@
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 
-// Déclarations TypeScript
 declare module "discord.js" {
 	interface SlashCommandBuilder {
 		setNames(key: string): this;
@@ -71,7 +70,6 @@ declare module "discord.js" {
 	}
 }
 
-// Implémentations avec typage explicite
 const SET_NAMES_IMPL = function (this: any, key: string) {
 	return this.setName(t(key)).setNameLocalizations(cmdLn(key));
 };
@@ -80,7 +78,6 @@ const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
 	return this.setDescription(t(key)).setDescriptionLocalizations(cmdLn(key));
 };
 
-// Extension des prototypes
 Object.defineProperty(Djs.SlashCommandBuilder.prototype, "setNames", {
 	value: SET_NAMES_IMPL,
 });
@@ -97,7 +94,6 @@ Object.defineProperty(Djs.SlashCommandSubcommandBuilder.prototype, "setDescripti
 	value: SET_DESCRIPTIONS_IMPL,
 });
 
-// Ajout du support pour les groupes de sous-commandes
 Object.defineProperty(Djs.SlashCommandSubcommandGroupBuilder.prototype, "setNames", {
 	value: SET_NAMES_IMPL,
 });
@@ -110,7 +106,6 @@ Object.defineProperty(
 	}
 );
 
-// Extension des options avec accès sécurisé
 const OPTION_TYPES = [
 	{ class: Djs.SlashCommandStringOption, name: "String" },
 	{ class: Djs.SlashCommandBooleanOption, name: "Boolean" },

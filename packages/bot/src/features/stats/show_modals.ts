@@ -42,7 +42,7 @@ export async function show(
 	if (stats && stats.length > 0) {
 		statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
 		if (statToDisplay.length === 0) {
-			//remove butto
+			//remove button
 			const button = Dice.buttons(ul, isModerator);
 			await reply(interaction, {
 				content: ul("modals.alreadySet"),
