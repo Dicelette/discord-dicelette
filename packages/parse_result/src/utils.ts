@@ -168,10 +168,15 @@ export function getExpression(
 		(_match, _p1, _p2, _offset, _string, groups) => {
 			const defaultValue = groups?.default ?? "1";
 			isExp = true;
-			return expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
+			const replacement =
+				expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
+			return replacement;
 		}
 	);
-	if (isExp) expressionStr = "";
+	if (isExp) {
+		dice = dice.replace(/([+-])0(?!\d)/g, "");
+		expressionStr = "";
+	}
 	return { dice, expressionStr };
 }
 
