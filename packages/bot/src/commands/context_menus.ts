@@ -6,7 +6,7 @@ import {
 } from "@dicelette/types";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { getLangAndConfig } from "../utils";
+import { getLangAndConfig } from "utils";
 
 type Results = {
 	info: string;
@@ -115,34 +115,23 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 
 		const ensureString = (): string => {
 			if (typeof value === "string") return value;
-			// Si on est encore sur { long, short } et qu'on doit appliquer un mod texte,
-			// on choisit long par défaut.
-			return (value as { long: string; short: string }).long;
+			return (value as ShortLong).long;
 		};
 
-		// Application séquentielle des mods dans l'ordre d'écriture
 		for (const mod of mods) {
 			const m = mod.toLowerCase();
 
 			if (m === "short") {
-				if (typeof value === "string") {
-					value = toShortFromString(value);
-				} else {
-					// value est encore { long, short } → on choisit la variante short
-					value = (value as ShortLong).short;
-				}
+				if (typeof value === "string") value = toShortFromString(value);
+				else value = (value as ShortLong).short;
 				continue;
 			}
 
 			if (m === "long") {
-				if (typeof value === "object") {
-					// value est encore { long, short } → on choisit la variante long
-					value = (value as ShortLong).long;
-				}
+				if (typeof value === "object") value = (value as ShortLong).long;
 				continue;
 			}
 
-			// À partir d'ici, tous les autres mods sont des mods texte sur string
 			let str = ensureString();
 
 			if (m === "upper") str = str.toUpperCase();
@@ -160,9 +149,7 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 			value = str;
 		}
 
-		return typeof value === "string"
-			? value
-			: (value as { long: string; short: string }).long;
+		return typeof value === "string" ? value : (value as ShortLong).long;
 	});
 }
 
@@ -177,13 +164,11 @@ export function finalLink(
 
 	const resultsText = createResultFromTemplate(template, variables);
 
-	// Construit le contexte global pour le template final
 	const context: Record<string, unknown> = {
 		link: variables.link,
 		results: resultsText,
 	};
 
-	// Comme avant : on applique d'abord le format.name pour produire une chaîne finale
 	if (variables.name) {
 		const nameCtx: Record<string, unknown> = {
 			name: getShortLong(variables.name),
@@ -191,7 +176,6 @@ export function finalLink(
 		context.name = renderTemplate(template.format.name, nameCtx);
 	} else context.name = "";
 
-	// Idem pour le personnage, en appliquant format.character
 	if (variables.character) {
 		const charCtx: Record<string, unknown> = {
 			character: getShortLong(variables.character),
@@ -242,7 +226,7 @@ function createResultFromTemplate(
 	return rollsText.join(template!.joinResult);
 }
 
-function getShortLong(text: string) {
+function getShortLong(text: string): ShortLong {
 	text = text.replaceAll("**", "").trim();
 	const short =
 		text.split(" ").length > 1
