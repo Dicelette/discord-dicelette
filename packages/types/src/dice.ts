@@ -1,4 +1,5 @@
-import type { Resultat } from "@dicelette/core";
+import type { ComparedValue, CustomCritical, Resultat } from "@dicelette/core";
+import type * as Djs from "discord.js";
 
 /**
  * Interface pour le résultat de l'extraction de dés
@@ -25,3 +26,14 @@ export interface DiceData {
 	comments: string | undefined;
 	diceValue: RegExpMatchArray | null;
 }
+
+export type RollOptions = {
+	critical?: { failure?: number | undefined; success?: number | undefined };
+	user?: Djs.User;
+	charName?: string;
+	infoRoll?: { name: string; standardized: string };
+	hideResult?: false | true | null;
+	customCritical?: Record<string, CustomCritical> | undefined;
+	opposition?: ComparedValue;
+	silent?: boolean;
+};

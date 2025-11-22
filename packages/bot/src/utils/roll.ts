@@ -1,5 +1,4 @@
 import {
-	type ComparedValue,
 	type CustomCritical,
 	DETECT_CRITICAL,
 	DiceTypeError,
@@ -23,7 +22,7 @@ import {
 	skillCustomCritical,
 	trimAll,
 } from "@dicelette/parse_result";
-import type { Translation, UserData } from "@dicelette/types";
+import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getRightValue, getTemplate, getUserFromInteraction } from "database";
@@ -259,15 +258,18 @@ export async function rollWithInteraction(
 	interaction: Djs.CommandInteraction,
 	dice: string,
 	client: EClient,
-	critical?: { failure?: number | undefined; success?: number | undefined },
-	user?: Djs.User,
-	charName?: string,
-	infoRoll?: { name: string; standardized: string },
-	hideResult?: false | true | null,
-	customCritical?: Record<string, CustomCritical> | undefined,
-	opposition?: ComparedValue,
-	silent?: boolean
+	opts: RollOptions
 ) {
+	const {
+		critical,
+		user,
+		charName,
+		infoRoll,
+		hideResult,
+		customCritical,
+		opposition,
+		silent,
+	} = opts;
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
 		config,
@@ -420,22 +422,19 @@ export async function rollMacro(
 			)
 		: undefined;
 	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
-	await rollWithInteraction(
-		interaction,
-		roll,
-		client,
-		undefined,
+	const opts: RollOptions = {
 		user,
-		charOptions,
+		charName: charOptions,
 		infoRoll,
 		hideResult,
-		skillCustomCritical(
+		customCritical: skillCustomCritical(
 			rCC || userStatistique.template.customCritical,
 			userStatistique.stats,
 			dollarValue?.total
 		),
-		opposition
-	);
+		opposition,
+	};
+	await rollWithInteraction(interaction, roll, client, opts);
 }
 
 /**
@@ -562,18 +561,16 @@ export async function rollStatistique(
 			? { name: statistic, standardized: standardizedStatistic }
 			: undefined;
 
-	await rollWithInteraction(
-		interaction,
-		roll,
-		client,
-		template.critical,
+	const opts: RollOptions = {
+		critical: template.critical,
 		user,
-		optionChar,
+		charName: optionChar,
 		infoRoll,
 		hideResult,
 		customCritical,
-		opposition
-	);
+		opposition,
+	};
+	await rollWithInteraction(interaction, roll, client, opts);
 }
 
 export async function getCritical(

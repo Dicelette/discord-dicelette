@@ -8,6 +8,7 @@ import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getCritical, getLangAndConfig, rollWithInteraction } from "utils";
 import "discord_ext";
+import type { RollOptions } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction } from "database";
 
 export const diceRoll = {
@@ -77,17 +78,13 @@ export async function baseRoll(
 		userData,
 		rollCustomCriticalsFromDice(dice, ul)
 	);
-	await rollWithInteraction(
-		interaction,
-		res.formula,
-		client,
-		serverData?.critical,
-		undefined,
+	const opts: RollOptions = {
+		critical: serverData?.critical,
 		charName,
-		undefined,
-		hidden,
-		criticalsFromDice,
+		hideResult: hidden,
+		customCritical: criticalsFromDice,
 		opposition,
-		silent
-	);
+		silent,
+	};
+	await rollWithInteraction(interaction, res.formula, client, opts);
 }

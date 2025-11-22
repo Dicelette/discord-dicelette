@@ -9,7 +9,7 @@ import {
 	skillCustomCritical,
 	trimAll,
 } from "@dicelette/parse_result";
-import type { Snippets } from "@dicelette/types";
+import type { RollOptions, Snippets } from "@dicelette/types";
 import { DICE_PATTERNS } from "@dicelette/types"; // ajout patterns pour nettoyage
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -87,18 +87,11 @@ export default {
 			const rCCShared = getCriticalFromDice(dice, ul);
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
 
-			await rollWithInteraction(
-				interaction,
-				dice,
-				client,
-				undefined,
-				interaction.user,
-				undefined,
-				undefined,
-				undefined,
-				skillCustomCritical(rCCShared),
-				undefined
-			);
+			const opts: RollOptions = {
+				user: interaction.user,
+				customCritical: skillCustomCritical(rCCShared),
+			};
+			await rollWithInteraction(interaction, dice, client, opts);
 			return;
 		}
 
@@ -132,19 +125,13 @@ export default {
 			mergedComments ? ` ${mergedComments}` : ""
 		}`.trim();
 		if (roll.includes(";") && roll.includes("&")) roll = fixSharedBracketSpacing(roll);
-
-		await rollWithInteraction(
-			interaction,
-			roll,
-			client,
-			undefined,
-			interaction.user,
-			charOptions,
-			undefined,
-			undefined,
-			skillCustomCritical(rCC),
-			opposition
-		);
+		const opts: RollOptions = {
+			user: interaction.user,
+			charName: charOptions,
+			customCritical: skillCustomCritical(rCC),
+			opposition,
+		};
+		await rollWithInteraction(interaction, roll, client, opts);
 	},
 };
 
