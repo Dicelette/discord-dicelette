@@ -23,233 +23,13 @@ import {
 	trimAll,
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
 import type { EClient } from "client";
-import { getRightValue, getTemplate, getUserFromInteraction } from "database";
+import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
 import { getLangAndConfig } from "utils";
-
-/**
- * Calcule la similarité entre deux chaînes en utilisant la distance de Levenshtein normalisée
- */
-export function calculateSimilarity(str1: string, str2: string): number {
-	const longer = str1.length > str2.length ? str1 : str2;
-	const shorter = str1.length > str2.length ? str2 : str1;
-
-	if (longer.length === 0) return 1.0;
-
-	const distance = levenshteinDistance(longer, shorter);
-	return (longer.length - distance) / longer.length;
-}
-
-/**
- * Calcule la distance de Levenshtein entre deux chaînes
- */
-function levenshteinDistance(str1: string, str2: string): number {
-	const matrix = Array(str2.length + 1)
-		.fill(null)
-		.map(() => Array(str1.length + 1).fill(null));
-
-	for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
-	for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
-
-	for (let j = 1; j <= str2.length; j++) {
-		for (let i = 1; i <= str1.length; i++) {
-			const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-			matrix[j][i] = Math.min(
-				matrix[j][i - 1] + 1, // insertion
-				matrix[j - 1][i] + 1, // deletion
-				matrix[j - 1][i - 1] + cost // substitution
-			);
-		}
-	}
-
-	return matrix[str2.length][str1.length];
-}
-
-/**
- * Traite une attaque spécifique et retourne le résultat ou met à jour le meilleur match
- */
-async function findMacroName(
-	client: EClient,
-	interaction: Djs.CommandInteraction,
-	userId: string,
-	userData: { charName?: string | null; damageName?: string[] },
-	atqName: string,
-	searchTerm: string,
-	bestSimilarity: number,
-	minSimilarity: number
-): Promise<{
-	perfectMatch?: {
-		dice: string;
-		attackName: string;
-		charName?: string;
-		similarity: number;
-	};
-	newBestMatch?: {
-		dice: string;
-		attackName: string;
-		charName?: string;
-		similarity: number;
-	};
-	newBestSimilarity?: number;
-}> {
-	const standardizedAtq = atqName.standardize();
-	const similarity = calculateSimilarity(searchTerm, standardizedAtq);
-
-	if (similarity === 1.0) {
-		try {
-			const specificUserData = (
-				await getUserFromInteraction(
-					client,
-					userId,
-					interaction,
-					userData.charName?.standardize()
-				)
-			)?.userData;
-
-			if (specificUserData?.damage) {
-				const dice = specificUserData.damage[standardizedAtq];
-				if (dice) {
-					return {
-						perfectMatch: {
-							attackName: atqName,
-							charName: userData.charName ?? undefined,
-							dice,
-							similarity,
-						},
-					};
-				}
-			}
-		} catch (error) {
-			logger.warn(`Error getting data for character "${userData.charName}":`, error);
-		}
-	}
-
-	// Pour les correspondances partielles, on garde la meilleure
-	if (similarity >= minSimilarity && similarity > bestSimilarity) {
-		try {
-			const specificUserData = (
-				await getUserFromInteraction(
-					client,
-					userId,
-					interaction,
-					userData.charName?.standardize()
-				)
-			)?.userData;
-
-			if (specificUserData?.damage) {
-				const dice = specificUserData.damage[standardizedAtq];
-				if (dice) {
-					return {
-						newBestMatch: {
-							attackName: atqName,
-							charName: userData.charName ?? undefined,
-							dice,
-							similarity,
-						},
-						newBestSimilarity: similarity,
-					};
-				}
-			}
-		} catch (error) {
-			logger.warn(`Error getting data for character "${userData.charName}":`, error);
-		}
-	}
-
-	return {};
-}
-
-/**
- * Trouve le dé le plus similaire parmi tous les personnages du joueur
- */
-async function findBestMatchingDice(
-	client: EClient,
-	interaction: Djs.CommandInteraction,
-	userId: string,
-	searchTerm: string,
-	charOptions?: string
-): Promise<{
-	dice: string;
-	attackName: string;
-	charName?: string;
-	similarity: number;
-} | null> {
-	const allUserData = client.settings.get(interaction.guild!.id, `user.${userId}`) ?? [];
-
-	let bestMatch: {
-		dice: string;
-		attackName: string;
-		charName?: string;
-		similarity: number;
-	} | null = null;
-	let bestSimilarity = 0;
-	const minSimilarity = 0.2;
-
-	for (const userData of allUserData) {
-		if (charOptions) {
-			const charNameMatches =
-				userData.charName?.toLowerCase().includes(charOptions.toLowerCase()) ||
-				userData.charName?.subText(charOptions);
-			if (!charNameMatches) continue;
-		}
-
-		const damageName = userData.damageName ?? [];
-
-		for (const atqName of damageName) {
-			const result = await findMacroName(
-				client,
-				interaction,
-				userId,
-				userData,
-				atqName,
-				searchTerm,
-				bestSimilarity,
-				minSimilarity
-			);
-
-			if (result.perfectMatch) return result.perfectMatch;
-
-			if (result.newBestMatch && result.newBestSimilarity) {
-				bestMatch = result.newBestMatch;
-				bestSimilarity = result.newBestSimilarity;
-			}
-		}
-	}
-
-	if (charOptions) {
-		for (const userData of allUserData) {
-			const damageName = userData.damageName ?? [];
-
-			for (const atqName of damageName) {
-				logger.info(
-					`Checking ${atqName.standardize()} against ${searchTerm}: similarity = ${calculateSimilarity(searchTerm, atqName.standardize())}`
-				);
-
-				const result = await findMacroName(
-					client,
-					interaction,
-					userId,
-					userData,
-					atqName,
-					searchTerm,
-					bestSimilarity,
-					minSimilarity
-				);
-
-				if (result.perfectMatch) return result.perfectMatch;
-
-				if (result.newBestMatch && result.newBestSimilarity) {
-					bestMatch = result.newBestMatch;
-					bestSimilarity = result.newBestSimilarity;
-				}
-			}
-		}
-	}
-
-	return bestMatch;
-}
+import { findBestMatchingDice } from "./find_macro";
 
 /**
  * create the roll dice, parse interaction etc... When the slash-commands is used for dice
@@ -315,15 +95,6 @@ export async function rollWithInteraction(
  * Processes a dice roll command based on a user's attack or ability, constructs the appropriate dice formula using user statistics and command options, and sends the roll result to the user.
  *
  * If the specified attack or damage is not found in the user's data, replies with an ephemeral error message.
- *
- * @param {Djs.CommandInteraction} interaction
- * @param {EClient} client
- * @param {UserData} userStatistique
- * @param {Djs.CommandInteractionOptionResolver} options - Command options containing the attack name, expression, and optional comments.
- * @param {Translation} ul
- * @param {string|undefined} charOptions - Optional character name or identifier to select the relevant character data.
- * @param {Djs.User|undefined} user
- * @param {boolean|null|undefined} hideResult - If true, the roll result is hidden from other users.
  */
 export async function rollMacro(
 	interaction: Djs.CommandInteraction,
@@ -333,6 +104,9 @@ export async function rollMacro(
 	ul: Translation,
 	charOptions?: string,
 	user?: Djs.User,
+	/**
+	 * If true, hides the roll result from other users.
+	 */
 	hideResult?: boolean | null
 ) {
 	let atq = options.getString(t("common.name"), true);
@@ -398,7 +172,7 @@ export async function rollMacro(
 	dice = dice.replace(DETECT_CRITICAL, "").trim();
 	dice = getThreshold(dice, threshold);
 
-	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
+	const comparatorMatch = COMPILED_PATTERNS.COMPARATOR.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
 		dice = dice.replace(comparatorMatch[0], "");
@@ -446,15 +220,6 @@ export async function rollMacro(
  * Processes a statistic-based dice roll command, applying user stats, overrides, and custom criticals, and sends the result to the user.
  *
  * If the selected statistic is excluded or required information is missing, replies with an ephemeral error message.
- *
- * @param {Djs.CommandInteraction} interaction
- * @param {EClient} client
- * @param {UserData} userStatistique
- * @param {Djs.CommandInteractionOptionResolver} options
- * @param {Translation} ul
- * @param {string|undefined} optionChar - Optional character name to associate with the roll.
- * @param {Djs.User|undefined} user - Optional user to attribute the roll to.
- * @param {boolean|null|undefined} hideResult - If true, hides the roll result from other users.
  */
 export async function rollStatistique(
 	interaction: Djs.CommandInteraction,
@@ -464,6 +229,9 @@ export async function rollStatistique(
 	ul: Translation,
 	optionChar?: string,
 	user?: Djs.User,
+	/**
+	 * If true, hides the roll result from other users.
+	 */
 	hideResult?: boolean | null
 ) {
 	let statistic = options.getString(t("common.statistic"), false);
@@ -524,8 +292,6 @@ export async function rollStatistique(
 	if (threshold)
 		threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
 
-	console.log("Dice after threshold:", dice);
-
 	const userStatStr = userStat?.toString();
 	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
 	dice = expr.dice;
@@ -533,7 +299,7 @@ export async function rollStatistique(
 	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
 	dice = dice.replace(DETECT_CRITICAL, "").trim();
 	dice = getThreshold(dice, threshold);
-	const comparatorMatch = /([><=!]+)(.+)/.exec(dice);
+	const comparatorMatch = COMPILED_PATTERNS.COMPARATOR_SIMPLE.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
 		//remove from dice
@@ -563,7 +329,9 @@ export async function rollStatistique(
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
 }
-
+/**
+ * Gets custom criticals based on the server template and user data.
+ */
 export async function getCritical(
 	client: EClient,
 	ul: Translation,
@@ -591,21 +359,21 @@ export async function getCritical(
 	return { criticalsFromDice, serverData };
 }
 
+/**
+ * Update the threshold if provided and remove existing comparator from dice.
+ */
 export function getThreshold(dice: string, threshold?: string) {
 	if (threshold) {
-		const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
-		const diceMatch = signRegex.exec(dice);
-		const thresholdMatch = signRegex.exec(threshold);
+		const diceMatch = COMPILED_PATTERNS.COMPARATOR.exec(dice);
+		const thresholdMatch = COMPILED_PATTERNS.COMPARATOR.exec(threshold);
 		if (diceMatch?.groups && thresholdMatch?.groups) {
 			dice = dice.replace(diceMatch[0], thresholdMatch[0]);
 		} else if (!diceMatch && thresholdMatch) {
 			dice += thresholdMatch[0];
 		} else if (diceMatch?.groups && !thresholdMatch) {
-			//search if they are a simple number and not a sign;
 			const simpleNumberMatch = /(?<comparator>(.+))/.exec(threshold);
 			const diceComparator = diceMatch.groups.comparator;
 			if (simpleNumberMatch?.groups) {
-				//if the override is a simple number, we replace the comparator with it
 				dice = dice.replace(diceComparator, simpleNumberMatch.groups.comparator);
 			}
 		}

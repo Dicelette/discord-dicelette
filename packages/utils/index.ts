@@ -7,6 +7,7 @@ export { logger, important };
 export * from "./src/changelog";
 export { default as dev } from "./src/dev";
 export * from "./src/regex";
+export * from "./src/similarity";
 
 /**
  * Get the random engine using node's crypto module
