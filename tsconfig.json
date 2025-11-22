@@ -12,7 +12,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
 		"inlineSourceMap": true,
-		"ignoreDeprecations": "6.0",
 		"lib": ["ESNext"],
 		"module": "esnext",
 		"moduleResolution": "node",
