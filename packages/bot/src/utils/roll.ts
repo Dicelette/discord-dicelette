@@ -348,6 +348,7 @@ export async function rollMacro(
 		: undefined;
 	const comments = comm ?? "";
 	let dice = userStatistique.damage?.[atq];
+	let threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
 
 	if (!dice) {
 		const bestMatch = await findBestMatchingDice(
@@ -391,8 +392,12 @@ export async function rollMacro(
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
+	if (threshold)
+		threshold = generateStatsDice(threshold, userStatistique.stats, dollarValue?.total);
 	const rCC = getCriticalFromDice(dice, ul);
 	dice = dice.replace(DETECT_CRITICAL, "").trim();
+	dice = getThreshold(dice, threshold);
+
 	const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -488,7 +493,7 @@ export async function rollStatistique(
 		? `# ${options.getString(t("common.comments"))}`
 		: undefined;
 	const comments = comm ?? "";
-	const threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
+	let threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
 	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
 	let userStat: undefined | number;
 	const expression = options.getString(t("common.expression")) ?? "0";
@@ -516,24 +521,10 @@ export async function rollStatistique(
 		});
 		return;
 	}
-	if (threshold) {
-		const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
-		const diceMatch = signRegex.exec(dice);
-		const thresholdMatch = signRegex.exec(threshold);
-		if (diceMatch?.groups && thresholdMatch?.groups) {
-			dice = dice.replace(diceMatch[0], thresholdMatch[0]);
-		} else if (!diceMatch && thresholdMatch) {
-			dice += thresholdMatch[0];
-		} else if (diceMatch?.groups && !thresholdMatch) {
-			//search if they are a simple number and not a sign;
-			const simpleNumberMatch = /(?<comparator>(.+))/.exec(threshold);
-			const diceComparator = diceMatch.groups.comparator;
-			if (simpleNumberMatch?.groups) {
-				//if the override is a simple number, we replace the comparator with it
-				dice = dice.replace(diceComparator, simpleNumberMatch.groups.comparator);
-			}
-		}
-	}
+	if (threshold)
+		threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
+
+	console.log("Dice after threshold:", dice);
 
 	const userStatStr = userStat?.toString();
 	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
@@ -541,7 +532,7 @@ export async function rollStatistique(
 	const expressionStr = expr.expressionStr;
 	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
 	dice = dice.replace(DETECT_CRITICAL, "").trim();
-
+	dice = getThreshold(dice, threshold);
 	const comparatorMatch = /([><=!]+)(.+)/.exec(dice);
 	let comparator = "";
 	if (comparatorMatch) {
@@ -598,4 +589,26 @@ export async function getCritical(
 			};
 	}
 	return { criticalsFromDice, serverData };
+}
+
+export function getThreshold(dice: string, threshold?: string) {
+	if (threshold) {
+		const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
+		const diceMatch = signRegex.exec(dice);
+		const thresholdMatch = signRegex.exec(threshold);
+		if (diceMatch?.groups && thresholdMatch?.groups) {
+			dice = dice.replace(diceMatch[0], thresholdMatch[0]);
+		} else if (!diceMatch && thresholdMatch) {
+			dice += thresholdMatch[0];
+		} else if (diceMatch?.groups && !thresholdMatch) {
+			//search if they are a simple number and not a sign;
+			const simpleNumberMatch = /(?<comparator>(.+))/.exec(threshold);
+			const diceComparator = diceMatch.groups.comparator;
+			if (simpleNumberMatch?.groups) {
+				//if the override is a simple number, we replace the comparator with it
+				dice = dice.replace(diceComparator, simpleNumberMatch.groups.comparator);
+			}
+		}
+	}
+	return dice;
 }

@@ -17,6 +17,7 @@ import * as Djs from "discord.js";
 import {
 	calculateSimilarity,
 	getLangAndConfig,
+	getThreshold,
 	macroOptions,
 	rollWithInteraction,
 } from "utils";
@@ -58,6 +59,10 @@ export default {
 		const macroName = interaction.options.getString(t("common.name"), true).standardize();
 		const snippets = client.userSettings.get(guildId, userId)?.snippets ?? {};
 		const expressionOpt = interaction.options.getString(t("common.expression")) ?? "0";
+		const threshold = interaction.options
+			.getString(t("dbRoll.options.override.name"))
+			?.trimAll();
+
 		const oppositionVal = interaction.options.getString(
 			t("dbRoll.options.opposition.name")
 		);
@@ -94,6 +99,7 @@ export default {
 
 			const rCCShared = getCriticalFromDice(dice, ul);
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
+			dice = getThreshold(dice, threshold);
 
 			const opts: RollOptions = {
 				customCritical: skillCustomCritical(rCCShared),
@@ -109,7 +115,9 @@ export default {
 		);
 		let processedDice = generateStatsDice(diceWithoutComments);
 		const rCC = getCriticalFromDice(processedDice, ul);
-		processedDice = processedDice.replace(DETECT_CRITICAL, "").trim();
+		processedDice = processedDice.replaceAll(DETECT_CRITICAL, "").trim();
+		processedDice = getThreshold(processedDice, threshold);
+
 		const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(processedDice);
 		let comparator = "";
 		if (comparatorMatch) {

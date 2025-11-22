@@ -99,7 +99,12 @@ export function macroOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, { character, expression: true, opposition: true });
+	return commonOptions(builder, {
+		character,
+		expression: true,
+		opposition: true,
+		threshold: true,
+	});
 }
 
 /**
