@@ -1,25 +1,28 @@
 {
+	"charName": true,
+	"critical": {
+		"failure": 1,
+		"success": 20
+	},
 	"diceType": "1d20+$>=20",
+	"forceDistrib": true,
 	"statistics": {
-		"Force": {
-			"min": 3
-		},
-		"Endurance": {
-			"min": 3
-		},
 		"Agilité": {
+			"min": 3
+		},
+		"Charisme": {
 			"min": 3
 		},
 		"Constitution": {
 			"min": 3
 		},
-		"Éducation": {
+		"Endurance": {
+			"min": 3
+		},
+		"Force": {
 			"min": 3
 		},
 		"Intelligence": {
-			"min": 3
-		},
-		"Charisme": {
 			"min": 3
 		},
 		"Pouvoir": {
@@ -27,13 +30,10 @@
 		},
 		"PV": {
 			"combinaison": "endurance*2+force"
+		},
+		"Éducation": {
+			"min": 3
 		}
 	},
-	"critical": {
-		"failure": 1,
-		"success": 20
-	},
-	"total": 88,
-	"charName": true,
-	"forceDistrib": true
+	"total": 88
 }
