@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.19.0](https://github.com/Dicelette/discord-dicelette/compare/2.18.1...2.19.0) (2025-11-22)
+
+
+### Features
+
+* allow threshold in macro & snippets ([6a060a3](https://github.com/Dicelette/discord-dicelette/commit/6a060a38ea2df2399eb8eb1de1cb5deea21a0d48))
+
+
+### Bug Fixes
+
+* should support at last expression in shared rolls in snippets ([fd5ca1d](https://github.com/Dicelette/discord-dicelette/commit/fd5ca1de502cd4a10a81b089a8a20a75a94cdd13))
+
 ## [2.18.1](https://github.com/Dicelette/discord-dicelette/compare/2.18.0...2.18.1) (2025-11-22)
 
 
