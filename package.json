@@ -14,7 +14,7 @@
 		"t": ""
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.20.1",
+		"@dicelette/core": "^1.21.0",
 		"@types/node": "^22.17.1",
 		"dedent": "^1.6.0",
 		"discord.js": "14.25.0",
