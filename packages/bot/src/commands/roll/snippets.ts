@@ -1,23 +1,22 @@
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
-	extractDiceData,
-	getComments,
+	composeRollBase,
+	extractAndMergeComments,
 	getCriticalFromDice,
 	getExpression,
 	parseOpposition,
 	skillCustomCritical,
-	trimAll,
 } from "@dicelette/parse_result";
 import type { RollOptions, Snippets } from "@dicelette/types";
 import {
+	COMPILED_PATTERNS,
 	calculateSimilarity,
 	capitalizeBetweenPunct,
-	DICE_PATTERNS,
 } from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { getLangAndConfig, getThreshold, macroOptions, rollWithInteraction } from "utils";
+import { getLangAndConfig, macroOptions, rollWithInteraction } from "utils";
 
 export function getSnippetAutocomplete(
 	interaction: Djs.AutocompleteInteraction,
@@ -82,6 +81,8 @@ export default {
 		const expr = getExpression(dice, expressionOpt);
 		dice = expr.dice;
 		const expressionStr = expr.expressionStr;
+
+		// Special case: shared dice notation with & and ; (multi-roll formula)
 		if (dice.includes("&") && dice.includes(";")) {
 			if (userComments) {
 				if (!dice.includes("#")) dice = `${dice} # ${userComments}`;
@@ -96,99 +97,57 @@ export default {
 
 			const rCCShared = getCriticalFromDice(dice, ul);
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
-			dice = getThreshold(dice, threshold);
+			// Use shared getThreshold (now imported from utils/dice_compose)
+			const composed = composeRollBase(
+				dice,
+				threshold,
+				COMPILED_PATTERNS.COMPARATOR,
+				undefined,
+				undefined,
+				"",
+				""
+			);
 
 			const opts: RollOptions = {
 				customCritical: skillCustomCritical(rCCShared),
 				user: interaction.user,
 			};
-			await rollWithInteraction(interaction, dice, client, opts);
+			await rollWithInteraction(interaction, composed.roll, client, opts);
 			return;
 		}
 
+		// Standard case: single roll formula
 		const { cleanedDice: diceWithoutComments, mergedComments } = extractAndMergeComments(
 			dice,
 			userComments
 		);
-		let processedDice = generateStatsDice(diceWithoutComments);
+		const processedDice = generateStatsDice(diceWithoutComments);
 		const rCC = getCriticalFromDice(processedDice, ul);
-		processedDice = processedDice.replaceAll(DETECT_CRITICAL, "").trim();
-		processedDice = getThreshold(processedDice, threshold);
 
-		const comparatorMatch = /(?<sign>[><=!]+)(?<comparator>(.+))/.exec(processedDice);
-		let comparator = "";
-		if (comparatorMatch) {
-			processedDice = processedDice.replace(comparatorMatch[0], "");
-			comparator = comparatorMatch[0];
-		}
-		comparator = generateStatsDice(comparator);
+		// Use shared composeRollBase for dice composition
+		const composed = composeRollBase(
+			processedDice,
+			threshold,
+			COMPILED_PATTERNS.COMPARATOR,
+			undefined,
+			undefined,
+			expressionStr,
+			mergedComments ?? ""
+		);
 
 		const opposition = oppositionVal
-			? parseOpposition(oppositionVal, comparator)
+			? parseOpposition(oppositionVal, composed.rawComparator)
 			: undefined;
-		const roll = `${trimAll(processedDice)}${expressionStr}${comparator}${
-			mergedComments ? ` ${mergedComments}` : ""
-		}`.trim();
+
 		const opts: RollOptions = {
 			charName: charOptions,
 			customCritical: skillCustomCritical(rCC),
 			opposition,
 			user: interaction.user,
 		};
-		await rollWithInteraction(interaction, roll, client, opts);
+		await rollWithInteraction(interaction, composed.roll, client, opts);
 	},
 };
-
-function extractAndMergeComments(
-	dice: string,
-	userComments?: string
-): { cleanedDice: string; mergedComments?: string } {
-	const isShared = dice.includes(";");
-	const globalRaw = getComments(dice);
-	const diceData = extractDiceData(dice);
-	let tailComments = diceData.comments;
-	if (tailComments && globalRaw && tailComments === globalRaw) tailComments = undefined;
-
-	function stripMeta(c?: string) {
-		if (!c) return undefined;
-		return c.replace(/^# ?/, "").trim();
-	}
-
-	const partsRaw = [globalRaw, tailComments, userComments];
-	const statsMarkers: string[] = [];
-	const commentTexts: string[] = [];
-	for (const part of partsRaw) {
-		if (!part || !part.trim().length) continue;
-		const markers = part.match(/%%\[__.*?__]%%/g) ?? [];
-		for (const m of markers) if (!statsMarkers.includes(m)) statsMarkers.push(m);
-		const cleanedPart = stripMeta(part.replace(/%%\[__.*?__]%%/g, "").trim());
-		if (cleanedPart && cleanedPart.length > 0) commentTexts.push(cleanedPart);
-	}
-
-	const uniqueComments: string[] = [];
-	for (const c of commentTexts) {
-		if (!uniqueComments.includes(c)) uniqueComments.push(c);
-	}
-
-	let merged = `${statsMarkers.join(" ")} ${uniqueComments.join(" ")}`.trim();
-	if (merged.length === 0) merged = "";
-
-	let cleaned = dice
-		.replace(/%%\[__.*?__]%%/g, "")
-		.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
-		.trim();
-	if (DICE_PATTERNS.DETECT_DICE_MESSAGE.test(cleaned)) {
-		const simple = cleaned.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
-		if (simple?.[1] && simple?.[3])
-			cleaned = cleaned.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
-	}
-	if (merged) {
-		if (isShared && !merged.startsWith("#")) merged = `# ${merged}`;
-		if (!isShared && merged.startsWith("#")) merged = merged.replace(/^# ?/, "").trim();
-	}
-
-	return { cleanedDice: cleaned, mergedComments: merged || undefined };
-}
 
 function findBestMatch(snippets: Snippets, macroName: string): string | null {
 	let bestMatch: string | null = null;

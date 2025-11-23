@@ -1,6 +1,5 @@
 import {
 	type CustomCritical,
-	DETECT_CRITICAL,
 	DiceTypeError,
 	generateStatsDice,
 	replaceFormulaInDice,
@@ -8,6 +7,7 @@ import {
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
+	composeRollBase,
 	convertNameToValue,
 	getCriticalFromDice,
 	getExpression,
@@ -20,7 +20,6 @@ import {
 	rollCustomCriticalsFromDice,
 	type Server,
 	skillCustomCritical,
-	trimAll,
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
@@ -29,49 +28,8 @@ import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
 import { getLangAndConfig } from "utils";
+import { extractRollOptions } from "./extract_options";
 import { findBestMatchingDice } from "./find_macro";
-
-/**
- * Compose the final roll string by applying critical removal, threshold substitution,
- * comparator extraction and evaluation in a single pass. This centralizes duplicated
- * logic previously present in both `rollMacro` and `rollStatistique`.
- */
-function composeRollBase(
-	dice: string,
-	threshold: string | undefined,
-	comparatorPattern: RegExp,
-	stats: Record<string, number>,
-	statTotal: string | number | undefined,
-	expressionStr: string,
-	comments: string
-): {
-	diceWithoutComparator: string;
-	rawComparator: string;
-	comparatorEvaluated: string;
-	roll: string;
-} {
-	// Remove critical detection markers (already parsed elsewhere) and normalize whitespace
-	let working = dice.replace(DETECT_CRITICAL, "").trim();
-	// Apply threshold logic only once
-	working = getThreshold(working, threshold);
-	// Extract comparator using reusable helper
-	const { dice: noComparator, comparator: rawComparator } = extractComparator(
-		working,
-		comparatorPattern
-	);
-	const comparatorEvaluated = generateStatsDice(
-		rawComparator,
-		stats,
-		statTotal?.toString()
-	);
-	const roll = `${trimAll(noComparator)}${expressionStr}${comparatorEvaluated} ${comments}`;
-	return {
-		diceWithoutComparator: noComparator,
-		rawComparator,
-		comparatorEvaluated,
-		roll,
-	};
-}
 
 /**
  * create the roll dice, parse interaction etc... When the slash-commands is used for dice
@@ -157,14 +115,10 @@ export async function rollMacro(
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
-	const expression = options.getString(t("common.expression")) ?? "0";
-	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
-	const comm = options.getString(t("common.comments"))
-		? `# ${options.getString(t("common.comments"))}`
-		: undefined;
-	const comments = comm ?? "";
+	const rollOpts = extractRollOptions(options);
+	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
 	let dice = userStatistique.damage?.[atq];
-	let threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
+	let threshold = thresholdOpt;
 
 	if (!dice) {
 		const bestMatch = await findBestMatchingDice(
@@ -306,14 +260,10 @@ export async function rollStatistique(
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
-	const comm = options.getString(t("common.comments"))
-		? `# ${options.getString(t("common.comments"))}`
-		: undefined;
-	const comments = comm ?? "";
-	let threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
-	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
+	const rollOpts = extractRollOptions(options);
+	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
+	let threshold = thresholdOpt;
 	let userStat: undefined | number;
-	const expression = options.getString(t("common.expression")) ?? "0";
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
 		const res = getRightValue(
 			userStatistique,
@@ -418,42 +368,4 @@ export async function getCritical(
 			};
 	}
 	return { criticalsFromDice, serverData };
-}
-
-/**
- * Update the threshold if provided and remove existing comparator from dice.
- */
-export function getThreshold(dice: string, threshold?: string) {
-	// Optimized threshold application:
-	// 1. Execute each regex at most once
-	// 2. Replace existing comparator block entirely if threshold provides one
-	// 3. If threshold is a plain number and dice already has comparator, swap only numeric part
-	if (!threshold) return dice;
-	const diceMatch = COMPILED_PATTERNS.COMPARATOR.exec(dice);
-	const thresholdMatch = COMPILED_PATTERNS.COMPARATOR.exec(threshold);
-	if (thresholdMatch) {
-		// Threshold includes a full comparator expression
-		if (diceMatch) return dice.replace(diceMatch[0], thresholdMatch[0]);
-		return dice + thresholdMatch[0];
-	}
-	// Threshold does not supply comparator operator, treat as value override
-	if (diceMatch?.groups) {
-		const value = threshold.trim();
-		if (value.length > 0) return dice.replace(diceMatch.groups.comparator, value);
-	}
-	return dice;
-}
-
-/**
- * Extracts a comparator token (e.g. ">=12" or "<=5") from a dice string once.
- * Returns the cleaned dice string and the comparator portion.
- * Using this helper centralizes regex usage and reduces repeated exec calls.
- */
-export function extractComparator(
-	dice: string,
-	pattern: RegExp
-): { dice: string; comparator: string } {
-	const match = pattern.exec(dice);
-	if (!match) return { dice: dice.trim(), comparator: "" };
-	return { dice: dice.replace(match[0], "").trim(), comparator: match[0] };
 }

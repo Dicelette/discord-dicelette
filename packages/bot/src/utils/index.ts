@@ -3,6 +3,7 @@
 export * from "./button";
 export * from "./check";
 export * from "./commands_options";
+export * from "./extract_options";
 export * from "./fetch";
 export * from "./find_macro";
 export * from "./import_csv";
