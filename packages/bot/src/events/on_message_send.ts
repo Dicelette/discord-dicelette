@@ -60,8 +60,9 @@ export default (client: EClient): void => {
 				charName = content.match(/ @(\w+)/)![1];
 				content = content.replace(/ @\w+/, "").trim();
 			}
-
-			const isRoll = isRolling(content, userData);
+			const statsName =
+				client.settings.get(message.guild.id, "templateID.statsName") ?? [];
+			const isRoll = isRolling(content, userData, statsName);
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);

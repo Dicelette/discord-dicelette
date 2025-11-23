@@ -234,6 +234,10 @@ export async function rollStatistique(
 	 */
 	hideResult?: boolean | null
 ) {
+	console.log(
+		"UserStatistique:",
+		client.settings.get(interaction.guildId!)?.templateID.statsName
+	);
 	let statistic = options.getString(t("common.statistic"), false);
 	const template = userStatistique.template;
 	let dice = template.diceType;
@@ -291,11 +295,17 @@ export async function rollStatistique(
 	}
 	if (threshold)
 		threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
-
 	const userStatStr = userStat?.toString();
-	const expr = getExpression(dice, expression, userStatistique.stats, userStatStr);
+	const expr = getExpression(
+		dice,
+		expression,
+		userStatistique.stats,
+		userStatStr,
+		client.settings.get(interaction.guildId!)?.templateID.statsName
+	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
+	const findStatsExpr = expr.statsFound;
 	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
 	dice = dice.replace(DETECT_CRITICAL, "").trim();
 	dice = getThreshold(dice, threshold);
@@ -310,13 +320,16 @@ export async function rollStatistique(
 	const opposition = oppositionVal
 		? parseOpposition(oppositionVal, comparator, userStatistique.stats, userStatStr)
 		: undefined;
-	const roll = `${trimAll(diceEvaluated)}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
-	const customCritical =
-		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
-	const infoRoll =
+	let infoRoll =
 		statistic && standardizedStatistic
 			? { name: statistic, standardized: standardizedStatistic }
 			: undefined;
+	if (!infoRoll && findStatsExpr)
+		infoRoll = { name: findStatsExpr.join(" "), standardized: findStatsExpr.join(" ") };
+
+	const roll = `${trimAll(diceEvaluated)}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
+	const customCritical =
+		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
 
 	const opts: RollOptions = {
 		charName: optionChar,

@@ -5,7 +5,7 @@ import { logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
-import { getRoll } from "./dice_extractor";
+import { findStatInDiceFormula, getRoll } from "./dice_extractor";
 
 // Pre-compiled regex patterns for better performance
 const COMPILED_PATTERNS = {
@@ -149,17 +149,13 @@ export function createUrl(
  *
  * If the provided {@link expression} evaluates to `"0"`, placeholders are replaced with the specified default value (or `"1"` if not provided). Otherwise, placeholders are replaced with the evaluated expression string (without a leading plus sign). If any replacement occurs, the returned `expressionStr` is set to an empty string.
  *
- * @param dice - The dice string containing `{exp}` or `{exp || default}` placeholders.
- * @param expression - The expression to evaluate and insert into the dice string.
- * @param stats - Optional statistics used for evaluating the expression.
- * @param total - Optional value used in expression evaluation.
- * @returns An object with the updated dice string and the evaluated expression string.
  */
 export function getExpression(
 	dice: string,
 	expression: string,
 	stats?: Record<string, number>,
-	total?: string
+	total?: string,
+	statsName?: string[]
 ) {
 	let expressionStr = convertExpression(expression, stats, total);
 	let isExp = false;
@@ -168,16 +164,18 @@ export function getExpression(
 		(_match, _p1, _p2, _offset, _string, groups) => {
 			const defaultValue = groups?.default ?? "1";
 			isExp = true;
-			const replacement =
-				expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
-			return replacement;
+			return expression === "0" ? defaultValue : expressionStr.replace(/^\+/, "");
 		}
 	);
 	if (isExp) {
 		dice = dice.replace(/([+-])0(?!\d)/g, "");
 		expressionStr = "";
 	}
-	return { dice, expressionStr };
+	return {
+		dice,
+		expressionStr,
+		statsFound: findStatInDiceFormula(expression, statsName),
+	};
 }
 
 export function filterStatsInDamage(

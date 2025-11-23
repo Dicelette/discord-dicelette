@@ -34,9 +34,8 @@ export class ResultAsText {
 		if (!result) {
 			this.error = true;
 			this.output = this.errorMessage();
-		} else {
-			parser = this.parse(!!infoRoll, critical, customCritical, opposition);
-		}
+		} else parser = this.parse(!!infoRoll, critical, customCritical, opposition);
+
 		this.output = this.defaultMessage();
 		this.parser = parser;
 		this.charName = charName;

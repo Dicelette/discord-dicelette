@@ -68,7 +68,13 @@ export async function baseRoll(
 		charName = dice.match(/ @(\w+)/)![1];
 		dice = dice.replace(/ @\w+/, "").trim();
 	}
-	const res = replaceStatsInDiceFormula(dice, userData?.stats, true);
+	const res = replaceStatsInDiceFormula(
+		dice,
+		userData?.stats,
+		true,
+		undefined,
+		client.settings.get(interaction.guild!.id)?.templateID.statsName
+	);
 	const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
 	const { criticalsFromDice, serverData } = await getCritical(
 		client,

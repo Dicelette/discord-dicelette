@@ -116,13 +116,20 @@ export function processChainedComments(
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
-	userData?: UserData
+	userData?: UserData,
+	statsName?: string[]
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
 		let infoRoll: string | undefined;
 		if (userData?.stats) {
-			const res = replaceStatsInDiceFormula(rollContent, userData.stats, true);
+			const res = replaceStatsInDiceFormula(
+				rollContent,
+				userData.stats,
+				true,
+				undefined,
+				statsName
+			);
 			rollContent = res.formula;
 			infoRoll = res.infoRoll;
 		}
@@ -148,13 +155,20 @@ export function applyCommentsToResult(
 
 export function processChainedDiceRoll(
 	content: string,
-	userData?: UserData
+	userData?: UserData,
+	statsName?: string[]
 ): { resultat: Resultat; infoRoll?: string } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
 	let infoRoll: string | undefined;
 	if (userData?.stats) {
-		const res = replaceStatsInDiceFormula(content, userData.stats, false, true);
+		const res = replaceStatsInDiceFormula(
+			content,
+			userData.stats,
+			false,
+			true,
+			statsName
+		);
 		processedContent = res.formula;
 		infoRoll = res.infoRoll;
 	}
@@ -183,7 +197,8 @@ export function processChainedDiceRoll(
 
 export function isRolling(
 	content: string,
-	userData?: UserData
+	userData?: UserData,
+	statsName?: string[]
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -195,14 +210,26 @@ export function isRolling(
 	if (reg?.groups) content = content.replace(reg.groups.second, "").trim();
 
 	let res = { formula: content };
-	if (userData?.stats) res = replaceStatsInDiceFormula(content, userData.stats);
+	if (userData?.stats)
+		res = replaceStatsInDiceFormula(
+			content,
+			userData.stats,
+			undefined,
+			undefined,
+			statsName
+		);
 	processedContent = res.formula;
 
 	const diceData = extractDiceData(processedContent);
 
 	if (diceData.bracketRoll) {
 		const cleanedForRoll = processedContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
-		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, userData);
+		const diceRoll = performDiceRoll(
+			cleanedForRoll,
+			diceData.bracketRoll,
+			userData,
+			statsName
+		);
 		if (diceRoll?.resultat)
 			return {
 				detectRoll: diceData.bracketRoll,
@@ -238,7 +265,7 @@ export function isRolling(
 
 		finalContent = finalContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(finalContent, undefined, userData);
+		const diceRoll = performDiceRoll(finalContent, undefined, userData, statsName);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return { detectRoll: undefined, result: diceRoll.resultat };
@@ -289,7 +316,8 @@ export function replaceStatsInDiceFormula(
 	content: string,
 	stats?: Record<string, number>,
 	deleteComments = false,
-	shared = false
+	shared = false,
+	statsName?: string[]
 ): { formula: string; infoRoll?: string } {
 	if (!stats) return { formula: content };
 	//remove secondary opposition
@@ -354,7 +382,9 @@ export function replaceStatsInDiceFormula(
 
 	const uniqueStats = Array.from(new Set(statsFounds.filter((stat) => stat.length > 0)));
 	if (uniqueStats.length > 0) {
-		const statsList = uniqueStats.join(", ");
+		const statsList = statsName
+			? unNormalizeStatsName(uniqueStats, statsName).join(", ")
+			: uniqueStats.join(", ");
 		comments = comments
 			? ` %%[__${statsList}__]%% ${comments} `
 			: ` %%[__${statsList}__]%% `;
@@ -362,6 +392,16 @@ export function replaceStatsInDiceFormula(
 	}
 	if (deleteComments) return { formula: processedFormula, infoRoll: uniqueStats[0] };
 	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };
+}
+
+function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
+	const unNormalized: string[] = [];
+	for (const stat of stats) {
+		const found = statsName.find((name) => name.standardize() === stat.standardize());
+		if (found) unNormalized.push(found);
+		else unNormalized.push(stat);
+	}
+	return unNormalized;
 }
 
 export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
@@ -382,4 +422,22 @@ export function includeDiceType(dice: string, diceType?: string, userStats?: boo
 	}
 	const detectDiceType = getCachedRegex(`\\b${diceType}\\b`, "i");
 	return detectDiceType.test(dice);
+}
+
+export function findStatInDiceFormula(
+	diceFormula: string,
+	statsToFind?: string[]
+): string[] | undefined {
+	if (!statsToFind) return undefined;
+
+	const foundStats: string[] = [];
+
+	for (const stat of statsToFind) {
+		const regex = getCachedRegex(`\\b${stat.standardize()}\\b`, "i");
+		if (regex.test(diceFormula.standardize())) {
+			foundStats.push(stat.capitalize());
+		}
+	}
+
+	return foundStats.length > 0 ? foundStats : undefined;
 }
