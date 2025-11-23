@@ -20,7 +20,10 @@ jobs:
             set PATH $PATH:/home/.local/share/nvm/v20.14.0/bin
             nvm use v20.14.0
             cd dicelette/
-            git stash push --include-untracked --message "Locales temporaires"
+            if ! git diff-index --quiet HEAD --; then
+              echo "Modifications non validées détectées"
+              git stash push --include-untracked --message "Modifications non validées détectées"
+            fi
             git pull --rebase
             pnpm i
             pnpm run pm2:restart
