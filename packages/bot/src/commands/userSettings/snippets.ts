@@ -66,7 +66,13 @@ export async function displayList(
 	for (let i = 0; i < lines.length; i += chunkSize) {
 		chunkedLines.push(lines.slice(i, i + chunkSize));
 	}
-	for (const chunk of chunkedLines) {
+	//send the first message
+	await interaction.reply({
+		content: chunkedLines[0].join("\n"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+	//send the rest as follow ups
+	for (const chunk of chunkedLines.slice(1)) {
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
 	}
