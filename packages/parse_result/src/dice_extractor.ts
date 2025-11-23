@@ -347,29 +347,8 @@ export function replaceStatsInDiceFormula(
 
 		if (!processedFormula.includes(fullMatch)) continue;
 
-		// First try exact match
-		let foundStat = normalizedStats.get(searchTerm);
-
-		// If no exact match, try partial matching
-		if (!foundStat) {
-			const candidates: Array<[string, number, number]> = [];
-
-			for (const [normalizedKey, [originalKey, value]] of normalizedStats) {
-				// Optimized: Check if the search term matches the beginning/end/contains of the stat name
-				if (normalizedKey.startsWith(searchTerm)) {
-					candidates.push([originalKey, value, normalizedKey.length]);
-				} else if (normalizedKey.endsWith(searchTerm)) {
-					candidates.push([originalKey, value, normalizedKey.length]);
-				} else if (normalizedKey.includes(searchTerm)) {
-					candidates.push([originalKey, value, normalizedKey.length]);
-				}
-			}
-
-			if (candidates.length > 0) {
-				candidates.sort((a, b) => a[2] - b[2]);
-				foundStat = [candidates[0][0], candidates[0][1]];
-			}
-		}
+		// Use the generic helper to find the best match (exact or partial)
+		const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats);
 
 		if (foundStat) {
 			const [original, statValue] = foundStat;
@@ -404,6 +383,58 @@ function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
 	return unNormalized;
 }
 
+// Helper: trouve la meilleure correspondance pour un token donné parmi les stats normalisées
+function findBestStatMatch<T>(
+	searchTerm: string,
+	normalizedStats: Map<string, T>
+): T | undefined {
+	// recherche exacte
+	const exact = normalizedStats.get(searchTerm);
+	if (exact) return exact;
+
+	// recherche partielle (startsWith, endsWith, includes) et choix du stat le plus court
+	const candidates: Array<[T, number]> = [];
+	for (const [normalizedKey, original] of normalizedStats) {
+		if (normalizedKey.startsWith(searchTerm))
+			candidates.push([original, normalizedKey.length]);
+		else if (normalizedKey.endsWith(searchTerm))
+			candidates.push([original, normalizedKey.length]);
+		else if (normalizedKey.includes(searchTerm))
+			candidates.push([original, normalizedKey.length]);
+	}
+	if (candidates.length === 0) return undefined;
+	candidates.sort((a, b) => a[1] - b[1]);
+	return candidates[0][0];
+}
+
+export function findStatInDiceFormula(
+	diceFormula: string,
+	statsToFind?: string[]
+): string[] | undefined {
+	if (!statsToFind) return undefined;
+
+	const foundStats: string[] = [];
+
+	// Normaliser la formule et préparer les tokens (mots) à analyser
+	const text = diceFormula.standardize().toLowerCase();
+	const tokens = text.match(/\p{L}[\p{L}0-9_]*/gu) || [];
+
+	// Préparer la map des stats normalisées -> original
+	const normalizedStats = new Map<string, string>();
+	for (const stat of statsToFind) {
+		normalizedStats.set(stat.standardize().toLowerCase(), stat);
+	}
+
+	for (const token of tokens) {
+		const match = findBestStatMatch<string>(token, normalizedStats);
+		if (match) foundStats.push(match.capitalize());
+	}
+
+	// garder l'ordre unique
+	const unique = Array.from(new Set(foundStats));
+	return unique.length > 0 ? unique : undefined;
+}
+
 export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
 	if (!diceType) return false;
 	if (userStats && diceType.includes("$")) {
@@ -422,22 +453,4 @@ export function includeDiceType(dice: string, diceType?: string, userStats?: boo
 	}
 	const detectDiceType = getCachedRegex(`\\b${diceType}\\b`, "i");
 	return detectDiceType.test(dice);
-}
-
-export function findStatInDiceFormula(
-	diceFormula: string,
-	statsToFind?: string[]
-): string[] | undefined {
-	if (!statsToFind) return undefined;
-
-	const foundStats: string[] = [];
-
-	for (const stat of statsToFind) {
-		const regex = getCachedRegex(`\\b${stat.standardize()}\\b`, "i");
-		if (regex.test(diceFormula.standardize())) {
-			foundStats.push(stat.capitalize());
-		}
-	}
-
-	return foundStats.length > 0 ? foundStats : undefined;
 }
