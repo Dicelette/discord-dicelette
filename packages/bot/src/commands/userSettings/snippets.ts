@@ -3,8 +3,7 @@ import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { embedError } from "messages";
-import { getLangAndConfig } from "utils";
+import { getLangAndConfig, replyEphemeral, replyEphemeralError } from "utils";
 import { baseRoll } from "../roll/base_roll";
 
 export async function register(
@@ -25,20 +24,14 @@ export async function register(
 		const text = ul("userSettings.snippets.create.success", {
 			name: macroName.toTitle(),
 		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await replyEphemeral(interaction, text);
 	} catch (error) {
 		if (error instanceof DiceTypeError) {
 			const text = ul("error.invalidDice.eval", { dice: error.dice });
-			await interaction.reply({
-				embeds: [embedError(text, ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+			await replyEphemeralError(interaction, text, ul);
 		} else {
 			const text = ul("error.generic.e", { message: (error as Error).message });
-			await interaction.reply({
-				embeds: [embedError(text, ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+			await replyEphemeralError(interaction, text, ul);
 		}
 	}
 }
@@ -54,7 +47,7 @@ export async function displayList(
 	const entries = Object.entries(macros);
 	if (entries.length === 0) {
 		const text = ul("userSettings.snippets.list.empty");
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await replyEphemeral(interaction, text);
 		return;
 	}
 	const lines = entries.map(
@@ -66,7 +59,13 @@ export async function displayList(
 	for (let i = 0; i < lines.length; i += chunkSize) {
 		chunkedLines.push(lines.slice(i, i + chunkSize));
 	}
-	for (const chunk of chunkedLines) {
+	//send the first message
+	await interaction.reply({
+		content: chunkedLines[0].join("\n"),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+	//send the rest as follow ups
+	for (const chunk of chunkedLines.slice(1)) {
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
 	}
@@ -85,7 +84,7 @@ export async function remove(
 		const text = ul("userSettings.snippets.delete.notFound", {
 			name: `**${macroName.toTitle()}**`,
 		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await replyEphemeral(interaction, text);
 		return;
 	}
 	delete macros[macroName];
@@ -94,5 +93,5 @@ export async function remove(
 	const text = ul("userSettings.snippets.delete.success", {
 		name: `**${macroName.toTitle()}**`,
 	});
-	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+	await replyEphemeral(interaction, text);
 }

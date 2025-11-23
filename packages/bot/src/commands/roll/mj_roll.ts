@@ -4,10 +4,10 @@ import { filterChoices, uniformizeRecords } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply } from "messages";
 import {
 	gmCommonOptions,
 	isSerializedNameEquals,
+	replyEphemeralError,
 	rollMacro,
 	rollStatistique,
 } from "utils";
@@ -140,15 +140,8 @@ export const mjRoll = {
 
 			const serializedNameQueries = isSerializedNameEquals(charData, charName);
 			if (charName && !serializedNameQueries) {
-				await reply(interaction, {
-					embeds: [
-						embedError(
-							ul("error.user.charName", { charName: charName.capitalize() }),
-							ul
-						),
-					],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
+				const text = ul("error.user.charName", { charName: charName.capitalize() });
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 
@@ -161,25 +154,17 @@ export const mjRoll = {
 			if (!charData) {
 				let userName = `<@${user.id}>`;
 				if (charName) userName += ` (${charName})`;
-				await reply(interaction, {
-					embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
-				});
+				const text = ul("error.user.registered", { user: userName });
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 		} else {
 			//build default char data based on the template
 			if (!template) {
-				await reply(interaction, {
-					embeds: [
-						embedError(
-							ul("error.template.notFound", {
-								guildId: interaction.guild.name,
-							}),
-							ul
-						),
-					],
-					flags: Djs.MessageFlags.Ephemeral,
+				const text = ul("error.template.notFound", {
+					guildId: interaction.guild.name,
 				});
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 			charData = {

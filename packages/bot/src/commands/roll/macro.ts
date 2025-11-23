@@ -4,8 +4,14 @@ import { filterChoices, logger, uniformizeRecords } from "@dicelette/utils";
 import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply } from "messages";
-import { getLangAndConfig, isSerializedNameEquals, macroOptions, rollMacro } from "utils";
+import { reply } from "messages";
+import {
+	getLangAndConfig,
+	isSerializedNameEquals,
+	macroOptions,
+	replyEphemeralError,
+	rollMacro,
+} from "utils";
 import "discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 
@@ -97,10 +103,7 @@ export default {
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
 		const { ul } = getLangAndConfig(client, interaction);
 		if (!user && !db.templateID?.damageName?.length) {
-			await reply(interaction, {
-				embeds: [embedError(t("error.user.data"), ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+			await replyEphemeralError(interaction, t("error.user.data"), ul);
 			return;
 		}
 		let charOptions = options.getString(t("common.character")) ?? undefined;
@@ -113,15 +116,8 @@ export default {
 			)?.userData;
 			const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
 			if (charOptions && !selectedCharByQueries) {
-				await reply(interaction, {
-					embeds: [
-						embedError(
-							ul("error.user.charName", { charName: charOptions.capitalize() }),
-							ul
-						),
-					],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
+				const text = ul("error.user.charName", { charName: charOptions.capitalize() });
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 			charOptions = userStatistique?.userName ? userStatistique.userName : undefined;
@@ -132,17 +128,11 @@ export default {
 			}
 			if (!db.templateID.damageName) {
 				if (!userStatistique) {
-					await reply(interaction, {
-						embeds: [embedError(ul("error.user.youRegistered"), ul)],
-						flags: Djs.MessageFlags.Ephemeral,
-					});
+					await replyEphemeralError(interaction, ul("error.user.youRegistered"), ul);
 					return;
 				}
 				if (!userStatistique.damage) {
-					await reply(interaction, {
-						embeds: [embedError(ul("error.damage.empty"), ul)],
-						flags: Djs.MessageFlags.Ephemeral,
-					});
+					await replyEphemeralError(interaction, ul("error.damage.empty"), ul);
 					return;
 				}
 			} else if (!userStatistique || !userStatistique.damage) {
@@ -150,17 +140,10 @@ export default {
 				//get the damageName from the global template
 				const template = await getTemplateByInteraction(interaction, client);
 				if (!template) {
-					await reply(interaction, {
-						embeds: [
-							embedError(
-								ul("error.template.notFound", {
-									guildId: interaction.guild.name,
-								}),
-								ul
-							),
-						],
-						flags: Djs.MessageFlags.Ephemeral,
+					const text = ul("error.template.notFound", {
+						guildId: interaction.guild.name,
 					});
+					await replyEphemeralError(interaction, text, ul);
 					return;
 				}
 				const damage = template.damage
