@@ -74,8 +74,6 @@ export async function store(
 
 /**
  * Button when registering the user, adding the "add dice" button
- * @param ul {Translation}
- * @param markAsValidated
  */
 export function buttons(
 	ul: Translation,

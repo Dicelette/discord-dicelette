@@ -1,31 +1,24 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome allow to set a specific rules for property of a global object, we stick against the naming convention */
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { DICE_COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
 import { findStatInDiceFormula, getRoll } from "./dice_extractor";
-
-// Pre-compiled regex patterns for better performance
-const COMPILED_PATTERNS = {
-	COMMENTS_REGEX: /\[([^\]]*)\]/,
-	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
-	STATS_REGEX_CACHE: new Map<string, RegExp>(),
-} as const;
 
 /**
  * Get or create cached regex for stats filtering
  */
 function getStatsRegex(statNames: string[]): RegExp {
 	const key = statNames.join("|");
-	let regex = COMPILED_PATTERNS.STATS_REGEX_CACHE.get(key);
+	let regex = DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.get(key);
 	if (!regex) {
 		regex = new RegExp(
 			`(${statNames.map((stat) => stat.standardize()).join("|")})`,
 			"gi"
 		);
-		COMPILED_PATTERNS.STATS_REGEX_CACHE.set(key, regex);
+		DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.set(key, regex);
 	}
 	return regex;
 }
@@ -115,10 +108,10 @@ export function convertNameToValue(
 export function trimAll(dice: string) {
 	const dices = dice.split(";");
 	const result = dices.map((d) => {
-		const comment = d.match(COMPILED_PATTERNS.COMMENTS_REGEX)?.groups?.comment
-			? `[${d.match(COMPILED_PATTERNS.COMMENTS_REGEX)?.groups?.comment}]`
+		const comment = d.match(DICE_COMPILED_PATTERNS.COMMENTS_REGEX)?.groups?.comment
+			? `[${d.match(DICE_COMPILED_PATTERNS.COMMENTS_REGEX)?.groups?.comment}]`
 			: "";
-		return `${d.replace(COMPILED_PATTERNS.COMMENTS_REGEX, "").trimAll()}${comment}`;
+		return `${d.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trimAll()}${comment}`;
 	});
 	return result.join(";");
 }
@@ -160,7 +153,7 @@ export function getExpression(
 	let expressionStr = convertExpression(expression, stats, total);
 	let isExp = false;
 	dice = dice.replace(
-		COMPILED_PATTERNS.DICE_EXPRESSION,
+		DICE_COMPILED_PATTERNS.DICE_EXPRESSION,
 		(_match, _p1, _p2, _offset, _string, groups) => {
 			const defaultValue = groups?.default ?? "1";
 			isExp = true;

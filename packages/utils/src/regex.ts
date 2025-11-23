@@ -12,6 +12,34 @@ export const COMPILED_PATTERNS = {
 	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
 } as const;
 
+export const DICE_PATTERNS = {
+	BRACKET_ROLL: /\[(.*)\]/,
+	BRACKETED_COMMENTS: /\[(.*)\]/,
+	BRACKETED_CONTENT: /^\[(.*)\]$/,
+	DETECT_DICE_MESSAGE: /([\w.]+|(\{.*\})) (.*)/i,
+	DICE_VALUE: /^\S*#?d\S+|\{.*\}/i,
+	GLOBAL_COMMENTS: /# ?(.*)/,
+	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,
+	INFO_STATS_COMMENTS: /%%(\[__.*__\])%%/,
+} as const;
+
+export const DICE_COMPILED_PATTERNS = {
+	COMMENTS_REGEX: /\[([^\]]*)\]/,
+	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
+	STATS_REGEX_CACHE: new Map<string, RegExp>(),
+} as const;
+
+export const REMOVER_PATTERN = {
+	ASTERISK_ESCAPE: /\*/g,
+	AT_MENTION_REMOVER: / @\w+/,
+	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
+	EXP_REMOVER: /\{exp(.*?)\}/g,
+	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
+	SIGN_REMOVER: /[><=!]+.*$/,
+	STAT_COMMENTS_REMOVER: /%%.*%%/,
+	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
+} as const;
+
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
 	// Reset lastIndex for global regex to avoid issues
@@ -48,4 +76,20 @@ export function capitalizeBetweenPunct(input: string) {
 
 function escapeRegex(string: string) {
 	return string.replace(COMPILED_PATTERNS.REGEX_ESCAPE, "\\$&");
+}
+
+// Cache for compiled regex patterns to improve performance
+const regexCache = new Map<string, RegExp>();
+
+/**
+ * Get or create a cached regex pattern
+ */
+export function getCachedRegex(pattern: string, flags = ""): RegExp {
+	const key = `${pattern}|${flags}`;
+	let regex = regexCache.get(key);
+	if (!regex) {
+		regex = new RegExp(pattern, flags);
+		regexCache.set(key, regex);
+	}
+	return regex;
 }

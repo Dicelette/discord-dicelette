@@ -1,42 +1,19 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
 import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
-import {
-	type ChainedComments,
-	DICE_PATTERNS,
-	type DiceData,
-	type DiceExtractionResult,
-	type UserData,
+import type {
+	ChainedComments,
+	DiceData,
+	DiceExtractionResult,
+	UserData,
 } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import {
+	DICE_PATTERNS,
+	findBestStatMatch,
+	getCachedRegex,
+	logger,
+	REMOVER_PATTERN,
+} from "@dicelette/utils";
 import { trimAll } from "./utils";
-
-// Cache for compiled regex patterns to improve performance
-const regexCache = new Map<string, RegExp>();
-
-/**
- * Get or create a cached regex pattern
- */
-function getCachedRegex(pattern: string, flags = ""): RegExp {
-	const key = `${pattern}|${flags}`;
-	let regex = regexCache.get(key);
-	if (!regex) {
-		regex = new RegExp(pattern, flags);
-		regexCache.set(key, regex);
-	}
-	return regex;
-}
-
-// Pre-compiled frequently used regex patterns
-const COMPILED_PATTERNS = {
-	ASTERISK_ESCAPE: /\*/g,
-	AT_MENTION_REMOVER: / @\w+/,
-	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
-	EXP_REMOVER: /\{exp(.*?)\}/g,
-	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
-	SIGN_REMOVER: /[><=!]+.*$/,
-	STAT_COMMENTS_REMOVER: /%%.*%%/,
-	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
-} as const;
 
 export function extractDiceData(content: string): DiceData {
 	const bracketRoll = content
@@ -183,7 +160,7 @@ export function processChainedDiceRoll(
 
 	try {
 		// Remove critical blocks before rolling
-		const cleaned = finalContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
+		const cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		const rollResult = roll(cleaned);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
@@ -203,7 +180,7 @@ export function isRolling(
 	// Process stats replacement if userData is available
 	let processedContent: string;
 	// Preclean to ignore {cs|cf:...} blocs
-	const contentForOpposition = content.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
+	const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 	const reg = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
 		contentForOpposition
 	);
@@ -223,7 +200,7 @@ export function isRolling(
 	const diceData = extractDiceData(processedContent);
 
 	if (diceData.bracketRoll) {
-		const cleanedForRoll = processedContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
+		const cleanedForRoll = processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		const diceRoll = performDiceRoll(
 			cleanedForRoll,
 			diceData.bracketRoll,
@@ -243,7 +220,7 @@ export function isRolling(
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
 		const diceRoll = processChainedDiceRoll(
-			processedContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, ""),
+			processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
 			userData
 		);
 		if (diceRoll)
@@ -263,7 +240,7 @@ export function isRolling(
 			comments = chained.comments;
 		}
 
-		finalContent = finalContent.replace(COMPILED_PATTERNS.CRITICAL_BLOCK, "");
+		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
 		const diceRoll = performDiceRoll(finalContent, undefined, userData, statsName);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
@@ -331,7 +308,7 @@ export function replaceStatsInDiceFormula(
 	let processedFormula = diceFormula;
 
 	const variableMatches = [
-		...processedFormula.matchAll(COMPILED_PATTERNS.VARIABLE_MATCHER),
+		...processedFormula.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER),
 	];
 
 	// Pre-process stats for better performance
@@ -383,30 +360,6 @@ function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
 	return unNormalized;
 }
 
-// Helper: trouve la meilleure correspondance pour un token donné parmi les stats normalisées
-function findBestStatMatch<T>(
-	searchTerm: string,
-	normalizedStats: Map<string, T>
-): T | undefined {
-	// recherche exacte
-	const exact = normalizedStats.get(searchTerm);
-	if (exact) return exact;
-
-	// recherche partielle (startsWith, endsWith, includes) et choix du stat le plus court
-	const candidates: Array<[T, number]> = [];
-	for (const [normalizedKey, original] of normalizedStats) {
-		if (normalizedKey.startsWith(searchTerm))
-			candidates.push([original, normalizedKey.length]);
-		else if (normalizedKey.endsWith(searchTerm))
-			candidates.push([original, normalizedKey.length]);
-		else if (normalizedKey.includes(searchTerm))
-			candidates.push([original, normalizedKey.length]);
-	}
-	if (candidates.length === 0) return undefined;
-	candidates.sort((a, b) => a[1] - b[1]);
-	return candidates[0][0];
-}
-
 export function findStatInDiceFormula(
 	diceFormula: string,
 	statsToFind?: string[]
@@ -443,13 +396,13 @@ export function includeDiceType(dice: string, diceType?: string, userStats?: boo
 	}
 	if (SIGN_REGEX.test(diceType)) {
 		//remove it from the diceType and the value after it like >=10 or <= 5 to prevent errors
-		diceType = diceType.replace(COMPILED_PATTERNS.SIGN_REMOVER, "").trim();
-		dice = dice.replace(COMPILED_PATTERNS.SIGN_REMOVER, "").trim();
+		diceType = diceType.replace(REMOVER_PATTERN.SIGN_REMOVER, "").trim();
+		dice = dice.replace(REMOVER_PATTERN.SIGN_REMOVER, "").trim();
 	}
 	//also prevent error with the {exp} value
 	if (diceType.includes("{exp")) {
-		diceType = diceType.replace(COMPILED_PATTERNS.EXP_REMOVER, "").trim();
-		dice = dice.replace(COMPILED_PATTERNS.EXP_REMOVER, "").trim();
+		diceType = diceType.replace(REMOVER_PATTERN.EXP_REMOVER, "").trim();
+		dice = dice.replace(REMOVER_PATTERN.EXP_REMOVER, "").trim();
 	}
 	const detectDiceType = getCachedRegex(`\\b${diceType}\\b`, "i");
 	return detectDiceType.test(dice);

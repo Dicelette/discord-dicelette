@@ -10,8 +10,11 @@ import {
 	trimAll,
 } from "@dicelette/parse_result";
 import type { RollOptions, Snippets } from "@dicelette/types";
-import { DICE_PATTERNS } from "@dicelette/types"; // ajout patterns pour nettoyage
-import { calculateSimilarity, capitalizeBetweenPunct } from "@dicelette/utils";
+import {
+	calculateSimilarity,
+	capitalizeBetweenPunct,
+	DICE_PATTERNS,
+} from "@dicelette/utils";
 import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getLangAndConfig, getThreshold, macroOptions, rollWithInteraction } from "utils";
@@ -135,12 +138,6 @@ export default {
 		await rollWithInteraction(interaction, roll, client, opts);
 	},
 };
-
-function fixSharedBracketSpacing(value: string) {
-	return value.replace(/(&[^;]*?)(\[)/g, (_all, seg, bracket) => {
-		return seg.endsWith(" ") ? `${seg}${bracket}` : `${seg} ${bracket}`;
-	});
-}
 
 function extractAndMergeComments(
 	dice: string,

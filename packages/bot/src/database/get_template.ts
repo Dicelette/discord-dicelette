@@ -13,8 +13,6 @@ import { fetchChannel } from "../utils";
  *
  * If a cached template exists for the guild, it is returned; otherwise, the template is fetched using the guild's settings and localization.
  *
- * @param {Djs.ButtonInteraction|Djs.ModalSubmitInteraction| Djs.CommandInteraction} interaction - The Discord interaction within a guild context.
- * @param {EClient} client
  * @returns The statistical template for the guild, or undefined if the interaction is not in a guild.
  */
 export async function getTemplateByInteraction(

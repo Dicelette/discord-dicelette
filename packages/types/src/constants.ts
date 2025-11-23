@@ -28,16 +28,6 @@ export const DISCORD_ERROR_CODE = [50001, 50013];
 export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
 
 // Regex patterns for dice detection
-export const DICE_PATTERNS = {
-	BRACKET_ROLL: /\[(.*)\]/,
-	BRACKETED_COMMENTS: /\[(.*)\]/,
-	BRACKETED_CONTENT: /^\[(.*)\]$/,
-	DETECT_DICE_MESSAGE: /([\w.]+|(\{.*\})) (.*)/i,
-	DICE_VALUE: /^\S*#?d\S+|\{.*\}/i,
-	GLOBAL_COMMENTS: /# ?(.*)/,
-	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,
-	INFO_STATS_COMMENTS: /%%(\[__.*__\])%%/,
-} as const;
 
 const MATH = {
 	dev: "<:math:1394002307431010334>",
