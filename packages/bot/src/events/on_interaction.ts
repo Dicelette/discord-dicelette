@@ -117,7 +117,14 @@ async function buttonSubmit(
 	const characters = client.characters;
 	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
 	if (interaction.customId === "register")
-		await User.start(interaction, template, interactionUser, ul, !!client.settings.get(interaction.guild!.id, "privateChannel"), selfRegister);
+		await User.start(
+			interaction,
+			template,
+			interactionUser,
+			ul,
+			!!client.settings.get(interaction.guild!.id, "privateChannel"),
+			selfRegister
+		);
 	else if (interaction.customId === "continue")
 		await User.continuePage(interaction, template, ul, interactionUser, selfRegister);
 	else if (interaction.customId.includes("add_dice")) {
