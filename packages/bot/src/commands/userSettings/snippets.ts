@@ -68,7 +68,7 @@ export async function displayList(
 	}
 	for (const chunk of chunkedLines) {
 		const text = chunk.join("\n");
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
 	}
 }
 
