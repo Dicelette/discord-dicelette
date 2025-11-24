@@ -360,7 +360,7 @@ export async function rename(
 	const guildData = client.settings.get(interaction.guildId as string);
 	const newdata = deleteUser(interaction, guildData!, user, oldData.charName);
 	client.settings.set(interaction.guildId as string, newdata);
-	await generateButton(message, ul, embedsList.list);
+	await generateButton(message, ul, embedsList.list, embedsList.files);
 	await reply(interaction, {
 		content: ul("edit.name.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,
