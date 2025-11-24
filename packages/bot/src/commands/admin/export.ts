@@ -2,13 +2,16 @@
  * Allow to export all characters from the database to a CSV file
  */
 
-import type { EClient } from "@dicelette/bot-core";
-import { type CSVRow, getGuildContext } from "@dicelette/bot-helpers";
+import {
+	type CSVRow,
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
-import { getLangAndConfig } from "utils";
 import "discord_ext";
 
 // small p-limit helper to avoid concurrent bursts against Discord API

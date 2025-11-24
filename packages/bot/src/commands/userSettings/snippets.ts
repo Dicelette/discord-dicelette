@@ -1,11 +1,11 @@
-import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
 import * as Djs from "discord.js";
 import { embedError } from "messages";
-import { getLangAndConfig } from "utils";
-import { baseRoll } from "../roll/base_roll";
+import { baseRoll } from "../roll";
 
 export async function register(
 	client: EClient,

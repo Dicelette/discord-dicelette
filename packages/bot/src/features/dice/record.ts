@@ -1,4 +1,12 @@
-import type { EClient } from "@dicelette/bot-core";
+import {
+	addAutoRole,
+	buildModerationButtons,
+	getInteractionContext as getLangAndConfig,
+	makeEmbedKey,
+	putModerationCache,
+	setModerationFooter,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Settings, Translation, UserMessageId } from "@dicelette/types";
@@ -22,17 +30,7 @@ import {
 	sendLogs,
 	updateUserEmbedThumbnail,
 } from "messages";
-import {
-	addAutoRole,
-	buildModerationButtons,
-	editUserButtons,
-	getLangAndConfig,
-	makeEmbedKey,
-	putModerationCache,
-	selectEditMenu,
-	selfRegisterAllowance,
-	setModerationFooter,
-} from "utils";
+import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
 
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.

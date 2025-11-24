@@ -1,5 +1,11 @@
-import type { EClient } from "@dicelette/bot-core";
-import { autoComplete, charUserOptions } from "@dicelette/bot-helpers";
+import {
+	autoComplete,
+	charUserOptions,
+	fetchAvatarUrl,
+	haveAccess,
+	reuploadAvatar,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
@@ -14,7 +20,8 @@ import {
 	getEmbeds,
 	reply,
 } from "messages";
-import { fetchAvatarUrl, haveAccess, optionInteractions, reuploadAvatar } from "utils";
+import { optionInteractions } from "utils";
+
 import "discord_ext";
 import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
 

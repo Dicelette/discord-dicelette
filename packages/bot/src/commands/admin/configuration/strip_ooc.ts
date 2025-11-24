@@ -1,9 +1,9 @@
-import type { EClient } from "@dicelette/bot-core";
+import { fetchChannel } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { reply } from "messages";
-import { fetchChannel } from "utils";
 
 export async function stripOOC(
 	options: Djs.CommandInteractionOptionResolver,

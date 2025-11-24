@@ -1,5 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
-import { getGuildContext } from "@dicelette/bot-helpers";
+import { fetchChannel, getGuildContext } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { lError, ln } from "@dicelette/localization";
 import {
 	isRolling,
@@ -18,7 +18,7 @@ import {
 	stripOOC,
 	threadToSend,
 } from "messages";
-import { fetchChannel, getCritical } from "utils";
+import { getCritical } from "utils";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {

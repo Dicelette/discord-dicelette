@@ -1,4 +1,4 @@
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import type { Translation } from "@dicelette/types";
 import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import type { Guild, GuildMember, User } from "discord.js";

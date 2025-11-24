@@ -1,4 +1,4 @@
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { DATABASE_NAMES } from "commands";

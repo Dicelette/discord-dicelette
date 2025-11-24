@@ -1,4 +1,19 @@
-import type { EClient } from "@dicelette/bot-core";
+import {
+	buildModerationButtons,
+	CUSTOM_ID_PREFIX,
+	deleteModerationCache,
+	fetchChannel,
+	fetchUser,
+	getMessageWithKeyPart,
+	getModerationCache,
+	getUserId,
+	makeEmbedKey,
+	parseKeyFromCustomId,
+	putModerationCache,
+	reuploadAvatar,
+	setModerationFooter,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import {
 	evalCombinaison,
 	evalOneCombinaison,
@@ -14,6 +29,7 @@ import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "data
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { Dice } from "features";
+import * as Messages from "messages";
 import {
 	createStatsEmbed,
 	displayOldAndNewStats,
@@ -24,25 +40,7 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import {
-	buildModerationButtons,
-	CUSTOM_ID_PREFIX,
-	continueCancelButtons,
-	deleteModerationCache,
-	editUserButtons,
-	fetchChannel,
-	fetchUser,
-	getMessageWithKeyPart,
-	getModerationCache,
-	getUserId,
-	makeEmbedKey,
-	parseKeyFromCustomId,
-	putModerationCache,
-	reuploadAvatar,
-	selfRegisterAllowance,
-	setModerationFooter,
-} from "utils";
-import * as Messages from "../../messages";
+import { continueCancelButtons, editUserButtons, selfRegisterAllowance } from "utils";
 import { sendValidationMessage } from "../user";
 
 /**

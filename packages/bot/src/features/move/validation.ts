@@ -1,4 +1,4 @@
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,

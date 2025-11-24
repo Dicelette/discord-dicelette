@@ -1,4 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
+import { fetchUser } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,
@@ -11,7 +12,6 @@ import { getUserByEmbed, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
-import { fetchUser } from "utils";
 
 /**
  * Handles validation and execution of a character rename operation from a Discord modal submission.

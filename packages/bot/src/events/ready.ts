@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: let me alone */
 
 import process from "node:process";
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { dev, important, logger } from "@dicelette/utils";

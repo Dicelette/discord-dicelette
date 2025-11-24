@@ -1,4 +1,4 @@
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { PersonnageIds, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";

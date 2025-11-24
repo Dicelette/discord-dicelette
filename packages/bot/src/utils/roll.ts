@@ -1,5 +1,10 @@
-import type { EClient } from "@dicelette/bot-core";
-import { getGuildContext, getStatisticOption } from "@dicelette/bot-helpers";
+import {
+	extractRollOptions,
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+	getStatisticOption,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import {
 	type CustomCritical,
 	DiceTypeError,
@@ -28,7 +33,6 @@ import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
-import { extractRollOptions, getLangAndConfig } from "utils";
 import { findBestMatchingDice } from "./find_macro";
 
 /**

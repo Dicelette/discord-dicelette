@@ -1,5 +1,8 @@
-import type { EClient } from "@dicelette/bot-core";
-import { getGuildContext } from "@dicelette/bot-helpers";
+import {
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import {
 	parseComparator,
@@ -7,7 +10,8 @@ import {
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
 import * as Djs from "discord.js";
-import { getCritical, getLangAndConfig, rollWithInteraction } from "utils";
+
+import { getCritical, rollWithInteraction } from "utils";
 import "discord_ext";
 import type { RollOptions } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction } from "database";

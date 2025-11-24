@@ -1,4 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { cmdLn, t } from "@dicelette/localization";
 import {
 	DEFAULT_TEMPLATE,
@@ -6,7 +7,6 @@ import {
 	type Translation,
 } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { getLangAndConfig } from "utils";
 
 type Results = {
 	info: string;

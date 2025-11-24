@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"@dicelette/bot-core": "workspace:*",
+		"@dicelette/client": "workspace:*",
 		"@dicelette/bot-helpers": "workspace:*",
 		"@dicelette/localization": "workspace:*",
 		"@dicelette/parse_result": "workspace:*",

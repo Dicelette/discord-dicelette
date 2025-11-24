@@ -1,8 +1,8 @@
-import type { EClient } from "@dicelette/bot-core";
+import { fetchChannel } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { ln } from "@dicelette/localization";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { fetchChannel } from "../utils";
 
 export const onReactionAdd = (client: EClient): void => {
 	client.on(Djs.Events.MessageReactionAdd, async (reaction, user) => {

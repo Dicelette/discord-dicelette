@@ -1,3 +1,4 @@
+import { reuploadAvatar } from "@dicelette/bot-helpers";
 import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
@@ -10,7 +11,6 @@ import {
 } from "@dicelette/utils";
 import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
-import { reuploadAvatar } from "../utils";
 
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];

@@ -1,4 +1,4 @@
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
 import type * as Djs from "discord.js";
 import { reply } from "messages";

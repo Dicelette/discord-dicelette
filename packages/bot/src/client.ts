@@ -1,4 +1,4 @@
-import { createBotClient, type EClient } from "@dicelette/bot-core";
+import { createBotClient, type EClient } from "@dicelette/client";
 import * as Djs from "discord.js";
 
 // Re-export EClient for backward compatibility

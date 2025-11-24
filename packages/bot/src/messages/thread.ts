@@ -1,4 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
+import { fetchChannel, fetchMember, haveAccess } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import type {
 	CharacterData,
 	Characters,
@@ -13,14 +14,7 @@ import { logger } from "@dicelette/utils";
 import { registerUser, setDefaultManagerId, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { deleteAfter, embedError, reply, sendLogs } from "messages";
-import {
-	editUserButtons,
-	fetchChannel,
-	fetchMember,
-	haveAccess,
-	searchUserChannel,
-	selectEditMenu,
-} from "utils";
+import { editUserButtons, searchUserChannel, selectEditMenu } from "utils";
 
 export async function createDefaultThread(
 	parent: Djs.ThreadChannel | Djs.TextChannel,

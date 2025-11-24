@@ -1,8 +1,8 @@
-import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { getLangAndConfig } from "utils";
 import { getSnippetAutocomplete } from "../roll/snippets";
 import {
 	createLinksCmdOptions,

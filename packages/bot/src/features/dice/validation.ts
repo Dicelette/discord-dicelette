@@ -1,4 +1,20 @@
-import type { EClient } from "@dicelette/bot-core";
+import {
+	buildModerationButtons,
+	CUSTOM_ID_PREFIX,
+	deleteModerationCache,
+	fetchChannel,
+	fetchUser,
+	getMessageWithKeyPart,
+	getModerationCache,
+	getUserId,
+	makeEmbedKey,
+	parseEmbedKey,
+	parseKeyFromCustomId,
+	putModerationCache,
+	reuploadAvatar,
+	setModerationFooter,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
@@ -16,25 +32,7 @@ import {
 	sendLogs,
 	stripFooter,
 } from "messages";
-import {
-	buildModerationButtons,
-	CUSTOM_ID_PREFIX,
-	deleteModerationCache,
-	editUserButtons,
-	fetchChannel,
-	fetchUser,
-	getMessageWithKeyPart,
-	getModerationCache,
-	getUserId,
-	makeEmbedKey,
-	parseEmbedKey,
-	parseKeyFromCustomId,
-	putModerationCache,
-	reuploadAvatar,
-	selectEditMenu,
-	selfRegisterAllowance,
-	setModerationFooter,
-} from "utils";
+import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.

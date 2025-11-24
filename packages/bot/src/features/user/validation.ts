@@ -1,4 +1,11 @@
-import type { EClient } from "@dicelette/bot-core";
+import {
+	addAutoRole,
+	fetchChannel,
+	getInteractionContext as getLangAndConfig,
+	pingModeratorRole,
+	reuploadAvatar,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
@@ -12,14 +19,7 @@ import {
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import * as Messages from "messages";
-import {
-	addAutoRole,
-	fetchChannel,
-	getLangAndConfig,
-	pingModeratorRole,
-	reuploadAvatar,
-	selfRegisterAllowance,
-} from "utils";
+import { selfRegisterAllowance } from "utils";
 
 /**
  * Interaction to continue to the next page of the statistics when registering a new user

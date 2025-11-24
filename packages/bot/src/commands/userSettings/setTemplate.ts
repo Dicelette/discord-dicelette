@@ -1,4 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import {
 	DEFAULT_TEMPLATE,
@@ -8,7 +9,6 @@ import {
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { merge } from "ts-deepmerge";
-import { getLangAndConfig } from "utils";
 import { finalLink } from "../context_menus";
 
 export async function setTemplate(

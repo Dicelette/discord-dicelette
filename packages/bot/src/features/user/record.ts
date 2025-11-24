@@ -1,4 +1,9 @@
-import type { EClient } from "@dicelette/bot-core";
+import {
+	fetchAvatarUrl,
+	fetchChannel,
+	getInteractionContext as getLangAndConfig,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { COMPILED_PATTERNS, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
@@ -7,13 +12,7 @@ import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import { embedError, reply } from "messages";
-import {
-	continueCancelButtons,
-	fetchAvatarUrl,
-	fetchChannel,
-	getLangAndConfig,
-	selfRegisterAllowance,
-} from "utils";
+import { continueCancelButtons, selfRegisterAllowance } from "utils";
 
 /**
  * Handles a modal submission to register user statistics for a specific page, validating the page number and template existence.

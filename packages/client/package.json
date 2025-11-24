@@ -1,5 +1,5 @@
 {
-	"name": "@dicelette/bot-core",
+	"name": "@dicelette/client",
 	"version": "1.0.0",
 	"description": "Core types, interfaces and client for Dicelette Discord bot",
 	"main": "dist/index.js",

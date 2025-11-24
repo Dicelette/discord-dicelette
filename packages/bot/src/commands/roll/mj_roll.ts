@@ -1,5 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
 import { extractCommonOptions, gmCommonOptions } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import { filterChoices, uniformizeRecords } from "@dicelette/utils";

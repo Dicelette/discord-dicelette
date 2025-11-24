@@ -1,4 +1,3 @@
-import "uniformize";
 import type { EClient } from "@dicelette/client";
 import type { GuildData } from "@dicelette/types";
 
@@ -41,8 +40,8 @@ export function getGuildContext(
 
 	return {
 		settings,
-		standardizedDamageNames: templateID?.damageName?.map((x: string) => x.standardize()),
-		standardizedStatsNames: templateID?.statsName?.map((x: string) => x.standardize()),
+		standardizedDamageNames: templateID?.damageName?.map((x) => x.standardize()),
+		standardizedStatsNames: templateID?.statsName?.map((x) => x.standardize()),
 		templateID,
 	};
 }

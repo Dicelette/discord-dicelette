@@ -1,10 +1,10 @@
-import type { EClient } from "@dicelette/bot-core";
+import { getGuildContext } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { filterStatsInDamage } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
 import type * as Djs from "discord.js";
-import { getGuildContext } from "utils";
 import "discord_ext";
 
 /**

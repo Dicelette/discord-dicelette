@@ -1,5 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
 import { autoCompleteCharacters, calcOptions } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";

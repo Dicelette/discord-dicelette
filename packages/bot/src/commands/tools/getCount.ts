@@ -1,11 +1,14 @@
 /** biome-ignore-all lint/style/useNamingConvention: Discord doesn't use CamelCase in their API */
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import * as Djs from "discord.js";
 import "discord_ext";
+import {
+	fetchAvatarUrl,
+	getInteractionContext as getLangAndConfig,
+} from "@dicelette/bot-helpers";
 import { cmdLn } from "@dicelette/localization";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import { t } from "i18next";
-import { fetchAvatarUrl, getLangAndConfig } from "utils";
 
 function percentage(partial: number, total: number) {
 	return total === 0 ? "0.00" : ((partial / total) * 100).toFixed(2);

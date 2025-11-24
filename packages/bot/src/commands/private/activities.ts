@@ -1,10 +1,10 @@
 /** biome-ignore-all lint/style/useNamingConvention: bruh */
 
 import * as fs from "node:fs";
-import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
-import { getLangAndConfig } from "utils";
 
 export default {
 	data: new Djs.SlashCommandBuilder()

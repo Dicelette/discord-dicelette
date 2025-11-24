@@ -1,5 +1,5 @@
-import type { EClient } from "@dicelette/bot-core";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln, ln, t } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";

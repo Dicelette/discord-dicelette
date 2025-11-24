@@ -18,7 +18,7 @@
 	"author": "Lisandra-dev",
 	"license": "AGPL-3.0",
 	"dependencies": {
-		"@dicelette/bot-core": "workspace:*",
+		"@dicelette/client": "workspace:*",
 		"@dicelette/localization": "workspace:*",
 		"@dicelette/parse_result": "workspace:*",
 		"@dicelette/types": "workspace:*",

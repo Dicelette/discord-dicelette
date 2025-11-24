@@ -1,4 +1,4 @@
-import type { EClient } from "@dicelette/bot-core";
+import type { EClient } from "@dicelette/client";
 import { logger } from "@dicelette/utils";
 import { COMMANDS, contextMenus, helpAtInvit } from "commands";
 

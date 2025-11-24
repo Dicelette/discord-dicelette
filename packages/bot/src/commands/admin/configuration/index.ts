@@ -1,8 +1,8 @@
-import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { localeList } from "locales";
-import { getLangAndConfig } from "utils";
 import { dice, stats } from "./auto_role";
 import { changeLanguage } from "./change_language";
 import { display, displayTemplate } from "./display";

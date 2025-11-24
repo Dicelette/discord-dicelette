@@ -1,5 +1,10 @@
-import type { EClient } from "@dicelette/bot-core";
-import { getGuildContext } from "@dicelette/bot-helpers";
+import {
+	fetchChannel,
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+	haveAccess,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln, ln, t } from "@dicelette/localization";
 import {
 	parseDamageFields,
@@ -22,13 +27,7 @@ import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
-import {
-	fetchChannel,
-	getLangAndConfig,
-	haveAccess,
-	isSerializedNameEquals,
-	searchUserChannel,
-} from "utils";
+import { isSerializedNameEquals, searchUserChannel } from "utils";
 
 export function getUserByEmbed(
 	data: { message?: Message; embeds?: EmbedBuilder[] },

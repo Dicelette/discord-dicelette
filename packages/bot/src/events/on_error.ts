@@ -1,5 +1,6 @@
 import process from "node:process";
-import type { EClient } from "@dicelette/bot-core";
+import { fetchChannel } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
 import { DiscordAPIError } from "@discordjs/rest";
@@ -7,7 +8,6 @@ import dedent from "dedent";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
 import { embedError, reply } from "messages";
-import { fetchChannel } from "utils";
 import { sendErrorToWebhook } from "./on_disconnect";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
