@@ -20,6 +20,7 @@
 	"scripts": {
 		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
 		"prebuild": "rimraf dist",
+		"test": "vitest",
 		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
 	},
 	"type": "module",
