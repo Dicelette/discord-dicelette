@@ -238,7 +238,6 @@ export async function rollStatistique(
 	hideResult?: boolean | null
 ) {
 	const ctx = getGuildContext(client, interaction.guildId!);
-	console.log("UserStatistique:", ctx?.templateID?.statsName);
 	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
 	let dice = template.diceType;
