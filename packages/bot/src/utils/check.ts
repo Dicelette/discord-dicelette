@@ -1,7 +1,7 @@
+import type { EClient } from "@dicelette/bot-core";
 import { findln, ln, t } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { verifyIfEmbedInDB } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, reply } from "messages";

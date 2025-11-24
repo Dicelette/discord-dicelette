@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/bot-core";
 import type { GuildData, UserMessageId } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import type * as Djs from "discord.js";
 import { addRestriction } from "event";
 import { deleteUserInChar } from "./memory";

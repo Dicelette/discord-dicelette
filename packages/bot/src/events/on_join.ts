@@ -1,5 +1,5 @@
-import { logger } from "@dicelette/utils";
 import type { EClient } from "@dicelette/bot-core";
+import { logger } from "@dicelette/utils";
 import { COMMANDS, contextMenus, helpAtInvit } from "commands";
 
 export default (client: EClient): void => {

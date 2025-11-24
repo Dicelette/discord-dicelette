@@ -1,5 +1,5 @@
-import { t } from "@dicelette/localization";
 import type { EClient } from "@dicelette/bot-core";
+import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { deleteAfter, reply, setTags } from "messages";
 import moment from "moment";

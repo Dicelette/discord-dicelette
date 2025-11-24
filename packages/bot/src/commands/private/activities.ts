@@ -1,8 +1,8 @@
 /** biome-ignore-all lint/style/useNamingConvention: bruh */
 
 import * as fs from "node:fs";
-import { cmdLn, t } from "@dicelette/localization";
 import type { EClient } from "@dicelette/bot-core";
+import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { getLangAndConfig } from "utils";
 

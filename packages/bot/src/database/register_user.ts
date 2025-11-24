@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/bot-core";
 import { ln } from "@dicelette/localization";
 import type {
 	PersonnageIds,
@@ -7,7 +8,6 @@ import type {
 	UserRegistration,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { getUser } from "database";
 import type * as Djs from "discord.js";
 import { searchUserChannel } from "utils";

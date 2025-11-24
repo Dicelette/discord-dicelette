@@ -1,3 +1,5 @@
+import type { EClient } from "@dicelette/bot-core";
+import { macroOptions } from "@dicelette/bot-helpers";
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
@@ -14,9 +16,8 @@ import {
 	calculateSimilarity,
 	capitalizeBetweenPunct,
 } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
-import { getLangAndConfig, macroOptions, rollWithInteraction } from "utils";
+import { getLangAndConfig, rollWithInteraction } from "utils";
 
 export function getSnippetAutocomplete(
 	interaction: Djs.AutocompleteInteraction,

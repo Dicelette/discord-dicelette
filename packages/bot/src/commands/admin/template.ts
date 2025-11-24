@@ -1,8 +1,8 @@
+import type { EClient } from "@dicelette/bot-core";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import {
 	bulkDeleteCharacters,

@@ -1,3 +1,5 @@
+export * from "./src/command_autocomplete";
+export * from "./src/command_builders";
 export * from "./src/extract_options";
 export * from "./src/fetch";
 export * from "./src/guild_context";
@@ -6,6 +8,7 @@ export * from "./src/moderation_cache";
 // Alias for backward compatibility
 export { buildModerationButtons as makeValidationRow } from "./src/moderation_cache";
 export * from "./src/options";
+export * from "./src/roles";
 
 /**
  * CSV Row type for import/export functionality.

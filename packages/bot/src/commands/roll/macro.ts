@@ -1,6 +1,7 @@
+import type { EClient } from "@dicelette/bot-core";
+import { macroOptions } from "@dicelette/bot-helpers";
 import { t } from "@dicelette/localization";
 import { logger, uniformizeRecords } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { reply, replyEphemeralError } from "messages";
@@ -8,7 +9,6 @@ import {
 	buildDamageAutocompleteChoices,
 	getLangAndConfig,
 	isSerializedNameEquals,
-	macroOptions,
 	rollMacro,
 } from "utils";
 import "discord_ext";

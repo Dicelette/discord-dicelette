@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/bot-core";
 import type { Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { selfRegisterAllowance } from "utils";

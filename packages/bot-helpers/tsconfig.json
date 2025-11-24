@@ -8,7 +8,7 @@
 		"composite": true
 	},
 	"exclude": ["./dist"],
-	"include": ["src", "index.ts", "package.json"],
+	"include": ["src/**/*", "index.ts", "package.json"],
 	"ts-node": {
 		"esm": true,
 		"require": ["tsconfig-paths/register"]

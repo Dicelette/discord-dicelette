@@ -53,12 +53,12 @@ export function extractCommonOptions(
 ): CommonOptions {
 	return {
 		character: options.getString(t("common.character"), required?.character) ?? undefined,
-		statistic: options.getString(t("common.statistic"), required?.statistic) ?? undefined,
-		name: options.getString(t("common.name"), required?.name) ?? undefined,
+		comments: options.getString(t("common.comments"), required?.comments) ?? undefined,
 		dice: options.getString(t("common.dice"), required?.dice) ?? undefined,
 		expression:
 			options.getString(t("common.expression"), required?.expression) ?? undefined,
-		comments: options.getString(t("common.comments"), required?.comments) ?? undefined,
+		name: options.getString(t("common.name"), required?.name) ?? undefined,
+		statistic: options.getString(t("common.statistic"), required?.statistic) ?? undefined,
 		user:
 			options.getString(t("display.userLowercase"), required?.user) ??
 			options.get(t("display.userLowercase"))?.value?.toString() ??

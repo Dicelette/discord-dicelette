@@ -1,8 +1,8 @@
+import type { EClient } from "@dicelette/bot-core";
 import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Settings, Translation, UserMessageId } from "@dicelette/types";
 import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import {
 	getTemplateByInteraction,
 	getUserByEmbed,

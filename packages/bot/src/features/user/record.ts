@@ -1,7 +1,7 @@
+import type { EClient } from "@dicelette/bot-core";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { COMPILED_PATTERNS, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";

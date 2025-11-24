@@ -1,3 +1,5 @@
+import type { EClient } from "@dicelette/bot-core";
+import { autoComplete, charUserOptions } from "@dicelette/bot-helpers";
 import { findln, t } from "@dicelette/localization";
 import type {
 	DiscordChannel,
@@ -7,7 +9,6 @@ import type {
 	UserRegistration,
 } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import {
 	deleteUser,
 	getRecordChar,
@@ -17,14 +18,7 @@ import {
 } from "database";
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "messages";
-import {
-	autoComplete,
-	charUserOptions,
-	getButton,
-	haveAccess,
-	optionInteractions,
-	reuploadAvatar,
-} from "utils";
+import { getButton, haveAccess, optionInteractions, reuploadAvatar } from "utils";
 import "discord_ext";
 import { COMPILED_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
 

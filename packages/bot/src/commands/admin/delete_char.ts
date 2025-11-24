@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/bot-core";
 import type {
 	DiscordChannel,
 	GuildData,
@@ -6,7 +7,6 @@ import type {
 	UserMessageId,
 } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { deleteUser, deleteUserInChar, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";

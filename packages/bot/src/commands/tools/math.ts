@@ -3,9 +3,10 @@
  */
 
 import type { EClient } from "@dicelette/bot-core";
+import { calcOptions } from "@dicelette/bot-helpers";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
-import { calcOptions, getLangAndConfig } from "utils";
+import { getLangAndConfig } from "utils";
 import { autocompleteCalc, calculate } from "./calc";
 import "discord_ext";
 

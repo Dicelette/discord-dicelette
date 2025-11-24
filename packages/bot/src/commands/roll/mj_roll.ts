@@ -1,17 +1,12 @@
 import type { EClient } from "@dicelette/bot-core";
-import { extractCommonOptions } from "@dicelette/bot-helpers";
+import { extractCommonOptions, gmCommonOptions } from "@dicelette/bot-helpers";
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import { filterChoices, uniformizeRecords } from "@dicelette/utils";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
-import {
-	gmCommonOptions,
-	isSerializedNameEquals,
-	rollMacro,
-	rollStatistique,
-} from "utils";
+import { isSerializedNameEquals, rollMacro, rollStatistique } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 import "discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";

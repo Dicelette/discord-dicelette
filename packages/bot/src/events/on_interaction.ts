@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/bot-core";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
-import type { EClient } from "@dicelette/bot-core";
 import {
 	ALL_COMMANDS,
 	AUTOCOMPLETE_COMMANDS,

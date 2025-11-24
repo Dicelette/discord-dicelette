@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/bot-core";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
@@ -8,7 +9,6 @@ import {
 	logger,
 	NoEmbed,
 } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import * as Messages from "messages";

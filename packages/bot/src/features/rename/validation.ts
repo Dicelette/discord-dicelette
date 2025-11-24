@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/bot-core";
 import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,
@@ -5,7 +6,6 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import type { EClient } from "@dicelette/bot-core";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
 import type { TextChannel } from "discord.js";

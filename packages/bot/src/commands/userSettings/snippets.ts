@@ -1,7 +1,7 @@
+import type { EClient } from "@dicelette/bot-core";
 import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { embedError } from "messages";
 import { getLangAndConfig } from "utils";

@@ -58,7 +58,7 @@
 		"build": "pnpm run --recursive build",
 		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
 		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-		"lint": "biome format --write packages",
+		"lint": "biome check --write ./packages/ --unsafe",
 		"pm2:delete": "pm2 delete dicelette",
 		"pm2:restart": "pnpm run build && pm2 restart dicelette",
 		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",

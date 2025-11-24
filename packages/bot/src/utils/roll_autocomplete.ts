@@ -1,7 +1,7 @@
+import type { EClient } from "@dicelette/bot-core";
 import { t } from "@dicelette/localization";
 import { filterStatsInDamage } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { getTemplateByInteraction } from "database";
 import type * as Djs from "discord.js";
 import { getGuildContext } from "utils";

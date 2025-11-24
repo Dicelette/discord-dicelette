@@ -1,5 +1,5 @@
-import { ln, t } from "@dicelette/localization";
 import type { EClient } from "@dicelette/bot-core";
+import { ln, t } from "@dicelette/localization";
 import type * as Djs from "discord.js";
 import { reply } from "messages";
 import { findLocale } from "./utils";

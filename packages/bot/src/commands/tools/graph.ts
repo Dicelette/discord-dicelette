@@ -1,9 +1,10 @@
 import path from "node:path";
+import type { EClient } from "@dicelette/bot-core";
+import { charUserOptions } from "@dicelette/bot-helpers";
 import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
-import type { EClient } from "@dicelette/bot-core";
 import {
 	findChara,
 	getRecordChar,
@@ -13,7 +14,7 @@ import {
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
-import { charUserOptions, getLangAndConfig, haveAccess, searchUserChannel } from "utils";
+import { getLangAndConfig, haveAccess, searchUserChannel } from "utils";
 import "discord_ext";
 import type { Statistic, StatisticalTemplate } from "@dicelette/core";
 

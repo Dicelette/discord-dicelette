@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/bot-core";
 import { t } from "@dicelette/localization";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { getLangAndConfig } from "utils";
 import { getSnippetAutocomplete } from "../roll/snippets";

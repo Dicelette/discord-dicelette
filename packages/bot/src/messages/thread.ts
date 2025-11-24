@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/bot-core";
 import type {
 	CharacterData,
 	Characters,
@@ -9,7 +10,6 @@ import type {
 	UserRegistration,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { registerUser, setDefaultManagerId, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { deleteAfter, embedError, reply, sendLogs } from "messages";

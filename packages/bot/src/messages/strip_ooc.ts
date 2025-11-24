@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/bot-core";
 import type { DiscordTextChannel, StripOOC, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { fetchChannel } from "utils";
 import { deleteAfter } from "./send";

@@ -1,8 +1,8 @@
+import type { EClient } from "@dicelette/bot-core";
 import type { StatisticalTemplate } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
 import type { DiscordChannel, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "@dicelette/bot-core";
 import { getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import {
