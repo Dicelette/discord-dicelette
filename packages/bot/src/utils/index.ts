@@ -22,6 +22,7 @@ export {
 	type GuildContext,
 	getCharacterOption,
 	getGuildContext,
+	getInteractionContext as getLangAndConfig,
 	getMessageWithKeyPart,
 	getModerationCache,
 	getNameOption,
@@ -46,7 +47,6 @@ export {
 } from "@dicelette/bot-helpers";
 export * from "./button";
 export * from "./check";
-export * from "./fetch";
 export * from "./find_macro";
 export * from "./import_csv";
 export * from "./roll";

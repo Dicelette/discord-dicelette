@@ -1,11 +1,11 @@
 import type { EClient } from "@dicelette/bot-core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import { findln, ln, t } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { verifyIfEmbedInDB } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, reply } from "messages";
-import { getLangAndConfig } from "./fetch";
 
 /**
  * Determines whether a user is permitted to edit a Discord message embed in an interaction.
