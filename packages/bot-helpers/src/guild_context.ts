@@ -41,8 +41,8 @@ export function getGuildContext(
 
 	return {
 		settings,
-		standardizedDamageNames: templateID?.damageName?.map((x) => x.standardize()),
-		standardizedStatsNames: templateID?.statsName?.map((x) => x.standardize()),
+		standardizedDamageNames: templateID?.damageName?.map((x: string) => x.standardize()),
+		standardizedStatsNames: templateID?.statsName?.map((x: string) => x.standardize()),
 		templateID,
 	};
 }

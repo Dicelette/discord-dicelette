@@ -2,11 +2,18 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
-		"rootDir": "./src",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationMap": true,
 		"composite": true
 	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist"]
+	"exclude": ["./dist"],
+	"include": ["src", "index.ts", "package.json"],
+	"ts-node": {
+		"esm": true,
+		"require": ["tsconfig-paths/register"]
+	},
+	"tsc-alias": {
+		"resolveFullPaths": true
+	}
 }

@@ -1,5 +1,6 @@
-export * from "./guild_context";
-export * from "./options";
+export * from "./src/guild_context";
+export * from "./src/interaction_context";
+export * from "./src/options";
 
 /**
  * CSV Row type for import/export functionality.

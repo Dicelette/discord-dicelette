@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/bot-core";
 import { findln } from "@dicelette/localization";
 import type { DataToFooter, Translation } from "@dicelette/types";
-import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { ensureEmbed, reply } from "messages";
 import { fetchUser } from "utils";
