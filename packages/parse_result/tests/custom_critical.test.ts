@@ -84,7 +84,7 @@ describe("parseCustomCritical", () => {
 		const keys = Object.keys(result || {});
 		expect(keys.length).toBeGreaterThan(0);
 		expect(keys[0].trim()).toBe("test name");
-	})
+	});
 
 	it("should standardize and trim the value", () => {
 		const result = parseCustomCritical("test", ">  10  ");
