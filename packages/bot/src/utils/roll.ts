@@ -28,8 +28,7 @@ import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
-import { getLangAndConfig } from "utils";
-import { extractRollOptions } from "./extract_options";
+import { extractRollOptions, getLangAndConfig } from "utils";
 import { findBestMatchingDice } from "./find_macro";
 
 /**
