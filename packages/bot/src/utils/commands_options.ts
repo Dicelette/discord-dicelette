@@ -1,6 +1,6 @@
 import { t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import type * as Djs from "discord.js";
 import type { SlashCommandSubcommandBuilder } from "discord.js";
 import "discord_ext";

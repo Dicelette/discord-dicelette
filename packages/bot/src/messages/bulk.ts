@@ -1,7 +1,7 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { PersonnageIds, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import { updateMemory } from "database";
 import * as Djs from "discord.js";
 import {

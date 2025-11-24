@@ -1,13 +1,14 @@
+import type { EClient } from "@dicelette/bot-core";
+import { extractCommonOptions } from "@dicelette/bot-helpers";
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import { filterChoices, uniformizeRecords } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
+import { replyEphemeralError } from "messages";
 import {
 	gmCommonOptions,
 	isSerializedNameEquals,
-	replyEphemeralError,
 	rollMacro,
 	rollStatistique,
 } from "utils";
@@ -26,7 +27,7 @@ export const mjRoll = {
 		const guildData = client.settings.get(interaction.guild!.id);
 		if (!guildData || !guildData.templateID) return;
 		let choices: string[] = [];
-		let user = options.get(t("display.userLowercase"))?.value;
+		const { user } = extractCommonOptions(options);
 		let allCharFromGuild: {
 			charName?: string | null;
 			messageId: UserMessageId;
@@ -34,14 +35,14 @@ export const mjRoll = {
 			isPrivate?: boolean;
 		}[] = [];
 
-		if (typeof user !== "string") user = interaction.user.id;
-		if (user === interaction.user.id) {
+		const userId = user ?? interaction.user.id;
+		if (userId === interaction.user.id) {
 			for (const [, char] of Object.entries(guildData.user)) {
 				for (const data of char) {
 					allCharFromGuild.push(data);
 				}
 			}
-		} else allCharFromGuild = guildData.user[user];
+		} else allCharFromGuild = guildData.user[userId];
 		if (fixed.name === t("common.character")) {
 			//get ALL characters from the guild
 			const skill = options.getString(t("common.name"));

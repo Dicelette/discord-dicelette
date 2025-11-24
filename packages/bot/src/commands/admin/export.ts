@@ -1,12 +1,14 @@
 /**
  * Allow to export all characters from the database to a CSV file
  */
+
+import type { EClient } from "@dicelette/bot-core";
+import { type CSVRow, getGuildContext } from "@dicelette/bot-helpers";
 import { t } from "@dicelette/localization";
-import type { EClient } from "client";
 import { getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
-import { type CSVRow, getLangAndConfig } from "utils";
+import { getLangAndConfig } from "utils";
 import "discord_ext";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
@@ -83,7 +85,8 @@ async function exportToCsv(
 	}
 	const { ul } = getLangAndConfig(client, interaction);
 	const csv: CSVRow[] = [];
-	const statsName = client.settings.get(guildId, "templateID.statsName");
+	const ctx = getGuildContext(client, guildId);
+	const statsName = ctx?.templateID?.statsName;
 	const isPrivateAllowed = !!client.settings.get(guildId, "privateChannel");
 
 	// precompute normalized stat keys if template provides names

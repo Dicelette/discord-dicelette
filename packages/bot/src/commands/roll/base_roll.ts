@@ -1,10 +1,11 @@
+import type { EClient } from "@dicelette/bot-core";
+import { getGuildContext } from "@dicelette/bot-helpers";
 import { t } from "@dicelette/localization";
 import {
 	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { getCritical, getLangAndConfig, rollWithInteraction } from "utils";
 import "discord_ext";
@@ -68,12 +69,13 @@ export async function baseRoll(
 		charName = dice.match(/ @(\w+)/)![1];
 		dice = dice.replace(/ @\w+/, "").trim();
 	}
+	const ctx = getGuildContext(client, interaction.guild!.id);
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
 		true,
 		undefined,
-		client.settings.get(interaction.guild!.id)?.templateID.statsName
+		ctx?.templateID?.statsName
 	);
 	const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
 	const { criticalsFromDice, serverData } = await getCritical(

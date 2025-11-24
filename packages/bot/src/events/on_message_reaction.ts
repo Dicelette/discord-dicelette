@@ -1,6 +1,6 @@
 import { ln } from "@dicelette/localization";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { fetchChannel } from "../utils";
 

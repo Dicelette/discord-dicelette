@@ -1,5 +1,5 @@
 import { roll } from "@dicelette/core";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 
 export default {

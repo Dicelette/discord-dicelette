@@ -8,7 +8,7 @@ import {
 	logger,
 	NoEmbed,
 } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import * as Messages from "messages";

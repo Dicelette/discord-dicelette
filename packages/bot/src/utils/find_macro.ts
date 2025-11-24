@@ -1,5 +1,5 @@
 import { calculateSimilarity, logger } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import { getUserFromInteraction } from "database";
 import type * as Djs from "discord.js";
 

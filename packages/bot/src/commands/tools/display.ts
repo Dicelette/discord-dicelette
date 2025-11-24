@@ -2,7 +2,7 @@ import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
 import { filterChoices } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import {

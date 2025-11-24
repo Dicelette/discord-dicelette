@@ -1,3 +1,5 @@
+import type { EClient } from "@dicelette/bot-core";
+import { getGuildContext, getStatisticOption } from "@dicelette/bot-helpers";
 import {
 	type CustomCritical,
 	DiceTypeError,
@@ -23,7 +25,6 @@ import {
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, reply, sendResult } from "messages";
@@ -233,18 +234,14 @@ export async function rollStatistique(
 	 */
 	hideResult?: boolean | null
 ) {
-	console.log(
-		"UserStatistique:",
-		client.settings.get(interaction.guildId!)?.templateID.statsName
-	);
-	let statistic = options.getString(t("common.statistic"), false);
+	const ctx = getGuildContext(client, interaction.guildId!);
+	console.log("UserStatistique:", ctx?.templateID?.statsName);
+	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
 	let dice = template.diceType;
 	let standardizedStatistic = statistic?.standardize(true);
 	//return if the standardizedStatistic is excluded from the list
-	const excludedStats = client.settings
-		.get(interaction.guild!.id, "templateID.excludedStats")
-		?.map((stat) => stat.standardize());
+	const excludedStats = ctx?.templateID?.excludedStats?.map((stat) => stat.standardize());
 	if (standardizedStatistic && excludedStats?.includes(standardizedStatistic)) {
 		await reply(interaction, {
 			content: ul("error.stats.excluded"),
@@ -296,7 +293,7 @@ export async function rollStatistique(
 		expression,
 		userStatistique.stats,
 		userStatStr,
-		client.settings.get(interaction.guildId!)?.templateID.statsName
+		ctx?.templateID?.statsName
 	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;

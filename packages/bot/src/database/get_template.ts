@@ -3,7 +3,7 @@ import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
 import { isValidJSON, logger } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
 import { fetchChannel } from "../utils";

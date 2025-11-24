@@ -3,7 +3,7 @@ import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import {
 	findChara,
 	getRecordChar,

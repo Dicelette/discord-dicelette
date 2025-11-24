@@ -166,6 +166,15 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": [
+				"**/package.json",
+				"biome.json",
+				"**/tsconfig.json",
+				"!**/node_modules/**"
+			],
+			"assist": { "actions": { "source": { "useSortedKeys": "off" } } }
 		}
 	]
 }

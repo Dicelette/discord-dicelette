@@ -1,10 +1,8 @@
-// noinspection SuspiciousTypeOfGuard
-
 import { createUrl, type ResultAsText } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { findMessageBefore, threadToSend } from "messages";
+import { embedError, findMessageBefore, threadToSend } from "messages";
 import { fetchChannel } from "utils";
 
 export async function sendLogs(
@@ -46,6 +44,27 @@ export async function reply(
 		logger.error(e);
 		return await interaction.followUp(options);
 	}
+}
+
+/**
+ * Convenient wrapper to reply with an error embed in ephemeral mode.
+ * Use this when you need to show an error message that only the user can see.
+ *
+ * @param interaction - Command or modal interaction to reply to
+ * @param errorText - Error message to display
+ * @param ul - Translation function
+ * @param cause - Optional additional context/cause string
+ */
+export async function replyEphemeralError(
+	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
+	errorText: string,
+	ul: Translation,
+	cause?: string
+): Promise<Djs.Message | Djs.InteractionResponse> {
+	return reply(interaction, {
+		embeds: [embedError(errorText, ul, cause)],
+		flags: Djs.MessageFlags.Ephemeral,
+	});
 }
 
 /**

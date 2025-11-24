@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/style/useNamingConvention: Discord doesn't use CamelCase in their API */
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import "discord_ext";
 import { cmdLn } from "@dicelette/localization";

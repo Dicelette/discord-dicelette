@@ -1,3 +1,5 @@
+import type { EClient } from "@dicelette/bot-core";
+import { getGuildContext } from "@dicelette/bot-helpers";
 import { lError, ln } from "@dicelette/localization";
 import {
 	isRolling,
@@ -7,7 +9,6 @@ import {
 } from "@dicelette/parse_result";
 import type { DiscordTextChannel } from "@dicelette/types";
 import { allValuesUndefined, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import {
@@ -60,8 +61,8 @@ export default (client: EClient): void => {
 				charName = content.match(/ @(\w+)/)![1];
 				content = content.replace(/ @\w+/, "").trim();
 			}
-			const statsName =
-				client.settings.get(message.guild.id, "templateID.statsName") ?? [];
+			const ctx = getGuildContext(client, message.guild.id);
+			const statsName = ctx?.templateID?.statsName ?? [];
 			const isRoll = isRolling(content, userData, statsName);
 
 			if (!isRoll || allValuesUndefined(isRoll))

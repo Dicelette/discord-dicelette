@@ -5,7 +5,7 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
 import type { TextChannel } from "discord.js";

@@ -1,6 +1,6 @@
 import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 

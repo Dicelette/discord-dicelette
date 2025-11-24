@@ -1,3 +1,5 @@
+import type { EClient } from "@dicelette/bot-core";
+import { getGuildContext } from "@dicelette/bot-helpers";
 import { findln, ln, t } from "@dicelette/localization";
 import {
 	parseDamageFields,
@@ -15,7 +17,6 @@ import type {
 	UserMessageId,
 } from "@dicelette/types";
 import { cleanAvatarUrl, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
@@ -639,7 +640,8 @@ export function getRightValue(
 	let userStat = userStatistique.stats?.[standardizedStatistic];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!userStat) {
-		const guildData = client.settings.get(guild.id, "templateID.statsName");
+		const ctx = getGuildContext(client, guild.id);
+		const guildData = ctx?.templateID?.statsName;
 		if (userStatistique.stats && guildData) {
 			const findStatInList = guildData.find((stat) =>
 				stat.subText(standardizedStatistic)

@@ -1,9 +1,10 @@
 import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import * as Djs from "discord.js";
-import { getLangAndConfig, replyEphemeral, replyEphemeralError } from "utils";
+import { embedError } from "messages";
+import { getLangAndConfig } from "utils";
 import { baseRoll } from "../roll/base_roll";
 
 export async function register(
@@ -24,14 +25,20 @@ export async function register(
 		const text = ul("userSettings.snippets.create.success", {
 			name: macroName.toTitle(),
 		});
-		await replyEphemeral(interaction, text);
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 	} catch (error) {
 		if (error instanceof DiceTypeError) {
 			const text = ul("error.invalidDice.eval", { dice: error.dice });
-			await replyEphemeralError(interaction, text, ul);
+			await interaction.reply({
+				embeds: [embedError(text, ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
 		} else {
 			const text = ul("error.generic.e", { message: (error as Error).message });
-			await replyEphemeralError(interaction, text, ul);
+			await interaction.reply({
+				embeds: [embedError(text, ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
 		}
 	}
 }
@@ -47,7 +54,7 @@ export async function displayList(
 	const entries = Object.entries(macros);
 	if (entries.length === 0) {
 		const text = ul("userSettings.snippets.list.empty");
-		await replyEphemeral(interaction, text);
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const lines = entries.map(
@@ -84,7 +91,7 @@ export async function remove(
 		const text = ul("userSettings.snippets.delete.notFound", {
 			name: `**${macroName.toTitle()}**`,
 		});
-		await replyEphemeral(interaction, text);
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	delete macros[macroName];
@@ -93,5 +100,5 @@ export async function remove(
 	const text = ul("userSettings.snippets.delete.success", {
 		name: `**${macroName.toTitle()}**`,
 	});
-	await replyEphemeral(interaction, text);
+	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }

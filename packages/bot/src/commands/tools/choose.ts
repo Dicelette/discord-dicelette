@@ -2,7 +2,7 @@ import * as Djs from "discord.js";
 import "discord_ext";
 import { t } from "@dicelette/localization";
 import { random } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import { getLangAndConfig } from "utils";
 
 export const choose = {

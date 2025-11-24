@@ -5,7 +5,7 @@ import process from "node:process";
 import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { dev, important, logger } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import {
 	COMMANDS,
 	contextMenus,

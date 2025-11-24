@@ -7,7 +7,7 @@ import type {
 	UserRegistration,
 } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import {
 	deleteUser,
 	getRecordChar,

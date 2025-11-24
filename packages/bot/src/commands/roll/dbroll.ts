@@ -1,4 +1,4 @@
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { autoCompleteCharacters, dbRollOptions, rollStatistique } from "utils";

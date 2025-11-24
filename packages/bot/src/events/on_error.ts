@@ -3,7 +3,7 @@ import process from "node:process";
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
 import { DiscordAPIError } from "@discordjs/rest";
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/bot-core";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
