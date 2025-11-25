@@ -5,8 +5,8 @@ import "discord_ext";
 import { cmdLn } from "@dicelette/localization";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import { t } from "i18next";
+import { embedError } from "messages";
 import { fetchAvatarUrl, getLangAndConfig } from "utils";
-import { embedError } from "../../messages";
 
 function percentage(partial: number, total: number) {
 	return total === 0 ? "0.00" : ((partial / total) * 100).toFixed(2);
