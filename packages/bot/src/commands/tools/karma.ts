@@ -9,6 +9,7 @@ import {
 import { cmdLn } from "@dicelette/localization";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import { t } from "i18next";
+import { embedError } from "messages";
 
 function percentage(partial: number, total: number) {
 	return total === 0 ? "0.00" : ((partial / total) * 100).toFixed(2);
@@ -456,6 +457,21 @@ const getCount = {
 				.addBooleanOption((option) =>
 					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
 				)
+		)
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setNames("luckMeter.reset.title")
+				.setDescriptions("luckMeter.reset.description")
+				.addBooleanOption((option) =>
+					option
+						.setNames("luckMeter.reset.all.name")
+						.setDescriptions("luckMeter.reset.all.description")
+				)
+				.addUserOption((option) =>
+					option
+						.setNames("edit.user.title")
+						.setDescriptions("luckMeter.reset.user.description")
+				)
 		),
 
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -466,7 +482,9 @@ const getCount = {
 		const flags = interaction.options.getBoolean(t("common.ephemeral"));
 
 		await interaction.deferReply(
-			flags ? { flags: Djs.MessageFlags.Ephemeral } : undefined
+			flags || subcmd === t("luckMeter.reset.title")
+				? { flags: Djs.MessageFlags.Ephemeral }
+				: undefined
 		);
 
 		switch (subcmd) {
@@ -479,7 +497,55 @@ const getCount = {
 			case t("luckMeter.moy.title"):
 				await server(interaction, client, ul);
 				break;
+			case t("luckMeter.reset.title"):
+				await resetCount(interaction, client, ul);
+				break;
 		}
 	},
 };
+
+async function resetCount(
+	interaction: Djs.ChatInputCommandInteraction,
+	client: EClient,
+	ul: Translation
+) {
+	const resetAll = interaction.options.getBoolean(t("luckMeter.reset.all.name"));
+	const selectedUser = interaction.options.getUser("user");
+	const guildId = interaction.guild!.id;
+	//!!! D'abord, on vérifie si le user a la permission de faire ça
+	//!!! Seul les admins (gestions des rôles) peuvent réinitialiser le classement des autres
+	const isRoleManager = interaction.memberPermissions?.has(
+		Djs.PermissionFlagsBits.ManageRoles
+	);
+	if (!resetAll && !selectedUser) {
+		// Reset own count
+		client.criticalCount.delete(guildId, interaction.user.id);
+		await interaction.editReply({
+			content: ul("luckMeter.reset.self.success"),
+		});
+		return;
+	}
+	if (!isRoleManager && (resetAll || selectedUser)) {
+		await interaction.editReply({
+			embeds: [embedError(ul("luckMeter.reset.noPermission"), ul)],
+		});
+		return;
+	}
+	if (resetAll) {
+		// Reset all counts
+		client.criticalCount.delete(guildId);
+		await interaction.editReply({
+			content: ul("luckMeter.reset.all.success"),
+		});
+		return;
+	}
+	// Reset selected user's count
+	client.criticalCount.delete(guildId, selectedUser!.id);
+	await interaction.editReply({
+		content: ul("luckMeter.reset.user.success", {
+			user: Djs.userMention(selectedUser!.id),
+		}),
+	});
+}
+
 export default getCount;

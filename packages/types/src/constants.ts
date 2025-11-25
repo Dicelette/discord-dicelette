@@ -30,8 +30,8 @@ export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
 // Regex patterns for dice detection
 
 const MATH = {
-	dev: "<:math:1394002307431010334>",
-	prod: "<:math:1394002540143710358>",
+	dev: "<:math:1394002307431010334>_ _",
+	prod: "<:math:1394002540143710358>_ _",
 } as const;
 
 export const EMOJI_MATH = process.env.NODE_ENV === "production" ? MATH.prod : MATH.dev;
