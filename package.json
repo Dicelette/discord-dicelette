@@ -69,5 +69,5 @@
 		"release": "commit-and-tag-version",
 		"test": "pnpm --filter @dicelette/parse_result run test"
 	},
-	"version": "2.20.0"
+	"version": "2.21.0"
 }

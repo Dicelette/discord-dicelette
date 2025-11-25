@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.21.0](https://github.com/Dicelette/discord-dicelette/compare/2.20.0...2.21.0) (2025-11-25)
+
+
+### Features
+
+* add `karma reset` if needed ([9774907](https://github.com/Dicelette/discord-dicelette/commit/9774907944737daba6251a467c5b748b4f8a685c))
+
+
+### Bug Fixes
+
+* cannot read of undefined "statsname" ([4047bd3](https://github.com/Dicelette/discord-dicelette/commit/4047bd39cfd7c8c80841675eb2a1b743e7d7146a))
+* message sending logic for chunked replies ([6daff3e](https://github.com/Dicelette/discord-dicelette/commit/6daff3e757f97a28514188f4c9f64887196043e1))
+* reply already replied ([231f96a](https://github.com/Dicelette/discord-dicelette/commit/231f96a3bde65200e01e3d58ac2572b056142f74))
+
 ## [2.20.0](https://github.com/Dicelette/discord-dicelette/compare/2.19.0...2.20.0) (2025-11-23)
 
 
