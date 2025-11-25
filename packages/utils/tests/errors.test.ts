@@ -122,9 +122,9 @@ describe("TotalExceededError", () => {
 
 	it("should handle different stat names and exceeded values", () => {
 		const tests = [
-			{ message: "Error 1", statName: "intelligence", exceeded: 3 },
-			{ message: "Error 2", statName: "wisdom", exceeded: 15 },
-			{ message: "Error 3", statName: "charisma", exceeded: 0 },
+			{ exceeded: 3, message: "Error 1", statName: "intelligence" },
+			{ exceeded: 15, message: "Error 2", statName: "wisdom" },
+			{ exceeded: 0, message: "Error 3", statName: "charisma" },
 		];
 
 		for (const { message, statName, exceeded } of tests) {

@@ -11,6 +11,7 @@ export default defineConfig({
 			"@dicelette/types": path.resolve(__dirname, "packages/types/index.ts"),
 			"@dicelette/utils": path.resolve(__dirname, "packages/utils/index.ts"),
 		},
+		projects: ["packages/*"],
 		exclude: [],
 	},
 });

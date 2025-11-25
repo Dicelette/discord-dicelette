@@ -66,7 +66,7 @@ describe("convertExpression", () => {
 	});
 
 	it("should handle expressions with statistics", () => {
-		const stats = { strength: 5, dexterity: 3 };
+		const stats = { dexterity: 3, strength: 5 };
 		const result = convertExpression("strength+2", stats);
 		expect(result).toBe("+7");
 	});
@@ -101,7 +101,7 @@ describe("convertExpression", () => {
 
 describe("replaceStatInDiceName", () => {
 	it("should replace stat name in parentheses with its value", () => {
-		const stats = { strength: 15, dexterity: 10 };
+		const stats = { dexterity: 10, strength: 15 };
 		const result = replaceStatInDiceName("Attack(strength)", stats);
 		expect(result).toBe("Attack(15)");
 	});
@@ -144,7 +144,7 @@ describe("replaceStatInDiceName", () => {
 	});
 
 	it("should handle multiple parentheses but only replace first match", () => {
-		const stats = { strength: 15, dexterity: 10 };
+		const stats = { dexterity: 10, strength: 15 };
 		const result = replaceStatInDiceName("Attack(strength)(dexterity)", stats);
 		expect(result).toContain("(15)");
 	});

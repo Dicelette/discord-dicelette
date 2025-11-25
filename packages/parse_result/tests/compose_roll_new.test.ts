@@ -18,12 +18,12 @@ describe("extractComparator", () => {
 
 	it("should handle different comparison operators", () => {
 		const tests = [
-			{ input: "1d20>10", expectedComp: ">10", expectedDice: "1d20" },
-			{ input: "2d6<5", expectedComp: "<5", expectedDice: "2d6" },
-			{ input: "1d8<=3", expectedComp: "<=3", expectedDice: "1d8" },
-			{ input: "1d12>=8", expectedComp: ">=8", expectedDice: "1d12" },
-			{ input: "1d4==2", expectedComp: "==2", expectedDice: "1d4" },
-			{ input: "1d10!=7", expectedComp: "!=7", expectedDice: "1d10" },
+			{ expectedComp: ">10", expectedDice: "1d20", input: "1d20>10" },
+			{ expectedComp: "<5", expectedDice: "2d6", input: "2d6<5" },
+			{ expectedComp: "<=3", expectedDice: "1d8", input: "1d8<=3" },
+			{ expectedComp: ">=8", expectedDice: "1d12", input: "1d12>=8" },
+			{ expectedComp: "==2", expectedDice: "1d4", input: "1d4==2" },
+			{ expectedComp: "!=7", expectedDice: "1d10", input: "1d10!=7" },
 		];
 
 		for (const { input, expectedComp, expectedDice } of tests) {
@@ -85,9 +85,9 @@ describe("getThreshold", () => {
 
 	it("should handle different operators in threshold", () => {
 		const tests = [
-			{ dice: "1d20>=10", threshold: ">15", expected: "1d20>15" },
-			{ dice: "1d20>10", threshold: "<=5", expected: "1d20<=5" },
-			{ dice: "1d20<10", threshold: "==8", expected: "1d20==8" },
+			{ dice: "1d20>=10", expected: "1d20>15", threshold: ">15" },
+			{ dice: "1d20>10", expected: "1d20<=5", threshold: "<=5" },
+			{ dice: "1d20<10", expected: "1d20==8", threshold: "==8" },
 		];
 
 		for (const { dice, threshold, expected } of tests) {

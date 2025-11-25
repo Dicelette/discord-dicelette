@@ -59,7 +59,8 @@ describe("calculateSimilarity", () => {
 		const similarity1 = calculateSimilarity("cat", "bat");
 		expect(similarity1).toBeGreaterThan(0);
 		expect(similarity1).toBeLessThan(1);
-		expect(similarity1).toBeCloseTo(0.6666, 4);
+		//cut to 4 digit
+		expect(similarity1.toFixed(4)).toBeCloseTo(0.6667, 4);
 
 		const similarity2 = calculateSimilarity("kitten", "sitting");
 		expect(similarity2).toBeGreaterThan(0);

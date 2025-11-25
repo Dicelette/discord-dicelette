@@ -48,12 +48,12 @@ describe("parseCustomCritical", () => {
 
 	it("should handle different comparison operators", () => {
 		const tests = [
-			{ input: ">10", expected: ">" },
-			{ input: "<5", expected: "<" },
-			{ input: ">=20", expected: ">=" },
-			{ input: "<=3", expected: "<=" },
-			{ input: "!=7", expected: "!=" },
-			{ input: "==15", expected: "==" },
+			{ expected: ">", input: ">10" },
+			{ expected: "<", input: "<5" },
+			{ expected: ">=", input: ">=20" },
+			{ expected: "<=", input: "<=3" },
+			{ expected: "!=", input: "!=7" },
+			{ expected: "==", input: "==15" },
 		];
 
 		for (const { input, expected } of tests) {
@@ -130,11 +130,11 @@ describe("parseOpposition", () => {
 
 	it("should handle different comparison operators", () => {
 		const tests = [
-			{ input: ">10", expected: ">" },
-			{ input: "<5", expected: "<" },
-			{ input: ">=20", expected: ">=" },
-			{ input: "<=3", expected: "<=" },
-			{ input: "!=7", expected: "!=" },
+			{ expected: ">", input: ">10" },
+			{ expected: "<", input: "<5" },
+			{ expected: ">=", input: ">=20" },
+			{ expected: "<=", input: "<=3" },
+			{ expected: "!=", input: "!=7" },
 		];
 
 		for (const { input, expected } of tests) {
@@ -164,17 +164,17 @@ describe("parseOpposition", () => {
 
 describe("skillCustomCritical", () => {
 	const mockCritical: Record<string, CustomCritical> = {
-		skillCrit: {
-			affectSkill: true,
-			onNaturalDice: false,
-			sign: ">",
-			value: "15",
-		},
 		nonSkillCrit: {
 			affectSkill: false,
 			onNaturalDice: false,
 			sign: "<",
 			value: "5",
+		},
+		skillCrit: {
+			affectSkill: true,
+			onNaturalDice: false,
+			sign: ">",
+			value: "15",
 		},
 	};
 

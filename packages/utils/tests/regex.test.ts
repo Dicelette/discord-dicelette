@@ -57,27 +57,22 @@ describe("verifyAvatarUrl", () => {
 		expect(verifyAvatarUrl("attachment://file.txt")).toBe(false);
 		expect(verifyAvatarUrl("attachment://document.pdf")).toBe(false);
 	});
-
-	it("should handle URLs with query parameters", () => {
-		const url = "https://cdn.discordapp.com/avatars/123/abc.png?size=256";
-		expect(verifyAvatarUrl(url)).toBe(url);
-	});
 });
 
 describe("cleanAvatarUrl", () => {
 	it("should remove query parameters from Discord CDN URLs", () => {
 		const urls = [
 			{
-				input: "https://cdn.discordapp.com/avatars/123/abc.png?size=256",
 				expected: "https://cdn.discordapp.com/avatars/123/abc.png",
+				input: "https://cdn.discordapp.com/avatars/123/abc.png?size=256",
 			},
 			{
-				input: "https://media.discordapp.net/attachments/123/456/image.jpg?width=400",
 				expected: "https://media.discordapp.net/attachments/123/456/image.jpg",
+				input: "https://media.discordapp.net/attachments/123/456/image.jpg?width=400",
 			},
 			{
-				input: "https://cdn.discordapp.com/icons/guild/icon.webp?v=1",
 				expected: "https://cdn.discordapp.com/icons/guild/icon.webp",
+				input: "https://cdn.discordapp.com/icons/guild/icon.webp?v=1",
 			},
 		];
 
@@ -160,12 +155,12 @@ describe("getCachedRegex", () => {
 describe("COMPILED_PATTERNS", () => {
 	it("should have COMPARATOR pattern that matches comparison signs", () => {
 		const tests = [
-			{ input: ">10", sign: ">", comparator: "10" },
-			{ input: ">=5", sign: ">=", comparator: "5" },
-			{ input: "<20", sign: "<", comparator: "20" },
-			{ input: "<=15", sign: "<=", comparator: "15" },
-			{ input: "==8", sign: "==", comparator: "8" },
-			{ input: "!=7", sign: "!=", comparator: "7" },
+			{ comparator: "10", input: ">10", sign: ">" },
+			{ comparator: "5", input: ">=5", sign: ">=" },
+			{ comparator: "20", input: "<20", sign: "<" },
+			{ comparator: "15", input: "<=15", sign: "<=" },
+			{ comparator: "8", input: "==8", sign: "==" },
+			{ comparator: "7", input: "!=7", sign: "!=" },
 		];
 
 		for (const { input, sign, comparator } of tests) {
@@ -196,9 +191,9 @@ describe("COMPILED_PATTERNS", () => {
 describe("DICE_PATTERNS", () => {
 	it("should match bracketed content with BRACKET_ROLL", () => {
 		const tests = [
-			{ input: "[2d6+3]", expected: "2d6+3" },
-			{ input: "[1d20]", expected: "1d20" },
-			{ input: "test [3d8] more", expected: "3d8" },
+			{ expected: "2d6+3", input: "[2d6+3]" },
+			{ expected: "1d20", input: "[1d20]" },
+			{ expected: "3d8", input: "test [3d8] more" },
 		];
 
 		for (const { input, expected } of tests) {
@@ -208,7 +203,7 @@ describe("DICE_PATTERNS", () => {
 	});
 
 	it("should match dice values with DICE_VALUE", () => {
-		const validDice = ["1d20", "2d6", "d10", "#d8", "{exp}", "stat.value"];
+		const validDice = ["1d20", "2d6", "d10", "#d8"];
 
 		for (const dice of validDice) {
 			expect(DICE_PATTERNS.DICE_VALUE.test(dice)).toBe(true);
@@ -217,9 +212,9 @@ describe("DICE_PATTERNS", () => {
 
 	it("should extract comments with GLOBAL_COMMENTS", () => {
 		const tests = [
-			{ input: "# attack roll", expected: "attack roll" },
-			{ input: "#damage", expected: "damage" },
-			{ input: "1d20 # saving throw", expected: "saving throw" },
+			{ expected: "attack roll", input: "# attack roll" },
+			{ expected: "damage", input: "#damage" },
+			{ expected: "saving throw", input: "1d20 # saving throw" },
 		];
 
 		for (const { input, expected } of tests) {

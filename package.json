@@ -67,7 +67,7 @@
 		"prepare": "husky",
 		"prerelease": "pnpm run --recursive tsc",
 		"release": "commit-and-tag-version",
-		"test": "pnpm --filter @dicelette/parse_result run test"
+		"test": "run test"
 	},
 	"version": "2.20.0"
 }
