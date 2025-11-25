@@ -166,6 +166,16 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["biome.json", "**/package.json", "!**/node_modules/**"],
+			"assist": {
+				"actions": {
+					"source": {
+						"useSortedKeys": "off"
+					}
+				}
+			}
 		}
 	]
 }
