@@ -73,7 +73,7 @@ export async function baseRoll(
 		userData?.stats,
 		true,
 		undefined,
-		client.settings.get(interaction.guild!.id)?.templateID.statsName
+		client.settings.get(interaction.guild!.id, "templateID.statsName")
 	);
 	const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
 	const { criticalsFromDice, serverData } = await getCritical(

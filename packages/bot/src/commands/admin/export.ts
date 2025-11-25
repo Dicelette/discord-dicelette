@@ -126,7 +126,8 @@ async function exportToCsv(
 					let newStats: Record<string, number | undefined> = {};
 					if (statsNameNormalized && stats.stats) {
 						for (let i = 0; i < statsNameNormalized.length; i++) {
-							const name = statsName![i];
+							const name = statsName?.[i];
+							if (!name) continue;
 							const norm = statsNameNormalized[i];
 							newStats[name] = stats.stats?.[norm];
 						}
