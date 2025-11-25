@@ -21,6 +21,7 @@ export async function findMessageBefore(
 export * from "./bulk";
 export * from "./criticalcount";
 export * from "./embeds";
+export * from "./roll_handler";
 export * from "./send";
 export * from "./strip_ooc";
 export * from "./thread";

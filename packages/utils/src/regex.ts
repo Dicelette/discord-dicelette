@@ -45,6 +45,7 @@ export function verifyAvatarUrl(url: string) {
 	// Reset lastIndex for global regex to avoid issues
 	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
 	COMPILED_PATTERNS.VALID_EXTENSIONS.lastIndex = 0;
+	url.split("?")[0]; // Ignore query parameters for extension check
 	if (url.match(COMPILED_PATTERNS.AVATAR_URL)) return url;
 	if (url.match(COMPILED_PATTERNS.VALID_EXTENSIONS) && url.startsWith("attachment://"))
 		return url;

@@ -9,7 +9,6 @@ import {
 	type CustomCritical,
 	DiceTypeError,
 	generateStatsDice,
-	replaceFormulaInDice,
 	type StatisticalTemplate,
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
@@ -179,7 +178,7 @@ export async function rollMacro(
 		expressionStr,
 		comments
 	);
-	dice = composed.diceWithoutComparator;
+	//dice = composed.diceWithoutComparator;
 	const comparator = composed.comparatorEvaluated;
 	const rawComparator = composed.rawComparator;
 
@@ -313,7 +312,7 @@ export async function rollStatistique(
 	);
 	dice = composed.diceWithoutComparator;
 	const rawComparator = composed.rawComparator;
-	const diceEvaluated = replaceFormulaInDice(dice);
+	//const diceEvaluated = replaceFormulaInDice(dice);
 	const opposition = oppositionVal
 		? parseOpposition(oppositionVal, rawComparator, userStatistique.stats, userStatStr)
 		: undefined;
