@@ -1,76 +1,73 @@
 {
-	"author": "",
-	"commit-and-tag-version": {
-		"bumpFiles": [
-			{
-				"filename": "packages/bot/package.json",
-				"type": "json"
-			},
-			{
-				"filename": "package.json",
-				"type": "json"
-			}
-		],
-		"t": ""
-	},
-	"dependencies": {
-		"@dicelette/core": "^1.21.0",
-		"@types/node": "^22.17.1",
-		"dedent": "^1.6.0",
-		"discord.js": "14.25.0",
-		"dotenv": "^17.2.1",
-		"tslog": "^4.9.3",
-		"tsx": "^4.20.4",
-		"uniformize": "^2.4.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.3.2",
-		"commit-and-tag-version": "^12.5.2",
-		"cross-env": "^7.0.3",
-		"husky": "^9.1.7",
-		"i18next": "^25.3.5",
-		"rimraf": "^6.0.1",
-		"ts-loader": "^9.5.2",
-		"tsc-alias": "^1.8.16",
-		"tsconfig-paths": "^4.2.0",
-		"typescript": "^5.9.3",
-		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "^3.2.4"
-	},
-	"engineStrict": true,
-	"engines": {
-		"node": "^20.0.0"
-	},
-	"keywords": [],
-	"license": "GNU GPLv3",
-	"name": "dicelette",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"better-sqlite3",
-			"canvas",
-			"esbuild"
-		],
-		"overrides": {
-			"@dicelette/core": "link:../core"
-		}
-	},
-	"private": true,
-	"scripts": {
-		"analyze": "pnpm --filter @testing/analyzeRoll run test",
-		"build": "pnpm run --recursive build",
-		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-		"lint": "biome check --write ./packages/ --unsafe",
-		"pm2:delete": "pm2 delete dicelette",
-		"pm2:restart": "pnpm run build && pm2 restart dicelette",
-		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
-		"pm2:stop": "pm2 stop dicelette",
-		"predev": "pnpm run --recursive prebuild",
-		"prepare": "husky",
-		"prerelease": "pnpm run --recursive tsc",
-		"release": "commit-and-tag-version",
-		"test": "run test"
-	},
-	"version": "2.20.0"
+  "author": "",
+  "commit-and-tag-version": {
+    "bumpFiles": [
+      {
+        "filename": "packages/bot/package.json",
+        "type": "json"
+      },
+      {
+        "filename": "package.json",
+        "type": "json"
+      }
+    ],
+    "t": ""
+  },
+  "dependencies": {
+    "@dicelette/core": "^1.21.0",
+    "@types/node": "^22.17.1",
+    "dedent": "^1.6.0",
+    "discord.js": "14.25.0",
+    "dotenv": "^17.2.1",
+    "tslog": "^4.9.3",
+    "tsx": "^4.20.4",
+    "uniformize": "^2.4.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.2",
+    "commit-and-tag-version": "^12.5.2",
+    "cross-env": "^7.0.3",
+    "husky": "^9.1.7",
+    "i18next": "^25.3.5",
+    "rimraf": "^6.0.1",
+    "ts-loader": "^9.5.2",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": "^20.0.0"
+  },
+  "keywords": [],
+  "license": "GNU GPLv3",
+  "name": "dicelette",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "better-sqlite3",
+      "canvas",
+      "esbuild"
+    ]
+  },
+  "private": true,
+  "scripts": {
+    "analyze": "pnpm --filter @testing/analyzeRoll run test",
+    "build": "pnpm run --recursive build",
+    "dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+    "dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+    "lint": "biome check --write ./packages/ --unsafe",
+    "pm2:delete": "pm2 delete dicelette",
+    "pm2:restart": "pnpm run build && pm2 restart dicelette",
+    "pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
+    "pm2:stop": "pm2 stop dicelette",
+    "predev": "pnpm run --recursive prebuild",
+    "prepare": "husky",
+    "prerelease": "pnpm run --recursive tsc",
+    "release": "commit-and-tag-version",
+    "test": "run test"
+  },
+  "version": "2.20.0"
 }
