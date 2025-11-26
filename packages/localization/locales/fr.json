@@ -31,8 +31,8 @@
 		"description": "Ajoute automatiquement un rôle quand une fiche est validée.",
 		"dice": {
 			"desc": "Ajoute un rôle quand des macros sont ajoutées",
-			"remove": "Aucun rôle ne sera ajouté aux joueurs quand leurs dés sont ajoutés.",
-			"set": "{{- role}} sera maintenant ajoutés aux joueurs quand leurs dés sont enregistrés."
+			"remove": "Aucun rôle ne sera ajouté aux joueurs quand leurs macros sont ajoutées.",
+			"set": "{{- role}} sera maintenant ajoutés aux joueurs quand leurs macros sont enregistrés."
 		},
 		"name": "auto_role",
 		"options": "Rôle à ajouter",
@@ -439,7 +439,7 @@
 		"dice": "Macro",
 		"display": "Personnage",
 		"edit": {
-			"dice": "Dés modifiés",
+			"dice": "Macros modifiées",
 			"stats": "Statistiques modifiées"
 		},
 		"old": "Joueur enregistré",
@@ -468,7 +468,7 @@
 			"type_error": "{{- type}} n'est pas une valeur valide. Les valeurs valides sont `cs` ou `cf`. "
 		},
 		"damage": {
-			"empty": "Vous n'avez pas de dés de capacités enregistrés.",
+			"empty": "Vous n'avez pas de macros enregistrées.",
 			"notFound": "`{{- atq}}` n'est pas enregistré pour {{- charName}}."
 		},
 		"discord": "## [DISCORD] :warning: __Erreur__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nMerci de signaler le bug sur [le serveur officiel](https://discord.gg/2PUqwWeQYZ).",
@@ -528,7 +528,7 @@
 			"json": "Vous devez fournir un fichier JSON valide.",
 			"notFound": "Aucun modèle ou channel configuré."
 		},
-		"tooMuchDice": "Trop de dés ont été fournis ! Vous ne pouvez pas avoir plus de 25 dés.",
+		"tooMuchDice": "Trop de macros ont été fournies ! Vous ne pouvez pas avoir plus de 25 macros.",
 		"totalExceededBy": "Le total des points est dépassé de `{{- max}}`.",
 		"user": {
 			"charName": "Le personnage {{- charName}} n'est pas enregistré.",
@@ -675,9 +675,9 @@
 		"delete": "Les logs ne seront plus envoyés",
 		"description": "Choisir un channel où envoyer les logs d'erreurs",
 		"dice": {
-			"add": "{{- user}} a ajouté les dés pour {{- char}} (dans {{- fiche}})",
-			"edit": "{{- user}} a modifié les dés de {{- char}} (dans {{- fiche}})",
-			"remove": "{{- user}} a supprimé les dés de {{-char}} (dans {{- fiche}})"
+			"add": "{{- user}} a ajouté des macro pour {{- char}} (dans {{- fiche}})",
+			"edit": "{{- user}} a modifié les macro de {{- char}} (dans {{- fiche}})",
+			"remove": "{{- user}} a supprimé les macros de {{-char}} (dans {{- fiche}})"
 		},
 		"inChan": "dans {{- chan}}.",
 		"name": "logs",
