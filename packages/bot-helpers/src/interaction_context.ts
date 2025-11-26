@@ -1,21 +1,9 @@
 import "uniformize";
 import type { EClient } from "@dicelette/client";
 import { ln } from "@dicelette/localization";
-import type { GuildData, Translation, UserData } from "@dicelette/types";
+import type { GuildData, UserData } from "@dicelette/types";
 import type * as Djs from "discord.js";
-
-/**
- * Complete interaction context with locale, translation, and guild configuration.
- * Reduces repeated getLangAndConfig pattern throughout the codebase.
- */
-export interface InteractionContext {
-	/** Translation function for the interaction's locale */
-	ul: Translation;
-	/** Locale to use for this interaction */
-	langToUse: Djs.Locale;
-	/** Guild configuration if interaction is in a guild */
-	config?: GuildData;
-}
+import type { InteractionContext } from "./interfaces";
 
 /**
  * Get comprehensive interaction context including locale and guild configuration.

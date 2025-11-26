@@ -2,7 +2,7 @@ import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-import { getInteractionContext } from "./interaction_context";
+import { getInteractionContext } from "../interaction_context";
 
 /**
  * Generic autocomplete helper that extracts common context

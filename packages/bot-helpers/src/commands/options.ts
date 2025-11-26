@@ -1,26 +1,6 @@
 import { t } from "@dicelette/localization";
 import type * as Djs from "discord.js";
-
-/**
- * Common interaction options extracted for convenience.
- * Reduces repetitive options.getString(t(...)) calls throughout the codebase.
- */
-export interface CommonOptions {
-	/** Character name from t("common.character") */
-	character?: string;
-	/** Statistic name from t("common.statistic") */
-	statistic?: string;
-	/** Skill/damage name from t("common.name") */
-	name?: string;
-	/** Dice value from t("common.dice") */
-	dice?: string;
-	/** Expression from t("common.expression") */
-	expression?: string;
-	/** Comments from t("common.comments") */
-	comments?: string;
-	/** User from t("display.userLowercase") */
-	user?: string;
-}
+import type { CommonOptions, RollInteractionOptions } from "../interfaces";
 
 /**
  * Extract commonly used interaction options in a single call.
@@ -110,4 +90,37 @@ export function getNameOption(
 	required = false
 ): string | undefined {
 	return options.getString(t("common.name"), required) ?? undefined;
+}
+
+/**
+ * Extracts and normalizes common roll-related options from a Discord command interaction.
+ * Centralizes the repetitive option extraction logic present in rollMacro, rollStatistique,
+ * and snippet commands.
+ *
+ * @param options - The command interaction options resolver
+ * @returns Normalized roll options object
+ *
+ * @example
+ * const opts = extractRollOptions(interaction.options);
+ * // => { expression: "0", threshold: ">=15", oppositionVal: "12", userComments: "test", comments: "# test" }
+ */
+export function extractRollOptions(
+	options: Djs.CommandInteractionOptionResolver
+): RollInteractionOptions {
+	const expression = options.getString(t("common.expression")) ?? "0";
+	const threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
+	const oppositionVal =
+		options.getString(t("dbRoll.options.opposition.name")) ?? undefined;
+	const userComments = options.getString(t("common.comments")) ?? undefined;
+
+	// Format comments with # prefix if present
+	const comments = userComments ? `# ${userComments}` : "";
+
+	return {
+		comments,
+		expression,
+		oppositionVal,
+		threshold,
+		userComments,
+	};
 }

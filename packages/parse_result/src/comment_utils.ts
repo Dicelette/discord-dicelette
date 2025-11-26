@@ -12,7 +12,7 @@ import { extractDiceData, getComments } from "./dice_extractor";
  *
  * @example
  * extractAndMergeComments("2d6 # attack", "damage roll")
- * // => { cleanedDice: "2d6", mergedComments: "# attack damage roll" }
+ * => { cleanedDice: "2d6", mergedComments: "# attack damage roll" }
  */
 export function extractAndMergeComments(
 	dice: string,
