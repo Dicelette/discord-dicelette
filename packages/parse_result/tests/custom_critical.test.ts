@@ -121,9 +121,6 @@ describe("parseOpposition", () => {
 	});
 
 	it("should return undefined if no sign found", () => {
-		const result = parseOpposition("10", ">5");
-		// parseOpposition peut retourner un résultat avec le signe du diceComparator
-		// Si on veut tester qu'il n'y a pas de signe, on doit passer une string sans signe dans les deux paramètres
 		const result2 = parseOpposition("10", "5");
 		expect(result2).toBeUndefined();
 	});
@@ -156,9 +153,9 @@ describe("parseOpposition", () => {
 		expect(result).toBeDefined();
 	});
 
-	it("should return undefined for non-numeric non-rollable values", () => {
-		const result = parseOpposition(">invalid_text", ">=5");
-		expect(result).toBeUndefined();
+	it("should return undefined for non-numeric non-rollable values", async () => {
+		const res = parseOpposition(">invalid", ">=5");
+		expect(res).toBeUndefined();
 	});
 });
 
