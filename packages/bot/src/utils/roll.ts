@@ -12,6 +12,7 @@ import {
 } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
+	buildInfoRollFromStats,
 	composeRollBase,
 	convertNameToValue,
 	getCriticalFromDice,
@@ -312,8 +313,9 @@ export async function rollStatistique(
 		statistic && standardizedStatistic
 			? { name: statistic, standardized: standardizedStatistic }
 			: undefined;
-	if (!infoRoll && findStatsExpr)
-		infoRoll = { name: findStatsExpr.join(" "), standardized: findStatsExpr.join(" ") };
+	if (!infoRoll && findStatsExpr) {
+		infoRoll = buildInfoRollFromStats(findStatsExpr, ctx?.templateID?.statsName);
+	}
 
 	const roll = composed.roll;
 	const customCritical =

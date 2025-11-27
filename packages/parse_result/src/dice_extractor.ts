@@ -360,6 +360,22 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	return unNormalized;
 }
 
+/**
+ * Build an infoRoll object from found stats, restoring original accents using statsName list.
+ */
+export function buildInfoRollFromStats(
+	statsFound: string[] | undefined,
+	statsName?: string[]
+): { name: string; standardized: string } | undefined {
+	if (!statsFound || statsFound.length === 0) return undefined;
+	const names =
+		statsName && statsName.length > 0
+			? unNormalizeStatsName(statsFound, statsName)
+			: statsFound;
+	const name = names.join(" ");
+	return { name, standardized: name.standardize() };
+}
+
 export function findStatInDiceFormula(
 	diceFormula: string,
 	statsToFind?: string[]

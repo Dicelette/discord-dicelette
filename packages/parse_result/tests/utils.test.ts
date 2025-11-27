@@ -77,7 +77,7 @@ describe("convertExpression", () => {
 	});
 
 	it("should add + prefix to expression without sign", () => {
-		const result = convertExpression("abc");
+		const result = convertExpression("force", { force: 8 });
 		expect(result).toMatch(/^\+/);
 	});
 

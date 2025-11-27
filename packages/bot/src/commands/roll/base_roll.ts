@@ -5,10 +5,10 @@ import {
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import {
+	buildInfoRollFromStats,
 	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
-	unNormalizeStatsName,
 } from "@dicelette/parse_result";
 import * as Djs from "discord.js";
 
@@ -93,15 +93,10 @@ export async function baseRoll(
 	);
 
 	// Build infoRoll using helper to recover original accented name if available
-	let infoRoll: { name: string; standardized: string } | undefined;
-	if (res.infoRoll) {
-		const statsList = ctx?.templateID?.statsName ?? [];
-		const original =
-			statsList.length > 0
-				? unNormalizeStatsName([res.infoRoll], statsList)[0]
-				: res.infoRoll;
-		infoRoll = { name: original, standardized: original.standardize() };
-	}
+	const infoRoll = buildInfoRollFromStats(
+		res.infoRoll ? [res.infoRoll] : undefined,
+		ctx?.templateID?.statsName
+	);
 	const opts: RollOptions = {
 		charName,
 		critical: serverData?.critical,
