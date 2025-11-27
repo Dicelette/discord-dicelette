@@ -350,7 +350,7 @@ export function replaceStatsInDiceFormula(
 	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };
 }
 
-function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
+export function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
 	const unNormalized: string[] = [];
 	for (const stat of stats) {
 		const found = statsName.find((name) => name.standardize() === stat.standardize());

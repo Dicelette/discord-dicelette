@@ -70,7 +70,9 @@ export async function handleRollResult(
 		{ lang },
 		serverCritical,
 		charName,
-		typeof infoRoll === "string" ? undefined : infoRoll,
+		typeof infoRoll === "string"
+			? { name: infoRoll, standardized: infoRoll.standardize() }
+			: infoRoll,
 		criticalsFromDice,
 		opposition
 	);

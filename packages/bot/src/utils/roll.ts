@@ -7,7 +7,6 @@ import {
 import type { EClient } from "@dicelette/client";
 import {
 	type CustomCritical,
-	DiceTypeError,
 	generateStatsDice,
 	type StatisticalTemplate,
 } from "@dicelette/core";
@@ -20,7 +19,6 @@ import {
 	getRoll,
 	includeDiceType,
 	parseOpposition,
-	ResultAsText,
 	replaceStatInDiceName,
 	rollCustomCritical,
 	rollCustomCriticalsFromDice,
@@ -61,26 +59,14 @@ export async function rollWithInteraction(
 		userId: user?.id ?? interaction.user.id,
 	};
 	const result = getRoll(dice);
-
-	const defaultMsg = new ResultAsText(
-		result,
-		data,
-		critical,
-		charName,
-		infoRoll,
-		customCritical,
-		opposition
-	);
-	const output = defaultMsg.defaultMessage();
+	if (!result) {
+		await reply(interaction, {
+			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
 	if (!silent) {
-		if (defaultMsg.error) {
-			await reply(interaction, {
-				embeds: [embedError(output, ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			return;
-		}
-
 		return await handleRollResult({
 			charName,
 			client,
@@ -90,14 +76,13 @@ export async function rollWithInteraction(
 			infoRoll,
 			lang: data.lang,
 			opposition,
-			result: result as NonNullable<typeof result>,
+			result: result,
 			serverCritical: critical,
 			source: interaction,
 			ul,
 			user,
 		});
 	}
-	if (defaultMsg.error) throw new DiceTypeError(dice, output);
 	return;
 }
 

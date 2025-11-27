@@ -8,6 +8,7 @@ import {
 	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
+	unNormalizeStatsName,
 } from "@dicelette/parse_result";
 import * as Djs from "discord.js";
 
@@ -90,11 +91,23 @@ export async function baseRoll(
 		userData,
 		rollCustomCriticalsFromDice(dice, ul)
 	);
+
+	// Build infoRoll using helper to recover original accented name if available
+	let infoRoll: { name: string; standardized: string } | undefined;
+	if (res.infoRoll) {
+		const statsList = ctx?.templateID?.statsName ?? [];
+		const original =
+			statsList.length > 0
+				? unNormalizeStatsName([res.infoRoll], statsList)[0]
+				: res.infoRoll;
+		infoRoll = { name: original, standardized: original.standardize() };
+	}
 	const opts: RollOptions = {
 		charName,
 		critical: serverData?.critical,
 		customCritical: criticalsFromDice,
 		hideResult: hidden,
+		infoRoll,
 		opposition,
 		silent,
 	};
