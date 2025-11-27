@@ -31,7 +31,7 @@ import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply, sendResult } from "messages";
+import { embedError, handleRollResult, reply } from "messages";
 import { findBestMatchingDice } from "./find_macro";
 
 /**
@@ -81,14 +81,21 @@ export async function rollWithInteraction(
 			return;
 		}
 
-		return await sendResult(
-			interaction,
-			{ roll: defaultMsg },
-			client.settings,
+		return await handleRollResult({
+			charName,
+			client,
+			criticalsFromDice: customCritical,
+			deleteInput: false,
+			hideResult: hideResult ?? undefined,
+			infoRoll,
+			lang: data.lang,
+			opposition,
+			result: result as NonNullable<typeof result>,
+			serverCritical: critical,
+			source: interaction,
 			ul,
 			user,
-			hideResult
-		);
+		});
 	}
 	if (defaultMsg.error) throw new DiceTypeError(dice, output);
 	return;

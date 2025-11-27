@@ -59,9 +59,8 @@ export default (client: EClient): void => {
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);
-			const { result, detectRoll } = isRoll;
+			const { result, detectRoll, infoRoll } = isRoll;
 			const deleteInput = !detectRoll;
-			const channel = message.channel;
 			if (!result) return;
 			const { criticalsFromDice, serverData } = await getCritical(
 				client,
@@ -72,7 +71,7 @@ export default (client: EClient): void => {
 				rollCustomCriticalsFromDice(content, ul)
 			);
 
-			const opposition = parseComparator(content, userData?.stats, isRoll.infoRoll);
+			const opposition = parseComparator(content, userData?.stats, infoRoll);
 
 			// Use the unified roll handler
 			await handleRollResult({
@@ -80,7 +79,7 @@ export default (client: EClient): void => {
 				client,
 				criticalsFromDice,
 				deleteInput,
-				infoRoll: isRoll.infoRoll,
+				infoRoll,
 				lang: userLang,
 				opposition,
 				result,

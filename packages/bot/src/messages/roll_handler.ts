@@ -12,6 +12,8 @@ interface RollHandlerOptions {
 	lang: Djs.Locale;
 	/** Translation function */
 	ul: Translation;
+	/** If true and source is an interaction, reply ephemerally */
+	hideResult?: boolean;
 	/** Server critical settings (simple success/failure thresholds) */
 	serverCritical?: Critical;
 	/** Character name */
@@ -50,6 +52,7 @@ export async function handleRollResult(
 		result,
 		lang,
 		ul,
+		hideResult,
 		serverCritical,
 		charName,
 		infoRoll,
@@ -101,7 +104,8 @@ export async function handleRollResult(
 			resultAsText,
 			author.id,
 			logUrl,
-			deleteInput
+			deleteInput,
+			hideResult
 		);
 		if (deleteInput && source instanceof Djs.Message) await source.delete();
 		return reply;
@@ -150,7 +154,8 @@ export async function handleRollResult(
 		resultAsText,
 		author.id,
 		idMessage,
-		deleteInput
+		deleteInput,
+		hideResult
 	);
 
 	// Apply delete timer
@@ -171,7 +176,8 @@ async function replyToSource(
 	resultAsText: ResultAsText,
 	authorId: string,
 	idMessage?: string,
-	deleteInput = false
+	deleteInput = false,
+	hideResult?: boolean
 ): Promise<Djs.Message | Djs.InteractionResponse> {
 	const content = resultAsText.onMessageSend(idMessage, authorId);
 
@@ -192,5 +198,6 @@ async function replyToSource(
 	return await source.reply({
 		allowedMentions: { repliedUser: true },
 		content,
+		flags: hideResult ? Djs.MessageFlags.Ephemeral : undefined,
 	});
 }

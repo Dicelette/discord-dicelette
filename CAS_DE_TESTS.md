@@ -15,7 +15,7 @@
 - **Prérequis** : Aucun
 - **Commande** : `/roll dé:4d6`
 - **Résultat attendu** : 
-  - Le bot lance 4 dés à 6 faces
+  - Le bot lance 4 dés à 6 faces4d6
   - Le résultat affiche chaque dé individuel et le total
 
 #### Test 1.1.3 : Lancer des dés avec modificateurs
@@ -33,7 +33,6 @@
   - Message éphémère
 
 #### Test 1.1.5 : Lancer des dés avec référence à un personnage
-- **Prérequis** : Avoir un personnage enregistré nommé "Gandalf"
 - **Commande** : `/roll dé:1d20 @Gandalf`
 - **Résultat attendu** : 
   - Le lancer est associé au personnage "Gandalf"
