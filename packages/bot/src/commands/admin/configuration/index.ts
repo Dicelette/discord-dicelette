@@ -70,7 +70,7 @@ export const configuration = {
 				.addChannelOption((option) =>
 					option
 						.setNames("common.channel")
-						.setDescription("changeThread.options")
+						.setDescriptions("changeThread.options")
 						.setRequired(false)
 						.addChannelTypes(
 							Djs.ChannelType.GuildText,
