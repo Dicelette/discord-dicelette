@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
 
 import process from "node:process";
+import type { Translation } from "..";
 import type { TemplateResult } from "./database";
 
 export const TUTORIAL_IMAGES = [
@@ -48,15 +49,17 @@ export enum LinksVariables {
 	ORIGINAL_DICE = "{{original_dice}}",
 }
 
-export const DEFAULT_TEMPLATE: TemplateResult = {
-	final: `[[${LinksVariables.NAME}${LinksVariables.RESULTS}]](<${LinksVariables.LINK}>)`,
-	format: {
-		character: `${LinksVariables.CHARACTER}`,
-		dice: `${LinksVariables.DICE}`,
-		info: `${LinksVariables.INFO} -`,
-		name: `__${LinksVariables.NAME}__: `,
-		originalDice: `${LinksVariables.ORIGINAL_DICE}`,
-	},
-	joinResult: "; ",
-	results: `${LinksVariables.INFO} \`${LinksVariables.DICE}\``,
+export const DEFAULT_TEMPLATE = (ul: Translation): TemplateResult => {
+	return {
+		final: `[[${LinksVariables.NAME}${LinksVariables.RESULTS}]](<${LinksVariables.LINK}>)`,
+		format: {
+			character: `${LinksVariables.CHARACTER}`,
+			dice: `${LinksVariables.DICE}`,
+			info: `${LinksVariables.INFO} -`,
+			name: `__${LinksVariables.NAME}__${ul("common.space")}: `,
+			originalDice: `${LinksVariables.ORIGINAL_DICE}`,
+		},
+		joinResult: "; ",
+		results: `${LinksVariables.INFO} \`${LinksVariables.DICE}\``,
+	};
 };

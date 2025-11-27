@@ -49,7 +49,7 @@ export async function commandMenu(
 	const message = interaction.targetMessage.content;
 	const messageUrl = interaction.targetMessage.url;
 
-	const link = finalLink(template, message, messageUrl);
+	const link = finalLink(template, message, messageUrl, ul);
 	if (!link) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.noResult"),
@@ -78,11 +78,7 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 
 		if (typeof valueRaw === "object" && "long" in valueRaw && "short" in valueRaw)
 			value = valueRaw as ShortLong;
-		else
-			value = String(valueRaw)
-				.replaceAll("`", "")
-				.replaceAll("*", "")
-				.replaceAll("_", "");
+		else value = String(valueRaw).replaceAll("*", "").replaceAll("_", "");
 
 		const ensureString = (): string => {
 			if (typeof value === "string") return value;
@@ -127,13 +123,14 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 export function finalLink(
 	template: TemplateResult | undefined,
 	message: string,
-	messageUrl: string
+	messageUrl: string,
+	ul: Translation
 ) {
 	const variables = getVariablesTemplate(message, messageUrl);
 	if (!variables) return undefined;
-	template = template ?? DEFAULT_TEMPLATE;
+	template = template ?? DEFAULT_TEMPLATE(ul);
 
-	const resultsText = createResultFromTemplate(template, variables);
+	const resultsText = createResultFromTemplate(template, variables, ul);
 
 	const context: Record<string, unknown> = {
 		link: variables.link,
@@ -154,14 +151,15 @@ export function finalLink(
 		context.character = renderTemplate(template.format.character, charCtx);
 	} else context.character = "";
 
-	return renderTemplate(template.final, context);
+	return renderTemplate(template.final, context).replaceAll("═", "=");
 }
 
 function createResultFromTemplate(
 	template: TemplateResult | undefined,
-	variables: Variables
+	variables: Variables,
+	ul: Translation
 ) {
-	template = template ?? DEFAULT_TEMPLATE;
+	template = template ?? DEFAULT_TEMPLATE(ul);
 	const fmt = template!.format;
 
 	const rollsText = variables.rolls.map(({ info, dice, original }) => {
@@ -255,8 +253,10 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 
 function getTemplate(
 	client: EClient,
-	interaction: Djs.ButtonInteraction | Djs.MessageContextMenuCommandInteraction
+	interaction: Djs.ButtonInteraction | Djs.MessageContextMenuCommandInteraction,
+	ul?: Translation
 ) {
+	if (!ul) ul = getLangAndConfig(client, interaction).ul;
 	const templateExportText = client.settings.get(
 		interaction.guildId!,
 		"createLinkTemplate"
@@ -265,7 +265,7 @@ function getTemplate(
 		interaction.guildId!,
 		interaction.user.id
 	)?.createLinkTemplate;
-	return templateExportText ?? userTemplate ?? DEFAULT_TEMPLATE;
+	return templateExportText ?? userTemplate ?? DEFAULT_TEMPLATE(ul);
 }
 
 export async function mobileLink(
@@ -277,7 +277,7 @@ export async function mobileLink(
 	const messageUrl = interaction.message.url;
 	const template = getTemplate(client, interaction);
 	//check user mobile or desktop
-	const link = finalLink(template, message, messageUrl);
+	const link = finalLink(template, message, messageUrl, ul);
 	if (!link) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.noResult"),
@@ -299,7 +299,7 @@ export async function desktopLink(
 	const template = getTemplate(client, interaction);
 	const message = interaction.message.content;
 	const messageUrl = interaction.message.url;
-	const link = finalLink(template, message, messageUrl);
+	const link = finalLink(template, message, messageUrl, ul);
 	if (!link) {
 		await interaction.reply({
 			content: ul("copyRollResult.error.noResult"),
