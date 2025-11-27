@@ -30,9 +30,9 @@
 	"autoRole": {
 		"description": "Automatically adds a role when a record is validated.",
 		"dice": {
-			"desc": "Adds a role when dice are added (macro)",
-			"remove": "No roles will be added to players when their dice are added.",
-			"set": "{{- role}} will now be added to players when their dice are saved."
+			"desc": "Adds a role when macros are added",
+			"remove": "No roles will be added to players when macros are added.",
+			"set": "{{- role}} will now be added to players when macros are saved."
 		},
 		"name": "auto_role",
 		"options": "Role to add",
@@ -439,8 +439,8 @@
 		"dice": "Macro",
 		"display": "Character",
 		"edit": {
-			"dice": "Edited dices",
-			"stats": "Modified statistics"
+			"dice": "Macro modified",
+			"stats": "Statistics modified"
 		},
 		"old": "Registered player",
 		"template": "Model",
@@ -468,7 +468,7 @@
 			"type_error": "{{- type}} is not recognized. Valid value are `cs` or `cf`"
 		},
 		"damage": {
-			"empty": "You have no ability dice saved.",
+			"empty": "You have no macros saved.",
 			"notFound": "`{{- atq}}` is not saved in `{{- charName}}`."
 		},
 		"discord": "## [DISCORD] :warning: __Error__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nPlease report the bug on [the official server](https://discord.gg/2PUqwWeQYZ).",
@@ -490,7 +490,7 @@
 			"default": "The dice type `{{- dice}}` is invalid. Logs:\n`{{- error}}`",
 			"embeds": "No macro embeds detected",
 			"eval": "Invalid die: `{{-dice}}` during evaluation validation.",
-			"minus": "Dices cannot be negative !\n\n-# Dice used: `{- dice}}`.",
+			"minus": "Dices cannot be negative !\n\n-# Dice used: `{{- dice}}`.",
 			"notFound": "No dice were found in the command!",
 			"withDice": "Invalid die: `{{- dice}}` during the validation roll."
 		},
@@ -528,7 +528,7 @@
 			"json": "You must provide a JSON file.",
 			"notFound": "No template or channel configured."
 		},
-		"tooMuchDice": "Too many dice have been saved! You cannot have more than 25 dice saved.",
+		"tooMuchDice": "Too many macros have been saved! You cannot have more than 25 macros saved.",
 		"totalExceededBy": "The total of points is exceeded by `{{- max}}`.",
 		"user": {
 			"charName": "The character {{- charName}} is not registered.",
