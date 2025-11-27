@@ -19,33 +19,36 @@ export async function setTemplate(
 	const options = interaction.options;
 	const getOpt = (name: string, required = false, def?: string) =>
 		(options.getString(name, required) ?? def ?? "").replaceAll("\\s", " ");
+	const { ul } = getLangAndConfig(client, interaction);
+
+	const defaultTemplate = DEFAULT_TEMPLATE(ul);
 
 	const template: TemplateResult = {
 		final: getOpt(t("userSettings.createLink.final.name"), true),
 		format: {
-			character: getOpt(t("common.character"), false, DEFAULT_TEMPLATE.format.character),
-			dice: getOpt(t("common.dice"), false, DEFAULT_TEMPLATE.format.dice),
+			character: getOpt(t("common.character"), false, defaultTemplate.format.character),
+			dice: getOpt(t("common.dice"), false, defaultTemplate.format.dice),
 			info: getOpt(
 				t("userSettings.createLink.info.name"),
 				false,
-				DEFAULT_TEMPLATE.format.info
+				defaultTemplate.format.info
 			),
-			name: getOpt(t("common.name"), false, DEFAULT_TEMPLATE.format.name),
+			name: getOpt(t("common.name"), false, defaultTemplate.format.name),
 			originalDice: getOpt(
 				t("userSettings.createLink.originalDice.name"),
 				false,
-				DEFAULT_TEMPLATE.format.originalDice
+				defaultTemplate.format.originalDice
 			),
 		},
 		joinResult: getOpt(
 			t("userSettings.createLink.joinResult.name"),
 			false,
-			DEFAULT_TEMPLATE.joinResult
+			defaultTemplate.joinResult
 		),
 		results: getOpt(
 			t("userSettings.createLink.result.name"),
 			false,
-			DEFAULT_TEMPLATE.results
+			defaultTemplate.results
 		),
 	};
 
@@ -54,7 +57,6 @@ export async function setTemplate(
 		client.userSettings.set(interaction.guildId!, template, userKeys);
 	} else client.settings.set(interaction.guildId!, template, "createLinkTemplate");
 
-	const { ul } = getLangAndConfig(client, interaction);
 	const preview = `\`\`${getTemplatePreview(ul, template)}\`\``;
 	await interaction.reply({
 		content: ul("userSettings.createLink.success", { preview }),
@@ -87,7 +89,8 @@ export function getTemplatePreview(ul: Translation, template?: TemplateResult) {
 	return finalLink(
 		template,
 		diceletteText,
-		"https://discord.com/channels/guildId/channelId/messageId"
+		"https://discord.com/channels/guildId/channelId/messageId",
+		ul
 	);
 }
 
@@ -106,7 +109,7 @@ export async function getTemplateValues(
 		)?.createLinkTemplate;
 	else template = client.settings.get(interaction.guildId!, "createLinkTemplate");
 	if (template) template = merge(DEFAULT_TEMPLATE, template);
-	else template = DEFAULT_TEMPLATE;
+	else template = DEFAULT_TEMPLATE(ul);
 
 	const preview = getTemplatePreview(ul, template);
 	const content = dedent(`
