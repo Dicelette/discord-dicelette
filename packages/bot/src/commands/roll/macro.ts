@@ -33,7 +33,7 @@ export default {
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
 		const { ul } = getLangAndConfig(client, interaction);
 		if (!user && !db.templateID?.damageName?.length) {
-			await replyEphemeralError(interaction, t("error.user.data"), ul);
+			await replyEphemeralError(interaction, ul("error.user.data"), ul);
 			return;
 		}
 		let charOptions = options.getString(t("common.character")) ?? undefined;
@@ -56,7 +56,7 @@ export default {
 				userStatistique = char?.userStatistique?.userData;
 				charOptions = char?.optionChar ?? undefined;
 			}
-			if (!db.templateID.damageName) {
+			if (!db.templateID?.damageName) {
 				if (!userStatistique) {
 					await replyEphemeralError(interaction, ul("error.user.youRegistered"), ul);
 					return;

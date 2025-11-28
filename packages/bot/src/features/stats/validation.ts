@@ -52,8 +52,7 @@ import { sendValidationMessage } from "../user";
  * @param template - The statistical template defining expected statistics and combinations.
  * @param page - The page number to display in the embed footer (defaults to 2).
  * @param lang - The language locale for localization (defaults to English GB).
- * @param moderation
- * @param moderation
+ * @param moderation - Whether the registration is being done under moderation (defaults to false).
  */
 export async function register(
 	interaction: Djs.ModalSubmitInteraction,

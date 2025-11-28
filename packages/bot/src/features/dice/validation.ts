@@ -347,7 +347,7 @@ async function sendValidationResponses(args: {
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		//compter le nombre de fields qui ont été supprimé depuis old et new
-		const count = oldFields ? Math.abs(oldFields.length - newFields.length) : 1;
+		const count = oldFields?.length ?? 1;
 		await sendLogs(
 			ul("logs.dice.remove", {
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,

@@ -327,10 +327,11 @@ export async function rename(
 		if (!oldCharData) {
 			const userData = getUserByEmbed({ message });
 			if (!userData) return;
+			oldChar.push(userData);
 			userData.userName = name;
 			client.characters.set(
 				interaction.guild!.id,
-				oldChar.push(userData),
+				userData,
 				user?.id ?? interaction.user.id
 			);
 		} else {
@@ -441,7 +442,7 @@ export async function move(
 	const newData = deleteUser(interaction, guildData!, user, oldData.charName);
 
 	client.settings.set(interaction.guildId as string, newData);
-	await generateButton(message, ul, embedsList.list);
+	await generateButton(message, ul, embedsList.list, embedsList.files);
 	await reply(interaction, {
 		content: ul("edit.user.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,

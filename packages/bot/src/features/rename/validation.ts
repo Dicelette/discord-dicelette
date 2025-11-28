@@ -40,7 +40,7 @@ export async function validate(
 		?.value.replace("<@", "")
 		.replace(">", "");
 	if (!userId) throw new Error(ul("error.user.notFound"));
-	const user = await fetchUser(interaction.client as EClient, userId);
+	const user = await fetchUser(client, userId);
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel.id,
 		messageId: message.id,

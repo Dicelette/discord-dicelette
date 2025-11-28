@@ -38,7 +38,7 @@ export function deleteByMessageIds(
 		const char = userChars.findIndex((char) => {
 			return char.messageId === messageId;
 		});
-		if (char) {
+		if (char !== -1) {
 			userChars.splice(char, 1);
 			if (userChars.length === 0) {
 				db.delete(guild.id, `user.${user}`);

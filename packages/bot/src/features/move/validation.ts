@@ -32,15 +32,7 @@ export async function validate(
 	if (!user) return;
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
-	//const user = await isUserNameOrId(userId, interaction);
 
-	if (!user) {
-		await interaction.reply({
-			embeds: [embedError(ul("error.user.notFound"), ul)],
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		return await resetButton(message, ul);
-	}
 	const oldUserId = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")
