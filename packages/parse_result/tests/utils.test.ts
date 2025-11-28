@@ -226,6 +226,7 @@ describe("edge cases and integration", () => {
 	});
 
 	it("should handle replaceStatInDiceName with complex names", () => {
+		// biome-ignore lint/style/useNamingConvention: variable-names for test
 		const stats = { my_stat: 20 };
 		const result = replaceStatInDiceName("Roll(my_stat)", stats);
 		expect(result).toBe("Roll(20)");
