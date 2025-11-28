@@ -18,7 +18,7 @@ import * as Djs from "discord.js";
 import dotenv from "dotenv";
 import { PRIVATE_ID, VERSION } from "../../index";
 
-dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
 export default (client: EClient): void => {
 	client.on("clientReady", async () => {

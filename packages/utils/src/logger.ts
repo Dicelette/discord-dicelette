@@ -3,7 +3,7 @@ import process from "node:process";
 import dotenv from "dotenv";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
 
-dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
 const LOG_LEVEL_COLORS = {
 	"*": ["bold", "black", "bgWhiteBright", "dim"],

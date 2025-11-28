@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 import { embedError, reply } from "messages";
 import { sendErrorToWebhook } from "./on_disconnect";
 
-dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
 export function formatErrorMessage(error: unknown): string {
 	if (error instanceof Error) {
