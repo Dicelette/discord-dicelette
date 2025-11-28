@@ -74,7 +74,9 @@ export async function baseRoll(
 		charName = dice.match(/ @(\w+)/)![1];
 		dice = dice.replace(/ @\w+/, "").trim();
 	}
-	const ctx = getGuildContext(client, interaction.guild!.id);
+	const ctx = interaction.guild
+		? getGuildContext(client, interaction.guild.id)
+		: undefined;
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
