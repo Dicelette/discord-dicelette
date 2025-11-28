@@ -331,7 +331,7 @@ export async function rename(
 			userData.userName = name;
 			client.characters.set(
 				interaction.guild!.id,
-				userData,
+				oldChar,
 				user?.id ?? interaction.user.id
 			);
 		} else {

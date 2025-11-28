@@ -13,7 +13,7 @@
 		"url": "https://github.com/Dicelette/discord-dicelette.git"
 	},
 	"scripts": {
-		"run": "tsx index.ts"
+		"analyze": "tsx index.ts"
 	},
 	"type": "module",
 	"version": "1.0.0"

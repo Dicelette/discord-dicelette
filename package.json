@@ -54,7 +54,7 @@
 	},
 	"private": true,
 	"scripts": {
-		"analyze": "pnpm --filter @testing/analyzeRoll run test",
+		"analyze": "pnpm --filter @testing/analyzeroll run analyze",
 		"build": "pnpm run --recursive build",
 		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
 		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
