@@ -311,11 +311,10 @@ export async function rollStatistique(
 		: undefined;
 	let infoRoll =
 		statistic && standardizedStatistic
-			? { name: statistic, standardized: standardizedStatistic }
+			? buildInfoRollFromStats([standardizedStatistic], ctx?.templateID?.statsName)
 			: undefined;
-	if (!infoRoll && findStatsExpr) {
+	if (!infoRoll && findStatsExpr)
 		infoRoll = buildInfoRollFromStats(findStatsExpr, ctx?.templateID?.statsName);
-	}
 
 	const roll = composed.roll;
 	const customCritical =

@@ -352,8 +352,9 @@ export function replaceStatsInDiceFormula(
 
 export function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
 	const unNormalized: string[] = [];
+	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
-		const found = statsName.find((name) => name.standardize() === stat.standardize());
+		const found = findBestStatMatch<string>(stat, normalizedStats);
 		if (found) unNormalized.push(found);
 		else unNormalized.push(stat);
 	}
@@ -376,6 +377,14 @@ export function buildInfoRollFromStats(
 	return { name, standardized: name.standardize() };
 }
 
+function normalizedMap(statsName: string[]): Map<string, string> {
+	const normalizedStats = new Map<string, string>();
+	for (const stat of statsName) {
+		normalizedStats.set(stat.standardize().toLowerCase(), stat);
+	}
+	return normalizedStats;
+}
+
 export function findStatInDiceFormula(
 	diceFormula: string,
 	statsToFind?: string[]
@@ -389,10 +398,7 @@ export function findStatInDiceFormula(
 	const tokens = text.match(/\p{L}[\p{L}0-9_]*/gu) || [];
 
 	// Préparer la map des stats normalisées -> original
-	const normalizedStats = new Map<string, string>();
-	for (const stat of statsToFind) {
-		normalizedStats.set(stat.standardize().toLowerCase(), stat);
-	}
+	const normalizedStats = normalizedMap(statsToFind);
 
 	for (const token of tokens) {
 		const match = findBestStatMatch<string>(token, normalizedStats);
