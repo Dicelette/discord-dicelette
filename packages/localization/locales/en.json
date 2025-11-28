@@ -439,8 +439,10 @@
 		"dice": "Macro",
 		"display": "Character",
 		"edit": {
-			"dice": "Macro modified",
-			"stats": "Statistics modified"
+			"dice_one": "Macro modified",
+			"dice_other": "Macro modified",
+			"stats_one": "Statistic modified",
+			"stats_other": "Statistics modified"
 		},
 		"old": "Registered player",
 		"template": "Model",

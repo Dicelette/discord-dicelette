@@ -357,12 +357,14 @@ async function sendValidationResponses(args: {
 		);
 		return;
 	}
+	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
 
 	await reply(interaction, {
-		content: ul("embed.edit.dice"),
+		content: ul("embed.edit.dice", {
+			count: compare.added + compare.changed + compare.removed,
+		}),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
 	const logMessage = ul("logs.dice.edit", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 		count: compare.added + compare.changed + compare.removed,

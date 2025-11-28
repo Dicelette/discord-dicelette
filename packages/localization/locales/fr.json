@@ -439,8 +439,10 @@
 		"dice": "Macro",
 		"display": "Personnage",
 		"edit": {
-			"dice": "Macros modifiées",
-			"stats": "Statistiques modifiées"
+			"dice_one": "Macro modifiée",
+			"dice_other": "Macros modifiées",
+			"stats_one": "Statistique modifiée",
+			"stats_other": "Statistiques modifiées"
 		},
 		"old": "Joueur enregistré",
 		"template": "Modèle",
