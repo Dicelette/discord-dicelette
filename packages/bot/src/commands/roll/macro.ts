@@ -7,7 +7,7 @@ import { t } from "@dicelette/localization";
 import { logger, uniformizeRecords } from "@dicelette/utils";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
-import { reply, replyEphemeralError } from "messages";
+import { replyEphemeralError } from "messages";
 import { buildDamageAutocompleteChoices, isSerializedNameEquals, rollMacro } from "utils";
 
 import "discord_ext";
@@ -103,10 +103,12 @@ export default {
 			);
 		} catch (e) {
 			logger.fatal(e);
-			await reply(interaction, {
-				content: t("error.generic.e", { e: e as Error }),
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+			const errorMessage = e instanceof Error ? e.message : String(e);
+			await replyEphemeralError(
+				interaction,
+				ul("error.generic.e", { e: errorMessage }),
+				ul
+			);
 			return;
 		}
 	},
