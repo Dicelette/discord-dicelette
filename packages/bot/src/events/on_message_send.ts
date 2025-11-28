@@ -2,6 +2,7 @@ import { fetchChannel, getGuildContext } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { lError, ln } from "@dicelette/localization";
 import {
+	buildInfoRollFromStats,
 	isRolling,
 	parseComparator,
 	rollCustomCriticalsFromDice,
@@ -73,13 +74,19 @@ export default (client: EClient): void => {
 
 			const opposition = parseComparator(content, userData?.stats, infoRoll);
 
+			// Build infoRoll using helper to recover original accented name if available
+			const formattedInfoRoll = buildInfoRollFromStats(
+				infoRoll ? [infoRoll] : undefined,
+				statsName
+			);
+
 			// Use the unified roll handler
 			await handleRollResult({
 				charName,
 				client,
 				criticalsFromDice,
 				deleteInput,
-				infoRoll,
+				infoRoll: formattedInfoRoll,
 				lang: userLang,
 				opposition,
 				result,

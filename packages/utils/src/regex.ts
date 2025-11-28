@@ -24,7 +24,7 @@ export const DICE_PATTERNS = {
 } as const;
 
 export const DICE_COMPILED_PATTERNS = {
-	COMMENTS_REGEX: /\[([^\]]*)\]/,
+	COMMENTS_REGEX: /\[([^\]]*)\]/gi,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 } as const;

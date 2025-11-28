@@ -164,7 +164,12 @@ export function processChainedDiceRoll(
 		const rollResult = roll(cleaned);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
-		if (globalComments) rollResult.comment = globalComments;
+		// For chained rolls with & and ;, only add comment if it's a true # comment
+		// (not the bracketed formula parts)
+		const isChainedRoll = content.includes("&") && content.includes(";");
+		const hasHashComment = content.includes("#");
+		if (globalComments && (!isChainedRoll || hasHashComment))
+			rollResult.comment = globalComments;
 		return { infoRoll, resultat: rollResult };
 	} catch (e) {
 		logger.warn(e);
