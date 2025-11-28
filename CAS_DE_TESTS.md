@@ -15,7 +15,7 @@
 - **Prérequis** : Aucun
 - **Commande** : `/roll dé:4d6`
 - **Résultat attendu** : 
-  - Le bot lance 4 dés à 6 faces4d6
+  - Le bot lance 4 dés à 6 faces (4d6)
   - Le résultat affiche chaque dé individuel et le total
 
 #### Test 1.1.3 : Lancer des dés avec modificateurs
