@@ -116,14 +116,16 @@ async function bilan(
 }
 
 function descriptionLeaderBoard(guildCount: DBCount, option: Options) {
-	const sorted = Object.entries(guildCount).sort((a, b) => b[1][option]! - a[1][option]!);
+	const sorted = Object.entries(guildCount).sort(
+		(a, b) => (b[1]?.[option] ?? 0) - (a[1]?.[option] ?? 0)
+	);
 	const top10 = sorted.slice(0, 10);
 
 	return top10
-		.filter(([, data]) => data[option]! > 0)
+		.filter(([, data]) => (data?.[option] ?? 0) > 0)
 		.map(([userId, data], i) => {
-			const value = data[option];
-			const total = data.total;
+			const value = data?.[option] ?? 0;
+			const total = data?.total ?? 0;
 			return option === "total"
 				? `**${i + 1}.** ${Djs.userMention(userId)}: ${value}`
 				: `**${i + 1}.** ${Djs.userMention(userId)}: ${value}/${total}`;
