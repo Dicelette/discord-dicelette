@@ -693,7 +693,7 @@ export async function cancelDiceAddModeration(
 
 	const samePerson = interaction.user.id === userId;
 	let content = ul("modals.cancelled", { url });
-	if (samePerson) content = ul("modals.cancelled_by_user");
+	if (samePerson) content = ul("modals.cancelled_by_user", { url });
 	await interaction.message.delete();
 	await reply(interaction, {
 		content,
