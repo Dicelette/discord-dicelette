@@ -200,7 +200,15 @@ async function leaderboard(
 	}
 
 	for (const userId in guildCount) {
-		const userCount = guildCount[userId];
+		const defaultCount: Count = {
+			criticalFailure: 0,
+			criticalSuccess: 0,
+			failure: 0,
+			success: 0,
+			total: 0,
+		};
+		//fusion des valeurs manquantes
+		const userCount = Object.assign(defaultCount, guildCount[userId]);
 		userCount.total = userCount.success + userCount.failure;
 	}
 	if (!option) {
@@ -260,7 +268,15 @@ function calculateServerStats(guildCount: Record<string, Count>) {
 	let rollTotal = 0;
 
 	for (const userId in guildCount) {
-		const userCount = guildCount[userId];
+		const defaultCount: Count = {
+			criticalFailure: 0,
+			criticalSuccess: 0,
+			failure: 0,
+			success: 0,
+			total: 0,
+		};
+		//fusion des valeurs manquantes
+		const userCount = Object.assign(defaultCount, guildCount[userId]);
 		const totalRolls = userCount.success + userCount.failure;
 
 		if (totalRolls > 0) {
