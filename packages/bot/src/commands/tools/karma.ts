@@ -210,8 +210,8 @@ async function leaderboard(
 			total: 0,
 		};
 		//fusion des valeurs manquantes
-		const userCount = Object.assign(defaultCount, guildCount[userId]);
-		userCount.total = userCount.success + userCount.failure;
+		guildCount[userId] = Object.assign(defaultCount, guildCount[userId]);
+		guildCount[userId].total = guildCount[userId].success + guildCount[userId].failure;
 	}
 	if (!option) {
 		// Display all leaderboards if no specific option is chosen
