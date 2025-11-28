@@ -38,7 +38,8 @@ export function levenshteinDistance(str1: string, str2: string): number {
 // Helper: trouve la meilleure correspondance pour un token donné parmi les stats normalisées
 export function findBestStatMatch<T>(
 	searchTerm: string,
-	normalizedStats: Map<string, T>
+	normalizedStats: Map<string, T>,
+	similarityThreshold = 0.6
 ): T | undefined {
 	// recherche exacte
 	const exact = normalizedStats.get(searchTerm);
@@ -54,7 +55,20 @@ export function findBestStatMatch<T>(
 		else if (normalizedKey.includes(searchTerm))
 			candidates.push([original, normalizedKey.length]);
 	}
-	if (candidates.length === 0) return undefined;
-	candidates.sort((a, b) => a[1] - b[1]);
-	return candidates[0][0];
+	if (candidates.length > 0) {
+		candidates.sort((a, b) => a[1] - b[1]);
+		return candidates[0][0];
+	}
+
+	// fallback: recherche par similarité si aucune correspondance partielle trouvée
+	let bestMatch: T | undefined;
+	let bestSimilarity = 0;
+	for (const [normalizedKey, original] of normalizedStats) {
+		const similarity = calculateSimilarity(searchTerm, normalizedKey);
+		if (similarity > bestSimilarity && similarity >= similarityThreshold) {
+			bestSimilarity = similarity;
+			bestMatch = original;
+		}
+	}
+	return bestMatch;
 }
