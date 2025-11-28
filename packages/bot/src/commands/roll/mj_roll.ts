@@ -37,7 +37,7 @@ export const mjRoll = {
 					allCharFromGuild.push(data);
 				}
 			}
-		} else allCharFromGuild = guildData.user[userId];
+		} else allCharFromGuild = guildData.user?.[userId];
 		if (fixed.name === t("common.character")) {
 			//get ALL characters from the guild
 			const skill = options.getString(t("common.name"));
