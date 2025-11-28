@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.22.0](https://github.com/Dicelette/discord-dicelette/compare/2.21.0...2.22.0) (2025-11-28)
+
+
+### Features
+
+* **snippets:** allow to import snippets from a JSON file ([81043c8](https://github.com/Dicelette/discord-dicelette/commit/81043c8090ef5e1d076ca67456dfb16c1ec35d55))
+
 ## [2.21.0](https://github.com/Dicelette/discord-dicelette/compare/2.20.0...2.21.0) (2025-11-25)
 
 

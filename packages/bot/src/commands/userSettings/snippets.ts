@@ -3,6 +3,7 @@ import type { EClient } from "@dicelette/client";
 import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
+import type { Snippets } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError } from "messages";
 import { baseRoll } from "../roll";
@@ -100,5 +101,103 @@ export async function remove(
 	const text = ul("userSettings.snippets.delete.success", {
 		name: `**${macroName.toTitle()}**`,
 	});
+	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+}
+
+export async function exportSnippets(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const { ul } = getLangAndConfig(client, interaction);
+	const userId = interaction.user.id;
+	const guildId = interaction.guild!.id;
+	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	if (Object.keys(macros).length === 0) {
+		const text = ul("userSettings.snippets.export.empty");
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		return;
+	}
+	const fileContent = JSON.stringify(macros, null, 2);
+	const buffer = Buffer.from(fileContent, "utf-8");
+	const attachment = new Djs.AttachmentBuilder(buffer, {
+		name: `snippets_${interaction.user.username}.json`,
+	});
+	await interaction.reply({
+		content: ul("userSettings.snippets.export.success"),
+		files: [attachment],
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+}
+
+export async function importSnippets(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const { ul } = getLangAndConfig(client, interaction);
+	const userId = interaction.user.id;
+	const guildId = interaction.guild!.id;
+	const file = interaction.options.getAttachment(
+		t("userSettings.snippets.import.file.title"),
+		true
+	);
+	if (!file.name.endsWith(".json")) {
+		const text = ul("userSettings.snippets.import.invalidFile");
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		return;
+	}
+	const response = await fetch(file.url);
+	const fileContent = await response.text();
+	let importedMacros: Snippets;
+	const ex: Record<string, string> = {
+		anotherMacro: "1d20",
+		testMacro: "2d6+3",
+	};
+	try {
+		importedMacros = JSON.parse(fileContent);
+	} catch {
+		const text = ul("userSettings.snippets.import.invalidContent", {
+			ex: JSON.stringify(ex, null, 2),
+		});
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		return;
+	}
+	if (typeof importedMacros !== "object" || Array.isArray(importedMacros)) {
+		const text = ul("userSettings.snippets.import.invalidContent", {
+			ex: JSON.stringify(ex, null, 2),
+		});
+		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		return;
+	}
+	const key = `${userId}.snippets`;
+	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	//verify and merge the imported macros
+	const errors: Snippets = {};
+	let count = 0;
+	for (const [name, content] of Object.entries(importedMacros)) {
+		if (typeof content !== "string") {
+			errors[name] = String(content);
+			continue;
+		}
+		try {
+			await baseRoll(getExpression(content, "0").dice, interaction, client, false, true);
+			macros[name] = content;
+			count += 1;
+		} catch (error) {
+			//skip invalid macros
+			errors[name] = content;
+		}
+	}
+	client.userSettings.set(guildId, macros, key);
+	let text = ul("userSettings.snippets.import.success", {
+		count,
+	});
+	if (Object.keys(errors).length > 0) {
+		const errorLines = Object.entries(errors)
+			.map(
+				([name, value]) => `- **${name.toTitle()}**${ul("common.space")}: \`${value}\``
+			)
+			.join("\n");
+		text += `\n\n${ul("userSettings.snippets.import.partialErrors", { count: Object.keys(errors).length })}\n${errorLines}`;
+	}
 	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }
