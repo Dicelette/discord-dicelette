@@ -34,7 +34,7 @@ export const editAvatar = {
 		const { guildData, ul, userID, fixed, choices } = param;
 
 		if (fixed.name === t("common.character")) {
-			const guildChars = guildData.user[userID];
+			const guildChars = guildData.user?.[userID];
 			if (!guildChars) return;
 			for (const data of guildChars) {
 				const allowed = await haveAccess(interaction, data.messageId[1], userID);
