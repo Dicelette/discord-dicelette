@@ -42,5 +42,5 @@
 		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
 	},
 	"type": "module",
-	"version": "2.21.0"
+	"version": "2.22.0"
 }
