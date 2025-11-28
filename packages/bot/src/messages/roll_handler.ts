@@ -81,18 +81,31 @@ export async function handleRollResult(
 	if (!parser) return;
 
 	const guild = source instanceof Djs.Message ? source.guild : source.guild;
-	if (!guild) return;
+	// If we're in DM (no guild), just reply directly without guild/thread handling
+	if (!guild) {
+		const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
+		const reply = await replyToSource(
+			source,
+			resultAsText,
+			author.id,
+			logUrl,
+			deleteInput,
+			hideResult
+		);
+		return reply;
+	}
 
 	const channel =
 		source instanceof Djs.Message
 			? source.channel
 			: (source.channel as Djs.TextChannel | null);
-	if (!channel || channel.type === Djs.ChannelType.DM) return;
+	if (!channel) return;
+	// Allow direct messages; only block deprecated GroupDM channels
 	if (channel.type === Djs.ChannelType.GroupDM) return;
 
 	const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
 
-	const channelName = channel.name ?? "";
+	const channelName = "name" in channel ? (channel.name ?? "") : "";
 	const isRollChannel =
 		client.settings.get(guild.id, "rollChannel") === channel.id ||
 		channelName.decode().startsWith("🎲");
@@ -135,10 +148,24 @@ export async function handleRollResult(
 		messageId,
 	};
 
+	// Ensure we're not in a DM before using threadToSend
+	if (channel.type === Djs.ChannelType.DM) {
+		// Fallback to simple reply for DM (shouldn't happen since we checked guild above)
+		const reply = await replyToSource(
+			source,
+			resultAsText,
+			author.id,
+			logUrl,
+			deleteInput,
+			hideResult
+		);
+		return reply;
+	}
+
 	// Send to thread
 	const thread = await threadToSend(
 		client.settings,
-		channel as Exclude<typeof channel, Djs.PartialGroupDMChannel>,
+		channel as Exclude<typeof channel, Djs.PartialGroupDMChannel | Djs.DMChannel>,
 		ul
 	);
 	const msgToEdit = await thread.send("_ _");
