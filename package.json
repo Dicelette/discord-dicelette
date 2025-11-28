@@ -67,7 +67,7 @@
 		"prepare": "husky",
 		"prerelease": "pnpm run --recursive tsc",
 		"release": "commit-and-tag-version",
-		"test": "vitest run test"
+		"test": "pnpm -r test"
 	},
 	"version": "2.22.0"
 }
