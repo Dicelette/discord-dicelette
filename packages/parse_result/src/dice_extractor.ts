@@ -375,10 +375,11 @@ export function buildInfoRollFromStats(
 	statsName?: string[]
 ): { name: string; standardized: string } | undefined {
 	if (!statsFound || statsFound.length === 0) return undefined;
+	const uniqueFound = Array.from(new Set(statsFound));
 	const names =
 		statsName && statsName.length > 0
-			? unNormalizeStatsName(statsFound, statsName)
-			: statsFound;
+			? unNormalizeStatsName(uniqueFound, statsName)
+			: uniqueFound;
 	const name = names.join(" ");
 	return { name, standardized: name.standardize() };
 }
