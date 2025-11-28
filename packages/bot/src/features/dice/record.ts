@@ -305,7 +305,7 @@ async function edit(
 	)[],
 	userID: string,
 	userName?: string,
-	compare?: string,
+	compare?: { stats: string; removed: number; added: number; changed: number },
 	first?: boolean
 ) {
 	if (interaction.message) {
@@ -326,6 +326,7 @@ async function edit(
 		return await sendLogs(
 			ul("logs.dice.add", {
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				count: 1,
 				fiche: interaction.message?.url ?? "no url",
 				user: Djs.userMention(interaction.user.id),
 			}),
@@ -334,10 +335,11 @@ async function edit(
 		);
 	const msg = ul("logs.dice.add", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		count: compare.added,
 		fiche: interaction.message?.url ?? "no url",
 		user: Djs.userMention(interaction.user.id),
 	});
-	return await sendLogs(`${msg}\n${compare}`, interaction.guild as Djs.Guild, db);
+	return await sendLogs(`${msg}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 }
 
 export function findDuplicate(diceEmbed: EmbedBuilder, name: string) {

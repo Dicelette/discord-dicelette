@@ -343,9 +343,12 @@ async function sendValidationResponses(args: {
 			content: ul("modals.removed.dice"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+		//compter le nombre de fields qui ont été supprimé depuis old et new
+		const count = oldFields ? Math.abs(oldFields.length - newFields.length) : 1;
 		await sendLogs(
 			ul("logs.dice.remove", {
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				count,
 				fiche: message.url,
 				user: Djs.userMention(interaction.user.id),
 			}),
@@ -362,10 +365,15 @@ async function sendValidationResponses(args: {
 	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
 	const logMessage = ul("logs.dice.edit", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		count: compare.added + compare.changed + compare.removed,
 		fiche: message.url,
 		user: Djs.userMention(interaction.user.id),
 	});
-	await sendLogs(`${logMessage}\n${compare}`.trim(), interaction.guild as Djs.Guild, db);
+	await sendLogs(
+		`${logMessage}\n${compare.stats}`.trim(),
+		interaction.guild as Djs.Guild,
+		db
+	);
 }
 
 /**

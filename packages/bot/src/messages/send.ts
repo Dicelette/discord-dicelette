@@ -95,26 +95,32 @@ export function displayOldAndNewStats(
 	newStats?: Djs.APIEmbedField[]
 ) {
 	let stats = "";
+	let removed = 0;
+	let added = 0;
+	let changed = 0;
 	if (oldStats && newStats) {
 		for (const field of oldStats) {
 			const name = field.name.toLowerCase();
 			const newField = newStats.find((f) => f.name.toLowerCase() === name);
 			if (!newField) {
 				stats += `- ~~${field.name}: ${field.value}~~\n`;
+				removed++;
 				continue;
 			}
 			if (field.value === newField.value) continue;
 			stats += `- ${field.name}: ${field.value} ⇒ ${newField.value}\n`;
+			changed++;
 		}
 		//verify if there is new stats
 		for (const field of newStats) {
 			const name = field.name.toLowerCase();
 			if (!oldStats.find((f) => f.name.toLowerCase() === name)) {
 				stats += `- ${field.name}: 0 ⇒ ${field.value}\n`;
+				added++;
 			}
 		}
 	}
-	return stats;
+	return { added, changed, removed, stats };
 }
 
 export async function sendResult(

@@ -325,11 +325,12 @@ export async function validateEdit(
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		count: compare.added + compare.changed + compare.removed,
 		fiche: message.url,
 		user: Djs.userMention(interaction.user.id),
 	});
 	//send logs
-	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
+	await sendLogs(`${logMessage}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 	//update memory
 	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
@@ -466,7 +467,7 @@ export async function validateByModeration(
 	});
 	//send logs
 	await sendLogs(
-		`${logMessage}\n${compare}`,
+		`${logMessage}\n${compare.stats}`,
 		interaction.guild as Djs.Guild,
 		client.settings
 	);
