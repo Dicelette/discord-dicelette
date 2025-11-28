@@ -20,7 +20,7 @@ export interface GuildContext {
 /**
  * Get comprehensive guild context with pre-computed values for optimal performance.
  * Caches standardized arrays to avoid repeated map operations in autocomplete and validation.
- *
+ * Use ctx.standardizedDamageNames instead of damageNames.map(x => x.standardize())
  * @param client - Discord client with settings
  * @param guildId - Guild ID to fetch context for
  * @returns Guild context with cached values or undefined if guild not found
@@ -28,7 +28,6 @@ export interface GuildContext {
  * @example
  * const ctx = getGuildContext(client, interaction.guild!.id);
  * if (!ctx?.templateID) return;
- * // Use ctx.standardizedDamageNames instead of damageNames.map(x => x.standardize())
  */
 export function getGuildContext(
 	client: EClient,
