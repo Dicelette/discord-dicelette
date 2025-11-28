@@ -1,40 +1,8 @@
-import { ln } from "@dicelette/localization";
+import type { EClient } from "@dicelette/client";
 import type { Translation } from "@dicelette/types";
 import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import type { Guild, GuildMember, User } from "discord.js";
 import * as Djs from "discord.js";
-import type { EClient } from "../client";
-
-export function getLangAndConfig(
-	client: EClient,
-	interaction: Djs.BaseInteraction,
-	guildId?: string
-) {
-	const langToUse = getLangFromInteraction(interaction, client, guildId);
-	const ul = ln(langToUse);
-	if (interaction.guild) {
-		const config = client.settings.get(guildId ?? interaction.guild.id);
-		return { config, langToUse, ul };
-	}
-	return { langToUse, ul };
-}
-
-export function getLangFromInteraction(
-	interaction: Djs.BaseInteraction,
-	client: EClient,
-	guildId?: string
-): Djs.Locale {
-	if (!interaction.guild) return interaction.locale;
-	if (!guildId) guildId = interaction.guild.id;
-	const guildLocale = client.guildLocale?.get(guildId);
-	if (guildLocale) return guildLocale;
-	const locale =
-		client.settings.get(guildId, "lang") ??
-		interaction.locale ??
-		interaction.guild?.preferredLocale;
-	client.guildLocale.set(guildId, locale);
-	return locale;
-}
 
 export async function fetchChannel(
 	guild: Djs.Guild,
@@ -75,6 +43,7 @@ export async function fetchUser(client: EClient, userId: string) {
 		return undefined;
 	}
 }
+
 export async function fetchMember(
 	guild: Djs.Guild,
 	memberId: string

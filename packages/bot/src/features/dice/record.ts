@@ -1,8 +1,16 @@
+import {
+	addAutoRole,
+	buildModerationButtons,
+	getInteractionContext as getLangAndConfig,
+	makeEmbedKey,
+	putModerationCache,
+	setModerationFooter,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Settings, Translation, UserMessageId } from "@dicelette/types";
 import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
-import type { EClient } from "client";
 import {
 	getTemplateByInteraction,
 	getUserByEmbed,
@@ -22,17 +30,7 @@ import {
 	sendLogs,
 	updateUserEmbedThumbnail,
 } from "messages";
-import {
-	addAutoRole,
-	buildModerationButtons,
-	editUserButtons,
-	getLangAndConfig,
-	makeEmbedKey,
-	putModerationCache,
-	selectEditMenu,
-	selfRegisterAllowance,
-	setModerationFooter,
-} from "utils";
+import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
 
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.
@@ -307,7 +305,7 @@ async function edit(
 	)[],
 	userID: string,
 	userName?: string,
-	compare?: string,
+	compare?: { stats: string; removed: number; added: number; changed: number },
 	first?: boolean
 ) {
 	if (interaction.message) {
@@ -328,6 +326,7 @@ async function edit(
 		return await sendLogs(
 			ul("logs.dice.add", {
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				count: 1,
 				fiche: interaction.message?.url ?? "no url",
 				user: Djs.userMention(interaction.user.id),
 			}),
@@ -336,10 +335,11 @@ async function edit(
 		);
 	const msg = ul("logs.dice.add", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		count: compare.added,
 		fiche: interaction.message?.url ?? "no url",
 		user: Djs.userMention(interaction.user.id),
 	});
-	return await sendLogs(`${msg}\n${compare}`, interaction.guild as Djs.Guild, db);
+	return await sendLogs(`${msg}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 }
 
 export function findDuplicate(diceEmbed: EmbedBuilder, name: string) {

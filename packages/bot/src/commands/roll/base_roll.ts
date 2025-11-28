@@ -1,12 +1,18 @@
+import {
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import {
+	buildInfoRollFromStats,
 	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import type { EClient } from "client";
 import * as Djs from "discord.js";
-import { getCritical, getLangAndConfig, rollWithInteraction } from "utils";
+
+import { getCritical, rollWithInteraction } from "utils";
 import "discord_ext";
 import type { RollOptions } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction } from "database";
@@ -68,12 +74,13 @@ export async function baseRoll(
 		charName = dice.match(/ @(\w+)/)![1];
 		dice = dice.replace(/ @\w+/, "").trim();
 	}
+	const ctx = getGuildContext(client, interaction.guild!.id);
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
 		true,
 		undefined,
-		client.settings.get(interaction.guild!.id, "templateID.statsName")
+		ctx?.templateID?.statsName
 	);
 	const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
 	const { criticalsFromDice, serverData } = await getCritical(
@@ -84,11 +91,18 @@ export async function baseRoll(
 		userData,
 		rollCustomCriticalsFromDice(dice, ul)
 	);
+
+	// Build infoRoll using helper to recover original accented name if available
+	const infoRoll = buildInfoRollFromStats(
+		res.infoRoll ? [res.infoRoll] : undefined,
+		ctx?.templateID?.statsName
+	);
 	const opts: RollOptions = {
 		charName,
 		critical: serverData?.critical,
 		customCritical: criticalsFromDice,
 		hideResult: hidden,
+		infoRoll,
 		opposition,
 		silent,
 	};

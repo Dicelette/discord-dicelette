@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
@@ -58,7 +58,7 @@ export async function resultChannel(
 		client.settings.delete(interaction.guild.id, "rollChannel");
 		if (oldChan)
 			await interaction.followUp({
-				content: `${ul("changeThread.delete")} ${ul("logs.inChan", { chan: oldChan })}`,
+				content: `${ul("changeThread.delete")} ${ul("logs.inChan", { chan: Djs.channelMention(oldChan) })}`,
 			});
 		if (disable === false) return await disableThread(interaction, client, ul, false);
 		return await disableThread(interaction, client, ul, true);

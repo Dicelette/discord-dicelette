@@ -1,3 +1,10 @@
+import {
+	fetchChannel,
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+	haveAccess,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln, ln, t } from "@dicelette/localization";
 import {
 	parseDamageFields,
@@ -15,19 +22,12 @@ import type {
 	UserMessageId,
 } from "@dicelette/types";
 import { cleanAvatarUrl, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
-import {
-	fetchChannel,
-	getLangAndConfig,
-	haveAccess,
-	isSerializedNameEquals,
-	searchUserChannel,
-} from "utils";
+import { isSerializedNameEquals, searchUserChannel } from "utils";
 
 export function getUserByEmbed(
 	data: { message?: Message; embeds?: EmbedBuilder[] },
@@ -639,7 +639,8 @@ export function getRightValue(
 	let userStat = userStatistique.stats?.[standardizedStatistic];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!userStat) {
-		const guildData = client.settings.get(guild.id, "templateID.statsName");
+		const ctx = getGuildContext(client, guild.id);
+		const guildData = ctx?.templateID?.statsName;
 		if (userStatistique.stats && guildData) {
 			const findStatInList = guildData.find((stat) =>
 				stat.subText(standardizedStatistic)

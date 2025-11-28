@@ -164,7 +164,12 @@ export function processChainedDiceRoll(
 		const rollResult = roll(cleaned);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
-		if (globalComments) rollResult.comment = globalComments;
+		// For chained rolls with & and ;, only add comment if it's a true # comment
+		// (not the bracketed formula parts)
+		const isChainedRoll = content.includes("&") && content.includes(";");
+		const hasHashComment = content.includes("#");
+		if (globalComments && (!isChainedRoll || hasHashComment))
+			rollResult.comment = globalComments;
 		return { infoRoll, resultat: rollResult };
 	} catch (e) {
 		logger.warn(e);
@@ -221,7 +226,8 @@ export function isRolling(
 	) {
 		const diceRoll = processChainedDiceRoll(
 			processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
-			userData
+			userData,
+			statsName
 		);
 		if (diceRoll)
 			return {
@@ -314,13 +320,13 @@ export function replaceStatsInDiceFormula(
 	// Pre-process stats for better performance
 	const normalizedStats = new Map<string, [string, number]>();
 	for (const [key, value] of Object.entries(stats)) {
-		const normalized = key.standardize().toLowerCase();
+		const normalized = key.standardize();
 		normalizedStats.set(normalized, [key, value]);
 	}
 
 	for (const match of variableMatches) {
 		const fullMatch = match[0];
-		const searchTerm = match[1].standardize().toLowerCase();
+		const searchTerm = match[1].standardize();
 
 		if (!processedFormula.includes(fullMatch)) continue;
 
@@ -350,14 +356,40 @@ export function replaceStatsInDiceFormula(
 	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };
 }
 
-function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
+export function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
 	const unNormalized: string[] = [];
+	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
-		const found = statsName.find((name) => name.standardize() === stat.standardize());
+		const found = findBestStatMatch<string>(stat.standardize(), normalizedStats);
 		if (found) unNormalized.push(found);
 		else unNormalized.push(stat);
 	}
 	return unNormalized;
+}
+
+/**
+ * Build an infoRoll object from found stats, restoring original accents using statsName list.
+ */
+export function buildInfoRollFromStats(
+	statsFound: string[] | undefined,
+	statsName?: string[]
+): { name: string; standardized: string } | undefined {
+	if (!statsFound || statsFound.length === 0) return undefined;
+	const uniqueFound = Array.from(new Set(statsFound));
+	const names =
+		statsName && statsName.length > 0
+			? unNormalizeStatsName(uniqueFound, statsName)
+			: uniqueFound;
+	const name = names.join(" ");
+	return { name, standardized: name.standardize() };
+}
+
+function normalizedMap(statsName: string[]): Map<string, string> {
+	const normalizedStats = new Map<string, string>();
+	for (const stat of statsName) {
+		normalizedStats.set(stat.standardize(), stat);
+	}
+	return normalizedStats;
 }
 
 export function findStatInDiceFormula(
@@ -369,14 +401,11 @@ export function findStatInDiceFormula(
 	const foundStats: string[] = [];
 
 	// Normaliser la formule et préparer les tokens (mots) à analyser
-	const text = diceFormula.standardize().toLowerCase();
+	const text = diceFormula.standardize();
 	const tokens = text.match(/\p{L}[\p{L}0-9_]*/gu) || [];
 
 	// Préparer la map des stats normalisées -> original
-	const normalizedStats = new Map<string, string>();
-	for (const stat of statsToFind) {
-		normalizedStats.set(stat.standardize().toLowerCase(), stat);
-	}
+	const normalizedStats = normalizedMap(statsToFind);
 
 	for (const token of tokens) {
 		const match = findBestStatMatch<string>(token, normalizedStats);

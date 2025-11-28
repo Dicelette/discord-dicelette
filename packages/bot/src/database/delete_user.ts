@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/client";
 import type { GuildData, UserMessageId } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import { addRestriction } from "event";
 import { deleteUserInChar } from "./memory";
@@ -38,7 +38,7 @@ export function deleteByMessageIds(
 		const char = userChars.findIndex((char) => {
 			return char.messageId === messageId;
 		});
-		if (char) {
+		if (char !== -1) {
 			userChars.splice(char, 1);
 			if (userChars.length === 0) {
 				db.delete(guild.id, `user.${user}`);

@@ -1,3 +1,5 @@
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import type {
 	DiscordChannel,
 	GuildData,
@@ -6,12 +8,11 @@ import type {
 	UserMessageId,
 } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { deleteUser, deleteUserInChar, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
-import { getLangAndConfig, optionInteractions, searchUserChannel } from "utils";
+import { optionInteractions, searchUserChannel } from "utils";
 import "discord_ext";
 export const t = i18next.getFixedT("en");
 

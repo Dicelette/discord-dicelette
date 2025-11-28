@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,
@@ -5,7 +6,6 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import type { EClient } from "client";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
 import type { TextChannel } from "discord.js";
@@ -32,15 +32,7 @@ export async function validate(
 	if (!user) return;
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new Error(ul("error.embed.notFound"));
-	//const user = await isUserNameOrId(userId, interaction);
 
-	if (!user) {
-		await interaction.reply({
-			embeds: [embedError(ul("error.user.notFound"), ul)],
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		return await resetButton(message, ul);
-	}
 	const oldUserId = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")

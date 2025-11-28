@@ -1,9 +1,10 @@
 import path from "node:path";
+import { charUserOptions, haveAccess } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
-import type { EClient } from "client";
 import {
 	findChara,
 	getRecordChar,
@@ -13,8 +14,9 @@ import {
 import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
-import { charUserOptions, getLangAndConfig, haveAccess, searchUserChannel } from "utils";
+import { searchUserChannel } from "utils";
 import "discord_ext";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { Statistic, StatisticalTemplate } from "@dicelette/core";
 
 async function chart(

@@ -1,3 +1,11 @@
+import {
+	addAutoRole,
+	fetchChannel,
+	getInteractionContext as getLangAndConfig,
+	pingModeratorRole,
+	reuploadAvatar,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
@@ -8,18 +16,10 @@ import {
 	logger,
 	NoEmbed,
 } from "@dicelette/utils";
-import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
 import * as Messages from "messages";
-import {
-	addAutoRole,
-	fetchChannel,
-	getLangAndConfig,
-	pingModeratorRole,
-	reuploadAvatar,
-	selfRegisterAllowance,
-} from "utils";
+import { selfRegisterAllowance } from "utils";
 
 /**
  * Interaction to continue to the next page of the statistics when registering a new user
@@ -104,17 +104,19 @@ export async function button(
 }
 
 export async function sendValidationMessage(
-	interaction: Djs.ButtonInteraction,
+	interaction: Djs.ButtonInteraction | Djs.ModalSubmitInteraction,
 	interactionUser: Djs.User,
 	ul: Translation,
-	client: EClient
+	client: EClient,
+	url?: string
 ) {
 	const logChannel = client.settings.get(interaction.guild!.id, "logs");
+	if (!url) url = interaction.message?.url ?? "";
 	if (logChannel)
 		await Messages.sendLogs(
 			ul("logs.validationWaiting", {
 				role: `\n-# ${pingModeratorRole(interaction.guild!)}`,
-				url: interaction.message.url,
+				url,
 				user: `${interactionUser.id}`,
 			}),
 			interaction.guild!,
@@ -128,7 +130,7 @@ export async function sendValidationMessage(
 			await systemChannel.send({
 				content: ul("logs.validationWaiting", {
 					role: `\n-# ${pingModeratorRole(interaction.guild!)}`,
-					url: interaction.message.url,
+					url,
 					user: `${interactionUser.id}`,
 				}),
 			});
@@ -140,7 +142,7 @@ export async function sendValidationMessage(
 					await owner.send({
 						content: ul("logs.validationWaiting", {
 							role: "",
-							url: interaction.message.url,
+							url,
 							user: `${interactionUser.id}`,
 						}),
 					});

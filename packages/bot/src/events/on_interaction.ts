@@ -1,6 +1,7 @@
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
-import type { EClient } from "client";
 import {
 	ALL_COMMANDS,
 	AUTOCOMPLETE_COMMANDS,
@@ -13,7 +14,7 @@ import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
 import { Avatar, Dice, Move, Rename, Stats, User } from "features";
 import { embedError } from "messages";
-import { cancel, getLangAndConfig } from "utils";
+import { cancel } from "utils";
 import { interactionError } from "./on_error";
 
 export default (client: EClient): void => {

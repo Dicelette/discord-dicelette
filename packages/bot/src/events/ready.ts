@@ -2,10 +2,10 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: let me alone */
 
 import process from "node:process";
+import type { EClient } from "@dicelette/client";
 import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { dev, important, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import {
 	COMMANDS,
 	contextMenus,
@@ -18,7 +18,7 @@ import * as Djs from "discord.js";
 import dotenv from "dotenv";
 import { PRIVATE_ID, VERSION } from "../../index";
 
-dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env" });
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
 export default (client: EClient): void => {
 	client.on("clientReady", async () => {

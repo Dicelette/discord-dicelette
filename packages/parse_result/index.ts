@@ -1,3 +1,5 @@
+export * from "./src/comment_utils";
+export * from "./src/compose_roll";
 export * from "./src/custom_critical";
 export * from "./src/dice_extractor";
 export * from "./src/interfaces";

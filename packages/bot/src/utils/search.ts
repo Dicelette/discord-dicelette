@@ -1,8 +1,9 @@
+import { fetchChannel } from "@dicelette/bot-helpers";
 import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, sendLogs } from "messages";
-import { fetchChannel, isValidChannel, isValidInteraction } from "utils";
+import { isValidChannel, isValidInteraction } from "utils";
 /**
  * Fetches and validates a Discord channel by ID within a guild context, handling errors and localization.
  *

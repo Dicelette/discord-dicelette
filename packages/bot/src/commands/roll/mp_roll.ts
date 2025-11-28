@@ -2,7 +2,7 @@
  * Importer et éditer la commande de base roll pour qu'elle soit /r et utilisable uniquement en dm
  */
 
-import type { EClient } from "client";
+import type { EClient } from "@dicelette/client";
 import * as Djs from "discord.js";
 import { klona } from "klona";
 import { diceRoll } from "./base_roll";

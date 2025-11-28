@@ -1,5 +1,5 @@
+import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
-import type { EClient } from "client";
 import type * as Djs from "discord.js";
 import { reply } from "messages";
 import { findLocale } from "./utils";

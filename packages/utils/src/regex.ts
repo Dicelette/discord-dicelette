@@ -24,7 +24,7 @@ export const DICE_PATTERNS = {
 } as const;
 
 export const DICE_COMPILED_PATTERNS = {
-	COMMENTS_REGEX: /\[([^\]]*)\]/,
+	COMMENTS_REGEX: /\[([^\]]*)\]/gi,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 } as const;
@@ -45,8 +45,12 @@ export function verifyAvatarUrl(url: string) {
 	// Reset lastIndex for global regex to avoid issues
 	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
 	COMPILED_PATTERNS.VALID_EXTENSIONS.lastIndex = 0;
-	if (url.match(COMPILED_PATTERNS.AVATAR_URL)) return url;
-	if (url.match(COMPILED_PATTERNS.VALID_EXTENSIONS) && url.startsWith("attachment://"))
+	const [baseUrl] = url.split("?"); // Ignore query parameters for extension check
+	if (baseUrl.match(COMPILED_PATTERNS.AVATAR_URL)) return url;
+	if (
+		baseUrl.match(COMPILED_PATTERNS.VALID_EXTENSIONS) &&
+		url.startsWith("attachment://")
+	)
 		return url;
 	return false;
 }

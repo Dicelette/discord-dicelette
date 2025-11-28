@@ -1,4 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Discord didn't use camelCase for command name */
+
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
 import { LINKS, type Settings, type Translation } from "@dicelette/types";
 import {
@@ -9,11 +12,10 @@ import {
 	normalizeChangelogFormat,
 	splitChangelogByVersion,
 } from "@dicelette/utils";
-import type { EClient } from "client";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
-import { getLangAndConfig } from "utils";
+
 import { VERSION } from "../../../index";
 import "discord_ext";
 

@@ -1,3 +1,10 @@
+import {
+	autoComplete,
+	charUserOptions,
+	haveAccess,
+	reuploadAvatar,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln, t } from "@dicelette/localization";
 import type {
 	DiscordChannel,
@@ -7,7 +14,6 @@ import type {
 	UserRegistration,
 } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import {
 	deleteUser,
 	getRecordChar,
@@ -17,14 +23,7 @@ import {
 } from "database";
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "messages";
-import {
-	autoComplete,
-	charUserOptions,
-	getButton,
-	haveAccess,
-	optionInteractions,
-	reuploadAvatar,
-} from "utils";
+import { getButton, optionInteractions } from "utils";
 import "discord_ext";
 import { COMPILED_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
 
@@ -35,7 +34,7 @@ export const editAvatar = {
 		const { guildData, ul, userID, fixed, choices } = param;
 
 		if (fixed.name === t("common.character")) {
-			const guildChars = guildData.user[userID];
+			const guildChars = guildData.user?.[userID];
 			if (!guildChars) return;
 			for (const data of guildChars) {
 				const allowed = await haveAccess(interaction, data.messageId[1], userID);
@@ -328,10 +327,11 @@ export async function rename(
 		if (!oldCharData) {
 			const userData = getUserByEmbed({ message });
 			if (!userData) return;
+			oldChar.push(userData);
 			userData.userName = name;
 			client.characters.set(
 				interaction.guild!.id,
-				oldChar.push(userData),
+				oldChar,
 				user?.id ?? interaction.user.id
 			);
 		} else {
@@ -361,7 +361,7 @@ export async function rename(
 	const guildData = client.settings.get(interaction.guildId as string);
 	const newdata = deleteUser(interaction, guildData!, user, oldData.charName);
 	client.settings.set(interaction.guildId as string, newdata);
-	await generateButton(message, ul, embedsList.list);
+	await generateButton(message, ul, embedsList.list, embedsList.files);
 	await reply(interaction, {
 		content: ul("edit.name.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,
@@ -442,7 +442,7 @@ export async function move(
 	const newData = deleteUser(interaction, guildData!, user, oldData.charName);
 
 	client.settings.set(interaction.guildId as string, newData);
-	await generateButton(message, ul, embedsList.list);
+	await generateButton(message, ul, embedsList.list, embedsList.files);
 	await reply(interaction, {
 		content: ul("edit.user.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,

@@ -1,9 +1,9 @@
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
-import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { deleteAfter, reply, setTags } from "messages";
 import moment from "moment";
-import { getLangAndConfig } from "utils";
 import "discord_ext";
 
 export default {

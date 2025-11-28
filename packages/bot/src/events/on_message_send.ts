@@ -1,23 +1,17 @@
+import { fetchChannel, getGuildContext } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { lError, ln } from "@dicelette/localization";
 import {
+	buildInfoRollFromStats,
 	isRolling,
 	parseComparator,
-	ResultAsText,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import type { DiscordTextChannel } from "@dicelette/types";
 import { allValuesUndefined, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
-import {
-	deleteAfter,
-	findMessageBefore,
-	saveCount,
-	stripOOC,
-	threadToSend,
-} from "messages";
-import { fetchChannel, getCritical } from "utils";
+import { handleRollResult, saveCount, stripOOC } from "messages";
+import { getCritical } from "utils";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -60,15 +54,14 @@ export default (client: EClient): void => {
 				charName = content.match(/ @(\w+)/)![1];
 				content = content.replace(/ @\w+/, "").trim();
 			}
-			const statsName =
-				client.settings.get(message.guild.id, "templateID.statsName") ?? [];
+			const ctx = getGuildContext(client, message.guild.id);
+			const statsName = ctx?.templateID?.statsName ?? [];
 			const isRoll = isRolling(content, userData, statsName);
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);
-			const { result, detectRoll } = isRoll;
+			const { result, detectRoll, infoRoll } = isRoll;
 			const deleteInput = !detectRoll;
-			const channel = message.channel;
 			if (!result) return;
 			const { criticalsFromDice, serverData } = await getCritical(
 				client,
@@ -79,61 +72,28 @@ export default (client: EClient): void => {
 				rollCustomCriticalsFromDice(content, ul)
 			);
 
-			const opposition = parseComparator(content, userData?.stats, isRoll.infoRoll);
+			const opposition = parseComparator(content, userData?.stats, infoRoll);
 
-			const resultAsText = new ResultAsText(
-				result,
-				{ lang: userLang },
-				serverData?.critical,
-				charName,
-				undefined,
-				criticalsFromDice,
-				opposition
+			// Build infoRoll using helper to recover original accented name if available
+			const formattedInfoRoll = buildInfoRollFromStats(
+				infoRoll ? [infoRoll] : undefined,
+				statsName
 			);
-			const parser = resultAsText.parser;
-			if (!parser) return;
-			const isRollChannel =
-				client.settings.get(message.guild.id, "rollChannel") === channel.id ||
-				channel.name.decode().startsWith("🎲");
 
-			if (client.settings.get(message.guild.id, "disableThread") === true) {
-				await replyDice(deleteInput, message, resultAsText);
-				if (deleteInput) await message.delete();
-				return;
-			}
-
-			if (isRollChannel) {
-				return await message.reply({
-					allowedMentions: { repliedUser: true },
-					content: parser,
-				});
-			}
-
-			let context = {
-				channelId: channel.id,
-				guildId: message.guildId ?? "",
-				messageId: message.id,
-			};
-			if (deleteInput && client.settings.get(message.guild.id, "context")) {
-				const messageBefore = await findMessageBefore(channel, message, client);
-				if (messageBefore)
-					context = {
-						channelId: channel.id,
-						guildId: message.guildId ?? "",
-						messageId: messageBefore.id,
-					};
-			}
-			const thread = await threadToSend(client.settings, channel, ul);
-			const msgToEdit = await thread.send("_ _");
-			const msg = resultAsText.onMessageSend(context, message.author.id);
-			await msgToEdit.edit(msg);
-			const idMessage = client.settings.get(message.guild.id, "linkToLogs")
-				? msgToEdit.url
-				: undefined;
-			const reply = await replyDice(deleteInput, message, resultAsText, idMessage);
-			const timer = client.settings.get(message.guild.id, "deleteAfter") ?? 180000;
-			await deleteAfter(reply, timer);
-			if (deleteInput) await message.delete();
+			// Use the unified roll handler
+			await handleRollResult({
+				charName,
+				client,
+				criticalsFromDice,
+				deleteInput,
+				infoRoll: formattedInfoRoll,
+				lang: userLang,
+				opposition,
+				result,
+				serverCritical: serverData?.critical,
+				source: message,
+				ul,
+			});
 			return;
 		} catch (e) {
 			if (!message.guild) return;
@@ -157,20 +117,3 @@ export default (client: EClient): void => {
 		}
 	});
 };
-
-async function replyDice(
-	deleteInput: boolean,
-	message: Djs.Message,
-	resultAsText: ResultAsText,
-	idMessage?: string
-) {
-	const channel = message.channel as DiscordTextChannel;
-	return deleteInput
-		? await channel.send({
-				content: resultAsText.onMessageSend(idMessage, message.author.id),
-			})
-		: await message.reply({
-				allowedMentions: { repliedUser: true },
-				content: resultAsText.onMessageSend(idMessage),
-			});
-}

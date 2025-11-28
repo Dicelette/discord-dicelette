@@ -1,8 +1,15 @@
+import {
+	autoComplete,
+	charUserOptions,
+	fetchAvatarUrl,
+	haveAccess,
+	reuploadAvatar,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
 import { filterChoices } from "@dicelette/utils";
-import type { EClient } from "client";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import {
@@ -13,14 +20,8 @@ import {
 	getEmbeds,
 	reply,
 } from "messages";
-import {
-	autoComplete,
-	charUserOptions,
-	fetchAvatarUrl,
-	haveAccess,
-	optionInteractions,
-	reuploadAvatar,
-} from "utils";
+import { optionInteractions } from "utils";
+
 import "discord_ext";
 import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
 

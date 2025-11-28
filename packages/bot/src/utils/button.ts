@@ -1,9 +1,9 @@
+import { fetchUser } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import type { DataToFooter, Translation } from "@dicelette/types";
-import type { EClient } from "client";
 import * as Djs from "discord.js";
 import { ensureEmbed, reply } from "messages";
-import { fetchUser } from "utils";
 
 /**
  * Button to edit the user embed character sheet

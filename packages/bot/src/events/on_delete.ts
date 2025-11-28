@@ -1,6 +1,6 @@
+import type { EClient } from "@dicelette/client";
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { DATABASE_NAMES } from "commands";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import * as Djs from "discord.js";

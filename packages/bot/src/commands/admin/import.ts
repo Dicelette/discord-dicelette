@@ -1,8 +1,8 @@
+import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import { cmdLn, t } from "@dicelette/localization";
 import type { DiscordChannel, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import {
@@ -13,14 +13,14 @@ import {
 	reply,
 	repostInThread,
 } from "messages";
+import { parseCSV } from "utils";
+import "discord_ext";
 import {
 	addAutoRole,
 	fetchAvatarUrl,
-	getLangAndConfig,
-	parseCSV,
+	getInteractionContext as getLangAndConfig,
 	reuploadAvatar,
-} from "utils";
-import "discord_ext";
+} from "@dicelette/bot-helpers";
 import { COMPILED_PATTERNS } from "@dicelette/utils";
 
 // Small helpers to reduce repetition and control concurrency

@@ -1,7 +1,8 @@
-import type { EClient } from "client";
+import { autoCompleteCharacters, dbRollOptions } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
-import { autoCompleteCharacters, dbRollOptions, rollStatistique } from "utils";
+import { rollStatistique } from "utils";
 import "discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 

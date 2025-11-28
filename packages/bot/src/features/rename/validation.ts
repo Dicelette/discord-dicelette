@@ -1,3 +1,5 @@
+import { fetchUser } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,
@@ -5,13 +7,11 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import type { EClient } from "client";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
-import { fetchUser } from "utils";
 
 /**
  * Handles validation and execution of a character rename operation from a Discord modal submission.
@@ -40,7 +40,7 @@ export async function validate(
 		?.value.replace("<@", "")
 		.replace(">", "");
 	if (!userId) throw new Error(ul("error.user.notFound"));
-	const user = await fetchUser(interaction.client as EClient, userId);
+	const user = await fetchUser(client, userId);
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel.id,
 		messageId: message.id,

@@ -1,4 +1,20 @@
 import {
+	buildModerationButtons,
+	CUSTOM_ID_PREFIX,
+	deleteModerationCache,
+	fetchChannel,
+	fetchUser,
+	getMessageWithKeyPart,
+	getModerationCache,
+	getUserId,
+	makeEmbedKey,
+	parseKeyFromCustomId,
+	putModerationCache,
+	reuploadAvatar,
+	setModerationFooter,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
+import {
 	evalCombinaison,
 	evalOneCombinaison,
 	FormulaError,
@@ -9,11 +25,11 @@ import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { DataToFooter, Translation } from "@dicelette/types";
 import { COMPILED_PATTERNS, logger, TotalExceededError } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { Dice } from "features";
+import * as Messages from "messages";
 import {
 	createStatsEmbed,
 	displayOldAndNewStats,
@@ -24,25 +40,7 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import {
-	buildModerationButtons,
-	CUSTOM_ID_PREFIX,
-	continueCancelButtons,
-	deleteModerationCache,
-	editUserButtons,
-	fetchChannel,
-	fetchUser,
-	getMessageWithKeyPart,
-	getModerationCache,
-	getUserId,
-	makeEmbedKey,
-	parseKeyFromCustomId,
-	putModerationCache,
-	reuploadAvatar,
-	selfRegisterAllowance,
-	setModerationFooter,
-} from "utils";
-import * as Messages from "../../messages";
+import { continueCancelButtons, editUserButtons, selfRegisterAllowance } from "utils";
 import { sendValidationMessage } from "../user";
 
 /**
@@ -54,8 +52,7 @@ import { sendValidationMessage } from "../user";
  * @param template - The statistical template defining expected statistics and combinations.
  * @param page - The page number to display in the embed footer (defaults to 2).
  * @param lang - The language locale for localization (defaults to English GB).
- * @param moderation
- * @param moderation
+ * @param moderation - Whether the registration is being done under moderation (defaults to false).
  */
 export async function register(
 	interaction: Djs.ModalSubmitInteraction,
@@ -319,19 +316,23 @@ export async function validateEdit(
 		message
 	);
 	await message.edit({ embeds: list, files });
+	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
+	const count = compare.added + compare.changed + compare.removed;
 
 	await reply(interaction, {
-		content: ul("embed.edit.stats"),
+		content: ul("embed.edit.stats", {
+			count,
+		}),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 	const logMessage = ul("logs.stats.added", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		count,
 		fiche: message.url,
 		user: Djs.userMention(interaction.user.id),
 	});
 	//send logs
-	await sendLogs(`${logMessage}\n${compare}`, interaction.guild as Djs.Guild, db);
+	await sendLogs(`${logMessage}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 	//update memory
 	await updateMemory(characters, interaction.guild!.id, userID, ul, {
 		embeds: list,
@@ -459,19 +460,6 @@ export async function validateByModeration(
 	if (!statsEmbeds) return;
 	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
 	if (!fieldsToAppend) return;
-	const { userID, userName } = await getUserNameAndChar(interaction, ul);
-	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
-	const logMessage = ul("logs.stats.added", {
-		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-		fiche: message.url,
-		user: Djs.userMention(interaction.user.id),
-	});
-	//send logs
-	await sendLogs(
-		`${logMessage}\n${compare}`,
-		interaction.guild as Djs.Guild,
-		client.settings
-	);
 	//add a new message embed in the channel with the new stats for the future validation
 	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
 	const user = await getUserNameAndChar(interaction, ul);
@@ -501,6 +489,9 @@ export async function validateByModeration(
 
 	const row = buildModerationButtons("stats-edit", ul, embedKey);
 	await interaction.reply({ components: [row], embeds: [newEmbedStats] });
+	const reply = await interaction.fetchReply();
+	//ping moderators in the channel
+	await sendValidationMessage(interaction, interaction.user, ul, client, reply.url);
 }
 
 export async function couldBeValidated(
@@ -603,12 +594,16 @@ export async function cancelStatsModeration(
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.stats.cancel, customId);
 	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
+	const samePerson = userId === interaction.user.id;
+	const content = samePerson
+		? ul("modals.cancelled_by_user", { url })
+		: ul("modals.cancelled", { url });
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled"),
+		content,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	if (userId) {
+	if (userId && !samePerson) {
 		const user = await fetchUser(client, userId);
 		if (user)
 			await user.send(

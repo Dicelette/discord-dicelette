@@ -6,14 +6,14 @@
 	},
 	"description": "",
 	"main": "index.ts",
-	"name": "@testing/analyzeRoll",
+	"name": "@testing/analyzeroll",
 	"private": true,
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Dicelette/discord-dicelette.git"
 	},
 	"scripts": {
-		"test": "tsx index.ts"
+		"analyze": "tsx index.ts"
 	},
 	"type": "module",
 	"version": "1.0.0"

@@ -1,8 +1,24 @@
+import {
+	buildModerationButtons,
+	CUSTOM_ID_PREFIX,
+	deleteModerationCache,
+	fetchChannel,
+	fetchUser,
+	getMessageWithKeyPart,
+	getModerationCache,
+	getUserId,
+	makeEmbedKey,
+	parseEmbedKey,
+	parseKeyFromCustomId,
+	putModerationCache,
+	reuploadAvatar,
+	setModerationFooter,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
 import { COMPILED_PATTERNS, capitalizeBetweenPunct, logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
@@ -16,25 +32,8 @@ import {
 	sendLogs,
 	stripFooter,
 } from "messages";
-import {
-	buildModerationButtons,
-	CUSTOM_ID_PREFIX,
-	deleteModerationCache,
-	editUserButtons,
-	fetchChannel,
-	fetchUser,
-	getMessageWithKeyPart,
-	getModerationCache,
-	getUserId,
-	makeEmbedKey,
-	parseEmbedKey,
-	parseKeyFromCustomId,
-	putModerationCache,
-	reuploadAvatar,
-	selectEditMenu,
-	selfRegisterAllowance,
-	setModerationFooter,
-} from "utils";
+import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
+import { sendValidationMessage } from "../user";
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.
@@ -105,7 +104,9 @@ export async function validate(
 				content: ul("modals.removed.dice"),
 			});
 		} else await interaction.editReply({ components: [row], embeds: [diceEmbed] });
-
+		//ping moderators in the channel
+		const url = await interaction.fetchReply();
+		await sendValidationMessage(interaction, interaction.user, ul, client, url.url);
 		return; // do not apply changes directly
 	}
 
@@ -345,9 +346,12 @@ async function sendValidationResponses(args: {
 			content: ul("modals.removed.dice"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+		//count the number of removed fields for the logs
+		const count = oldFields?.length ?? 0;
 		await sendLogs(
 			ul("logs.dice.remove", {
 				char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+				count,
 				fiche: message.url,
 				user: Djs.userMention(interaction.user.id),
 			}),
@@ -356,18 +360,25 @@ async function sendValidationResponses(args: {
 		);
 		return;
 	}
-
+	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
+	const count = compare.added + compare.changed + compare.removed;
 	await reply(interaction, {
-		content: ul("embed.edit.dice"),
+		content: ul("embed.edit.dice", {
+			count,
+		}),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
 	const logMessage = ul("logs.dice.edit", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
+		count,
 		fiche: message.url,
 		user: Djs.userMention(interaction.user.id),
 	});
-	await sendLogs(`${logMessage}\n${compare}`.trim(), interaction.guild as Djs.Guild, db);
+	await sendLogs(
+		`${logMessage}\n${compare.stats}`.trim(),
+		interaction.guild as Djs.Guild,
+		db
+	);
 }
 
 /**
@@ -493,15 +504,17 @@ export async function cancelDiceModeration(
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
 	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
-
+	const samePerson = interaction.user.id === userId;
+	let content = ul("modals.cancelled", { url });
+	if (samePerson) content = ul("modals.cancelled_by_user", { url });
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled"),
+		content,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	if (userId) {
+	if (userId && !samePerson) {
 		const user = await fetchUser(client, userId);
-		if (user) await user.send(ul("modals.cancelled", { url }));
+		if (user) await user.send(content);
 	}
 }
 
@@ -678,15 +691,17 @@ export async function cancelDiceAddModeration(
 	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
 
+	const samePerson = interaction.user.id === userId;
+	let content = ul("modals.cancelled", { url });
+	if (samePerson) content = ul("modals.cancelled_by_user", { url });
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled_moderator"),
+		content,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	//send a message to the user that the edition has been cancelled
-	if (userId) {
+	if (userId && !samePerson) {
 		const user = await fetchUser(client, userId);
-		logger.trace("Cancelling dice add moderation for user:", userId);
-		if (user) await user.send(ul("modals.cancelled", { url }));
+		if (user) await user.send(content);
 	}
 }

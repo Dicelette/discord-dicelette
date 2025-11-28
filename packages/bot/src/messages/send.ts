@@ -1,11 +1,9 @@
-// noinspection SuspiciousTypeOfGuard
-
+import { fetchChannel } from "@dicelette/bot-helpers";
 import { createUrl, type ResultAsText } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { findMessageBefore, threadToSend } from "messages";
-import { fetchChannel } from "utils";
+import { embedError, findMessageBefore, threadToSend } from "messages";
 
 export async function sendLogs(
 	message: string,
@@ -49,6 +47,27 @@ export async function reply(
 }
 
 /**
+ * Convenient wrapper to reply with an error embed in ephemeral mode.
+ * Use this when you need to show an error message that only the user can see.
+ *
+ * @param interaction - Command or modal interaction to reply to
+ * @param errorText - Error message to display
+ * @param ul - Translation function
+ * @param cause - Optional additional context/cause string
+ */
+export async function replyEphemeralError(
+	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
+	errorText: string,
+	ul: Translation,
+	cause?: string
+): Promise<Djs.Message | Djs.InteractionResponse> {
+	return reply(interaction, {
+		embeds: [embedError(errorText, ul, cause)],
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+}
+
+/**
  * Deletes a given message after a specified time delay.
  * If the time delay is zero, the function exits immediately.
  * Uses setTimeout to schedule the deletion and handles any errors silently.
@@ -76,26 +95,32 @@ export function displayOldAndNewStats(
 	newStats?: Djs.APIEmbedField[]
 ) {
 	let stats = "";
+	let removed = 0;
+	let added = 0;
+	let changed = 0;
 	if (oldStats && newStats) {
 		for (const field of oldStats) {
 			const name = field.name.toLowerCase();
 			const newField = newStats.find((f) => f.name.toLowerCase() === name);
 			if (!newField) {
 				stats += `- ~~${field.name}: ${field.value}~~\n`;
+				removed++;
 				continue;
 			}
 			if (field.value === newField.value) continue;
 			stats += `- ${field.name}: ${field.value} ⇒ ${newField.value}\n`;
+			changed++;
 		}
 		//verify if there is new stats
 		for (const field of newStats) {
 			const name = field.name.toLowerCase();
 			if (!oldStats.find((f) => f.name.toLowerCase() === name)) {
 				stats += `- ${field.name}: 0 ⇒ ${field.value}\n`;
+				added++;
 			}
 		}
 	}
-	return stats;
+	return { added, changed, removed, stats };
 }
 
 export async function sendResult(

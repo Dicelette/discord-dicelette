@@ -1,34 +1,32 @@
 import {
-	type CustomCritical,
-	DETECT_CRITICAL,
-	DiceTypeError,
-	generateStatsDice,
-	replaceFormulaInDice,
-	type StatisticalTemplate,
-} from "@dicelette/core";
+	extractRollOptions,
+	getGuildContext,
+	getInteractionContext as getLangAndConfig,
+	getStatisticOption,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
+import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
+	buildInfoRollFromStats,
+	composeRollBase,
 	convertNameToValue,
 	getCriticalFromDice,
 	getExpression,
 	getRoll,
 	includeDiceType,
 	parseOpposition,
-	ResultAsText,
 	replaceStatInDiceName,
 	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 	type Server,
 	skillCustomCritical,
-	trimAll,
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply, sendResult } from "messages";
-import { getLangAndConfig } from "utils";
+import { embedError, handleRollResult, reply } from "messages";
 import { findBestMatchingDice } from "./find_macro";
 
 /**
@@ -58,36 +56,30 @@ export async function rollWithInteraction(
 		userId: user?.id ?? interaction.user.id,
 	};
 	const result = getRoll(dice);
-
-	const defaultMsg = new ResultAsText(
-		result,
-		data,
-		critical,
-		charName,
-		infoRoll,
-		customCritical,
-		opposition
-	);
-	const output = defaultMsg.defaultMessage();
+	if (!result) {
+		await reply(interaction, {
+			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
 	if (!silent) {
-		if (defaultMsg.error) {
-			await reply(interaction, {
-				embeds: [embedError(output, ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			return;
-		}
-
-		return await sendResult(
-			interaction,
-			{ roll: defaultMsg },
-			client.settings,
+		return await handleRollResult({
+			charName,
+			client,
+			criticalsFromDice: customCritical,
+			deleteInput: false,
+			hideResult: hideResult ?? undefined,
+			infoRoll,
+			lang: data.lang,
+			opposition,
+			result: result,
+			serverCritical: critical,
+			source: interaction,
 			ul,
 			user,
-			hideResult
-		);
+		});
 	}
-	if (defaultMsg.error) throw new DiceTypeError(dice, output);
 	return;
 }
 
@@ -115,14 +107,10 @@ export async function rollMacro(
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
-	const expression = options.getString(t("common.expression")) ?? "0";
-	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
-	const comm = options.getString(t("common.comments"))
-		? `# ${options.getString(t("common.comments"))}`
-		: undefined;
-	const comments = comm ?? "";
+	const rollOpts = extractRollOptions(options);
+	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
 	let dice = userStatistique.damage?.[atq];
-	let threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
+	const threshold = thresholdOpt;
 
 	if (!dice) {
 		const bestMatch = await findBestMatchingDice(
@@ -165,21 +153,26 @@ export async function rollMacro(
 	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
-	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
-	if (threshold)
-		threshold = generateStatsDice(threshold, userStatistique.stats, dollarValue?.total);
+	//dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
+	//if (threshold)
+	//	threshold = generateStatsDice(threshold, userStatistique.stats, dollarValue?.total);
 	const rCC = getCriticalFromDice(dice, ul);
-	dice = dice.replace(DETECT_CRITICAL, "").trim();
-	dice = getThreshold(dice, threshold);
+	// Unified dice composition (critical removal, threshold application, comparator extraction)
+	const composed = composeRollBase(
+		dice,
+		threshold,
+		COMPILED_PATTERNS.COMPARATOR,
+		userStatistique.stats,
+		dollarValue?.total,
+		expressionStr,
+		comments
+	);
+	//dice = composed.diceWithoutComparator;
+	const comparator = composed.comparatorEvaluated;
+	const rawComparator = composed.rawComparator;
 
-	const comparatorMatch = COMPILED_PATTERNS.COMPARATOR.exec(dice);
-	let comparator = "";
-	if (comparatorMatch) {
-		dice = dice.replace(comparatorMatch[0], "");
-		comparator = comparatorMatch[0];
-	}
-
-	if (dollarValue && comparator.length > 0) {
+	// Adjust infoRoll name with stat substitution if comparator present
+	if (dollarValue && rawComparator.length > 0) {
 		const originalName = infoRoll.name;
 		if (dollarValue.diceResult)
 			infoRoll.name = replaceStatInDiceName(
@@ -190,8 +183,6 @@ export async function rollMacro(
 		else infoRoll.name = replaceStatInDiceName(infoRoll.name, userStatistique.stats, "");
 		if (infoRoll.name.length === 0) infoRoll.name = capitalizeBetweenPunct(originalName);
 	}
-
-	comparator = generateStatsDice(comparator, userStatistique.stats, dollarValue?.total);
 	const opposition = oppositionVal
 		? parseOpposition(
 				oppositionVal,
@@ -200,7 +191,7 @@ export async function rollMacro(
 				dollarValue?.total
 			)
 		: undefined;
-	const roll = `${trimAll(dice)}${expressionStr}${comparator} ${comments}`;
+	const roll = composed.roll;
 	const opts: RollOptions = {
 		charName: charOptions,
 		customCritical: skillCustomCritical(
@@ -234,18 +225,13 @@ export async function rollStatistique(
 	 */
 	hideResult?: boolean | null
 ) {
-	console.log(
-		"UserStatistique:",
-		client.settings.get(interaction.guildId!)?.templateID.statsName
-	);
-	let statistic = options.getString(t("common.statistic"), false);
+	const ctx = getGuildContext(client, interaction.guildId!);
+	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
 	let dice = template.diceType;
 	let standardizedStatistic = statistic?.standardize(true);
 	//return if the standardizedStatistic is excluded from the list
-	const excludedStats = client.settings
-		.get(interaction.guild!.id, "templateID.excludedStats")
-		?.map((stat) => stat.standardize());
+	const excludedStats = ctx?.templateID?.excludedStats?.map((stat) => stat.standardize());
 	if (standardizedStatistic && excludedStats?.includes(standardizedStatistic)) {
 		await reply(interaction, {
 			content: ul("error.stats.excluded"),
@@ -261,14 +247,10 @@ export async function rollStatistique(
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
-	const comm = options.getString(t("common.comments"))
-		? `# ${options.getString(t("common.comments"))}`
-		: undefined;
-	const comments = comm ?? "";
-	let threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
-	const oppositionVal = options.getString(t("dbRoll.options.opposition.name"));
+	const rollOpts = extractRollOptions(options);
+	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
+	const threshold = thresholdOpt;
 	let userStat: undefined | number;
-	const expression = options.getString(t("common.expression")) ?? "0";
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
 		const res = getRightValue(
 			userStatistique,
@@ -293,41 +275,49 @@ export async function rollStatistique(
 		});
 		return;
 	}
-	if (threshold)
-		threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
+	//if (threshold)
+	//	threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
 	const userStatStr = userStat?.toString();
 	const expr = getExpression(
 		dice,
 		expression,
 		userStatistique.stats,
 		userStatStr,
-		client.settings.get(interaction.guildId!)?.templateID.statsName
+		ctx?.templateID?.statsName
 	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	const findStatsExpr = expr.statsFound;
 	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
-	dice = dice.replace(DETECT_CRITICAL, "").trim();
-	dice = getThreshold(dice, threshold);
-	const comparatorMatch = COMPILED_PATTERNS.COMPARATOR_SIMPLE.exec(dice);
-	let comparator = "";
-	if (comparatorMatch) {
-		//remove from dice
-		dice = dice.replace(comparatorMatch[0], "").trim();
-		comparator = comparatorMatch[0];
-	}
-	const diceEvaluated = replaceFormulaInDice(dice);
+	// Unified composition for statistique variant
+	const composed = composeRollBase(
+		dice,
+		threshold,
+		COMPILED_PATTERNS.COMPARATOR_SIMPLE,
+		userStatistique.stats,
+		userStatStr,
+		expressionStr,
+		comments
+	);
+	//dice = composed.diceWithoutComparator;
+	//const rawComparator = composed.rawComparator;
+	//const diceEvaluated = replaceFormulaInDice(dice);
 	const opposition = oppositionVal
-		? parseOpposition(oppositionVal, comparator, userStatistique.stats, userStatStr)
+		? parseOpposition(
+				oppositionVal,
+				composed.comparatorEvaluated,
+				userStatistique.stats,
+				userStatStr
+			)
 		: undefined;
 	let infoRoll =
 		statistic && standardizedStatistic
-			? { name: statistic, standardized: standardizedStatistic }
+			? buildInfoRollFromStats([standardizedStatistic], ctx?.templateID?.statsName)
 			: undefined;
 	if (!infoRoll && findStatsExpr)
-		infoRoll = { name: findStatsExpr.join(" "), standardized: findStatsExpr.join(" ") };
+		infoRoll = buildInfoRollFromStats(findStatsExpr, ctx?.templateID?.statsName);
 
-	const roll = `${trimAll(diceEvaluated)}${expressionStr}${generateStatsDice(comparator, userStatistique.stats, userStatStr)} ${comments}`;
+	const roll = composed.roll;
 	const customCritical =
 		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
 
@@ -370,26 +360,4 @@ export async function getCritical(
 			};
 	}
 	return { criticalsFromDice, serverData };
-}
-
-/**
- * Update the threshold if provided and remove existing comparator from dice.
- */
-export function getThreshold(dice: string, threshold?: string) {
-	if (threshold) {
-		const diceMatch = COMPILED_PATTERNS.COMPARATOR.exec(dice);
-		const thresholdMatch = COMPILED_PATTERNS.COMPARATOR.exec(threshold);
-		if (diceMatch?.groups && thresholdMatch?.groups) {
-			dice = dice.replace(diceMatch[0], thresholdMatch[0]);
-		} else if (!diceMatch && thresholdMatch) {
-			dice += thresholdMatch[0];
-		} else if (diceMatch?.groups && !thresholdMatch) {
-			const simpleNumberMatch = /(?<comparator>(.+))/.exec(threshold);
-			const diceComparator = diceMatch.groups.comparator;
-			if (simpleNumberMatch?.groups) {
-				dice = dice.replace(diceComparator, simpleNumberMatch.groups.comparator);
-			}
-		}
-	}
-	return dice;
 }

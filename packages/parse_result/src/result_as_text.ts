@@ -485,7 +485,8 @@ export class ResultAsText {
 		}
 
 		const headerLine = `${mention}${compareHint}${timestamp(this.data.config?.timestamp)}`;
-		return `${headerLine}\n${this.parser}${linkToOriginal}`;
+		const infoLine = this.infoRoll ? `\n[__${this.infoRoll.name.capitalize()}__] ` : "\n";
+		return `${headerLine}${infoLine}${this.parser}${linkToOriginal}`;
 	}
 
 	private asciiSign(sign: string) {

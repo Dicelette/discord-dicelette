@@ -1,8 +1,12 @@
+import {
+	fetchChannel,
+	getInteractionContext as getLangAndConfig,
+} from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import type { EClient } from "client";
 import * as Djs from "discord.js";
 import {
 	bulkDeleteCharacters,
@@ -12,7 +16,6 @@ import {
 	embedError,
 	reply,
 } from "messages";
-import { fetchChannel, getLangAndConfig } from "utils";
 import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";

@@ -1,9 +1,9 @@
 import * as Djs from "discord.js";
 import "discord_ext";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { random } from "@dicelette/utils";
-import type { EClient } from "client";
-import { getLangAndConfig } from "utils";
 
 export const choose = {
 	data: new Djs.SlashCommandBuilder()

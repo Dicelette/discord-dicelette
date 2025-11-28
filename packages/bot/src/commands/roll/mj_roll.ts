@@ -1,16 +1,12 @@
+import { extractCommonOptions, gmCommonOptions } from "@dicelette/bot-helpers";
+import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
 import type { UserData, UserMessageId } from "@dicelette/types";
 import { filterChoices, uniformizeRecords } from "@dicelette/utils";
-import type { EClient } from "client";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply } from "messages";
-import {
-	gmCommonOptions,
-	isSerializedNameEquals,
-	rollMacro,
-	rollStatistique,
-} from "utils";
+import { replyEphemeralError } from "messages";
+import { isSerializedNameEquals, rollMacro, rollStatistique } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 import "discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
@@ -26,7 +22,7 @@ export const mjRoll = {
 		const guildData = client.settings.get(interaction.guild!.id);
 		if (!guildData || !guildData.templateID) return;
 		let choices: string[] = [];
-		let user = options.get(t("display.userLowercase"))?.value;
+		const { user } = extractCommonOptions(options);
 		let allCharFromGuild: {
 			charName?: string | null;
 			messageId: UserMessageId;
@@ -34,14 +30,14 @@ export const mjRoll = {
 			isPrivate?: boolean;
 		}[] = [];
 
-		if (typeof user !== "string") user = interaction.user.id;
-		if (user === interaction.user.id) {
+		const userId = user ?? interaction.user.id;
+		if (userId === interaction.user.id) {
 			for (const [, char] of Object.entries(guildData.user)) {
 				for (const data of char) {
 					allCharFromGuild.push(data);
 				}
 			}
-		} else allCharFromGuild = guildData.user[user];
+		} else allCharFromGuild = guildData.user?.[userId];
 		if (fixed.name === t("common.character")) {
 			//get ALL characters from the guild
 			const skill = options.getString(t("common.name"));
@@ -140,15 +136,8 @@ export const mjRoll = {
 
 			const serializedNameQueries = isSerializedNameEquals(charData, charName);
 			if (charName && !serializedNameQueries) {
-				await reply(interaction, {
-					embeds: [
-						embedError(
-							ul("error.user.charName", { charName: charName.capitalize() }),
-							ul
-						),
-					],
-					flags: Djs.MessageFlags.Ephemeral,
-				});
+				const text = ul("error.user.charName", { charName: charName.capitalize() });
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 
@@ -161,25 +150,17 @@ export const mjRoll = {
 			if (!charData) {
 				let userName = `<@${user.id}>`;
 				if (charName) userName += ` (${charName})`;
-				await reply(interaction, {
-					embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
-				});
+				const text = ul("error.user.registered", { user: userName });
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 		} else {
 			//build default char data based on the template
 			if (!template) {
-				await reply(interaction, {
-					embeds: [
-						embedError(
-							ul("error.template.notFound", {
-								guildId: interaction.guild.name,
-							}),
-							ul
-						),
-					],
-					flags: Djs.MessageFlags.Ephemeral,
+				const text = ul("error.template.notFound", {
+					guildId: interaction.guild.name,
 				});
+				await replyEphemeralError(interaction, text, ul);
 				return;
 			}
 			charData = {

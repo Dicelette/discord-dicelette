@@ -108,10 +108,7 @@ export function convertNameToValue(
 export function trimAll(dice: string) {
 	const dices = dice.split(";");
 	const result = dices.map((d) => {
-		const comment = d.match(DICE_COMPILED_PATTERNS.COMMENTS_REGEX)?.groups?.comment
-			? `[${d.match(DICE_COMPILED_PATTERNS.COMMENTS_REGEX)?.groups?.comment}]`
-			: "";
-		return `${d.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trimAll()}${comment}`;
+		return `${d.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trimAll()}`;
 	});
 	return result.join(";");
 }
