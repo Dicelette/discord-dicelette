@@ -5,11 +5,7 @@ import {
 	getStatisticOption,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import {
-	type CustomCritical,
-	generateStatsDice,
-	type StatisticalTemplate,
-} from "@dicelette/core";
+import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
 	buildInfoRollFromStats,
@@ -114,7 +110,7 @@ export async function rollMacro(
 	const rollOpts = extractRollOptions(options);
 	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
 	let dice = userStatistique.damage?.[atq];
-	let threshold = thresholdOpt;
+	const threshold = thresholdOpt;
 
 	if (!dice) {
 		const bestMatch = await findBestMatchingDice(
@@ -157,9 +153,9 @@ export async function rollMacro(
 	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
-	dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
-	if (threshold)
-		threshold = generateStatsDice(threshold, userStatistique.stats, dollarValue?.total);
+	//dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
+	//if (threshold)
+	//	threshold = generateStatsDice(threshold, userStatistique.stats, dollarValue?.total);
 	const rCC = getCriticalFromDice(dice, ul);
 	// Unified dice composition (critical removal, threshold application, comparator extraction)
 	const composed = composeRollBase(
@@ -253,7 +249,7 @@ export async function rollStatistique(
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
 	const rollOpts = extractRollOptions(options);
 	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
-	let threshold = thresholdOpt;
+	const threshold = thresholdOpt;
 	let userStat: undefined | number;
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
 		const res = getRightValue(
@@ -279,8 +275,8 @@ export async function rollStatistique(
 		});
 		return;
 	}
-	if (threshold)
-		threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
+	//if (threshold)
+	//	threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
 	const userStatStr = userStat?.toString();
 	const expr = getExpression(
 		dice,

@@ -58,6 +58,7 @@ export function composeRollBase(
 } {
 	let working = dice.replace(DETECT_CRITICAL, "").trim();
 	working = getThreshold(working, threshold);
+	working = generateStatsDice(working, stats, statTotal?.toString());
 	const { dice: noComparator, comparator: rawComparator } = extractComparator(
 		working,
 		comparatorPattern
