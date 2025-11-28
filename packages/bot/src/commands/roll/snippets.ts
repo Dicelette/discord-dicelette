@@ -140,7 +140,7 @@ export default {
 		);
 
 		const opposition = oppositionVal
-			? parseOpposition(oppositionVal, composed.rawComparator)
+			? parseOpposition(oppositionVal, composed.comparatorEvaluated)
 			: undefined;
 
 		const opts: RollOptions = {

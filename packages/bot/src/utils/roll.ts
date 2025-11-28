@@ -300,10 +300,15 @@ export async function rollStatistique(
 		comments
 	);
 	//dice = composed.diceWithoutComparator;
-	const rawComparator = composed.rawComparator;
+	//const rawComparator = composed.rawComparator;
 	//const diceEvaluated = replaceFormulaInDice(dice);
 	const opposition = oppositionVal
-		? parseOpposition(oppositionVal, rawComparator, userStatistique.stats, userStatStr)
+		? parseOpposition(
+				oppositionVal,
+				composed.comparatorEvaluated,
+				userStatistique.stats,
+				userStatStr
+			)
 		: undefined;
 	let infoRoll =
 		statistic && standardizedStatistic
