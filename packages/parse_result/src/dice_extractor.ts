@@ -226,7 +226,8 @@ export function isRolling(
 	) {
 		const diceRoll = processChainedDiceRoll(
 			processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
-			userData
+			userData,
+			statsName
 		);
 		if (diceRoll)
 			return {
