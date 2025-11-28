@@ -314,13 +314,13 @@ export function replaceStatsInDiceFormula(
 	// Pre-process stats for better performance
 	const normalizedStats = new Map<string, [string, number]>();
 	for (const [key, value] of Object.entries(stats)) {
-		const normalized = key.standardize().toLowerCase();
+		const normalized = key.standardize();
 		normalizedStats.set(normalized, [key, value]);
 	}
 
 	for (const match of variableMatches) {
 		const fullMatch = match[0];
-		const searchTerm = match[1].standardize().toLowerCase();
+		const searchTerm = match[1].standardize();
 
 		if (!processedFormula.includes(fullMatch)) continue;
 
@@ -354,7 +354,7 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	const unNormalized: string[] = [];
 	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
-		const found = findBestStatMatch<string>(stat, normalizedStats);
+		const found = findBestStatMatch<string>(stat.standardize(), normalizedStats);
 		if (found) unNormalized.push(found);
 		else unNormalized.push(stat);
 	}
@@ -380,7 +380,7 @@ export function buildInfoRollFromStats(
 function normalizedMap(statsName: string[]): Map<string, string> {
 	const normalizedStats = new Map<string, string>();
 	for (const stat of statsName) {
-		normalizedStats.set(stat.standardize().toLowerCase(), stat);
+		normalizedStats.set(stat.standardize(), stat);
 	}
 	return normalizedStats;
 }
@@ -394,7 +394,7 @@ export function findStatInDiceFormula(
 	const foundStats: string[] = [];
 
 	// Normaliser la formule et préparer les tokens (mots) à analyser
-	const text = diceFormula.standardize().toLowerCase();
+	const text = diceFormula.standardize();
 	const tokens = text.match(/\p{L}[\p{L}0-9_]*/gu) || [];
 
 	// Préparer la map des stats normalisées -> original
