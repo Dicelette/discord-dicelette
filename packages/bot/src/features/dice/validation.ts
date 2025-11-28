@@ -361,16 +361,16 @@ async function sendValidationResponses(args: {
 		return;
 	}
 	const compare = displayOldAndNewStats(oldFields ?? [], newFields);
-
+	const count = compare.added + compare.changed + compare.removed;
 	await reply(interaction, {
 		content: ul("embed.edit.dice", {
-			count: compare.added + compare.changed + compare.removed,
+			count,
 		}),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	const logMessage = ul("logs.dice.edit", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-		count: compare.added + compare.changed + compare.removed,
+		count,
 		fiche: message.url,
 		user: Djs.userMention(interaction.user.id),
 	});

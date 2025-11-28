@@ -317,16 +317,17 @@ export async function validateEdit(
 	);
 	await message.edit({ embeds: list, files });
 	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
+	const count = compare.added + compare.changed + compare.removed;
 
 	await reply(interaction, {
 		content: ul("embed.edit.stats", {
-			count: compare.added + compare.changed + compare.removed,
+			count,
 		}),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	const logMessage = ul("logs.stats.added", {
 		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-		count: compare.added + compare.changed + compare.removed,
+		count,
 		fiche: message.url,
 		user: Djs.userMention(interaction.user.id),
 	});
