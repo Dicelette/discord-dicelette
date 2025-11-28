@@ -303,7 +303,7 @@ export async function rollStatistique(
 		expressionStr,
 		comments
 	);
-	dice = composed.diceWithoutComparator;
+	//dice = composed.diceWithoutComparator;
 	const rawComparator = composed.rawComparator;
 	//const diceEvaluated = replaceFormulaInDice(dice);
 	const opposition = oppositionVal
