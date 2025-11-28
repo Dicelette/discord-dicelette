@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.22.1](https://github.com/Dicelette/discord-dicelette/compare/2.22.0...2.22.1) (2025-11-28)
+
+
+### Bug Fixes
+
+* Centralized command helpers, autocomplete, and interaction context ([0726907](https://github.com/Dicelette/discord-dicelette/commit/072690769300fa70ac202cbb69a2bf9afff9f745))
+
 ## [2.22.0](https://github.com/Dicelette/discord-dicelette/compare/2.21.0...2.22.0) (2025-11-28)
 
 
