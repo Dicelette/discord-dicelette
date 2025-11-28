@@ -33,6 +33,7 @@ import {
 	stripFooter,
 } from "messages";
 import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
+import { sendValidationMessage } from "../user";
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.
@@ -103,7 +104,9 @@ export async function validate(
 				content: ul("modals.removed.dice"),
 			});
 		} else await interaction.editReply({ components: [row], embeds: [diceEmbed] });
-
+		//ping moderators in the channel
+		const url = await interaction.fetchReply();
+		await sendValidationMessage(interaction, interaction.user, ul, client, url.url);
 		return; // do not apply changes directly
 	}
 
@@ -501,15 +504,17 @@ export async function cancelDiceModeration(
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
 	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
-
+	const samePerson = interaction.user.id === userId;
+	let content = ul("modals.cancelled", { url });
+	if (samePerson) content = ul("modals.cancelled_by_user", { url });
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled"),
+		content,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	if (userId) {
+	if (userId && !samePerson) {
 		const user = await fetchUser(client, userId);
-		if (user) await user.send(ul("modals.cancelled", { url }));
+		if (user) await user.send(content);
 	}
 }
 
@@ -686,15 +691,17 @@ export async function cancelDiceAddModeration(
 	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
 
+	const samePerson = interaction.user.id === userId;
+	let content = ul("modals.cancelled", { url });
+	if (samePerson) content = ul("modals.cancelled_by_user");
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled_moderator"),
+		content,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	//send a message to the user that the edition has been cancelled
-	if (userId) {
+	if (userId && !samePerson) {
 		const user = await fetchUser(client, userId);
-		logger.trace("Cancelling dice add moderation for user:", userId);
-		if (user) await user.send(ul("modals.cancelled", { url }));
+		if (user) await user.send(content);
 	}
 }

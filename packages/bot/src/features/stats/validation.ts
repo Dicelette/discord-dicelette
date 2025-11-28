@@ -460,19 +460,6 @@ export async function validateByModeration(
 	if (!statsEmbeds) return;
 	const fieldsToAppend = await getFieldsToAppend(ul, interaction, client, statsEmbeds);
 	if (!fieldsToAppend) return;
-	const { userID, userName } = await getUserNameAndChar(interaction, ul);
-	const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
-	const logMessage = ul("logs.stats.added", {
-		char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
-		fiche: message.url,
-		user: Djs.userMention(interaction.user.id),
-	});
-	//send logs
-	await sendLogs(
-		`${logMessage}\n${compare.stats}`,
-		interaction.guild as Djs.Guild,
-		client.settings
-	);
 	//add a new message embed in the channel with the new stats for the future validation
 	const newEmbedStats = createStatsEmbed(ul).addFields(fieldsToAppend);
 	const user = await getUserNameAndChar(interaction, ul);
@@ -502,6 +489,9 @@ export async function validateByModeration(
 
 	const row = buildModerationButtons("stats-edit", ul, embedKey);
 	await interaction.reply({ components: [row], embeds: [newEmbedStats] });
+	const reply = await interaction.fetchReply();
+	//ping moderators in the channel
+	await sendValidationMessage(interaction, interaction.user, ul, client, reply.url);
 }
 
 export async function couldBeValidated(
@@ -604,12 +594,16 @@ export async function cancelStatsModeration(
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.stats.cancel, customId);
 	const { userId, url } = getUserId(interaction);
 	if (embedKey) deleteModerationCache(embedKey);
+	const samePerson = userId === interaction.user.id;
+	const content = samePerson
+		? ul("modals.cancelled_by_user", { url })
+		: ul("modals.cancelled", { url });
 	await interaction.message.delete();
 	await reply(interaction, {
-		content: ul("modals.cancelled"),
+		content,
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	if (userId) {
+	if (userId && !samePerson) {
 		const user = await fetchUser(client, userId);
 		if (user)
 			await user.send(

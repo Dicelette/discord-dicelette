@@ -104,17 +104,19 @@ export async function button(
 }
 
 export async function sendValidationMessage(
-	interaction: Djs.ButtonInteraction,
+	interaction: Djs.ButtonInteraction | Djs.ModalSubmitInteraction,
 	interactionUser: Djs.User,
 	ul: Translation,
-	client: EClient
+	client: EClient,
+	url?: string
 ) {
 	const logChannel = client.settings.get(interaction.guild!.id, "logs");
+	if (!url) url = interaction.message?.url ?? "";
 	if (logChannel)
 		await Messages.sendLogs(
 			ul("logs.validationWaiting", {
 				role: `\n-# ${pingModeratorRole(interaction.guild!)}`,
-				url: interaction.message.url,
+				url,
 				user: `${interactionUser.id}`,
 			}),
 			interaction.guild!,
@@ -128,7 +130,7 @@ export async function sendValidationMessage(
 			await systemChannel.send({
 				content: ul("logs.validationWaiting", {
 					role: `\n-# ${pingModeratorRole(interaction.guild!)}`,
-					url: interaction.message.url,
+					url,
 					user: `${interactionUser.id}`,
 				}),
 			});
@@ -140,7 +142,7 @@ export async function sendValidationMessage(
 					await owner.send({
 						content: ul("logs.validationWaiting", {
 							role: "",
-							url: interaction.message.url,
+							url,
 							user: `${interactionUser.id}`,
 						}),
 					});
