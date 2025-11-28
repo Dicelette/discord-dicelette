@@ -76,6 +76,22 @@ export const userSettings = {
 						.setNames("userSettings.snippets.list.title")
 						.setDescriptions("userSettings.snippets.list.description")
 				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("export.name")
+						.setDescriptions("userSettings.snippets.export.description")
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("import.name")
+						.setDescriptions("userSettings.snippets.import.description")
+						.addAttachmentOption((option) =>
+							option
+								.setNames("userSettings.snippets.import.file.title")
+								.setDescriptions("userSettings.snippets.import.file.description")
+								.setRequired(true)
+						)
+				)
 		),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		const group = interaction.options.getSubcommandGroup(true);
@@ -95,6 +111,10 @@ export const userSettings = {
 				return await snippets.remove(client, interaction);
 			if (subcommand === t("userSettings.snippets.list.title"))
 				return await snippets.displayList(client, interaction);
+			if (subcommand === t("export.name"))
+				return await snippets.exportSnippets(client, interaction);
+			if (subcommand === t("import.name"))
+				return await snippets.importSnippets(client, interaction);
 		}
 	},
 };
