@@ -95,6 +95,8 @@ if (hasSentry) {
 		dsn: process.env.SENTRY_DSN,
 		environment: process.env.NODE_ENV ?? "production",
 		release: process.env.BOT_VERSION, // optionnel,
+		tracesSampleRate: 1.0,
+		sendDefaultPii: true,
 	});
 } else {
 	important.warn("Sentry DSN is not provided. Sentry is disabled.");
