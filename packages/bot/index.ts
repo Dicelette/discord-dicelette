@@ -1,11 +1,12 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
-import { logger } from "@dicelette/utils";
+import { logger, sentry } from "@dicelette/utils";
 import dotenv from "dotenv";
 import "uniformize";
 import process from "node:process";
 import { important, setupProcessErrorHandlers } from "@dicelette/utils";
 import { client } from "client";
 import * as event from "event";
+import express from "express";
 import packageJson from "./package.json" with { type: "json" };
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
@@ -44,7 +45,19 @@ try {
 	event.onDebug(client);
 } catch (error) {
 	logger.fatal(error);
+	sentry.fatal("Failed to register bot events", { error });
 }
+
+const app = express();
+
+app.get("/healthz", (_req, res) => {
+	if (client.ws.status === 0) res.status(200).send("Discord bot is connected 👍");
+	else res.status(500).send("Discord bot is not connected 👎");
+});
+
+app.listen(process.env.PORT || 3000, () => {
+	important.info(`Health check server is running on port ${process.env.PORT || 3000}`);
+});
 
 client
 	.login(process.env.DISCORD_TOKEN)
@@ -53,4 +66,6 @@ client
 	})
 	.catch((error) => {
 		console.error(error);
+		sentry.fatal("Failed to login bot", { error });
+		process.exit(1);
 	});
