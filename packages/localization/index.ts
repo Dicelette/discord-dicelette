@@ -1,3 +1,4 @@
+import { buildTranslationKeyCache } from "./src/translate";
 import { resources } from "./src/types";
 
 export * from "./src/flattenJson";
@@ -21,3 +22,5 @@ i18next?.services?.formatter?.add("optional", (value, _lng, _options) => {
 	}
 	return value;
 });
+
+buildTranslationKeyCache();
