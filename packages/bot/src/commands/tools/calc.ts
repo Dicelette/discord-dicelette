@@ -4,7 +4,7 @@ import { generateStatsDice, isNumber } from "@dicelette/core";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { logger, profiler } from "@dicelette/utils";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
@@ -132,6 +132,7 @@ export async function calculate(
 	hide?: boolean | null,
 	user: Djs.User = interaction.user
 ) {
+	profiler.startProfiler();
 	let formula = options
 		.getString(t("common.expression"), true)
 		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
@@ -227,6 +228,8 @@ export async function calculate(
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });
 		logger.warn(error);
+	} finally {
+		profiler.stopProfiler();
 	}
 }
 

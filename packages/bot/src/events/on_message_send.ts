@@ -7,7 +7,7 @@ import {
 	parseComparator,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import { allValuesUndefined, logger } from "@dicelette/utils";
+import { allValuesUndefined, logger, profiler } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
@@ -17,6 +17,7 @@ import { isApiError } from "./on_error";
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
 		try {
+			profiler.startProfiler();
 			if (message.channel.type === Djs.ChannelType.DM) return;
 			if (!message.guild) return;
 			const userLang =
@@ -114,6 +115,8 @@ export default (client: EClient): void => {
 					await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
 				}
 			}
+		} finally {
+			profiler.stopProfiler();
 		}
 	});
 };

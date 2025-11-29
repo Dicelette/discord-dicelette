@@ -23,7 +23,7 @@ import {
 	skillCustomCritical,
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
-import { COMPILED_PATTERNS, capitalizeBetweenPunct } from "@dicelette/utils";
+import { COMPILED_PATTERNS, capitalizeBetweenPunct, profiler } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";
@@ -38,6 +38,7 @@ export async function rollWithInteraction(
 	client: EClient,
 	opts: RollOptions
 ) {
+	profiler.startProfiler();
 	const {
 		critical,
 		user,
@@ -80,6 +81,7 @@ export async function rollWithInteraction(
 			user,
 		});
 	}
+	profiler.stopProfiler();
 	return;
 }
 
@@ -101,6 +103,7 @@ export async function rollMacro(
 	 */
 	hideResult?: boolean | null
 ) {
+	profiler.startProfiler();
 	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
 		name: atq,
@@ -205,6 +208,7 @@ export async function rollMacro(
 		user,
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
+	profiler.stopProfiler();
 }
 
 /**
@@ -225,6 +229,7 @@ export async function rollStatistique(
 	 */
 	hideResult?: boolean | null
 ) {
+	profiler.startProfiler();
 	const ctx = getGuildContext(client, interaction.guildId!);
 	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
@@ -331,6 +336,7 @@ export async function rollStatistique(
 		user,
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
+	profiler.stopProfiler();
 }
 /**
  * Gets custom criticals based on the server template and user data.

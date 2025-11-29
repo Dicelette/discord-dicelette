@@ -10,6 +10,7 @@ import {
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
+import { profiler } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
@@ -52,6 +53,7 @@ export async function baseRoll(
 	hidden?: boolean,
 	silent?: boolean
 ): Promise<void> {
+	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
 	let firstChara: string | undefined;
 	if (dice.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/) && interaction.guild)
@@ -109,4 +111,5 @@ export async function baseRoll(
 		silent,
 	};
 	await rollWithInteraction(interaction, res.formula, client, opts);
+	profiler.stopProfiler();
 }

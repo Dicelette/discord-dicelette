@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
 import * as Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
@@ -94,9 +95,12 @@ if (hasSentry) {
 		},
 		dsn: process.env.SENTRY_DSN,
 		environment: process.env.NODE_ENV ?? "production",
+		integrations: [nodeProfilingIntegration()],
+		profileLifecycle: "manual",
+		profileSessionSampleRate: 1.0,
 		release: process.env.BOT_VERSION, // optionnel,
-		tracesSampleRate: 1.0,
 		sendDefaultPii: true,
+		tracesSampleRate: 1.0,
 	});
 } else {
 	important.warn("Sentry DSN is not provided. Sentry is disabled.");
@@ -139,3 +143,5 @@ export const sentry = {
 		Sentry.captureException(e, { extra, level: "warning" });
 	},
 };
+
+export const profiler = Sentry.profiler;

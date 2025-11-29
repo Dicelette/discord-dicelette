@@ -4,7 +4,13 @@ import {
 	FormulaError,
 	NoStatisticsError,
 } from "@dicelette/core";
-import { InvalidCsvContent, logger, NoChannel, NoEmbed } from "@dicelette/utils";
+import {
+	InvalidCsvContent,
+	logger,
+	NoChannel,
+	NoEmbed,
+	profiler,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { default as i18next, type TFunction } from "i18next";
 import { ZodError } from "zod";
@@ -113,17 +119,32 @@ export function cmdLn(key: string) {
 	return localized;
 }
 
-export function findln(translatedText: string) {
+// Cache pour accélérer la recherche de clé par texte traduit
+const translationKeyCache: Record<string, string> = {};
+let cacheBuilt = false;
+export function buildTranslationKeyCache() {
+	if (cacheBuilt) return;
 	const allLocales = Object.keys(resources);
 	for (const locale of allLocales) {
 		const ul = ln(locale as Djs.Locale);
 		for (const key of ALL_TRANSLATION_KEYS) {
-			if (ul(key).toLowerCase() === translatedText.toLowerCase()) {
-				return key;
+			const translation = ul(key).toLowerCase();
+			if (!(translation in translationKeyCache)) {
+				translationKeyCache[translation] = key;
 			}
 		}
 	}
-	return translatedText;
+	cacheBuilt = true;
+	logger.trace("Translation key cache built.");
+	return;
+}
+
+export function findln(translatedText: string) {
+	profiler.startProfiler();
+	const normalized = translatedText.toLowerCase();
+	const res = translationKeyCache[normalized] ?? translatedText;
+	profiler.stopProfiler();
+	return res;
 }
 
 export function diceTypeError(
