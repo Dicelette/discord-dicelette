@@ -2,6 +2,7 @@ import { fetchChannel } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
+import { sentry } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 
@@ -112,6 +113,7 @@ export async function stripOOC(
 		});
 	} catch (e) {
 		console.error("Error in stripOOC selection:", e);
+		sentry.error("Error in stripOOC selection", { error: e });
 		await interaction.editReply({
 			components: [],
 			content: ul("config.stripOOC.timeOut"),

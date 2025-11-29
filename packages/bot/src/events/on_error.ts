@@ -3,10 +3,12 @@ import { fetchChannel } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
+import { sentry } from "@dicelette/utils";
 import { DiscordAPIError } from "@discordjs/rest";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
+import { e } from "mathjs";
 import { embedError, reply } from "messages";
 import { sendErrorToWebhook } from "./on_disconnect";
 
@@ -40,7 +42,8 @@ export function isApiError(error: unknown) {
 
 export async function sendMessageError(error: unknown, client: EClient): Promise<void> {
 	if (isApiError(error)) return;
-	console.error("\n", error);
+	console.error(error);
+	sentry.error(e);
 	if (!process.env.OWNER_ID) return;
 	const dm = await client.users.createDM(process.env.OWNER_ID);
 	await dm.send({ content: formatErrorMessage(error) });
@@ -61,6 +64,7 @@ export async function interactionError(
 	langToUse?: Djs.Locale
 ) {
 	console.error(e);
+	sentry.error(e);
 	if (!interaction.guild) return;
 	const msgError = lError(e as Error, interaction, langToUse);
 	if (msgError.length === 0) return;

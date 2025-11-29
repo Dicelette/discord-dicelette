@@ -9,7 +9,7 @@ import type { EClient } from "@dicelette/client";
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
-import { filterChoices } from "@dicelette/utils";
+import { filterChoices, sentry } from "@dicelette/utils";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import {
@@ -164,6 +164,7 @@ export const displayUser = {
 			await reply(interaction, { embeds: displayEmbeds, files });
 		} catch (e) {
 			console.error(e);
+			sentry.error(e, { source: "display-command" });
 			await reply(interaction, {
 				embeds: [embedError(ul("error.user.notFound"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,

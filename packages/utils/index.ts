@@ -1,11 +1,12 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome support this kind of configuration, we need to ignore the naming rules */
-import { important, logger } from "./src/logger";
 import "uniformize";
 import { getEngine, standardizeDice } from "@dicelette/core";
+import { logger } from "@sentry/node";
 import { Random } from "random-js";
-export { logger, important };
+
 export * from "./src/changelog";
 export { default as dev } from "./src/dev";
+export * from "./src/logger";
 export * from "./src/regex";
 export * from "./src/similarity";
 

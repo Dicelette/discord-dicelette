@@ -1,6 +1,8 @@
 /** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
+import * as Sentry from "@sentry/node";
 import dotenv from "dotenv";
+import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
@@ -77,3 +79,61 @@ export const important: Logger<ILogObj> = new Logger({
 	prettyLogTimeZone: "local",
 	stylePrettyLogs: true,
 });
+
+const hasSentry = !!process.env.SENTRY_DSN;
+
+if (hasSentry) {
+	important.info("Sentry is enabled for logging errors.");
+	Sentry.init({
+		beforeBreadcrumb(breadcrumb, _hint) {
+			//remove ansi
+			if (breadcrumb.message) {
+				breadcrumb.message = stripAnsi(breadcrumb.message);
+			}
+			return breadcrumb;
+		},
+		dsn: process.env.SENTRY_DSN,
+		environment: process.env.NODE_ENV ?? "production",
+		release: process.env.BOT_VERSION, // optionnel,
+	});
+} else {
+	important.warn("Sentry DSN is not provided. Sentry is disabled.");
+}
+
+export function setupProcessErrorHandlers() {
+	if (!hasSentry) return;
+
+	process.on("unhandledRejection", (reason) => {
+		Sentry.captureException(reason);
+	});
+
+	process.on("uncaughtException", (err) => {
+		Sentry.captureException(err);
+		void Sentry.flush(2000).then(() => {
+			process.exit(1);
+		});
+	});
+}
+
+export const sentry = {
+	debug: (e: unknown, extra?: Record<string, unknown>) => {
+		if (!hasSentry) return;
+		Sentry.captureException(e, { extra, level: "debug" });
+	},
+	error: (e: unknown, extra?: Record<string, unknown>) => {
+		if (!hasSentry) return;
+		Sentry.captureException(e, { extra, level: "error" });
+	},
+	fatal: (e: unknown, extra?: Record<string, unknown>) => {
+		if (!hasSentry) return;
+		Sentry.captureException(e, { extra, level: "fatal" });
+	},
+	info: (e: unknown, extra: Record<string, unknown>) => {
+		if (!hasSentry) return;
+		Sentry.captureException(e, { extra, level: "info" });
+	},
+	warn: (e: unknown, extra?: Record<string, unknown>) => {
+		if (!hasSentry) return;
+		Sentry.captureException(e, { extra, level: "warning" });
+	},
+};

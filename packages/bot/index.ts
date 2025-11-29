@@ -3,13 +3,13 @@ import { logger } from "@dicelette/utils";
 import dotenv from "dotenv";
 import "uniformize";
 import process from "node:process";
-import { important } from "@dicelette/utils";
+import { important, setupProcessErrorHandlers } from "@dicelette/utils";
 import { client } from "client";
 import * as event from "event";
 import packageJson from "./package.json" with { type: "json" };
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
-
+setupProcessErrorHandlers();
 process.on("unhandledRejection", async (reason) => {
 	await event.sendErrorToWebhook(reason);
 	console.error(reason);
