@@ -51,8 +51,14 @@ try {
 const app = express();
 
 app.get("/healthz", (_req, res) => {
-	if (client.ws.status === 0) res.status(200).send("Discord bot is connected 👍");
-	else res.status(500).send("Discord bot is not connected 👎");
+	const status = {
+		botConnected: client.ws.status === 0,
+		guilds: client.guilds.cache.size,
+		latency: client.ws.ping,
+		uptime: process.uptime(),
+	};
+	if (client.ws.status === 0) res.status(200).json(status);
+	else res.status(500).json(status);
 });
 
 app.listen(process.env.PORT || 3000, () => {
