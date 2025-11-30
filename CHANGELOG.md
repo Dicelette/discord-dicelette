@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.22.2](https://github.com/Dicelette/discord-dicelette/compare/2.22.1...2.22.2) (2025-11-30)
+
+
+### Bug Fixes
+
+* ensure user ID is valid and not a webhook in saveCount function ([d761a5a](https://github.com/Dicelette/discord-dicelette/commit/d761a5a4d9cb3a62b19ed7335bf3a99f1a559c90))
+* id not found in mp ([cd58af5](https://github.com/Dicelette/discord-dicelette/commit/cd58af53ee26a0edfe283e9c3c47126a5bfdd6c6))
+* interaction.guild.id doesn't exists in MP ([033c0c2](https://github.com/Dicelette/discord-dicelette/commit/033c0c28468981a07d1cf6b6aa66a9b7641bb4d4))
+* total = 0 ([a0d65b1](https://github.com/Dicelette/discord-dicelette/commit/a0d65b15e9a10921688f006c7952dfc783049e89))
+* total is undefined ([ecfd6fd](https://github.com/Dicelette/discord-dicelette/commit/ecfd6fd2d8d54a6d97cf4b1dc4c800bff7bb204e))
+* undefined success ([0a1d047](https://github.com/Dicelette/discord-dicelette/commit/0a1d04762233a1e290c8121d3d8d0cbe93b11fb8))
+
 ## [2.22.1](https://github.com/Dicelette/discord-dicelette/compare/2.22.0...2.22.1) (2025-11-28)
 
 

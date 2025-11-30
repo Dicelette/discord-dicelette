@@ -72,5 +72,5 @@
 		"release": "commit-and-tag-version",
 		"test": "pnpm -r test"
 	},
-	"version": "2.22.1"
+	"version": "2.22.2"
 }
