@@ -108,8 +108,12 @@ export function saveCount(
 	type: "add" | "remove" = "add"
 ) {
 	const count = getTypeFroMessage(message);
-	const userId = getAuthor(message);
+	let userId = getAuthor(message);
 	if (!userId) return;
+
+	//verify that the user is not a bot
+	const author = message.client.users.cache.get(userId);
+	if (!author) userId = message.client.user?.id ?? "0";
 	if (type === "add") addCount(criticalCount, userId, guildId, count);
 	else removeCount(criticalCount, userId, guildId, count);
 }
