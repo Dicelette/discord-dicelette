@@ -112,8 +112,8 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"character": "personnage",
 		"charName": "Nom du personnage",
+		"character": "personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -400,19 +400,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -433,6 +420,19 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -482,7 +482,7 @@
 		"failedReply": "Échec de l'envoi du message initial ou de l'obtention de la réponse.",
 		"generic": {
 			"e": "{{- e.message}}",
-			"withWarning": "## :warning: __Erreur__ :\n{{- e.message}}"
+			"withWarning": "## [{{- e.name}}]\n{{- e.message}}"
 		},
 		"guild": {
 			"data": "Aucune donnée trouvée pour le serveur {{- server }}.",
@@ -520,15 +520,16 @@
 			"excluded": "Cette statistique est exclue : Vous ne pouvez pas faire de jet pour elle.",
 			"notFound": "La statistique `{{- value}}` est introuvable ! Avez vous fait une erreur de frappe ?",
 			"notFound_plural": "Cette commande ne peut pas être utilisé : aucune statistique n'a été enregistrée.",
-			"notFound_singular": "La statistique `{{- stat}}` est introuvable sur le personnage sélectionné{{ char, optional}}.",
+			"notFound_singular": "La statistique `{{- stat}}` est introuvable pour le personnage sélectionné {{ char, optional}}.",
 			"shouldSelect": "Vous avez besoin de sélectionner une statistique pour lancer un dé.",
 			"tooMuch": "Trop de statistiques ont été fournies ! Vous ne pouvez pas avoir plus de 25 statistiques.",
 			"user": "Un utilisateur doit être sélectionné pour lancer un dé sur `{{- stat}}`."
 		},
 		"template": {
 			"id": "Aucun message trouvé avec les données sauvegardée dans la base de données:\n- Channel : `{{- channelId}}`\n- ID du message : `{{- messageId}}`",
+			"invalid": "Le modèle n'a pas été retrouvé correctement, veuillez réessayer.",
 			"json": "Vous devez fournir un fichier JSON valide.",
-			"notFound": "Aucun modèle ou channel configuré."
+			"notFound": "Aucun modèle n'a été configuré."
 		},
 		"tooMuchDice": "Trop de macros ont été fournies ! Vous ne pouvez pas avoir plus de 25 macros.",
 		"totalExceededBy": "Le total des points est dépassé de `{{- max}}`.",
@@ -696,12 +697,6 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"desc": "Résultats connus de {{- user}}:",
@@ -748,6 +743,12 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
 		}
 	},
 	"math": {

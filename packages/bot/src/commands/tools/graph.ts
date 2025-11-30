@@ -3,7 +3,7 @@ import { charUserOptions, haveAccess } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
-import { filterChoices, logger } from "@dicelette/utils";
+import { filterChoices, logger, sentry } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import {
 	findChara,
@@ -328,6 +328,15 @@ export const graph = {
 				client.settings
 			);
 			logger.fatal(error);
+			sentry.fatal(error, {
+				interaction: {
+					guildId: interaction.guild?.id,
+					id: interaction.id,
+					options: interaction.options.data,
+					userId: interaction.user.id,
+				},
+			});
+			return;
 		}
 	},
 };

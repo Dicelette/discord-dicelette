@@ -7,7 +7,7 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { BotError, BotErrorLevel, logger } from "@dicelette/utils";
 import { getUser } from "database";
 import type * as Djs from "discord.js";
 import { searchUserChannel } from "utils";
@@ -58,7 +58,8 @@ export async function registerUser(
 		});
 		const char = user[charIndex];
 		if (char) {
-			if (errorOnDuplicate) throw new Error("DUPLICATE");
+			if (errorOnDuplicate)
+				throw new BotError("DUPLICATE", { level: BotErrorLevel.Warning });
 			//delete old message
 			if (deleteMsg) {
 				try {

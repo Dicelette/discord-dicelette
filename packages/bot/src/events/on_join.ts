@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { logger } from "@dicelette/utils";
+import { logger, sentry } from "@dicelette/utils";
 import { COMMANDS, contextMenus, helpAtInvit } from "commands";
 
 export default (client: EClient): void => {
@@ -19,6 +19,7 @@ export default (client: EClient): void => {
 			await helpAtInvit(guild);
 		} catch (e) {
 			logger.fatal(e);
+			sentry.fatal(e);
 		}
 	});
 };

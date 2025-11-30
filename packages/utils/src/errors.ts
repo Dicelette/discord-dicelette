@@ -39,3 +39,30 @@ export class TotalExceededError extends Error {
 		this.exceeded = exceeded;
 	}
 }
+
+export enum BotErrorLevel {
+	Info = 0,
+	Warning = 1,
+	Error = 2,
+	Critical = 3,
+	Fatal = 4,
+}
+
+export type BotErrorOptions = {
+	cause?: string;
+	level?: BotErrorLevel;
+	code?: string;
+};
+
+export class BotError extends Error {
+	cause?: string;
+	level?: BotErrorLevel;
+	code?: string;
+	constructor(message: string, options?: BotErrorOptions) {
+		super(message);
+		this.name = "BotError";
+		if (options?.cause) this.cause = options.cause;
+		if (options?.level) this.level = options.level;
+		if (options?.code) this.code = options.code;
+	}
+}

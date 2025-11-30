@@ -5,11 +5,13 @@ import {
 	NoStatisticsError,
 } from "@dicelette/core";
 import {
+	BotError,
 	InvalidCsvContent,
 	logger,
 	NoChannel,
 	NoEmbed,
 	profiler,
+	sentry,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { default as i18next, type TFunction } from "i18next";
@@ -90,6 +92,8 @@ export function lError(
 
 	if (e instanceof NoChannel) return ul("error.channel.notFound", { channel: "" });
 
+	if (e instanceof BotError) return ul("error.generic.e", { e });
+
 	if (e instanceof Djs.DiscordAPIError) {
 		if (e.method === "DELETE") {
 			logger.warn("Error while deleting message", e);
@@ -97,6 +101,7 @@ export function lError(
 		}
 		if (e.code === 50001) return ul("error.missingPermission");
 		if (e.code === 50013) return ul("error.botMissingPermission");
+		sentry.error(e);
 		return ul("error.discord", { code: e.code, stack: e.stack });
 	}
 	if (e.message.includes(":warning:")) return ul("error.generic.e", { e });

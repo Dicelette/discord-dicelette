@@ -1,6 +1,12 @@
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, cleanAvatarUrl, verifyAvatarUrl } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	COMPILED_PATTERNS,
+	cleanAvatarUrl,
+	verifyAvatarUrl,
+} from "@dicelette/utils";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
@@ -51,7 +57,11 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 	}
 
 	const embed = getEmbeds(message, "user");
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed)
+		throw new BotError(ul("error.embed.notFound"), {
+			cause: "AVATAR_EDIT",
+			level: BotErrorLevel.Warning,
+		});
 	embed.setThumbnail(avatar);
 	const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
 

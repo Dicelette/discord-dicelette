@@ -10,7 +10,13 @@ import type { EClient } from "@dicelette/client";
 import { evalStatsDice } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Settings, Translation, UserMessageId } from "@dicelette/types";
-import { capitalizeBetweenPunct, NoEmbed } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	capitalizeBetweenPunct,
+	NoEmbed,
+} from "@dicelette/utils";
 import {
 	getTemplateByInteraction,
 	getUserByEmbed,
@@ -32,6 +38,10 @@ import {
 } from "messages";
 import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
 
+const botErrorOptions: BotErrorOptions = {
+	cause: "DICE_REGISTER",
+	level: BotErrorLevel.Warning,
+};
 /**
  * Handles a modal submit interaction to register new skill damage dice for a user.
  *
@@ -130,10 +140,10 @@ async function registerDamageDice(
 	const { ul } = getLangAndConfig(client, interaction);
 	const name = interaction.fields.getTextInputValue("damageName");
 	let value = interaction.fields.getTextInputValue("damageValue");
-	if (!interaction.guild) throw new Error(ul("error.guild.empty"));
-	if (!interaction.message) throw new Error(ul("error.noMessage"));
+	if (!interaction.guild) throw new BotError(ul("error.guild.empty"), botErrorOptions);
+	if (!interaction.message) throw new BotError(ul("error.noMessage"), botErrorOptions);
 
-	if (name.includes(":")) throw new Error(ul("error.colon"));
+	if (name.includes(":")) throw new BotError(ul("error.colon"), botErrorOptions);
 	const oldDiceEmbeds = getEmbeds(interaction.message ?? undefined, "damage")?.toJSON();
 	const diceEmbed = oldDiceEmbeds
 		? new Djs.EmbedBuilder(oldDiceEmbeds)
@@ -156,7 +166,7 @@ async function registerDamageDice(
 			}
 		}
 	const user = getUserByEmbed({ message: interaction.message }, first);
-	if (!user) throw new Error(ul("error.user.notFound")); //mean that there is no embed
+	if (!user) throw new BotError(ul("error.user.notFound"), botErrorOptions); //mean that there is no embed
 	value = evalStatsDice(value, user.stats);
 
 	if (!findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {

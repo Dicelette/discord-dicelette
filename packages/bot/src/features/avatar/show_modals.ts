@@ -1,6 +1,11 @@
 import { fetchAvatarUrl } from "@dicelette/bot-helpers";
 import type { Settings, Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	COMPILED_PATTERNS,
+	cleanAvatarUrl,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
@@ -28,7 +33,11 @@ async function showAvatarEdit(
 	ul: Translation
 ) {
 	const embed = getEmbeds(interaction.message, "user");
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed)
+		throw new BotError(ul("error.embed.notFound"), {
+			cause: "AVATAR_EDIT",
+			level: BotErrorLevel.Warning,
+		});
 	const jsonEmbed = embed.toJSON().thumbnail?.url;
 	let thumbnail = jsonEmbed
 		? cleanAvatarUrl(jsonEmbed)

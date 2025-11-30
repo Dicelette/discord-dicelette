@@ -2,11 +2,21 @@ import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
-import { isArrayEqual } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	isArrayEqual,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { Dice } from "features";
 import { getEmbeds, reply } from "messages";
 import { allowEdit } from "utils";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "STAT_MODALS",
+	level: BotErrorLevel.Warning,
+};
 
 /**
  * Modal to display the statistics when adding a new user
@@ -107,7 +117,7 @@ async function showEditorStats(
 	db: Settings
 ) {
 	const statistics = getEmbeds(interaction.message, "stats");
-	if (!statistics) throw new Error(ul("error.stats.notFound_plural"));
+	if (!statistics) throw new BotError(ul("error.stats.notFound_plural"), botErrorOptions);
 	const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed);
 	const originalGuildData = db.get(interaction.guild!.id, "templateID.statsName");
 	const registeredStats = originalGuildData?.map((stat) => stat.unidecode());

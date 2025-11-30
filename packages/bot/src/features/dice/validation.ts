@@ -18,7 +18,14 @@ import type { EClient } from "@dicelette/client";
 import { evalStatsDice, isNumber, roll } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
-import { COMPILED_PATTERNS, capitalizeBetweenPunct, logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	COMPILED_PATTERNS,
+	capitalizeBetweenPunct,
+	logger,
+} from "@dicelette/utils";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
@@ -34,6 +41,11 @@ import {
 } from "messages";
 import { editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
 import { sendValidationMessage } from "../user";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "DICE_VALIDATION",
+	level: BotErrorLevel.Warning,
+};
 
 /**
  * Validates and applies dice edits from a Discord modal interaction, updating or removing dice embeds in the message as needed.
@@ -219,7 +231,8 @@ function createAndValidateDiceEmbed(
 		}
 		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 		if (!statsEmbeds) {
-			if (!roll(dice)) throw new Error(ul("error.invalidDice.withDice", { dice }));
+			if (!roll(dice))
+				throw new BotError(ul("error.invalidDice.withDice", { dice }), botErrorOptions);
 			continue;
 		}
 		const statsValues = parseStatsString(statsEmbeds);
@@ -227,7 +240,7 @@ function createAndValidateDiceEmbed(
 			evalStatsDice(dice, statsValues);
 		} catch (error) {
 			logger.warn(error);
-			throw new Error(ul("error.invalidDice.eval", { dice }));
+			throw new BotError(ul("error.invalidDice.eval", { dice }), botErrorOptions);
 		}
 		newEmbedDice.push({ inline: true, name: skill.capitalize(), value: `\`${dice}\`` });
 	}
@@ -403,7 +416,7 @@ export async function couldBeValidatedDice(
 
 	const customId = interaction.customId;
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.validate, customId);
-	if (!embedKey) throw new Error(ul("error.embed.notFound"));
+	if (!embedKey) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 
 	// Retrieve the embed from cache or message
 	const cached = getModerationCache(embedKey);
@@ -421,7 +434,7 @@ export async function couldBeValidatedDice(
 			workingEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 		}
 	}
-	if (!workingEmbed) throw new Error(ul("error.embed.notFound"));
+	if (!workingEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 
 	// Get the original message to edit
 	const message = await getMessageWithKeyPart(ul, interaction, embedKey);
@@ -454,7 +467,7 @@ export async function couldBeValidatedDice(
 			);
 	// Get user ID and name from the user embed
 	const userEmbed = getEmbeds(message ?? undefined, "user");
-	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
+	if (!userEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const parsedUser = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	const mention = parsedUser["common.user"]; // e.g., <@123>
 	const idMatch = mention?.match(/<@(?<id>\d+)>/);
@@ -538,7 +551,7 @@ export async function couldBeValidatedDiceAdd(
 	}
 	const customId = interaction.customId;
 	const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.validate, customId);
-	if (!embedKey) throw new Error(ul("error.embed.notFound"));
+	if (!embedKey) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const cachedRaw = getModerationCache(embedKey);
 	const cached = cachedRaw && cachedRaw.kind === "dice-add" ? cachedRaw : undefined;
 
@@ -556,19 +569,20 @@ export async function couldBeValidatedDiceAdd(
 	} else {
 		// Fallback: use the key encoded in the customId to retrieve the original message
 		const apiEmbed = interaction.message.embeds[0];
-		if (!apiEmbed) throw new Error(ul("error.embed.notFound"));
+		if (!apiEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 		moderationDiceEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 		const keyParts = parseEmbedKey(embedKey);
-		if (!keyParts) throw new Error(ul("error.embed.notFound"));
+		if (!keyParts) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 		targetChannelId = keyParts.channelId;
 		targetMessageId = keyParts.messageId;
 	}
 
 	const channel = await fetchChannel(interaction.guild!, targetChannelId!);
-	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+	if (!channel || !channel.isTextBased())
+		throw new BotError(ul("error.channel.notFound"), botErrorOptions);
 	const message = await channel.messages.fetch(targetMessageId!);
 	const userEmbed = getEmbeds(message ?? undefined, "user");
-	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
+	if (!userEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 
 	// Keep field in case of cache miss
 	const oldDamage = getEmbeds(message ?? undefined, "damage");

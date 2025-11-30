@@ -5,6 +5,7 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
+import { BotError } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
@@ -124,22 +125,31 @@ export function setupProcessErrorHandlers() {
 export const sentry = {
 	debug: (e: unknown, extra?: Record<string, unknown>) => {
 		if (!hasSentry) return;
+		if (e instanceof BotError && e.level && e.level < 2) return;
 		Sentry.captureException(e, { extra, level: "debug" });
 	},
 	error: (e: unknown, extra?: Record<string, unknown>) => {
 		if (!hasSentry) return;
+		if (e instanceof BotError && e.level && e.level < 2) return;
+
 		Sentry.captureException(e, { extra, level: "error" });
 	},
 	fatal: (e: unknown, extra?: Record<string, unknown>) => {
 		if (!hasSentry) return;
+		if (e instanceof BotError && e.level && e.level < 2) return;
+
 		Sentry.captureException(e, { extra, level: "fatal" });
 	},
 	info: (e: unknown, extra: Record<string, unknown>) => {
 		if (!hasSentry) return;
+		if (e instanceof BotError && e.level && e.level < 2) return;
+
 		Sentry.captureException(e, { extra, level: "info" });
 	},
 	warn: (e: unknown, extra?: Record<string, unknown>) => {
 		if (!hasSentry) return;
+		if (e instanceof BotError && e.level && e.level < 2) return;
+
 		Sentry.captureException(e, { extra, level: "warning" });
 	},
 };

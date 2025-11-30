@@ -4,7 +4,13 @@ import type { EClient } from "@dicelette/client";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, Translation } from "@dicelette/types";
-import { isValidJSON, logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	isValidJSON,
+	logger,
+} from "@dicelette/utils";
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
 
@@ -48,9 +54,14 @@ export async function getTemplate(
 	ul: Translation,
 	skipNoFound = false
 ) {
+	const botErrorOptions: BotErrorOptions = {
+		cause: "TEMPLATE",
+		level: BotErrorLevel.Warning,
+	};
 	const templateID = enmap.get(guild.id, "templateID");
 	if (!enmap.has(guild.id) || !templateID) {
-		if (!skipNoFound) throw new Error(ul("error.guild.data", { server: guild.name }));
+		if (!skipNoFound)
+			throw new BotError(ul("error.guild.data", { server: guild.name }), botErrorOptions);
 		return undefined;
 	}
 	const { channelId, messageId } = templateID;
@@ -67,11 +78,18 @@ export async function getTemplate(
 		const message = await channel.messages.fetch(messageId);
 		return fetchTemplate(message, enmap);
 	} catch (error) {
-		logger.fatal(error);
+		logger.warn(error);
+
 		if (skipNoFound) return undefined;
 		if ((error as Error).message === "Unknown Message")
-			throw new Error(ul("error.template.id", { channelId, messageId }));
-		throw new Error(ul("error.template.notFound", { guildId: guild.name }));
+			throw new BotError(
+				ul("error.template.id", { channelId, messageId }),
+				botErrorOptions
+			);
+		throw new BotError(
+			ul("error.template.notFound", { guildId: guild.name }),
+			botErrorOptions
+		);
 	}
 }
 
@@ -99,7 +117,7 @@ export async function fetchTemplate(
 	const resContent = await res.text();
 	const validJson = isValidJSON(resContent);
 	if (!res.ok || res.status !== 200 || !validJson) {
-		logger.fatal(`Invalid JSON format in template attachment: ${template.url}`);
+		logger.warn(`Invalid JSON format in template attachment: ${template.url}`);
 		return undefined;
 	}
 	if (!enmap.get(message.guild!.id, "templateID.valid")) {

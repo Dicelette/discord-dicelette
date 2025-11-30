@@ -1,6 +1,7 @@
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Settings, Translation } from "@dicelette/types";
+import { BotError, BotErrorLevel } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
@@ -86,7 +87,11 @@ export async function edit(
  */
 async function showEdit(interaction: Djs.ButtonInteraction, ul: Translation) {
 	const diceEmbed = getEmbeds(interaction.message, "damage");
-	if (!diceEmbed) throw new Error(ul("error.invalidDice.embeds"));
+	if (!diceEmbed)
+		throw new BotError(ul("error.invalidDice.embeds"), {
+			cause: "DICE_EDIT",
+			level: BotErrorLevel.Warning,
+		});
 	const diceFields = parseEmbedFields(diceEmbed.toJSON() as Djs.Embed);
 	let dices = "";
 	for (const [skill, dice] of Object.entries(diceFields)) {

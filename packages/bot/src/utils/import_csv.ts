@@ -1,7 +1,13 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { UserData } from "@dicelette/types";
-import { InvalidCsvContent, InvalidURL, logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	InvalidCsvContent,
+	InvalidURL,
+	logger,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "uniformize";
@@ -94,7 +100,8 @@ export async function parseCSV(
 		header: true,
 		skipEmptyLines: true,
 	});
-	if (error) throw new Error(error);
+	if (error)
+		throw new BotError(error, { cause: "CSV_PARSE", level: BotErrorLevel.Warning });
 	if (csvData.length === 0) throw new InvalidCsvContent("url");
 	return await step(csvData, guildTemplate, interaction, allowPrivate, lang);
 }

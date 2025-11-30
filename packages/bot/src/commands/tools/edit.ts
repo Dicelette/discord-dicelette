@@ -13,7 +13,13 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import { filterChoices, logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	filterChoices,
+	logger,
+} from "@dicelette/utils";
 import {
 	deleteUser,
 	getRecordChar,
@@ -26,6 +32,11 @@ import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "
 import { getButton, optionInteractions } from "utils";
 import "discord_ext";
 import { COMPILED_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "AVATAR",
+	level: BotErrorLevel.Warning,
+};
 
 export const editAvatar = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
@@ -194,7 +205,11 @@ async function avatar(
 		let files = message.attachments.map(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
-		if (!fileUrl && !fileAttachment) throw new Error(ul("error.avatar.missing"));
+		if (!fileUrl && !fileAttachment)
+			throw new BotError(ul("error.avatar.missing"), {
+				cause: "AVATAR",
+				level: BotErrorLevel.Warning,
+			});
 		let avatarURL: string | null = null;
 		if (fileAttachment) {
 			//we need to reupload in the cache
@@ -214,7 +229,7 @@ async function avatar(
 			);
 		} else if (fileUrl) {
 			if (fileUrl.match(COMPILED_PATTERNS.DISCORD_CDN))
-				throw new Error(ul("error.avatar.cdn"));
+				throw new BotError(ul("error.avatar.cdn"), botErrorOptions);
 			avatarURL = fileUrl;
 		}
 		if (!avatarURL || !verifyAvatarUrl(avatarURL))
@@ -222,7 +237,7 @@ async function avatar(
 				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
 		const embed = getEmbeds(message, "user");
-		if (!embed) throw new Error(ul("error.embed.notFound"));
+		if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 
 		embed.setThumbnail(avatarURL);
 
@@ -290,11 +305,11 @@ export async function rename(
 		name = null;
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const n = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character");
-	if (!n) throw new Error(ul("error.user.rename"));
+	if (!n) throw new BotError(ul("error.user.rename"), botErrorOptions);
 	n.value = name ? name : ul("common.noSet");
 	//update the embed
 	const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
@@ -401,10 +416,10 @@ export async function move(
 ) {
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const n = embed.toJSON().fields?.find((field) => findln(field.name) === "common.user");
 
-	if (!n) throw new Error(ul("error.embed.old"));
+	if (!n) throw new BotError(ul("error.embed.old"), botErrorOptions);
 	n.value = `<@${newUser.id}>`;
 	//update the embed
 	const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);

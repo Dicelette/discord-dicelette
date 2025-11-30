@@ -6,12 +6,18 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
+import { BotError, BotErrorLevel, type BotErrorOptions } from "@dicelette/utils";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "validationMove",
+	level: BotErrorLevel.Warning,
+};
 
 /**
  * Handles a Discord modal submission to validate and process the transfer of a character between users within a guild.
@@ -31,7 +37,7 @@ export async function validate(
 	const user = interaction.fields.getSelectedUsers("user")?.first();
 	if (!user) return;
 	const embed = getEmbeds(message, "user");
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 
 	const oldUserId = embed
 		.toJSON()

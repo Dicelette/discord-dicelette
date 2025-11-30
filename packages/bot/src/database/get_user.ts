@@ -21,7 +21,13 @@ import type {
 	UserGuildData,
 	UserMessageId,
 } from "@dicelette/types";
-import { cleanAvatarUrl, logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	cleanAvatarUrl,
+	logger,
+} from "@dicelette/utils";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
@@ -185,6 +191,10 @@ async function getUserFrom(
 		cleanUrl?: boolean;
 	}
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
+	const botErrorOptions: BotErrorOptions = {
+		cause: "USER_FETCH",
+		level: BotErrorLevel.Warning,
+	};
 	const guildId =
 		options?.guildId ??
 		(context.type === "interaction"
@@ -237,13 +247,13 @@ async function getUserFrom(
 			ul,
 			userMessageId.channelId
 		);
-		if (!thread) throw new Error(ul("error.user.notFound"));
+		if (!thread) throw new BotError(ul("error.user.notFound"), botErrorOptions);
 		if (
 			user.isPrivate &&
 			!allowAccess &&
 			!(await haveAccess(context.interaction, thread.id, userId))
 		)
-			throw new Error(ul("error.private"));
+			throw new BotError(ul("error.private"), botErrorOptions);
 
 		targetMessage = await thread.messages.fetch(userMessageId.messageId);
 	} else {
@@ -258,7 +268,7 @@ async function getUserFrom(
 		}
 
 		if (!channel || !("messages" in channel)) {
-			if (!skipNotFound) throw new Error(ul("error.channel.thread"));
+			if (!skipNotFound) throw new BotError(ul("error.channel.thread"), botErrorOptions);
 			return;
 		}
 
@@ -270,7 +280,7 @@ async function getUserFrom(
 				context.message.member?.permissions.has(Djs.PermissionFlagsBits.Administrator)
 			)
 		)
-			throw new Error(ul("error.private"));
+			throw new BotError(ul("error.private"), botErrorOptions);
 
 		targetMessage = await channel.messages.fetch(userMessageId.messageId);
 	}
@@ -292,8 +302,7 @@ async function getUserFrom(
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
 		logger.warn(error);
-		if (!skipNotFound)
-			throw new Error(ul("error.user.notFound"), { cause: "404 not found" });
+		if (!skipNotFound) throw new BotError(ul("error.user.notFound"), botErrorOptions);
 	}
 }
 
@@ -490,24 +499,28 @@ export async function getUserNameAndChar(
 	ul: Translation,
 	first?: boolean
 ) {
+	const botErrorOptions: BotErrorOptions = {
+		cause: "USER_EXTRACT",
+		level: BotErrorLevel.Warning,
+	};
 	let userEmbed = getEmbeds(interaction?.message ?? undefined, "user");
 	if (first) {
 		const firstEmbed = ensureEmbed(interaction?.message ?? undefined);
 		if (firstEmbed) userEmbed = new Djs.EmbedBuilder(firstEmbed.toJSON());
 	}
-	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
+	if (!userEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const userID = userEmbed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
-	if (!userID) throw new Error(ul("error.user.notFound"));
+	if (!userID) throw new BotError(ul("error.user.notFound"), botErrorOptions);
 	if (
 		!interaction.channel ||
 		(!(interaction.channel instanceof Djs.ThreadChannel) &&
 			!(interaction.channel instanceof Djs.TextChannel))
 	)
-		throw new Error(ul("error.channel.thread"));
+		throw new BotError(ul("error.channel.thread"), botErrorOptions);
 	let userName = userEmbed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
@@ -636,6 +649,10 @@ export function getRightValue(
 	optionChar: string | undefined,
 	statistic: string
 ) {
+	const botErrorOptions: BotErrorOptions = {
+		cause: "STAT_FETCH",
+		level: BotErrorLevel.Warning,
+	};
 	let userStat = userStatistique.stats?.[standardizedStatistic];
 	// noinspection LoopStatementThatDoesntLoopJS
 	while (!userStat) {
@@ -654,23 +671,26 @@ export function getRightValue(
 		if (userStat) break;
 		if (userStatistique.isFromTemplate) {
 			if (!optionChar)
-				throw new Error(
+				throw new BotError(
 					ul("error.stats.user", {
 						stat: standardizedStatistic,
-					})
+					}),
+					botErrorOptions
 				);
-			throw new Error(
+			throw new BotError(
 				ul("error.stats.char", {
 					char: optionChar.capitalize(),
 					stat: standardizedStatistic,
-				})
+				}),
+				botErrorOptions
 			);
 		}
-		throw new Error(
+		throw new BotError(
 			ul("error.stats.notFound_singular", {
-				char: optionChar ? ` ${optionChar.capitalize()}` : "",
+				char: optionChar ? `${optionChar.capitalize()}` : "",
 				stat: standardizedStatistic,
-			})
+			}),
+			botErrorOptions
 		);
 	}
 	return { standardizedStatistic, statistic, userStat };

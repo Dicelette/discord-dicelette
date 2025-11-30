@@ -6,7 +6,13 @@ import type { EClient } from "@dicelette/client";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	capitalizeBetweenPunct,
+	logger,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import {
 	bulkDeleteCharacters,
@@ -19,8 +25,12 @@ import {
 import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 import { interactionError } from "event";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "CUSTOM_CRITICAL",
+	level: BotErrorLevel.Warning,
+};
 
 export const templateManager = {
 	data: new Djs.SlashCommandBuilder()
@@ -123,7 +133,7 @@ export const templateManager = {
 		} catch (e) {
 			logger.fatal(e, "updateTemplateFile: error while updating template");
 			const langToUse = getLangAndConfig(client, interaction).langToUse;
-			await interactionError(client, interaction, e as Error, ul, langToUse);
+			await interactionError(client, interaction, e as BotError, ul, langToUse);
 		}
 	},
 };
@@ -199,9 +209,7 @@ async function registerTemplate(
 		Djs.ChannelType.GuildForum,
 	];
 	const templateData = await getTemplateFile(options, interaction, ul);
-	if (!templateData) {
-		throw new Error(ul("error.template.invalid"));
-	}
+	if (!templateData) throw new BotError(ul("error.template.invalid"), botErrorOptions);
 
 	const guildId = interaction.guild!.id;
 	const channel = options.getChannel(t("common.channel"), true, allowedChannelType) as
@@ -451,9 +459,8 @@ async function updateTemplateFile(
 	client: EClient
 ) {
 	const templateData = await getTemplateFile(options, interaction, ul);
-	if (!templateData) {
-		throw new Error(ul("error.template.invalid"));
-	}
+	if (!templateData) throw new BotError(ul("error.template.invalid"), botErrorOptions);
+
 	const guildId = interaction.guild!.id;
 	const oldData = client.settings.get(guildId);
 	if (!oldData) {

@@ -7,12 +7,17 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
+import { BotError, BotErrorLevel, type BotErrorOptions } from "@dicelette/utils";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 
+const botErrorOptions: BotErrorOptions = {
+	cause: "validationRename",
+	level: BotErrorLevel.Warning,
+};
 /**
  * Handles validation and execution of a character rename operation from a Discord modal submission.
  *
@@ -33,21 +38,21 @@ export async function validate(
 	const newName = interaction.fields.getTextInputValue("newName");
 	if (!newName || !interaction.channel) return;
 	const embed = getEmbeds(message, "user");
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const userId = embed
 		.toJSON()
 		.fields?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
-	if (!userId) throw new Error(ul("error.user.notFound"));
+	if (!userId) throw new BotError(ul("error.user.notFound"), botErrorOptions);
 	const user = await fetchUser(client, userId);
 	const sheetLocation: PersonnageIds = {
 		channelId: interaction.channel.id,
 		messageId: message.id,
 	};
-	if (!user) throw new Error(ul("error.user.notFound"));
+	if (!user) throw new BotError(ul("error.user.notFound"), botErrorOptions);
 	const charData = getUserByEmbed({ message: message });
-	if (!charData) throw new Error(ul("error.user.youRegistered"));
+	if (!charData) throw new BotError(ul("error.user.youRegistered"), botErrorOptions);
 	const oldData: {
 		charName?: string | null;
 		messageId: UserMessageId;

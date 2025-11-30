@@ -3,6 +3,9 @@ import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
 	COMPILED_PATTERNS,
 	cleanAvatarUrl,
 	logger,
@@ -11,6 +14,11 @@ import {
 } from "@dicelette/utils";
 import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "EMBEDS",
+	level: BotErrorLevel.Warning,
+};
 
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];
@@ -244,9 +252,15 @@ export function getStatistiqueFields(
 		if (!statValue) continue;
 		const num = Number.parseInt(statValue, 10);
 		if (value.min && num < value.min)
-			throw new Error(ul("error.mustBeGreater", { min: value.min, value: name }));
+			throw new BotError(
+				ul("error.mustBeGreater", { min: value.min, value: name }),
+				botErrorOptions
+			);
 		if (value.max && num > value.max)
-			throw new Error(ul("error.mustBeLower", { max: value.max, value: name }));
+			throw new BotError(
+				ul("error.mustBeLower", { max: value.max, value: name }),
+				botErrorOptions
+			);
 		if (total) {
 			logger.trace("oldStatsTotal", oldStatsTotal, "total", total, "num", num);
 			total -= num;

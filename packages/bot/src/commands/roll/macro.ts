@@ -4,7 +4,7 @@ import {
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
-import { logger, uniformizeRecords } from "@dicelette/utils";
+import { logger, sentry, uniformizeRecords } from "@dicelette/utils";
 import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
@@ -109,6 +109,14 @@ export default {
 				ul("error.generic.e", { e: errorMessage }),
 				ul
 			);
+			sentry.fatal(e, {
+				interaction: {
+					guildId: interaction.guild?.id,
+					id: interaction.id,
+					options: interaction.options.data,
+					userId: interaction.user.id,
+				},
+			});
 			return;
 		}
 	},

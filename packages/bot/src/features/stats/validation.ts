@@ -24,7 +24,14 @@ import {
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { DataToFooter, Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, logger, TotalExceededError } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	COMPILED_PATTERNS,
+	logger,
+	TotalExceededError,
+} from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
@@ -42,6 +49,11 @@ import {
 } from "messages";
 import { continueCancelButtons, editUserButtons, selfRegisterAllowance } from "utils";
 import { sendValidationMessage } from "../user";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "STAT_VALIDATION",
+	level: BotErrorLevel.Warning,
+};
 
 /**
  * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
@@ -376,7 +388,8 @@ async function getFieldsToAppend(
 			embedsStatsFields.find((field) => field.name.unidecode() === name.unidecode())
 		)
 			continue;
-		if (!stat) throw new Error(ul("error.stats.notFound", { value: name }));
+		if (!stat)
+			throw new BotError(ul("error.stats.notFound", { value: name }), botErrorOptions);
 
 		if (!isNumber(value)) {
 			//it's a combinaison OR an error
@@ -395,7 +408,10 @@ async function getFieldsToAppend(
 		}
 		const num = Number.parseInt(value, 10);
 		if (stat.min && num < stat.min) {
-			throw new Error(ul("error.mustBeGreater", { min: stat.min, value: name }));
+			throw new BotError(
+				ul("error.mustBeGreater", { min: stat.min, value: name }),
+				botErrorOptions
+			);
 		} //skip register total + max because leveling can be done here
 		embedsStatsFields.push({
 			inline: true,
@@ -523,20 +539,23 @@ export async function couldBeValidated(
 	if (!embedKey) {
 		// backward compatibility: old feed based on footer
 		const replyIds = interaction.message.embeds[0]?.footer?.text;
-		if (!replyIds) throw new Error(ul("error.embed.notFound"));
+		if (!replyIds) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 		const data: DataToFooter = JSON.parse(replyIds);
 		const { channelId, messageId } = data;
 		const userData = { userID: data.userID, userName: data.userName };
 		logger.trace("Data from footer:", channelId, messageId);
-		if (!channelId || !messageId) throw new Error(ul("error.embed.notFound"));
+		if (!channelId || !messageId)
+			throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 		const channel = await fetchChannel(interaction.guild!, channelId);
-		if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+		if (!channel || !channel.isTextBased())
+			throw new BotError(ul("error.channel.notFound"), botErrorOptions);
 
 		const message = await channel.messages.fetch(messageId);
 		const oldStatsEmbed =
 			getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(ul);
 		const fieldsToAppend = interaction.message.embeds[0]?.toJSON().fields;
-		if (!fieldsToAppend || !message) throw new Error(ul("error.embed.notFound"));
+		if (!fieldsToAppend || !message)
+			throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 		await validateEdit(
 			interaction,
 			ul,
@@ -554,17 +573,18 @@ export async function couldBeValidated(
 	// Fallback: if cache missing after restart, rebuild from moderation message embed
 	if (!embed) {
 		const apiEmbed = interaction.message.embeds[0];
-		if (!apiEmbed) throw new Error(ul("error.embed.notFound"));
+		if (!apiEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 		embed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 	}
-	if (!embed) throw new Error(ul("error.embed.notFound"));
+	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const message = await getMessageWithKeyPart(ul, interaction, embedKey);
 	const oldStatsEmbed = getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(ul);
 	const fieldsToAppend = embed.toJSON().fields;
-	if (!fieldsToAppend || !message) throw new Error(ul("error.embed.notFound"));
+	if (!fieldsToAppend || !message)
+		throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	// Extract the target user from the original message
 	const userEmbed = getEmbeds(message ?? undefined, "user");
-	if (!userEmbed) throw new Error(ul("error.embed.notFound"));
+	if (!userEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 	const mention = parsedFields["common.user"]; // <@id>
 	const match = mention?.match(/<@(?<id>\d+)>/);

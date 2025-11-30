@@ -1,6 +1,6 @@
 import type { EClient } from "@dicelette/client";
 import type { Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, logger } from "@dicelette/utils";
+import { BotError, BotErrorLevel, COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import type { Guild, GuildMember, User } from "discord.js";
 import * as Djs from "discord.js";
 
@@ -69,7 +69,10 @@ export async function reuploadAvatar(
 	ul: Translation
 ) {
 	if (!avatar.name.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
-		throw new Error(ul("error.avatar.format"));
+		throw new BotError(ul("error.avatar.format"), {
+			cause: "FETCH_AVATAR",
+			level: BotErrorLevel.Warning,
+		});
 	//we have only a link so we need to fetch the attachment again
 	const fetched = await fetch(avatar.url);
 	const newAttachment = new Djs.AttachmentBuilder(

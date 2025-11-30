@@ -1,5 +1,5 @@
 import type { Settings } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { BotError, BotErrorLevel, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { fetchChannel, fetchMember } from "./fetch";
 
@@ -52,8 +52,12 @@ export async function addAutoRole(
 	try {
 		const guildMember = await fetchMember(interaction.guild!, member);
 		if (!guildMember)
-			throw new Error(
-				"Member not found in the guild. Should not happen. Please report this issue. Prout."
+			throw new BotError(
+				"Member not found in the guild. Should not happen. Please report this issue.",
+				{
+					cause: "AUTO_ROLE",
+					level: BotErrorLevel.Critical,
+				}
 			);
 
 		//fetch role

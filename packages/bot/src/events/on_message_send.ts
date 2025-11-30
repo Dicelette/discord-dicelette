@@ -7,7 +7,7 @@ import {
 	parseComparator,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import { allValuesUndefined, logger, profiler } from "@dicelette/utils";
+import { allValuesUndefined, logger, profiler, sentry } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
@@ -98,7 +98,10 @@ export default (client: EClient): void => {
 			return;
 		} catch (e) {
 			if (!message.guild) return;
-			if (!isApiError(e)) logger.fatal(e);
+			if (!isApiError(e)) {
+				logger.fatal(e);
+				sentry.fatal(e);
+			}
 			const userLang =
 				client.settings.get(message.guild.id, "lang") ??
 				message.guild.preferredLocale ??

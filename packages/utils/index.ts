@@ -86,7 +86,7 @@ export function isValidJSON(jsonString: string): unknown | false {
 	try {
 		return JSON.parse(jsonString) as unknown;
 	} catch (e) {
-		logger.fatal(`Invalid JSON format: ${e}`);
+		logger.warn(`Invalid JSON format: ${e}`);
 		return false;
 	}
 }

@@ -3,7 +3,7 @@ import { fetchChannel } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
-import { sentry } from "@dicelette/utils";
+import { type BotError, sentry } from "@dicelette/utils";
 import { DiscordAPIError } from "@discordjs/rest";
 import dedent from "dedent";
 import * as Djs from "discord.js";
@@ -59,7 +59,7 @@ export default (client: EClient): void => {
 export async function interactionError(
 	client: EClient,
 	interaction: Djs.BaseInteraction,
-	e: Error,
+	e: BotError | Error,
 	ul: Translation,
 	langToUse?: Djs.Locale
 ) {

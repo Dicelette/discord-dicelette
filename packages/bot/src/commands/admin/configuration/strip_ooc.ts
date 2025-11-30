@@ -2,9 +2,11 @@ import { fetchChannel } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
-import { sentry } from "@dicelette/utils";
+import { BotError, BotErrorLevel, type BotErrorOptions, sentry } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { reply } from "messages";
+
+const botErrorOptions: BotErrorOptions = { cause: "OOC", level: BotErrorLevel.Warning };
 
 export async function stripOOC(
 	options: Djs.CommandInteractionOptionResolver,
@@ -26,12 +28,12 @@ export async function stripOOC(
 		});
 		return;
 	}
-	if (!prefix && !suffix && !regex) {
-		throw new Error(ul("config.stripOOC.error"));
-	}
-	if (!timer || timer <= 0) {
-		throw new Error(ul("config.stripOOC.timer.error"));
-	}
+	if (!prefix && !suffix && !regex)
+		throw new BotError(ul("config.stripOOC.error"), botErrorOptions);
+
+	if (!timer || timer <= 0)
+		throw new BotError(ul("config.stripOOC.timer.error"), botErrorOptions);
+
 	if (regex) {
 		//validate regex
 		if (!regex.startsWith("^")) regex = `^${regex}`;
@@ -39,14 +41,14 @@ export async function stripOOC(
 		try {
 			new RegExp(regex);
 		} catch (e) {
-			throw new Error(ul("config.stripOOC.regex.error", { e }));
+			throw new BotError(ul("config.stripOOC.regex.error", { e }), botErrorOptions);
 		}
 	}
 	//construct regex based on prefix/suffix
 	if (suffix && prefix && !regex) {
 		regex = `^${escapeRegex(prefix)}(.*)${escapeRegex(suffix)}$`;
 	}
-	if (!regex) throw new Error(ul("config.stripOOC.error"));
+	if (!regex) throw new BotError(ul("config.stripOOC.error"), botErrorOptions);
 	const row = new Djs.ActionRowBuilder<Djs.ChannelSelectMenuBuilder>().addComponents(
 		new Djs.ChannelSelectMenuBuilder()
 			.setCustomId("stripOoc_select")
@@ -73,7 +75,7 @@ export async function stripOOC(
 			i.user.id === interaction.user.id && i.customId === "stripOoc_select";
 		if (!response.resource?.message) {
 			// noinspection ExceptionCaughtLocallyJS
-			throw new Error(ul("error.failedReply"));
+			throw new BotError(ul("error.failedReply"), botErrorOptions);
 		}
 		const selection = response.resource.message.createMessageComponentCollector({
 			componentType: Djs.ComponentType.ChannelSelect,

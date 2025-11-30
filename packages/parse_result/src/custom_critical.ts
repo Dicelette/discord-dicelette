@@ -5,8 +5,14 @@ import {
 	isNumber,
 } from "@dicelette/core";
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
+import { BotError, BotErrorLevel, type BotErrorOptions } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import { getRoll } from "./dice_extractor";
+
+const botErrorOptions: BotErrorOptions = {
+	cause: "CUSTOM_CRITICAL",
+	level: BotErrorLevel.Warning,
+};
 
 /**
  * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`
@@ -154,9 +160,16 @@ export function getCriticalFromDice(
 					textType = ul("roll.critical.failure");
 					break;
 				default:
-					throw new Error(ul("error.customCritical.type_error", { type }));
+					throw new BotError(
+						ul("error.customCritical.type_error", { type }),
+						botErrorOptions
+					);
 			}
-		} else throw new Error(ul("error.customCritical.type_error", { type }));
+		} else
+			throw new BotError(
+				ul("error.customCritical.type_error", { type }),
+				botErrorOptions
+			);
 		if (sign === "=") sign = "==";
 		customCritical[textType] = {
 			affectSkill: true,

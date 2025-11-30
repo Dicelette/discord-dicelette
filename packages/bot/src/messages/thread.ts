@@ -10,12 +10,16 @@ import type {
 	UserData,
 	UserRegistration,
 } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { BotError, BotErrorLevel, type BotErrorOptions, logger } from "@dicelette/utils";
 import { registerUser, setDefaultManagerId, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { deleteAfter, embedError, reply, sendLogs } from "messages";
 import { editUserButtons, searchUserChannel, selectEditMenu } from "utils";
 
+const botErrorOptions: BotErrorOptions = {
+	cause: "THREAD",
+	level: BotErrorLevel.Warning,
+};
 export async function createDefaultThread(
 	parent: Djs.ThreadChannel | Djs.TextChannel,
 	guildData: Settings,
@@ -128,10 +132,11 @@ export async function repostInThread(
 	// noinspection SuspiciousTypeOfGuard
 	if (!channel || channel instanceof Djs.CategoryChannel) return;
 	if (!guildData)
-		throw new Error(
+		throw new BotError(
 			ul("error.generic.e", {
 				e: "No server data found in database for this server.",
-			})
+			}),
+			botErrorOptions
 		);
 	const dataToSend = {
 		components: [editUserButtons(ul, which.stats, which.dice), selectEditMenu(ul)],
@@ -157,7 +162,7 @@ export async function repostInThread(
 			thread = newThread as Djs.AnyThreadChannel;
 			isForumThread = true;
 			const starterMsg = await newThread.fetchStarterMessage();
-			if (!starterMsg) throw new Error(ul("error.channel.thread"));
+			if (!starterMsg) throw new BotError(ul("error.channel.thread"), botErrorOptions);
 			msg = starterMsg;
 			const ping = await thread.send(
 				interaction.user.id !== userId
@@ -171,10 +176,10 @@ export async function repostInThread(
 		if (!thread && channel instanceof Djs.TextChannel)
 			thread = await createDefaultThread(channel, guildData, interaction);
 	}
-	if (!thread) throw new Error(ul("error.channel.thread"));
+	if (!thread) throw new BotError(ul("error.channel.thread"), botErrorOptions);
 
 	if (!isForumThread) msg = await thread.send(dataToSend);
-	if (!msg) throw new Error(ul("error.channel.thread"));
+	if (!msg) throw new BotError(ul("error.channel.thread"), botErrorOptions);
 	const userRegister: UserRegistration = {
 		charName: userTemplate.userName,
 		damage: damageName,

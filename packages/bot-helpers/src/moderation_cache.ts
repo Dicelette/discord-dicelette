@@ -1,4 +1,5 @@
 import type { Translation } from "@dicelette/types";
+import { BotError, BotErrorLevel, type BotErrorOptions } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { fetchChannel } from "./fetch";
 
@@ -133,14 +134,20 @@ export function getUserId(interaction: Djs.ButtonInteraction) {
 	return { url, userId };
 }
 
+const botErrorOptions: BotErrorOptions = {
+	cause: "MODERATION_CACHE",
+	level: BotErrorLevel.Warning,
+};
+
 export async function getMessageWithKeyPart(
 	ul: Translation,
 	interaction: Djs.ButtonInteraction,
 	embedKey: string
 ) {
 	const keyParts = parseEmbedKey(embedKey);
-	if (!keyParts) throw new Error(ul("error.embed.notFound"));
+	if (!keyParts) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
-	if (!channel || !channel.isTextBased()) throw new Error(ul("error.channel.notFound"));
+	if (!channel || !channel.isTextBased())
+		throw new BotError(ul("error.channel.notFound"), botErrorOptions);
 	return await channel.messages.fetch(keyParts.messageId);
 }
