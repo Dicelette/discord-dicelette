@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.22.3](https://github.com/Dicelette/discord-dicelette/compare/2.22.2...2.22.3) (2025-12-01)
+
+
+### Bug Fixes
+
+* **choose:** prevent random.sample to roll when the list is empty or howMany > list length ([cf7988a](https://github.com/Dicelette/discord-dicelette/commit/cf7988a2aa2f4c39dd39b8d5c773b1c945a2619e))
+
 ## [2.22.2](https://github.com/Dicelette/discord-dicelette/compare/2.22.1...2.22.2) (2025-11-30)
 
 
