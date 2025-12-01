@@ -56,6 +56,18 @@ async function command(interaction: Djs.ChatInputCommandInteraction, client: ECl
 	const howMany = interaction.options.getInteger(t("choose.number.name"), false);
 	const { ul } = getLangAndConfig(client, interaction);
 	const items = list.split(/[, ;]+/).filter((item) => item.trim().length > 0);
+	if (items.length === 0)
+		return await interaction.reply({
+			content: ul("choose.noItems"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+
+	if (howMany && howMany > items.length)
+		return await interaction.reply({
+			content: ul("choose.tooMany", { count: items.length }),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+
 	const selected = random.sample(items, howMany ?? 1);
 	await interaction.reply({
 		content: ul("choose.result", {
