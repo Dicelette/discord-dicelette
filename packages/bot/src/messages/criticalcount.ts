@@ -1,5 +1,5 @@
 import { findln } from "@dicelette/localization";
-import type { Count, CriticalCount } from "@dicelette/types";
+import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
 import type * as Djs from "discord.js";
 
 /**
@@ -10,15 +10,16 @@ import type * as Djs from "discord.js";
  * - Simple message : `  Succès — 1d100 ⟶ [67] = [67] > 20`
  */
 function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
-	if (!message.content)
-		return { criticalFailure: 0, criticalSuccess: 0, failure: 0, success: 0 };
-	const msgs = message.content.split("\n");
 	const count: Count = {
 		criticalFailure: 0,
 		criticalSuccess: 0,
 		failure: 0,
 		success: 0,
 	};
+	if (!message.content) return count;
+	if (message.content.includes(IGNORE_COUNT_KEY.emoji)) return count;
+	const msgs = message.content.split("\n");
+
 	if (!msgs.length) return count;
 	for (const msg of msgs) {
 		const word = msg.trim();

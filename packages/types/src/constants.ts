@@ -39,6 +39,11 @@ export const EMOJI_MATH = process.env.NODE_ENV === "production" ? MATH.prod : MA
 
 export const AND = "&";
 
+export const IGNORE_COUNT_KEY = {
+	emoji: "ⁱ",
+	key: "/ignore/",
+};
+
 export enum LinksVariables {
 	NAME = "{{name}}",
 	INFO = "{{info}}",
