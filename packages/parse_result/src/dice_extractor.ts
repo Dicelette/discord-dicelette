@@ -59,7 +59,7 @@ export function processChainedComments(
 	comments: string
 ): ChainedComments {
 	if (
-		comments.match(DICE_PATTERNS.BRACKETED_COMMENTS) &&
+		comments.match(DICE_PATTERNS.BRACKET_ROLL) &&
 		content.includes("&") &&
 		content.includes(";")
 	) {

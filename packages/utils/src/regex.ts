@@ -14,7 +14,6 @@ export const COMPILED_PATTERNS = {
 
 export const DICE_PATTERNS = {
 	BRACKET_ROLL: /\[(.*)\]/,
-	BRACKETED_COMMENTS: /\[(.*)\]/,
 	BRACKETED_CONTENT: /^\[(.*)\]$/,
 	DETECT_DICE_MESSAGE: /([\w.()]+|(\{.*\})) (.*)/i,
 	DICE_VALUE: /^(\d+)?#?d\S+|\{.*\}/i,
@@ -26,18 +25,17 @@ export const DICE_PATTERNS = {
 export const DICE_COMPILED_PATTERNS = {
 	COMMENTS_REGEX: /\[([^\]]*)\]/gi,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
+	OPPOSITION: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 } as const;
 
 export const REMOVER_PATTERN = {
 	ASTERISK_ESCAPE: /\*/g,
-	AT_MENTION_REMOVER: / @\w+/,
 	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
 	EXP_REMOVER: /\{exp(.*?)\}/g,
-	OPPOSITION_MATCHER: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
 	SIGN_REMOVER: /[><=!]+.*$/,
 	STAT_COMMENTS_REMOVER: /%%.*%%/,
-	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
+	VARIABLE_MATCHER: /\$([\p{L}\p{M}_][\p{L}\p{M}0-9_]*)/giu,
 } as const;
 
 export const PARSE_RESULT_PATTERNS = {
@@ -58,7 +56,6 @@ export const PARSE_RESULT_PATTERNS = {
 } as const;
 
 export const CHARACTER_DETECTION = / @([\p{L}\p{M}]+)/u;
-export const STAT_REGEX_DETECTION = /\$([\p{L}\p{M}_][\p{L}\p{M}0-9_]*)/u;
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;

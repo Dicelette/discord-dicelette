@@ -10,7 +10,12 @@ import {
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import { CHARACTER_DETECTION, profiler, STAT_REGEX_DETECTION } from "@dicelette/utils";
+import {
+	CHARACTER_DETECTION,
+	DICE_COMPILED_PATTERNS,
+	profiler,
+	REMOVER_PATTERN,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
@@ -57,7 +62,7 @@ export async function baseRoll(
 	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
 	let firstChara: string | undefined;
-	if (dice.match(STAT_REGEX_DETECTION) && interaction.guild)
+	if (dice.match(REMOVER_PATTERN.VARIABLE_MATCHER) && interaction.guild)
 		firstChara = await getCharFromText(client, interaction.guild.id, user.id, dice);
 	if (firstChara) dice = dice.replace(CHARACTER_DETECTION, "").trim();
 
@@ -77,7 +82,7 @@ export async function baseRoll(
 		: undefined;
 
 	// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
-	const oppositionMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(dice);
+	const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(dice);
 	const opposition = parseComparator(dice, userData?.stats, undefined);
 	if (oppositionMatch?.groups?.second) {
 		dice = dice.replace(oppositionMatch.groups.second, "").trim();

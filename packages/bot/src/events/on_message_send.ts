@@ -12,7 +12,7 @@ import {
 	CHARACTER_DETECTION,
 	logger,
 	profiler,
-	STAT_REGEX_DETECTION,
+	REMOVER_PATTERN,
 	sentry,
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";
@@ -40,7 +40,7 @@ export default (client: EClient): void => {
 			if (message.content.match(/`.*`/)) return await stripOOC(message, client, ul);
 			//detect roll between bracket
 			let firstChara: string | undefined;
-			if (content.match(STAT_REGEX_DETECTION))
+			if (content.match(REMOVER_PATTERN.VARIABLE_MATCHER))
 				firstChara = await getCharFromText(
 					client,
 					message.guild.id,
