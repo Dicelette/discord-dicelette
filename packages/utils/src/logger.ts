@@ -82,7 +82,7 @@ export const important: Logger<ILogObj> = new Logger({
 	stylePrettyLogs: true,
 });
 
-const hasSentry = !!process.env.SENTRY_DSN;
+const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "production";
 
 if (hasSentry) {
 	important.info("Sentry is enabled for logging errors.");
@@ -103,8 +103,6 @@ if (hasSentry) {
 		sendDefaultPii: true,
 		tracesSampleRate: 1.0,
 	});
-} else {
-	important.warn("Sentry DSN is not provided. Sentry is disabled.");
 }
 
 export function setupProcessErrorHandlers() {
