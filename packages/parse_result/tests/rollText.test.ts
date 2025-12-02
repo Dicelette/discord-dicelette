@@ -127,6 +127,41 @@ describe("shared roll with statsPerSegment", () => {
 		expect(text).not.toContain("[__Dext__]");
 	});
 
+	it("should handle dynamic dice in shared rolls with comparison", () => {
+		// Simulating the result of: 1d(55+5);&+2>5
+		// This should show:
+		// - First segment: `1d(55+5)`: 1d60 ⟶ [28] = [28]
+		// - Second segment: **Succès** — 1d60+2 ⟶ [28]+2 = [30] ⩾ 5
+		const result: Resultat = {
+			compare: {
+				sign: ">",
+				value: 5,
+			},
+			dice: "1d(55+5);&+2>5",
+			result: "1d60: [28] = 28;✓ 1d60+2: [28]+2 = 30",
+			total: 58,
+		};
+
+		const res = new ResultAsText(result, DATA);
+		const text = res.defaultMessage();
+
+		console.log("Dynamic dice shared roll result:", text);
+		console.log("Result.result:", result.result);
+
+		// Should contain dynamic dice notation in first segment
+		expect(text).toContain("1d(55+5)");
+		expect(text).toContain("1d60");
+
+		// Should contain success/failure symbols
+		expect(text).toMatch(/[※◈]/);
+		expect(text).toContain("**");
+
+		// Should NOT repeat the dynamic dice notation in the second segment
+		const lines = text.split("\n");
+		const dynamicDiceCount = text.match(/1d\(55\+5\)/g)?.length || 0;
+		expect(dynamicDiceCount).toBe(1); // Should appear only once
+	});
+
 	it("should not display stat names for non-shared rolls", () => {
 		const result: Resultat = {
 			dice: "1d100+40",

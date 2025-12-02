@@ -109,33 +109,65 @@ export class ResultAsText {
 
 	private message(result: string, tot?: string | number) {
 		if (result.includes("◈")) tot = undefined;
-		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
+		let resultEdited = result;
 
-		if (this.resultat?.dice?.includes("(")) {
-			const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(this.resultat.dice);
-			if (diceMatch) {
-				const diceOnly = diceMatch[1];
-				const parenMatch = PARSE_RESULT_PATTERNS.parenExpression.exec(diceOnly);
-				if (parenMatch) {
-					try {
-						const expression = parenMatch[1];
-						const evaluated = evaluate(expression);
-						const simplifiedDice = diceOnly.replace(parenMatch[0], evaluated.toString());
-						const arrowPos = result.indexOf(":");
-						if (arrowPos !== -1) {
-							const coreDice = result.substring(0, arrowPos);
-							resultEdited = resultEdited.replace(
-								coreDice,
-								`\`${diceOnly}\`: ${simplifiedDice}`
+		// Check if original dice string contains dynamic dice with parentheses
+		// We need to match segments from this.resultat.dice to the current result segment
+		if (this.resultat?.dice?.includes("(") && result.includes(":")) {
+			// Split the original dice into segments
+			const diceSegments = this.resultat.dice.split(";");
+
+			// Find the matching segment by checking if result starts with evaluated dice
+			for (const diceSegment of diceSegments) {
+				// Skip segments that don't contain parentheses
+				if (!diceSegment.includes("(")) continue;
+
+				// Remove comment from dice segment for matching
+				const cleanDiceSegment = diceSegment.replace(/\[([^\]]+)\]/g, "").trim();
+				// Remove comparator for matching (>5, >=10, etc.)
+				const diceWithoutComparator = cleanDiceSegment.replace(/[><=!]+\d+$/, "").trim();
+
+				const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(diceWithoutComparator);
+				if (diceMatch) {
+					const diceOnly = diceMatch[1];
+					const parenMatch = PARSE_RESULT_PATTERNS.parenExpression.exec(diceOnly);
+					if (parenMatch) {
+						try {
+							const expression = parenMatch[1];
+							const evaluated = evaluate(expression);
+							const simplifiedDice = diceOnly.replace(
+								parenMatch[0],
+								evaluated.toString()
 							);
+
+							// Check if the current result segment matches this evaluated dice
+							const colonPos = result.indexOf(":");
+							if (colonPos !== -1) {
+								const resultDicePart = result.substring(0, colonPos).trim();
+								// Remove leading symbols like ✓ or ✕
+								const cleanResultDice = resultDicePart.replace(/^[✕✓]\s*/, "");
+
+								// Only replace if it's an exact match (not just contained)
+								// This prevents replacing "1d60" in "1d60+2" when we already processed "1d60"
+								if (cleanResultDice === simplifiedDice) {
+									resultEdited = resultEdited.replace(
+										cleanResultDice,
+										`\`${diceOnly}\`: ${simplifiedDice}`
+									);
+									break; // Found the match, no need to continue
+								}
+							}
+						} catch (e) {
+							// If evaluation fails, keep original result
+							logger.warn("Failed to evaluate dynamic dice expression:", e);
 						}
-					} catch (e) {
-						// If evaluation fails, keep original result
-						logger.warn("Failed to evaluate dynamic dice expression:", e);
 					}
 				}
 			}
 		}
+
+		// Apply standard transformations after dynamic dice processing
+		resultEdited = resultEdited.replaceAll(";", "\n").replaceAll(":", " ⟶");
 
 		if (!tot)
 			resultEdited = `${resultEdited.replaceAll(PARSE_RESULT_PATTERNS.resultEquals, " = ` $1 `")}`;
