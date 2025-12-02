@@ -172,7 +172,7 @@ export function calcOptions(
  */
 export function gmCommonOptions(
 	builder: Djs.SlashCommandSubcommandBuilder,
-	type: "dbroll" | "macro" | "calc"
+	type: "dbroll" | "macro" | "calc" | "roll"
 ) {
 	let builderCopy = builder;
 	function addHiddenOpts(
@@ -203,6 +203,18 @@ export function gmCommonOptions(
 			builderCopy = addHiddenOpts(
 				calcOptions(builder) as Djs.SlashCommandSubcommandBuilder
 			);
+			break;
+		}
+		case "roll": {
+			builderCopy = addHiddenOpts(
+				builder.addStringOption((option) =>
+					option
+						.setNames("common.dice")
+						.setDescriptions("roll.option.description")
+						.setRequired(true)
+				)
+			) as Djs.SlashCommandSubcommandBuilder;
+
 			break;
 		}
 		default:

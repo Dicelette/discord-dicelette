@@ -51,22 +51,18 @@ export async function baseRoll(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	hidden?: boolean,
-	silent?: boolean
+	silent?: boolean,
+	user: Djs.User = interaction.user
 ): Promise<void> {
 	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
 	let firstChara: string | undefined;
 	if (dice.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/) && interaction.guild)
-		firstChara = await getCharFromText(
-			client,
-			interaction.guild.id,
-			interaction.user.id,
-			dice
-		);
+		firstChara = await getCharFromText(client, interaction.guild.id, user.id, dice);
 	if (firstChara) dice = dice.replace(/ @\w+/, "").trim();
 
 	const data = interaction.guild
-		? await getUserFromInteraction(client, interaction.user.id, interaction, firstChara, {
+		? await getUserFromInteraction(client, user.id, interaction, firstChara, {
 				skipNotFound: true,
 			})
 		: undefined;
@@ -109,6 +105,7 @@ export async function baseRoll(
 		infoRoll,
 		opposition,
 		silent,
+		user,
 	};
 	await rollWithInteraction(interaction, res.formula, client, opts);
 	profiler.stopProfiler();

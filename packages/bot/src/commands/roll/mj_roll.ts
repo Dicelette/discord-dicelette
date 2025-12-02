@@ -10,6 +10,7 @@ import { isSerializedNameEquals, rollMacro, rollStatistique } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
 import "discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { baseRoll } from "./base_roll";
 
 export const mjRoll = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
@@ -114,6 +115,11 @@ export const mjRoll = {
 				gmCommonOptions(sub, "calc")
 					.setNames("calc.title")
 					.setDescriptions("calc.description")
+		)
+		.addSubcommand((sub) =>
+			gmCommonOptions(sub, "roll")
+				.setNames("roll.name")
+				.setDescriptions("roll.description")
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
@@ -123,6 +129,17 @@ export const mjRoll = {
 		if (!guildData) return;
 
 		const user = options.getUser(t("display.userLowercase"), false) ?? undefined;
+		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
+		const subcommand = options.getSubcommand(true);
+		if (subcommand === ul("roll.name"))
+			return await baseRoll(
+				options.getString(t("common.dice"), true),
+				interaction,
+				client,
+				hide ?? undefined,
+				undefined,
+				user
+			);
 		const charName = options.getString(t("common.character"), false)?.toLowerCase();
 		let optionChar = options.getString(t("common.character")) ?? undefined;
 		let charData: undefined | UserData;
@@ -175,8 +192,7 @@ export const mjRoll = {
 				},
 			};
 		}
-		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
-		const subcommand = options.getSubcommand(true);
+
 		/** Should never happen
 		if (allValuesUndefined(charData.template) && template && user) {
 			charData.template = template;
