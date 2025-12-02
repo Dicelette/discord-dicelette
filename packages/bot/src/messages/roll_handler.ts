@@ -141,9 +141,7 @@ export async function handleRollResult(
 			source,
 			client
 		);
-		if (messageBefore) {
-			messageId = messageBefore.id;
-		}
+		if (messageBefore) messageId = messageBefore.id;
 	}
 
 	const context = {

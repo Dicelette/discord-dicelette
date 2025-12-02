@@ -224,6 +224,50 @@ describe("dice_extractor", () => {
 			expect(result!.detectRoll).toBeUndefined();
 		});
 
+		it("should handle opposition rolls with comments", () => {
+			const content = "1d20>10>5 # test comment";
+
+			const result = isRolling(content);
+
+			expect(result).toBeDefined();
+			expect(result!.result.dice).toContain("1d20");
+			expect(result!.result.dice).toContain(">10");
+			expect(result!.result.compare).toBeDefined();
+			expect(result!.result.compare?.sign).toBe(">");
+			expect(result!.result.compare?.value).toBe(10);
+			expect(result!.result.comment).toBe("test comment");
+		});
+
+		it("should handle opposition rolls with inline comments", () => {
+			const content = "1d20>10>5 attack roll";
+
+			const result = isRolling(content);
+
+			expect(result).toBeDefined();
+			expect(result!.result.dice).toContain("1d20");
+			expect(result!.result.comment).toBe("attack roll");
+		});
+
+		it("should handle opposition rolls with complex dice and comments", () => {
+			const content = "2d6+3>=15>=10 # damage roll";
+
+			const result = isRolling(content);
+
+			expect(result).toBeDefined();
+			expect(result!.result.dice).toContain("2d6+3");
+			expect(result!.result.comment).toBe("damage roll");
+		});
+
+		it("should handle opposition rolls with expression and inline comment", () => {
+			const content = "1d20+5>12>8 critical strike";
+
+			const result = isRolling(content);
+
+			expect(result).toBeDefined();
+			expect(result!.result.dice).toContain("1d20+5");
+			expect(result!.result.comment).toBe("critical strike");
+		});
+
 		it("should handle chained comments", () => {
 			const content = "1d20;&+2 [something] #global comment";
 

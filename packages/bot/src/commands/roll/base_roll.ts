@@ -75,6 +75,14 @@ export async function baseRoll(
 	const ctx = interaction.guild
 		? getGuildContext(client, interaction.guild.id)
 		: undefined;
+
+	// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
+	const oppositionMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(dice);
+	const opposition = parseComparator(dice, userData?.stats, undefined);
+	if (oppositionMatch?.groups?.second) {
+		dice = dice.replace(oppositionMatch.groups.second, "").trim();
+	}
+
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
@@ -82,7 +90,6 @@ export async function baseRoll(
 		undefined,
 		ctx?.templateID?.statsName
 	);
-	const opposition = parseComparator(dice, userData?.stats, res.infoRoll);
 	const { criticalsFromDice, serverData } = await getCritical(
 		client,
 		ul,
