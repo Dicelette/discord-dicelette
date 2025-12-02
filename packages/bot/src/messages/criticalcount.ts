@@ -50,7 +50,8 @@ function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 }
 
 function getAuthor(message: Djs.Message | Djs.PartialMessage): string | undefined {
-	if (message.interactionMetadata?.user) return message.interactionMetadata.user.id;
+	if (message.interactionMetadata?.user && !message.content)
+		return message.interactionMetadata.user.id;
 	if (!message.content) return undefined;
 	const regAuthor = /\*<?@(.*?)>?\*/;
 	const match = regAuthor.exec(message.content);
