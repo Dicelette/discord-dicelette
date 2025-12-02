@@ -83,7 +83,7 @@ export async function getCharFromText(
 	userId: string,
 	dice: string
 ) {
-	const regex = / @(\w+)\]?$/;
+	const regex = / @([\p{L}\p{M}]+)\]?$/u;
 	const match = dice.match(regex);
 	if (!match)
 		return (await firstCharName(client, guildId, userId))?.charName ?? undefined;

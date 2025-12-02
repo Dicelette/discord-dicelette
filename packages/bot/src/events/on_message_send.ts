@@ -7,7 +7,14 @@ import {
 	parseComparator,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import { allValuesUndefined, logger, profiler, sentry } from "@dicelette/utils";
+import {
+	allValuesUndefined,
+	CHARACTER_DETECTION,
+	logger,
+	profiler,
+	STAT_REGEX_DETECTION,
+	sentry,
+} from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
@@ -33,14 +40,14 @@ export default (client: EClient): void => {
 			if (message.content.match(/`.*`/)) return await stripOOC(message, client, ul);
 			//detect roll between bracket
 			let firstChara: string | undefined;
-			if (content.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/))
+			if (content.match(STAT_REGEX_DETECTION))
 				firstChara = await getCharFromText(
 					client,
 					message.guild.id,
 					message.author.id,
 					content
 				);
-			if (firstChara) content = content.replace(/ @\w+/, "").trim();
+			if (firstChara) content = content.replace(CHARACTER_DETECTION, "").trim();
 			const data = await getUserFromMessage(
 				client,
 				message.author.id,
@@ -51,9 +58,9 @@ export default (client: EClient): void => {
 			const userData = data?.userData;
 			let charName = data?.charName ?? firstChara;
 
-			if (!charName && content.match(/ @\w+/)) {
-				charName = content.match(/ @(\w+)/)![1];
-				content = content.replace(/ @\w+/, "").trim();
+			if (!charName && content.match(CHARACTER_DETECTION)) {
+				charName = content.match(CHARACTER_DETECTION)![1];
+				content = content.replace(CHARACTER_DETECTION, "").trim();
 			}
 			const ctx = getGuildContext(client, message.guild.id);
 			const statsName = ctx?.templateID?.statsName ?? [];

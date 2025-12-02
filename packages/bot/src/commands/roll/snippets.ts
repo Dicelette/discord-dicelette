@@ -15,6 +15,7 @@ import {
 } from "@dicelette/parse_result";
 import type { RollOptions, Snippets } from "@dicelette/types";
 import {
+	CHARACTER_DETECTION,
 	COMPILED_PATTERNS,
 	calculateSimilarity,
 	capitalizeBetweenPunct,
@@ -78,9 +79,9 @@ export default {
 			return;
 		}
 		let charOptions: undefined | string;
-		if (dice.match(/ @\w+/)) {
-			charOptions = dice.match(/ @(\w+)/)![1];
-			dice = dice.replace(/ @\w+/, "").trim();
+		if (dice.match(CHARACTER_DETECTION)) {
+			charOptions = dice.match(CHARACTER_DETECTION)![1];
+			dice = dice.replace(CHARACTER_DETECTION, "").trim();
 		}
 		const expr = getExpression(dice, expressionOpt);
 		dice = expr.dice;

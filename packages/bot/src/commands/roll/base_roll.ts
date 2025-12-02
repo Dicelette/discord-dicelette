@@ -10,7 +10,7 @@ import {
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import { profiler } from "@dicelette/utils";
+import { CHARACTER_DETECTION, profiler, STAT_REGEX_DETECTION } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
@@ -57,9 +57,9 @@ export async function baseRoll(
 	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
 	let firstChara: string | undefined;
-	if (dice.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/) && interaction.guild)
+	if (dice.match(STAT_REGEX_DETECTION) && interaction.guild)
 		firstChara = await getCharFromText(client, interaction.guild.id, user.id, dice);
-	if (firstChara) dice = dice.replace(/ @\w+/, "").trim();
+	if (firstChara) dice = dice.replace(CHARACTER_DETECTION, "").trim();
 
 	const data = interaction.guild
 		? await getUserFromInteraction(client, user.id, interaction, firstChara, {
@@ -68,9 +68,9 @@ export async function baseRoll(
 		: undefined;
 	const userData = data?.userData;
 	let charName = data?.charName ?? firstChara;
-	if (!charName && dice.match(/ @\w+/)) {
-		charName = dice.match(/ @(\w+)/)![1];
-		dice = dice.replace(/ @\w+/, "").trim();
+	if (!charName && dice.match(CHARACTER_DETECTION)) {
+		charName = dice.match(CHARACTER_DETECTION)![1];
+		dice = dice.replace(CHARACTER_DETECTION, "").trim();
 	}
 	const ctx = interaction.guild
 		? getGuildContext(client, interaction.guild.id)

@@ -54,6 +54,9 @@ export const PARSE_RESULT_PATTERNS = {
 	successSymbol: /^◈\s+\*\*/,
 } as const;
 
+export const CHARACTER_DETECTION = / @([\p{L}\p{M}]+)/u;
+export const STAT_REGEX_DETECTION = /\$([\p{L}\p{M}_][\p{L}\p{M}0-9_]*)/u;
+
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
 	// Reset lastIndex for global regex to avoid issues
