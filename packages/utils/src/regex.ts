@@ -40,6 +40,20 @@ export const REMOVER_PATTERN = {
 	VARIABLE_MATCHER: /\$([\p{L}_][\p{L}0-9_]*)/giu,
 } as const;
 
+export const PARSE_RESULT_PATTERNS = {
+	commentBracket: /\[([^\]]+)\]/,
+	diceResultPattern: /(?<entry>\S+) ⟶ (?<calc>.*) =/,
+	dynamicDice: /(\d+d\([^)]+\))/,
+	extractInfo: /%%(.*)%%/,
+	formulaDiceSymbols: /^[✕✓]/,
+	naturalDice: /\[(\d+)\]/gi,
+	parenExpression: /\(([^)]+)\)/,
+	resultEquals: / = (\S+)/g,
+	sharedStartSymbol: /^◈\s+/,
+	sharedSymbol: /^([※◈])/,
+	successSymbol: /^◈\s+\*\*/,
+} as const;
+
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
 	// Reset lastIndex for global regex to avoid issues

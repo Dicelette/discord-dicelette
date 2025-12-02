@@ -10,6 +10,7 @@ import type { Server } from "./interfaces";
 import { createUrl, timestamp } from "./utils";
 import "uniformize";
 import { ln } from "@dicelette/localization";
+import { logger, PARSE_RESULT_PATTERNS } from "@dicelette/utils";
 
 export class ResultAsText {
 	parser?: string;
@@ -24,7 +25,7 @@ export class ResultAsText {
 	private readonly statsPerSegment?: string[];
 	private readonly commentsPerSegment?: string[];
 
-	private ignoreCount = "";
+	private readonly ignoreCount: string = "";
 
 	constructor(
 		result: Resultat | undefined,
@@ -76,7 +77,6 @@ export class ResultAsText {
 		if (mention) user = mentionUser;
 		else if (this.charName) user = titleCharName;
 		if (time) user += `${timestamp(this.data?.config?.timestamp)}`;
-		// Afficher la comparaison principale à côté du pseudo: ("sign value")
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
 		if (header) {
@@ -111,40 +111,36 @@ export class ResultAsText {
 		if (result.includes("◈")) tot = undefined;
 		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
 
-		// Vérifier si le dé original contient des parenthèses (notation dynamique)
 		if (this.resultat?.dice?.includes("(")) {
-			console.log("Detected dynamic dice notation:", this.resultat.dice);
-			// Extraire uniquement la partie dé avec parenthèses (sans le commentaire)
-			const diceMatch = /(\d+d\([^)]+\))/.exec(this.resultat.dice);
+			const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(this.resultat.dice);
 			if (diceMatch) {
 				const diceOnly = diceMatch[1];
-				// Extraire l'expression dans les parenthèses
-				const parenMatch = /\(([^)]+)\)/.exec(diceOnly);
+				const parenMatch = PARSE_RESULT_PATTERNS.parenExpression.exec(diceOnly);
 				if (parenMatch) {
 					try {
 						const expression = parenMatch[1];
 						const evaluated = evaluate(expression);
-						// Construire le dé simplifié (ex: 1d13)
 						const simplifiedDice = diceOnly.replace(parenMatch[0], evaluated.toString());
-						// Extraire la partie avant " ⟶" dans result (c'est le dé qui vient de core)
 						const arrowPos = result.indexOf(":");
 						if (arrowPos !== -1) {
 							const coreDice = result.substring(0, arrowPos);
-							// Remplacer "1d13" par "1d(8+5): 1d13" dans resultEdited
 							resultEdited = resultEdited.replace(
 								coreDice,
 								`\`${diceOnly}\`: ${simplifiedDice}`
 							);
 						}
 					} catch (e) {
-						// Si l'évaluation échoue, on garde l'affichage original
+						// If evaluation fails, keep original result
+						logger.warn("Failed to evaluate dynamic dice expression:", e);
 					}
 				}
 			}
 		}
 
-		if (!tot) resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, " = ` $1 `")}`;
-		else resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, `${tot}`)}`;
+		if (!tot)
+			resultEdited = `${resultEdited.replaceAll(PARSE_RESULT_PATTERNS.resultEquals, " = ` $1 `")}`;
+		else
+			resultEdited = `${resultEdited.replaceAll(PARSE_RESULT_PATTERNS.resultEquals, `${tot}`)}`;
 		resultEdited = resultEdited.replaceAll("*", "\\*");
 		return resultEdited;
 	}
@@ -176,7 +172,6 @@ export class ResultAsText {
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
 
-		// Ne pas ajouter d'espace supplémentaire si le commentaire est vide
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
 		const joinedRes = finalRes.join("\n ");
 		return hasComment ? `${comment}${joinedRes.trimEnd()}` : ` ${joinedRes}`;
@@ -194,7 +189,6 @@ export class ResultAsText {
 			successOrFailure?: string;
 		};
 	} {
-		const regexForFormulesDices = /^[✕✓]/;
 		let msgSuccess = "";
 		let total = 0;
 		const natural: number[] = [];
@@ -202,7 +196,7 @@ export class ResultAsText {
 		let successOrFailure = "";
 
 		for (const r of messageResult) {
-			if (r.match(regexForFormulesDices)) {
+			if (r.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
 				msgSuccess += `${this.message(r)}\n`;
 				continue;
 			}
@@ -252,10 +246,8 @@ export class ResultAsText {
 		let oldCompare: ComparedValue | undefined;
 		if (opposition && resultOfCompare) {
 			const newCompare = evaluate(`${total} ${opposition.sign} ${opposition.value}`);
-			// Save original comparison for display
 			oldCompare = structuredClone(this.resultat!.compare);
 
-			// Mise à jour du message pour montrer le résultat final de l'opposition
 			successOrFailure = newCompare
 				? `**${this.ul("roll.success")}**`
 				: `**${this.ul("roll.failure")}**`;
@@ -270,7 +262,7 @@ export class ResultAsText {
 	}
 
 	private naturalDice(r: string, natural: number[]) {
-		const naturalDice = r.matchAll(/\[(\d+)\]/gi);
+		const naturalDice = r.matchAll(PARSE_RESULT_PATTERNS.naturalDice);
 		for (const dice of naturalDice) natural.push(Number.parseInt(dice[1], 10));
 	}
 
@@ -283,18 +275,17 @@ export class ResultAsText {
 		| { successOrFailure: string; isCritical: "failure" | "success" | "custom" }
 		| undefined {
 		if (critical) {
-			if (critical.failure && natural.includes(critical.failure)) {
+			if (critical.failure && natural.includes(critical.failure))
 				return {
 					isCritical: "failure",
 					successOrFailure: `**${this.ul("roll.critical.failure")}**`,
 				};
-			}
-			if (critical.success && natural.includes(critical.success)) {
+
+			if (critical.success && natural.includes(critical.success))
 				return {
 					isCritical: "success",
 					successOrFailure: `**${this.ul("roll.critical.success")}**`,
 				};
-			}
 		}
 
 		if (customCritical) {
@@ -369,10 +360,9 @@ export class ResultAsText {
 			: `= \`[${total}]\``;
 
 		const resMsg = this.message(r, totalSuccess);
-		if (resMsg.match(/^[✕✓]/)) {
-			return `${this.message(r, totalSuccess).replace(/^[✕✓]/, `${successOrFailure} — `)}\n`;
+		if (resMsg.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
+			return `${this.message(r, totalSuccess).replace(PARSE_RESULT_PATTERNS.formulaDiceSymbols, `${successOrFailure} — `)}\n`;
 		}
-		// Si c'est un symbole ※ (roll sans comparaison), ne pas le remplacer
 		if (resMsg.startsWith("※")) {
 			return `${resMsg}\n`;
 		}
@@ -387,14 +377,11 @@ export class ResultAsText {
 
 	private extractCommentsPerSegment(): string[] | undefined {
 		if (!this.resultat?.dice || !this.resultat.dice.includes(";")) return undefined;
-
-		// Extraire les commentaires entre crochets pour chaque segment
-		// Format: 1d20[comment1];&+5[comment2]
 		const segments = this.resultat.dice.split(";");
 		const comments: string[] = [];
 
 		for (const segment of segments) {
-			const commentMatch = segment.match(/\[([^\]]+)\]/);
+			const commentMatch = segment.match(PARSE_RESULT_PATTERNS.commentBracket);
 			comments.push(commentMatch ? commentMatch[1] : "");
 		}
 
@@ -411,17 +398,20 @@ export class ResultAsText {
 	}
 
 	private comment(interaction?: boolean): string {
-		const extractRegex = /%%(.*)%%/;
-		const extractorInfo = extractRegex.exec(this.resultat!.comment || "");
+		const extractorInfo = PARSE_RESULT_PATTERNS.extractInfo.exec(
+			this.resultat!.comment || ""
+		);
 		let info = "";
 
 		if (extractorInfo?.[1]) {
 			info = `${extractorInfo[1]} `;
-			this.resultat!.comment = this.resultat!.comment?.replace(extractRegex, "").trim();
+			this.resultat!.comment = this.resultat!.comment?.replace(
+				PARSE_RESULT_PATTERNS.extractInfo,
+				""
+			).trim();
 		}
 		this.resultat!.comment = this.removeIgnore();
 
-		// Pour les shared rolls avec statsPerSegment, ne pas ajouter de ligne vide si pas de commentaire
 		const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
 		return this.resultat!.comment
 			? `${info}*${this.resultat!.comment.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
@@ -439,13 +429,12 @@ export class ResultAsText {
 			successOrFailure?: string;
 		}
 	): string[] {
-		const dicesResult = /(?<entry>\S+) ⟶ (?<calc>.*) =/;
 		const splitted = msgSuccess.split("\n");
 		const finalRes = [];
 		let segmentIndex = 0;
 
 		for (let res of splitted) {
-			const matches = dicesResult.exec(res);
+			const matches = PARSE_RESULT_PATTERNS.diceResultPattern.exec(res);
 			if (matches) {
 				const { entry, calc } = matches.groups || {};
 				if (entry) {
@@ -469,9 +458,7 @@ export class ResultAsText {
 			const hasComments = this.commentsPerSegment && this.commentsPerSegment.length > 0;
 
 			if (hasStats || hasComments) {
-				// Détecter les lignes de résultat (avec ※ ou ◈)
-				const symbolRegex = /^(※|◈)/;
-				const hasSharedSymbol = res.match(symbolRegex);
+				const hasSharedSymbol = res.match(PARSE_RESULT_PATTERNS.sharedSymbol);
 
 				if (
 					hasSharedSymbol &&
@@ -484,7 +471,6 @@ export class ResultAsText {
 					const statName = this.statsPerSegment?.[segmentIndex] || "";
 					const comment = this.commentsPerSegment?.[segmentIndex] || "";
 
-					// Construire l'en-tête du segment: Stat + Comment (si présents)
 					const parts: string[] = [];
 					if (statName) parts.push(`__${statName}__`);
 					if (comment) parts.push(`__${comment}__`);
@@ -492,19 +478,15 @@ export class ResultAsText {
 					if (parts.length > 0) {
 						const header = parts.join(" — ");
 
-						// Injecter après le symbole ※ ou ◈
-						// Cas 1: Ligne déjà formatée avec "◈ **Succès** —"
-						if (res.match(/^◈\s+\*\*/)) {
-							res = res.replace(/^◈\s+/, `◈ ${header} — `);
-						}
-						// Cas 2: Ligne avec ※ (pas de comparaison)
-						else if (res.startsWith("※")) {
-							// Vérifier si le commentaire n'est pas déjà présent dans res
+						if (res.match(PARSE_RESULT_PATTERNS.successSymbol)) {
+							res = res.replace(
+								PARSE_RESULT_PATTERNS.sharedStartSymbol,
+								`◈ ${header} — `
+							);
+						} else if (res.startsWith("※")) {
 							if (!res.includes(`__${comment}__`)) {
 								res = res.replace(/^※\s*/, `※ ${header} — `);
-							}
-							// Sinon, ajouter uniquement le statName s'il existe et n'est pas déjà là
-							else if (statName && !res.includes(`__${statName}__`)) {
+							} else if (statName && !res.includes(`__${statName}__`)) {
 								res = res.replace(/^※\s*/, `※ __${statName}__ — `);
 							}
 						}
@@ -524,8 +506,6 @@ export class ResultAsText {
 		isCritical: undefined | "failure" | "success" | "custom",
 		successOrFailure?: string
 	): string {
-		const regexForFormulesDices = /^[✕✓]/;
-
 		if (isCritical === "failure")
 			return res.replace("✕", `◈ **${this.ul("roll.critical.failure")}** —`);
 
@@ -533,7 +513,10 @@ export class ResultAsText {
 			return res.replace("✓", `◈ **${this.ul("roll.critical.success")}** —`);
 
 		if (isCritical === "custom")
-			return res.replace(regexForFormulesDices, `${successOrFailure} —`);
+			return res.replace(
+				PARSE_RESULT_PATTERNS.formulaDiceSymbols,
+				`${successOrFailure} —`
+			);
 
 		// Ne pas remplacer le symbole ※ qui est utilisé pour les rolls sans comparaison
 		return res
