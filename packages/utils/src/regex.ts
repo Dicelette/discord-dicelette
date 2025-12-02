@@ -16,7 +16,7 @@ export const DICE_PATTERNS = {
 	BRACKET_ROLL: /\[(.*)\]/,
 	BRACKETED_COMMENTS: /\[(.*)\]/,
 	BRACKETED_CONTENT: /^\[(.*)\]$/,
-	DETECT_DICE_MESSAGE: /([\w.]+|(\{.*\})) (.*)/i,
+	DETECT_DICE_MESSAGE: /([\w.()]+|(\{.*\})) (.*)/i,
 	DICE_VALUE: /^\S*#?d\S+|\{.*\}/i,
 	GLOBAL_COMMENTS: /# ?(.*)/,
 	GLOBAL_COMMENTS_GROUP: /# ?(?<comment>.*)/,

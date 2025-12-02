@@ -105,29 +105,32 @@ export class ResultAsText {
 
 		// Vérifier si le dé original contient des parenthèses (notation dynamique)
 		if (this.resultat?.dice?.includes("(")) {
-			// Extraire l'expression dans les parenthèses et l'évaluer
-			const parenMatch = /\(([^)]+)\)/.exec(this.resultat.dice);
-			if (parenMatch) {
-				try {
-					const expression = parenMatch[1];
-					const evaluated = evaluate(expression);
-					// Construire le dé simplifié (ex: 1d13)
-					const simplifiedDice = this.resultat.dice.replace(
-						parenMatch[0],
-						evaluated.toString()
-					);
-					// Extraire la partie avant " ⟶" dans result (c'est le dé qui vient de core)
-					const arrowPos = result.indexOf(":");
-					if (arrowPos !== -1) {
-						const coreDice = result.substring(0, arrowPos);
-						// Remplacer "1d13" par "1d(8+5): 1d13" dans resultEdited
-						resultEdited = resultEdited.replace(
-							coreDice,
-							`\`${this.resultat.dice}\`: ${simplifiedDice}`
-						);
+			console.log("Detected dynamic dice notation:", this.resultat.dice);
+			// Extraire uniquement la partie dé avec parenthèses (sans le commentaire)
+			const diceMatch = /(\d+d\([^)]+\))/.exec(this.resultat.dice);
+			if (diceMatch) {
+				const diceOnly = diceMatch[1];
+				// Extraire l'expression dans les parenthèses
+				const parenMatch = /\(([^)]+)\)/.exec(diceOnly);
+				if (parenMatch) {
+					try {
+						const expression = parenMatch[1];
+						const evaluated = evaluate(expression);
+						// Construire le dé simplifié (ex: 1d13)
+						const simplifiedDice = diceOnly.replace(parenMatch[0], evaluated.toString());
+						// Extraire la partie avant " ⟶" dans result (c'est le dé qui vient de core)
+						const arrowPos = result.indexOf(":");
+						if (arrowPos !== -1) {
+							const coreDice = result.substring(0, arrowPos);
+							// Remplacer "1d13" par "1d(8+5): 1d13" dans resultEdited
+							resultEdited = resultEdited.replace(
+								coreDice,
+								`\`${diceOnly}\`: ${simplifiedDice}`
+							);
+						}
+					} catch (e) {
+						// Si l'évaluation échoue, on garde l'affichage original
 					}
-				} catch (e) {
-					// Si l'évaluation échoue, on garde l'affichage original
 				}
 			}
 		}
