@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.1](https://github.com/Dicelette/discord-dicelette/compare/2.24.0...2.24.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* comments with statistics in $ ([95be868](https://github.com/Dicelette/discord-dicelette/commit/95be868a89390d2fdbe93683e9723c0ab7952ff8))
+* opposition not rolled successfully ([15fa28f](https://github.com/Dicelette/discord-dicelette/commit/15fa28f6ccdaab0edf4877429f266d8731d0aef5))
+* **sharedRoll:** better handling comments in complexe shared roll (statistics + comparaison) ([4cde44e](https://github.com/Dicelette/discord-dicelette/commit/4cde44e2aa0b97c1de677a32041f5501bef73711))
+* **sharedRoll:** parenthesis dice with shared roll comparaison ([a3d8f1c](https://github.com/Dicelette/discord-dicelette/commit/a3d8f1c1447fe2706f5772b27ded4c17b5d6e893))
+* should handle accented character in charname ([055edc9](https://github.com/Dicelette/discord-dicelette/commit/055edc9b46fb92b73a6aef006593e3c1282b84d5))
+* should use /ignore/ also in shared roll ([d4a1e49](https://github.com/Dicelette/discord-dicelette/commit/d4a1e494f16ba4eb1bdfca8d7e68a96140df58b9))
+
 ## [2.24.0](https://github.com/Dicelette/discord-dicelette/compare/2.23.1...2.24.0) (2025-12-02)
 
 
