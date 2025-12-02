@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.0](https://github.com/Dicelette/discord-dicelette/compare/2.23.1...2.24.0) (2025-12-02)
+
+
+### Features
+
+* mj roll to roll any dice for another user ([b8e7dc3](https://github.com/Dicelette/discord-dicelette/commit/b8e7dc3b27ee712233fcd84d7c44d6f8b3ff6786))
+
+
+### Bug Fixes
+
+* use the metadata user only when there is no content available ([5cb278d](https://github.com/Dicelette/discord-dicelette/commit/5cb278d358d1c9884b543d79ccf4f5f0c33205bd))
+
 ## [2.23.1](https://github.com/Dicelette/discord-dicelette/compare/2.23.0...2.23.1) (2025-12-02)
 
 
