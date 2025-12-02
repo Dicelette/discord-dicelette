@@ -25,7 +25,7 @@ export class ResultAsText {
 	private readonly statsPerSegment?: string[];
 	private readonly commentsPerSegment?: string[];
 
-	private readonly ignoreCount: string = "";
+	private ignoreCount = "";
 
 	constructor(
 		result: Resultat | undefined,
@@ -369,9 +369,9 @@ export class ResultAsText {
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
 
-	private setIgnoreCount() {
-		if (this.resultat?.comment?.includes(IGNORE_COUNT_KEY.key))
-			return ` ${IGNORE_COUNT_KEY.emoji} `;
+	private setIgnoreCount(comment: string | undefined = this.resultat?.comment) {
+		if (this.ignoreCount !== "") return this.ignoreCount;
+		if (comment?.includes(IGNORE_COUNT_KEY.key)) return ` ${IGNORE_COUNT_KEY.emoji} `;
 		return "";
 	}
 
@@ -388,13 +388,13 @@ export class ResultAsText {
 		return comments.length > 0 ? comments : undefined;
 	}
 
-	private removeIgnore() {
-		if (this.resultat?.comment) {
-			const com = this.resultat.comment.replace(IGNORE_COUNT_KEY.key, "").trim();
+	private removeIgnore(comment: string | undefined): string | undefined {
+		if (comment) {
+			const com = comment.replaceAll(IGNORE_COUNT_KEY.key, "").trim();
 			if (com.trimAll() === "#") return undefined;
 			return com;
 		}
-		return this.resultat?.comment;
+		return comment;
 	}
 
 	private comment(interaction?: boolean): string {
@@ -410,7 +410,7 @@ export class ResultAsText {
 				""
 			).trim();
 		}
-		this.resultat!.comment = this.removeIgnore();
+		this.resultat!.comment = this.removeIgnore(this.resultat!.comment);
 
 		const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
 		return this.resultat!.comment
@@ -469,7 +469,9 @@ export class ResultAsText {
 						)
 				) {
 					const statName = this.statsPerSegment?.[segmentIndex] || "";
-					const comment = this.commentsPerSegment?.[segmentIndex] || "";
+					const commentSource = this.commentsPerSegment?.[segmentIndex] || "";
+					const comment = this.removeIgnore(commentSource) || "";
+					this.ignoreCount = this.setIgnoreCount(commentSource);
 
 					const parts: string[] = [];
 					if (statName) parts.push(`__${statName}__`);
@@ -484,11 +486,10 @@ export class ResultAsText {
 								`◈ ${header} — `
 							);
 						} else if (res.startsWith("※")) {
-							if (!res.includes(`__${comment}__`)) {
+							if (!res.includes(`__${comment}__`))
 								res = res.replace(/^※\s*/, `※ ${header} — `);
-							} else if (statName && !res.includes(`__${statName}__`)) {
+							else if (statName && !res.includes(`__${statName}__`))
 								res = res.replace(/^※\s*/, `※ __${statName}__ — `);
-							}
 						}
 					}
 					// Incrémenter pour passer au segment suivant
@@ -602,9 +603,9 @@ export class ResultAsText {
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
 		if (header)
-			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)${this.ignoreCount}`;
+			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
 
-		const headerLine = `${mention}${compareHint}${timestamp(this.data.config?.timestamp)}`;
+		const headerLine = `${mention}${compareHint}${this.ignoreCount}${timestamp(this.data.config?.timestamp)}`;
 		// For shared rolls with statsPerSegment, don't show global infoRoll
 		// as stat names are displayed per segment next to ※/◈ symbols
 		const showGlobalInfoRoll =
