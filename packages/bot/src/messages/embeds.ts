@@ -6,10 +6,10 @@ import {
 	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
-	COMPILED_PATTERNS,
 	cleanAvatarUrl,
 	logger,
 	NoEmbed,
+	QUERY_URL_PATTERNS,
 	TotalExceededError,
 } from "@dicelette/utils";
 import type { Embed, EmbedBuilder, Message } from "discord.js";
@@ -109,7 +109,7 @@ export async function updateUserEmbedThumbnail(
 		) ?? [];
 
 	const thumbnail = userDataEmbed.data.thumbnail?.url;
-	if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+	if (thumbnail?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 		const res = await reuploadAvatar(
 			{
 				name: thumbnail.split("?")[0].split("/").pop() ?? "avatar.png",

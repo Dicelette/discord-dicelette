@@ -23,7 +23,7 @@ import {
 import { optionInteractions } from "utils";
 
 import "discord_ext";
-import { COMPILED_PATTERNS, cleanAvatarUrl } from "@dicelette/utils";
+import { cleanAvatarUrl, QUERY_URL_PATTERNS } from "@dicelette/utils";
 
 export const displayUser = {
 	async autocomplete(
@@ -125,7 +125,7 @@ export const displayUser = {
 			let avatar = thumbnailJson
 				? cleanAvatarUrl(thumbnailJson)
 				: await fetchAvatarUrl(interaction.guild!, user ?? interaction.user);
-			if (persist && thumbnailJson?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+			if (persist && thumbnailJson?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 				//get the attachment if exists
 				const result = await reuploadAvatar(
 					{

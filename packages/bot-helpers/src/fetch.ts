@@ -1,6 +1,6 @@
 import type { EClient } from "@dicelette/client";
 import type { Translation } from "@dicelette/types";
-import { BotError, BotErrorLevel, COMPILED_PATTERNS, logger } from "@dicelette/utils";
+import { BotError, BotErrorLevel, logger, QUERY_URL_PATTERNS } from "@dicelette/utils";
 import type { Guild, GuildMember, User } from "discord.js";
 import * as Djs from "discord.js";
 
@@ -68,7 +68,7 @@ export async function reuploadAvatar(
 	avatar: { name: string; url: string },
 	ul: Translation
 ) {
-	if (!avatar.name.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
+	if (!avatar.name.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS))
 		throw new BotError(ul("error.avatar.format"), {
 			cause: "FETCH_AVATAR",
 			level: BotErrorLevel.Warning,

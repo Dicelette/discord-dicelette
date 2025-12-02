@@ -21,7 +21,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	reuploadAvatar,
 } from "@dicelette/bot-helpers";
-import { COMPILED_PATTERNS } from "@dicelette/utils";
+import { QUERY_URL_PATTERNS } from "@dicelette/utils";
 
 // Small helpers to reduce repetition and control concurrency
 // getFileExtension: safer/more readable than chaining split/pop
@@ -67,7 +67,7 @@ async function buildEmbedsForCharacter(
 	const files: Djs.AttachmentBuilder[] = [];
 
 	// Re-upload avatar if it's a Discord CDN link
-	if (char.avatar?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+	if (char.avatar?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 		const res = await reuploadAvatar(
 			{
 				name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",

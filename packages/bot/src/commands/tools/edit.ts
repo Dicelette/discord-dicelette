@@ -31,7 +31,7 @@ import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "messages";
 import { getButton, optionInteractions } from "utils";
 import "discord_ext";
-import { COMPILED_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
+import { QUERY_URL_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "AVATAR",
@@ -228,7 +228,7 @@ async function avatar(
 				(name) => files.find((f) => f.name === name)!
 			);
 		} else if (fileUrl) {
-			if (fileUrl.match(COMPILED_PATTERNS.DISCORD_CDN))
+			if (fileUrl.match(QUERY_URL_PATTERNS.DISCORD_CDN))
 				throw new BotError(ul("error.avatar.cdn"), botErrorOptions);
 			avatarURL = fileUrl;
 		}

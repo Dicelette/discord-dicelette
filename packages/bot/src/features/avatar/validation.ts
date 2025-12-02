@@ -3,8 +3,8 @@ import type { Translation } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
-	COMPILED_PATTERNS,
 	cleanAvatarUrl,
+	QUERY_URL_PATTERNS,
 	verifyAvatarUrl,
 } from "@dicelette/utils";
 import type { TextChannel } from "discord.js";
@@ -32,7 +32,7 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 	let avatar = "";
 
 	if (uploaded) {
-		if (!uploaded.contentType?.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
+		if (!uploaded.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.format"), ul)],
 			});
@@ -45,7 +45,7 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.missing"), ul)],
 			});
-		if (input.match(COMPILED_PATTERNS.DISCORD_CDN))
+		if (input.match(QUERY_URL_PATTERNS.DISCORD_CDN))
 			return await reply(interaction, {
 				embeds: [embedError(ul("error.avatar.cdn"), ul)],
 			});

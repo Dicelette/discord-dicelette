@@ -1,5 +1,5 @@
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
-import { COMPILED_PATTERNS } from "@dicelette/utils";
+import { QUERY_URL_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
 
 /**
@@ -24,8 +24,8 @@ export function extractComparator(
  */
 export function getThreshold(dice: string, threshold?: string): string {
 	if (!threshold) return dice;
-	const diceMatch = COMPILED_PATTERNS.COMPARATOR.exec(dice);
-	const thresholdMatch = COMPILED_PATTERNS.COMPARATOR.exec(threshold);
+	const diceMatch = QUERY_URL_PATTERNS.COMPARATOR.exec(dice);
+	const thresholdMatch = QUERY_URL_PATTERNS.COMPARATOR.exec(threshold);
 	if (thresholdMatch) {
 		if (diceMatch) return dice.replace(diceMatch[0], thresholdMatch[0]);
 		return dice + thresholdMatch[0];

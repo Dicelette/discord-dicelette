@@ -1,5 +1,5 @@
 // Pre-compiled regex patterns for better performance
-export const COMPILED_PATTERNS = {
+export const QUERY_URL_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
 	// Dice comparator patterns centralised (sign + comparator value)
 	COMPARATOR: /(?<sign>[><=!]+)(?<comparator>(.+))/,
@@ -60,12 +60,12 @@ export const CHARACTER_DETECTION = / @([\p{L}\p{M}]+)/u;
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
 	// Reset lastIndex for global regex to avoid issues
-	COMPILED_PATTERNS.AVATAR_URL.lastIndex = 0;
-	COMPILED_PATTERNS.VALID_EXTENSIONS.lastIndex = 0;
+	QUERY_URL_PATTERNS.AVATAR_URL.lastIndex = 0;
+	QUERY_URL_PATTERNS.VALID_EXTENSIONS.lastIndex = 0;
 	const [baseUrl] = url.split("?"); // Ignore query parameters for extension check
-	if (baseUrl.match(COMPILED_PATTERNS.AVATAR_URL)) return url;
+	if (baseUrl.match(QUERY_URL_PATTERNS.AVATAR_URL)) return url;
 	if (
-		baseUrl.match(COMPILED_PATTERNS.VALID_EXTENSIONS) &&
+		baseUrl.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS) &&
 		url.startsWith("attachment://")
 	)
 		return url;
@@ -73,8 +73,8 @@ export function verifyAvatarUrl(url: string) {
 }
 
 export function cleanAvatarUrl(url: string) {
-	if (url.match(COMPILED_PATTERNS.DISCORD_CDN))
-		return url.replace(COMPILED_PATTERNS.QUERY_PARAMS, "");
+	if (url.match(QUERY_URL_PATTERNS.DISCORD_CDN))
+		return url.replace(QUERY_URL_PATTERNS.QUERY_PARAMS, "");
 	return url;
 }
 
@@ -82,7 +82,7 @@ export function capitalizeBetweenPunct(input: string) {
 	// Regex to find sections enclosed by punctuation marks
 	let remainingText = input;
 	let result = input;
-	for (const match of input.matchAll(COMPILED_PATTERNS.PUNCTUATION_ENCLOSED)) {
+	for (const match of input.matchAll(QUERY_URL_PATTERNS.PUNCTUATION_ENCLOSED)) {
 		const { open, enclosed, close } = match.groups ?? {};
 		if (open && enclosed && close) {
 			const capitalized = enclosed.capitalize();
@@ -91,12 +91,12 @@ export function capitalizeBetweenPunct(input: string) {
 		}
 	}
 	remainingText = remainingText.toTitle();
-	result = result.replace(COMPILED_PATTERNS.WORD_BOUNDARY(remainingText), remainingText);
+	result = result.replace(QUERY_URL_PATTERNS.WORD_BOUNDARY(remainingText), remainingText);
 	return result;
 }
 
 function escapeRegex(string: string) {
-	return string.replace(COMPILED_PATTERNS.REGEX_ESCAPE, "\\$&");
+	return string.replace(QUERY_URL_PATTERNS.REGEX_ESCAPE, "\\$&");
 }
 
 // Cache for compiled regex patterns to improve performance

@@ -23,7 +23,7 @@ import {
 	skillCustomCritical,
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
-import { COMPILED_PATTERNS, capitalizeBetweenPunct, profiler } from "@dicelette/utils";
+import { capitalizeBetweenPunct, profiler, QUERY_URL_PATTERNS } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";
@@ -166,7 +166,7 @@ export async function rollMacro(
 	const composed = composeRollBase(
 		dice,
 		threshold,
-		COMPILED_PATTERNS.COMPARATOR,
+		QUERY_URL_PATTERNS.COMPARATOR,
 		userStatistique.stats,
 		dollarValue?.total,
 		expressionStr,
@@ -300,7 +300,7 @@ export async function rollStatistique(
 	const composed = composeRollBase(
 		dice,
 		threshold,
-		COMPILED_PATTERNS.COMPARATOR_SIMPLE,
+		QUERY_URL_PATTERNS.COMPARATOR_SIMPLE,
 		userStatistique.stats,
 		userStatStr,
 		expressionStr,

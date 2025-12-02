@@ -11,10 +11,10 @@ import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Characters, Translation, UserData } from "@dicelette/types";
 import {
 	allValueUndefOrEmptyString,
-	COMPILED_PATTERNS,
 	cleanAvatarUrl,
 	logger,
 	NoEmbed,
+	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { Dice, Stats } from "features";
@@ -206,7 +206,7 @@ export async function validateUser(
 		(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 	);
 	let avatarStr = jsonThumbnail || "";
-	if (jsonThumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+	if (jsonThumbnail?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 		const fileName = jsonThumbnail.split("?")[0].split("/").pop() || `${userID}_avatar`;
 		const result = await reuploadAvatar({ name: fileName, url: jsonThumbnail }, ul);
 		avatarStr = result.name;

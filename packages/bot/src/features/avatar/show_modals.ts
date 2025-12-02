@@ -3,8 +3,8 @@ import type { Settings, Translation } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
-	COMPILED_PATTERNS,
 	cleanAvatarUrl,
+	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
@@ -42,7 +42,7 @@ async function showAvatarEdit(
 	let thumbnail = jsonEmbed
 		? cleanAvatarUrl(jsonEmbed)
 		: await fetchAvatarUrl(interaction.guild!, interaction.user);
-	if (thumbnail.match(COMPILED_PATTERNS.DISCORD_CDN)) thumbnail = "";
+	if (thumbnail.match(QUERY_URL_PATTERNS.DISCORD_CDN)) thumbnail = "";
 	const modal = new Djs.ModalBuilder()
 		.setCustomId("editAvatar")
 		.setTitle(ul("button.avatar.description"))

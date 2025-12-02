@@ -22,9 +22,9 @@ import {
 	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
-	COMPILED_PATTERNS,
 	capitalizeBetweenPunct,
 	logger,
+	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -606,7 +606,7 @@ export async function couldBeValidatedDiceAdd(
 			// Update files if an avatar reupload is needed
 			const userEmbed = getEmbeds(undefined, "user", embedsApplied);
 			const thumbnail = userEmbed?.data.thumbnail?.url;
-			if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+			if (thumbnail?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 				const res = await reuploadAvatar(
 					{
 						name: thumbnail.split("?")[0].split("/").pop() ?? "avatar.png",

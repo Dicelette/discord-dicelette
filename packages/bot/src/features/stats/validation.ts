@@ -28,8 +28,8 @@ import {
 	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
-	COMPILED_PATTERNS,
 	logger,
+	QUERY_URL_PATTERNS,
 	TotalExceededError,
 } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
@@ -88,7 +88,7 @@ export async function register(
 	const files = message.attachments.map(
 		(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 	);
-	if (thumbnail?.match(COMPILED_PATTERNS.DISCORD_CDN)) {
+	if (thumbnail?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 		const fileName = thumbnail.split("?")[0].split("/").pop() || "avatar.png";
 		const result = await reuploadAvatar({ name: fileName, url: thumbnail }, ul);
 		userEmbed.setThumbnail(result.name);

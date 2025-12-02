@@ -6,7 +6,7 @@ import {
 import type { EClient } from "@dicelette/client";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { COMPILED_PATTERNS, NoChannel, verifyAvatarUrl } from "@dicelette/utils";
+import { NoChannel, QUERY_URL_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
@@ -133,11 +133,11 @@ async function createFirstPage(
 	const avatar = interaction.fields.getUploadedFiles("avatarFile")?.first();
 	const files = [];
 	let avatarStr = "";
-	if (avatar?.contentType?.match(COMPILED_PATTERNS.VALID_EXTENSIONS)) {
+	if (avatar?.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS)) {
 		const avatarAttachment = new Djs.AttachmentBuilder(avatar.url, { name: avatar.name });
 		files.push(avatarAttachment);
 		avatarStr = `attachment://${avatarAttachment.name}`;
-	} else if (avatar && !avatar.contentType?.match(COMPILED_PATTERNS.VALID_EXTENSIONS))
+	} else if (avatar && !avatar.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS))
 		avatarStr = "error";
 
 	let sheetId = client.settings.get(interaction.guild!.id, "managerId");
