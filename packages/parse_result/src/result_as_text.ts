@@ -1,5 +1,10 @@
 import type { Compare, ComparedValue, CustomCritical, Resultat } from "@dicelette/core";
-import { AND, type CustomCriticalRoll, type Translation } from "@dicelette/types";
+import {
+	AND,
+	type CustomCriticalRoll,
+	IGNORE_COUNT_KEY,
+	type Translation,
+} from "@dicelette/types";
 import { evaluate } from "mathjs";
 import type { Server } from "./interfaces";
 import { createUrl, timestamp } from "./utils";
@@ -17,6 +22,8 @@ export class ResultAsText {
 	private readonly resultat?: Resultat;
 	private headerCompare?: ComparedValue;
 
+	private ignoreCount = "";
+
 	constructor(
 		result: Resultat | undefined,
 		data: Server,
@@ -30,6 +37,7 @@ export class ResultAsText {
 		this.infoRoll = infoRoll;
 		this.ul = ln(data.lang);
 		this.resultat = result;
+		this.ignoreCount = this.setIgnoreCount();
 		let parser = "";
 		if (!result) {
 			this.error = true;
@@ -94,6 +102,36 @@ export class ResultAsText {
 	private message(result: string, tot?: string | number) {
 		if (result.includes("◈")) tot = undefined;
 		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
+
+		// Vérifier si le dé original contient des parenthèses (notation dynamique)
+		if (this.resultat?.dice?.includes("(")) {
+			// Extraire l'expression dans les parenthèses et l'évaluer
+			const parenMatch = /\(([^)]+)\)/.exec(this.resultat.dice);
+			if (parenMatch) {
+				try {
+					const expression = parenMatch[1];
+					const evaluated = evaluate(expression);
+					// Construire le dé simplifié (ex: 1d13)
+					const simplifiedDice = this.resultat.dice.replace(
+						parenMatch[0],
+						evaluated.toString()
+					);
+					// Extraire la partie avant " ⟶" dans result (c'est le dé qui vient de core)
+					const arrowPos = result.indexOf(":");
+					if (arrowPos !== -1) {
+						const coreDice = result.substring(0, arrowPos);
+						// Remplacer "1d13" par "1d(8+5): 1d13" dans resultEdited
+						resultEdited = resultEdited.replace(
+							coreDice,
+							`\`${this.resultat.dice}\`: ${simplifiedDice}`
+						);
+					}
+				} catch (e) {
+					// Si l'évaluation échoue, on garde l'affichage original
+				}
+			}
+		}
+
 		if (!tot) resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, " = ` $1 `")}`;
 		else resultEdited = `${resultEdited.replaceAll(/ = (\S+)/g, `${tot}`)}`;
 		resultEdited = resultEdited.replaceAll("*", "\\*");
@@ -222,9 +260,7 @@ export class ResultAsText {
 
 	private naturalDice(r: string, natural: number[]) {
 		const naturalDice = r.matchAll(/\[(\d+)\]/gi);
-		for (const dice of naturalDice) {
-			natural.push(Number.parseInt(dice[1], 10));
-		}
+		for (const dice of naturalDice) natural.push(Number.parseInt(dice[1], 10));
 	}
 
 	private critical(
@@ -255,11 +291,10 @@ export class ResultAsText {
 				const valueToCompare = custom.onNaturalDice ? natural : total;
 				let success: unknown;
 
-				if (custom.onNaturalDice) {
+				if (custom.onNaturalDice)
 					success = natural.includes(Number.parseInt(custom.value, 10));
-				} else {
-					success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
-				}
+				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
+
 				if (success) {
 					return {
 						isCritical: "custom",
@@ -329,6 +364,19 @@ export class ResultAsText {
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
 
+	private setIgnoreCount() {
+		if (this.resultat?.comment?.includes(IGNORE_COUNT_KEY.key))
+			return ` ${IGNORE_COUNT_KEY.emoji} `;
+		return "";
+	}
+
+	private removeIgnore() {
+		const haveCompare = this.headerCompare ?? this.resultat?.compare;
+		if (haveCompare && this.resultat?.comment)
+			return this.resultat.comment.replace(IGNORE_COUNT_KEY.key, "").trim();
+		return this.resultat?.comment;
+	}
+
 	private comment(interaction?: boolean): string {
 		const extractRegex = /%%(.*)%%/;
 		const extractorInfo = extractRegex.exec(this.resultat!.comment || "");
@@ -338,6 +386,7 @@ export class ResultAsText {
 			info = `${extractorInfo[1]} `;
 			this.resultat!.comment = this.resultat!.comment?.replace(extractRegex, "").trim();
 		}
+		this.resultat!.comment = this.removeIgnore();
 		return this.resultat!.comment
 			? `${info}*${this.resultat!.comment.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
 					.replaceAll("×", "*")
@@ -389,15 +438,15 @@ export class ResultAsText {
 	): string {
 		const regexForFormulesDices = /^[✕✓]/;
 
-		if (isCritical === "failure") {
+		if (isCritical === "failure")
 			return res.replace("✕", `**${this.ul("roll.critical.failure")}** —`);
-		}
-		if (isCritical === "success") {
+
+		if (isCritical === "success")
 			return res.replace("✓", `**${this.ul("roll.critical.success")}** —`);
-		}
-		if (isCritical === "custom") {
+
+		if (isCritical === "custom")
 			return res.replace(regexForFormulesDices, `${successOrFailure} —`);
-		}
+
 		return res
 			.replace("✕", `**${this.ul("roll.failure")}** —`)
 			.replace("✓", `**${this.ul("roll.success")}** —`);
@@ -480,9 +529,8 @@ export class ResultAsText {
 		// Display only the comparison next to the username
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
-		if (header) {
-			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
-		}
+		if (header)
+			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)${this.ignoreCount}`;
 
 		const headerLine = `${mention}${compareHint}${timestamp(this.data.config?.timestamp)}`;
 		const infoLine = this.infoRoll ? `\n[__${this.infoRoll.name.capitalize()}__] ` : "\n";

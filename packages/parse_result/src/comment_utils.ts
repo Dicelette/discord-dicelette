@@ -60,6 +60,11 @@ export function extractAndMergeComments(
 	let cleaned = dice
 		.replace(/%%\[__.*?__]%%/g, "")
 		.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
+		// In certains cas, des marqueurs vides peuvent laisser des "%%%%" résiduels
+		// qui cassent le parseur de dés. On les supprime proprement.
+		.replace(/%{4,}/g, "")
+		// Et on normalise les occurrences de "%%" isolées entourées d'espaces éventuels
+		.replace(/\s*%%+\s*/g, " ")
 		.trim();
 
 	// Handle dice message format extraction

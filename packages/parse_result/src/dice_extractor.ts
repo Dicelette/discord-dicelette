@@ -110,7 +110,14 @@ export function performDiceRoll(
 			rollContent = res.formula;
 			infoRoll = res.infoRoll;
 		}
-		rollContent = rollContent.replace(/ @\w+/, "").trimEnd();
+		// Nettoyage des marqueurs/commentaires avant le parseur de dés
+		rollContent = rollContent
+			.replace(/%%\[__.*?__]%%/g, "")
+			.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
+			.replace(/%{4,}/g, "")
+			.replace(/\s*%%+\s*/g, " ")
+			.replace(/ @\w+/, "")
+			.trimEnd();
 		return { infoRoll, resultat: roll(rollContent) };
 	} catch (e) {
 		logger.warn(e);

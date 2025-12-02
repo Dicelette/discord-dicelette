@@ -84,4 +84,16 @@ describe("custom critical roll", () => {
 		const text = res.defaultMessage();
 		expect(text).toContain("test");
 	});
+	it("should display dynamic dice notation with parentheses", () => {
+		const result: Resultat = {
+			dice: "1d(8+5)",
+			result: "1d13: [7] = 7",
+			total: 7,
+		};
+		const res = new ResultAsText(result, DATA);
+		const text = res.defaultMessage();
+		expect(text).toContain("1d(8+5)");
+		expect(text).toContain("1d13");
+		expect(text).toContain("[7]");
+	});
 });
