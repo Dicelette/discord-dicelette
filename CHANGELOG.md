@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.1](https://github.com/Dicelette/discord-dicelette/compare/2.23.0...2.23.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* comments deleted when an user data is send ([3fbc339](https://github.com/Dicelette/discord-dicelette/commit/3fbc33983b362d36ddca20c964b119a392980243))
+* crash /multiple error even when skip = true ([202fc4c](https://github.com/Dicelette/discord-dicelette/commit/202fc4c7a0c07c7bb1a780c1527ab5761304eb2e))
+* empty comments ([b20b96f](https://github.com/Dicelette/discord-dicelette/commit/b20b96fdea13e4d987f306e1b91b8d1db7110372))
+* handle dice with () and comments ([ea8b9ca](https://github.com/Dicelette/discord-dicelette/commit/ea8b9ca03a73e4d194882aac693afcd500f161e1))
+
 ## [2.23.0](https://github.com/Dicelette/discord-dicelette/compare/2.22.3...2.23.0) (2025-12-02)
 
 
