@@ -443,7 +443,7 @@ export class ResultAsText {
 			// Inject stat name for shared rolls next to ※ or ◈ symbols
 			if (this.statsPerSegment && this.statsPerSegment.length > 0) {
 				const hasSharedSymbol = res.match(/^[※◈]/);
-				if (hasSharedSymbol) {
+				if (hasSharedSymbol && segmentIndex < this.statsPerSegment.length) {
 					const statName = this.statsPerSegment[segmentIndex];
 					if (statName && statName.length > 0) {
 						// Replace the symbol with symbol + stat name

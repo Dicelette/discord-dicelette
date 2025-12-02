@@ -333,7 +333,9 @@ export function replaceStatsInDiceFormula(
 	const statsPerSegment: string[] = [];
 
 	if (isSharedRoll) {
-		// Split by ; but keep the ; in the result for proper reconstruction
+		// Split by ; using lookahead/lookbehind to preserve the delimiter
+		// (?=;) matches position before ;, (?<=;) matches position after ;
+		// This results in [segment1, ";", segment2, ";", ...] after filtering empty strings
 		const segments = diceFormula.split(/(?=;)|(?<=;)/).filter((s) => s.length > 0);
 		const processedSegments: string[] = [];
 
@@ -375,12 +377,13 @@ export function replaceStatsInDiceFormula(
 			// Track the stat for this segment (use first stat if multiple, or empty string)
 			if (segment !== ";") {
 				const uniqueSegmentStats = Array.from(new Set(segmentStats));
-				const statForSegment =
-					uniqueSegmentStats.length > 0
-						? statsName
-							? unNormalizeStatsName(uniqueSegmentStats, statsName)[0]
-							: uniqueSegmentStats[0]
-						: "";
+				let statForSegment = "";
+				if (uniqueSegmentStats.length > 0) {
+					// If statsName is provided, try to restore original casing
+					statForSegment = statsName
+						? unNormalizeStatsName(uniqueSegmentStats, statsName)[0]
+						: uniqueSegmentStats[0];
+				}
 				statsPerSegment.push(statForSegment);
 			}
 		}
