@@ -372,8 +372,11 @@ export class ResultAsText {
 
 	private removeIgnore() {
 		const haveCompare = this.headerCompare ?? this.resultat?.compare;
-		if (haveCompare && this.resultat?.comment)
-			return this.resultat.comment.replace(IGNORE_COUNT_KEY.key, "").trim();
+		if (haveCompare && this.resultat?.comment) {
+			const com = this.resultat.comment.replace(IGNORE_COUNT_KEY.key, "").trim();
+			if (com.trimAll() === "#") return undefined;
+			return com;
+		}
 		return this.resultat?.comment;
 	}
 
