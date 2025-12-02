@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.4](https://github.com/Dicelette/discord-dicelette/compare/2.24.3...2.24.4) (2025-12-02)
+
 ## [2.24.3](https://github.com/Dicelette/discord-dicelette/compare/2.24.2...2.24.3) (2025-12-02)
 
 ## [2.24.2](https://github.com/Dicelette/discord-dicelette/compare/2.24.1...2.24.2) (2025-12-02)
