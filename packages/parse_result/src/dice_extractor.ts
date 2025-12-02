@@ -93,23 +93,11 @@ export function processChainedComments(
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
-	userData?: UserData,
-	statsName?: string[]
+	infoRoll?: string
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
-		let infoRoll: string | undefined;
-		if (userData?.stats) {
-			const res = replaceStatsInDiceFormula(
-				rollContent,
-				userData.stats,
-				true,
-				undefined,
-				statsName
-			);
-			rollContent = res.formula;
-			infoRoll = res.infoRoll;
-		}
+
 		// Nettoyage des marqueurs/commentaires avant le parseur de dés
 		rollContent = rollContent
 			.replace(/%%\[__.*?__]%%/g, "")
@@ -198,7 +186,10 @@ export function isRolling(
 	);
 	if (reg?.groups) content = content.replace(reg.groups.second, "").trim();
 
-	let res = { formula: content };
+	let res: { formula: string; infoRoll?: string | undefined } = {
+		formula: content,
+		infoRoll: undefined,
+	};
 	if (userData?.stats)
 		res = replaceStatsInDiceFormula(
 			content,
@@ -213,12 +204,7 @@ export function isRolling(
 
 	if (diceData.bracketRoll) {
 		const cleanedForRoll = processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const diceRoll = performDiceRoll(
-			cleanedForRoll,
-			diceData.bracketRoll,
-			userData,
-			statsName
-		);
+		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, res?.infoRoll);
 		if (diceRoll?.resultat)
 			return {
 				detectRoll: diceData.bracketRoll,
@@ -232,7 +218,7 @@ export function isRolling(
 		(processedContent.includes("&") && processedContent.includes(";"))
 	) {
 		const diceRoll = processChainedDiceRoll(
-			processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
+			content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
 			userData,
 			statsName
 		);
@@ -255,7 +241,7 @@ export function isRolling(
 
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(finalContent, undefined, userData, statsName);
+		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return { detectRoll: undefined, result: diceRoll.resultat };
@@ -323,6 +309,7 @@ export function replaceStatsInDiceFormula(
 	const variableMatches = [
 		...processedFormula.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER),
 	];
+	if (!variableMatches.length) return { formula: content };
 
 	// Pre-process stats for better performance
 	const normalizedStats = new Map<string, [string, number]>();
