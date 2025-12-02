@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.2](https://github.com/Dicelette/discord-dicelette/compare/2.24.1...2.24.2) (2025-12-02)
+
+
+### Bug Fixes
+
+* regression with parenthesis ([d26e94f](https://github.com/Dicelette/discord-dicelette/commit/d26e94f172bacf6111f3196e191b773c89400ba1))
+
 ## [2.24.1](https://github.com/Dicelette/discord-dicelette/compare/2.24.0...2.24.1) (2025-12-02)
 
 
