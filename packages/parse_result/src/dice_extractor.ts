@@ -358,9 +358,17 @@ export function replaceStatsInDiceFormula(
 			? ` %%[__${statsList}__]%% ${comments} `
 			: ` %%[__${statsList}__]%% `;
 		if (shared) comments = `#${comments}`;
+	} else comments = comments ? ` ${comments} ` : "";
+
+	// deleteComments = true : ne pas ajouter le marqueur %%[__Stats__]%%, mais préserver les commentaires originaux
+	if (deleteComments) {
+		const originalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3] || "";
+		const finalFormula = originalComments
+			? `${processedFormula} ${originalComments}`.trim()
+			: processedFormula;
+		return { formula: finalFormula, infoRoll: uniqueStats?.[0] };
 	}
-	if (deleteComments) return { formula: processedFormula, infoRoll: uniqueStats[0] };
-	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats[0] };
+	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats?.[0] };
 }
 
 export function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {
