@@ -106,8 +106,11 @@ export class ResultAsText {
 		return createUrl(this.ul, context, logUrl);
 	}
 	private parseParenthesis(resultEdited: string) {
-		// Detect dynamic dice from the original dice input, not the current edited segment
-		// because the segment may have already been simplified
+		// Early exits for performance
+		const arrowPos = resultEdited.indexOf(" ⟶");
+		if (arrowPos === -1) return resultEdited;
+
+		// Detect dynamic dice from the original dice input
 		const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(this.resultat!.dice);
 		if (!diceMatch) return resultEdited;
 
@@ -120,103 +123,67 @@ export class ResultAsText {
 			const evaluated = evaluate(expression);
 			const simplifiedDice = diceOnly.replace(parenMatch[0], evaluated.toString());
 
-			// Work on the segment before the arrow only, but preserve leading shared symbols/text
-			const arrowPos = resultEdited.indexOf(" ⟶");
-			if (arrowPos === -1) return resultEdited;
-
 			const beforeArrow = resultEdited.substring(0, arrowPos);
-			const afterArrow = resultEdited.substring(arrowPos); // keep arrow and what follows
+			const afterArrow = resultEdited.substring(arrowPos);
 
-			// Detect if the segment contains comparison/operators outside the dynamic dice before the arrow (shared compare line)
-			let hasComparison = false;
-			// Check if the original dice (diceOnly) appears in beforeArrow
+			// Single pass to find dice position
 			const dicePos = beforeArrow.indexOf(diceOnly);
-			// If original dice not found, check for simplified dice (meaning it was already replaced)
-			const simplifiedPos =
-				dicePos === -1 ? beforeArrow.indexOf(simplifiedDice) : dicePos;
+			const simplifiedPos = dicePos === -1 ? beforeArrow.indexOf(simplifiedDice) : -1;
+			const foundPos = dicePos !== -1 ? dicePos : simplifiedPos;
+			const foundDice = dicePos !== -1 ? diceOnly : simplifiedDice;
 
-			if (simplifiedPos !== -1) {
-				// Check the tail after the dice expression for operators
-				const tail = beforeArrow.substring(
-					simplifiedPos + (dicePos !== -1 ? diceOnly.length : simplifiedDice.length)
-				);
-				hasComparison = /[<>]=?|!?==|[+\-*/]/.test(tail);
-			} else {
-				// If we cannot locate either dice, fallback to the generic check
-				hasComparison = /[<>]=?|!?==|[+\-*/]/.test(beforeArrow.replace(/`/g, ""));
-			}
+			// Check for comparison operators
+			const hasComparison =
+				foundPos !== -1
+					? PARSE_RESULT_PATTERNS.mathsSigns.test(
+							beforeArrow.substring(foundPos + foundDice.length)
+						)
+					: PARSE_RESULT_PATTERNS.mathsSigns.test(beforeArrow.replace(/`/g, ""));
 
 			if (hasComparison) {
-				// For compare lines: replace original dynamic dice with simplified dice
-				// Detect if this is a shared compare line by checking if it's part of a multi-segment result
-				// and contains a formula dice symbol (✓, ✕, etc.)
+				// Cache multi-segment check
 				const isMultiSegment = (this.resultat?.result || "").includes(";");
-				const hasFormulaSymbol = /[✓✕◈※]/.test(beforeArrow);
-				const isSharedCompareLine = isMultiSegment && hasFormulaSymbol;
+				const isSharedCompareLine =
+					isMultiSegment && PARSE_RESULT_PATTERNS.allSharedSymbols.test(beforeArrow);
 
 				if (isSharedCompareLine) {
-					// Replace the original dice with simplified dice in the entry portion
-					let updatedBefore = beforeArrow.replace(diceOnly, simplifiedDice);
-					// If original wasn't found but simplified is there, it's already correct
-					if (dicePos === -1 && simplifiedPos !== -1) {
-						updatedBefore = beforeArrow; // already simplified
-					}
-					// Also replace in the afterArrow part (for bracketed expressions like [1d(55+5)])
+					// Only replace if diceOnly is found, otherwise already simplified
+					const updatedBefore =
+						dicePos !== -1 ? beforeArrow.replace(diceOnly, simplifiedDice) : beforeArrow;
 					const updatedAfter = afterArrow.replaceAll(diceOnly, simplifiedDice);
-					resultEdited = `${updatedBefore}${updatedAfter}`;
-				} else {
-					// For non-shared compare lines, keep original notation
-					resultEdited = `${beforeArrow}${afterArrow}`;
+					return `${updatedBefore}${updatedAfter}`;
 				}
-			} else {
-				// For simple result lines: show mapping `original` | simplified, but do not remove shared symbols
-				// Identify leading prefix like "※ ", "◈ ... — " and keep it intact
-				const sharedPrefixMatch = beforeArrow.match(/^(?:※\s|◈\s[^—]+—\s)?/);
-				const prefix = sharedPrefixMatch ? sharedPrefixMatch[0] : "";
-				const core = beforeArrow.substring(prefix.length);
-
-				// Determine if this is a shared roll context (with ※ symbol or multi-segment)
-				const isSharedContext =
-					prefix.includes("※") || (this.resultat?.result || "").includes(";");
-
-				// Use pipe mapping
-				let mappedCore = core;
-				if (core.includes(diceOnly)) {
-					// Original dice found, replace with mapping
-					if (isSharedContext) {
-						mappedCore = core.replace(diceOnly, `\`${diceOnly}\` | ${simplifiedDice}`);
-					} else {
-						// For non-shared simple rolls, use backticks around both with pipe and spaces
-						mappedCore = core.replace(
-							diceOnly,
-							`\`${diceOnly}\` | \`${simplifiedDice}\``
-						);
-					}
-				} else if (core.includes(simplifiedDice)) {
-					// Simplified dice found (already replaced), prepend original in mapping
-					if (isSharedContext)
-						mappedCore = core.replace(
-							simplifiedDice,
-							`\`${diceOnly}\` | ${simplifiedDice}`
-						);
-					else
-						mappedCore = core.replace(
-							simplifiedDice,
-							`\`${diceOnly}\` | \`${simplifiedDice}\``
-						);
-				} else {
-					// Neither found, inject mapping at the beginning of core
-					if (isSharedContext) mappedCore = `\`${diceOnly}\` | ${simplifiedDice}`;
-					else mappedCore = `\`${diceOnly}\` | \`${simplifiedDice}\``;
-				}
-				resultEdited = `${prefix}${mappedCore}${afterArrow}`;
+				return resultEdited; // Keep original for non-shared compare lines
 			}
-		} catch (e) {
-			// If evaluation fails, keep original result
-			logger.warn("Failed to evaluate dynamic dice expression:", e);
-		}
 
-		return resultEdited;
+			// Simple result lines: show mapping
+			const sharedPrefixMatch = beforeArrow.match(PARSE_RESULT_PATTERNS.beforeArrow);
+			const prefix = sharedPrefixMatch ? sharedPrefixMatch[0] : "";
+			const core = beforeArrow.substring(prefix.length);
+
+			// Determine shared context once
+			const isSharedContext =
+				prefix.includes("※") || (this.resultat?.result || "").includes(";");
+
+			// Build mapping based on what's found in core
+			let mappedCore: string;
+			const mapping = isSharedContext
+				? `\`${diceOnly}\` | ${simplifiedDice}`
+				: `\`${diceOnly}\` | \`${simplifiedDice}\``;
+
+			if (core.includes(diceOnly)) {
+				mappedCore = core.replace(diceOnly, mapping);
+			} else if (core.includes(simplifiedDice)) {
+				mappedCore = core.replace(simplifiedDice, mapping);
+			} else {
+				mappedCore = mapping;
+			}
+
+			return `${prefix}${mappedCore}${afterArrow}`;
+		} catch (e) {
+			logger.warn("Failed to evaluate dynamic dice expression:", e);
+			return resultEdited;
+		}
 	}
 	private message(result: string, tot?: string | number) {
 		if (result.includes("◈")) tot = undefined;

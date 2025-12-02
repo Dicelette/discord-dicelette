@@ -41,11 +41,14 @@ export const REMOVER_PATTERN = {
 } as const;
 
 export const PARSE_RESULT_PATTERNS = {
+	allSharedSymbols: /[✓✕◈※]/,
+	beforeArrow: /^(?:※\s|◈\s[^—]+—\s)?/,
 	commentBracket: /\[([^\]]+)\]/,
 	diceResultPattern: /(?<entry>\S+) ⟶ (?<calc>.*) =/,
 	dynamicDice: /(\d+d\([^)]+\))/,
 	extractInfo: /%%(.*)%%/,
 	formulaDiceSymbols: /^[✕✓]/,
+	mathsSigns: /[<>]=?|!?==|[+\-*/]/,
 	naturalDice: /\[(\d+)\]/gi,
 	parenExpression: /\(([^)]+)\)/,
 	resultEquals: / = (\S+)/g,
