@@ -129,10 +129,11 @@ export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
 	statsName?: string[]
-): { resultat: Resultat; infoRoll?: string } | undefined {
+): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
 	let infoRoll: string | undefined;
+	let statsPerSegment: string[] | undefined;
 	if (userData?.stats) {
 		const res = replaceStatsInDiceFormula(
 			content,
@@ -143,6 +144,7 @@ export function processChainedDiceRoll(
 		);
 		processedContent = res.formula;
 		infoRoll = res.infoRoll;
+		statsPerSegment = res.statsPerSegment;
 	}
 
 	const globalComments = getComments(content);
@@ -165,7 +167,7 @@ export function processChainedDiceRoll(
 		const hasHashComment = content.includes("#");
 		if (globalComments && (!isChainedRoll || hasHashComment))
 			rollResult.comment = globalComments;
-		return { infoRoll, resultat: rollResult };
+		return { infoRoll, resultat: rollResult, statsPerSegment };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -186,9 +188,14 @@ export function isRolling(
 	);
 	if (reg?.groups) content = content.replace(reg.groups.second, "").trim();
 
-	let res: { formula: string; infoRoll?: string | undefined } = {
+	let res: {
+		formula: string;
+		infoRoll?: string | undefined;
+		statsPerSegment?: string[];
+	} = {
 		formula: content,
 		infoRoll: undefined,
+		statsPerSegment: undefined,
 	};
 	if (userData?.stats)
 		res = replaceStatsInDiceFormula(
@@ -210,6 +217,7 @@ export function isRolling(
 				detectRoll: diceData.bracketRoll,
 				infoRoll: diceRoll.infoRoll,
 				result: diceRoll.resultat,
+				statsPerSegment: res.statsPerSegment,
 			};
 	}
 
@@ -227,6 +235,7 @@ export function isRolling(
 				detectRoll: undefined,
 				infoRoll: diceRoll.infoRoll,
 				result: diceRoll.resultat,
+				statsPerSegment: diceRoll.statsPerSegment,
 			};
 	}
 	if (hasValidDice(diceData)) {
@@ -244,7 +253,11 @@ export function isRolling(
 		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
-		return { detectRoll: undefined, result: diceRoll.resultat };
+		return {
+			detectRoll: undefined,
+			result: diceRoll.resultat,
+			statsPerSegment: res.statsPerSegment,
+		};
 	}
 
 	return undefined;
@@ -287,6 +300,7 @@ export function getRoll(dice: string): Resultat | undefined {
 /**
  * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
  * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
+ * For shared rolls (with ;), returns statsPerSegment to track which stat applies to each segment
  */
 export function replaceStatsInDiceFormula(
 	content: string,
@@ -294,7 +308,7 @@ export function replaceStatsInDiceFormula(
 	deleteComments = false,
 	shared = false,
 	statsName?: string[]
-): { formula: string; infoRoll?: string } {
+): { formula: string; infoRoll?: string; statsPerSegment?: string[] } {
 	if (!stats) return { formula: content };
 	//remove secondary opposition
 
@@ -304,13 +318,6 @@ export function replaceStatsInDiceFormula(
 	if (comments) diceFormula = diceFormula.replace(comments, "").trim() ?? "";
 	else comments = "";
 
-	let processedFormula = diceFormula;
-
-	const variableMatches = [
-		...processedFormula.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER),
-	];
-	if (!variableMatches.length) return { formula: content };
-
 	// Pre-process stats for better performance
 	const normalizedStats = new Map<string, [string, number]>();
 	for (const [key, value] of Object.entries(stats)) {
@@ -318,21 +325,89 @@ export function replaceStatsInDiceFormula(
 		normalizedStats.set(normalized, [key, value]);
 	}
 
-	for (const match of variableMatches) {
-		const fullMatch = match[0];
-		const searchTerm = match[1].standardize();
+	// Check if this is a shared roll (contains ;)
+	const isSharedRoll = diceFormula.includes(";");
 
-		if (!processedFormula.includes(fullMatch)) continue;
+	// For shared rolls, process each segment separately to track stats per segment
+	let processedFormula = diceFormula;
+	const statsPerSegment: string[] = [];
 
-		// Use the generic helper to find the best match (exact or partial)
-		const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats);
+	if (isSharedRoll) {
+		// Split by ; but keep the ; in the result for proper reconstruction
+		const segments = diceFormula.split(/(?=;)|(?<=;)/).filter((s) => s.length > 0);
+		const processedSegments: string[] = [];
 
-		if (foundStat) {
-			const [original, statValue] = foundStat;
-			statsFounds.push(original.capitalize());
-			const escapedMatch = fullMatch.replace(/\$/g, "\\$");
-			const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
-			processedFormula = processedFormula.replace(regex, statValue.toString());
+		for (const segment of segments) {
+			if (segment === ";") {
+				processedSegments.push(segment);
+				continue;
+			}
+
+			let processedSegment = segment;
+			const segmentStats: string[] = [];
+
+			const variableMatches = [...segment.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER)];
+
+			for (const match of variableMatches) {
+				const fullMatch = match[0];
+				const searchTerm = match[1].standardize();
+
+				if (!processedSegment.includes(fullMatch)) continue;
+
+				const foundStat = findBestStatMatch<[string, number]>(
+					searchTerm,
+					normalizedStats
+				);
+
+				if (foundStat) {
+					const [original, statValue] = foundStat;
+					const capitalizedStat = original.capitalize();
+					segmentStats.push(capitalizedStat);
+					statsFounds.push(capitalizedStat);
+					const escapedMatch = fullMatch.replace(/\$/g, "\\$");
+					const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
+					processedSegment = processedSegment.replace(regex, statValue.toString());
+				}
+			}
+
+			processedSegments.push(processedSegment);
+
+			// Track the stat for this segment (use first stat if multiple, or empty string)
+			if (segment !== ";") {
+				const uniqueSegmentStats = Array.from(new Set(segmentStats));
+				const statForSegment =
+					uniqueSegmentStats.length > 0
+						? statsName
+							? unNormalizeStatsName(uniqueSegmentStats, statsName)[0]
+							: uniqueSegmentStats[0]
+						: "";
+				statsPerSegment.push(statForSegment);
+			}
+		}
+
+		processedFormula = processedSegments.join("");
+	} else {
+		// Non-shared roll: process as before
+		const variableMatches = [
+			...processedFormula.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER),
+		];
+		if (!variableMatches.length) return { formula: content };
+
+		for (const match of variableMatches) {
+			const fullMatch = match[0];
+			const searchTerm = match[1].standardize();
+
+			if (!processedFormula.includes(fullMatch)) continue;
+
+			const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats);
+
+			if (foundStat) {
+				const [original, statValue] = foundStat;
+				statsFounds.push(original.capitalize());
+				const escapedMatch = fullMatch.replace(/\$/g, "\\$");
+				const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
+				processedFormula = processedFormula.replace(regex, statValue.toString());
+			}
 		}
 	}
 
@@ -353,9 +428,17 @@ export function replaceStatsInDiceFormula(
 		const finalFormula = originalComments
 			? `${processedFormula} ${originalComments}`.trim()
 			: processedFormula;
-		return { formula: finalFormula, infoRoll: uniqueStats?.[0] };
+		return {
+			formula: finalFormula,
+			infoRoll: uniqueStats?.[0],
+			statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
+		};
 	}
-	return { formula: `${processedFormula} ${comments}`, infoRoll: uniqueStats?.[0] };
+	return {
+		formula: `${processedFormula} ${comments}`,
+		infoRoll: uniqueStats?.[0],
+		statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
+	};
 }
 
 export function unNormalizeStatsName(stats: string[], statsName: string[]): string[] {

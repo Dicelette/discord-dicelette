@@ -8,6 +8,8 @@ export interface DiceExtractionResult {
 	result: Resultat;
 	detectRoll: string | undefined;
 	infoRoll?: string;
+	/** Stats names per segment for shared rolls (e.g., ['Dext', 'Force'] for `1d100+$dext;&+$force`) */
+	statsPerSegment?: string[];
 }
 
 /**
@@ -36,4 +38,6 @@ export type RollOptions = {
 	customCritical?: Record<string, CustomCritical> | undefined;
 	opposition?: ComparedValue;
 	silent?: boolean;
+	/** Stats names per segment for shared rolls (e.g., ['Dext', 'Force'] for `1d100+$dext;&+$force`) */
+	statsPerSegment?: string[];
 };

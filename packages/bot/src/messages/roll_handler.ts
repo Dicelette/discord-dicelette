@@ -34,6 +34,8 @@ interface RollHandlerOptions {
 	user?: Djs.User;
 	/** Link to logs message URL */
 	logUrl?: string;
+	/** Stats names per segment for shared rolls (e.g., ['Dext', 'Force'] for `1d100+$dext;&+$force`) */
+	statsPerSegment?: string[];
 }
 
 /**
@@ -63,6 +65,7 @@ export async function handleRollResult(
 		client,
 		user,
 		logUrl,
+		statsPerSegment,
 	} = opts;
 
 	const resultAsText = new ResultAsText(
@@ -74,7 +77,8 @@ export async function handleRollResult(
 			? { name: infoRoll, standardized: infoRoll.standardize() }
 			: infoRoll,
 		criticalsFromDice,
-		opposition
+		opposition,
+		statsPerSegment
 	);
 
 	const parser = resultAsText.parser;

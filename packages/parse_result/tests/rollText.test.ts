@@ -97,3 +97,49 @@ describe("custom critical roll", () => {
 		expect(text).toContain("[7]");
 	});
 });
+
+describe("shared roll with statsPerSegment", () => {
+	it("should display stat names next to symbols for shared rolls", () => {
+		// Simulating the result of a shared roll: 1d100+$dext;&+$force
+		// Where dext=40 and force=5
+		const result: Resultat = {
+			dice: "1d100+40;&+5",
+			result: "※ 1d100+40: [13]+40 = 53;◈ [1d100+40]+5: [53]+5 = 58",
+			total: 111,
+		};
+
+		const statsPerSegment = ["Dext", "Force"];
+		const res = new ResultAsText(
+			result,
+			DATA,
+			undefined,
+			undefined,
+			{ name: "Dext", standardized: "dext" },
+			undefined,
+			undefined,
+			statsPerSegment
+		);
+		const text = res.defaultMessage();
+		// Should contain stat names next to symbols
+		expect(text).toContain("__Dext__");
+		expect(text).toContain("__Force__");
+		// Should not display global infoRoll at the top
+		expect(text).not.toContain("[__Dext__]");
+	});
+
+	it("should not display stat names for non-shared rolls", () => {
+		const result: Resultat = {
+			dice: "1d100+40",
+			result: "1d100+40: [13]+40 = 53",
+			total: 53,
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, {
+			name: "Dext",
+			standardized: "dext",
+		});
+		const text = res.defaultMessage();
+		// Should display global infoRoll at the top
+		expect(text).toContain("[__Dext__]");
+	});
+});

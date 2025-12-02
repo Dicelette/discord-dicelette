@@ -61,7 +61,7 @@ export default (client: EClient): void => {
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);
-			const { result, detectRoll, infoRoll } = isRoll;
+			const { result, detectRoll, infoRoll, statsPerSegment } = isRoll;
 			const deleteInput = !detectRoll;
 			if (!result) return;
 			const { criticalsFromDice, serverData } = await getCritical(
@@ -93,6 +93,7 @@ export default (client: EClient): void => {
 				result,
 				serverCritical: serverData?.critical,
 				source: message,
+				statsPerSegment,
 				ul,
 			});
 			return;

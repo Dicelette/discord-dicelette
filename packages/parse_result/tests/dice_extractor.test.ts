@@ -7,6 +7,7 @@ import {
 	isRolling,
 	performDiceRoll,
 	processChainedComments,
+	replaceStatsInDiceFormula,
 } from "../src/dice_extractor";
 
 describe("dice_extractor", () => {
@@ -240,6 +241,66 @@ describe("dice_extractor", () => {
 			expect(result).toBeDefined();
 			expect(result!.result).toBeDefined();
 			expect(result!.result.dice).toContain("1d100");
+		});
+	});
+
+	describe("replaceStatsInDiceFormula", () => {
+		it("should replace stat variables in formula", () => {
+			const content = "1d100+$dext";
+			const stats = { dext: 40 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.formula).toContain("1d100+40");
+			expect(result.infoRoll).toBe("Dext");
+		});
+
+		it("should track stats per segment for shared rolls", () => {
+			const content = "1d100+$dext;&+$force";
+			const stats = { dext: 40, force: 5 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.formula).toContain("1d100+40;&+5");
+			expect(result.statsPerSegment).toBeDefined();
+			expect(result.statsPerSegment).toHaveLength(2);
+			expect(result.statsPerSegment![0]).toBe("Dext");
+			expect(result.statsPerSegment![1]).toBe("Force");
+		});
+
+		it("should return undefined statsPerSegment for non-shared rolls", () => {
+			const content = "1d100+$dext";
+			const stats = { dext: 40 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.statsPerSegment).toBeUndefined();
+		});
+
+		it("should handle shared rolls with only one stat", () => {
+			const content = "1d100+$dext;&+5";
+			const stats = { dext: 40 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.formula).toContain("1d100+40;&+5");
+			expect(result.statsPerSegment).toBeDefined();
+			expect(result.statsPerSegment).toHaveLength(2);
+			expect(result.statsPerSegment![0]).toBe("Dext");
+			expect(result.statsPerSegment![1]).toBe(""); // No stat for second segment
+		});
+
+		it("should handle shared rolls with multiple segments", () => {
+			const content = "1d100+$str;&+$dex;&+$con";
+			const stats = { con: 12, dex: 15, str: 10 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.formula).toContain("1d100+10;&+15;&+12");
+			expect(result.statsPerSegment).toHaveLength(3);
+			expect(result.statsPerSegment![0]).toBe("Str");
+			expect(result.statsPerSegment![1]).toBe("Dex");
+			expect(result.statsPerSegment![2]).toBe("Con");
 		});
 	});
 });

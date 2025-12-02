@@ -21,6 +21,7 @@ export class ResultAsText {
 	private readonly infoRoll?: { name: string; standardized: string };
 	private readonly resultat?: Resultat;
 	private headerCompare?: ComparedValue;
+	private readonly statsPerSegment?: string[];
 
 	private ignoreCount = "";
 
@@ -31,13 +32,15 @@ export class ResultAsText {
 		charName?: string,
 		infoRoll?: { name: string; standardized: string },
 		customCritical?: Record<string, CustomCritical>,
-		opposition?: ComparedValue
+		opposition?: ComparedValue,
+		statsPerSegment?: string[]
 	) {
 		this.data = data;
 		this.infoRoll = infoRoll;
 		this.ul = ln(data.lang);
 		this.resultat = result;
 		this.ignoreCount = this.setIgnoreCount();
+		this.statsPerSegment = statsPerSegment;
 		let parser = "";
 		if (!result) {
 			this.error = true;
@@ -78,7 +81,10 @@ export class ResultAsText {
 			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
 		}
 		if (user.trim().length > 0) user += `${this.ul("common.space")}${compareHint}:\n`;
-		if (this.infoRoll) return `${user}[__${this.infoRoll.name.capitalize()}__] `;
+		// For shared rolls with statsPerSegment, don't show global infoRoll
+		// as stat names are displayed per segment next to ※/◈ symbols
+		if (this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0))
+			return `${user}[__${this.infoRoll.name.capitalize()}__] `;
 		return user;
 	}
 	logUrl(url?: string) {
@@ -412,6 +418,7 @@ export class ResultAsText {
 		const dicesResult = /(?<entry>\S+) ⟶ (?<calc>.*) =/;
 		const splitted = msgSuccess.split("\n");
 		const finalRes = [];
+		let segmentIndex = 0;
 
 		for (let res of splitted) {
 			const matches = dicesResult.exec(res);
@@ -432,6 +439,20 @@ export class ResultAsText {
 				criticalState.isCritical,
 				criticalState.successOrFailure
 			);
+
+			// Inject stat name for shared rolls next to ※ or ◈ symbols
+			if (this.statsPerSegment && this.statsPerSegment.length > 0) {
+				const hasSharedSymbol = res.match(/^[※◈]/);
+				if (hasSharedSymbol) {
+					const statName = this.statsPerSegment[segmentIndex];
+					if (statName && statName.length > 0) {
+						// Replace the symbol with symbol + stat name
+						res = res.replace(/^([※◈])/, `$1 __${statName}__ —`);
+					}
+					segmentIndex++;
+				}
+			}
+
 			finalRes.push(res.trimStart());
 		}
 		return finalRes;
@@ -539,7 +560,13 @@ export class ResultAsText {
 			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)${this.ignoreCount}`;
 
 		const headerLine = `${mention}${compareHint}${timestamp(this.data.config?.timestamp)}`;
-		const infoLine = this.infoRoll ? `\n[__${this.infoRoll.name.capitalize()}__] ` : "\n";
+		// For shared rolls with statsPerSegment, don't show global infoRoll
+		// as stat names are displayed per segment next to ※/◈ symbols
+		const showGlobalInfoRoll =
+			this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0);
+		const infoLine = showGlobalInfoRoll
+			? `\n[__${this.infoRoll!.name.capitalize()}__] `
+			: "\n";
 		return `${headerLine}${infoLine}${this.parser}${linkToOriginal}`;
 	}
 
