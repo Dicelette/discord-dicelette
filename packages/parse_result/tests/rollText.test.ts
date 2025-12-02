@@ -143,3 +143,67 @@ describe("shared roll with statsPerSegment", () => {
 		expect(text).toContain("[__Dext__]");
 	});
 });
+
+describe("interaction formatting with infoRoll", () => {
+	it("should have newline after infoRoll when used as interaction without comment", () => {
+		const result: Resultat = {
+			dice: "1d45",
+			result: "1d45: [33] = 33",
+			total: 33,
+		};
+
+		// Simulate interaction by passing true to parse (via constructor)
+		const res = new ResultAsText(result, DATA, undefined, undefined, {
+			name: "Dextérité",
+			standardized: "dexterite",
+		});
+		const text = res.defaultMessage();
+		console.log("WITHOUT COMMENT:", JSON.stringify(text));
+
+		// Should have the infoRoll
+		expect(text).toContain("[__Dextérité__]");
+		// Should have a newline after infoRoll before dice (with possible blank line)
+		expect(text).toMatch(/\[__Dextérité__\]\s*\n\s*`1d45`/);
+	});
+
+	it("should have newline after infoRoll when used as interaction with comment", () => {
+		const result: Resultat = {
+			comment: "cc",
+			dice: "1d45 /* cc */",
+			result: "1d45: [12] = 12",
+			total: 12,
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, {
+			name: "Dextérité",
+			standardized: "dexterite",
+		});
+		const text = res.defaultMessage();
+		console.log("WITH COMMENT:", JSON.stringify(text));
+
+		// Should have the infoRoll
+		expect(text).toContain("[__Dextérité__]");
+		// Should have the comment
+		expect(text).toContain("*cc*");
+		// infoRoll and comment should be on same line, then newline before dice
+		expect(text).toMatch(/\[__Dextérité__\]\s+\*cc\*\n/);
+	});
+
+	it("should format correctly when used via onMessageSend", () => {
+		const result: Resultat = {
+			dice: "1d45",
+			result: "1d45: [45] = 45",
+			total: 45,
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, "Laureen", {
+			name: "Dextérité",
+			standardized: "dexterite",
+		});
+		const messageText = res.onMessageSend(undefined, "189390243676422144");
+		console.log("ON MESSAGE SEND:", JSON.stringify(messageText));
+
+		// Should have the infoRoll with newline after it
+		expect(messageText).toMatch(/\[__Dextérité__\]\s*\n\s*`1d45`/);
+	});
+});

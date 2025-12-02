@@ -112,6 +112,7 @@ export async function baseRoll(
 		infoRoll,
 		opposition,
 		silent,
+		statsPerSegment: res.statsPerSegment,
 		user,
 	};
 	await rollWithInteraction(interaction, res.formula, client, opts);

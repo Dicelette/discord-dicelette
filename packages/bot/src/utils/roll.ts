@@ -48,6 +48,7 @@ export async function rollWithInteraction(
 		customCritical,
 		opposition,
 		silent,
+		statsPerSegment,
 	} = opts;
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
@@ -77,6 +78,7 @@ export async function rollWithInteraction(
 			result: result,
 			serverCritical: critical,
 			source: interaction,
+			statsPerSegment,
 			ul,
 			user,
 		});

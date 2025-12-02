@@ -86,7 +86,7 @@ export class ResultAsText {
 		// For shared rolls with statsPerSegment, don't show global infoRoll
 		// as stat names are displayed per segment next to ※/◈ symbols
 		if (this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0))
-			return `${user}[__${this.infoRoll.name.capitalize()}__] `;
+			return `${user}[__${this.infoRoll.name.capitalize()}__]\n`;
 		return user;
 	}
 	logUrl(url?: string) {
@@ -185,16 +185,23 @@ export class ResultAsText {
 					const marker = hasStatsPerSegment ? "⚐" : "";
 					msgSuccess += `${marker}${this.message(r, " = ` [$1] `")}\n`;
 				}
-			} else {
-				msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
-			}
+			} else msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
 		}
 
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
 		const joinedRes = finalRes.join("\n ");
-		return hasComment ? `${comment}${joinedRes.trimEnd()}` : ` ${joinedRes}`;
+		// If comment contains only whitespace/newline, don't add extra space
+		if (hasComment) {
+			return ` ${comment} ${joinedRes.trimEnd()}`;
+		}
+		// For interaction without comment, comment() returns "\n", so prepend newline to joinedRes
+		if (comment === "\n") {
+			return `\n ${joinedRes}`;
+		}
+		// Default case (non-interaction without comment): add space before result
+		return ` ${joinedRes}`;
 	}
 
 	private compare(
@@ -438,7 +445,7 @@ export class ResultAsText {
 					.replaceAll("×", "*")
 					.trim()}*\n `
 			: interaction || hasStatsPerSegment
-				? `${info ? `${info}\n ` : ""}`
+				? `${info ? `${info}\n` : "\n"}`
 				: `${info ? `${info}\n` : ""}_ _`;
 	}
 
@@ -659,7 +666,7 @@ export class ResultAsText {
 		const showGlobalInfoRoll =
 			this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0);
 		const infoLine = showGlobalInfoRoll
-			? `\n[__${this.infoRoll!.name.capitalize()}__] `
+			? `\n[__${this.infoRoll!.name.capitalize()}__]`
 			: "\n";
 		return `${headerLine}${infoLine}${this.parser}${linkToOriginal}`;
 	}
