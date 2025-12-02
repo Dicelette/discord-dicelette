@@ -33,6 +33,14 @@ describe("dice_extractor", () => {
 			expect(result.diceValue).toBeTruthy();
 		});
 
+		it("should extract repeated dice pattern like 4#d10", () => {
+			const content = "4#d10 attack roll";
+			const result = extractDiceData(content);
+
+			expect(result.diceValue).toBeTruthy();
+			expect(result.diceValue?.[0]).toMatch(/\d+#d\d+/);
+		});
+
 		it("should handle content without dice patterns", () => {
 			const content = "just a message";
 			const result = extractDiceData(content);
@@ -241,6 +249,19 @@ describe("dice_extractor", () => {
 			expect(result).toBeDefined();
 			expect(result!.result).toBeDefined();
 			expect(result!.result.dice).toContain("1d100");
+		});
+
+		it("should recognize repeated dice notation like 4#d10", () => {
+			const content = "4#d10 attack roll";
+
+			const result = isRolling(content);
+
+			expect(result).toBeDefined();
+			expect(result!.result).toBeDefined();
+			// The dice parser processes 4#d10 into multiple d10 rolls
+			// Check that the result contains multiple d10 rolls
+			expect(result!.result.result).toContain("d10:");
+			expect(result!.result.comment).toBe("attack roll");
 		});
 	});
 

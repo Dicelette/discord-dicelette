@@ -167,11 +167,31 @@ export class ResultAsText {
 			const result = this.compare(messageResult, critical, customCritical, opposition);
 			msgSuccess = result.msgSuccess;
 			criticalState = result.criticalState;
-		} else msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
+		} else {
+			// Process each segment separately for shared rolls
+			const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
+			// If we have multiple segments (with or without statsPerSegment), process them individually
+			if (messageResult.length > 1) {
+				msgSuccess = "";
+				for (let i = 0; i < messageResult.length; i++) {
+					let r = messageResult[i];
+					// Remove comment from segment if we're processing shared rolls with stats
+					// The comment will be added back by formatMultipleRes via commentsPerSegment
+					if (hasStatsPerSegment && this.commentsPerSegment?.[i]) {
+						const commentToRemove = this.commentsPerSegment[i];
+						r = r.replace(`[${commentToRemove}]`, "").trim();
+					}
+					// Add a marker that formatMultipleRes can detect
+					const marker = hasStatsPerSegment ? "⚐" : "";
+					msgSuccess += `${marker}${this.message(r, " = ` [$1] `")}\n`;
+				}
+			} else {
+				msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
+			}
+		}
 
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
-
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
 		const joinedRes = finalRes.join("\n ");
 		return hasComment ? `${comment}${joinedRes.trimEnd()}` : ` ${joinedRes}`;
@@ -459,9 +479,16 @@ export class ResultAsText {
 
 			if (hasStats || hasComments) {
 				const hasSharedSymbol = res.match(PARSE_RESULT_PATTERNS.sharedSymbol);
+				// Detect if this is a dice result line with our marker or with ⟶ symbol
+				const hasMarker = res.startsWith("⚐");
+				const isDiceResult = res.includes(" ⟶ ");
 
+				// Remove the marker if present
+				if (hasMarker) {
+					res = res.substring(1);
+				}
 				if (
-					hasSharedSymbol &&
+					(hasSharedSymbol || hasMarker || isDiceResult) &&
 					segmentIndex <
 						Math.max(
 							this.statsPerSegment?.length ?? 0,
@@ -486,17 +513,38 @@ export class ResultAsText {
 								`◈ ${header} — `
 							);
 						} else if (res.startsWith("※")) {
+							// Remove the existing ※ and add it back with the header
 							if (!res.includes(`__${comment}__`))
 								res = res.replace(/^※\s*/, `※ ${header} — `);
 							else if (statName && !res.includes(`__${statName}__`))
 								res = res.replace(/^※\s*/, `※ __${statName}__ — `);
+						} else if (isDiceResult && !hasSharedSymbol) {
+							// For lines without symbols but with dice results
+							// Use ※ for first segment, ◈ for subsequent ones
+							const symbol = segmentIndex === 0 ? "※" : "◈";
+							// Remove any existing comment/statName already present in res to avoid duplication
+							let cleanRes = res;
+							// The comment might appear as __comment__ or [comment] in the result
+							if (comment) {
+								cleanRes = cleanRes.replace(`__${comment}__ — `, "").trim();
+								cleanRes = cleanRes.replace(`[${comment}]`, "").trim();
+							}
+							if (statName) cleanRes = cleanRes.replace(`__${statName}__`, "").trim();
+
+							// Clean up any multiple or leading/trailing separators
+							cleanRes = cleanRes
+								.replace(PARSE_RESULT_PATTERNS.sharedStartSymbol, "")
+								.replace(/\s*—\s*/g, " — ") // Normalize all separators
+								.replace(/^—\s*|\s*—$/g, "") // Remove leading/trailing separators
+								.replace(/—\s*—/g, "—") // Remove double separators
+								.trim();
+							res = `${symbol} ${header} — ${cleanRes}`;
 						}
 					}
 					// Incrémenter pour passer au segment suivant
 					segmentIndex++;
 				}
 			}
-
 			finalRes.push(res.trimStart());
 		}
 		return finalRes;
