@@ -245,9 +245,14 @@ async function getUserFrom(
 			guildData,
 			context.interaction,
 			ul,
-			userMessageId.channelId
+			userMessageId.channelId,
+			undefined,
+			skipNotFound
 		);
-		if (!thread) throw new BotError(ul("error.user.notFound"), botErrorOptions);
+		if (!thread) {
+			if (skipNotFound) return;
+			throw new BotError(ul("error.channel.thread"), botErrorOptions);
+		}
 		if (
 			user.isPrivate &&
 			!allowAccess &&
@@ -301,8 +306,9 @@ async function getUserFrom(
 
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
+		if (skipNotFound) return;
 		logger.warn(error);
-		if (!skipNotFound) throw new BotError(ul("error.user.notFound"), botErrorOptions);
+		throw new BotError(ul("error.user.notFound"), botErrorOptions);
 	}
 }
 

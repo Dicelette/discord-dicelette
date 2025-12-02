@@ -21,7 +21,8 @@ export async function searchUserChannel(
 	interaction: Djs.BaseInteraction,
 	ul: Translation,
 	channelId: string,
-	register?: boolean
+	register?: boolean,
+	skipNoFound?: boolean
 ): Promise<DiscordChannel> {
 	let thread: Djs.TextChannel | Djs.AnyThreadChannel | undefined | Djs.GuildBasedChannel;
 	const msg = ul("error.channel.thread");
@@ -31,9 +32,8 @@ export async function searchUserChannel(
 		if (register && channel instanceof Djs.ForumChannel) return;
 		if (!isValidChannel(channel, interaction)) {
 			// Avoid using `any`: rely on runtime class to detect forum channels
-			if (register && channel instanceof Djs.ForumChannel) {
-				return;
-			}
+			if (register && channel instanceof Djs.ForumChannel) return;
+			if (skipNoFound) return;
 
 			if (isValidInteraction(interaction) && interaction.channel?.isSendable()) {
 				await interaction.channel.send({
@@ -54,6 +54,7 @@ export async function searchUserChannel(
 		return;
 	}
 	if (!thread) {
+		if (skipNoFound) return;
 		if (isValidInteraction(interaction)) {
 			if (interaction.isRepliable()) {
 				if (interaction.replied) await interaction.editReply({ embeds });

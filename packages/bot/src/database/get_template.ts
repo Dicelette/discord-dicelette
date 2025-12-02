@@ -78,9 +78,8 @@ export async function getTemplate(
 		const message = await channel.messages.fetch(messageId);
 		return fetchTemplate(message, enmap);
 	} catch (error) {
-		logger.warn(error);
-
 		if (skipNoFound) return undefined;
+		logger.warn(error);
 		if ((error as Error).message === "Unknown Message")
 			throw new BotError(
 				ul("error.template.id", { channelId, messageId }),
