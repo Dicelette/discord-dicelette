@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.0](https://github.com/Dicelette/discord-dicelette/compare/2.22.3...2.23.0) (2025-12-02)
+
+
+### Features
+
+* allow to ignore some dice from the karma ([1ad2388](https://github.com/Dicelette/discord-dicelette/commit/1ad238834c62050a065cb0288b96e5724f0eb42a))
+* dice with parenthesis will be better handled ([43194b6](https://github.com/Dicelette/discord-dicelette/commit/43194b6b60f2f53f039e5abbcfb798fad7c7f030))
+
 ## [2.22.3](https://github.com/Dicelette/discord-dicelette/compare/2.22.2...2.22.3) (2025-12-01)
 
 
