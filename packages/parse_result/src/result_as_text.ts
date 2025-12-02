@@ -22,6 +22,7 @@ export class ResultAsText {
 	private readonly resultat?: Resultat;
 	private headerCompare?: ComparedValue;
 	private readonly statsPerSegment?: string[];
+	private readonly commentsPerSegment?: string[];
 
 	private ignoreCount = "";
 
@@ -41,6 +42,7 @@ export class ResultAsText {
 		this.resultat = result;
 		this.ignoreCount = this.setIgnoreCount();
 		this.statsPerSegment = statsPerSegment;
+		this.commentsPerSegment = this.extractCommentsPerSegment();
 		let parser = "";
 		if (!result) {
 			this.error = true;
@@ -174,7 +176,10 @@ export class ResultAsText {
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
 
-		return `${comment} ${finalRes.join("\n  ").trimEnd()}`;
+		// Ne pas ajouter d'espace supplémentaire si le commentaire est vide
+		const hasComment = comment.trim().length > 0 && comment !== "_ _";
+		const joinedRes = finalRes.join("\n ");
+		return hasComment ? `${comment}${joinedRes.trimEnd()}` : ` ${joinedRes}`;
 	}
 
 	private compare(
@@ -256,12 +261,9 @@ export class ResultAsText {
 				: `**${this.ul("roll.failure")}**`;
 
 			// Update current comparison only if opposition is successful
-			if (newCompare) {
-				this.resultat!.compare = opposition;
-			} else {
-				// If the opposition fails, the original comparison is retained but the failure is displayed.
-				this.resultat!.compare = opposition;
-			}
+			if (newCompare) this.resultat!.compare = opposition;
+			// If the opposition fails, the original comparison is retained but the failure is displayed.
+			else this.resultat!.compare = opposition;
 		}
 
 		return { oldCompare, successOrFailure, total };
@@ -367,8 +369,12 @@ export class ResultAsText {
 			: `= \`[${total}]\``;
 
 		const resMsg = this.message(r, totalSuccess);
-		if (resMsg.match(/^[✕✓※]/)) {
-			return `${this.message(r, totalSuccess).replace(/^[✕✓※]/, `${successOrFailure} — `)}\n`;
+		if (resMsg.match(/^[✕✓]/)) {
+			return `${this.message(r, totalSuccess).replace(/^[✕✓]/, `${successOrFailure} — `)}\n`;
+		}
+		// Si c'est un symbole ※ (roll sans comparaison), ne pas le remplacer
+		if (resMsg.startsWith("※")) {
+			return `${resMsg}\n`;
 		}
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
@@ -379,9 +385,24 @@ export class ResultAsText {
 		return "";
 	}
 
+	private extractCommentsPerSegment(): string[] | undefined {
+		if (!this.resultat?.dice || !this.resultat.dice.includes(";")) return undefined;
+
+		// Extraire les commentaires entre crochets pour chaque segment
+		// Format: 1d20[comment1];&+5[comment2]
+		const segments = this.resultat.dice.split(";");
+		const comments: string[] = [];
+
+		for (const segment of segments) {
+			const commentMatch = segment.match(/\[([^\]]+)\]/);
+			comments.push(commentMatch ? commentMatch[1] : "");
+		}
+
+		return comments.length > 0 ? comments : undefined;
+	}
+
 	private removeIgnore() {
-		const haveCompare = this.headerCompare ?? this.resultat?.compare;
-		if (haveCompare && this.resultat?.comment) {
+		if (this.resultat?.comment) {
 			const com = this.resultat.comment.replace(IGNORE_COUNT_KEY.key, "").trim();
 			if (com.trimAll() === "#") return undefined;
 			return com;
@@ -399,12 +420,15 @@ export class ResultAsText {
 			this.resultat!.comment = this.resultat!.comment?.replace(extractRegex, "").trim();
 		}
 		this.resultat!.comment = this.removeIgnore();
+
+		// Pour les shared rolls avec statsPerSegment, ne pas ajouter de ligne vide si pas de commentaire
+		const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
 		return this.resultat!.comment
 			? `${info}*${this.resultat!.comment.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
 					.replaceAll("×", "*")
 					.trim()}*\n `
-			: interaction
-				? `${info}\n `
+			: interaction || hasStatsPerSegment
+				? `${info ? `${info}\n ` : ""}`
 				: `${info ? `${info}\n` : ""}_ _`;
 	}
 
@@ -440,15 +464,52 @@ export class ResultAsText {
 				criticalState.successOrFailure
 			);
 
-			// Inject stat name for shared rolls next to ※ or ◈ symbols
-			if (this.statsPerSegment && this.statsPerSegment.length > 0) {
-				const hasSharedSymbol = res.match(/^[※◈]/);
-				if (hasSharedSymbol && segmentIndex < this.statsPerSegment.length) {
-					const statName = this.statsPerSegment[segmentIndex];
-					if (statName && statName.length > 0) {
-						// Replace the symbol with symbol + stat name
-						res = res.replace(/^([※◈])/, `$1 __${statName}__ —`);
+			// Inject stat names and/or comments for shared rolls next to ※ or ◈ symbols
+			const hasStats = this.statsPerSegment && this.statsPerSegment.length > 0;
+			const hasComments = this.commentsPerSegment && this.commentsPerSegment.length > 0;
+
+			if (hasStats || hasComments) {
+				// Détecter les lignes de résultat (avec ※ ou ◈)
+				const symbolRegex = /^(※|◈)/;
+				const hasSharedSymbol = res.match(symbolRegex);
+
+				if (
+					hasSharedSymbol &&
+					segmentIndex <
+						Math.max(
+							this.statsPerSegment?.length ?? 0,
+							this.commentsPerSegment?.length ?? 0
+						)
+				) {
+					const statName = this.statsPerSegment?.[segmentIndex] || "";
+					const comment = this.commentsPerSegment?.[segmentIndex] || "";
+
+					// Construire l'en-tête du segment: Stat + Comment (si présents)
+					const parts: string[] = [];
+					if (statName) parts.push(`__${statName}__`);
+					if (comment) parts.push(`__${comment}__`);
+
+					if (parts.length > 0) {
+						const header = parts.join(" — ");
+
+						// Injecter après le symbole ※ ou ◈
+						// Cas 1: Ligne déjà formatée avec "◈ **Succès** —"
+						if (res.match(/^◈\s+\*\*/)) {
+							res = res.replace(/^◈\s+/, `◈ ${header} — `);
+						}
+						// Cas 2: Ligne avec ※ (pas de comparaison)
+						else if (res.startsWith("※")) {
+							// Vérifier si le commentaire n'est pas déjà présent dans res
+							if (!res.includes(`__${comment}__`)) {
+								res = res.replace(/^※\s*/, `※ ${header} — `);
+							}
+							// Sinon, ajouter uniquement le statName s'il existe et n'est pas déjà là
+							else if (statName && !res.includes(`__${statName}__`)) {
+								res = res.replace(/^※\s*/, `※ __${statName}__ — `);
+							}
+						}
 					}
+					// Incrémenter pour passer au segment suivant
 					segmentIndex++;
 				}
 			}
@@ -466,17 +527,18 @@ export class ResultAsText {
 		const regexForFormulesDices = /^[✕✓]/;
 
 		if (isCritical === "failure")
-			return res.replace("✕", `**${this.ul("roll.critical.failure")}** —`);
+			return res.replace("✕", `◈ **${this.ul("roll.critical.failure")}** —`);
 
 		if (isCritical === "success")
-			return res.replace("✓", `**${this.ul("roll.critical.success")}** —`);
+			return res.replace("✓", `◈ **${this.ul("roll.critical.success")}** —`);
 
 		if (isCritical === "custom")
 			return res.replace(regexForFormulesDices, `${successOrFailure} —`);
 
+		// Ne pas remplacer le symbole ※ qui est utilisé pour les rolls sans comparaison
 		return res
-			.replace("✕", `**${this.ul("roll.failure")}** —`)
-			.replace("✓", `**${this.ul("roll.success")}** —`);
+			.replace("✕", `◈ **${this.ul("roll.failure")}** —`)
+			.replace("✓", `◈ **${this.ul("roll.success")}** —`);
 	}
 
 	private chained(
