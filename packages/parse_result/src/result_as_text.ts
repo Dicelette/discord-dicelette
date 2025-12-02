@@ -49,7 +49,6 @@ export class ResultAsText {
 			this.error = true;
 			this.output = this.errorMessage();
 		} else parser = this.parse(!!infoRoll, critical, customCritical, opposition);
-
 		this.output = this.defaultMessage();
 		this.parser = parser;
 		this.charName = charName;
@@ -106,68 +105,131 @@ export class ResultAsText {
 	) {
 		return createUrl(this.ul, context, logUrl);
 	}
+	private parseParenthesis(resultEdited: string) {
+		// Detect dynamic dice from the original dice input, not the current edited segment
+		// because the segment may have already been simplified
+		const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(this.resultat!.dice);
+		if (!diceMatch) return resultEdited;
 
+		const diceOnly = diceMatch[1];
+		const parenMatch = PARSE_RESULT_PATTERNS.parenExpression.exec(diceOnly);
+		if (!parenMatch) return resultEdited;
+
+		try {
+			const expression = parenMatch[1];
+			const evaluated = evaluate(expression);
+			const simplifiedDice = diceOnly.replace(parenMatch[0], evaluated.toString());
+
+			// Work on the segment before the arrow only, but preserve leading shared symbols/text
+			const arrowPos = resultEdited.indexOf(" ⟶");
+			if (arrowPos === -1) return resultEdited;
+
+			const beforeArrow = resultEdited.substring(0, arrowPos);
+			const afterArrow = resultEdited.substring(arrowPos); // keep arrow and what follows
+
+			// Detect if the segment contains comparison/operators outside the dynamic dice before the arrow (shared compare line)
+			let hasComparison = false;
+			// Check if the original dice (diceOnly) appears in beforeArrow
+			const dicePos = beforeArrow.indexOf(diceOnly);
+			// If original dice not found, check for simplified dice (meaning it was already replaced)
+			const simplifiedPos =
+				dicePos === -1 ? beforeArrow.indexOf(simplifiedDice) : dicePos;
+
+			if (simplifiedPos !== -1) {
+				// Check the tail after the dice expression for operators
+				const tail = beforeArrow.substring(
+					simplifiedPos + (dicePos !== -1 ? diceOnly.length : simplifiedDice.length)
+				);
+				hasComparison = /[<>]=?|!?==|[+\-*/]/.test(tail);
+			} else {
+				// If we cannot locate either dice, fallback to the generic check
+				hasComparison = /[<>]=?|!?==|[+\-*/]/.test(beforeArrow.replace(/`/g, ""));
+			}
+
+			if (hasComparison) {
+				// For compare lines: replace original dynamic dice with simplified dice
+				// Detect if this is a shared compare line by checking if it's part of a multi-segment result
+				// and contains a formula dice symbol (✓, ✕, etc.)
+				const isMultiSegment = (this.resultat?.result || "").includes(";");
+				const hasFormulaSymbol = /[✓✕◈※]/.test(beforeArrow);
+				const isSharedCompareLine = isMultiSegment && hasFormulaSymbol;
+
+				if (isSharedCompareLine) {
+					// Replace the original dice with simplified dice in the entry portion
+					let updatedBefore = beforeArrow.replace(diceOnly, simplifiedDice);
+					// If original wasn't found but simplified is there, it's already correct
+					if (dicePos === -1 && simplifiedPos !== -1) {
+						updatedBefore = beforeArrow; // already simplified
+					}
+					// Also replace in the afterArrow part (for bracketed expressions like [1d(55+5)])
+					const updatedAfter = afterArrow.replaceAll(diceOnly, simplifiedDice);
+					resultEdited = `${updatedBefore}${updatedAfter}`;
+				} else {
+					// For non-shared compare lines, keep original notation
+					resultEdited = `${beforeArrow}${afterArrow}`;
+				}
+			} else {
+				// For simple result lines: show mapping `original` | simplified, but do not remove shared symbols
+				// Identify leading prefix like "※ ", "◈ ... — " and keep it intact
+				const sharedPrefixMatch = beforeArrow.match(/^(?:※\s|◈\s[^—]+—\s)?/);
+				const prefix = sharedPrefixMatch ? sharedPrefixMatch[0] : "";
+				const core = beforeArrow.substring(prefix.length);
+
+				// Determine if this is a shared roll context (with ※ symbol or multi-segment)
+				const isSharedContext =
+					prefix.includes("※") || (this.resultat?.result || "").includes(";");
+
+				// Use pipe mapping
+				let mappedCore = core;
+				if (core.includes(diceOnly)) {
+					// Original dice found, replace with mapping
+					if (isSharedContext) {
+						mappedCore = core.replace(diceOnly, `\`${diceOnly}\` | ${simplifiedDice}`);
+					} else {
+						// For non-shared simple rolls, use backticks around both with pipe and spaces
+						mappedCore = core.replace(
+							diceOnly,
+							`\`${diceOnly}\` | \`${simplifiedDice}\``
+						);
+					}
+				} else if (core.includes(simplifiedDice)) {
+					// Simplified dice found (already replaced), prepend original in mapping
+					if (isSharedContext)
+						mappedCore = core.replace(
+							simplifiedDice,
+							`\`${diceOnly}\` | ${simplifiedDice}`
+						);
+					else
+						mappedCore = core.replace(
+							simplifiedDice,
+							`\`${diceOnly}\` | \`${simplifiedDice}\``
+						);
+				} else {
+					// Neither found, inject mapping at the beginning of core
+					if (isSharedContext) mappedCore = `\`${diceOnly}\` | ${simplifiedDice}`;
+					else mappedCore = `\`${diceOnly}\` | \`${simplifiedDice}\``;
+				}
+				resultEdited = `${prefix}${mappedCore}${afterArrow}`;
+			}
+		} catch (e) {
+			// If evaluation fails, keep original result
+			logger.warn("Failed to evaluate dynamic dice expression:", e);
+		}
+
+		return resultEdited;
+	}
 	private message(result: string, tot?: string | number) {
 		if (result.includes("◈")) tot = undefined;
-		let resultEdited = result;
+		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
 
-		// Check if original dice string contains dynamic dice with parentheses
-		// We need to match segments from this.resultat.dice to the current result segment
-		if (this.resultat?.dice?.includes("(") && result.includes(":")) {
-			// Split the original dice into segments
-			const diceSegments = this.resultat.dice.split(";");
-
-			// Find the matching segment by checking if result starts with evaluated dice
-			for (const diceSegment of diceSegments) {
-				// Skip segments that don't contain parentheses
-				if (!diceSegment.includes("(")) continue;
-
-				// Remove comment from dice segment for matching
-				const cleanDiceSegment = diceSegment.replace(/\[([^\]]+)\]/g, "").trim();
-				// Remove comparator for matching (>5, >=10, etc.)
-				const diceWithoutComparator = cleanDiceSegment.replace(/[><=!]+\d+$/, "").trim();
-
-				const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(diceWithoutComparator);
-				if (diceMatch) {
-					const diceOnly = diceMatch[1];
-					const parenMatch = PARSE_RESULT_PATTERNS.parenExpression.exec(diceOnly);
-					if (parenMatch) {
-						try {
-							const expression = parenMatch[1];
-							const evaluated = evaluate(expression);
-							const simplifiedDice = diceOnly.replace(
-								parenMatch[0],
-								evaluated.toString()
-							);
-
-							// Check if the current result segment matches this evaluated dice
-							const colonPos = result.indexOf(":");
-							if (colonPos !== -1) {
-								const resultDicePart = result.substring(0, colonPos).trim();
-								// Remove leading symbols like ✓ or ✕
-								const cleanResultDice = resultDicePart.replace(/^[✕✓]\s*/, "");
-
-								// Only replace if it's an exact match (not just contained)
-								// This prevents replacing "1d60" in "1d60+2" when we already processed "1d60"
-								if (cleanResultDice === simplifiedDice) {
-									resultEdited = resultEdited.replace(
-										cleanResultDice,
-										`\`${diceOnly}\`: ${simplifiedDice}`
-									);
-									break; // Found the match, no need to continue
-								}
-							}
-						} catch (e) {
-							// If evaluation fails, keep original result
-							logger.warn("Failed to evaluate dynamic dice expression:", e);
-						}
-					}
-				}
-			}
-		}
+		if (this.resultat?.dice?.includes("("))
+			resultEdited = this.parseParenthesis(resultEdited);
 
 		// Apply standard transformations after dynamic dice processing
 		resultEdited = resultEdited.replaceAll(";", "\n").replaceAll(":", " ⟶");
+
+		// Restore the custom colon placeholder for dynamic dice notation
+		resultEdited = resultEdited.replaceAll("⁚", ":");
 
 		if (!tot)
 			resultEdited = `${resultEdited.replaceAll(PARSE_RESULT_PATTERNS.resultEquals, " = ` $1 `")}`;
@@ -496,12 +558,35 @@ export class ResultAsText {
 			const matches = PARSE_RESULT_PATTERNS.diceResultPattern.exec(res);
 			if (matches) {
 				const { entry, calc } = matches.groups || {};
+				// Decide if we should avoid backticks for simple dynamic dice mapping (non-shared, no compare)
+				const isShared =
+					(this.resultat?.result || "").includes(";") ||
+					(this.statsPerSegment && this.statsPerSegment.length > 0);
+				const hasCompare = !!this.resultat?.compare;
+				const isSimpleDynamic =
+					!isShared && !hasCompare && !!entry && entry.includes(":");
+				const entryIsBracketed = !!entry && /^\s*\[.*\]\s*$/.test(entry);
+				const calcIsBracketed = !!calc && /^\s*\[.*\]\s*$/.test(calc);
+				// Detect if entry contains a pipe mapping (e.g., "1d(8+5) | 1d13")
+				const entryHasPipeMapping = !!entry && entry.includes(" | ");
+				// Detect if entry already has backticks (for dynamic dice mapping like `1d(8+5)`|`1d13`)
+				const entryHasBackticks = !!entry && entry.includes("`");
+
 				if (entry) {
 					const entryStr = entry.replaceAll("\\*", "×");
-					res = res.replace(entry, `\`${entryStr.trim()}\``);
+					// Don't add backticks if entry already has pipe mapping, backticks, or is a simple dynamic dice
+					if (
+						!isSimpleDynamic &&
+						!(isShared && entryIsBracketed) &&
+						!entryHasPipeMapping &&
+						!entryHasBackticks
+					)
+						res = res.replace(entry, `\`${entryStr.trim()}\``);
+					else res = res.replace(entry, `${entryStr.trim()}`);
 				}
 				if (calc) {
 					const calcStr = calc.replaceAll("\\*", "×");
+					// Always backtick the calculation part after the arrow, even for shared rolls
 					res = res.replace(calc, `\`${calcStr.trim()}\``);
 				}
 			}

@@ -81,7 +81,7 @@ describe("custom critical roll", () => {
 			undefined,
 			critical
 		);
-		const text = res.defaultMessage();
+		const text = res.onMessageSend(undefined, "0189390243676422144");
 		expect(text).toContain("test");
 	});
 	it("should display dynamic dice notation with parentheses", () => {
@@ -91,9 +91,8 @@ describe("custom critical roll", () => {
 			total: 7,
 		};
 		const res = new ResultAsText(result, DATA);
-		const text = res.defaultMessage();
-		expect(text).toContain("1d(8+5)");
-		expect(text).toContain("1d13");
+		const text = res.onMessageSend(undefined, "0189390243676422144");
+		expect(text).toMatch(/`?1d\(8\+5\)`?\s*\|\s*`?1d13`?/);
 		expect(text).toContain("[7]");
 	});
 });
@@ -133,20 +132,16 @@ describe("shared roll with statsPerSegment", () => {
 		// - First segment: `1d(55+5)`: 1d60 ⟶ [28] = [28]
 		// - Second segment: **Succès** — 1d60+2 ⟶ [28]+2 = [30] ⩾ 5
 		const result: Resultat = {
-			compare: {
-				sign: ">",
-				value: 5,
-			},
+			comment: undefined,
+			compare: undefined,
 			dice: "1d(55+5);&+2>5",
-			result: "1d60: [28] = 28;✓ 1d60+2: [28]+2 = 30",
-			total: 58,
+			modifier: { sign: "+", value: 5 },
+			result: "※ 1d(55+5): [11] = 11;✓ [1d(55+5)]+2>5: [11]+2>5 = 13>5",
+			total: 11,
 		};
 
 		const res = new ResultAsText(result, DATA);
-		const text = res.defaultMessage();
-
-		console.log("Dynamic dice shared roll result:", text);
-		console.log("Result.result:", result.result);
+		const text = res.onMessageSend();
 
 		// Should contain dynamic dice notation in first segment
 		expect(text).toContain("1d(55+5)");
@@ -157,7 +152,6 @@ describe("shared roll with statsPerSegment", () => {
 		expect(text).toContain("**");
 
 		// Should NOT repeat the dynamic dice notation in the second segment
-		const lines = text.split("\n");
 		const dynamicDiceCount = text.match(/1d\(55\+5\)/g)?.length || 0;
 		expect(dynamicDiceCount).toBe(1); // Should appear only once
 	});
@@ -193,7 +187,6 @@ describe("interaction formatting with infoRoll", () => {
 			standardized: "dexterite",
 		});
 		const text = res.defaultMessage();
-		console.log("WITHOUT COMMENT:", JSON.stringify(text));
 
 		// Should have the infoRoll
 		expect(text).toContain("[__Dextérité__]");
@@ -214,7 +207,6 @@ describe("interaction formatting with infoRoll", () => {
 			standardized: "dexterite",
 		});
 		const text = res.defaultMessage();
-		console.log("WITH COMMENT:", JSON.stringify(text));
 
 		// Should have the infoRoll
 		expect(text).toContain("[__Dextérité__]");
@@ -236,7 +228,6 @@ describe("interaction formatting with infoRoll", () => {
 			standardized: "dexterite",
 		});
 		const messageText = res.onMessageSend(undefined, "189390243676422144");
-		console.log("ON MESSAGE SEND:", JSON.stringify(messageText));
 
 		// Should have the infoRoll with newline after it
 		expect(messageText).toMatch(/\[__Dextérité__\]\s*\n\s*`1d45`/);
