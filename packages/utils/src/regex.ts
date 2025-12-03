@@ -1,7 +1,6 @@
 // Pre-compiled regex patterns for better performance
 export const QUERY_URL_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
-	// Dice comparator patterns centralised (sign + comparator value)
 	COMPARATOR: /(?<sign>[><=!]+)(?<comparator>(.+))/,
 	COMPARATOR_SIMPLE: /([><=!]+)(.+)/,
 	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
