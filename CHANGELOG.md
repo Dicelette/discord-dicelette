@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.25.0](https://github.com/Dicelette/discord-dicelette/compare/2.24.4...2.25.0) (2025-12-03)
+
+
+### Features
+
+* **onMessageSend:** allow moderator to ping someone to "roll for them" ([3ec1fd4](https://github.com/Dicelette/discord-dicelette/commit/3ec1fd4a37a6c9589d01a07313c5bca0841ee5b9))
+
 ## [2.24.4](https://github.com/Dicelette/discord-dicelette/compare/2.24.3...2.24.4) (2025-12-02)
 
 ## [2.24.3](https://github.com/Dicelette/discord-dicelette/compare/2.24.2...2.24.3) (2025-12-02)
