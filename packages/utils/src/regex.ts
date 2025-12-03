@@ -55,7 +55,7 @@ export const PARSE_RESULT_PATTERNS = {
 	successSymbol: /^◈\s+\*\*/,
 } as const;
 
-export const CHARACTER_DETECTION = / @([\p{L}\p{M}]+)/u;
+export const CHARACTER_DETECTION = / @([\p{L}\p{M}._-]+)/u;
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
