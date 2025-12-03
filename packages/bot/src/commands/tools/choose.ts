@@ -51,11 +51,21 @@ export const select = {
 		await command(interaction, client);
 	},
 };
+
+function separator(input: string) {
+	//on doit privilégier , et ; sur l'espace pour éviter de séparer des éléments composés de plusieurs mots
+	if (input.includes(",") || input.includes(";")) return /[,;]/;
+	return /\s+/;
+}
+
 async function command(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 	const list = interaction.options.getString(t("choose.list.name"), true);
 	const howMany = interaction.options.getInteger(t("choose.number.name"), false);
 	const { ul } = getLangAndConfig(client, interaction);
-	const items = list.split(/[, ;]+/).filter((item) => item.trim().length > 0);
+	const items = list
+		.split(separator(list))
+		.filter((item) => item.trim().length > 0)
+		.map((item) => item.trim());
 	if (items.length === 0)
 		return await interaction.reply({
 			content: ul("choose.noItems"),
