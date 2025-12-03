@@ -38,23 +38,22 @@ export default (client: EClient): void => {
 				return saveCount(message, client.criticalCount, message.guild.id);
 			let content = message.content;
 			if (message.content.match(/`.*`/)) return await stripOOC(message, client, ul);
-			//detect roll between bracket
+			let author = message.author;
+			if (message.member?.permissions.has(Djs.PermissionFlagsBits.ManageRoles)) {
+				//verify if they are any mentions
+				if (message.mentions.users.size > 0) {
+					author = message.mentions.users.first()!;
+					content = content.replaceAll(`<@${author.id}>`, "").trim();
+				}
+			}
+
 			let firstChara: string | undefined;
 			if (content.match(REMOVER_PATTERN.VARIABLE_MATCHER))
-				firstChara = await getCharFromText(
-					client,
-					message.guild.id,
-					message.author.id,
-					content
-				);
+				firstChara = await getCharFromText(client, message.guild.id, author.id, content);
 			if (firstChara) content = content.replace(CHARACTER_DETECTION, "").trim();
-			const data = await getUserFromMessage(
-				client,
-				message.author.id,
-				message,
-				firstChara,
-				{ skipNotFound: true }
-			);
+			const data = await getUserFromMessage(client, author.id, message, firstChara, {
+				skipNotFound: true,
+			});
 			const userData = data?.userData;
 			let charName = data?.charName ?? firstChara;
 
@@ -102,6 +101,7 @@ export default (client: EClient): void => {
 				source: message,
 				statsPerSegment,
 				ul,
+				user: author,
 			});
 			return;
 		} catch (e) {
