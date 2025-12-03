@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.26.0](https://github.com/Dicelette/discord-dicelette/compare/2.25.0...2.26.0) (2025-12-03)
+
+
+### Features
+
+* **choose:** should allow multi word if using ; or , ([590f95b](https://github.com/Dicelette/discord-dicelette/commit/590f95b080ebfa94e9c673d491a459e39a54dc35))
+
+
+### Bug Fixes
+
+* allow more character in detection ([7bd3bf6](https://github.com/Dicelette/discord-dicelette/commit/7bd3bf6b42ff221af410e6091328e9b980cb5aab))
+
 ## [2.25.0](https://github.com/Dicelette/discord-dicelette/compare/2.24.4...2.25.0) (2025-12-03)
 
 
