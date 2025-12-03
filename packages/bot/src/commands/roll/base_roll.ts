@@ -62,7 +62,7 @@ export async function baseRoll(
 	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
 	let firstChara: string | undefined;
-	if (dice.match(REMOVER_PATTERN.VARIABLE_MATCHER) && interaction.guild)
+	if (dice.match(REMOVER_PATTERN.STAT_MATCHER) && interaction.guild)
 		firstChara = await getCharFromText(client, interaction.guild.id, user.id, dice);
 	if (firstChara) dice = dice.replace(CHARACTER_DETECTION, "").trim();
 

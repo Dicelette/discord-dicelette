@@ -48,7 +48,7 @@ export default (client: EClient): void => {
 			}
 
 			let firstChara: string | undefined;
-			if (content.match(REMOVER_PATTERN.VARIABLE_MATCHER))
+			if (content.match(REMOVER_PATTERN.STAT_MATCHER))
 				firstChara = await getCharFromText(client, message.guild.id, author.id, content);
 			if (firstChara) content = content.replace(CHARACTER_DETECTION, "").trim();
 			const data = await getUserFromMessage(client, author.id, message, firstChara, {

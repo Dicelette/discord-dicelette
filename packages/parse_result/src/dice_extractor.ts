@@ -389,7 +389,7 @@ export function replaceStatsInDiceFormula(
 			let processedSegment = segment;
 			const segmentStats: string[] = [];
 
-			const variableMatches = [...segment.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER)];
+			const variableMatches = [...segment.matchAll(REMOVER_PATTERN.STAT_MATCHER)];
 
 			for (const match of variableMatches) {
 				const fullMatch = match[0];
@@ -432,9 +432,7 @@ export function replaceStatsInDiceFormula(
 		processedFormula = processedSegments.join("");
 	} else {
 		// Non-shared roll: process as before
-		const variableMatches = [
-			...processedFormula.matchAll(REMOVER_PATTERN.VARIABLE_MATCHER),
-		];
+		const variableMatches = [...processedFormula.matchAll(REMOVER_PATTERN.STAT_MATCHER)];
 		if (!variableMatches.length) return { formula: content };
 
 		for (const match of variableMatches) {
