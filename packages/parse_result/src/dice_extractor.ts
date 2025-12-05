@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
-import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
+import { escapeRegex, type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
 import type {
 	ChainedComments,
 	DiceData,
@@ -16,6 +16,8 @@ import {
 import { trimAll } from "./utils";
 
 export function extractDiceData(content: string): DiceData {
+	//exclude if the content is between codeblocks
+
 	const bracketRoll = content
 		.replace(/%%.*%%/, "")
 		.match(DICE_PATTERNS.BRACKET_ROLL)?.[1];
@@ -106,6 +108,7 @@ export function performDiceRoll(
 			.replace(/\s*%%+\s*/g, " ")
 			.replace(/ @\w+/, "")
 			.trimEnd();
+		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
 		return { infoRoll, resultat: roll(rollContent) };
 	} catch (e) {
 		logger.warn(e);
@@ -214,9 +217,7 @@ export function isRolling(
 		// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
 		if (!preservedComments) {
 			const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
-			if (hashComment?.[1]) {
-				preservedComments = hashComment[1];
-			}
+			if (hashComment?.[1]) preservedComments = hashComment[1];
 		}
 
 		content = content.replace(reg.groups.second, "").trim();

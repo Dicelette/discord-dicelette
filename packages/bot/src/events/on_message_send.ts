@@ -37,7 +37,7 @@ export default (client: EClient): void => {
 			if (message.author.bot && message.author.id === client.user?.id)
 				return saveCount(message, client.criticalCount, message.guild.id);
 			let content = message.content;
-			if (message.content.match(/`.*`/)) return await stripOOC(message, client, ul);
+			if (message.content.match(/^`.*`$/)) return await stripOOC(message, client, ul);
 			let author = message.author;
 			if (message.member?.permissions.has(Djs.PermissionFlagsBits.ManageRoles)) {
 				//verify if they are any mentions
