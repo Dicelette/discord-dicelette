@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
-import { escapeRegex, type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
+import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
 import type {
 	ChainedComments,
 	DiceData,
