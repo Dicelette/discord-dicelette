@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.26.1](https://github.com/Dicelette/discord-dicelette/compare/2.26.0...2.26.1) (2025-12-07)
+
+
+### Bug Fixes
+
+* allow bracket roll in same message that code blocks ([1e95a4f](https://github.com/Dicelette/discord-dicelette/commit/1e95a4fbfdb81e32bc099ddca30a4c322898e65f))
+* allow neg stats & block with force distrib (quickfix) ([5443db1](https://github.com/Dicelette/discord-dicelette/commit/5443db13216832ed51aa164544b7df4db3467ce4))
+
 ## [2.26.0](https://github.com/Dicelette/discord-dicelette/compare/2.25.0...2.26.0) (2025-12-03)
 
 
