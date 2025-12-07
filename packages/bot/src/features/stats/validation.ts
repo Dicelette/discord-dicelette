@@ -108,7 +108,13 @@ export async function register(
 	let stats: Record<string, number> = {};
 
 	try {
-		const result = getStatistiqueFields(interaction, template, ul, oldStatsTotal);
+		const result = getStatistiqueFields(
+			interaction,
+			template,
+			ul,
+			oldStatsTotal,
+			template.forceDistrib
+		);
 		combinaisonFields = result.combinaisonFields;
 		stats = result.stats;
 	} catch (error) {

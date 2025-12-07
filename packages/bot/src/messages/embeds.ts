@@ -234,7 +234,8 @@ export function getStatistiqueFields(
 	interaction: Djs.ModalSubmitInteraction,
 	templateData: StatisticalTemplate,
 	ul: Translation,
-	oldStatsTotal?: number
+	oldStatsTotal?: number,
+	forceDistribution?: boolean
 ) {
 	const combinaisonFields: Record<string, string> = {};
 	const stats: Record<string, number> = {};
@@ -264,7 +265,7 @@ export function getStatistiqueFields(
 		if (total) {
 			logger.trace("oldStatsTotal", oldStatsTotal, "total", total, "num", num);
 			total -= num;
-			if (total < 0) {
+			if (total < 0 && forceDistribution) {
 				const exceeded = Math.abs(total);
 				const errorMessage = ul("error.totalExceededBy", { max: exceeded, value: name });
 				throw new TotalExceededError(errorMessage, name, exceeded);
