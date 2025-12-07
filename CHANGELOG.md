@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.26.2](https://github.com/Dicelette/discord-dicelette/compare/2.26.1...2.26.2) (2025-12-07)
+
+
+### Bug Fixes
+
+* allow negative statistics in template ([622e1ce](https://github.com/Dicelette/discord-dicelette/commit/622e1ce783e7a6577144ec608acc30644c7f0846))
+
 ## [2.26.1](https://github.com/Dicelette/discord-dicelette/compare/2.26.0...2.26.1) (2025-12-07)
 
 
