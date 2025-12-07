@@ -2,6 +2,7 @@ import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helper
 import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
+import { profiler } from "@dicelette/utils";
 import {
 	ALL_COMMANDS,
 	AUTOCOMPLETE_COMMANDS,
@@ -84,6 +85,7 @@ async function modalSubmit(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	if (interaction.customId.includes("damageDice"))
 		await Dice.store(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
@@ -98,6 +100,7 @@ async function modalSubmit(
 	else if (interaction.customId === "rename")
 		await Rename.validate(interaction, ul, client);
 	else if (interaction.customId === "move") await Move.validate(interaction, ul, client);
+	profiler.stopProfiler();
 }
 
 /**
@@ -115,6 +118,7 @@ async function buttonSubmit(
 	template: StatisticalTemplate,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	const characters = client.characters;
 	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
 	if (interaction.customId === "register")
@@ -191,6 +195,7 @@ async function buttonSubmit(
 		await cancel(interaction, ul, client, interactionUser, true);
 	else if (interaction.customId === "cancel_by_user")
 		await cancel(interaction, ul, client, interactionUser, false, true);
+	profiler.stopProfiler();
 }
 
 async function selectSubmit(
@@ -199,6 +204,7 @@ async function selectSubmit(
 	interactionUser: Djs.User,
 	db: Settings
 ) {
+	profiler.startProfiler();
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
 		switch (value) {
@@ -213,4 +219,5 @@ async function selectSubmit(
 				break;
 		}
 	}
+	profiler.stopProfiler();
 }
