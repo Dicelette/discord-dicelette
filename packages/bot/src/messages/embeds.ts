@@ -7,10 +7,8 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	cleanAvatarUrl,
-	logger,
 	NoEmbed,
 	QUERY_URL_PATTERNS,
-	TotalExceededError,
 } from "@dicelette/utils";
 import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
@@ -233,15 +231,11 @@ export function stripFooter(embed: Djs.EmbedBuilder) {
 export function getStatistiqueFields(
 	interaction: Djs.ModalSubmitInteraction,
 	templateData: StatisticalTemplate,
-	ul: Translation,
-	oldStatsTotal?: number,
-	forceDistribution?: boolean
+	ul: Translation
 ) {
 	const combinaisonFields: Record<string, string> = {};
 	const stats: Record<string, number> = {};
-	let total = templateData.total;
 	if (!templateData.statistics) return { combinaisonFields, stats };
-	if (total && oldStatsTotal) total = total - oldStatsTotal;
 	for (const [key, value] of Object.entries(templateData.statistics)) {
 		const name = key.standardize();
 		if (!interaction.fields.fields.has(name) && !value.combinaison) continue;
@@ -262,16 +256,13 @@ export function getStatistiqueFields(
 				ul("error.mustBeLower", { max: value.max, value: name }),
 				botErrorOptions
 			);
-		if (total) {
-			logger.trace("oldStatsTotal", oldStatsTotal, "total", total, "num", num);
-			total -= num;
-			if (total < 0 && forceDistribution) {
-				const exceeded = Math.abs(total);
-				const errorMessage = ul("error.totalExceededBy", { max: exceeded, value: name });
-				throw new TotalExceededError(errorMessage, name, exceeded);
-			}
-			stats[key] = num;
-		} else stats[key] = num;
+		// Only allow negative values if min is negative
+		if (num < 0 && value.min !== undefined && value.min >= 0)
+			throw new BotError(
+				ul("error.mustBeGreater", { min: value.min ?? 0, value: name }),
+				botErrorOptions
+			);
+		stats[key] = num;
 	}
 	return { combinaisonFields, stats };
 }

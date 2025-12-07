@@ -319,7 +319,7 @@ async function createEmbed(
 			const { min, max, combinaison, exclude } = value;
 			let msg = "";
 			if (combinaison) msg += `- Combinaison${ul("common.space")}: \`${combinaison}\`\n`;
-			if (min) msg += `- Min${ul("common.space")}: \`${min}\`\n`;
+			if (min !== undefined) msg += `- Min${ul("common.space")}: \`${min}\`\n`;
 			if (max) msg += `- Max${ul("common.space")}: \`${max}\`\n`;
 			msg += `- __${ul("register.embed.exclude")}__${ul("common.space")}: ${exclude ? ul("common.yes") : ul("common.no")}\n`;
 			if (msg.length === 0) msg = ul("register.embed.noValue");

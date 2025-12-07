@@ -30,7 +30,6 @@ import {
 	type BotErrorOptions,
 	logger,
 	QUERY_URL_PATTERNS,
-	TotalExceededError,
 } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -106,36 +105,9 @@ export async function register(
 
 	let combinaisonFields: Record<string, string> = {};
 	let stats: Record<string, number> = {};
-
-	try {
-		const result = getStatistiqueFields(
-			interaction,
-			template,
-			ul,
-			oldStatsTotal,
-			template.forceDistrib
-		);
-		combinaisonFields = result.combinaisonFields;
-		stats = result.stats;
-	} catch (error) {
-		// If the total is exceeded and forceDistrib is enabled, reset the modal
-		if (error instanceof TotalExceededError && template.forceDistrib) {
-			await reply(interaction, {
-				content: error.message,
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			// back to the previous step
-			//change the page to 1
-			userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
-			message.edit({
-				components: [continueCancelButtons(ul)],
-				embeds: [userEmbed],
-			});
-			return;
-		}
-		// If this is not an overflow error or if forceDistrib is not enabled, re-throw the error.
-		throw error;
-	}
+	const result = getStatistiqueFields(interaction, template, ul);
+	combinaisonFields = result.combinaisonFields;
+	stats = result.stats;
 
 	//combine all embeds as one
 	userEmbed.setFooter({ text: ul("common.page", { nb: page }) });
@@ -167,28 +139,45 @@ export async function register(
 	);
 	const nbStats = Object.keys(embedStats).length;
 	const ilReste = calculateRemainingPoints(template.total, oldStatsTotal, stats);
-	if (
-		nbStats === statsWithoutCombinaison.length &&
-		ilReste &&
-		ilReste > 0 &&
-		template.forceDistrib
-	) {
-		await reply(interaction, {
-			content: ul("modals.stats.forceDistrib", { reste: ilReste }),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		//back to the previous step
-		//change the page to 1
-		userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+	const allStatsFilled = nbStats === statsWithoutCombinaison.length;
 
-		message.edit({
-			components: [continueCancelButtons(ul)],
-			embeds: [userEmbed],
-			files: uniqueFiles,
-		});
-		return;
+	if (allStatsFilled && template.forceDistrib) {
+		if (ilReste !== undefined && ilReste < 0) {
+			const exceeded = Math.abs(ilReste);
+			const errorMessage = ul("error.totalExceededBy", {
+				max: exceeded,
+				value: ul("common.statistics"),
+			});
+			await reply(interaction, {
+				content: errorMessage,
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			// back to the previous step
+			userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+			message.edit({
+				components: [continueCancelButtons(ul)],
+				embeds: [userEmbed],
+				files: uniqueFiles,
+			});
+			return;
+		}
+		if (ilReste && ilReste > 0) {
+			await reply(interaction, {
+				content: ul("modals.stats.forceDistrib", { reste: ilReste }),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			// back to the previous step
+			userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+			message.edit({
+				components: [continueCancelButtons(ul)],
+				embeds: [userEmbed],
+				files: uniqueFiles,
+			});
+			return;
+		}
 	}
-	if (nbStats === statsWithoutCombinaison.length) {
+
+	if (allStatsFilled) {
 		// noinspection JSUnusedAssignment
 		let combinaison: Record<string, number> = {};
 		combinaison = evalCombinaison(combinaisonFields, embedStats);
@@ -215,7 +204,14 @@ export async function register(
 		return;
 	}
 	const restePoints = ilReste
-		? `\n${ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: ilReste, total: template.total })}`
+		? (() => {
+				// Check if negative stats are allowed in template
+				const allowNegative = Object.values(template.statistics || {}).some(
+					(stat) => stat.min !== undefined && stat.min < 0
+				);
+				const displayReste = allowNegative ? ilReste : Math.abs(ilReste);
+				return `\n${ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: template.total })}`;
+			})()
 		: "";
 
 	message.edit({
@@ -235,15 +231,11 @@ function calculateRemainingPoints(
 	oldTotal = 0,
 	stats?: Record<string, number>
 ) {
-	let newTotal = 0;
-	if (stats) newTotal = Object.values(stats).reduce((sum, value) => sum + value, 0);
 	if (total === 0) return undefined;
-	if (oldTotal === 0) {
-		return total - newTotal;
-	}
-	if (oldTotal > 0) return total - (oldTotal + newTotal);
-
-	return undefined;
+	const newTotal = stats
+		? Object.values(stats).reduce((sum, value) => sum + value, 0)
+		: 0;
+	return total - oldTotal - newTotal;
 }
 
 async function getFromModal(
