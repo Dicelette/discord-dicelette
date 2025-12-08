@@ -7,7 +7,12 @@ import type {
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
-import { BotError, BotErrorLevel, type BotErrorOptions } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	profiler,
+} from "@dicelette/utils";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
@@ -31,6 +36,7 @@ export async function validate(
 	client: EClient
 ) {
 	if (!interaction.message) return;
+	profiler.startProfiler();
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id
 	);
@@ -81,4 +87,5 @@ export async function validate(
 		oldData,
 		interaction.channel as DiscordChannel
 	);
+	profiler.stopProfiler();
 }

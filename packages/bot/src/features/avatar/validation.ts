@@ -4,6 +4,7 @@ import {
 	BotError,
 	BotErrorLevel,
 	cleanAvatarUrl,
+	profiler,
 	QUERY_URL_PATTERNS,
 	verifyAvatarUrl,
 } from "@dicelette/utils";
@@ -23,6 +24,7 @@ import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
  */
 export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translation) {
 	if (!interaction.message) return;
+	profiler.startProfiler();
 	const message = await (interaction.channel as TextChannel).messages.fetch(
 		interaction.message.id
 	);
@@ -79,4 +81,5 @@ export async function edit(interaction: Djs.ModalSubmitInteraction, ul: Translat
 		content: ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
+	profiler.stopProfiler();
 }

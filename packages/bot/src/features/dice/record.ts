@@ -16,6 +16,7 @@ import {
 	type BotErrorOptions,
 	capitalizeBetweenPunct,
 	NoEmbed,
+	profiler,
 } from "@dicelette/utils";
 import {
 	getTemplateByInteraction,
@@ -54,6 +55,7 @@ export async function store(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	if (!(await getTemplateByInteraction(interaction, client))) {
 		await reply(interaction, {
 			embeds: [
@@ -78,6 +80,7 @@ export async function store(
 			content: ul("modals.noPermission"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+	profiler.stopProfiler();
 }
 
 /**
@@ -136,6 +139,7 @@ async function registerDamageDice(
 	client: EClient,
 	first?: boolean
 ) {
+	profiler.startProfiler();
 	const db = client.settings;
 	const { ul } = getLangAndConfig(client, interaction);
 	const name = interaction.fields.getTextInputValue("damageName");
@@ -302,6 +306,7 @@ async function registerDamageDice(
 		compare,
 		first
 	);
+	profiler.stopProfiler();
 }
 
 async function edit(

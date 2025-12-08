@@ -6,7 +6,12 @@ import {
 import type { EClient } from "@dicelette/client";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import { NoChannel, QUERY_URL_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
+import {
+	NoChannel,
+	profiler,
+	QUERY_URL_PATTERNS,
+	verifyAvatarUrl,
+} from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
@@ -28,6 +33,7 @@ export async function pageNumber(
 	ul: Translation,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	const pageNumber = interaction.customId.replace("page", "");
 	if (!isNumber(pageNumber)) return;
 	const template = await getTemplateByInteraction(interaction, client);
@@ -52,6 +58,7 @@ export async function pageNumber(
 		selfRegisterAllowance(client.settings.get(interaction.guild!.id, "allowSelfRegister"))
 			.moderation
 	);
+	profiler.stopProfiler();
 }
 
 /**
@@ -86,6 +93,7 @@ async function createFirstPage(
 	template: StatisticalTemplate,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
 	const channel = interaction.channel;
 	if (!channel) throw new NoChannel();
@@ -210,4 +218,5 @@ async function createFirstPage(
 	const allButtons = Dice.buttons(ul, selfRegister.moderation && !moderator);
 
 	await reply(interaction, { components: [allButtons], embeds: [embed] });
+	profiler.stopProfiler();
 }

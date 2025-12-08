@@ -85,7 +85,6 @@ async function modalSubmit(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	profiler.startProfiler();
 	if (interaction.customId.includes("damageDice"))
 		await Dice.store(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
@@ -100,7 +99,6 @@ async function modalSubmit(
 	else if (interaction.customId === "rename")
 		await Rename.validate(interaction, ul, client);
 	else if (interaction.customId === "move") await Move.validate(interaction, ul, client);
-	profiler.stopProfiler();
 }
 
 /**

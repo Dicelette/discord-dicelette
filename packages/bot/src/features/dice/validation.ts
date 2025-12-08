@@ -24,6 +24,7 @@ import {
 	type BotErrorOptions,
 	capitalizeBetweenPunct,
 	logger,
+	profiler,
 	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import { getUserNameAndChar, registerUser, updateMemory } from "database";
@@ -59,6 +60,7 @@ export async function validate(
 	ul: Translation,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	const db = client.settings;
 	if (!interaction.message) return;
 	const message = await (interaction.channel as TextChannel).messages.fetch(
@@ -160,6 +162,7 @@ export async function validate(
 		userID,
 		userName,
 	});
+	profiler.stopProfiler();
 }
 
 /**

@@ -29,6 +29,7 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	logger,
+	profiler,
 	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
@@ -452,6 +453,7 @@ export async function validateByModeration(
 	ul: Translation,
 	client: EClient
 ) {
+	profiler.startProfiler();
 	//only used when the self-registration is enabled.
 	//after the modals the user can't validate the stats by himself and the moderation team should push the button "validate"
 	//we should display a little message in the channel to set the edit and add a button to validate
@@ -506,6 +508,7 @@ export async function validateByModeration(
 	const reply = await interaction.fetchReply();
 	//ping moderators in the channel
 	await sendValidationMessage(interaction, interaction.user, ul, client, reply.url);
+	profiler.stopProfiler();
 }
 
 export async function couldBeValidated(
