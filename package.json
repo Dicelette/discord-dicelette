@@ -14,7 +14,7 @@
 		"t": ""
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.22.1",
+		"@dicelette/core": "^1.22.2",
 		"@sentry/node": "^10.27.0",
 		"@sentry/profiling-node": "^10.27.0",
 		"@types/node": "^22.17.1",
