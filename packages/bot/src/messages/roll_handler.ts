@@ -210,25 +210,36 @@ async function replyToSource(
 	deleteInput = false,
 	hideResult?: boolean
 ): Promise<Djs.Message | Djs.InteractionResponse> {
-	const content = resultAsText.onMessageSend(idMessage, authorId);
+	const content: string | undefined = resultAsText.onMessageSend(idMessage, authorId);
+	const replyOptions: Djs.MessageCreateOptions = {
+		allowedMentions: { repliedUser: true },
+		content,
+	};
+	// biome-ignore lint/suspicious/noExplicitAny: too complicated typing
+	const flags: any[] = [];
+	if (content.length > 2000) {
+		delete replyOptions.content;
+		replyOptions.components = [new Djs.TextDisplayBuilder().setContent(content)];
+		flags.push(Djs.MessageFlags.IsComponentsV2);
+		replyOptions.flags = [Djs.MessageFlags.IsComponentsV2];
+	}
 
 	if (source instanceof Djs.Message) {
 		const channel = source.channel as DiscordTextChannel;
 		return deleteInput
-			? await channel.send({ content })
-			: await source.reply({
-					allowedMentions: { repliedUser: true },
-					content,
-				});
+			? await channel.send(replyOptions)
+			: await source.reply(replyOptions);
 	}
 
 	// CommandInteraction
-	if (source.replied || source.deferred) {
-		return await source.editReply({ content });
+	if (source.replied || source.deferred)
+		return await source.editReply(replyOptions as Djs.InteractionEditReplyOptions);
+
+	const replyInteraction = replyOptions as Djs.InteractionReplyOptions;
+
+	if (hideResult) {
+		flags.push(Djs.MessageFlags.Ephemeral);
+		replyInteraction.flags = flags;
 	}
-	return await source.reply({
-		allowedMentions: { repliedUser: true },
-		content,
-		flags: hideResult ? Djs.MessageFlags.Ephemeral : undefined,
-	});
+	return await source.reply(replyOptions as Djs.InteractionReplyOptions);
 }
