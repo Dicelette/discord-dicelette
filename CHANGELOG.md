@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.26.3](https://github.com/Dicelette/discord-dicelette/compare/2.26.2...2.26.3) (2025-12-09)
+
+
+### Bug Fixes
+
+* add profiler start/stop calls in interaction handling ([9375b60](https://github.com/Dicelette/discord-dicelette/commit/9375b60af32389634c0ed6a92cb0a993551f8bab))
+* **InteractionNotReplied:** should check before to send the follow up ([c266531](https://github.com/Dicelette/discord-dicelette/commit/c2665315287d1e007ead0caea51c4568b2b83754))
+* **roll:** allow 4000 characters comments using componentV2 ([c64d419](https://github.com/Dicelette/discord-dicelette/commit/c64d41975474d8103cc9bcf71668bea418ee57fa))
+* **sharedRoll:** false positive shared rolls when the comments includes ; ([7123138](https://github.com/Dicelette/discord-dicelette/commit/7123138c070969e0c644cae1ec47fc30f60184c5))
+
 ## [2.26.2](https://github.com/Dicelette/discord-dicelette/compare/2.26.1...2.26.2) (2025-12-07)
 
 
