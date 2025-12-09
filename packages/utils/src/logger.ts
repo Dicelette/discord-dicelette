@@ -5,6 +5,7 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
+import pkgJson from "../package.json" with { type: "json" };
 import { BotError } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
@@ -99,7 +100,7 @@ if (hasSentry) {
 		integrations: [nodeProfilingIntegration()],
 		profileLifecycle: "manual",
 		profileSessionSampleRate: 1.0,
-		release: process.env.BOT_VERSION, // optionnel,
+		release: `dicelette@${pkgJson.version}`,
 		sendDefaultPii: true,
 		tracesSampleRate: 1.0,
 	});
