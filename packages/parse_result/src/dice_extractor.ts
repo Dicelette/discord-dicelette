@@ -316,8 +316,14 @@ function getRollInShared(dice: string) {
 	return rollDice;
 }
 
+function isSharedRoll(dice: string): boolean {
+	//we need to remove the comments to avoid false positive
+	const cleanedDice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
+	return cleanedDice.includes(";");
+}
+
 export function getRoll(dice: string): Resultat | undefined {
-	if (dice.includes(";")) return getRollInShared(dice);
+	if (isSharedRoll(dice)) return getRollInShared(dice);
 	const comments = dice
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
 		.replaceAll("*", "\\*");
