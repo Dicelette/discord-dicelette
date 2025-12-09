@@ -42,6 +42,9 @@ export async function reply(
 		return await interaction.reply(options);
 	} catch (e) {
 		logger.error(e);
+		if (!interaction.deferred && !interaction.replied)
+			return await interaction.reply(options);
+
 		return await interaction.followUp(options);
 	}
 }
