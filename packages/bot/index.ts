@@ -50,12 +50,18 @@ try {
 
 const app = express();
 
-app.get("/healthz", (_req, res) => {
+app.get("/healthz", async (req, res) => {
+	if (req.headers["get-status-only"] === "true") {
+		if (client.ws.status === 0) res.status(200).send("OK");
+		else res.status(500).send("NOT OK");
+		return;
+	}
 	const status = {
 		botConnected: client.ws.status === 0,
-		guilds: client.guilds.cache.size,
+		guilds: (await client.guilds.fetch()).size,
 		latency: client.ws.ping,
-		uptime: process.uptime(),
+		uptime: process.uptime() * 1000,
+		version: VERSION,
 	};
 	if (client.ws.status === 0) res.status(200).json(status);
 	else res.status(500).json(status);
