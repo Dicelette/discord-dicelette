@@ -60,7 +60,7 @@ app.get("/healthz", async (req, res) => {
 		botConnected: client.ws.status === 0,
 		guilds: client.guilds.cache.size,
 		latency: client.ws.ping,
-		uptime: humanizeDuration(process.uptime()),
+		uptime: humanizeDuration(process.uptime() * 1000),
 		version: VERSION,
 	};
 	if (client.ws.status === 0) res.status(200).json(status);
