@@ -15,7 +15,7 @@ import {
 import { getTemplateByInteraction } from "database";
 import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
-import { Dice, Stats } from "features";
+import { Macro, Stats } from "features";
 import { embedError, reply } from "messages";
 import { continueCancelButtons, selfRegisterAllowance } from "utils";
 
@@ -215,7 +215,7 @@ async function createFirstPage(
 		});
 		return;
 	}
-	const allButtons = Dice.buttons(ul, selfRegister.moderation && !moderator);
+	const allButtons = Macro.buttons(ul, selfRegister.moderation && !moderator);
 
 	await reply(interaction, { components: [allButtons], embeds: [embed] });
 	profiler.stopProfiler();

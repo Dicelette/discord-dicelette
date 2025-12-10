@@ -17,7 +17,7 @@ import {
 	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { Dice, Stats } from "features";
+import { Macro, Stats } from "features";
 import * as Messages from "messages";
 import { selfRegisterAllowance } from "utils";
 
@@ -276,7 +276,7 @@ export async function validateUser(
 			diceEmbed = Messages.createDiceEmbed(ul);
 		}
 		//prevent duplicate fields in the dice embed
-		if (Dice.findDuplicate(diceEmbed, name)) continue;
+		if (Macro.findDuplicate(diceEmbed, name)) continue;
 		//why i forgot this????
 		diceEmbed.addFields({
 			inline: true,

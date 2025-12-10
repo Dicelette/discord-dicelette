@@ -9,7 +9,7 @@ import {
 	isArrayEqual,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { Dice } from "features";
+import { Macro } from "features";
 import { getEmbeds, reply } from "messages";
 import { allowEdit } from "utils";
 
@@ -53,7 +53,7 @@ export async function show(
 		statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
 		if (statToDisplay.length === 0) {
 			//remove button
-			const button = Dice.buttons(ul, isModerator);
+			const button = Macro.buttons(ul, isModerator);
 			await reply(interaction, {
 				content: ul("modals.alreadySet"),
 				flags: Djs.MessageFlags.Ephemeral,

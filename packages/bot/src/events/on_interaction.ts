@@ -13,7 +13,7 @@ import {
 } from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { Avatar, Dice, Move, Rename, Stats, User } from "features";
+import { Avatar, Macro, Move, Rename, Stats, User } from "features";
 import { embedError } from "messages";
 import { cancel } from "utils";
 import { interactionError } from "./on_error";
@@ -86,7 +86,7 @@ async function modalSubmit(
 	client: EClient
 ) {
 	if (interaction.customId.includes("damageDice"))
-		await Dice.store(interaction, ul, interactionUser, client);
+		await Macro.store(interaction, ul, interactionUser, client);
 	else if (interaction.customId.includes("page"))
 		await User.pageNumber(interaction, ul, client);
 	else if (interaction.customId === "editStats")
@@ -94,7 +94,7 @@ async function modalSubmit(
 	else if (interaction.customId === "firstPage")
 		await User.firstPage(interaction, client);
 	else if (interaction.customId === "editDice")
-		await Dice.validate(interaction, ul, client);
+		await Macro.validate(interaction, ul, client);
 	else if (interaction.customId === "editAvatar") await Avatar.edit(interaction, ul);
 	else if (interaction.customId === "rename")
 		await Rename.validate(interaction, ul, client);
@@ -131,7 +131,7 @@ async function buttonSubmit(
 	else if (interaction.customId === "continue")
 		await User.continuePage(interaction, template, ul, interactionUser, selfRegister);
 	else if (interaction.customId.includes("add_dice")) {
-		await Dice.add(interaction, interactionUser, client.settings);
+		await Macro.add(interaction, interactionUser, client.settings);
 		if (!interaction.customId.includes("first"))
 			await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "edit_stats") {
@@ -142,7 +142,7 @@ async function buttonSubmit(
 	} else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, client, interactionUser);
 	else if (interaction.customId === "edit_dice") {
-		await Dice.edit(interaction, ul, interactionUser, client.settings);
+		await Macro.edit(interaction, ul, interactionUser, client.settings);
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);
@@ -162,13 +162,13 @@ async function buttonSubmit(
 	} else if (interaction.customId.includes("modo_stats_cancel_")) {
 		await Stats.cancelStatsModeration(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_validation_")) {
-		await Dice.couldBeValidatedDice(interaction, ul, client);
+		await Macro.couldBeValidatedDice(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_cancel_")) {
-		await Dice.cancelDiceModeration(interaction, ul, client);
+		await Macro.cancelDiceModeration(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_add_validation_")) {
-		await Dice.couldBeValidatedDiceAdd(interaction, ul, client);
+		await Macro.couldBeValidatedDiceAdd(interaction, ul, client);
 	} else if (interaction.customId.includes("modo_dice_add_cancel_")) {
-		await Dice.cancelDiceAddModeration(interaction, ul, client);
+		await Macro.cancelDiceAddModeration(interaction, ul, client);
 	} else if (interaction.customId.includes("mark_as_valid")) {
 		const isModerator = interaction.guild?.members.cache
 			.get(interactionUser.id)
@@ -180,7 +180,7 @@ async function buttonSubmit(
 			});
 			return;
 		} //update the button of the message and send a DM
-		const button = Dice.buttons(ul, false, true);
+		const button = Macro.buttons(ul, false, true);
 		await interaction.message.edit({ components: [button] });
 		//send the message
 		await User.sendValidationMessage(interaction, interactionUser, ul, client);

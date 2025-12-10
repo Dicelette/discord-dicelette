@@ -35,7 +35,7 @@ import {
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
-import { Dice } from "features";
+import { Macro } from "features";
 import * as Messages from "messages";
 import {
 	createStatsEmbed,
@@ -104,8 +104,8 @@ export async function register(
 		.reduce((sum, field) => sum + Number.parseInt(field.value.removeBacktick(), 10), 0);
 	logger.trace(`Old stats total: ${oldStatsTotal}`);
 
-	let combinaisonFields: Record<string, string> = {};
-	let stats: Record<string, number> = {};
+	let combinaisonFields: Record<string, string>;
+	let stats: Record<string, number>;
 	const result = getStatistiqueFields(interaction, template, ul);
 	combinaisonFields = result.combinaisonFields;
 	stats = result.stats;
@@ -194,7 +194,7 @@ export async function register(
 		userEmbed.setFooter({ text: ul("common.page", { nb: page + 1 }) });
 
 		message.edit({
-			components: [Dice.buttons(ul, moderation && !isModerator)],
+			components: [Macro.buttons(ul, moderation && !isModerator)],
 			embeds: [userEmbed, statEmbeds],
 			files: uniqueFiles,
 		});
