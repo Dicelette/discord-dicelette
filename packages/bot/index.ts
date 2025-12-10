@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
-import { logger, sentry } from "@dicelette/utils";
+import { humanizeDuration, logger, sentry } from "@dicelette/utils";
 import dotenv from "dotenv";
 import "uniformize";
 import process from "node:process";
@@ -58,9 +58,9 @@ app.get("/healthz", async (req, res) => {
 	}
 	const status = {
 		botConnected: client.ws.status === 0,
-		guilds: (await client.guilds.fetch()).size,
+		guilds: client.guilds.cache.size,
 		latency: client.ws.ping,
-		uptime: process.uptime() * 1000,
+		uptime: humanizeDuration(process.uptime()),
 		version: VERSION,
 	};
 	if (client.ws.status === 0) res.status(200).json(status);
