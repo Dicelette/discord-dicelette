@@ -15,7 +15,7 @@ import {
 	setModerationFooter,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { evalStatsDice, isNumber, roll } from "@dicelette/core";
+import { evalStatsDice, isNumber } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type { Translation, UserMessageId, UserRegistration } from "@dicelette/types";
 import {
@@ -23,6 +23,7 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	capitalizeBetweenPunct,
+	DICE_PATTERNS,
 	logger,
 	profiler,
 	QUERY_URL_PATTERNS,
@@ -224,6 +225,9 @@ function createAndValidateDiceEmbed(
 		},
 		{} as Record<string, string>
 	);
+	const statsEmbeds = getEmbeds(message ?? undefined, "stats");
+	let statsValues: Record<string, number> | undefined;
+	if (statsEmbeds) statsValues = parseStatsString(statsEmbeds);
 
 	const newEmbedDice: Djs.APIEmbedField[] = [];
 	for (const [skill, dice] of Object.entries(dices)) {
@@ -232,20 +236,15 @@ function createAndValidateDiceEmbed(
 			newEmbedDice.push({ inline: true, name: skill.capitalize(), value: "X" });
 			continue;
 		}
-		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
-		if (!statsEmbeds) {
-			if (!roll(dice))
-				throw new BotError(ul("error.invalidDice.withDice", { dice }), botErrorOptions);
-			continue;
-		}
-		const statsValues = parseStatsString(statsEmbeds);
+		//remove comments if any
+		const toRoll = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		try {
-			evalStatsDice(dice, statsValues);
+			evalStatsDice(toRoll, statsValues);
 		} catch (error) {
 			logger.warn(error);
 			throw new BotError(ul("error.invalidDice.eval", { dice }), botErrorOptions);
 		}
-		newEmbedDice.push({ inline: true, name: skill.capitalize(), value: `\`${dice}\`` });
+		newEmbedDice.push({ inline: true, name: skill.capitalize(), value: `\`${toRoll}\`` });
 	}
 
 	const oldDice = diceEmbeds.toJSON().fields;

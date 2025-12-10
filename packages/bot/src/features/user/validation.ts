@@ -272,9 +272,8 @@ export async function validateUser(
 	for (const [name, dice] of Object.entries(template.damage ?? {})) {
 		if (!templateMacro) templateMacro = {};
 		templateMacro[name] = dice;
-		if (!diceEmbed) {
-			diceEmbed = Messages.createDiceEmbed(ul);
-		}
+		if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(ul);
+
 		//prevent duplicate fields in the dice embed
 		if (Macro.findDuplicate(diceEmbed, name)) continue;
 		//why i forgot this????

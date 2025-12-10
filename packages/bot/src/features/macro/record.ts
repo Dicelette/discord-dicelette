@@ -15,6 +15,7 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	capitalizeBetweenPunct,
+	DICE_PATTERNS,
 	NoEmbed,
 	profiler,
 } from "@dicelette/utils";
@@ -171,6 +172,8 @@ async function registerDamageDice(
 		}
 	const user = getUserByEmbed({ message: interaction.message }, first);
 	if (!user) throw new BotError(ul("error.user.notFound"), botErrorOptions); //mean that there is no embed
+	//remove comments
+	value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 	value = evalStatsDice(value, user.stats);
 
 	if (!findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {
