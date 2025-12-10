@@ -1,6 +1,6 @@
 {
 	"name": "dicelette",
-	"version": "2.26.3",
+	"version": "2.27.0",
 	"private": true,
 	"author": "",
 	"license": "GNU GPLv3",
@@ -25,7 +25,6 @@
 		"release": "commit-and-tag-version",
 		"test": "pnpm -r test"
 	},
-
 	"dependencies": {
 		"@dicelette/core": "^1.22.2",
 		"@sentry/node": "^10.27.0",

@@ -1,6 +1,6 @@
 {
 	"name": "@dicelette/bot",
-	"version": "2.26.3",
+	"version": "2.27.0",
 	"private": true,
 	"description": "",
 	"type": "module",

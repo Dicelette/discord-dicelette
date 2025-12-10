@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.27.0](https://github.com/Dicelette/discord-dicelette/compare/2.26.3...2.27.0) (2025-12-10)
+
+
+### Features
+
+* **sync-version:** add script to synchronize package versions ([7af49b6](https://github.com/Dicelette/discord-dicelette/commit/7af49b68e4c60c7971500bf7e4e4d09b5354991a))
+
+
+### Bug Fixes
+
+* **logger:** update release version to match package.json ([77c5613](https://github.com/Dicelette/discord-dicelette/commit/77c5613d93670f72a47fb151148838d6456a4101))
+* **macro:** clean up dice message handling and remove unnecessary comments ([c7c9799](https://github.com/Dicelette/discord-dicelette/commit/c7c97990fdd7294ddec0eb7e3f2f7d493033245c))
+
 ## [2.26.3](https://github.com/Dicelette/discord-dicelette/compare/2.26.2...2.26.3) (2025-12-09)
 
 
