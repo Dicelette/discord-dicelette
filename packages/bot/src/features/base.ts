@@ -14,17 +14,15 @@ export interface IFeature {
 		interaction: Djs.StringSelectMenuInteraction,
 		ul: Translation,
 		interactionUser: Djs.User,
-		db?: Settings
+		db: Settings
 	): Promise<void>;
 
 	/**
-	 * Optional method to handle button interactions
+	 * Optional method to handle modal submissions (Avatar uses this for edit)
 	 */
 	edit?(
-		interaction: Djs.ButtonInteraction | Djs.ModalSubmitInteraction,
-		ul: Translation,
-		interactionUser?: Djs.User,
-		dbOrClient?: Settings | EClient
+		interaction: Djs.ModalSubmitInteraction,
+		ul: Translation
 	): Promise<void>;
 
 	/**
