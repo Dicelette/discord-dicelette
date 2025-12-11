@@ -1,9 +1,11 @@
 import type { EClient } from "@dicelette/client";
-import type { Settings, Translation } from "@dicelette/types";
+import type { StatisticalTemplate } from "@dicelette/core";
+import type { Characters, Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 
 /**
  * Context object containing common dependencies for feature operations
+ * Extended to support more complex feature requirements
  */
 export interface FeatureContext {
 	interaction: Djs.BaseInteraction;
@@ -11,6 +13,11 @@ export interface FeatureContext {
 	interactionUser: Djs.User;
 	db?: Settings;
 	client?: EClient;
+	// Extended properties for complex features
+	template?: StatisticalTemplate;
+	characters?: Characters;
+	havePrivate?: boolean;
+	selfRegister?: boolean | string;
 }
 
 /**
@@ -44,6 +51,11 @@ export abstract class BaseFeature implements IFeature {
 	protected interactionUser: Djs.User;
 	protected db?: Settings;
 	protected client?: EClient;
+	// Extended properties for complex features
+	protected template?: StatisticalTemplate;
+	protected characters?: Characters;
+	protected havePrivate?: boolean;
+	protected selfRegister?: boolean | string;
 
 	constructor(context: FeatureContext) {
 		this.interaction = context.interaction;
@@ -51,5 +63,9 @@ export abstract class BaseFeature implements IFeature {
 		this.interactionUser = context.interactionUser;
 		this.db = context.db;
 		this.client = context.client;
+		this.template = context.template;
+		this.characters = context.characters;
+		this.havePrivate = context.havePrivate;
+		this.selfRegister = context.selfRegister;
 	}
 }
