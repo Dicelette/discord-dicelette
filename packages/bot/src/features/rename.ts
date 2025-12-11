@@ -112,8 +112,7 @@ export class RenameFeature extends Feature {
 		const userId = embed
 			.toJSON()
 			.fields?.find((field) => findln(field.name) === "common.user")
-			?.value.replace("<@", "")
-			.replace(">", "");
+			?.value.replace(/<@|>/g, "");
 		if (!userId) throw new BotError(ul("error.user.notFound"), botErrorOptions);
 		const user = await fetchUser(client, userId);
 		const sheetLocation: PersonnageIds = {

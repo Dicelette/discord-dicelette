@@ -94,8 +94,7 @@ export class MoveFeature extends Feature {
 		const oldUserId = embed
 			.toJSON()
 			.fields?.find((field) => findln(field.name) === "common.user")
-			?.value.replace("<@", "")
-			.replace(">", "");
+			?.value.replace(/<@|>/g, "");
 		if (!oldUserId) {
 			await interaction.reply({
 				embeds: [embedError(ul("error.user.notFound"), ul)],
