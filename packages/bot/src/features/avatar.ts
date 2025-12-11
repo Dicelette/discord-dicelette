@@ -27,9 +27,9 @@ export class AvatarFeature implements IFeature {
 		interaction: Djs.StringSelectMenuInteraction,
 		ul: Translation,
 		interactionUser: Djs.User,
-		db: Settings
+		db?: Settings
 	): Promise<void> {
-		if (await allowEdit(interaction, db, interactionUser))
+		if (db && await allowEdit(interaction, db, interactionUser))
 			await this.showAvatarEdit(interaction, ul);
 	}
 

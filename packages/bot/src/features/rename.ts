@@ -39,9 +39,9 @@ export class RenameFeature implements IFeature {
 		interaction: Djs.StringSelectMenuInteraction,
 		ul: Translation,
 		interactionUser: Djs.User,
-		db: Settings
+		db?: Settings
 	): Promise<void> {
-		if (await allowEdit(interaction, db, interactionUser))
+		if (db && await allowEdit(interaction, db, interactionUser))
 			await this.showRename(interaction, ul);
 	}
 
