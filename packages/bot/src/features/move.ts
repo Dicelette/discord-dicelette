@@ -31,6 +31,8 @@ const botErrorOptions: BotErrorOptions = {
 export class MoveFeature extends Feature {
 	/**
 	 * Handles the start of move operation from a select menu interaction
+	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter
+	 * as it only checks moderator permissions via guild member cache
 	 */
 	async start(
 		interaction: Djs.StringSelectMenuInteraction,
@@ -111,7 +113,7 @@ export class MoveFeature extends Feature {
 		}
 
 		const sheetLocation: PersonnageIds = {
-			channelId: interaction.channel!.id,
+			channelId: interaction.channel.id,
 			messageId: message.id,
 		};
 		const charData = getUserByEmbed({ message: message });
@@ -123,12 +125,12 @@ export class MoveFeature extends Feature {
 			return await resetButton(message, ul);
 		}
 		//update the characters in the database characters
-		const allCharsNewUser = client.characters.get(interaction.guild!.id, user.id);
-		const allCharsOldUser = client.characters.get(interaction.guild!.id, oldUserId);
+		const allCharsNewUser = client.characters.get(interaction.guild.id, user.id);
+		const allCharsOldUser = client.characters.get(interaction.guild.id, oldUserId);
 		if (allCharsOldUser)
 			//remove the character from the old user
 			client.characters.set(
-				interaction.guild!.id,
+				interaction.guild.id,
 				allCharsOldUser.filter((char) => char?.userName !== charData?.userName),
 				oldUserId
 			);
@@ -136,7 +138,7 @@ export class MoveFeature extends Feature {
 			//prevent duplicate
 			if (!allCharsNewUser.find((char) => char?.userName === charData?.userName))
 				client.characters.set(
-					interaction.guild!.id,
+					interaction.guild.id,
 					[...allCharsNewUser, charData],
 					user.id
 				);
