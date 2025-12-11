@@ -29,7 +29,8 @@ export class AvatarFeature implements IFeature {
 		interactionUser: Djs.User,
 		db?: Settings
 	): Promise<void> {
-		if (db && await allowEdit(interaction, db, interactionUser))
+		if (!db) return; // db is required for Avatar but optional in interface for Move compatibility
+		if (await allowEdit(interaction, db, interactionUser))
 			await this.showAvatarEdit(interaction, ul);
 	}
 

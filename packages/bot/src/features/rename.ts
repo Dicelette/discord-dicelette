@@ -41,7 +41,8 @@ export class RenameFeature implements IFeature {
 		interactionUser: Djs.User,
 		db?: Settings
 	): Promise<void> {
-		if (db && await allowEdit(interaction, db, interactionUser))
+		if (!db) return; // db is required for Rename but optional in interface for Move compatibility
+		if (await allowEdit(interaction, db, interactionUser))
 			await this.showRename(interaction, ul);
 	}
 
