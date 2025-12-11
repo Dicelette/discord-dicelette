@@ -2,8 +2,11 @@
 export { AvatarFeature } from "./avatar";
 export { MoveFeature } from "./move";
 export { RenameFeature } from "./rename";
+export { MacroFeature } from "./macro";
+export { StatsFeature } from "./stats";
+export { UserFeature } from "./user";
 
-// Old module-based exports (to be refactored)
-export * as Macro from "./macro";
-export * as Stats from "./stats";
-export * as User from "./user";
+// Keep old module-based exports for compatibility during transition
+export * as MacroModule from "./macro";
+export * as StatsModule from "./stats";
+export * as UserModule from "./user";
