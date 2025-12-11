@@ -3,6 +3,7 @@ import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,
 	PersonnageIds,
+	Settings,
 	Translation,
 	UserMessageId,
 } from "@dicelette/types";
@@ -37,7 +38,8 @@ export class MoveFeature implements IFeature {
 	async start(
 		interaction: Djs.StringSelectMenuInteraction,
 		ul: Translation,
-		interactionUser: Djs.User
+		interactionUser: Djs.User,
+		_db?: Settings // Unused but required by IFeature interface
 	): Promise<void> {
 		const moderator = interaction.guild?.members.cache
 			.get(interactionUser.id)
