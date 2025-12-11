@@ -14,12 +14,12 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
 import { allowEdit } from "utils";
-import { Feature } from "./base";
+import { IFeature } from "./base";
 
 /**
  * Avatar feature class - handles avatar editing operations
  */
-export class AvatarFeature extends Feature {
+export class AvatarFeature implements IFeature {
 	/**
 	 * Handles the start of avatar editing from a select menu interaction
 	 */

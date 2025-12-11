@@ -21,7 +21,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
-import { Feature } from "./base";
+import { IFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationRename",
@@ -31,7 +31,7 @@ const botErrorOptions: BotErrorOptions = {
 /**
  * Rename feature class - handles character renaming operations
  */
-export class RenameFeature extends Feature {
+export class RenameFeature implements IFeature {
 	/**
 	 * Handles the start of rename operation from a select menu interaction
 	 */

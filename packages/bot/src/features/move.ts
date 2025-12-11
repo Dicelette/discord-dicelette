@@ -18,7 +18,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
-import { Feature } from "./base";
+import { IFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationMove",
@@ -28,7 +28,7 @@ const botErrorOptions: BotErrorOptions = {
 /**
  * Move feature class - handles moving characters between users
  */
-export class MoveFeature extends Feature {
+export class MoveFeature implements IFeature {
 	/**
 	 * Handles the start of move operation from a select menu interaction
 	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter

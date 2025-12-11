@@ -3,45 +3,34 @@ import type { Settings, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 
 /**
- * Base class for all feature implementations
- * Provides common structure and utilities for feature modules
+ * Interface for feature implementations
+ * Defines the contract for feature modules without imposing implementation details
  */
-export abstract class Feature {
+export interface IFeature {
 	/**
 	 * Optional method to handle string select menu interactions
-	 * @param interaction - The string select menu interaction
-	 * @param ul - Translation utility
-	 * @param interactionUser - The user who triggered the interaction
-	 * @param db - Settings database
 	 */
-	async start?(
+	start?(
 		interaction: Djs.StringSelectMenuInteraction,
 		ul: Translation,
 		interactionUser: Djs.User,
-		db: Settings
+		db?: Settings
 	): Promise<void>;
 
 	/**
 	 * Optional method to handle button interactions
-	 * @param interaction - The button interaction
-	 * @param ul - Translation utility
-	 * @param interactionUser - The user who triggered the interaction
-	 * @param db - Settings database
 	 */
-	async edit?(
-		interaction: Djs.ButtonInteraction,
+	edit?(
+		interaction: Djs.ButtonInteraction | Djs.ModalSubmitInteraction,
 		ul: Translation,
-		interactionUser: Djs.User,
-		db: Settings
+		interactionUser?: Djs.User,
+		dbOrClient?: Settings | EClient
 	): Promise<void>;
 
 	/**
 	 * Optional method to validate modal submissions
-	 * @param interaction - The modal submit interaction
-	 * @param ul - Translation utility
-	 * @param client - The Discord client
 	 */
-	async validate?(
+	validate?(
 		interaction: Djs.ModalSubmitInteraction,
 		ul: Translation,
 		client: EClient
