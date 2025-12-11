@@ -13,7 +13,7 @@ import {
 } from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { Avatar, Macro, Move, Rename, Stats, User } from "features";
+import { AvatarFeature, Macro, MoveFeature, RenameFeature, Stats, User } from "features";
 import { embedError } from "messages";
 import { cancel } from "utils";
 import { interactionError } from "./on_error";
@@ -95,10 +95,16 @@ async function modalSubmit(
 		await User.firstPage(interaction, client);
 	else if (interaction.customId === "editDice")
 		await Macro.validate(interaction, ul, client);
-	else if (interaction.customId === "editAvatar") await Avatar.edit(interaction, ul);
-	else if (interaction.customId === "rename")
-		await Rename.validate(interaction, ul, client);
-	else if (interaction.customId === "move") await Move.validate(interaction, ul, client);
+	else if (interaction.customId === "editAvatar") {
+		const avatarFeature = new AvatarFeature(interaction, ul, interactionUser);
+		await avatarFeature.edit();
+	} else if (interaction.customId === "rename") {
+		const renameFeature = new RenameFeature(interaction, ul, interactionUser, undefined, client);
+		await renameFeature.validate();
+	} else if (interaction.customId === "move") {
+		const moveFeature = new MoveFeature(interaction, ul, interactionUser, client);
+		await moveFeature.validate();
+	}
 }
 
 /**
@@ -206,15 +212,21 @@ async function selectSubmit(
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
 		switch (value) {
-			case "name":
-				await Rename.start(interaction, ul, interactionUser, db);
+			case "name": {
+				const renameFeature = new RenameFeature(interaction, ul, interactionUser, db);
+				await renameFeature.start();
 				break;
-			case "avatar":
-				await Avatar.start(interaction, ul, interactionUser, db);
+			}
+			case "avatar": {
+				const avatarFeature = new AvatarFeature(interaction, ul, interactionUser, db);
+				await avatarFeature.start();
 				break;
-			case "user":
-				await Move.start(interaction, ul, interactionUser);
+			}
+			case "user": {
+				const moveFeature = new MoveFeature(interaction, ul, interactionUser);
+				await moveFeature.start();
 				break;
+			}
 		}
 	}
 	profiler.stopProfiler();

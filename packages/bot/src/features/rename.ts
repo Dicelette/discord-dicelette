@@ -21,7 +21,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
-import { Feature } from "./base";
+import type { Feature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationRename",
@@ -31,28 +31,47 @@ const botErrorOptions: BotErrorOptions = {
 /**
  * Rename feature class - handles character renaming operations
  */
-export class RenameFeature extends Feature {
+export class RenameFeature implements Feature {
+	private interaction: Djs.StringSelectMenuInteraction | Djs.ModalSubmitInteraction;
+	private ul: Translation;
+	private interactionUser: Djs.User;
+	private db?: Settings;
+	private client?: EClient;
+
+	constructor(
+		interaction: Djs.StringSelectMenuInteraction | Djs.ModalSubmitInteraction,
+		ul: Translation,
+		interactionUser: Djs.User,
+		db?: Settings,
+		client?: EClient
+	) {
+		this.interaction = interaction;
+		this.ul = ul;
+		this.interactionUser = interactionUser;
+		this.db = db;
+		this.client = client;
+	}
+
 	/**
 	 * Handles the start of rename operation from a select menu interaction
 	 */
-	async start(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation,
-		interactionUser: Djs.User,
-		db: Settings
-	): Promise<void> {
-		if (await allowEdit(interaction, db, interactionUser))
-			await this.showRename(interaction, ul);
+	async start(): Promise<void> {
+		if (
+			this.db &&
+			this.interaction instanceof Djs.StringSelectMenuInteraction &&
+			(await allowEdit(this.interaction, this.db, this.interactionUser))
+		)
+			await this.showRename();
 	}
 
 	/**
 	 * Extracts the current character name from the message embed associated with the interaction.
-	 * @param interaction - The Discord StringSelectMenuInteraction containing the message and embeds.
 	 * @returns The character name as a string, or null if not found or not set.
 	 */
-	private getCurrentName(interaction: Djs.StringSelectMenuInteraction): string | null {
-		if (!interaction.message) return null;
-		const embeds = getEmbeds(interaction.message, "user", interaction.message.embeds);
+	private getCurrentName(): string | null {
+		if (!(this.interaction instanceof Djs.StringSelectMenuInteraction)) return null;
+		if (!this.interaction.message) return null;
+		const embeds = getEmbeds(this.interaction.message, "user", this.interaction.message.embeds);
 		if (!embeds) return null;
 		const parsedFields = parseEmbedFields(embeds.toJSON() as Djs.Embed);
 		const charNameFields = [
@@ -68,23 +87,21 @@ export class RenameFeature extends Feature {
 	/**
 	 * Displays a modal for renaming a character
 	 */
-	private async showRename(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation
-	): Promise<void> {
-		const name = this.getCurrentName(interaction);
+	private async showRename(): Promise<void> {
+		if (!(this.interaction instanceof Djs.StringSelectMenuInteraction)) return;
+		const name = this.getCurrentName();
 		const modal = new Djs.ModalBuilder()
 			.setCustomId("rename")
-			.setTitle(ul("button.edit.name"))
+			.setTitle(this.ul("button.edit.name"))
 			.addLabelComponents((label) =>
-				label.setLabel(ul("common.charName")).setTextInputComponent((input) => {
+				label.setLabel(this.ul("common.charName")).setTextInputComponent((input) => {
 					input.setCustomId("newName").setStyle(Djs.TextInputStyle.Short).setRequired(true);
 					if (name) input.setValue(name);
 					return input;
 				})
 			);
 
-		await interaction.showModal(modal);
+		await this.interaction.showModal(modal);
 	}
 
 	/**
@@ -94,34 +111,32 @@ export class RenameFeature extends Feature {
 	 *
 	 * @throws {Error} If the required embed, user ID, user object, or character data cannot be found.
 	 */
-	async validate(
-		interaction: Djs.ModalSubmitInteraction,
-		ul: Translation,
-		client: EClient
-	): Promise<void> {
-		if (!interaction.message) return;
+	async validate(): Promise<void> {
+		if (!this.client) return;
+		if (!(this.interaction instanceof Djs.ModalSubmitInteraction)) return;
+		if (!this.interaction.message) return;
 		profiler.startProfiler();
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
+		const message = await (this.interaction.channel as TextChannel).messages.fetch(
+			this.interaction.message.id
 		);
-		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-		const newName = interaction.fields.getTextInputValue("newName");
-		if (!newName || !interaction.channel) return;
+		await this.interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+		const newName = this.interaction.fields.getTextInputValue("newName");
+		if (!newName || !this.interaction.channel) return;
 		const embed = getEmbeds(message, "user");
-		if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
+		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const userId = embed
 			.toJSON()
 			.fields?.find((field) => findln(field.name) === "common.user")
 			?.value.replace(/<@|>/g, "");
-		if (!userId) throw new BotError(ul("error.user.notFound"), botErrorOptions);
-		const user = await fetchUser(client, userId);
+		if (!userId) throw new BotError(this.ul("error.user.notFound"), botErrorOptions);
+		const user = await fetchUser(this.client, userId);
 		const sheetLocation: PersonnageIds = {
-			channelId: interaction.channel.id,
+			channelId: this.interaction.channel.id,
 			messageId: message.id,
 		};
-		if (!user) throw new BotError(ul("error.user.notFound"), botErrorOptions);
+		if (!user) throw new BotError(this.ul("error.user.notFound"), botErrorOptions);
 		const charData = getUserByEmbed({ message: message });
-		if (!charData) throw new BotError(ul("error.user.youRegistered"), botErrorOptions);
+		if (!charData) throw new BotError(this.ul("error.user.youRegistered"), botErrorOptions);
 		const oldData: {
 			charName?: string | null;
 			messageId: UserMessageId;
@@ -133,26 +148,23 @@ export class RenameFeature extends Feature {
 			isPrivate: charData.private,
 			messageId: [sheetLocation.messageId, sheetLocation.channelId],
 		};
-		const guildData = client.settings.get(interaction.guildId as string);
+		const guildData = this.client.settings.get(this.interaction.guildId as string);
 		if (!guildData) return;
 		//update the characters database
 		//remove the old chara
-		await updateMemory(client.characters, interaction.guild!.id, userId, ul, {
+		await updateMemory(this.client.characters, this.interaction.guild!.id, userId, this.ul, {
 			userData: charData,
 		});
 		await rename(
 			newName,
-			interaction,
-			ul,
+			this.interaction,
+			this.ul,
 			user,
-			client,
+			this.client,
 			sheetLocation,
 			oldData,
-			interaction.channel as DiscordChannel
+			this.interaction.channel as DiscordChannel
 		);
 		profiler.stopProfiler();
 	}
 }
-
-// Export singleton instance
-export const Rename = new RenameFeature();

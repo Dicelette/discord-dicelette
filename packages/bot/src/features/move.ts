@@ -18,7 +18,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
-import { Feature } from "./base";
+import type { Feature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationMove",
@@ -28,24 +28,38 @@ const botErrorOptions: BotErrorOptions = {
 /**
  * Move feature class - handles moving characters between users
  */
-export class MoveFeature extends Feature {
+export class MoveFeature implements Feature {
+	private interaction: Djs.StringSelectMenuInteraction | Djs.ModalSubmitInteraction;
+	private ul: Translation;
+	private interactionUser: Djs.User;
+	private client?: EClient;
+
+	constructor(
+		interaction: Djs.StringSelectMenuInteraction | Djs.ModalSubmitInteraction,
+		ul: Translation,
+		interactionUser: Djs.User,
+		client?: EClient
+	) {
+		this.interaction = interaction;
+		this.ul = ul;
+		this.interactionUser = interactionUser;
+		this.client = client;
+	}
+
 	/**
 	 * Handles the start of move operation from a select menu interaction
 	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter
 	 * as it only checks moderator permissions via guild member cache
 	 */
-	async start(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation,
-		interactionUser: Djs.User
-	): Promise<void> {
-		const moderator = interaction.guild?.members.cache
-			.get(interactionUser.id)
+	async start(): Promise<void> {
+		if (!(this.interaction instanceof Djs.StringSelectMenuInteraction)) return;
+		const moderator = this.interaction.guild?.members.cache
+			.get(this.interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (moderator) await this.showMove(interaction, ul);
+		if (moderator) await this.showMove();
 		else
-			await interaction.reply({
-				content: ul("modals.noPermission"),
+			await this.interaction.reply({
+				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 	}
@@ -53,21 +67,19 @@ export class MoveFeature extends Feature {
 	/**
 	 * Displays a modal for selecting a user to move the character to
 	 */
-	private async showMove(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation
-	): Promise<void> {
+	private async showMove(): Promise<void> {
+		if (!(this.interaction instanceof Djs.StringSelectMenuInteraction)) return;
 		const modal = new Djs.ModalBuilder()
 			.setCustomId("move")
-			.setTitle(ul("button.user"))
+			.setTitle(this.ul("button.user"))
 			.addLabelComponents((label) =>
 				label
-					.setLabel(ul("common.user"))
+					.setLabel(this.ul("common.user"))
 					.setUserSelectMenuComponent((select) =>
 						select.setCustomId("user").setRequired(true).setMaxValues(1)
 					)
 			);
-		await interaction.showModal(modal);
+		await this.interaction.showModal(modal);
 	}
 
 	/**
@@ -75,69 +87,70 @@ export class MoveFeature extends Feature {
 	 *
 	 * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
 	 */
-	async validate(
-		interaction: Djs.ModalSubmitInteraction,
-		ul: Translation,
-		client: EClient
-	): Promise<void> {
-		if (!interaction.message || !interaction.channel || !interaction.guild) return;
+	async validate(): Promise<void> {
+		if (!this.client) return;
+		if (!(this.interaction instanceof Djs.ModalSubmitInteraction)) return;
+		if (!this.interaction.message || !this.interaction.channel || !this.interaction.guild) return;
 		profiler.startProfiler();
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
+		const message = await (this.interaction.channel as TextChannel).messages.fetch(
+			this.interaction.message.id
 		);
-		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-		const user = interaction.fields.getSelectedUsers("user")?.first();
+		await this.interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+		const user = this.interaction.fields.getSelectedUsers("user")?.first();
 		if (!user) return;
 		const embed = getEmbeds(message, "user");
-		if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
+		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 
 		const oldUserId = embed
 			.toJSON()
 			.fields?.find((field) => findln(field.name) === "common.user")
 			?.value.replace(/<@|>/g, "");
 		if (!oldUserId) {
-			await interaction.reply({
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+			await this.interaction.reply({
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return await resetButton(message, ul);
+			await resetButton(message, this.ul);
+			return;
 		}
-		const oldUser = await isUserNameOrId(oldUserId, interaction);
+		const oldUser = await isUserNameOrId(oldUserId, this.interaction);
 		if (!oldUser) {
-			await interaction.reply({
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+			await this.interaction.reply({
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return await resetButton(message, ul);
+			await resetButton(message, this.ul);
+			return;
 		}
 
 		const sheetLocation: PersonnageIds = {
-			channelId: interaction.channel.id,
+			channelId: this.interaction.channel.id,
 			messageId: message.id,
 		};
 		const charData = getUserByEmbed({ message: message });
 		if (!charData) {
-			await interaction.reply({
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+			await this.interaction.reply({
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return await resetButton(message, ul);
+			await resetButton(message, this.ul);
+			return;
 		}
 		//update the characters in the database characters
-		const allCharsNewUser = client.characters.get(interaction.guild.id, user.id);
-		const allCharsOldUser = client.characters.get(interaction.guild.id, oldUserId);
+		const allCharsNewUser = this.client.characters.get(this.interaction.guild.id, user.id);
+		const allCharsOldUser = this.client.characters.get(this.interaction.guild.id, oldUserId);
 		if (allCharsOldUser)
 			//remove the character from the old user
-			client.characters.set(
-				interaction.guild.id,
+			this.client.characters.set(
+				this.interaction.guild.id,
 				allCharsOldUser.filter((char) => char?.userName !== charData?.userName),
 				oldUserId
 			);
 		if (allCharsNewUser) {
 			//prevent duplicate
 			if (!allCharsNewUser.find((char) => char?.userName === charData?.userName))
-				client.characters.set(
-					interaction.guild.id,
+				this.client.characters.set(
+					this.interaction.guild.id,
 					[...allCharsNewUser, charData],
 					user.id
 				);
@@ -152,23 +165,20 @@ export class MoveFeature extends Feature {
 			charName: charData.userName,
 			damageName: Object.keys(charData.damage ?? {}),
 			isPrivate: charData.private,
-			messageId: [message.id, interaction.channel.id],
+			messageId: [message.id, this.interaction.channel.id],
 		};
-		const guildData = client.settings.get(interaction.guild.id);
+		const guildData = this.client.settings.get(this.interaction.guild.id);
 		if (!guildData) return;
 		await move(
 			user,
-			interaction,
-			ul,
+			this.interaction,
+			this.ul,
 			oldUser.user,
-			client,
+			this.client,
 			sheetLocation,
 			oldData,
-			interaction.channel as DiscordChannel
+			this.interaction.channel as DiscordChannel
 		);
 		profiler.stopProfiler();
 	}
 }
-
-// Export singleton instance
-export const Move = new MoveFeature();

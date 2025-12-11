@@ -1,49 +1,35 @@
 import type { EClient } from "@dicelette/client";
 import type { Settings, Translation } from "@dicelette/types";
-import * as Djs from "discord.js";
+import type * as Djs from "discord.js";
 
 /**
- * Base class for all feature implementations
- * Provides common structure and utilities for feature modules
+ * Context interface for feature operations
  */
-export abstract class Feature {
+export interface FeatureContext {
+	interaction: Djs.StringSelectMenuInteraction | Djs.ModalSubmitInteraction;
+	ul: Translation;
+	interactionUser: Djs.User;
+	db?: Settings;
+	client?: EClient;
+}
+
+/**
+ * Interface for all feature implementations
+ * Features should implement this interface and store context as instance properties
+ */
+export interface Feature {
 	/**
-	 * Optional method to handle string select menu interactions
-	 * @param interaction - The string select menu interaction
-	 * @param ul - Translation utility
-	 * @param interactionUser - The user who triggered the interaction
-	 * @param db - Settings database
+	 * Optional method to handle string select menu interactions (start operation)
 	 */
-	async start?(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation,
-		interactionUser: Djs.User,
-		db: Settings
-	): Promise<void>;
+	start?(): Promise<void>;
 
 	/**
-	 * Optional method to handle button interactions
-	 * @param interaction - The button interaction
-	 * @param ul - Translation utility
-	 * @param interactionUser - The user who triggered the interaction
-	 * @param db - Settings database
+	 * Optional method to handle modal submissions (validation operation)
 	 */
-	async edit?(
-		interaction: Djs.ButtonInteraction,
-		ul: Translation,
-		interactionUser: Djs.User,
-		db: Settings
-	): Promise<void>;
+	validate?(): Promise<void>;
 
 	/**
-	 * Optional method to validate modal submissions
-	 * @param interaction - The modal submit interaction
-	 * @param ul - Translation utility
-	 * @param client - The Discord client
+	 * Optional method to handle button interactions (edit operation)
 	 */
-	async validate?(
-		interaction: Djs.ModalSubmitInteraction,
-		ul: Translation,
-		client: EClient
-	): Promise<void>;
+	edit?(): Promise<void>;
 }
