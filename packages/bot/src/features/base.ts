@@ -9,12 +9,13 @@ import * as Djs from "discord.js";
 export interface IFeature {
 	/**
 	 * Optional method to handle string select menu interactions
+	 * Note: db parameter is optional as not all features require it (e.g., Move)
 	 */
 	start?(
 		interaction: Djs.StringSelectMenuInteraction,
 		ul: Translation,
 		interactionUser: Djs.User,
-		db: Settings
+		db?: Settings
 	): Promise<void>;
 
 	/**
