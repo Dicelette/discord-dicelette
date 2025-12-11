@@ -122,26 +122,25 @@ export class MoveFeature extends BaseFeature {
 			return await resetButton(message, this.ul);
 		}
 		//update the characters in the database characters
-		const allCharsNewUser = this.client.characters.get(interaction.guild.id, user.id);
+		const allCharsNewUser = this.client.characters.get(interaction.guild.id, user.id) || [];
 		const allCharsOldUser = this.client.characters.get(interaction.guild.id, oldUserId);
-		if (allCharsOldUser)
-			//remove the character from the old user
+		
+		// Remove character from old user
+		if (allCharsOldUser) {
 			this.client.characters.set(
 				interaction.guild.id,
 				allCharsOldUser.filter((char) => char?.userName !== charData?.userName),
 				oldUserId
 			);
-		if (allCharsNewUser) {
-			//prevent duplicate
-			if (!allCharsNewUser.find((char) => char?.userName === charData?.userName))
-				this.client.characters.set(
-					interaction.guild.id,
-					[...allCharsNewUser, charData],
-					user.id
-				);
-		} else {
-			// User has no existing characters, create new array
-			this.client.characters.set(interaction.guild.id, [charData], user.id);
+		}
+		
+		// Add character to new user if not already present
+		if (!allCharsNewUser.find((char) => char?.userName === charData?.userName)) {
+			this.client.characters.set(
+				interaction.guild.id,
+				[...allCharsNewUser, charData],
+				user.id
+			);
 		}
 
 		const oldData: {
