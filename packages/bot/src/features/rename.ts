@@ -97,7 +97,6 @@ export class RenameFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
 		if (!this.client) return;
-		
 		profiler.startProfiler();
 		const message = await (interaction.channel as TextChannel).messages.fetch(
 			interaction.message.id

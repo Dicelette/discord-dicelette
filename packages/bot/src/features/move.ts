@@ -79,7 +79,6 @@ export class MoveFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
 		if (!this.client) return;
-		
 		profiler.startProfiler();
 		const message = await (interaction.channel as TextChannel).messages.fetch(
 			interaction.message.id
@@ -140,6 +139,9 @@ export class MoveFeature extends BaseFeature {
 					[...allCharsNewUser, charData],
 					user.id
 				);
+		} else {
+			// User has no existing characters, create new array
+			this.client.characters.set(interaction.guild.id, [charData], user.id);
 		}
 
 		const oldData: {
