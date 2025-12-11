@@ -134,7 +134,7 @@ export class MoveFeature extends BaseFeature {
 			);
 		if (allCharsNewUser) {
 			//prevent duplicate
-			if (!allCharsNewUser.find((char) => char?.userName !== charData?.userName))
+			if (!allCharsNewUser.find((char) => char?.userName === charData?.userName))
 				this.client.characters.set(
 					interaction.guild.id,
 					[...allCharsNewUser, charData],
