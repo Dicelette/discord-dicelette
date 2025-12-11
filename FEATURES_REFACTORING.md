@@ -80,9 +80,12 @@ This document tracks the refactoring of the bot's features directory from a modu
 - **Recommendation**: Refactor after Stats and Macro
 
 ## Cleanup Tasks
-- [ ] Remove old `features/avatar/` subdirectory once Avatar refactoring is confirmed working
-- [ ] Remove old `features/move/` subdirectory once Move refactoring is confirmed working
-- [ ] Remove old `features/rename/` subdirectory once Rename refactoring is confirmed working
+- [x] Remove old `features/avatar/` subdirectory (COMPLETED)
+- [x] Remove old `features/move/` subdirectory (COMPLETED)
+- [x] Remove old `features/rename/` subdirectory (COMPLETED)
+- [ ] Remove old `features/stats/` subdirectory once Stats refactoring is complete
+- [ ] Remove old `features/macro/` subdirectory once Macro refactoring is complete
+- [ ] Remove old `features/user/` subdirectory once User refactoring is complete
 
 ## Pattern Established
 
