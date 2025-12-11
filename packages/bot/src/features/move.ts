@@ -19,7 +19,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
-import { IFeature } from "./base";
+import { BaseFeature, type FeatureContext } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationMove",
@@ -28,26 +28,27 @@ const botErrorOptions: BotErrorOptions = {
 
 /**
  * Move feature class - handles moving characters between users
+ * Uses instance properties to store context and reduce parameter passing
  */
-export class MoveFeature implements IFeature {
+export class MoveFeature extends BaseFeature {
+	constructor(context: FeatureContext) {
+		super(context);
+	}
+
 	/**
 	 * Handles the start of move operation from a select menu interaction
 	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter
 	 * as it only checks moderator permissions via guild member cache
 	 */
-	async start(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation,
-		interactionUser: Djs.User,
-		_db?: Settings // Unused but required by IFeature interface
-	): Promise<void> {
+	async start(): Promise<void> {
+		const interaction = this.interaction as Djs.StringSelectMenuInteraction;
 		const moderator = interaction.guild?.members.cache
-			.get(interactionUser.id)
+			.get(this.interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (moderator) await this.showMove(interaction, ul);
+		if (moderator) await this.showMove(interaction);
 		else
 			await interaction.reply({
-				content: ul("modals.noPermission"),
+				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 	}
@@ -55,16 +56,13 @@ export class MoveFeature implements IFeature {
 	/**
 	 * Displays a modal for selecting a user to move the character to
 	 */
-	private async showMove(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation
-	): Promise<void> {
+	private async showMove(interaction: Djs.StringSelectMenuInteraction): Promise<void> {
 		const modal = new Djs.ModalBuilder()
 			.setCustomId("move")
-			.setTitle(ul("button.user"))
+			.setTitle(this.ul("button.user"))
 			.addLabelComponents((label) =>
 				label
-					.setLabel(ul("common.user"))
+					.setLabel(this.ul("common.user"))
 					.setUserSelectMenuComponent((select) =>
 						select.setCustomId("user").setRequired(true).setMaxValues(1)
 					)
@@ -77,12 +75,11 @@ export class MoveFeature implements IFeature {
 	 *
 	 * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
 	 */
-	async validate(
-		interaction: Djs.ModalSubmitInteraction,
-		ul: Translation,
-		client: EClient
-	): Promise<void> {
+	async validate(): Promise<void> {
+		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
+		if (!this.client) return;
+		
 		profiler.startProfiler();
 		const message = await (interaction.channel as TextChannel).messages.fetch(
 			interaction.message.id
@@ -91,7 +88,7 @@ export class MoveFeature implements IFeature {
 		const user = interaction.fields.getSelectedUsers("user")?.first();
 		if (!user) return;
 		const embed = getEmbeds(message, "user");
-		if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
+		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 
 		const oldUserId = embed
 			.toJSON()
@@ -99,18 +96,18 @@ export class MoveFeature implements IFeature {
 			?.value.replace(/<@|>/g, "");
 		if (!oldUserId) {
 			await interaction.reply({
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return await resetButton(message, ul);
+			return await resetButton(message, this.ul);
 		}
 		const oldUser = await isUserNameOrId(oldUserId, interaction);
 		if (!oldUser) {
 			await interaction.reply({
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return await resetButton(message, ul);
+			return await resetButton(message, this.ul);
 		}
 
 		const sheetLocation: PersonnageIds = {
@@ -120,25 +117,25 @@ export class MoveFeature implements IFeature {
 		const charData = getUserByEmbed({ message: message });
 		if (!charData) {
 			await interaction.reply({
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return await resetButton(message, ul);
+			return await resetButton(message, this.ul);
 		}
 		//update the characters in the database characters
-		const allCharsNewUser = client.characters.get(interaction.guild.id, user.id);
-		const allCharsOldUser = client.characters.get(interaction.guild.id, oldUserId);
+		const allCharsNewUser = this.client.characters.get(interaction.guild.id, user.id);
+		const allCharsOldUser = this.client.characters.get(interaction.guild.id, oldUserId);
 		if (allCharsOldUser)
 			//remove the character from the old user
-			client.characters.set(
+			this.client.characters.set(
 				interaction.guild.id,
 				allCharsOldUser.filter((char) => char?.userName !== charData?.userName),
 				oldUserId
 			);
 		if (allCharsNewUser) {
 			//prevent duplicate
-			if (!allCharsNewUser.find((char) => char?.userName === charData?.userName))
-				client.characters.set(
+			if (!allCharsNewUser.find((char) => char?.userName !== charData?.userName))
+				this.client.characters.set(
 					interaction.guild.id,
 					[...allCharsNewUser, charData],
 					user.id
@@ -156,14 +153,14 @@ export class MoveFeature implements IFeature {
 			isPrivate: charData.private,
 			messageId: [message.id, interaction.channel.id],
 		};
-		const guildData = client.settings.get(interaction.guild.id);
+		const guildData = this.client.settings.get(interaction.guild.id);
 		if (!guildData) return;
 		await move(
 			user,
 			interaction,
-			ul,
+			this.ul,
 			oldUser.user,
-			client,
+			this.client,
 			sheetLocation,
 			oldData,
 			interaction.channel as DiscordChannel
@@ -171,6 +168,3 @@ export class MoveFeature implements IFeature {
 		profiler.stopProfiler();
 	}
 }
-
-// Export singleton instance
-export const Move = new MoveFeature();

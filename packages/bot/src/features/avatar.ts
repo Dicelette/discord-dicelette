@@ -14,41 +14,38 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
 import { allowEdit } from "utils";
-import { IFeature } from "./base";
+import { BaseFeature, type FeatureContext } from "./base";
 
 /**
  * Avatar feature class - handles avatar editing operations
+ * Uses instance properties to store context and reduce parameter passing
  */
-export class AvatarFeature implements IFeature {
+export class AvatarFeature extends BaseFeature {
+	constructor(context: FeatureContext) {
+		super(context);
+	}
+
 	/**
 	 * Handles the start of avatar editing from a select menu interaction
 	 */
-	async start(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation,
-		interactionUser: Djs.User,
-		db?: Settings
-	): Promise<void> {
-		if (!db) return; // db is required for Avatar but optional in interface for Move compatibility
-		if (await allowEdit(interaction, db, interactionUser))
-			await this.showAvatarEdit(interaction, ul);
+	async start(): Promise<void> {
+		const interaction = this.interaction as Djs.StringSelectMenuInteraction;
+		if (!this.db) return; // db is required for Avatar
+		if (await allowEdit(interaction, this.db, this.interactionUser))
+			await this.showAvatarEdit(interaction);
 	}
 
 	/**
 	 * Displays a modal for editing a user's avatar, pre-filling the input with the current avatar URL.
 	 *
-	 * @param interaction - The select menu interaction triggering the avatar edit.
-	 * @param ul - The translation function or object for localized strings.
-	 *
 	 * @throws {Error} If the user embed is not found in the interaction message.
 	 */
 	private async showAvatarEdit(
-		interaction: Djs.StringSelectMenuInteraction,
-		ul: Translation
+		interaction: Djs.StringSelectMenuInteraction
 	): Promise<void> {
 		const embed = getEmbeds(interaction.message, "user");
 		if (!embed)
-			throw new BotError(ul("error.embed.notFound"), {
+			throw new BotError(this.ul("error.embed.notFound"), {
 				cause: "AVATAR_EDIT",
 				level: BotErrorLevel.Warning,
 			});
@@ -59,11 +56,11 @@ export class AvatarFeature implements IFeature {
 		if (thumbnail.match(QUERY_URL_PATTERNS.DISCORD_CDN)) thumbnail = "";
 		const modal = new Djs.ModalBuilder()
 			.setCustomId("editAvatar")
-			.setTitle(ul("button.avatar.description"))
+			.setTitle(this.ul("button.avatar.description"))
 			.addLabelComponents((label) =>
 				label
-					.setLabel(ul("modals.avatar.name"))
-					.setDescription(ul("modals.avatar.description"))
+					.setLabel(this.ul("modals.avatar.name"))
+					.setDescription(this.ul("modals.avatar.description"))
 					.setTextInputComponent((input) =>
 						input
 							.setCustomId("avatar")
@@ -74,8 +71,8 @@ export class AvatarFeature implements IFeature {
 			)
 			.addLabelComponents((label) =>
 				label
-					.setLabel(ul("modals.avatar.name"))
-					.setDescription(ul("modals.avatar.file.description"))
+					.setLabel(this.ul("modals.avatar.name"))
+					.setDescription(this.ul("modals.avatar.file.description"))
 					.setFileUploadComponent((file) =>
 						file.setCustomId("avatarFile").setRequired(false).setMaxValues(1)
 					)
@@ -89,12 +86,10 @@ export class AvatarFeature implements IFeature {
 	 *
 	 * Validates the provided avatar URL, updates the embed's thumbnail if valid, edits the original message with the new embed, and sends an ephemeral confirmation reply to the user.
 	 *
-	 * @param interaction - The modal submission interaction containing the avatar URL input.
-	 * @param ul - Localization utility for retrieving translated strings.
-	 *
 	 * @throws {Error} If the user embed is not found in the message.
 	 */
-	async edit(interaction: Djs.ModalSubmitInteraction, ul: Translation): Promise<void> {
+	async edit(): Promise<void> {
+		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
 		profiler.startProfiler();
 		const message = await (interaction.channel as TextChannel).messages.fetch(
@@ -108,7 +103,7 @@ export class AvatarFeature implements IFeature {
 		if (uploaded) {
 			if (!uploaded.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS))
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.avatar.format"), ul)],
+					embeds: [embedError(this.ul("error.avatar.format"), this.ul)],
 				});
 			const attachment = new Djs.AttachmentBuilder(uploaded.url, { name: uploaded.name });
 			files.push(attachment);
@@ -117,27 +112,27 @@ export class AvatarFeature implements IFeature {
 			const input = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 			if (!input)
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.avatar.missing"), ul)],
+					embeds: [embedError(this.ul("error.avatar.missing"), this.ul)],
 				});
 			if (input.match(QUERY_URL_PATTERNS.DISCORD_CDN))
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.avatar.cdn"), ul)],
+					embeds: [embedError(this.ul("error.avatar.cdn"), this.ul)],
 				});
 			if (!verifyAvatarUrl(input))
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.avatar.url"), ul)],
+					embeds: [embedError(this.ul("error.avatar.url"), this.ul)],
 				});
 			avatar = input;
 		}
 
 		const embed = getEmbeds(message, "user");
 		if (!embed)
-			throw new BotError(ul("error.embed.notFound"), {
+			throw new BotError(this.ul("error.embed.notFound"), {
 				cause: "AVATAR_EDIT",
 				level: BotErrorLevel.Warning,
 			});
 		embed.setThumbnail(avatar);
-		const embedsList = await replaceEmbedInList(ul, { embed, which: "user" }, message);
+		const embedsList = await replaceEmbedInList(this.ul, { embed, which: "user" }, message);
 
 		await message.edit({ embeds: embedsList.list, files });
 		const user = embed
@@ -150,12 +145,9 @@ export class AvatarFeature implements IFeature {
 			!charName || findln(charName) === "common.noSet" ? user : `${user} (${charName})`;
 		const msgLink = message.url;
 		await reply(interaction, {
-			content: ul("edit.avatar.success", { link: msgLink, name: nameMention }),
+			content: this.ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		profiler.stopProfiler();
 	}
 }
-
-// Export singleton instance
-export const Avatar = new AvatarFeature();
