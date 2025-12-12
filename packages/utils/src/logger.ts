@@ -96,8 +96,14 @@ if (hasSentry) {
 			return breadcrumb;
 		},
 		dsn: process.env.SENTRY_DSN,
+		enableLogs: true,
 		environment: process.env.NODE_ENV ?? "production",
-		integrations: [nodeProfilingIntegration()],
+		integrations: [
+			nodeProfilingIntegration(),
+			Sentry.consoleLoggingIntegration({
+				levels: ["debug", "info", "warn", "error", "log", "assert", "trace"],
+			}),
+		],
 		profileLifecycle: "manual",
 		profileSessionSampleRate: 1.0,
 		release: `dicelette@${pkgJson.version}`,
