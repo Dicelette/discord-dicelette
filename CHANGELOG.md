@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.28.0](https://github.com/Dicelette/discord-dicelette/compare/2.27.0...2.28.0) (2025-12-12)
+
+
+### Features
+
+* **choose:** add `|` and weight with *nb ([c981679](https://github.com/Dicelette/discord-dicelette/commit/c981679a10519b2ce2854173ab4f821ccb238a90))
+* **health-check:** enhance health check endpoint with detailed status and resource usage ([5e13b53](https://github.com/Dicelette/discord-dicelette/commit/5e13b53026d9e68323f85aff82d7bab75b061e36))
+* **logger:** add sentry logs ([cdf49ca](https://github.com/Dicelette/discord-dicelette/commit/cdf49caac11158491a4b54fb3f828d0c1c4ddfc2))
+
+
+### Bug Fixes
+
+* **choose:** use array fill instead of repeat ([ea59ff8](https://github.com/Dicelette/discord-dicelette/commit/ea59ff8dbdf49390e2ed0509835b3a1ae2e23817))
+
 ## [2.27.0](https://github.com/Dicelette/discord-dicelette/compare/2.26.3...2.27.0) (2025-12-10)
 
 
