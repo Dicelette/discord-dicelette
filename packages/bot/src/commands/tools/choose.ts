@@ -5,6 +5,8 @@ import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { random } from "@dicelette/utils";
 
+const REPEAT_CHOOSE = /(?<word>.*?)\* ?(?<repeat>\d+)/;
+
 export const choose = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("choose.name")
@@ -53,19 +55,37 @@ export const select = {
 };
 
 function separator(input: string) {
-	//on doit privilégier , et ; sur l'espace pour éviter de séparer des éléments composés de plusieurs mots
-	if (input.includes(",") || input.includes(";")) return /[,;]/;
+	const sep = /[,;|]/;
+	if (input.match(sep)) return sep;
 	return /\s+/;
+}
+
+function weight(input: string[]): string[] {
+	const results: string[] = [];
+	for (const item of input) {
+		const match = REPEAT_CHOOSE.exec(item);
+		if (match?.groups) {
+			const word = match.groups.word.trim();
+			const repeat = Number.parseInt(match.groups.repeat, 10);
+			results.push(word.repeat(repeat));
+			continue;
+		}
+		results.push(item);
+	}
+	return results;
 }
 
 async function command(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 	const list = interaction.options.getString(t("choose.list.name"), true);
 	const howMany = interaction.options.getInteger(t("choose.number.name"), false);
 	const { ul } = getLangAndConfig(client, interaction);
-	const items = list
+	const hasWeight = REPEAT_CHOOSE.test(list);
+	let items = list
 		.split(separator(list))
-		.filter((item) => item.trim().length > 0)
-		.map((item) => item.trim());
+		.map((item) => item.trim())
+		.filter((item) => item.length > 0);
+	if (hasWeight) items = weight(items);
+
 	if (items.length === 0)
 		return await interaction.reply({
 			content: ul("choose.noItems"),
