@@ -75,7 +75,7 @@ export class MoveFeature extends BaseFeature {
 	 *
 	 * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
 	 */
-	async validate(): Promise<void> {
+	async validate(): Promise<void | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
 		if (!this.client) return;

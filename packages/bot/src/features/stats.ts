@@ -50,7 +50,6 @@ import {
 } from "messages";
 import { allowEdit, continueCancelButtons, editUserButtons, selfRegisterAllowance } from "utils";
 import { BaseFeature, type FeatureContext } from "./base";
-import { sendValidationMessage } from "./user";
 
 const botErrorOptionsModals: BotErrorOptions = {
 	cause: "STAT_MODALS",
@@ -407,7 +406,7 @@ export class StatsFeature extends BaseFeature {
 		const { fieldsToAppend, statsEmbeds, message } = data;
 		if (!fieldsToAppend) return;
 		const newEmbedStats = createStatsEmbed(this.ul).addFields(fieldsToAppend);
-		if (!userData) userData = await getUserNameAndChar(interaction, this.ul);
+		if (!userData) userData = await getUserNameAndChar(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction | Djs.CommandInteraction | Djs.StringSelectMenuInteraction, this.ul);
 		const { userID, userName } = userData;
 		if (!fieldsToAppend || fieldsToAppend.length === 0) {
 			const { list, exists, files } = await replaceEmbedInList(
@@ -418,7 +417,7 @@ export class StatsFeature extends BaseFeature {
 			const toAdd = removeEmbedsFromList(list, "stats");
 			const components = editUserButtons(this.ul, false, exists.damage);
 			await message.edit({ components: [components], embeds: toAdd, files });
-			await reply(interaction, {
+			await reply(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction | Djs.CommandInteraction | Djs.StringSelectMenuInteraction, {
 				content: this.ul("modals.removed.stats"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -441,7 +440,7 @@ export class StatsFeature extends BaseFeature {
 		const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 		const count = compare.added + compare.changed + compare.removed;
 
-		await reply(interaction, {
+		await reply(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction | Djs.CommandInteraction | Djs.StringSelectMenuInteraction, {
 			content: this.ul("embed.edit.stats", {
 				count,
 			}),

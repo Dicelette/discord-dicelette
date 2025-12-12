@@ -56,7 +56,6 @@ import {
 } from "messages";
 import { allowEdit, editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
 import { BaseFeature, type FeatureContext } from "./base";
-import { sendValidationMessage } from "./user";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "DICE_REGISTER",
@@ -293,7 +292,7 @@ export class MacroFeature extends BaseFeature {
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 
-		if (!this.findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {
+		if (!MacroFeature.findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {
 			diceEmbed.addFields({
 				inline: true,
 				name: capitalizeBetweenPunct(name),
@@ -474,7 +473,7 @@ export class MacroFeature extends BaseFeature {
 		return await sendLogs(`${msg}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 	}
 
-	private findDuplicate(diceEmbed: EmbedBuilder, name: string) {
+	static findDuplicate(diceEmbed: EmbedBuilder, name: string) {
 		if (!diceEmbed.toJSON().fields) return false;
 		return (
 			diceEmbed

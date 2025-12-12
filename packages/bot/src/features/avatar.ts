@@ -88,7 +88,7 @@ export class AvatarFeature extends BaseFeature {
 	 *
 	 * @throws {Error} If the user embed is not found in the message.
 	 */
-	async edit(): Promise<void> {
+	async edit(): Promise<void | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
 		profiler.startProfiler();
