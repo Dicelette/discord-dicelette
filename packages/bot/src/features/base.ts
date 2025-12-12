@@ -45,7 +45,7 @@ export interface IFeature {
  * Base class for features with context management
  * Stores common dependencies as instance properties
  */
-export abstract class BaseFeature implements IFeature {
+export abstract class BaseFeature {
 	protected interaction: Djs.BaseInteraction;
 	protected ul: Translation;
 	protected interactionUser: Djs.User;
