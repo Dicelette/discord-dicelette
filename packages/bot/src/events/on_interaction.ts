@@ -13,13 +13,13 @@ import {
 } from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { 
-	AvatarFeature, 
+import {
+	AvatarFeature,
 	MacroFeature,
-	MoveFeature, 
+	MoveFeature,
 	RenameFeature,
 	StatsFeature,
-	UserFeature
+	UserFeature,
 } from "features";
 import { embedError } from "messages";
 import { cancel } from "utils";
@@ -93,48 +93,41 @@ async function modalSubmit(
 	client: EClient
 ) {
 	if (interaction.customId.includes("damageDice")) {
-		const macro = new MacroFeature({ interaction, ul, interactionUser, client });
+		const macro = new MacroFeature({ client, interaction, interactionUser, ul });
 		await macro.store();
-	}
-	else if (interaction.customId.includes("page")) {
-		const user = new UserFeature({ interaction, ul, interactionUser, client });
+	} else if (interaction.customId.includes("page")) {
+		const user = new UserFeature({ client, interaction, interactionUser, ul });
 		await user.pageNumber();
-	}
-	else if (interaction.customId === "editStats") {
-		const stats = new StatsFeature({ interaction, ul, interactionUser, client });
+	} else if (interaction.customId === "editStats") {
+		const stats = new StatsFeature({ client, interaction, interactionUser, ul });
 		await stats.validateByModeration();
-	}
-	else if (interaction.customId === "firstPage") {
-		const user = new UserFeature({ interaction, ul, interactionUser, client });
+	} else if (interaction.customId === "firstPage") {
+		const user = new UserFeature({ client, interaction, interactionUser, ul });
 		await user.firstPage();
-	}
-	else if (interaction.customId === "editDice") {
-		const macro = new MacroFeature({ interaction, ul, interactionUser, client });
+	} else if (interaction.customId === "editDice") {
+		const macro = new MacroFeature({ client, interaction, interactionUser, ul });
 		await macro.validate();
-	}
-	else if (interaction.customId === "editAvatar") {
+	} else if (interaction.customId === "editAvatar") {
 		const avatar = new AvatarFeature({
 			interaction,
-			ul,
 			interactionUser,
+			ul,
 		});
 		await avatar.edit();
-	}
-	else if (interaction.customId === "rename") {
+	} else if (interaction.customId === "rename") {
 		const rename = new RenameFeature({
-			interaction,
-			ul,
-			interactionUser,
 			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await rename.validate();
-	}
-	else if (interaction.customId === "move") {
+	} else if (interaction.customId === "move") {
 		const move = new MoveFeature({
-			interaction,
-			ul,
-			interactionUser,
 			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await move.validate();
 	}
@@ -159,66 +152,64 @@ async function buttonSubmit(
 	const characters = client.characters;
 	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
 	const havePrivate = !!client.settings.get(interaction.guild!.id, "privateChannel");
-	
+
 	if (interaction.customId === "register") {
-		const user = new UserFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client, 
-			template,
+		const user = new UserFeature({
+			client,
 			havePrivate,
-			selfRegister 
+			interaction,
+			interactionUser,
+			selfRegister,
+			template,
+			ul,
 		});
 		await user.start();
-	}
-	else if (interaction.customId === "continue") {
-		const user = new UserFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
+	} else if (interaction.customId === "continue") {
+		const user = new UserFeature({
+			interaction,
+			interactionUser,
+			selfRegister,
 			template,
-			selfRegister 
+			ul,
 		});
 		await user.continuePage();
-	}
-	else if (interaction.customId.includes("add_dice")) {
-		const macro = new MacroFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			db: client.settings 
+	} else if (interaction.customId.includes("add_dice")) {
+		const macro = new MacroFeature({
+			db: client.settings,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await macro.add();
 		if (!interaction.customId.includes("first"))
 			await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "edit_stats") {
-		const stats = new StatsFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			db: client.settings 
+		const stats = new StatsFeature({
+			db: client.settings,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await stats.edit();
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "validate") {
-		const user = new UserFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client, 
+		const user = new UserFeature({
+			characters,
+			client,
+			interaction,
+			interactionUser,
 			template,
-			characters 
+			ul,
 		});
 		await user.button();
 	} else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, client, interactionUser);
 	else if (interaction.customId === "edit_dice") {
-		const macro = new MacroFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			db: client.settings 
+		const macro = new MacroFeature({
+			db: client.settings,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await macro.edit();
 		await resetButton(interaction.message, ul);
@@ -236,51 +227,51 @@ async function buttonSubmit(
 		else await desktopLink(interaction, ul, client);
 		await message.edit({ components: [] });
 	} else if (interaction.customId.includes("modo_stats_validation")) {
-		const stats = new StatsFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const stats = new StatsFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await stats.couldBeValidated();
 	} else if (interaction.customId.includes("modo_stats_cancel_")) {
-		const stats = new StatsFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const stats = new StatsFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await stats.cancelStatsModeration();
 	} else if (interaction.customId.includes("modo_dice_validation_")) {
-		const macro = new MacroFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const macro = new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await macro.couldBeValidatedDice();
 	} else if (interaction.customId.includes("modo_dice_cancel_")) {
-		const macro = new MacroFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const macro = new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await macro.cancelDiceModeration();
 	} else if (interaction.customId.includes("modo_dice_add_validation_")) {
-		const macro = new MacroFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const macro = new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await macro.couldBeValidatedDiceAdd();
 	} else if (interaction.customId.includes("modo_dice_add_cancel_")) {
-		const macro = new MacroFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const macro = new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await macro.cancelDiceAddModeration();
 	} else if (interaction.customId.includes("mark_as_valid")) {
@@ -297,11 +288,11 @@ async function buttonSubmit(
 		const button = MacroFeature.buttons(ul, false, true);
 		await interaction.message.edit({ components: [button] });
 		//send the message
-		const user = new UserFeature({ 
-			interaction, 
-			ul, 
-			interactionUser, 
-			client 
+		const user = new UserFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
 		});
 		await user.sendValidationMessage();
 		await interaction.reply({
@@ -328,20 +319,20 @@ async function selectSubmit(
 		switch (value) {
 			case "name": {
 				const rename = new RenameFeature({
-					interaction,
-					ul,
-					interactionUser,
 					db,
+					interaction,
+					interactionUser,
+					ul,
 				});
 				await rename.start();
 				break;
 			}
 			case "avatar": {
 				const avatar = new AvatarFeature({
-					interaction,
-					ul,
-					interactionUser,
 					db,
+					interaction,
+					interactionUser,
+					ul,
 				});
 				await avatar.start();
 				break;
@@ -349,8 +340,8 @@ async function selectSubmit(
 			case "user": {
 				const move = new MoveFeature({
 					interaction,
-					ul,
 					interactionUser,
+					ul,
 				});
 				await move.start();
 				break;

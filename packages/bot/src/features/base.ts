@@ -1,7 +1,7 @@
 import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Characters, Settings, Translation } from "@dicelette/types";
-import * as Djs from "discord.js";
+import type * as Djs from "discord.js";
 
 /**
  * Context object containing common dependencies for feature operations

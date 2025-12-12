@@ -1,7 +1,5 @@
 import { fetchAvatarUrl } from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
-import type { Settings, Translation } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -14,17 +12,13 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
 import { allowEdit } from "utils";
-import { BaseFeature, type FeatureContext } from "./base";
+import { BaseFeature } from "./base";
 
 /**
  * Avatar feature class - handles avatar editing operations
  * Uses instance properties to store context and reduce parameter passing
  */
 export class AvatarFeature extends BaseFeature {
-	constructor(context: FeatureContext) {
-		super(context);
-	}
-
 	/**
 	 * Handles the start of avatar editing from a select menu interaction
 	 */
@@ -88,7 +82,7 @@ export class AvatarFeature extends BaseFeature {
 	 *
 	 * @throws {Error} If the user embed is not found in the message.
 	 */
-	async edit(): Promise<void | Djs.Message | Djs.InteractionResponse> {
+	async edit(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
 		profiler.startProfiler();
@@ -132,7 +126,11 @@ export class AvatarFeature extends BaseFeature {
 				level: BotErrorLevel.Warning,
 			});
 		embed.setThumbnail(avatar);
-		const embedsList = await replaceEmbedInList(this.ul, { embed, which: "user" }, message);
+		const embedsList = await replaceEmbedInList(
+			this.ul,
+			{ embed, which: "user" },
+			message
+		);
 
 		await message.edit({ embeds: embedsList.list, files });
 		const user = embed

@@ -1,12 +1,5 @@
-import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
-import type {
-	DiscordChannel,
-	PersonnageIds,
-	Settings,
-	Translation,
-	UserMessageId,
-} from "@dicelette/types";
+import type { DiscordChannel, PersonnageIds, UserMessageId } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -19,7 +12,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
-import { BaseFeature, type FeatureContext } from "./base";
+import { BaseFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationMove",
@@ -31,10 +24,6 @@ const botErrorOptions: BotErrorOptions = {
  * Uses instance properties to store context and reduce parameter passing
  */
 export class MoveFeature extends BaseFeature {
-	constructor(context: FeatureContext) {
-		super(context);
-	}
-
 	/**
 	 * Handles the start of move operation from a select menu interaction
 	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter
@@ -75,7 +64,7 @@ export class MoveFeature extends BaseFeature {
 	 *
 	 * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
 	 */
-	async validate(): Promise<void | Djs.Message | Djs.InteractionResponse> {
+	async validate(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
 		if (!this.client) return;
@@ -122,9 +111,10 @@ export class MoveFeature extends BaseFeature {
 			return await resetButton(message, this.ul);
 		}
 		//update the characters in the database characters
-		const allCharsNewUser = this.client.characters.get(interaction.guild.id, user.id) || [];
+		const allCharsNewUser =
+			this.client.characters.get(interaction.guild.id, user.id) || [];
 		const allCharsOldUser = this.client.characters.get(interaction.guild.id, oldUserId);
-		
+
 		// Remove character from old user
 		if (allCharsOldUser) {
 			this.client.characters.set(
@@ -133,7 +123,7 @@ export class MoveFeature extends BaseFeature {
 				oldUserId
 			);
 		}
-		
+
 		// Add character to new user if not already present
 		if (!allCharsNewUser.find((char) => char?.userName === charData?.userName)) {
 			this.client.characters.set(

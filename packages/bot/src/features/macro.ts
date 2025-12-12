@@ -20,7 +20,12 @@ import type { EClient } from "@dicelette/client";
 import { evalStatsDice, isNumber } from "@dicelette/core";
 import { findln, ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type { Settings, Translation, UserMessageId, UserRegistration } from "@dicelette/types";
+import type {
+	Settings,
+	Translation,
+	UserMessageId,
+	UserRegistration,
+} from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -55,7 +60,7 @@ import {
 	updateUserEmbedThumbnail,
 } from "messages";
 import { allowEdit, editUserButtons, selectEditMenu, selfRegisterAllowance } from "utils";
-import { BaseFeature, type FeatureContext } from "./base";
+import { BaseFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "DICE_REGISTER",
@@ -72,10 +77,6 @@ const botErrorOptionsValidation: BotErrorOptions = {
  * This includes adding, editing, and validating macro dice.
  */
 export class MacroFeature extends BaseFeature {
-	constructor(context: FeatureContext) {
-		super(context);
-	}
-
 	/**
 	 * Handles the interaction for adding a new skill dice via a button press.
 	 * Checks if the user has permission to edit, then displays a modal for entering new skill dice details.
@@ -83,7 +84,7 @@ export class MacroFeature extends BaseFeature {
 	async add() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.db) return;
-		
+
 		const allow = await allowEdit(interaction, this.db, this.interactionUser);
 		if (allow)
 			await this.show(
@@ -135,7 +136,7 @@ export class MacroFeature extends BaseFeature {
 	async edit() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.db) return;
-		
+
 		if (await allowEdit(interaction, this.db, this.interactionUser))
 			await this.showEdit();
 	}
@@ -185,12 +186,15 @@ export class MacroFeature extends BaseFeature {
 	async store() {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		profiler.startProfiler();
 		if (!(await getTemplateByInteraction(interaction, this.client))) {
 			await reply(interaction, {
 				embeds: [
-					embedError(this.ul("error.template.notFound", { guildId: interaction.guildId }), this.ul),
+					embedError(
+						this.ul("error.template.notFound", { guildId: interaction.guildId }),
+						this.ul
+					),
 				],
 			});
 			return;
@@ -257,7 +261,7 @@ export class MacroFeature extends BaseFeature {
 	private async registerDamageDice(first?: boolean) {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		profiler.startProfiler();
 		const db = this.client.settings;
 		const { ul } = getLangAndConfig(this.client, interaction);
@@ -281,8 +285,9 @@ export class MacroFeature extends BaseFeature {
 				if (
 					diceEmbed
 						.toJSON()
-						.fields?.findIndex((f) => f.name.standardize() === field.name.standardize()) ===
-					-1
+						.fields?.findIndex(
+							(f) => f.name.standardize() === field.name.standardize()
+						) === -1
 				) {
 					diceEmbed.addFields(newField);
 				}
@@ -488,7 +493,7 @@ export class MacroFeature extends BaseFeature {
 	async validate() {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		profiler.startProfiler();
 		const db = this.client.settings;
 		if (!interaction.message) return;
@@ -509,13 +514,11 @@ export class MacroFeature extends BaseFeature {
 		await interaction.deferReply({ flags });
 		const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 		if (!diceEmbeds) return;
-		
+
 		const values = interaction.fields.getTextInputValue("allDice");
-		const { fieldsToAppend, diceEmbed, oldFields, removed } = this.createAndValidateDiceEmbed(
-			values,
-			message
-		);
-		
+		const { fieldsToAppend, diceEmbed, oldFields, removed } =
+			this.createAndValidateDiceEmbed(values, message);
+
 		const { userID, userName } = await getUserNameAndChar(interaction, this.ul);
 		const messageID = [message.id, message.channelId] as UserMessageId;
 
@@ -541,7 +544,12 @@ export class MacroFeature extends BaseFeature {
 				});
 			} else await interaction.editReply({ components: [row], embeds: [diceEmbed] });
 			const url = await interaction.fetchReply();
-			const userFeature = new (await import("./user")).UserFeature({ interaction, ul: this.ul, interactionUser: interaction.user, client: this.client });
+			const userFeature = new (await import("./user")).UserFeature({
+				client: this.client,
+				interaction,
+				interactionUser: interaction.user,
+				ul: this.ul,
+			});
 			await userFeature.sendValidationMessage(url.url);
 			return;
 		}
@@ -597,10 +605,7 @@ export class MacroFeature extends BaseFeature {
 		return a.unidecode().standardize() === b.unidecode().standardize();
 	}
 
-	private createAndValidateDiceEmbed(
-		values: string,
-		message: Djs.Message
-	) {
+	private createAndValidateDiceEmbed(values: string, message: Djs.Message) {
 		const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 		if (!diceEmbeds)
 			return {
@@ -635,7 +640,8 @@ export class MacroFeature extends BaseFeature {
 
 		const newEmbedDice: Djs.APIEmbedField[] = [];
 		for (const [skill, dice] of Object.entries(dices)) {
-			if (newEmbedDice.find((field) => this.compareUnidecode(field.name, skill))) continue;
+			if (newEmbedDice.find((field) => this.compareUnidecode(field.name, skill)))
+				continue;
 			if (dice.toLowerCase() === "x" || dice.trim().length === 0 || dice === "0") {
 				newEmbedDice.push({ inline: true, name: skill.capitalize(), value: "X" });
 				continue;
@@ -645,9 +651,16 @@ export class MacroFeature extends BaseFeature {
 				evalStatsDice(toRoll, statsValues);
 			} catch (error) {
 				logger.warn(error);
-				throw new BotError(this.ul("error.invalidDice.eval", { dice }), botErrorOptionsValidation);
+				throw new BotError(
+					this.ul("error.invalidDice.eval", { dice }),
+					botErrorOptionsValidation
+				);
 			}
-			newEmbedDice.push({ inline: true, name: skill.capitalize(), value: `\`${toRoll}\`` });
+			newEmbedDice.push({
+				inline: true,
+				name: skill.capitalize(),
+				value: `\`${toRoll}\``,
+			});
 		}
 
 		const oldDice = diceEmbeds.toJSON().fields;
@@ -656,7 +669,11 @@ export class MacroFeature extends BaseFeature {
 				const name = field.name.toLowerCase();
 				const newValue = newEmbedDice.find((f) => this.compareUnidecode(f.name, name));
 				if (!newValue)
-					newEmbedDice.push({ inline: true, name: name.capitalize(), value: field.value });
+					newEmbedDice.push({
+						inline: true,
+						name: name.capitalize(),
+						value: field.value,
+					});
 			}
 		}
 
@@ -716,8 +733,10 @@ export class MacroFeature extends BaseFeature {
 	) {
 		if (!this.client) return;
 		const interaction = this.interaction;
-		
-		await updateMemory(this.client.characters, interaction.guild!.id, userID, this.ul, { embeds });
+
+		await updateMemory(this.client.characters, interaction.guild!.id, userID, this.ul, {
+			embeds,
+		});
 		const userRegister: UserRegistration = {
 			charName: userName,
 			damage,
@@ -737,16 +756,9 @@ export class MacroFeature extends BaseFeature {
 		message: Djs.Message;
 		db: EClient["settings"];
 	}) {
-		const interaction = args.interaction ?? (this.interaction as Djs.ModalSubmitInteraction);
-		const {
-			removed,
-			oldFields,
-			newFields,
-			userID,
-			userName,
-			message,
-			db,
-		} = args;
+		const interaction =
+			args.interaction ?? (this.interaction as Djs.ModalSubmitInteraction);
+		const { removed, oldFields, newFields, userID, userName, message, db } = args;
 		if (removed) {
 			await reply(interaction, {
 				content: this.ul("modals.removed.dice"),
@@ -832,12 +844,13 @@ export class MacroFeature extends BaseFeature {
 	async couldBeValidatedDice() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
-		
-		if (!await this.checkModeratorPermission()) return;
+
+		if (!(await this.checkModeratorPermission())) return;
 
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.validate, customId);
-		if (!embedKey) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+		if (!embedKey)
+			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 
 		const cached = getModerationCache(embedKey);
 		let workingEmbed: Djs.EmbedBuilder | undefined =
@@ -851,7 +864,8 @@ export class MacroFeature extends BaseFeature {
 				workingEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 			}
 		}
-		if (!workingEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+		if (!workingEmbed)
+			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 
 		const message = await getMessageWithKeyPart(this.ul, interaction, embedKey);
 		const newFields = workingEmbed.toJSON().fields ?? [];
@@ -878,7 +892,8 @@ export class MacroFeature extends BaseFeature {
 					)
 				);
 		const userEmbed = getEmbeds(message ?? undefined, "user");
-		if (!userEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+		if (!userEmbed)
+			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 		const parsedUser = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 		const mention = parsedUser["common.user"];
 		const idMatch = mention?.match(/<@(?<id>\d+)>/);
@@ -918,7 +933,7 @@ export class MacroFeature extends BaseFeature {
 	async cancelDiceModeration() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
-		
+
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
 		await this.handleCancellation(embedKey);
@@ -930,12 +945,13 @@ export class MacroFeature extends BaseFeature {
 	async couldBeValidatedDiceAdd() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
-		
-		if (!await this.checkModeratorPermission()) return;
-		
+
+		if (!(await this.checkModeratorPermission())) return;
+
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.validate, customId);
-		if (!embedKey) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+		if (!embedKey)
+			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 		const cachedRaw = getModerationCache(embedKey);
 		const cached = cachedRaw && cachedRaw.kind === "dice-add" ? cachedRaw : undefined;
 
@@ -952,10 +968,12 @@ export class MacroFeature extends BaseFeature {
 			userName = cached.meta.userName;
 		} else {
 			const apiEmbed = interaction.message.embeds[0];
-			if (!apiEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+			if (!apiEmbed)
+				throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 			moderationDiceEmbed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 			const keyParts = parseEmbedKey(embedKey);
-			if (!keyParts) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+			if (!keyParts)
+				throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 			targetChannelId = keyParts.channelId;
 			targetMessageId = keyParts.messageId;
 		}
@@ -965,7 +983,8 @@ export class MacroFeature extends BaseFeature {
 			throw new BotError(this.ul("error.channel.notFound"), botErrorOptionsValidation);
 		const message = await channel.messages.fetch(targetMessageId!);
 		const userEmbed = getEmbeds(message ?? undefined, "user");
-		if (!userEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
+		if (!userEmbed)
+			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 
 		const oldDamage = getEmbeds(message ?? undefined, "damage");
 		const oldFields = oldDamage?.toJSON().fields ?? [];
@@ -1013,7 +1032,10 @@ export class MacroFeature extends BaseFeature {
 			hasStats = edited.exists.stats;
 			files = edited.files;
 		}
-		const components = [editUserButtons(this.ul, hasStats, true), selectEditMenu(this.ul)];
+		const components = [
+			editUserButtons(this.ul, hasStats, true),
+			selectEditMenu(this.ul),
+		];
 
 		await message.edit({ components, embeds: embedsApplied, files });
 
@@ -1038,7 +1060,8 @@ export class MacroFeature extends BaseFeature {
 			userID = idMatch2?.groups?.id ?? mention2?.replace(/<@|>/g, "");
 			const charNameRaw2 = parsedUser2["common.character"];
 			userName =
-				charNameRaw2 && charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
+				charNameRaw2 &&
+				charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
 					? charNameRaw2
 					: undefined;
 		}
@@ -1069,7 +1092,7 @@ export class MacroFeature extends BaseFeature {
 	async cancelDiceAddModeration() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
-		
+
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.cancel, customId);
 		await this.handleCancellation(embedKey);

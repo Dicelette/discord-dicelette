@@ -1,19 +1,14 @@
 import {
+	addAutoRole,
 	fetchAvatarUrl,
 	fetchChannel,
 	getInteractionContext as getLangAndConfig,
-	addAutoRole,
 	pingModeratorRole,
 	reuploadAvatar,
 } from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
 import { isNumber, type StatisticalTemplate } from "@dicelette/core";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type {
-	Characters,
-	Translation,
-	UserData,
-} from "@dicelette/types";
+import type { UserData } from "@dicelette/types";
 import {
 	allValueUndefOrEmptyString,
 	cleanAvatarUrl,
@@ -30,31 +25,26 @@ import * as Djs from "discord.js";
 import { MacroFeature, StatsFeature } from "features";
 import * as Messages from "messages";
 import { continueCancelButtons, selfRegisterAllowance } from "utils";
-import { BaseFeature, type FeatureContext } from "./base";
+import { BaseFeature } from "./base";
 
 /**
  * User feature class - handles user registration and management
  * Uses instance properties to store context and reduce parameter passing
  */
 export class UserFeature extends BaseFeature {
-	constructor(context: FeatureContext) {
-		super(context);
-	}
-
 	/**
 	 * Handles the start of user registration from a button interaction
 	 */
 	async start(): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template) return;
-		
+
 		const moderatorPermission = interaction.guild?.members.cache
 			.get(this.interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		const isModerator = this.selfRegister || moderatorPermission;
 
-		if (isModerator)
-			await this.show(moderatorPermission);
+		if (isModerator) await this.show(moderatorPermission);
 		else
 			await Messages.reply(interaction, {
 				content: this.ul("modals.noPermission"),
@@ -68,7 +58,7 @@ export class UserFeature extends BaseFeature {
 	private async show(isModerator?: boolean): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template) return;
-		
+
 		let nbOfPages = 1;
 		if (this.template.statistics) {
 			const nbOfStatistique = Object.keys(this.template.statistics).length;
@@ -161,7 +151,7 @@ export class UserFeature extends BaseFeature {
 	async pageNumber(): Promise<void> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		profiler.startProfiler();
 		const pageNumberStr = interaction.customId.replace("page", "");
 		if (!isNumber(pageNumberStr)) return;
@@ -179,11 +169,11 @@ export class UserFeature extends BaseFeature {
 			});
 			return;
 		}
-		const stats = new StatsFeature({ 
-			interaction, 
-			ul: this.ul, 
+		const stats = new StatsFeature({
+			interaction,
 			interactionUser: this.interactionUser,
-			template 
+			template,
+			ul: this.ul,
 		});
 		await stats.register(Number.parseInt(pageNumberStr, 10));
 		profiler.stopProfiler();
@@ -194,7 +184,12 @@ export class UserFeature extends BaseFeature {
 	 */
 	async firstPage(): Promise<void> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
-		if (!interaction.guild || !interaction.channel || interaction.channel.isDMBased() || !this.client)
+		if (
+			!interaction.guild ||
+			!interaction.channel ||
+			interaction.channel.isDMBased() ||
+			!this.client
+		)
 			return;
 		const template = await getTemplateByInteraction(interaction, this.client);
 		if (!template) return;
@@ -207,7 +202,7 @@ export class UserFeature extends BaseFeature {
 	private async createFirstPage(template: StatisticalTemplate): Promise<void> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		profiler.startProfiler();
 		const { ul } = getLangAndConfig(this.client, interaction);
 		const channel = interaction.channel;
@@ -256,14 +251,19 @@ export class UserFeature extends BaseFeature {
 		const files = [];
 		let avatarStr = "";
 		if (avatar?.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS)) {
-			const avatarAttachment = new Djs.AttachmentBuilder(avatar.url, { name: avatar.name });
+			const avatarAttachment = new Djs.AttachmentBuilder(avatar.url, {
+				name: avatar.name,
+			});
 			files.push(avatarAttachment);
 			avatarStr = `attachment://${avatarAttachment.name}`;
 		} else if (avatar && !avatar.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS))
 			avatarStr = "error";
 
 		let sheetId = this.client.settings.get(interaction.guild!.id, "managerId");
-		const privateChannel = this.client.settings.get(interaction.guild!.id, "privateChannel");
+		const privateChannel = this.client.settings.get(
+			interaction.guild!.id,
+			"privateChannel"
+		);
 		if (isPrivate && privateChannel) sheetId = privateChannel;
 		if (customChannel) sheetId = customChannel.id;
 
@@ -341,7 +341,7 @@ export class UserFeature extends BaseFeature {
 	async continuePage(): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template) return;
-		
+
 		const isModerator =
 			this.selfRegister ||
 			interaction.guild?.members.cache
@@ -359,12 +359,15 @@ export class UserFeature extends BaseFeature {
 		const embed = Messages.getEmbeds(interaction.message, "user");
 		if (!embed || !this.template.statistics) return;
 		const statsEmbed =
-			Messages.getEmbeds(interaction.message, "stats") ?? Messages.createStatsEmbed(this.ul);
+			Messages.getEmbeds(interaction.message, "stats") ??
+			Messages.createStatsEmbed(this.ul);
 		const allTemplateStat = Object.keys(this.template.statistics).map((stat) =>
 			stat.unidecode()
 		);
 
-		const statsAlreadySet = Object.keys(parseEmbedFields(statsEmbed.toJSON() as Djs.Embed))
+		const statsAlreadySet = Object.keys(
+			parseEmbedFields(statsEmbed.toJSON() as Djs.Embed)
+		)
 			.filter((stat) => allTemplateStat.includes(stat.unidecode()))
 			.map((stat) => stat.unidecode());
 		if (statsAlreadySet.length === allTemplateStat.length) {
@@ -376,9 +379,9 @@ export class UserFeature extends BaseFeature {
 		}
 		const stats = new StatsFeature({
 			interaction,
-			ul: this.ul,
 			interactionUser: this.interactionUser,
-			template: this.template
+			template: this.template,
+			ul: this.ul,
 		});
 		await stats.show(statsAlreadySet, page + 1);
 	}
@@ -389,8 +392,11 @@ export class UserFeature extends BaseFeature {
 	async button(): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template || !this.client || !this.characters) return;
-		
-		const selfAllow = this.client.settings.get(interaction.guild!.id, "allowSelfRegister");
+
+		const selfAllow = this.client.settings.get(
+			interaction.guild!.id,
+			"allowSelfRegister"
+		);
 		const selfRegisterAllow = selfAllow ? /true/.test(selfAllow.toString()) : false;
 		const isModerator =
 			selfRegisterAllow ||
@@ -413,9 +419,11 @@ export class UserFeature extends BaseFeature {
 	 * Sends a validation message to moderators or the owner
 	 */
 	async sendValidationMessage(url?: string): Promise<void> {
-		const interaction = this.interaction as Djs.ButtonInteraction | Djs.ModalSubmitInteraction;
+		const interaction = this.interaction as
+			| Djs.ButtonInteraction
+			| Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		const logChannel = this.client.settings.get(interaction.guild!.id, "logs");
 		if (!url) url = interaction.message?.url ?? "";
 		if (logChannel)
@@ -466,7 +474,7 @@ export class UserFeature extends BaseFeature {
 	private async validateUser(): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template || !this.client || !this.characters) return;
-		
+
 		const { ul } = getLangAndConfig(this.client, interaction);
 		const userEmbed = Messages.getEmbeds(interaction.message, "user");
 		if (!userEmbed) throw new NoEmbed();
@@ -520,7 +528,9 @@ export class UserFeature extends BaseFeature {
 		const userDataEmbed = Messages.createUserEmbed(ul, avatarStr, userID, charName);
 		const oldDiceEmbeds = Messages.getEmbeds(interaction.message, "damage");
 		const oldStatsEmbed = Messages.getEmbeds(interaction.message, "stats");
-		const oldDiceEmbedsFields = oldDiceEmbeds ? (oldDiceEmbeds.toJSON().fields ?? []) : [];
+		const oldDiceEmbedsFields = oldDiceEmbeds
+			? (oldDiceEmbeds.toJSON().fields ?? [])
+			: [];
 		const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.toJSON().fields ?? []) : [];
 		let diceEmbed: Djs.EmbedBuilder | undefined;
 		let statsEmbed: Djs.EmbedBuilder | undefined;
@@ -530,7 +540,8 @@ export class UserFeature extends BaseFeature {
 			diceEmbed.addFields({
 				inline: true,
 				name: field.name.unidecode(true).capitalize(),
-				value: field.value && field.value.trim().length > 0 ? `\`${field.value}\`` : "_ _",
+				value:
+					field.value && field.value.trim().length > 0 ? `\`${field.value}\`` : "_ _",
 			});
 		}
 		for (const field of statEmbedsFields) {
@@ -649,7 +660,13 @@ export class UserFeature extends BaseFeature {
 		} catch (e) {
 			logger.warn(e, "validateUser: can't delete the message");
 		}
-		await addAutoRole(interaction, userID, !!diceEmbed, !!statsEmbed, this.client.settings);
+		await addAutoRole(
+			interaction,
+			userID,
+			!!diceEmbed,
+			!!statsEmbed,
+			this.client.settings
+		);
 		await Messages.reply(interaction, {
 			content: ul("modals.finished"),
 			flags: Djs.MessageFlags.Ephemeral,

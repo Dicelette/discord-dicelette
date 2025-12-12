@@ -1,14 +1,7 @@
 import { fetchUser } from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type {
-	DiscordChannel,
-	PersonnageIds,
-	Settings,
-	Translation,
-	UserMessageId,
-} from "@dicelette/types";
+import type { DiscordChannel, PersonnageIds, UserMessageId } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -21,7 +14,7 @@ import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
-import { BaseFeature, type FeatureContext } from "./base";
+import { BaseFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "validationRename",
@@ -33,10 +26,6 @@ const botErrorOptions: BotErrorOptions = {
  * Uses instance properties to store context and reduce parameter passing
  */
 export class RenameFeature extends BaseFeature {
-	constructor(context: FeatureContext) {
-		super(context);
-	}
-
 	/**
 	 * Handles the start of rename operation from a select menu interaction
 	 */
@@ -77,7 +66,10 @@ export class RenameFeature extends BaseFeature {
 			.setTitle(this.ul("button.edit.name"))
 			.addLabelComponents((label) =>
 				label.setLabel(this.ul("common.charName")).setTextInputComponent((input) => {
-					input.setCustomId("newName").setStyle(Djs.TextInputStyle.Short).setRequired(true);
+					input
+						.setCustomId("newName")
+						.setStyle(Djs.TextInputStyle.Short)
+						.setRequired(true);
 					if (name) input.setValue(name);
 					return input;
 				})
@@ -118,7 +110,8 @@ export class RenameFeature extends BaseFeature {
 		};
 		if (!user) throw new BotError(this.ul("error.user.notFound"), botErrorOptions);
 		const charData = getUserByEmbed({ message: message });
-		if (!charData) throw new BotError(this.ul("error.user.youRegistered"), botErrorOptions);
+		if (!charData)
+			throw new BotError(this.ul("error.user.youRegistered"), botErrorOptions);
 		const oldData: {
 			charName?: string | null;
 			messageId: UserMessageId;

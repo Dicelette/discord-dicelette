@@ -13,17 +13,15 @@ import {
 	reuploadAvatar,
 	setModerationFooter,
 } from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
 import {
 	evalCombinaison,
 	evalOneCombinaison,
 	FormulaError,
 	isNumber,
-	type StatisticalTemplate,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
-import type { DataToFooter, Settings, Translation } from "@dicelette/types";
+import type { DataToFooter } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -36,8 +34,6 @@ import {
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
-import { MacroFeature } from "./macro";
-import { UserFeature } from "./user";
 import * as Messages from "messages";
 import {
 	createStatsEmbed,
@@ -49,8 +45,15 @@ import {
 	reply,
 	sendLogs,
 } from "messages";
-import { allowEdit, continueCancelButtons, editUserButtons, selfRegisterAllowance } from "utils";
-import { BaseFeature, type FeatureContext } from "./base";
+import {
+	allowEdit,
+	continueCancelButtons,
+	editUserButtons,
+	selfRegisterAllowance,
+} from "utils";
+import { BaseFeature } from "./base";
+import { MacroFeature } from "./macro";
+import { UserFeature } from "./user";
 
 const botErrorOptionsModals: BotErrorOptions = {
 	cause: "STAT_MODALS",
@@ -67,10 +70,6 @@ const botErrorOptions: BotErrorOptions = {
  * This includes showing modals, registering stats, editing stats, and validation.
  */
 export class StatsFeature extends BaseFeature {
-	constructor(context: FeatureContext) {
-		super(context);
-	}
-
 	/**
 	 * Modal to display the statistics when adding a new user.
 	 * Will display the statistics that are not already set (5 statistics per page).
@@ -78,7 +77,7 @@ export class StatsFeature extends BaseFeature {
 	async show(stats?: string[], page = 1, moderation = false) {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template?.statistics) return;
-		
+
 		const ul = ln(interaction.locale as Djs.Locale);
 		const isModerator =
 			moderation &&
@@ -110,7 +109,10 @@ export class StatsFeature extends BaseFeature {
 		}
 		const statsToDisplay = statToDisplay.slice(0, 4);
 		const statisticsLowerCase = Object.fromEntries(
-			Object.entries(this.template.statistics).map(([key, value]) => [key.standardize(), value])
+			Object.entries(this.template.statistics).map(([key, value]) => [
+				key.standardize(),
+				value,
+			])
 		);
 		const inputs = [];
 		for (const stat of statsToDisplay) {
@@ -144,7 +146,7 @@ export class StatsFeature extends BaseFeature {
 	async edit() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.db) return;
-		
+
 		if (await allowEdit(interaction, this.db, this.interactionUser))
 			await this.showEditorStats();
 	}
@@ -156,9 +158,10 @@ export class StatsFeature extends BaseFeature {
 	private async showEditorStats() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.db) return;
-		
+
 		const statistics = getEmbeds(interaction.message, "stats");
-		if (!statistics) throw new BotError(this.ul("error.stats.notFound_plural"), botErrorOptionsModals);
+		if (!statistics)
+			throw new BotError(this.ul("error.stats.notFound_plural"), botErrorOptionsModals);
 		const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed);
 		const originalGuildData = this.db.get(interaction.guild!.id, "templateID.statsName");
 		const registeredStats = originalGuildData?.map((stat) => stat.unidecode());
@@ -180,7 +183,9 @@ export class StatsFeature extends BaseFeature {
 		) {
 			const diff = registeredStats.filter((x) => !userStats.includes(x));
 			for (const stat of diff) {
-				const realName = originalGuildData?.find((x) => x.unidecode() === stat.unidecode());
+				const realName = originalGuildData?.find(
+					(x) => x.unidecode() === stat.unidecode()
+				);
 				statsStrings += `- ${realName?.capitalize()}${this.ul("common.space")}: 0\n`;
 			}
 		}
@@ -205,10 +210,14 @@ export class StatsFeature extends BaseFeature {
 	/**
 	 * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
 	 */
-	async register(page: number | undefined = 2, lang: Djs.Locale = Djs.Locale.EnglishGB, moderation = false) {
+	async register(
+		page: number | undefined = 2,
+		lang: Djs.Locale = Djs.Locale.EnglishGB,
+		moderation = false
+	) {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.template || !interaction.message) return;
-		
+
 		const message = await (interaction.channel as TextChannel).messages.fetch(
 			interaction.message.id
 		);
@@ -268,10 +277,16 @@ export class StatsFeature extends BaseFeature {
 		}
 
 		const embedStats = Object.fromEntries(
-			Object.entries(parsedFields).filter(([key]) => statsWithoutCombinaison.includes(key))
+			Object.entries(parsedFields).filter(([key]) =>
+				statsWithoutCombinaison.includes(key)
+			)
 		);
 		const nbStats = Object.keys(embedStats).length;
-		const ilReste = this.calculateRemainingPoints(this.template.total, oldStatsTotal, stats);
+		const ilReste = this.calculateRemainingPoints(
+			this.template.total,
+			oldStatsTotal,
+			stats
+		);
 		const allStatsFilled = nbStats === statsWithoutCombinaison.length;
 
 		if (allStatsFilled && this.template.forceDistrib) {
@@ -368,7 +383,7 @@ export class StatsFeature extends BaseFeature {
 	private async getFromModal() {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client || !interaction.message) return;
-		
+
 		const message = await (interaction.channel as TextChannel).messages.fetch(
 			interaction.message.id
 		);
@@ -398,7 +413,7 @@ export class StatsFeature extends BaseFeature {
 	) {
 		const interaction = this.interaction;
 		if (!this.client) return;
-		
+
 		const db = this.client.settings;
 		const characters = this.client.characters;
 		if (interaction.isModalSubmit()) data = await this.getFromModal();
@@ -407,7 +422,11 @@ export class StatsFeature extends BaseFeature {
 		const { fieldsToAppend, statsEmbeds, message } = data;
 		if (!fieldsToAppend) return;
 		const newEmbedStats = createStatsEmbed(this.ul).addFields(fieldsToAppend);
-		if (!userData) userData = await getUserNameAndChar(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction, this.ul);
+		if (!userData)
+			userData = await getUserNameAndChar(
+				interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction,
+				this.ul
+			);
 		const { userID, userName } = userData;
 		if (!fieldsToAppend || fieldsToAppend.length === 0) {
 			const { list, exists, files } = await replaceEmbedInList(
@@ -418,10 +437,17 @@ export class StatsFeature extends BaseFeature {
 			const toAdd = removeEmbedsFromList(list, "stats");
 			const components = editUserButtons(this.ul, false, exists.damage);
 			await message.edit({ components: [components], embeds: toAdd, files });
-			await reply(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction | Djs.CommandInteraction | Djs.StringSelectMenuInteraction, {
-				content: this.ul("modals.removed.stats"),
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+			await reply(
+				interaction as
+					| Djs.ModalSubmitInteraction
+					| Djs.ButtonInteraction
+					| Djs.CommandInteraction
+					| Djs.StringSelectMenuInteraction,
+				{
+					content: this.ul("modals.removed.stats"),
+					flags: Djs.MessageFlags.Ephemeral,
+				}
+			);
 			await sendLogs(
 				this.ul("logs.stats.removed", {
 					char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
@@ -441,12 +467,19 @@ export class StatsFeature extends BaseFeature {
 		const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
 		const count = compare.added + compare.changed + compare.removed;
 
-		await reply(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction | Djs.CommandInteraction | Djs.StringSelectMenuInteraction, {
-			content: this.ul("embed.edit.stats", {
-				count,
-			}),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
+		await reply(
+			interaction as
+				| Djs.ModalSubmitInteraction
+				| Djs.ButtonInteraction
+				| Djs.CommandInteraction
+				| Djs.StringSelectMenuInteraction,
+			{
+				content: this.ul("embed.edit.stats", {
+					count,
+				}),
+				flags: Djs.MessageFlags.Ephemeral,
+			}
+		);
 		const logMessage = this.ul("logs.stats.added", {
 			char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 			count,
@@ -462,7 +495,7 @@ export class StatsFeature extends BaseFeature {
 	private async getFieldsToAppend(statsEmbeds: Djs.EmbedBuilder) {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		const values = interaction.fields.getTextInputValue("allStats");
 		const templateStats = await getTemplateByInteraction(interaction, this.client);
 		if (!templateStats || !templateStats.statistics) return;
@@ -493,7 +526,10 @@ export class StatsFeature extends BaseFeature {
 			)
 				continue;
 			if (!stat)
-				throw new BotError(this.ul("error.stats.notFound", { value: name }), botErrorOptions);
+				throw new BotError(
+					this.ul("error.stats.notFound", { value: name }),
+					botErrorOptions
+				);
 
 			if (!isNumber(value)) {
 				const combinaison = Number.parseInt(evalOneCombinaison(value, stats), 10);
@@ -550,7 +586,7 @@ export class StatsFeature extends BaseFeature {
 	async validateByModeration() {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
-		
+
 		profiler.startProfiler();
 		const allowance = selfRegisterAllowance(
 			this.client.settings.get(interaction.guild!.id, "allowSelfRegister")
@@ -598,7 +634,12 @@ export class StatsFeature extends BaseFeature {
 		const row = buildModerationButtons("stats-edit", this.ul, embedKey);
 		await interaction.reply({ components: [row], embeds: [newEmbedStats] });
 		const replyMessage = await interaction.fetchReply();
-		const userFeature = new UserFeature({ interaction, ul: this.ul, interactionUser: interaction.user, client: this.client });
+		const userFeature = new UserFeature({
+			client: this.client,
+			interaction,
+			interactionUser: interaction.user,
+			ul: this.ul,
+		});
 		await userFeature.sendValidationMessage(replyMessage.url);
 		profiler.stopProfiler();
 	}
@@ -606,14 +647,19 @@ export class StatsFeature extends BaseFeature {
 	async couldBeValidated() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
-		
+
 		const moderator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		if (!moderator) {
 			let notAllowedMsg = this.ul("modals.noPermission");
 			notAllowedMsg += `\n${this.ul("modals.onlyModerator")}`;
-			const userFeature = new UserFeature({ interaction, ul: this.ul, interactionUser: this.interactionUser, client: this.client });
+			const userFeature = new UserFeature({
+				client: this.client,
+				interaction,
+				interactionUser: this.interactionUser,
+				ul: this.ul,
+			});
 			await userFeature.sendValidationMessage();
 			await Messages.reply(interaction, {
 				content: notAllowedMsg,
@@ -661,7 +707,8 @@ export class StatsFeature extends BaseFeature {
 		}
 		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const message = await getMessageWithKeyPart(this.ul, interaction, embedKey);
-		const oldStatsEmbed = getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(this.ul);
+		const oldStatsEmbed =
+			getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(this.ul);
 		const fieldsToAppend = embed.toJSON().fields;
 		if (!fieldsToAppend || !message)
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
@@ -687,7 +734,7 @@ export class StatsFeature extends BaseFeature {
 	async cancelStatsModeration() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
-		
+
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.stats.cancel, customId);
 		const { userId, url } = getUserId(interaction);
