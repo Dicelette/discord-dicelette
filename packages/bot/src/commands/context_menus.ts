@@ -6,6 +6,7 @@ import {
 	type TemplateResult,
 	type Translation,
 } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 type Results = {
@@ -85,12 +86,16 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 			return (value as ShortLong).long;
 		};
 
+		logger.trace("Rendering variable:", varName, "with mods:", mods, "and value:", value);
+		let isShortened = false;
+
 		for (const mod of mods) {
 			const m = mod.toLowerCase();
 
 			if (m === "short") {
 				if (typeof value === "string") value = short(value);
 				else value = (value as ShortLong).short;
+				isShortened = true;
 				continue;
 			}
 
@@ -105,7 +110,10 @@ function renderTemplate(template: string, context: Record<string, unknown>) {
 			else if (m === "lower") str = str.toLowerCase();
 			else if (m === "title") str = str.toTitle();
 			else if (m === "standardize") str = str.removeAccents();
-			else if (m.startsWith("trunc=")) {
+			else if (m === "standardize_short") {
+				if (isShortened) continue;
+				str = short(str, true);
+			} else if (m.startsWith("trunc=")) {
 				const truncMatch = m.match(/trunc=(\d+)/);
 				if (truncMatch) {
 					const maxLength = Number.parseInt(truncMatch[1], 10);
@@ -195,12 +203,14 @@ function createResultFromTemplate(
 	return rollsText.join(template!.joinResult);
 }
 
-function short(text: string): string {
-	const cleaned = text.replaceAll("**", "").trim();
+function short(text: string, standardize?: boolean): string {
+	const cleaned = text.replaceAll("*", "").trim();
 	if (!cleaned) return "";
-	const parts = cleaned.split(/\W+/);
+	const parts = cleaned.split(/\s+/);
 	if (parts.length === 1) return cleaned;
-	return parts.map((w) => w.charAt(0).toUpperCase()).join("");
+	const end = parts.map((w) => w.charAt(0).toUpperCase()).join("");
+	if (standardize) return end.removeAccents();
+	return end;
 }
 
 function getShortLong(text: string): ShortLong {
