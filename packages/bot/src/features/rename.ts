@@ -6,6 +6,7 @@ import {
 	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
+	getIdFromMention,
 	profiler,
 } from "@dicelette/utils";
 import { rename } from "commands";
@@ -98,10 +99,9 @@ export class RenameFeature extends BaseFeature {
 		if (!newName || !interaction.channel) return;
 		const embed = getEmbeds(message, "user");
 		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
-		const userId = embed
-			.toJSON()
-			.fields?.find((field) => findln(field.name) === "common.user")
-			?.value.replace(/<@|>/g, "");
+		const userId = getIdFromMention(
+			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
+		);
 		if (!userId) throw new BotError(this.ul("error.user.notFound"), botErrorOptions);
 		const user = await fetchUser(this.client, userId);
 		const sheetLocation: PersonnageIds = {

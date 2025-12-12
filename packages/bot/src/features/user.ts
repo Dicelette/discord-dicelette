@@ -12,6 +12,7 @@ import type { UserData } from "@dicelette/types";
 import {
 	allValueUndefOrEmptyString,
 	cleanAvatarUrl,
+	getIdFromMention,
 	logger,
 	NoChannel,
 	NoEmbed,
@@ -487,7 +488,7 @@ export class UserFeature extends BaseFeature {
 		if (channelToPost) {
 			const channel = await fetchChannel(
 				interaction.guild!,
-				channelToPost.replace(/<@|>/g, "")
+				getIdFromMention(channelToPost) || channelToPost
 			);
 			if (!channel) {
 				await Messages.reply(interaction, {
@@ -510,7 +511,7 @@ export class UserFeature extends BaseFeature {
 			});
 			return;
 		}
-		userID = userID.replace(/<@|>/g, "");
+		userID = userID.replace("<@", "");
 		const files = interaction.message.attachments.map(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
@@ -651,7 +652,7 @@ export class UserFeature extends BaseFeature {
 			ul,
 			{ dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
 			this.client.settings,
-			channelToPost.replace(/<@|>/g, ""),
+			getIdFromMention(channelToPost) ?? channelToPost.replace("<#", "").replace(">", ""),
 			this.characters,
 			uniqueFiles
 		);

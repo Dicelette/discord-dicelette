@@ -113,3 +113,9 @@ export function getCachedRegex(pattern: string, flags = ""): RegExp {
 	}
 	return regex;
 }
+
+export function getIdFromMention(mention: string | undefined): string | undefined {
+	if (!mention) return undefined;
+	const match = mention.match(/<[@#]&?(\d+)>/);
+	return match ? match[1] : undefined;
+}

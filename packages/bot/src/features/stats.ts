@@ -26,6 +26,7 @@ import {
 	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
+	getIdFromMention,
 	isArrayEqual,
 	logger,
 	profiler,
@@ -716,8 +717,7 @@ export class StatsFeature extends BaseFeature {
 		if (!userEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 		const mention = parsedFields["common.user"];
-		const match = mention?.match(/<@(?<id>\d+)>/);
-		const ownerId = match?.groups?.id ?? mention?.replace(/<@|>/g, "");
+		const ownerId = getIdFromMention(mention);
 		const charNameRaw = parsedFields["common.character"];
 		const ownerName =
 			charNameRaw && charNameRaw.toLowerCase() !== this.ul("common.noSet").toLowerCase()

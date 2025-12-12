@@ -32,6 +32,7 @@ import {
 	type BotErrorOptions,
 	capitalizeBetweenPunct,
 	DICE_PATTERNS,
+	getIdFromMention,
 	logger,
 	NoEmbed,
 	profiler,
@@ -200,14 +201,14 @@ export class MacroFeature extends BaseFeature {
 			return;
 		}
 		const embed = ensureEmbed(interaction.message ?? undefined);
-		const user =
-			embed.fields
-				.find((field) => findln(field.name) === "common.user")
-				?.value.replace(/<@|>/g, "") === this.interactionUser.id;
+		const userMention = embed.fields.find(
+			(field) => findln(field.name) === "common.user"
+		)?.value;
+		const sameUser = getIdFromMention(userMention) === this.interactionUser.id;
 		const isModerator = interaction.guild?.members.cache
 			.get(this.interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (user || isModerator)
+		if (sameUser || isModerator)
 			await this.registerDamageDice(interaction.customId.includes("first"));
 		else
 			await reply(interaction, {
@@ -896,8 +897,7 @@ export class MacroFeature extends BaseFeature {
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 		const parsedUser = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 		const mention = parsedUser["common.user"];
-		const idMatch = mention?.match(/<@(?<id>\d+)>/);
-		const ownerId = idMatch?.groups?.id ?? mention?.replace(/<@|>/g, "");
+		const ownerId = getIdFromMention(mention);
 		const charNameRaw = parsedUser["common.character"];
 		const ownerName =
 			charNameRaw && charNameRaw.toLowerCase() !== this.ul("common.noSet").toLowerCase()
@@ -1056,8 +1056,7 @@ export class MacroFeature extends BaseFeature {
 		if (!userID) {
 			const parsedUser2 = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
 			const mention2 = parsedUser2["common.user"];
-			const idMatch2 = mention2?.match(/<@(?<id>\d+)>/);
-			userID = idMatch2?.groups?.id ?? mention2?.replace(/<@|>/g, "");
+			userID = getIdFromMention(mention2);
 			const charNameRaw2 = parsedUser2["common.character"];
 			userName =
 				charNameRaw2 &&

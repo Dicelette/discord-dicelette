@@ -4,6 +4,7 @@ import {
 	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
+	getIdFromMention,
 	profiler,
 } from "@dicelette/utils";
 import { move, resetButton } from "commands";
@@ -78,10 +79,9 @@ export class MoveFeature extends BaseFeature {
 		const embed = getEmbeds(message, "user");
 		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 
-		const oldUserId = embed
-			.toJSON()
-			.fields?.find((field) => findln(field.name) === "common.user")
-			?.value.replace(/<@|>/g, "");
+		const oldUserId = getIdFromMention(
+			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
+		);
 		if (!oldUserId) {
 			await interaction.reply({
 				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
