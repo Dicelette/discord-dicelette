@@ -37,6 +37,7 @@ import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "data
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { MacroFeature } from "./macro";
+import { UserFeature } from "./user";
 import * as Messages from "messages";
 import {
 	createStatsEmbed,
@@ -406,7 +407,7 @@ export class StatsFeature extends BaseFeature {
 		const { fieldsToAppend, statsEmbeds, message } = data;
 		if (!fieldsToAppend) return;
 		const newEmbedStats = createStatsEmbed(this.ul).addFields(fieldsToAppend);
-		if (!userData) userData = await getUserNameAndChar(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction | Djs.CommandInteraction | Djs.StringSelectMenuInteraction, this.ul);
+		if (!userData) userData = await getUserNameAndChar(interaction as Djs.ModalSubmitInteraction | Djs.ButtonInteraction, this.ul);
 		const { userID, userName } = userData;
 		if (!fieldsToAppend || fieldsToAppend.length === 0) {
 			const { list, exists, files } = await replaceEmbedInList(
@@ -597,7 +598,8 @@ export class StatsFeature extends BaseFeature {
 		const row = buildModerationButtons("stats-edit", this.ul, embedKey);
 		await interaction.reply({ components: [row], embeds: [newEmbedStats] });
 		const replyMessage = await interaction.fetchReply();
-		await sendValidationMessage(interaction, interaction.user, this.ul, this.client, replyMessage.url);
+		const userFeature = new UserFeature({ interaction, ul: this.ul, interactionUser: interaction.user, client: this.client });
+		await userFeature.sendValidationMessage(replyMessage.url);
 		profiler.stopProfiler();
 	}
 
@@ -611,7 +613,8 @@ export class StatsFeature extends BaseFeature {
 		if (!moderator) {
 			let notAllowedMsg = this.ul("modals.noPermission");
 			notAllowedMsg += `\n${this.ul("modals.onlyModerator")}`;
-			await sendValidationMessage(interaction, this.interactionUser, this.ul, this.client);
+			const userFeature = new UserFeature({ interaction, ul: this.ul, interactionUser: this.interactionUser, client: this.client });
+			await userFeature.sendValidationMessage();
 			await Messages.reply(interaction, {
 				content: notAllowedMsg,
 				flags: Djs.MessageFlags.Ephemeral,

@@ -541,7 +541,8 @@ export class MacroFeature extends BaseFeature {
 				});
 			} else await interaction.editReply({ components: [row], embeds: [diceEmbed] });
 			const url = await interaction.fetchReply();
-			await sendValidationMessage(interaction, interaction.user, this.ul, this.client, url.url);
+			const userFeature = new (await import("./user")).UserFeature({ interaction, ul: this.ul, interactionUser: interaction.user, client: this.client });
+			await userFeature.sendValidationMessage(url.url);
 			return;
 		}
 
@@ -786,12 +787,10 @@ export class MacroFeature extends BaseFeature {
 	}
 
 	/**
-	 * Validation by a moderator for dice editing (via button).
+	 * Helper method to check if user has moderator permissions
 	 */
-	async couldBeValidatedDice() {
+	private async checkModeratorPermission(): Promise<boolean> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
-		if (!this.client) return;
-		
 		const moderator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
@@ -800,8 +799,41 @@ export class MacroFeature extends BaseFeature {
 				content: this.ul("modals.onlyModerator"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			return;
+			return false;
 		}
+		return true;
+	}
+
+	/**
+	 * Helper method to handle cancellation logic
+	 */
+	private async handleCancellation(embedKey: string | undefined): Promise<void> {
+		const interaction = this.interaction as Djs.ButtonInteraction;
+		const { userId, url } = getUserId(interaction);
+		if (embedKey) deleteModerationCache(embedKey);
+
+		const samePerson = interaction.user.id === userId;
+		let content = this.ul("modals.cancelled", { url });
+		if (samePerson) content = this.ul("modals.cancelled_by_user", { url });
+		await interaction.message.delete();
+		await reply(interaction, {
+			content,
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		if (userId && !samePerson) {
+			const user = await fetchUser(this.client!, userId);
+			if (user) await user.send(content);
+		}
+	}
+
+	/**
+	 * Validation by a moderator for dice editing (via button).
+	 */
+	async couldBeValidatedDice() {
+		const interaction = this.interaction as Djs.ButtonInteraction;
+		if (!this.client) return;
+		
+		if (!await this.checkModeratorPermission()) return;
 
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.validate, customId);
@@ -889,20 +921,7 @@ export class MacroFeature extends BaseFeature {
 		
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceEdit.cancel, customId);
-		const { userId, url } = getUserId(interaction);
-		if (embedKey) deleteModerationCache(embedKey);
-		const samePerson = interaction.user.id === userId;
-		let content = this.ul("modals.cancelled", { url });
-		if (samePerson) content = this.ul("modals.cancelled_by_user", { url });
-		await interaction.message.delete();
-		await reply(interaction, {
-			content,
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		if (userId && !samePerson) {
-			const user = await fetchUser(this.client, userId);
-			if (user) await user.send(content);
-		}
+		await this.handleCancellation(embedKey);
 	}
 
 	/**
@@ -912,16 +931,8 @@ export class MacroFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.client) return;
 		
-		const moderator = interaction.guild?.members.cache
-			.get(interaction.user.id)
-			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (!moderator) {
-			await reply(interaction, {
-				content: this.ul("modals.onlyModerator"),
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-			return;
-		}
+		if (!await this.checkModeratorPermission()) return;
+		
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.validate, customId);
 		if (!embedKey) throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
@@ -1061,20 +1072,6 @@ export class MacroFeature extends BaseFeature {
 		
 		const customId = interaction.customId;
 		const embedKey = parseKeyFromCustomId(CUSTOM_ID_PREFIX.diceAdd.cancel, customId);
-		const { userId, url } = getUserId(interaction);
-		if (embedKey) deleteModerationCache(embedKey);
-
-		const samePerson = interaction.user.id === userId;
-		let content = this.ul("modals.cancelled", { url });
-		if (samePerson) content = this.ul("modals.cancelled_by_user", { url });
-		await interaction.message.delete();
-		await reply(interaction, {
-			content,
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		if (userId && !samePerson) {
-			const user = await fetchUser(this.client, userId);
-			if (user) await user.send(content);
-		}
+		await this.handleCancellation(embedKey);
 	}
 }
