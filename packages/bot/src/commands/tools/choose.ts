@@ -3,7 +3,7 @@ import "discord_ext";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
-import { random } from "@dicelette/utils";
+import { logger, random } from "@dicelette/utils";
 
 const REPEAT_CHOOSE = /(?<word>.*?)\* ?(?<repeat>\d+)/;
 
@@ -67,7 +67,7 @@ function weight(input: string[]): string[] {
 		if (match?.groups) {
 			const word = match.groups.word.trim();
 			const repeat = Number.parseInt(match.groups.repeat, 10);
-			results.push(word.repeat(repeat));
+			results.push(...Array(repeat).fill(word));
 			continue;
 		}
 		results.push(item);
@@ -85,6 +85,8 @@ async function command(interaction: Djs.ChatInputCommandInteraction, client: ECl
 		.map((item) => item.trim())
 		.filter((item) => item.length > 0);
 	if (hasWeight) items = weight(items);
+
+	logger.debug("Choose command items:", items);
 
 	if (items.length === 0)
 		return await interaction.reply({
