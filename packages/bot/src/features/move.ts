@@ -11,7 +11,7 @@ import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
 import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
-import { embedError, getEmbeds } from "messages";
+import { embedError, getEmbeds, reply } from "messages";
 import { isUserNameOrId } from "utils";
 import { BaseFeature } from "./base";
 
@@ -91,7 +91,7 @@ export class MoveFeature extends BaseFeature {
 		}
 		const oldUser = await isUserNameOrId(oldUserId, interaction);
 		if (!oldUser) {
-			await interaction.reply({
+			await reply(interaction, {
 				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -104,7 +104,7 @@ export class MoveFeature extends BaseFeature {
 		};
 		const charData = getUserByEmbed({ message: message });
 		if (!charData) {
-			await interaction.reply({
+			await reply(interaction, {
 				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
