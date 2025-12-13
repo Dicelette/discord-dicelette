@@ -78,7 +78,7 @@ export const displayUser = {
 		let userData: CharacterData | undefined = charData?.[user?.id ?? interaction.user.id];
 		if (!userData) userData = await findChara(charData, charName);
 		if (!userData) {
-			await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
+			await reply(interaction, { embeds: [embedError(ul("error.user.notFound.generic"), ul)] });
 			return;
 		}
 
@@ -111,7 +111,7 @@ export const displayUser = {
 			const diceFields = generateDice(diceEmbed?.toJSON().fields, statsFields);
 			const dataUserEmbeds = getEmbeds(userMessage, "user");
 			if (!statisticEmbed && !diceEmbed && !diceFields && !statsFields) {
-				await reply(interaction, { embeds: [embedError(ul("error.user.notFound"), ul)] });
+				await reply(interaction, { embeds: [embedError(ul("error.user.notFound.generic"), ul)] });
 				return;
 			}
 			const jsonDataUser = dataUserEmbeds!
@@ -166,7 +166,7 @@ export const displayUser = {
 			console.error(e);
 			sentry.error(e, { source: "display-command" });
 			await reply(interaction, {
-				embeds: [embedError(ul("error.user.notFound"), ul)],
+				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;

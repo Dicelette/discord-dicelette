@@ -308,7 +308,7 @@ async function getUserFrom(
 	} catch (error) {
 		if (skipNotFound) return;
 		logger.warn(error);
-		throw new BotError(ul("error.user.notFound"), botErrorOptions);
+		throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 	}
 }
 
@@ -520,7 +520,7 @@ export async function getUserNameAndChar(
 		.fields?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
-	if (!userID) throw new BotError(ul("error.user.notFound"), botErrorOptions);
+	if (!userID) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 	if (
 		!interaction.channel ||
 		(!(interaction.channel instanceof Djs.ThreadChannel) &&

@@ -287,7 +287,7 @@ export class MacroFeature extends BaseFeature {
 					diceEmbed.addFields(newField);
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
-		if (!user) throw new BotError(ul("error.user.notFound"), botErrorOptions);
+		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 

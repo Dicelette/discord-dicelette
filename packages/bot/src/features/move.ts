@@ -84,7 +84,9 @@ export class MoveFeature extends BaseFeature {
 		);
 		if (!oldUserId) {
 			await reply(interaction, {
-				embeds: [embedError(this.ul("error.user.notFound"), this.ul, "oldUserId")],
+				embeds: [
+					embedError(this.ul("error.user.notFound.userId", { oldUserId }), this.ul),
+				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);
@@ -92,7 +94,9 @@ export class MoveFeature extends BaseFeature {
 		const oldUser = await isUserNameOrId(oldUserId, interaction);
 		if (!oldUser) {
 			await reply(interaction, {
-				embeds: [embedError(this.ul("error.user.notFound"), this.ul, "oldUser")],
+				embeds: [
+					embedError(this.ul("error.user.notFound.oldUser", { oldUserId }), this.ul),
+				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);
@@ -105,7 +109,14 @@ export class MoveFeature extends BaseFeature {
 		const charData = getUserByEmbed({ message: message });
 		if (!charData) {
 			await reply(interaction, {
-				embeds: [embedError(this.ul("error.user.notFound"), this.ul, "charData")],
+				embeds: [
+					embedError(
+						this.ul("error.user.notFound.charData", {
+							url: `https://discord.com/channels/${interaction.guildId}/${message.id}/${message.id}`,
+						}),
+						this.ul
+					),
+				],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);

@@ -221,7 +221,7 @@ export class UserFeature extends BaseFeature {
 
 		if (!user) {
 			await Messages.reply(interaction, {
-				embeds: [Messages.embedError(this.ul("error.user.notFound"), this.ul)],
+				embeds: [Messages.embedError(this.ul("error.user.notFound.generic"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -507,7 +507,7 @@ export class UserFeature extends BaseFeature {
 		if (charName && charName === "common.noSet") charName = undefined;
 		if (!userID) {
 			await Messages.reply(interaction, {
-				embeds: [Messages.embedError(this.ul("error.user.notFound"), this.ul)],
+				embeds: [Messages.embedError(this.ul("error.user.notFound.generic"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
