@@ -14,6 +14,7 @@ import {
 	cleanAvatarUrl,
 	getIdFromMention,
 	logger,
+	MENTION_ID_DETECTION,
 	NoChannel,
 	NoEmbed,
 	profiler,
@@ -478,7 +479,6 @@ export class UserFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template || !this.client || !this.characters) return;
 
-		const { ul } = getLangAndConfig(this.client, interaction);
 		const userEmbed = Messages.getEmbeds(interaction.message, "user");
 		if (!userEmbed) throw new NoEmbed();
 		const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
@@ -490,14 +490,15 @@ export class UserFeature extends BaseFeature {
 		if (channelToPost) {
 			const channel = await fetchChannel(
 				interaction.guild!,
-				getIdFromMention(channelToPost) || channelToPost
+				getIdFromMention(channelToPost) ||
+					channelToPost.replace(MENTION_ID_DETECTION, "$1")
 			);
 			if (!channel) {
 				await Messages.reply(interaction, {
 					embeds: [
 						Messages.embedError(
-							ul("error.channel.notFound", { channel: channelToPost }),
-							ul
+							this.ul("error.channel.notFound", { channel: channelToPost }),
+							this.ul
 						),
 					],
 					flags: Djs.MessageFlags.Ephemeral,
@@ -508,19 +509,22 @@ export class UserFeature extends BaseFeature {
 		if (charName && charName === "common.noSet") charName = undefined;
 		if (!userID) {
 			await Messages.reply(interaction, {
-				embeds: [Messages.embedError(ul("error.user.notFound"), ul)],
+				embeds: [Messages.embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
-		userID = userID.replace("<@", "");
+		userID = getIdFromMention(userID) || userID.replace(MENTION_ID_DETECTION, "$1");
 		const files = interaction.message.attachments.map(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
 		let avatarStr = jsonThumbnail || "";
 		if (jsonThumbnail?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 			const fileName = jsonThumbnail.split("?")[0].split("/").pop() || `${userID}_avatar`;
-			const result = await reuploadAvatar({ name: fileName, url: jsonThumbnail }, ul);
+			const result = await reuploadAvatar(
+				{ name: fileName, url: jsonThumbnail },
+				this.ul
+			);
 			avatarStr = result.name;
 			files.push(result.newAttachment);
 		}
@@ -528,7 +532,7 @@ export class UserFeature extends BaseFeature {
 		const uniqueFiles = Array.from(new Set(files.map((f) => f.name))).map(
 			(name) => files.find((f) => f.name === name)!
 		);
-		const userDataEmbed = Messages.createUserEmbed(ul, avatarStr, userID, charName);
+		const userDataEmbed = Messages.createUserEmbed(this.ul, avatarStr, userID, charName);
 		const oldDiceEmbeds = Messages.getEmbeds(interaction.message, "damage");
 		const oldStatsEmbed = Messages.getEmbeds(interaction.message, "stats");
 		const oldDiceEmbedsFields = oldDiceEmbeds
@@ -538,7 +542,7 @@ export class UserFeature extends BaseFeature {
 		let diceEmbed: Djs.EmbedBuilder | undefined;
 		let statsEmbed: Djs.EmbedBuilder | undefined;
 		for (const field of oldDiceEmbedsFields) {
-			if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(ul);
+			if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(this.ul);
 
 			diceEmbed.addFields({
 				inline: true,
@@ -549,7 +553,7 @@ export class UserFeature extends BaseFeature {
 		}
 		for (const field of statEmbedsFields) {
 			if (!statsEmbed) {
-				statsEmbed = Messages.createStatsEmbed(ul);
+				statsEmbed = Messages.createStatsEmbed(this.ul);
 			}
 			statsEmbed.addFields({
 				inline: true,
@@ -587,7 +591,7 @@ export class UserFeature extends BaseFeature {
 		for (const [name, dice] of Object.entries(this.template.damage ?? {})) {
 			if (!templateMacro) templateMacro = {};
 			templateMacro[name] = dice;
-			if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(ul);
+			if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(this.ul);
 
 			//prevent duplicate fields in the dice embed
 			if (MacroFeature.findDuplicate(diceEmbed, name)) continue;
@@ -615,24 +619,24 @@ export class UserFeature extends BaseFeature {
 			!allValueUndefOrEmptyString(this.template.critical) ||
 			!allValueUndefOrEmptyString(this.template.customCritical)
 		) {
-			templateEmbed = Messages.createTemplateEmbed(ul);
+			templateEmbed = Messages.createTemplateEmbed(this.ul);
 			if (this.template.diceType && this.template.diceType.length > 0)
 				templateEmbed.addFields({
 					inline: true,
-					name: ul("common.dice").capitalize(),
+					name: this.ul("common.dice").capitalize(),
 					value: `\`${this.template.diceType}\``,
 				});
 			if (this.template.critical?.success) {
 				templateEmbed.addFields({
 					inline: true,
-					name: ul("roll.critical.success"),
+					name: this.ul("roll.critical.success"),
 					value: `\`${this.template.critical.success}\``,
 				});
 			}
 			if (this.template.critical?.failure) {
 				templateEmbed.addFields({
 					inline: true,
-					name: ul("roll.critical.failure"),
+					name: this.ul("roll.critical.failure"),
 					value: `\`${this.template.critical.failure}\``,
 				});
 			}
@@ -651,7 +655,7 @@ export class UserFeature extends BaseFeature {
 			interaction,
 			userStatistique,
 			userID,
-			ul,
+			this.ul,
 			{ dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
 			this.client.settings,
 			getIdFromMention(channelToPost) ?? channelToPost.replace("<#", "").replace(">", ""),
@@ -671,7 +675,7 @@ export class UserFeature extends BaseFeature {
 			this.client.settings
 		);
 		await Messages.reply(interaction, {
-			content: ul("modals.finished"),
+			content: this.ul("modals.finished"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
