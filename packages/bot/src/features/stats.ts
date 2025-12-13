@@ -742,7 +742,7 @@ export class StatsFeature extends BaseFeature {
 			if (!apiEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 			embed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
 		}
-		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
+		//if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const message = await getMessageWithKeyPart(this.ul, interaction, embedKey);
 		const oldStatsEmbed =
 			getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(this.ul);
