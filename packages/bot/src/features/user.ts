@@ -2,7 +2,6 @@ import {
 	addAutoRole,
 	fetchAvatarUrl,
 	fetchChannel,
-	getInteractionContext as getLangAndConfig,
 	pingModeratorRole,
 	reuploadAvatar,
 } from "@dicelette/bot-helpers";
