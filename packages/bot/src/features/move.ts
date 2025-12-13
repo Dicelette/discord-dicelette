@@ -37,7 +37,7 @@ export class MoveFeature extends BaseFeature {
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		if (moderator) await this.showMove(interaction);
 		else
-			await interaction.reply({
+			await reply(interaction, {
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -83,8 +83,8 @@ export class MoveFeature extends BaseFeature {
 			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
 		if (!oldUserId) {
-			await interaction.reply({
-				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
+			await reply(interaction, {
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul, "oldUserId")],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);
@@ -92,7 +92,7 @@ export class MoveFeature extends BaseFeature {
 		const oldUser = await isUserNameOrId(oldUserId, interaction);
 		if (!oldUser) {
 			await reply(interaction, {
-				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul, "oldUser")],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);
@@ -105,7 +105,7 @@ export class MoveFeature extends BaseFeature {
 		const charData = getUserByEmbed({ message: message });
 		if (!charData) {
 			await reply(interaction, {
-				embeds: [embedError(this.ul("error.user.notFound"), this.ul)],
+				embeds: [embedError(this.ul("error.user.notFound"), this.ul, "charData")],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);
