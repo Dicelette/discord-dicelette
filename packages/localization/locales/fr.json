@@ -548,6 +548,7 @@
       },
       "registered": "{{- user}} n'est pas enregistré.",
       "rename": "Votre personnage n'a pas de nom : il ne peut donc pas être renommé !",
+      "sameUser": "L'ancien et le nouvel utilisateur sont identique. L'opération de déplacement n'est donc pas possible.",
       "youRegistered": "Vous n'êtes pas enregistré !"
     }
   },

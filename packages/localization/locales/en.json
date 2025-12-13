@@ -548,6 +548,7 @@
       },
       "registered": "{{- user}} is not registered.",
       "rename": "Your character does not have a name: it cannot therefore be renamed!",
+      "sameUser": "The old and new users are identical. Therefore, the move operation is not possible.",
       "youRegistered": "You are not registered"
     }
   },

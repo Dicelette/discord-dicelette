@@ -82,6 +82,13 @@ export class MoveFeature extends BaseFeature {
 		const oldUserId = getIdFromMention(
 			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
+		if (oldUserId === user.id) {
+			await reply(interaction, {
+				embeds: [embedError(this.ul("error.user.sameUser"), this.ul)],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return await resetButton(message, this.ul);
+		}
 		if (!oldUserId) {
 			await reply(interaction, {
 				embeds: [
@@ -157,6 +164,7 @@ export class MoveFeature extends BaseFeature {
 		};
 		const guildData = this.client.settings.get(interaction.guild.id);
 		if (!guildData) return;
+
 		await move(
 			user,
 			interaction,

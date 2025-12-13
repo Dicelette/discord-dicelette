@@ -13,7 +13,6 @@ import {
 	cleanAvatarUrl,
 	getIdFromMention,
 	logger,
-	MENTION_ID_DETECTION,
 	NoChannel,
 	NoEmbed,
 	profiler,
@@ -395,7 +394,6 @@ export class UserFeature extends BaseFeature {
 	async button(): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template || !this.client || !this.characters) return;
-
 		const selfAllow = this.client.settings.get(
 			interaction.guild!.id,
 			"allowSelfRegister"
@@ -512,7 +510,7 @@ export class UserFeature extends BaseFeature {
 			});
 			return;
 		}
-		userID = getIdFromMention(userID) || userID.replace(MENTION_ID_DETECTION, "$1");
+		userID = getIdFromMention(userID);
 		const files = interaction.message.attachments.map(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
