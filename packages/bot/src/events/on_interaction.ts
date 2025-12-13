@@ -107,7 +107,7 @@ async function modalSubmit(
 	} else if (interaction.customId === "editDice") {
 		await new MacroFeature({ client, interaction, interactionUser, ul }).validate();
 	} else if (interaction.customId === "editAvatar") {
-		new AvatarFeature({
+		await new AvatarFeature({
 			interaction,
 			interactionUser,
 			ul,
