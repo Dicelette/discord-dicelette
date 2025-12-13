@@ -163,7 +163,7 @@ export class StatsFeature extends BaseFeature {
 		const statistics = getEmbeds(interaction.message, "stats");
 		if (!statistics)
 			throw new BotError(this.ul("error.stats.notFound_plural"), botErrorOptionsModals);
-		const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed);
+		const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed, false);
 		const originalGuildData = this.db.get(interaction.guild!.id, "templateID.statsName");
 		const registeredStats = originalGuildData?.map((stat) => stat.unidecode());
 		const userStats = Object.keys(stats).map((stat) => stat.unidecode());

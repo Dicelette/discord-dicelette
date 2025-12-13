@@ -367,7 +367,7 @@ export class UserFeature extends BaseFeature {
 		);
 
 		const statsAlreadySet = Object.keys(
-			parseEmbedFields(statsEmbed.toJSON() as Djs.Embed)
+			parseEmbedFields(statsEmbed.toJSON() as Djs.Embed, false)
 		)
 			.filter((stat) => allTemplateStat.includes(stat.unidecode()))
 			.map((stat) => stat.unidecode());
@@ -557,7 +557,7 @@ export class UserFeature extends BaseFeature {
 		}
 
 		const parsedStats = statsEmbed
-			? parseEmbedFields(statsEmbed.toJSON() as Djs.Embed)
+			? parseEmbedFields(statsEmbed.toJSON() as Djs.Embed, false)
 			: undefined;
 		const stats: Record<string, number> = {};
 		for (const [name, value] of Object.entries(parsedStats ?? {})) {

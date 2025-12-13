@@ -69,14 +69,21 @@ export function parseTemplateField(embed: Record<string, string>): {
 /**
  * Parse the embed fields and remove the backtick if any
  */
-export function parseEmbedFields(embed: Djs.Embed): Record<string, string> {
+export function parseEmbedFields(
+	embed: Djs.Embed,
+	findKey = true
+): Record<string, string> {
 	const fields = embed?.fields;
 	if (!fields) return {};
 	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
-		parsedFields[findln(field.name.removeBacktick().unidecode(true))] = findln(
-			field.value.removeBacktick()
-		);
+		if (findKey)
+			parsedFields[findln(field.name.removeBacktick().unidecode(true))] = findln(
+				field.value.removeBacktick()
+			);
+		else
+			parsedFields[field.name.removeBacktick().unidecode(true)] =
+				field.value.removeBacktick();
 	}
 	return parsedFields;
 }

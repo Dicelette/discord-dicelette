@@ -155,7 +155,7 @@ export class MacroFeature extends BaseFeature {
 				cause: "DICE_EDIT",
 				level: BotErrorLevel.Warning,
 			});
-		const diceFields = parseEmbedFields(diceEmbed.toJSON() as Djs.Embed);
+		const diceFields = parseEmbedFields(diceEmbed.toJSON() as Djs.Embed, false);
 		let dices = "";
 		for (const [skill, dice] of Object.entries(diceFields)) {
 			if (dice === "common.space") dices += `- ${skill}: _ _\n`;
@@ -289,9 +289,8 @@ export class MacroFeature extends BaseFeature {
 						.fields?.findIndex(
 							(f) => f.name.standardize() === field.name.standardize()
 						) === -1
-				) {
+				)
 					diceEmbed.addFields(newField);
-				}
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound"), botErrorOptions);
@@ -308,7 +307,7 @@ export class MacroFeature extends BaseFeature {
 			const allFieldWithoutDuplicate = diceEmbed
 				.toJSON()
 				?.fields?.filter((field) => field.name.standardize() !== name.standardize());
-			if (allFieldWithoutDuplicate) {
+			if (allFieldWithoutDuplicate)
 				diceEmbed.setFields([
 					...allFieldWithoutDuplicate,
 					{
@@ -317,7 +316,6 @@ export class MacroFeature extends BaseFeature {
 						value: `\`${value}\``,
 					},
 				]);
-			}
 		}
 
 		const damageName = diceEmbed.toJSON().fields?.reduce(
@@ -589,7 +587,7 @@ export class MacroFeature extends BaseFeature {
 	}
 
 	private parseStatsString(statsEmbed: Djs.EmbedBuilder) {
-		const stats = parseEmbedFields(statsEmbed.toJSON() as Djs.Embed);
+		const stats = parseEmbedFields(statsEmbed.toJSON() as Djs.Embed, false);
 		const parsedStats: Record<string, number> = {};
 		for (const [name, value] of Object.entries(stats)) {
 			let number = Number.parseInt(value, 10);
