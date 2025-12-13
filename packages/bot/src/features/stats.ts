@@ -457,7 +457,8 @@ export class StatsFeature extends BaseFeature {
 
 		if (!data) return;
 		const { fieldsToAppend, statsEmbeds, message } = data;
-		if (!fieldsToAppend) return;
+		// Distinguish between `undefined` (no data) and an empty array (explicit removal)
+		if (fieldsToAppend === undefined) return;
 		const newEmbedStats = createStatsEmbed(this.ul).addFields(fieldsToAppend);
 		if (!userData)
 			userData = await getUserNameAndChar(
@@ -494,6 +495,8 @@ export class StatsFeature extends BaseFeature {
 				interaction.guild as Djs.Guild,
 				db
 			);
+			// Stop here: we handled the explicit empty-fields (removal) case
+			return;
 		}
 		const { list, files } = await replaceEmbedInList(
 			this.ul,
