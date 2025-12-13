@@ -489,8 +489,7 @@ export class UserFeature extends BaseFeature {
 		if (channelToPost) {
 			const channel = await fetchChannel(
 				interaction.guild!,
-				getIdFromMention(channelToPost) ||
-					channelToPost.replace(MENTION_ID_DETECTION, "$1")
+				getIdFromMention(channelToPost)
 			);
 			if (!channel) {
 				await Messages.reply(interaction, {
@@ -657,7 +656,7 @@ export class UserFeature extends BaseFeature {
 			this.ul,
 			{ dice: !!diceEmbed, stats: !!statsEmbed, template: !!templateEmbed },
 			this.client.settings,
-			getIdFromMention(channelToPost) ?? channelToPost.replace("<#", "").replace(">", ""),
+			getIdFromMention(channelToPost),
 			this.characters,
 			uniqueFiles
 		);

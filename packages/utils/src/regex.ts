@@ -115,6 +115,12 @@ export function getCachedRegex(pattern: string, flags = ""): RegExp {
 	return regex;
 }
 
-export function getIdFromMention(mention: string | undefined): string | undefined {
+// Generic overload: the return type depends on the input type
+export function getIdFromMention<T extends string | undefined>(
+	mention: T
+): T extends string ? string : undefined;
+// Broad overload to accept union arguments (helps when caller has string | undefined)
+export function getIdFromMention(mention: string | undefined): string | undefined;
+export function getIdFromMention(mention?: string): string | undefined {
 	return mention?.replace(MENTION_ID_DETECTION, "$1");
 }
