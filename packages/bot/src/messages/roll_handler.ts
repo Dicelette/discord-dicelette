@@ -3,7 +3,7 @@ import type { ComparedValue, Critical, CustomCritical, Resultat } from "@dicelet
 import { ResultAsText } from "@dicelette/parse_result";
 import type { DiscordTextChannel, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, threadToSend } from "messages";
+import { deleteAfter, findMessageBefore, reply, threadToSend } from "messages";
 
 interface RollHandlerOptions {
 	/** Result of the dice roll */
@@ -245,15 +245,17 @@ async function replyToSource(
 			: await source.reply(replyOptions);
 	}
 
-	// CommandInteraction
-	if (source.replied || source.deferred)
+	// -- CommandInteraction ---
+	//
+	/* Not needed as we use the reply wrapped that handle this
+		if (source.replied || source.deferred)
 		return await source.editReply(replyOptions as Djs.InteractionEditReplyOptions);
-
+	*/
 	const replyInteraction = replyOptions as Djs.InteractionReplyOptions;
 
 	if (hideResult) {
 		flags.push(Djs.MessageFlags.Ephemeral);
 		replyInteraction.flags = flags;
 	}
-	return await source.reply(replyOptions as Djs.InteractionReplyOptions);
+	return await reply(source, replyOptions as Djs.InteractionReplyOptions);
 }

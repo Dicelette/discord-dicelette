@@ -669,7 +669,7 @@ export class StatsFeature extends BaseFeature {
 		});
 
 		const row = buildModerationButtons("stats-edit", this.ul, embedKey);
-		await interaction.reply({ components: [row], embeds: [newEmbedStats] });
+		await reply(interaction, { components: [row], embeds: [newEmbedStats] });
 		const replyMessage = await interaction.fetchReply();
 		const userFeature = new UserFeature({
 			client: this.client,
