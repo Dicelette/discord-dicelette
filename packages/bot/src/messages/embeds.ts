@@ -226,48 +226,6 @@ export function stripFooter(embed: Djs.EmbedBuilder) {
 }
 
 /**
- * Get the statistiques fields from the modals and verify if all value are correct and if the total is not exceeded
- */
-export function getStatistiqueFields(
-	interaction: Djs.ModalSubmitInteraction,
-	templateData: StatisticalTemplate,
-	ul: Translation
-) {
-	const combinaisonFields: Record<string, string> = {};
-	const stats: Record<string, number> = {};
-	if (!templateData.statistics) return { combinaisonFields, stats };
-	for (const [key, value] of Object.entries(templateData.statistics)) {
-		const name = key.standardize();
-		if (!interaction.fields.fields.has(name) && !value.combinaison) continue;
-		if (value.combinaison) {
-			combinaisonFields[key] = value.combinaison;
-			continue;
-		}
-		const statValue = interaction.fields.getTextInputValue(name);
-		if (!statValue) continue;
-		const num = Number.parseInt(statValue, 10);
-		if (value.min && num < value.min)
-			throw new BotError(
-				ul("error.mustBeGreater", { min: value.min, value: name }),
-				botErrorOptions
-			);
-		if (value.max && num > value.max)
-			throw new BotError(
-				ul("error.mustBeLower", { max: value.max, value: name }),
-				botErrorOptions
-			);
-		// Only allow negative values if min is negative
-		if (num < 0 && value.min !== undefined && value.min >= 0)
-			throw new BotError(
-				ul("error.mustBeGreater", { min: value.min ?? 0, value: name }),
-				botErrorOptions
-			);
-		stats[key] = num;
-	}
-	return { combinaisonFields, stats };
-}
-
-/**
  * Remove the embeds from the list
  */
 export function removeEmbedsFromList(

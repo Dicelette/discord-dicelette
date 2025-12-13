@@ -18,6 +18,7 @@ import {
 	evalOneCombinaison,
 	FormulaError,
 	isNumber,
+	type StatisticalTemplate,
 } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
@@ -40,7 +41,6 @@ import {
 	createStatsEmbed,
 	displayOldAndNewStats,
 	getEmbeds,
-	getStatistiqueFields,
 	removeEmbedsFromList,
 	replaceEmbedInList,
 	reply,
@@ -211,11 +211,7 @@ export class StatsFeature extends BaseFeature {
 	/**
 	 * Handles a modal submission to register new user statistics and updates the corresponding Discord message embeds.
 	 */
-	async register(
-		page: number | undefined = 2,
-		lang: Djs.Locale = Djs.Locale.EnglishGB,
-		moderation = false
-	) {
+	async register(page: number | undefined = 2, moderation = false) {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.template || !interaction.message) return;
 
@@ -226,7 +222,6 @@ export class StatsFeature extends BaseFeature {
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
-		const ul = ln(lang);
 		const userEmbed = getEmbeds(message, "user");
 		if (!userEmbed) return;
 		const thumbnail = userEmbed.toJSON().thumbnail?.url;
@@ -235,7 +230,7 @@ export class StatsFeature extends BaseFeature {
 		);
 		if (thumbnail?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
 			const fileName = thumbnail.split("?")[0].split("/").pop() || "avatar.png";
-			const result = await reuploadAvatar({ name: fileName, url: thumbnail }, ul);
+			const result = await reuploadAvatar({ name: fileName, url: thumbnail }, this.ul);
 			userEmbed.setThumbnail(result.name);
 			files.push(result.newAttachment);
 		}
@@ -250,13 +245,13 @@ export class StatsFeature extends BaseFeature {
 
 		let combinaisonFields: Record<string, string>;
 		let stats: Record<string, number>;
-		const result = getStatistiqueFields(interaction, this.template, ul);
+		const result = this.getStatistiqueFields(interaction, this.template);
 		combinaisonFields = result.combinaisonFields;
 		stats = result.stats;
 
-		userEmbed.setFooter({ text: ul("common.page", { nb: page }) });
+		userEmbed.setFooter({ text: this.ul("common.page", { nb: page }) });
 
-		const statEmbeds = statsEmbed ?? createStatsEmbed(ul);
+		const statEmbeds = statsEmbed ?? createStatsEmbed(this.ul);
 		for (const [stat, value] of Object.entries(stats)) {
 			statEmbeds.addFields({
 				inline: true,
@@ -293,17 +288,17 @@ export class StatsFeature extends BaseFeature {
 		if (allStatsFilled && this.template.forceDistrib) {
 			if (ilReste !== undefined && ilReste < 0) {
 				const exceeded = Math.abs(ilReste);
-				const errorMessage = ul("error.totalExceededBy", {
+				const errorMessage = this.ul("error.totalExceededBy", {
 					max: exceeded,
-					value: ul("common.statistics"),
+					value: this.ul("common.statistics"),
 				});
 				await reply(interaction, {
 					content: errorMessage,
 					flags: Djs.MessageFlags.Ephemeral,
 				});
-				userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+				userEmbed.setFooter({ text: this.ul("common.page", { nb: 1 }) });
 				message.edit({
-					components: [continueCancelButtons(ul)],
+					components: [continueCancelButtons(this.ul)],
 					embeds: [userEmbed],
 					files: uniqueFiles,
 				});
@@ -311,12 +306,12 @@ export class StatsFeature extends BaseFeature {
 			}
 			if (ilReste && ilReste > 0) {
 				await reply(interaction, {
-					content: ul("modals.stats.forceDistrib", { reste: ilReste }),
+					content: this.ul("modals.stats.forceDistrib", { reste: ilReste }),
 					flags: Djs.MessageFlags.Ephemeral,
 				});
-				userEmbed.setFooter({ text: ul("common.page", { nb: 1 }) });
+				userEmbed.setFooter({ text: this.ul("common.page", { nb: 1 }) });
 				message.edit({
-					components: [continueCancelButtons(ul)],
+					components: [continueCancelButtons(this.ul)],
 					embeds: [userEmbed],
 					files: uniqueFiles,
 				});
@@ -325,7 +320,7 @@ export class StatsFeature extends BaseFeature {
 		}
 
 		if (allStatsFilled) {
-			let combinaison: Record<string, number> = {};
+			let combinaison: Record<string, number>;
 			combinaison = evalCombinaison(combinaisonFields, embedStats);
 			for (const stat of Object.keys(combinaison)) {
 				statEmbeds.addFields({
@@ -334,15 +329,15 @@ export class StatsFeature extends BaseFeature {
 					value: `\`${combinaisonFields[stat]}\` = ${combinaison[stat]}`,
 				});
 			}
-			userEmbed.setFooter({ text: ul("common.page", { nb: page + 1 }) });
+			userEmbed.setFooter({ text: this.ul("common.page", { nb: page + 1 }) });
 
 			message.edit({
-				components: [MacroFeature.buttons(ul, moderation && !isModerator)],
+				components: [MacroFeature.buttons(this.ul, moderation && !isModerator)],
 				embeds: [userEmbed, statEmbeds],
 				files: uniqueFiles,
 			});
 			await reply(interaction, {
-				content: ul("modals.added.stats"),
+				content: this.ul("modals.added.stats"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -353,20 +348,61 @@ export class StatsFeature extends BaseFeature {
 						(stat) => stat.min !== undefined && stat.min < 0
 					);
 					const displayReste = allowNegative ? ilReste : Math.abs(ilReste);
-					return `\n${ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: this.template.total })}`;
+					return `\n${this.ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: this.template.total })}`;
 				})()
 			: "";
 
 		message.edit({
-			components: [continueCancelButtons(ul)],
+			components: [continueCancelButtons(this.ul)],
 			embeds: [userEmbed, statEmbeds],
 			files: uniqueFiles,
 		});
 		await reply(interaction, {
-			content: `${ul("modals.added.stats")}${restePoints}`,
+			content: `${this.ul("modals.added.stats")}${restePoints}`,
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
+	}
+
+	/**
+	 * Get the statistiques fields from the modals and verify if all value are correct and if the total is not exceeded
+	 */
+	private getStatistiqueFields(
+		interaction: Djs.ModalSubmitInteraction,
+		templateData: StatisticalTemplate
+	) {
+		const combinaisonFields: Record<string, string> = {};
+		const stats: Record<string, number> = {};
+		if (!templateData.statistics) return { combinaisonFields, stats };
+		for (const [key, value] of Object.entries(templateData.statistics)) {
+			const name = key.standardize();
+			if (!interaction.fields.fields.has(name) && !value.combinaison) continue;
+			if (value.combinaison) {
+				combinaisonFields[key] = value.combinaison;
+				continue;
+			}
+			const statValue = interaction.fields.getTextInputValue(name);
+			if (!statValue) continue;
+			const num = Number.parseInt(statValue, 10);
+			if (value.min && num < value.min)
+				throw new BotError(
+					this.ul("error.mustBeGreater", { min: value.min, value: name }),
+					botErrorOptions
+				);
+			if (value.max && num > value.max)
+				throw new BotError(
+					this.ul("error.mustBeLower", { max: value.max, value: name }),
+					botErrorOptions
+				);
+			// Only allow negative values if min is negative
+			if (num < 0 && value.min !== undefined && value.min >= 0)
+				throw new BotError(
+					this.ul("error.mustBeGreater", { min: value.min ?? 0, value: name }),
+					botErrorOptions
+				);
+			stats[key] = num;
+		}
+		return { combinaisonFields, stats };
 	}
 
 	private calculateRemainingPoints(

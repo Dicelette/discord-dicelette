@@ -27,8 +27,7 @@ import { interactionError } from "./on_error";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
-		const cfg = getLangAndConfig(client, interaction);
-		const { ul, langToUse } = cfg;
+		const { ul, langToUse } = getLangAndConfig(client, interaction);
 		const interactionUser = interaction.user;
 		try {
 			if (interaction.isMessageContextMenuCommand()) {

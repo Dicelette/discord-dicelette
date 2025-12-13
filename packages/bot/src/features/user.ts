@@ -205,7 +205,6 @@ export class UserFeature extends BaseFeature {
 		if (!this.client) return;
 
 		profiler.startProfiler();
-		const { ul } = getLangAndConfig(this.client, interaction);
 		const channel = interaction.channel;
 		if (!channel) throw new NoChannel();
 
@@ -222,7 +221,7 @@ export class UserFeature extends BaseFeature {
 
 		if (!user) {
 			await Messages.reply(interaction, {
-				embeds: [Messages.embedError(ul("error.user.notFound"), ul)],
+				embeds: [Messages.embedError(this.ul("error.user.notFound"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
@@ -279,31 +278,31 @@ export class UserFeature extends BaseFeature {
 			: undefined;
 		if (!existChannel) {
 			await Messages.reply(interaction, {
-				embeds: [Messages.embedError(ul("error.channel.thread"), ul)],
+				embeds: [Messages.embedError(this.ul("error.channel.thread"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
 		const embed = new Djs.EmbedBuilder()
-			.setTitle(ul("embed.add"))
+			.setTitle(this.ul("embed.add"))
 			.setThumbnail(
 				verifiedAvatar ? avatarStr : await fetchAvatarUrl(interaction.guild!, user)
 			)
-			.setFooter({ text: ul("common.page", { nb: 1 }) })
+			.setFooter({ text: this.ul("common.page", { nb: 1 }) })
 			.addFields(
 				{
 					inline: true,
-					name: ul("common.charName"),
-					value: charName.length > 0 ? charName : ul("common.noSet"),
+					name: this.ul("common.charName"),
+					value: charName.length > 0 ? charName : this.ul("common.noSet"),
 				},
 				{
 					inline: true,
-					name: ul("common.user"),
+					name: this.ul("common.user"),
 					value: Djs.userMention(user.id),
 				},
 				{
 					inline: true,
-					name: ul("common.isPrivate"),
+					name: this.ul("common.isPrivate"),
 					value: isPrivate ? "✓" : "✕",
 				}
 			);
@@ -311,7 +310,7 @@ export class UserFeature extends BaseFeature {
 			embed.addFields({ inline: true, name: "_ _", value: "_ _" });
 			embed.addFields({
 				inline: true,
-				name: ul("common.channel").capitalize(),
+				name: this.ul("common.channel").capitalize(),
 				value: `${Djs.channelMention(sheetId as string)}`,
 			});
 			embed.addFields({ inline: true, name: "_ _", value: "_ _" });
@@ -320,17 +319,20 @@ export class UserFeature extends BaseFeature {
 		//add continue button
 		if (template.statistics) {
 			await Messages.reply(interaction, {
-				components: [continueCancelButtons(ul)],
+				components: [continueCancelButtons(this.ul)],
 				content:
 					verifiedAvatar !== false
 						? ""
-						: `:warning: **${ul("error.avatar.url")}** \n-# *${ul("edit_avatar.default")}*`,
+						: `:warning: **${this.ul("error.avatar.url")}** \n-# *${this.ul("edit_avatar.default")}*`,
 				embeds: [embed],
 				files,
 			});
 			return;
 		}
-		const allButtons = MacroFeature.buttons(ul, selfRegister.moderation && !moderator);
+		const allButtons = MacroFeature.buttons(
+			this.ul,
+			selfRegister.moderation && !moderator
+		);
 
 		await Messages.reply(interaction, { components: [allButtons], embeds: [embed] });
 		profiler.stopProfiler();

@@ -18,7 +18,7 @@ import {
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { evalStatsDice, isNumber } from "@dicelette/core";
-import { findln, ln } from "@dicelette/localization";
+import { findln } from "@dicelette/localization";
 import { parseEmbedFields } from "@dicelette/parse_result";
 import type {
 	Settings,
@@ -87,28 +87,22 @@ export class MacroFeature extends BaseFeature {
 		if (!this.db) return;
 
 		const allow = await allowEdit(interaction, this.db, this.interactionUser);
-		if (allow)
-			await this.show(
-				interaction.customId.includes("first"),
-				this.db.get(interaction.guild!.id, "lang") ?? interaction.locale
-			);
+		if (allow) await this.show(interaction.customId.includes("first"));
 	}
 
 	/**
 	 * Creates and displays a modal for adding damage dice to a character.
 	 * @param first - Indicates if this is the initial dice addition during registration.
-	 * @param lang - The locale used for modal labels and placeholders.
 	 */
-	private async show(first?: boolean, lang: Djs.Locale = Djs.Locale.EnglishGB) {
+	private async show(first?: boolean) {
 		const interaction = this.interaction as Djs.ButtonInteraction;
-		const ul = ln(lang);
 		const id = first ? "damageDice_first" : "damageDice";
 		const modal = new Djs.ModalBuilder()
 			.setCustomId(id)
-			.setTitle(ul("common.macro").capitalize());
+			.setTitle(this.ul("common.macro").capitalize());
 
 		const damageDice: Djs.LabelBuilder = new Djs.LabelBuilder()
-			.setLabel(ul("modals.dice.name"))
+			.setLabel(this.ul("modals.dice.name"))
 			.setTextInputComponent(
 				new Djs.TextInputBuilder()
 					.setCustomId("damageName")
@@ -116,8 +110,8 @@ export class MacroFeature extends BaseFeature {
 					.setStyle(Djs.TextInputStyle.Short)
 			);
 		const diceValue: Djs.LabelBuilder = new Djs.LabelBuilder()
-			.setLabel(ul("modals.dice.value"))
-			.setDescription(ul("modals.dice.placeholder"))
+			.setLabel(this.ul("modals.dice.value"))
+			.setDescription(this.ul("modals.dice.placeholder"))
 			.setTextInputComponent(
 				new Djs.TextInputBuilder()
 					.setCustomId("damageValue")
