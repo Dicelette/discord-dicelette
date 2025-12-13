@@ -55,7 +55,7 @@ export const PARSE_RESULT_PATTERNS = {
 } as const;
 
 export const CHARACTER_DETECTION = / @([\p{L}\p{M}._-]+)/u;
-export const MENTION_ID_DETECTION = /<[@#]&?(\d+)>/;
+export const MENTION_ID_DETECTION = /<[@#]&?(\d+)>>?/;
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
