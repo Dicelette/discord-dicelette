@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.28.1](https://github.com/Dicelette/discord-dicelette/compare/2.28.0...2.28.1) (2025-12-14)
+
+
+### Bug Fixes
+
+* add MENTION_ID_DETECTION regex and refactor getIdFromMention function ([f350b87](https://github.com/Dicelette/discord-dicelette/commit/f350b8701774cb964927cdf837299c9b730ea5dc))
+* Add proper guard clauses for optional db parameter ([5d4447e](https://github.com/Dicelette/discord-dicelette/commit/5d4447e317913a18d5eead6fa3b07206dab6c9a6))
+* Add unused db parameter to Move.start for interface consistency ([28e662e](https://github.com/Dicelette/discord-dicelette/commit/28e662eb9ecbfa426b3bcf0963c96ecbcfc95a60))
+* Correct duplicate prevention logic in Move feature ([ce798f8](https://github.com/Dicelette/discord-dicelette/commit/ce798f8b7c3302962242030095f724ab8bd22a68))
+* Correct IFeature interface to match actual implementations ([9bd5a0f](https://github.com/Dicelette/discord-dicelette/commit/9bd5a0fe1af82415766d653a769d2a26b3e0340d))
+* **features:** should not findLn for stats/macro ([788704b](https://github.com/Dicelette/discord-dicelette/commit/788704b5d5ceef887e2bedcd19b09d4062cc1693))
+* Handle case when user has no existing characters in Move ([9d135d6](https://github.com/Dicelette/discord-dicelette/commit/9d135d6f62a2915e6865208696d94f9624bf5496))
+* Make db parameter optional in Avatar and Rename implementations ([eee2eb3](https://github.com/Dicelette/discord-dicelette/commit/eee2eb3fbcbd94a164e17f9069b196127a6b55e7))
+* Make db parameter optional in IFeature.start for Move compatibility ([5801e69](https://github.com/Dicelette/discord-dicelette/commit/5801e69da3a45f55ae46274d67913010613fff6c))
+* missing await ([b365010](https://github.com/Dicelette/discord-dicelette/commit/b3650105511be3d3f1256365e38db7a24bbbc542))
+* refactor interaction reply to use reply helper function ([5a609a3](https://github.com/Dicelette/discord-dicelette/commit/5a609a300ea37a4c0898f2a1295d9e327dd53b70))
+* Remove IFeature implementation from abstract BaseFeature class ([ee45662](https://github.com/Dicelette/discord-dicelette/commit/ee456625b5df1bcb45bc1e492fcc6d000c72deab))
+* Remove unnecessary non-null assertions in MoveFeature ([ccfe276](https://github.com/Dicelette/discord-dicelette/commit/ccfe276141dcdde844ceec1d333642dda9c4221f))
+* shortened links ([314e4be](https://github.com/Dicelette/discord-dicelette/commit/314e4bed06bc8992a8859ea94f1516d59251713a))
+* should use this.ul ([e6963ce](https://github.com/Dicelette/discord-dicelette/commit/e6963cea4c795a5b3f87aed074f906a0849aec7f))
+* there will always be an embed at this step ([c82a896](https://github.com/Dicelette/discord-dicelette/commit/c82a896d10416e1b79a869f5f99af213a10327e6))
+* update error handling in reply to include context for user not found ([310ff7d](https://github.com/Dicelette/discord-dicelette/commit/310ff7ddf7ea6af4685863641af20c2626ff2be5))
+* update error handling in reply to include context for user not found ([fcaedfb](https://github.com/Dicelette/discord-dicelette/commit/fcaedfb32da0ee4b7a1a51c8cdd8de167f30fefe))
+* when using with create url, the result add too much \n ([f528eca](https://github.com/Dicelette/discord-dicelette/commit/f528eca4fbe420877493ac05657775ed22949202))
+
 ## [2.28.0](https://github.com/Dicelette/discord-dicelette/compare/2.27.0...2.28.0) (2025-12-12)
 
 
