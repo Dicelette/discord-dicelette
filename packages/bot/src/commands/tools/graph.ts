@@ -232,7 +232,7 @@ export const graph = {
 
 			if (!userData) {
 				await reply(interaction, {
-					embeds: [embedError(ul("error.user.notFound"), ul)],
+					embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 				});
 				return;
 			}
@@ -263,7 +263,7 @@ export const graph = {
 			const userStatistique = getUserByEmbed({ message }, undefined, false);
 			if (!userStatistique) {
 				await reply(interaction, {
-					embeds: [embedError(ul("error.user.notFound"), ul)],
+					embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 				});
 				return;
 			}

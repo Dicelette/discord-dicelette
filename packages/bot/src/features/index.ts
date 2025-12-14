@@ -1,6 +1,9 @@
-export * as Avatar from "./avatar";
-export * as Macro from "./macro";
-export * as Move from "./move";
-export * as Rename from "./rename";
-export * as Stats from "./stats";
-export * as User from "./user";
+// Class-based exports - create new instances per interaction
+export { AvatarFeature } from "./avatar";
+// Base class and context interface
+export { BaseFeature, type FeatureContext } from "./base";
+export { MacroFeature } from "./macro";
+export { MoveFeature } from "./move";
+export { RenameFeature } from "./rename";
+export { StatsFeature } from "./stats";
+export { UserFeature } from "./user";

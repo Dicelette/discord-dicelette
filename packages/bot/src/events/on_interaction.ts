@@ -13,15 +13,21 @@ import {
 } from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { Avatar, Macro, Move, Rename, Stats, User } from "features";
+import {
+	AvatarFeature,
+	MacroFeature,
+	MoveFeature,
+	RenameFeature,
+	StatsFeature,
+	UserFeature,
+} from "features";
 import { embedError } from "messages";
 import { cancel } from "utils";
 import { interactionError } from "./on_error";
 
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
-		const cfg = getLangAndConfig(client, interaction);
-		const { ul, langToUse } = cfg;
+		const { ul, langToUse } = getLangAndConfig(client, interaction);
 		const interactionUser = interaction.user;
 		try {
 			if (interaction.isMessageContextMenuCommand()) {
@@ -85,20 +91,42 @@ async function modalSubmit(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	if (interaction.customId.includes("damageDice"))
-		await Macro.store(interaction, ul, interactionUser, client);
-	else if (interaction.customId.includes("page"))
-		await User.pageNumber(interaction, ul, client);
-	else if (interaction.customId === "editStats")
-		await Stats.validateByModeration(interaction, ul, client);
-	else if (interaction.customId === "firstPage")
-		await User.firstPage(interaction, client);
-	else if (interaction.customId === "editDice")
-		await Macro.validate(interaction, ul, client);
-	else if (interaction.customId === "editAvatar") await Avatar.edit(interaction, ul);
-	else if (interaction.customId === "rename")
-		await Rename.validate(interaction, ul, client);
-	else if (interaction.customId === "move") await Move.validate(interaction, ul, client);
+	if (interaction.customId.includes("damageDice")) {
+		await new MacroFeature({ client, interaction, interactionUser, ul }).store();
+	} else if (interaction.customId.includes("page")) {
+		await new UserFeature({ client, interaction, interactionUser, ul }).pageNumber();
+	} else if (interaction.customId === "editStats") {
+		await new StatsFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validateByModeration();
+	} else if (interaction.customId === "firstPage") {
+		await new UserFeature({ client, interaction, interactionUser, ul }).firstPage();
+	} else if (interaction.customId === "editDice") {
+		await new MacroFeature({ client, interaction, interactionUser, ul }).validate();
+	} else if (interaction.customId === "editAvatar") {
+		await new AvatarFeature({
+			interaction,
+			interactionUser,
+			ul,
+		}).edit();
+	} else if (interaction.customId === "rename") {
+		await new RenameFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validate();
+	} else if (interaction.customId === "move") {
+		await new MoveFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validate();
+	}
 }
 
 /**
@@ -119,30 +147,66 @@ async function buttonSubmit(
 	profiler.startProfiler();
 	const characters = client.characters;
 	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
-	if (interaction.customId === "register")
-		await User.start(
+	const havePrivate = !!client.settings.get(interaction.guild!.id, "privateChannel");
+
+	if (interaction.customId === "register") {
+		await new UserFeature({
+			client,
+			havePrivate,
 			interaction,
+			interactionUser,
+			selfRegister,
 			template,
+			ul,
+		}).start();
+	} else if (interaction.customId === "continue") {
+		await new UserFeature({
+			interaction,
+			interactionUser,
+			selfRegister,
+			template,
+			ul,
+		}).continuePage();
+		//await user.continuePage();
+	} else if (interaction.customId.includes("add_dice")) {
+		await new MacroFeature({
+			db: client.settings,
+			interaction,
 			interactionUser,
 			ul,
-			!!client.settings.get(interaction.guild!.id, "privateChannel"),
-			selfRegister
-		);
-	else if (interaction.customId === "continue")
-		await User.continuePage(interaction, template, ul, interactionUser, selfRegister);
-	else if (interaction.customId.includes("add_dice")) {
-		await Macro.add(interaction, interactionUser, client.settings);
+		}).add();
+		//await macro.add();
 		if (!interaction.customId.includes("first"))
 			await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "edit_stats") {
-		await Stats.edit(interaction, ul, interactionUser, client.settings);
+		await new StatsFeature({
+			db: client.settings,
+			interaction,
+			interactionUser,
+			ul,
+		}).edit();
+		//await stats.edit();
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "validate") {
-		await User.button(interaction, interactionUser, template, ul, client, characters);
+		await new UserFeature({
+			characters,
+			client,
+			interaction,
+			interactionUser,
+			template,
+			ul,
+		}).button();
+		//await user.button();
 	} else if (interaction.customId === "cancel")
 		await cancel(interaction, ul, client, interactionUser);
 	else if (interaction.customId === "edit_dice") {
-		await Macro.edit(interaction, ul, interactionUser, client.settings);
+		await new MacroFeature({
+			db: client.settings,
+			interaction,
+			interactionUser,
+			ul,
+		}).edit();
+		//await macro.edit();
 		await resetButton(interaction.message, ul);
 	} else if (interaction.customId === "avatar") {
 		await resetButton(interaction.message, ul);
@@ -158,17 +222,53 @@ async function buttonSubmit(
 		else await desktopLink(interaction, ul, client);
 		await message.edit({ components: [] });
 	} else if (interaction.customId.includes("modo_stats_validation")) {
-		await Stats.couldBeValidated(interaction, ul, client, interactionUser);
+		await new StatsFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).couldBeValidated();
+		//await stats.couldBeValidated();
 	} else if (interaction.customId.includes("modo_stats_cancel_")) {
-		await Stats.cancelStatsModeration(interaction, ul, client);
+		await new StatsFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).cancelStatsModeration();
+		//await stats.cancelStatsModeration();
 	} else if (interaction.customId.includes("modo_dice_validation_")) {
-		await Macro.couldBeValidatedDice(interaction, ul, client);
+		await new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).couldBeValidatedDice();
+		//await macro.couldBeValidatedDice();
 	} else if (interaction.customId.includes("modo_dice_cancel_")) {
-		await Macro.cancelDiceModeration(interaction, ul, client);
+		await new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).cancelDiceModeration();
+		//await macro.cancelDiceModeration();
 	} else if (interaction.customId.includes("modo_dice_add_validation_")) {
-		await Macro.couldBeValidatedDiceAdd(interaction, ul, client);
+		await new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).couldBeValidatedDiceAdd();
+		//await macro.couldBeValidatedDiceAdd();
 	} else if (interaction.customId.includes("modo_dice_add_cancel_")) {
-		await Macro.cancelDiceAddModeration(interaction, ul, client);
+		await new MacroFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).cancelDiceAddModeration();
+		//await macro.cancelDiceAddModeration();
 	} else if (interaction.customId.includes("mark_as_valid")) {
 		const isModerator = interaction.guild?.members.cache
 			.get(interactionUser.id)
@@ -180,10 +280,16 @@ async function buttonSubmit(
 			});
 			return;
 		} //update the button of the message and send a DM
-		const button = Macro.buttons(ul, false, true);
+		const button = MacroFeature.buttons(ul, false, true);
 		await interaction.message.edit({ components: [button] });
 		//send the message
-		await User.sendValidationMessage(interaction, interactionUser, ul, client);
+		await new UserFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).sendValidationMessage();
+		//await user.sendValidationMessage();
 		await interaction.reply({
 			content: ul("register.confirm"),
 			flags: Djs.MessageFlags.Ephemeral,
@@ -206,15 +312,35 @@ async function selectSubmit(
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
 		switch (value) {
-			case "name":
-				await Rename.start(interaction, ul, interactionUser, db);
+			case "name": {
+				await new RenameFeature({
+					db,
+					interaction,
+					interactionUser,
+					ul,
+				}).start();
+				//await rename.start();
 				break;
-			case "avatar":
-				await Avatar.start(interaction, ul, interactionUser, db);
+			}
+			case "avatar": {
+				await new AvatarFeature({
+					db,
+					interaction,
+					interactionUser,
+					ul,
+				}).start();
+				//await avatar.start();
 				break;
-			case "user":
-				await Move.start(interaction, ul, interactionUser);
+			}
+			case "user": {
+				await new MoveFeature({
+					interaction,
+					interactionUser,
+					ul,
+				}).start();
+				//await move.start();
 				break;
+			}
 		}
 	}
 	profiler.stopProfiler();

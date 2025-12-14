@@ -3,7 +3,7 @@ import type { ComparedValue, Critical, CustomCritical, Resultat } from "@dicelet
 import { ResultAsText } from "@dicelette/parse_result";
 import type { DiscordTextChannel, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, threadToSend } from "messages";
+import { deleteAfter, findMessageBefore, reply, threadToSend } from "messages";
 
 interface RollHandlerOptions {
 	/** Result of the dice roll */
@@ -88,7 +88,7 @@ export async function handleRollResult(
 	// If we're in DM (no guild), just reply directly without guild/thread handling
 	if (!guild) {
 		const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
-		const reply = await replyToSource(
+		return await replyToSource(
 			source,
 			resultAsText,
 			author.id,
@@ -96,7 +96,6 @@ export async function handleRollResult(
 			deleteInput,
 			hideResult
 		);
-		return reply;
 	}
 
 	const channel =
@@ -153,7 +152,7 @@ export async function handleRollResult(
 	// Ensure we're not in a DM before using threadToSend
 	if (channel.type === Djs.ChannelType.DM) {
 		// Fallback to simple reply for DM (shouldn't happen since we checked guild above)
-		const reply = await replyToSource(
+		return await replyToSource(
 			source,
 			resultAsText,
 			author.id,
@@ -161,40 +160,55 @@ export async function handleRollResult(
 			deleteInput,
 			hideResult
 		);
-		return reply;
 	}
 
-	// Send to thread
+	const msgWithContext = resultAsText.onMessageSend(context, author.id);
+	const linkToLogs = client.settings.get(guild.id, "linkToLogs");
+	const deleteTimer = client.settings.get(guild.id, "deleteAfter") ?? 180000;
+
+	// Reply to user first, then find thread in background
+	const reply = await replyToSource(
+		source,
+		resultAsText,
+		author.id,
+		undefined,
+		deleteInput,
+		hideResult
+	);
+
+	// Find thread and create empty message in background
 	const thread = await threadToSend(
 		client.settings,
 		channel as Exclude<typeof channel, Djs.PartialGroupDMChannel | Djs.DMChannel>,
 		ul
 	);
 	const msgToEdit = await thread.send("_ _");
-	const msgWithContext = resultAsText.onMessageSend(context, author.id);
-	await msgToEdit.edit(msgWithContext);
 
-	// Get log URL if enabled
-	const idMessage = client.settings.get(guild.id, "linkToLogs")
-		? msgToEdit.url
-		: undefined;
-
-	// Reply to user
-	const reply = await replyToSource(
-		source,
-		resultAsText,
-		author.id,
-		idMessage,
-		deleteInput,
-		hideResult
-	);
-
-	// Apply delete timer
-	const timer = client.settings.get(guild.id, "deleteAfter") ?? 180000;
-	await deleteAfter(reply, timer);
-
-	// Delete original message if needed
-	if (deleteInput && source instanceof Djs.Message) await source.delete();
+	// All remaining operations in background: edit thread, update reply with URL, apply timers
+	Promise.all([
+		msgToEdit.edit(msgWithContext),
+		linkToLogs
+			? (async () => {
+					const idMessage = msgToEdit.url;
+					const contentWithUrl = resultAsText.onMessageSend(idMessage, author.id);
+					if (source instanceof Djs.CommandInteraction) {
+						await source.editReply({
+							allowedMentions: { repliedUser: true },
+							content: contentWithUrl,
+						});
+					} else if (reply instanceof Djs.Message) {
+						await reply.edit({
+							allowedMentions: { repliedUser: true },
+							content: contentWithUrl,
+						});
+					}
+				})()
+			: Promise.resolve(),
+		deleteAfter(reply, deleteTimer),
+		deleteInput && source instanceof Djs.Message ? source.delete() : Promise.resolve(),
+	]).catch(() => {
+		// Silently fail for background operations
+	});
 
 	return reply;
 }
@@ -231,15 +245,17 @@ async function replyToSource(
 			: await source.reply(replyOptions);
 	}
 
-	// CommandInteraction
-	if (source.replied || source.deferred)
+	// -- CommandInteraction ---
+	//
+	/* Not needed as we use the reply wrapped that handle this
+		if (source.replied || source.deferred)
 		return await source.editReply(replyOptions as Djs.InteractionEditReplyOptions);
-
+	*/
 	const replyInteraction = replyOptions as Djs.InteractionReplyOptions;
 
 	if (hideResult) {
 		flags.push(Djs.MessageFlags.Ephemeral);
 		replyInteraction.flags = flags;
 	}
-	return await source.reply(replyOptions as Djs.InteractionReplyOptions);
+	return await reply(source, replyOptions as Djs.InteractionReplyOptions);
 }
