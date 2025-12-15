@@ -641,6 +641,17 @@
     "register": {
       "description": "Affiche l'aide général pour activer la fonction de sauvegarde de fiche.",
       "message": "Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous permet ensuite de créer des feuilles de personnage ainsi que de retenir les dés.\r\n\r\n### Fonctionnalités principales :\r\n- **Confidentialité et contrôle** : Toutes les données sont stockées localement sur votre serveur.\r\n- **Adaptabilité** : Le modèle est conçu pour répondre à des besoins variés, offrant une grande personnalisation.\r\n\r\n### Premiers pas :\r\n1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://dicelette.github.io/docs/sheet/model>) pour configurer votre modèle de serveur.\r\n2. **Sauvegarder les fiches de personnage** : Une fois le modèle configuré, vous pouvez sauvegarder les fiches directement sur votre serveur via la commande </register:{{-register}}>.\r\n\r\n### Aperçu des commandes :\r\nAprès avoir configuré le modèle, vous pouvez utiliser les commandes suivantes pour interagir avec les fiches de personnage :\r\n- **</macro:{{-macro}}>** : Lancez des dés basés sur les données sauvegardées.\r\n- **</dbroll:{{-dbroll}}>** : Effectuez des lancers de dés statistiques.\r\n- **</graph:{{-graph}}>** : Générez des graphiques à partir des statistiques des personnages.\r\n- **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.\r\n\r\n### Ressources supplémentaires :\r\n- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://dicelette.github.io/>).\r\n- **Support** : En cas de problème, consultez la documentation ou contactez l'équipe de support."
+    },
+    "stats": {
+      "connecting": "Connexion",
+      "description": "Affiche des informations génériques sur le bot",
+      "disconnected": "Déconnecté",
+      "idle": "Inactif",
+      "message": "- Nombre de serveur : `{{- guildCount}}`\n- Latence : `{{- latency}}ms`\n- Uptime : `{{- uptime}}`\n- Version : `{{- VERSION}}`",
+      "name": "stats",
+      "nearly": "Presque",
+      "reconnecting": "Reconnexion",
+      "resuming": "Reprise"
     }
   },
   "hidden": {
