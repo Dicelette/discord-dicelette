@@ -18,7 +18,6 @@ import { reply } from "messages";
 
 import { VERSION } from "../../../../index";
 import "discord_ext";
-import { Status } from "discord.js";
 import { getConfigIds, getHelpDBCmd, getIDForAdminDB } from "./commandId";
 import { createHelpMessageDB } from "./createHelpMessage";
 

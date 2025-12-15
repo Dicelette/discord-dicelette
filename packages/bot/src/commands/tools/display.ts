@@ -78,7 +78,9 @@ export const displayUser = {
 		let userData: CharacterData | undefined = charData?.[user?.id ?? interaction.user.id];
 		if (!userData) userData = await findChara(charData, charName);
 		if (!userData) {
-			await reply(interaction, { embeds: [embedError(ul("error.user.notFound.generic"), ul)] });
+			await reply(interaction, {
+				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
+			});
 			return;
 		}
 
@@ -111,7 +113,9 @@ export const displayUser = {
 			const diceFields = generateDice(diceEmbed?.toJSON().fields, statsFields);
 			const dataUserEmbeds = getEmbeds(userMessage, "user");
 			if (!statisticEmbed && !diceEmbed && !diceFields && !statsFields) {
-				await reply(interaction, { embeds: [embedError(ul("error.user.notFound.generic"), ul)] });
+				await reply(interaction, {
+					embeds: [embedError(ul("error.user.notFound.generic"), ul)],
+				});
 				return;
 			}
 			const jsonDataUser = dataUserEmbeds!

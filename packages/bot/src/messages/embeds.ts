@@ -1,9 +1,8 @@
 import { reuploadAvatar } from "@dicelette/bot-helpers";
-import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
+import type { CustomCritical } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import {
-	BotError,
 	BotErrorLevel,
 	type BotErrorOptions,
 	cleanAvatarUrl,

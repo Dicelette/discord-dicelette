@@ -102,13 +102,15 @@ export class RenameFeature extends BaseFeature {
 		const userId = getIdFromMention(
 			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
-		if (!userId) throw new BotError(this.ul("error.user.notFound.generic"), botErrorOptions);
+		if (!userId)
+			throw new BotError(this.ul("error.user.notFound.generic"), botErrorOptions);
 		const user = await fetchUser(this.client, userId);
 		const sheetLocation: PersonnageIds = {
 			channelId: interaction.channel.id,
 			messageId: message.id,
 		};
-		if (!user) throw new BotError(this.ul("error.user.notFound.generic"), botErrorOptions);
+		if (!user)
+			throw new BotError(this.ul("error.user.notFound.generic"), botErrorOptions);
 		const charData = getUserByEmbed({ message: message });
 		if (!charData)
 			throw new BotError(this.ul("error.user.youRegistered"), botErrorOptions);
