@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.29.0](https://github.com/Dicelette/discord-dicelette/compare/2.28.1...2.29.0) (2025-12-15)
+
+
+### Features
+
+* **help:** add bot stats ([859bd1c](https://github.com/Dicelette/discord-dicelette/commit/859bd1c6d545feacd2c2216b8a0ee684318736d2))
+
 ## [2.28.1](https://github.com/Dicelette/discord-dicelette/compare/2.28.0...2.28.1) (2025-12-14)
 
 
