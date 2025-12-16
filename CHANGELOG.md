@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.1](https://github.com/Dicelette/discord-dicelette/compare/2.30.0...2.30.1) (2025-12-16)
+
+
+### Bug Fixes
+
+* **snippets:** should use reply for better handling result ([94cc092](https://github.com/Dicelette/discord-dicelette/commit/94cc092fce50310141113114e2da9acc3cfe1f9d))
+
 ## [2.30.0](https://github.com/Dicelette/discord-dicelette/compare/2.29.0...2.30.0) (2025-12-16)
 
 
