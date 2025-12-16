@@ -2,6 +2,7 @@ import type { EClient } from "@dicelette/client";
 import type { ComparedValue, Critical, CustomCritical, Resultat } from "@dicelette/core";
 import { ResultAsText } from "@dicelette/parse_result";
 import type { DiscordTextChannel, Translation } from "@dicelette/types";
+import { COMPILED_COMMENTS } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, reply, threadToSend } from "messages";
 
@@ -231,11 +232,31 @@ async function replyToSource(
 	};
 	// biome-ignore lint/suspicious/noExplicitAny: too complicated typing
 	const flags: any[] = [];
-	if (content.length > 2000) {
+	if (content.length > 2000 && content.length <= 4000) {
 		delete replyOptions.content;
 		replyOptions.components = [new Djs.TextDisplayBuilder().setContent(content)];
 		flags.push(Djs.MessageFlags.IsComponentsV2);
 		replyOptions.flags = [Djs.MessageFlags.IsComponentsV2];
+	} else if (content.length > 4000) {
+		//we should keep the first line as a summary in the message
+		replyOptions.content = content.split("\n")[0];
+		//and after remove it from content and send as a file
+		let newContent = content.split("\n").slice(1).join("\n");
+		const compiledComments = COMPILED_COMMENTS.exec(newContent)?.groups?.comment;
+		if (
+			compiledComments &&
+			compiledComments.length > 0 &&
+			compiledComments.length <= 4000
+		) {
+			replyOptions.content += `\n${compiledComments}`;
+			//remove from newContent
+			newContent = newContent.replace(compiledComments, "").trim();
+		}
+		replyOptions.files = [
+			new Djs.AttachmentBuilder(Buffer.from(newContent, "utf-8"), {
+				name: "roll_result.md",
+			}),
+		];
 	}
 
 	if (source instanceof Djs.Message) {
