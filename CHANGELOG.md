@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.0](https://github.com/Dicelette/discord-dicelette/compare/2.29.0...2.30.0) (2025-12-16)
+
+
+### Features
+
+* **result:** allow to send result > 4000 (extreme case) ([1a2b2f8](https://github.com/Dicelette/discord-dicelette/commit/1a2b2f85171837a766aca789e9b542bdb3b2fb76))
+
 ## [2.29.0](https://github.com/Dicelette/discord-dicelette/compare/2.28.1...2.29.0) (2025-12-15)
 
 
