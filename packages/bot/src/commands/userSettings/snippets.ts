@@ -5,7 +5,7 @@ import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
 import type { Snippets } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { embedError } from "messages";
+import { embedError, reply } from "messages";
 import { baseRoll } from "../roll";
 
 export async function register(
@@ -26,17 +26,17 @@ export async function register(
 		const text = ul("userSettings.snippets.create.success", {
 			name: macroName.toTitle(),
 		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 	} catch (error) {
 		if (error instanceof DiceTypeError) {
 			const text = ul("error.invalidDice.eval", { dice: error.dice });
-			await interaction.reply({
+			await reply(interaction, {
 				embeds: [embedError(text, ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 		} else {
 			const text = ul("error.generic.e", { message: (error as Error).message });
-			await interaction.reply({
+			await reply(interaction, {
 				embeds: [embedError(text, ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -55,7 +55,7 @@ export async function displayList(
 	const entries = Object.entries(macros);
 	if (entries.length === 0) {
 		const text = ul("userSettings.snippets.list.empty");
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const lines = entries.map(
@@ -68,7 +68,7 @@ export async function displayList(
 		chunkedLines.push(lines.slice(i, i + chunkSize));
 	}
 	//send the first message
-	await interaction.reply({
+	await reply(interaction, {
 		content: chunkedLines[0].join("\n"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
@@ -92,7 +92,7 @@ export async function remove(
 		const text = ul("userSettings.snippets.delete.notFound", {
 			name: `**${macroName.toTitle()}**`,
 		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	delete macros[macroName];
@@ -101,7 +101,7 @@ export async function remove(
 	const text = ul("userSettings.snippets.delete.success", {
 		name: `**${macroName.toTitle()}**`,
 	});
-	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 
 export async function exportSnippets(
@@ -114,7 +114,7 @@ export async function exportSnippets(
 	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
 	if (Object.keys(macros).length === 0) {
 		const text = ul("userSettings.snippets.export.empty");
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const fileContent = JSON.stringify(macros, null, 2);
@@ -122,7 +122,7 @@ export async function exportSnippets(
 	const attachment = new Djs.AttachmentBuilder(buffer, {
 		name: `snippets_${interaction.user.username}.json`,
 	});
-	await interaction.reply({
+	await reply(interaction, {
 		content: ul("userSettings.snippets.export.success"),
 		files: [attachment],
 		flags: Djs.MessageFlags.Ephemeral,
@@ -142,7 +142,7 @@ export async function importSnippets(
 	);
 	if (!file.name.endsWith(".json")) {
 		const text = ul("userSettings.snippets.import.invalidFile");
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const response = await fetch(file.url);
@@ -158,14 +158,14 @@ export async function importSnippets(
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	if (typeof importedMacros !== "object" || Array.isArray(importedMacros)) {
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const key = `${userId}.snippets`;
@@ -199,5 +199,5 @@ export async function importSnippets(
 			.join("\n");
 		text += `\n\n${ul("userSettings.snippets.import.partialErrors", { count: Object.keys(errors).length })}\n${errorLines}`;
 	}
-	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 }
