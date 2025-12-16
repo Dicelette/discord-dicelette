@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.3](https://github.com/Dicelette/discord-dicelette/compare/2.30.2...2.30.3) (2025-12-16)
+
+
+### Bug Fixes
+
+* **regex:** enhance STAT_MATCHER to support optional parentheses around variable names ([04c9026](https://github.com/Dicelette/discord-dicelette/commit/04c9026b238757b2d639817af09c7f1b2d255a52))
+* **roll:** preserve comments in dice target during parsing ([86cb176](https://github.com/Dicelette/discord-dicelette/commit/86cb1764ca1d1e203df16fee16adfb89d305b764))
+
 ## [2.30.2](https://github.com/Dicelette/discord-dicelette/compare/2.30.1...2.30.2) (2025-12-16)
 
 
