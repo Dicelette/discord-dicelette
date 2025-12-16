@@ -81,12 +81,17 @@ export async function baseRoll(
 		? getGuildContext(client, interaction.guild.id)
 		: undefined;
 
-	// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
-	const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(dice);
-	const opposition = parseComparator(dice, userData?.stats, undefined);
-	if (oppositionMatch?.groups?.second) {
-		dice = dice.replace(oppositionMatch.groups.second, "").trim();
-	}
+	let opposition;
+	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
+	if (!evaluated) {
+			// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
+		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(dice);
+		opposition = parseComparator(dice, userData?.stats, undefined);
+		if (oppositionMatch?.groups?.second)
+			dice = dice.replace(oppositionMatch.groups.second, "").trim();
+	} else if (evaluated[1])
+		dice = evaluated[1];
+	
 
 	const res = replaceStatsInDiceFormula(
 		dice,

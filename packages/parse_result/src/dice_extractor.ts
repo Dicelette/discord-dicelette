@@ -7,6 +7,7 @@ import type {
 	UserData,
 } from "@dicelette/types";
 import {
+	DICE_COMPILED_PATTERNS,
 	DICE_PATTERNS,
 	findBestStatMatch,
 	getCachedRegex,
@@ -198,37 +199,42 @@ export function isRolling(
 
 	// Preserve original content before any modifications for processChainedDiceRoll
 	const originalContent = content;
-
-	// Preclean to ignore {cs|cf:...} blocs
-	const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-	const reg = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
-		contentForOpposition
-	);
-
-	// Extract comments before removing opposition part
-	let preservedComments: string | undefined;
-	if (reg?.groups) {
-		// Extract any comments from the content before removing the opposition
-		// Use DETECT_DICE_MESSAGE which captures comments without the leading "#"
-		const commentMatch = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
-		if (commentMatch?.[3]) {
-			preservedComments = commentMatch[3];
+	const evaluated= DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
+	if (!evaluated) {
+		// Preclean to ignore {cs|cf:...} blocs
+		const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
+		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(
+			contentForOpposition
+		);
+		
+		// Extract comments before removing opposition part
+		let preservedComments: string | undefined;
+		if (reg?.groups) {
+			// Extract any comments from the content before removing the opposition
+			// Use DETECT_DICE_MESSAGE which captures comments without the leading "#"
+			const commentMatch = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
+			if (commentMatch?.[3]) {
+				preservedComments = commentMatch[3];
+			}
+			// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
+			if (!preservedComments) {
+				const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
+				if (hashComment?.[1]) preservedComments = hashComment[1];
+			}
+			
+			content = content.replace(reg.groups.second, "").trim();
+			
+			// Re-append the comment if it was lost during opposition removal
+			if (preservedComments && !content.includes(preservedComments)) {
+				// Add back the comment as an inline comment (without #)
+				// The processing pipeline will handle it correctly
+				content = `${content} ${preservedComments}`;
+			}
 		}
-		// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
-		if (!preservedComments) {
-			const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
-			if (hashComment?.[1]) preservedComments = hashComment[1];
-		}
-
-		content = content.replace(reg.groups.second, "").trim();
-
-		// Re-append the comment if it was lost during opposition removal
-		if (preservedComments && !content.includes(preservedComments)) {
-			// Add back the comment as an inline comment (without #)
-			// The processing pipeline will handle it correctly
-			content = `${content} ${preservedComments}`;
-		}
-	}
+	} else if (evaluated[1])
+		//remove the first { and the last }
+		content = evaluated[1];
+	
 
 	let res: {
 		formula: string;
@@ -327,9 +333,8 @@ export function getRoll(dice: string): Resultat | undefined {
 	const comments = dice
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
 		.replaceAll("*", "\\*");
-	if (comments) {
-		dice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1");
-	}
+	if (comments) dice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1");
+
 	dice = dice.trim();
 	try {
 		const rollDice = roll(dice);
