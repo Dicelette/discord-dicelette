@@ -425,8 +425,9 @@ export function replaceStatsInDiceFormula(
 					const capitalizedStat = original.capitalize();
 					segmentStats.push(capitalizedStat);
 					statsFounds.push(capitalizedStat);
-					const escapedMatch = fullMatch.replace(/\$/g, "\\$");
-					const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
+					// Escape all regex special characters in the fullMatch (including parentheses)
+					const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+					const regex = getCachedRegex(`${escapedMatch}`, "gu");
 					processedSegment = processedSegment.replace(regex, statValue.toString());
 				}
 			}
@@ -464,8 +465,9 @@ export function replaceStatsInDiceFormula(
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
-				const escapedMatch = fullMatch.replace(/\$/g, "\\$");
-				const regex = getCachedRegex(`${escapedMatch}(?![\\w\\p{L}])`, "gu");
+				// Escape all regex special characters in the fullMatch (including parentheses)
+				const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+				const regex = getCachedRegex(`${escapedMatch}`, "gu");
 				processedFormula = processedFormula.replace(regex, statValue.toString());
 			}
 		}

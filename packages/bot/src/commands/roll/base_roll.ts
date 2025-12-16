@@ -12,7 +12,7 @@ import {
 } from "@dicelette/parse_result";
 import {
 	CHARACTER_DETECTION,
-	DICE_COMPILED_PATTERNS,
+	DICE_COMPILED_PATTERNS, logger,
 	profiler,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
@@ -99,7 +99,6 @@ export async function baseRoll(
 			dice = `${dice} ${comments}`;
 	}
 	
-
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
