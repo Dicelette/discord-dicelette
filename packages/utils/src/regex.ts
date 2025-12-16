@@ -1,8 +1,8 @@
 // Pre-compiled regex patterns for better performance
 export const QUERY_URL_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
-	COMPARATOR: /(?<sign>[><=!]+)(?<comparator>(.+))/,
-	COMPARATOR_SIMPLE: /([><=!]+)(.+)/,
+	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
+	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
 	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,
 	QUERY_PARAMS: /\?.*$/g,
@@ -25,6 +25,8 @@ export const DICE_COMPILED_PATTERNS = {
 	COMMENTS_REGEX: /\[([^\]]*)\]/gi,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
 	OPPOSITION: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/,
+	//old version: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))
+	OPPOSITION: /(?<first>(([><=]|!=)+)(.+?))(?<second>(([><=]|!=)+)(.+))/,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 } as const;
 
@@ -32,7 +34,7 @@ export const REMOVER_PATTERN = {
 	ASTERISK_ESCAPE: /\*/g,
 	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
 	EXP_REMOVER: /\{exp(.*?)\}/g,
-	SIGN_REMOVER: /[><=!]+.*$/,
+	SIGN_REMOVER: /([><=]|!=)+.*$/,
 	STAT_COMMENTS_REMOVER: /%%.*%%/,
 	STAT_MATCHER: /\$([\p{L}\p{M}_][\p{L}\p{M}0-9_]*)/giu,
 } as const;
