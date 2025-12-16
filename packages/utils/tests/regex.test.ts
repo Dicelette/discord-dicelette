@@ -3,7 +3,7 @@ import {
 	cleanAvatarUrl,
 	DICE_PATTERNS,
 	getCachedRegex,
-	verifyAvatarUrl, QUERY_URL_PATTERNS,
+	verifyAvatarUrl, QUERY_URL_PATTERNS, DICE_COMPILED_PATTERNS,
 } from "../src/regex";
 
 describe("verifyAvatarUrl", () => {
