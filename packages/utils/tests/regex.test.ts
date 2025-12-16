@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-	COMPILED_PATTERNS,
 	cleanAvatarUrl,
 	DICE_PATTERNS,
 	getCachedRegex,
-	verifyAvatarUrl,
+	verifyAvatarUrl, QUERY_URL_PATTERNS,
 } from "../src/regex";
 
 describe("verifyAvatarUrl", () => {
@@ -164,7 +163,7 @@ describe("COMPILED_PATTERNS", () => {
 		];
 
 		for (const { input, sign, comparator } of tests) {
-			const match = COMPILED_PATTERNS.COMPARATOR.exec(input);
+			const match = QUERY_URL_PATTERNS.COMPARATOR.exec(input);
 			expect(match?.groups?.sign).toBe(sign);
 			expect(match?.groups?.comparator).toBe(comparator);
 		}
@@ -172,7 +171,7 @@ describe("COMPILED_PATTERNS", () => {
 
 	it("should have PUNCTUATION_ENCLOSED pattern that matches content between punctuation", () => {
 		const text = "(hello) [world] {test}";
-		const matches = [...text.matchAll(COMPILED_PATTERNS.PUNCTUATION_ENCLOSED)];
+		const matches = [...text.matchAll(QUERY_URL_PATTERNS.PUNCTUATION_ENCLOSED)];
 
 		expect(matches.length).toBeGreaterThan(0);
 		expect(matches[0].groups?.open).toBe("(");
@@ -182,7 +181,7 @@ describe("COMPILED_PATTERNS", () => {
 
 	it("should have QUERY_PARAMS pattern that matches query strings", () => {
 		const url = "https://example.com/path?key=value&other=test";
-		const cleaned = url.replace(COMPILED_PATTERNS.QUERY_PARAMS, "");
+		const cleaned = url.replace(QUERY_URL_PATTERNS.QUERY_PARAMS, "");
 
 		expect(cleaned).toBe("https://example.com/path");
 	});

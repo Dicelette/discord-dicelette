@@ -1,4 +1,4 @@
-import { COMPILED_PATTERNS } from "@dicelette/utils";
+import { QUERY_URL_PATTERNS} from "@dicelette/utils";
 import { describe, expect, it } from "vitest";
 import { composeRollBase, extractComparator, getThreshold } from "../src/compose_roll";
 
@@ -181,7 +181,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"2d6>=10",
 			undefined,
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			undefined,
 			undefined,
 			"",
@@ -195,7 +195,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"2d6>=10",
 			undefined,
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			undefined,
 			undefined,
 			"+3",
@@ -207,7 +207,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"2d6>=10",
 			">=15",
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			undefined,
 			undefined,
 			"",
@@ -220,7 +220,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"2d6{cf:<=2}>=10",
 			undefined,
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			undefined,
 			undefined,
 			"",
@@ -232,7 +232,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"1d20+strength>=15",
 			undefined,
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			{ strength: 3 },
 			undefined,
 			"",
@@ -246,7 +246,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"1d20>=strength+5",
 			undefined,
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			{ strength: 4 },
 			undefined,
 			"",
@@ -260,7 +260,7 @@ describe("composeRollBase", () => {
 		const r = composeRollBase(
 			"1d20>=10",
 			">=strength+5",
-			COMPILED_PATTERNS.COMPARATOR,
+			QUERY_URL_PATTERNS.COMPARATOR,
 			{ strength: 6 },
 			undefined,
 			"",
