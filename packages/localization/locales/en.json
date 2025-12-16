@@ -496,7 +496,7 @@
 			"eval": "Invalid die: `{{-dice}}` during evaluation validation.",
 			"minus": "Dices cannot be negative !\n\n-# Dice used: `{{- dice}}`.",
 			"notFound": "No dice were found in the command!",
-			"withDice": "Invalid die: `{{- dice}}` during the validation roll."
+			"withDice": "The dice `{{- dice}}` is invalid."
 		},
 		"invalidFormula": "Invalid formula: `{{- formula}}`",
 		"malformedMacros": "Macros seems to be malformed.",

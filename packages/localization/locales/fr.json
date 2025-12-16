@@ -496,7 +496,7 @@
 			"eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
 			"minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
 			"notFound": "Aucun dé n'a été retrouvé dans la commande !",
-			"withDice": "Dé invalide : `{{- dice}}` durant le jet de validation."
+			"withDice": "Le dé `{{- dice}}` est invalide."
 		},
 		"invalidFormula": "Formule invalide : `{{- formula}}`",
 		"malformedMacros": "Les macros semblent avoir été mal renseignées.",
