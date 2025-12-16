@@ -231,9 +231,15 @@ export function isRolling(
 				content = `${content} ${preservedComments}`;
 			}
 		}
-	} else if (evaluated[1])
-		//remove the first { and the last }
-		content = evaluated[1];
+	} else if (evaluated.groups){
+		//also find the comments and preserve them
+		//dice is group 1
+		//comments can be group 2
+		const {dice, comments} = evaluated.groups;
+		content = dice;
+		if (comments)
+			content = `${content} ${comments}`;
+	}
 	
 
 	let res: {

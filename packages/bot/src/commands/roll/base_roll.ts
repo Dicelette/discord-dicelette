@@ -89,8 +89,15 @@ export async function baseRoll(
 		opposition = parseComparator(dice, userData?.stats, undefined);
 		if (oppositionMatch?.groups?.second)
 			dice = dice.replace(oppositionMatch.groups.second, "").trim();
-	} else if (evaluated[1])
-		dice = evaluated[1];
+	} else if (evaluated.groups) {
+		//also find the comments and preserve them
+		//dice is group 1
+		//comments can be group 2
+		const {dice:value, comments} = evaluated.groups;
+		dice = value;
+		if (comments)
+			dice = `${dice} ${comments}`;
+	}
 	
 
 	const res = replaceStatsInDiceFormula(
