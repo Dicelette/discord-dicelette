@@ -147,7 +147,7 @@ export async function importSnippets(
 	}
 	const response = await fetch(file.url);
 	const fileContent = await response.text();
-	let importedMacros: Snippets;
+	let importedMacros: Record<string, unknown>;
 	const ex: Record<string, string> = {
 		anotherMacro: "1d20",
 		testMacro: "2d6+3",
