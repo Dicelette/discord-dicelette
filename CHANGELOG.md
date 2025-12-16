@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.2](https://github.com/Dicelette/discord-dicelette/compare/2.30.1...2.30.2) (2025-12-16)
+
+
+### Bug Fixes
+
+* replace QUERY_URL_PATTERNS with DICE_COMPILED_PATTERNS in roll and validation logic ([226e6a6](https://github.com/Dicelette/discord-dicelette/commit/226e6a64c8cfd426ec7abf3b611b67f70814685f))
+* **roll:** exclude automatically dice from comparaison with `{syntax}` if the entire dice is in it. ([da1f019](https://github.com/Dicelette/discord-dicelette/commit/da1f019982b2f8be9ff8c4ccac503859e8ed705b))
+* **roll:** should not considerate ! as a sign if not followed by = ([6bf7578](https://github.com/Dicelette/discord-dicelette/commit/6bf7578691582d2b7c674d0885b9de45eb01a7e5))
+* update regex patterns for custom critical and opposition handling ([e07b4a6](https://github.com/Dicelette/discord-dicelette/commit/e07b4a6234361754bf5493cafc96f5e15968e332))
+
 ## [2.30.1](https://github.com/Dicelette/discord-dicelette/compare/2.30.0...2.30.1) (2025-12-16)
 
 
