@@ -5,7 +5,7 @@ import {
 	isNumber,
 } from "@dicelette/core";
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
-import { BotError, BotErrorLevel, type BotErrorOptions } from "@dicelette/utils";
+import {BotError, BotErrorLevel, type BotErrorOptions, QUERY_URL_PATTERNS} from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import { getRoll } from "./dice_extractor";
 
@@ -21,10 +21,10 @@ export function parseCustomCritical(
 	name: string,
 	customCritical: string
 ): Record<string, CustomCritical> | undefined {
-	const findPart = /(?<sign>([<>=!]+))(?<value>.*)/gi;
+	const findPart = new RegExp(QUERY_URL_PATTERNS.COMPARATOR, 'gi')
 	const match = findPart.exec(customCritical);
 	if (!match) return;
-	let { sign, value } = match.groups || {};
+	let { sign, comparator:value } = match.groups || {};
 	if (!name || !sign || !value) return;
 	const onNaturalDice = name.startsWith("(N)");
 	let nameStr = onNaturalDice ? name.replace("(N)", "") : name;
