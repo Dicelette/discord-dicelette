@@ -163,7 +163,7 @@ describe("COMPILED_PATTERNS", () => {
 		];
 
 		for (const { input, sign, comparator } of tests) {
-			const match = QUERY_URL_PATTERNS.COMPARATOR.exec(input);
+			const match = DICE_COMPILED_PATTERNS.COMPARATOR.exec(input);
 			expect(match?.groups?.sign).toBe(sign);
 			expect(match?.groups?.comparator).toBe(comparator);
 		}

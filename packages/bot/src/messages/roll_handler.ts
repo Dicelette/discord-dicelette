@@ -242,7 +242,8 @@ async function replyToSource(
 		replyOptions.content = content.split("\n")[0];
 		//and after remove it from content and send as a file
 		let newContent = content.split("\n").slice(1).join("\n");
-		const compiledComments = COMPILED_COMMENTS.exec(newContent)?.groups?.comment;
+		
+		const compiledComments = new RegExp(COMPILED_COMMENTS).exec(newContent)?.groups?.comment;
 		if (
 			compiledComments &&
 			compiledComments.length > 0 &&

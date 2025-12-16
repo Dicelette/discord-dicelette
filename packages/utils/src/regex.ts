@@ -1,8 +1,6 @@
 // Pre-compiled regex patterns for better performance
 export const QUERY_URL_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
-	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
-	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
 	PUNCTUATION_ENCLOSED: /(?<open>\p{P})(?<enclosed>.*?)(?<close>\p{P})/gu,
 	QUERY_PARAMS: /\?.*$/g,
@@ -27,6 +25,8 @@ export const DICE_COMPILED_PATTERNS = {
 	//old version: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))
 	OPPOSITION: /(?<first>(([><=]|!=)+)(.+?))(?<second>(([><=]|!=)+)(.+))/,
 	TARGET_VALUE: /^\{(.*?)}$/,
+	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
+	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 } as const;
 

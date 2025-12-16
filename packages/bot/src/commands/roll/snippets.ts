@@ -18,7 +18,7 @@ import {
 	CHARACTER_DETECTION,
 	calculateSimilarity,
 	capitalizeBetweenPunct,
-	QUERY_URL_PATTERNS,
+	QUERY_URL_PATTERNS, DICE_COMPILED_PATTERNS,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
@@ -106,7 +106,7 @@ export default {
 			const composed = composeRollBase(
 				dice,
 				threshold,
-				QUERY_URL_PATTERNS.COMPARATOR,
+				DICE_COMPILED_PATTERNS.COMPARATOR,
 				undefined,
 				undefined,
 				"",
@@ -133,7 +133,7 @@ export default {
 		const composed = composeRollBase(
 			processedDice,
 			threshold,
-			QUERY_URL_PATTERNS.COMPARATOR,
+			DICE_COMPILED_PATTERNS.COMPARATOR,
 			undefined,
 			undefined,
 			expressionStr,
