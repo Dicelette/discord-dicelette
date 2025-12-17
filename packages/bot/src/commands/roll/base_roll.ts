@@ -85,10 +85,12 @@ export async function baseRoll(
 
 	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
-	logger.trace("Evaluated dice regex result:", evaluated);
+	logger.trace("Evaluated dice regex result" + ":", evaluated);
 	if (!evaluated) {
+		// Preclean to ignore {cs|cf:...} blocs before checking for opposition
+		const contentForOpposition = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
-		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(dice);
+		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
 		opposition = parseComparator(dice, userData?.stats, undefined);
 		logger.trace("Opposition match regex result:", oppositionMatch, opposition);
 		if (oppositionMatch?.groups?.second)
