@@ -18,7 +18,7 @@ import {
 	CHARACTER_DETECTION,
 	calculateSimilarity,
 	capitalizeBetweenPunct,
-	QUERY_URL_PATTERNS, DICE_COMPILED_PATTERNS,
+	DICE_COMPILED_PATTERNS,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
@@ -126,9 +126,17 @@ export default {
 			dice,
 			userComments
 		);
-		const processedDice = generateStatsDice(diceWithoutComments);
+		let processedDice = generateStatsDice(diceWithoutComments);
 		const rCC = getCriticalFromDice(processedDice, ul);
 
+		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);
+		if (targetValue?.groups) {
+			const {dice, comments} = targetValue.groups;
+			processedDice = dice.trim();
+			if (comments && comments.length > 0)
+				processedDice += ` # ${comments.trim()}`;
+			
+		}
 		// Use shared composeRollBase for dice composition
 		const composed = composeRollBase(
 			processedDice,
