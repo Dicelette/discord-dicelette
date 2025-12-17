@@ -26,30 +26,30 @@
 		"test": "pnpm -r test"
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.22.2",
-		"@sentry/node": "^10.27.0",
-		"@sentry/profiling-node": "^10.27.0",
-		"@types/node": "^22.17.1",
-		"dedent": "^1.6.0",
+		"@dicelette/core": "^1.22.3",
+		"@sentry/node": "^10.31.0",
+		"@sentry/profiling-node": "^10.31.0",
+		"@types/node": "^22.19.3",
+		"dedent": "^1.7.1",
 		"discord.js": "14.25.0",
-		"dotenv": "^17.2.1",
-		"tslog": "^4.9.3",
-		"tsx": "^4.20.4",
-		"uniformize": "^2.4.0"
+		"dotenv": "^17.2.3",
+		"tslog": "^4.10.2",
+		"tsx": "^4.21.0",
+		"uniformize": "^2.5.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.3.2",
-		"commit-and-tag-version": "^12.5.2",
+		"@biomejs/biome": "^2.3.10",
+		"commit-and-tag-version": "^12.6.1",
 		"cross-env": "^7.0.3",
 		"husky": "^9.1.7",
-		"i18next": "^25.3.5",
-		"rimraf": "^6.0.1",
-		"ts-loader": "^9.5.2",
+		"i18next": "^25.7.3",
+		"rimraf": "^6.1.2",
+		"ts-loader": "^9.5.4",
 		"tsc-alias": "^1.8.16",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.9.3",
 		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "^4.0.14"
+		"vitest": "^4.0.16"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
