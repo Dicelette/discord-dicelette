@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.5](https://github.com/Dicelette/discord-dicelette/compare/2.30.4...2.30.5) (2025-12-17)
+
+
+### Bug Fixes
+
+* broken cs/cf in baseRoll ([c8713a6](https://github.com/Dicelette/discord-dicelette/commit/c8713a66a0fcd0d30ae9b49888db560050f6548c))
+* i dont now ([ac117c5](https://github.com/Dicelette/discord-dicelette/commit/ac117c5c4be400cccea4f72de73771edae81994a))
+
 ## [2.30.4](https://github.com/Dicelette/discord-dicelette/compare/2.30.3...2.30.4) (2025-12-17)
 
 
