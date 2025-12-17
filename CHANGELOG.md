@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.6](https://github.com/Dicelette/discord-dicelette/compare/2.30.3...2.30.6) (2025-12-17)
+
+
+### Bug Fixes
+
+* broken cs/cf in baseRoll ([75fac8c](https://github.com/Dicelette/discord-dicelette/commit/75fac8cec1e6ea2e9ef6f477a85e78057aafe7d3))
+* **regex:** `!` should not be valid if not followed by `!=` in theses case ([42408bf](https://github.com/Dicelette/discord-dicelette/commit/42408bff707ad7a4cf83e595c44697dd96dfcea5))
+* **snippets:** should support {dice} and {{dice}>20} ([ca2b38e](https://github.com/Dicelette/discord-dicelette/commit/ca2b38e6f9c46c56d27585e569f588359e8e9134))
+
 ## [2.30.5](https://github.com/Dicelette/discord-dicelette/compare/2.30.4...2.30.5) (2025-12-17)
 
 
