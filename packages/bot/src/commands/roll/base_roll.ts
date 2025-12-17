@@ -13,6 +13,7 @@ import {
 import {
 	CHARACTER_DETECTION,
 	DICE_COMPILED_PATTERNS,
+	logger,
 	profiler,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
@@ -84,10 +85,12 @@ export async function baseRoll(
 
 	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
+	logger.trace("Evaluated dice regex result:", evaluated);
 	if (!evaluated) {
 		// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
 		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(dice);
 		opposition = parseComparator(dice, userData?.stats, undefined);
+		logger.trace("Opposition match regex result:", oppositionMatch, opposition);
 		if (oppositionMatch?.groups?.second)
 			dice = dice.replace(oppositionMatch.groups.second, "").trim();
 	} else if (evaluated.groups) {
@@ -99,6 +102,7 @@ export async function baseRoll(
 		if (comments) dice = `${dice} ${comments}`;
 	}
 
+	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
@@ -131,6 +135,7 @@ export async function baseRoll(
 		statsPerSegment: res.statsPerSegment,
 		user,
 	};
+	logger.trace(`Rolling dice for ${user.tag}: ${res.formula}`);
 	await rollWithInteraction(interaction, res.formula, client, opts);
 	profiler.stopProfiler();
 }

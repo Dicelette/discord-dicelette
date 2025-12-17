@@ -331,6 +331,7 @@ function isSharedRoll(dice: string): boolean {
 }
 
 export function getRoll(dice: string): Resultat | undefined {
+	logger.trace("Getting roll for dice:", dice);
 	if (isSharedRoll(dice)) return getRollInShared(dice);
 	const comments = dice
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
