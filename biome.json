@@ -139,7 +139,8 @@
 				"noUnsafeNegation": "error",
 				"noVar": "error",
 				"noWith": "error",
-				"useGetterReturn": "error"
+				"useGetterReturn": "error",
+				"noExtraNonNullAssertion": "off"
 			}
 		}
 	},
