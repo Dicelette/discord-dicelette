@@ -1,5 +1,5 @@
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
-import {DICE_COMPILED_PATTERNS, QUERY_URL_PATTERNS} from "@dicelette/utils";
+import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
 
 /**

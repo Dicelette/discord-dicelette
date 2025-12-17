@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome allow to set a specific rules for property of a global object, we stick against the naming convention */
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
-import {DICE_COMPILED_PATTERNS, logger, REMOVER_PATTERN} from "@dicelette/utils";
+import { DICE_COMPILED_PATTERNS, logger, REMOVER_PATTERN } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
@@ -185,9 +185,7 @@ export function parseComparator(
 ) {
 	// Ignore les blocs de critiques personnalisés lors de la détection
 	const cleanedDice = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-	const comparatorMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(
-		cleanedDice
-	);
+	const comparatorMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(cleanedDice);
 	let comparator = "";
 	let opposition: string | undefined;
 	if (comparatorMatch?.groups) {

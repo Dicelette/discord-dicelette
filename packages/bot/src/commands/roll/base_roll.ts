@@ -12,7 +12,7 @@ import {
 } from "@dicelette/parse_result";
 import {
 	CHARACTER_DETECTION,
-	DICE_COMPILED_PATTERNS, logger,
+	DICE_COMPILED_PATTERNS,
 	profiler,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
@@ -20,6 +20,7 @@ import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
 import "discord_ext";
+import type { ComparedValue } from "@dicelette/core";
 import type { RollOptions } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction } from "database";
 
@@ -81,10 +82,10 @@ export async function baseRoll(
 		? getGuildContext(client, interaction.guild.id)
 		: undefined;
 
-	let opposition;
+	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
 	if (!evaluated) {
-			// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
+		// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
 		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(dice);
 		opposition = parseComparator(dice, userData?.stats, undefined);
 		if (oppositionMatch?.groups?.second)
@@ -93,12 +94,11 @@ export async function baseRoll(
 		//also find the comments and preserve them
 		//dice is group 1
 		//comments can be group 2
-		const {dice:value, comments} = evaluated.groups;
+		const { dice: value, comments } = evaluated.groups;
 		dice = value;
-		if (comments)
-			dice = `${dice} ${comments}`;
+		if (comments) dice = `${dice} ${comments}`;
 	}
-	
+
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,

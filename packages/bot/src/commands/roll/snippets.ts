@@ -131,11 +131,9 @@ export default {
 
 		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);
 		if (targetValue?.groups) {
-			const {dice, comments} = targetValue.groups;
+			const { dice, comments } = targetValue.groups;
 			processedDice = dice.trim();
-			if (comments && comments.length > 0)
-				processedDice += ` # ${comments.trim()}`;
-			
+			if (comments && comments.length > 0) processedDice += ` # ${comments.trim()}`;
 		}
 		// Use shared composeRollBase for dice composition
 		const composed = composeRollBase(

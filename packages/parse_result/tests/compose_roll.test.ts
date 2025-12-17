@@ -1,4 +1,4 @@
-import {DICE_COMPILED_PATTERNS} from "@dicelette/utils";
+import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { describe, expect, it } from "vitest";
 import { composeRollBase, extractComparator, getThreshold } from "../src/compose_roll";
 

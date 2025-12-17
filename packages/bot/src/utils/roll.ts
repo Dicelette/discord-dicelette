@@ -23,7 +23,11 @@ import {
 	skillCustomCritical,
 } from "@dicelette/parse_result";
 import type { RollOptions, Translation, UserData } from "@dicelette/types";
-import {capitalizeBetweenPunct, DICE_COMPILED_PATTERNS, profiler, QUERY_URL_PATTERNS} from "@dicelette/utils";
+import {
+	capitalizeBetweenPunct,
+	DICE_COMPILED_PATTERNS,
+	profiler,
+} from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";

@@ -21,13 +21,13 @@ export const DICE_PATTERNS = {
 
 export const DICE_COMPILED_PATTERNS = {
 	COMMENTS_REGEX: /\[([^\]]*)\]/gi,
+	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
+	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
 	//old version: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))
 	OPPOSITION: /(?<first>(([><=]|!=)+)(.+?))(?<second>(([><=]|!=)+)(.+))/,
-	TARGET_VALUE: /^\{(?<dice>.*?)}(?<comments>(?:^|\s)# ?(.*))?$/,
-	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
-	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
+	TARGET_VALUE: /^\{(?<dice>.*?)}(?<comments>(?:^|\s)# ?(.*))?$/,
 } as const;
 
 export const REMOVER_PATTERN = {

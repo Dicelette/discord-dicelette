@@ -254,13 +254,11 @@ export class ResultAsText {
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
 		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join("\n ");
 		// If comment contains only whitespace/newline, don't add extra space
-		if (hasComment) {
-			return ` ${comment} ${joinedRes.trimEnd()}`;
-		}
+		if (hasComment) return ` ${comment} ${joinedRes.trimEnd()}`;
+
 		// For interaction without comment, comment() returns "\n", so prepend newline to joinedRes
-		if (comment === "\n") {
-			return `\n ${joinedRes}`;
-		}
+		if (comment === "\n") return `\n ${joinedRes}`;
+
 		// Default case (non-interaction without comment): add space before result
 		return ` ${joinedRes}`;
 	}
@@ -451,9 +449,8 @@ export class ResultAsText {
 		if (resMsg.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
 			return `${this.message(r, totalSuccess).replace(PARSE_RESULT_PATTERNS.formulaDiceSymbols, `${successOrFailure} — `)}\n`;
 		}
-		if (resMsg.startsWith("※")) {
-			return `${resMsg}\n`;
-		}
+		if (resMsg.startsWith("※")) return `${resMsg}\n`;
+
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
 
@@ -533,7 +530,7 @@ export class ResultAsText {
 				const isSimpleDynamic =
 					!isShared && !hasCompare && !!entry && entry.includes(":");
 				const entryIsBracketed = !!entry && /^\s*\[.*\]\s*$/.test(entry);
-				const calcIsBracketed = !!calc && /^\s*\[.*\]\s*$/.test(calc);
+				//const calcIsBracketed = !!calc && /^\s*\[.*\]\s*$/.test(calc);
 				// Detect if entry contains a pipe mapping (e.g., "1d(8+5) | 1d13")
 				const entryHasPipeMapping = !!entry && entry.includes(" | ");
 				// Detect if entry already has backticks (for dynamic dice mapping like `1d(8+5)`|`1d13`)
@@ -632,7 +629,7 @@ export class ResultAsText {
 							res = `${symbol} ${header} — ${cleanRes}`;
 						}
 					}
-					// Incrémenter pour passer au segment suivant
+					// Increment segment index only if we processed a shared symbol line
 					segmentIndex++;
 				}
 			}
@@ -658,7 +655,7 @@ export class ResultAsText {
 				`${successOrFailure} —`
 			);
 
-		// Ne pas remplacer le symbole ※ qui est utilisé pour les rolls sans comparaison
+		// Do not replace the symbol ※, which is used for rolls without comparison.
 		return res
 			.replace("✕", `◈ **${this.ul("roll.failure")}** —`)
 			.replace("✓", `◈ **${this.ul("roll.success")}** —`);

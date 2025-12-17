@@ -199,14 +199,12 @@ export function isRolling(
 
 	// Preserve original content before any modifications for processChainedDiceRoll
 	const originalContent = content;
-	const evaluated= DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
+	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
 	if (!evaluated) {
 		// Preclean to ignore {cs|cf:...} blocs
 		const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(
-			contentForOpposition
-		);
-		
+		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
+
 		// Extract comments before removing opposition part
 		let preservedComments: string | undefined;
 		if (reg?.groups) {
@@ -221,9 +219,9 @@ export function isRolling(
 				const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
 				if (hashComment?.[1]) preservedComments = hashComment[1];
 			}
-			
+
 			content = content.replace(reg.groups.second, "").trim();
-			
+
 			// Re-append the comment if it was lost during opposition removal
 			if (preservedComments && !content.includes(preservedComments)) {
 				// Add back the comment as an inline comment (without #)
@@ -231,16 +229,14 @@ export function isRolling(
 				content = `${content} ${preservedComments}`;
 			}
 		}
-	} else if (evaluated.groups){
+	} else if (evaluated.groups) {
 		//also find the comments and preserve them
 		//dice is group 1
 		//comments can be group 2
-		const {dice, comments} = evaluated.groups;
+		const { dice, comments } = evaluated.groups;
 		content = dice;
-		if (comments)
-			content = `${content} ${comments}`;
+		if (comments) content = `${content} ${comments}`;
 	}
-	
 
 	let res: {
 		formula: string;

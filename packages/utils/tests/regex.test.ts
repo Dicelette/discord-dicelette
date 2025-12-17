@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
 	cleanAvatarUrl,
+	DICE_COMPILED_PATTERNS,
 	DICE_PATTERNS,
 	getCachedRegex,
-	verifyAvatarUrl, QUERY_URL_PATTERNS, DICE_COMPILED_PATTERNS,
+	QUERY_URL_PATTERNS,
+	verifyAvatarUrl,
 } from "../src/regex";
 
 describe("verifyAvatarUrl", () => {

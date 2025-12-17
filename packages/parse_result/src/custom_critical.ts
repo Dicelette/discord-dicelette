@@ -26,10 +26,10 @@ export function parseCustomCritical(
 	name: string,
 	customCritical: string
 ): Record<string, CustomCritical> | undefined {
-	const findPart = new RegExp(DICE_COMPILED_PATTERNS.COMPARATOR, 'gi')
+	const findPart = new RegExp(DICE_COMPILED_PATTERNS.COMPARATOR, "gi");
 	const match = findPart.exec(customCritical);
 	if (!match) return;
-	let { sign, comparator:value } = match.groups || {};
+	let { sign, comparator: value } = match.groups || {};
 	if (!name || !sign || !value) return;
 	const onNaturalDice = name.startsWith("(N)");
 	let nameStr = onNaturalDice ? name.replace("(N)", "") : name;
