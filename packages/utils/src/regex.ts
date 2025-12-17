@@ -32,7 +32,7 @@ export const DICE_COMPILED_PATTERNS = {
 
 export const REMOVER_PATTERN = {
 	ASTERISK_ESCAPE: /\*/g,
-	CRITICAL_BLOCK: /\{\*?c[fs]:[<>=!]+.+?\}/gim,
+	CRITICAL_BLOCK: /\{\*?c[fs]:([<>=]|!=)+.+?\}/gim,
 	EXP_REMOVER: /\{exp(.*?)\}/g,
 	SIGN_REMOVER: /([><=]|!=)+.*$/,
 	STAT_COMMENTS_REMOVER: /%%.*%%/,
