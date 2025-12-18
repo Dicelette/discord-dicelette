@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.7](https://github.com/Dicelette/discord-dicelette/compare/2.30.6...2.30.7) (2025-12-18)
+
+
+### Bug Fixes
+
+* **roll:** should support {dice} and {{dice}>20} as target failure/success ([f025c93](https://github.com/Dicelette/discord-dicelette/commit/f025c931303a979a5938f95d93f49582a5ccdadc))
+
 ## [2.30.6](https://github.com/Dicelette/discord-dicelette/compare/2.30.3...2.30.6) (2025-12-17)
 
 
