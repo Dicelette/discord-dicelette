@@ -230,11 +230,17 @@ export function isRolling(
 			}
 		}
 	} else if (evaluated.groups) {
-		//also find the comments and preserve them
-		//dice is group 1
-		//comments can be group 2
+		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
+		logger.trace("Double target", doubleTarget);
 		const { dice, comments } = evaluated.groups;
-		content = dice;
+		if (doubleTarget?.groups?.dice) {
+			content = dice.trim();
+		} else {
+			//also find the comments and preserve them
+			//dice is group 1
+			//comments can be group 2
+			content = `{${dice.trim()}}`;
+		}
 		if (comments) content = `${content} ${comments}`;
 	}
 

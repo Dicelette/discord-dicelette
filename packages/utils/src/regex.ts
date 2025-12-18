@@ -24,6 +24,7 @@ export const DICE_COMPILED_PATTERNS = {
 	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
 	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
+	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
 	//old version: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))
 	OPPOSITION: /(?<first>(([><=]|!=)+)(.+?))(?<second>(([><=]|!=)+)(.+))/,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),

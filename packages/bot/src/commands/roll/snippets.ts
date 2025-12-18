@@ -131,8 +131,10 @@ export default {
 
 		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);
 		if (targetValue?.groups) {
+			const isDouble = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(processedDice);
 			const { dice, comments } = targetValue.groups;
-			processedDice = dice.trim();
+			if (isDouble?.groups?.dice) processedDice = dice.trim();
+			else processedDice = `{${dice.trim()}}`;
 			if (comments && comments.length > 0) processedDice += ` # ${comments.trim()}`;
 		}
 		// Use shared composeRollBase for dice composition

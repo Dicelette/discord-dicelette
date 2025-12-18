@@ -99,8 +99,11 @@ export async function baseRoll(
 		//also find the comments and preserve them
 		//dice is group 1
 		//comments can be group 2
+		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(dice);
+		logger.trace("Double target", doubleTarget);
 		const { dice: value, comments } = evaluated.groups;
-		dice = value;
+		if (doubleTarget?.groups?.dice) dice = value;
+		else dice = `{${value}}`;
 		if (comments) dice = `${dice} ${comments}`;
 	}
 

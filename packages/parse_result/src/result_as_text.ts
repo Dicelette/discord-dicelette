@@ -171,13 +171,10 @@ export class ResultAsText {
 				? `\`${diceOnly}\` | ${simplifiedDice}`
 				: `\`${diceOnly}\` | \`${simplifiedDice}\``;
 
-			if (core.includes(diceOnly)) {
-				mappedCore = core.replace(diceOnly, mapping);
-			} else if (core.includes(simplifiedDice)) {
+			if (core.includes(diceOnly)) mappedCore = core.replace(diceOnly, mapping);
+			else if (core.includes(simplifiedDice))
 				mappedCore = core.replace(simplifiedDice, mapping);
-			} else {
-				mappedCore = mapping;
-			}
+			else mappedCore = mapping;
 
 			return `${prefix}${mappedCore}${afterArrow}`;
 		} catch (e) {
