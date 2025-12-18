@@ -42,7 +42,7 @@ try {
 	event.onDisconnect(client);
 	event.onError(client);
 	event.onWarn(client);
-	event.onDebug(client);
+	if (process.env.NODE_ENV === "development") event.onDebug(client);
 } catch (error) {
 	logger.fatal(error);
 	sentry.fatal("Failed to register bot events", { error });

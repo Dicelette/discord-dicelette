@@ -10,7 +10,8 @@ export const onWarn = (client: EClient): void => {
 
 export const onDebug = (client: EClient): void => {
 	client.on("debug", async (message) => {
-		if (!message.includes("Heartbeat acknowledged, latency of")) {
+		const excludedKeys = ["Heartbeat acknowledged, latency of"];
+		if (!excludedKeys.some((key) => message.includes(key))) {
 			important.debug(message);
 			//sentry.debug(message, { source: "discord-debug" });
 		}
