@@ -39,10 +39,7 @@ export function extractCommonOptions(
 			options.getString(t("common.expression"), required?.expression) ?? undefined,
 		name: options.getString(t("common.name"), required?.name) ?? undefined,
 		statistic: options.getString(t("common.statistic"), required?.statistic) ?? undefined,
-		user:
-			options.getString(t("display.userLowercase"), required?.user) ??
-			options.get(t("display.userLowercase"))?.value?.toString() ??
-			undefined,
+		user: options.getUser(t("display.userLowercase"), required?.user) ?? undefined,
 	};
 }
 

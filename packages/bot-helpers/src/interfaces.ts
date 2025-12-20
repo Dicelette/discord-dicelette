@@ -18,7 +18,7 @@ export interface CommonOptions {
 	/** Comments from t("common.comments") */
 	comments?: string;
 	/** User from t("display.userLowercase") */
-	user?: string;
+	user?: Djs.User;
 }
 
 /**
