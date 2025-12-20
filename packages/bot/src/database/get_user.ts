@@ -539,22 +539,31 @@ export async function getUserNameAndChar(
  *
  * Attempts to obtain the user's character statistics based on the interaction options and guild configuration. Handles cases where statistics are required by the dice template, falling back to the first registered character or a minimal template if necessary. Replies with error messages if required data is missing.
  *
+ * @param interaction
+ * @param client
+ * @param skipNotFound
+ * @param user - Optional user to retrieve statistics for. If not provided, uses the interaction user.
+ *
  * @returns An object containing the user's statistics, translation object, selected character name, and interaction options, or `undefined` if data is unavailable.
  */
 export async function getStatistics(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
-	skipNotFound = false
+	skipNotFound = false,
+	user?: Djs.User
 ) {
 	if (!interaction.guild || !interaction.channel) return undefined;
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const { ul, config: guildData } = getLangAndConfig(client, interaction);
 	if (!guildData) return;
+
+	const targetUserId = user?.id ?? interaction.user.id;
 	let optionChar = options.getString(t("common.character")) ?? undefined;
+	if (optionChar && findln(optionChar) === "common.default") optionChar = undefined;
 	const charName = optionChar?.standardize();
 
 	let userStatistique = (
-		await getUserFromInteraction(client, interaction.user.id, interaction, charName, {
+		await getUserFromInteraction(client, targetUserId, interaction, charName, {
 			skipNotFound: true,
 		})
 	)?.userData;
@@ -616,15 +625,9 @@ export async function getStatistics(
 	if (userStatistique && template && !equal(userStatistique.template, template)) {
 		logger.trace("Updating user template to match guild template settings.");
 		userStatistique.template = template;
-		await updateMemory(
-			client.characters,
-			interaction.guild!.id,
-			interaction.user.id,
-			ul,
-			{
-				userData: userStatistique,
-			}
-		);
+		await updateMemory(client.characters, interaction.guild!.id, targetUserId, ul, {
+			userData: userStatistique,
+		});
 	}
 
 	return { optionChar, options, ul, userStatistique };
