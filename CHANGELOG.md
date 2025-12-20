@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.8](https://github.com/Dicelette/discord-dicelette/compare/2.30.7...2.30.8) (2025-12-20)
+
+
+### Bug Fixes
+
+* **mjRoll:** default should give the first chara in the user ([7cc41ca](https://github.com/Dicelette/discord-dicelette/commit/7cc41ca6b941929370b33dd5877c4584892e5530))
+* **mjRoll:** incoherence between data in user retrieval ([64ee533](https://github.com/Dicelette/discord-dicelette/commit/64ee53345738241d57af20a2425795e35790667d))
+
 ## [2.30.7](https://github.com/Dicelette/discord-dicelette/compare/2.30.6...2.30.7) (2025-12-18)
 
 
