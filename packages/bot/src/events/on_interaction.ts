@@ -25,6 +25,97 @@ import { embedError } from "messages";
 import { cancel } from "utils";
 import { interactionError } from "./on_error";
 
+/**
+ * Type definitions for interaction handlers
+ */
+type ModalHandler = (
+	interaction: Djs.ModalSubmitInteraction,
+	ul: Translation,
+	interactionUser: Djs.User,
+	client: EClient
+) => Promise<void>;
+
+type ButtonHandler = (
+	interaction: Djs.ButtonInteraction,
+	ul: Translation,
+	interactionUser: Djs.User,
+	template: StatisticalTemplate,
+	client: EClient
+) => Promise<void>;
+
+type SelectHandler = (
+	interaction: Djs.StringSelectMenuInteraction,
+	ul: Translation,
+	interactionUser: Djs.User,
+	db: Settings
+) => Promise<void>;
+
+type PrefixMatcher = {
+	prefix: string;
+	handler: ButtonHandler;
+};
+
+/**
+ * Dispatch maps for modal handlers
+ */
+const MODAL_HANDLERS: Record<string, ModalHandler> = {
+	editStats: async (interaction, ul, interactionUser, client) => {
+		await new StatsFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validateByModeration();
+	},
+	firstPage: async (interaction, ul, interactionUser, client) => {
+		await new UserFeature({ client, interaction, interactionUser, ul }).firstPage();
+	},
+	editDice: async (interaction, ul, interactionUser, client) => {
+		await new MacroFeature({ client, interaction, interactionUser, ul }).validate();
+	},
+	editAvatar: async (interaction, ul, interactionUser, client) => {
+		await new AvatarFeature({
+			interaction,
+			interactionUser,
+			ul,
+		}).edit();
+	},
+	rename: async (interaction, ul, interactionUser, client) => {
+		await new RenameFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validate();
+	},
+	move: async (interaction, ul, interactionUser, client) => {
+		await new MoveFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validate();
+	},
+};
+
+/**
+ * Prefix-based modal handlers
+ */
+const MODAL_PREFIX_HANDLERS: { prefix: string; handler: ModalHandler }[] = [
+	{
+		prefix: "damageDice",
+		handler: async (interaction, ul, interactionUser, client) => {
+			await new MacroFeature({ client, interaction, interactionUser, ul }).store();
+		},
+	},
+	{
+		prefix: "page",
+		handler: async (interaction, ul, interactionUser, client) => {
+			await new UserFeature({ client, interaction, interactionUser, ul }).pageNumber();
+		},
+	},
+];
+
 export default (client: EClient): void => {
 	client.on("interactionCreate", async (interaction: Djs.BaseInteraction) => {
 		const { ul, langToUse } = getLangAndConfig(client, interaction);
@@ -91,43 +182,215 @@ async function modalSubmit(
 	interactionUser: Djs.User,
 	client: EClient
 ) {
-	if (interaction.customId.includes("damageDice")) {
-		await new MacroFeature({ client, interaction, interactionUser, ul }).store();
-	} else if (interaction.customId.includes("page")) {
-		await new UserFeature({ client, interaction, interactionUser, ul }).pageNumber();
-	} else if (interaction.customId === "editStats") {
-		await new StatsFeature({
+	// Check prefix-based handlers first
+	for (const { prefix, handler } of MODAL_PREFIX_HANDLERS) {
+		if (interaction.customId.includes(prefix)) {
+			await handler(interaction, ul, interactionUser, client);
+			return;
+		}
+	}
+
+	// Check exact match handlers
+	const handler = MODAL_HANDLERS[interaction.customId];
+	if (handler) {
+		await handler(interaction, ul, interactionUser, client);
+	}
+}
+
+/**
+ * Dispatch maps for button handlers
+ */
+const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
+	register: async (interaction, ul, interactionUser, template, client) => {
+		const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
+		const havePrivate = !!client.settings.get(interaction.guild!.id, "privateChannel");
+		await new UserFeature({
 			client,
+			havePrivate,
 			interaction,
 			interactionUser,
+			selfRegister,
+			template,
 			ul,
-		}).validateByModeration();
-	} else if (interaction.customId === "firstPage") {
-		await new UserFeature({ client, interaction, interactionUser, ul }).firstPage();
-	} else if (interaction.customId === "editDice") {
-		await new MacroFeature({ client, interaction, interactionUser, ul }).validate();
-	} else if (interaction.customId === "editAvatar") {
-		await new AvatarFeature({
+		}).start();
+	},
+	continue: async (interaction, ul, interactionUser, template, client) => {
+		const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
+		await new UserFeature({
+			interaction,
+			interactionUser,
+			selfRegister,
+			template,
+			ul,
+		}).continuePage();
+	},
+	edit_stats: async (interaction, ul, interactionUser, template, client) => {
+		await new StatsFeature({
+			db: client.settings,
 			interaction,
 			interactionUser,
 			ul,
 		}).edit();
-	} else if (interaction.customId === "rename") {
-		await new RenameFeature({
+		await resetButton(interaction.message, ul);
+	},
+	validate: async (interaction, ul, interactionUser, template, client) => {
+		await new UserFeature({
+			characters: client.characters,
 			client,
 			interaction,
 			interactionUser,
+			template,
 			ul,
-		}).validate();
-	} else if (interaction.customId === "move") {
-		await new MoveFeature({
-			client,
+		}).button();
+	},
+	cancel: async (interaction, ul, interactionUser, template, client) => {
+		await cancel(interaction, ul, client, interactionUser);
+	},
+	edit_dice: async (interaction, ul, interactionUser, template, client) => {
+		await new MacroFeature({
+			db: client.settings,
 			interaction,
 			interactionUser,
 			ul,
-		}).validate();
-	}
-}
+		}).edit();
+		await resetButton(interaction.message, ul);
+	},
+	avatar: async (interaction, ul, interactionUser, template, client) => {
+		await resetButton(interaction.message, ul);
+		await interaction.reply({
+			content: ul("refresh"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+	},
+	moderation_refuse: async (interaction, ul, interactionUser, template, client) => {
+		await cancel(interaction, ul, client, interactionUser, true);
+	},
+	cancel_by_user: async (interaction, ul, interactionUser, template, client) => {
+		await cancel(interaction, ul, client, interactionUser, false, true);
+	},
+};
+
+/**
+ * Prefix-based button handlers
+ */
+const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
+	{
+		prefix: "add_dice",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new MacroFeature({
+				db: client.settings,
+				interaction,
+				interactionUser,
+				ul,
+			}).add();
+			if (!interaction.customId.includes("first"))
+				await resetButton(interaction.message, ul);
+		},
+	},
+	{
+		prefix: "copyResult",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			const isMobile = interaction.customId.includes("mobile");
+			const message = await interaction.message.fetch();
+			if (isMobile) await mobileLink(interaction, ul, client);
+			else await desktopLink(interaction, ul, client);
+			await message.edit({ components: [] });
+		},
+	},
+	{
+		prefix: "modo_stats_validation",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new StatsFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).couldBeValidated();
+		},
+	},
+	{
+		prefix: "modo_stats_cancel_",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new StatsFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).cancelStatsModeration();
+		},
+	},
+	{
+		prefix: "modo_dice_validation_",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new MacroFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).couldBeValidatedDice();
+		},
+	},
+	{
+		prefix: "modo_dice_cancel_",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new MacroFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).cancelDiceModeration();
+		},
+	},
+	{
+		prefix: "modo_dice_add_validation_",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new MacroFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).couldBeValidatedDiceAdd();
+		},
+	},
+	{
+		prefix: "modo_dice_add_cancel_",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			await new MacroFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).cancelDiceAddModeration();
+		},
+	},
+	{
+		prefix: "mark_as_valid",
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			const isModerator = interaction.guild?.members.cache
+				.get(interactionUser.id)
+				?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+			if (isModerator) {
+				await interaction.reply({
+					content: ul("register.markAsValid"),
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+				return;
+			}
+			const button = MacroFeature.buttons(ul, false, true);
+			await interaction.message.edit({ components: [button] });
+			await new UserFeature({
+				client,
+				interaction,
+				interactionUser,
+				ul,
+			}).sendValidationMessage();
+			await interaction.reply({
+				content: ul("register.confirm"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+		},
+	},
+];
 
 /**
  * Switch for button interaction
@@ -145,162 +408,53 @@ async function buttonSubmit(
 	client: EClient
 ) {
 	profiler.startProfiler();
-	const characters = client.characters;
-	const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
-	const havePrivate = !!client.settings.get(interaction.guild!.id, "privateChannel");
 
-	if (interaction.customId === "register") {
-		await new UserFeature({
-			client,
-			havePrivate,
-			interaction,
-			interactionUser,
-			selfRegister,
-			template,
-			ul,
-		}).start();
-	} else if (interaction.customId === "continue") {
-		await new UserFeature({
-			interaction,
-			interactionUser,
-			selfRegister,
-			template,
-			ul,
-		}).continuePage();
-		//await user.continuePage();
-	} else if (interaction.customId.includes("add_dice")) {
-		await new MacroFeature({
-			db: client.settings,
-			interaction,
-			interactionUser,
-			ul,
-		}).add();
-		//await macro.add();
-		if (!interaction.customId.includes("first"))
-			await resetButton(interaction.message, ul);
-	} else if (interaction.customId === "edit_stats") {
-		await new StatsFeature({
-			db: client.settings,
-			interaction,
-			interactionUser,
-			ul,
-		}).edit();
-		//await stats.edit();
-		await resetButton(interaction.message, ul);
-	} else if (interaction.customId === "validate") {
-		await new UserFeature({
-			characters,
-			client,
-			interaction,
-			interactionUser,
-			template,
-			ul,
-		}).button();
-		//await user.button();
-	} else if (interaction.customId === "cancel")
-		await cancel(interaction, ul, client, interactionUser);
-	else if (interaction.customId === "edit_dice") {
-		await new MacroFeature({
-			db: client.settings,
-			interaction,
-			interactionUser,
-			ul,
-		}).edit();
-		//await macro.edit();
-		await resetButton(interaction.message, ul);
-	} else if (interaction.customId === "avatar") {
-		await resetButton(interaction.message, ul);
-		await interaction.reply({
-			content: ul("refresh"),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-	} else if (interaction.customId.includes("copyResult")) {
-		const isMobile = interaction.customId.includes("mobile");
-		//remove button from the message
-		const message = await interaction.message.fetch();
-		if (isMobile) await mobileLink(interaction, ul, client);
-		else await desktopLink(interaction, ul, client);
-		await message.edit({ components: [] });
-	} else if (interaction.customId.includes("modo_stats_validation")) {
-		await new StatsFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).couldBeValidated();
-		//await stats.couldBeValidated();
-	} else if (interaction.customId.includes("modo_stats_cancel_")) {
-		await new StatsFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).cancelStatsModeration();
-		//await stats.cancelStatsModeration();
-	} else if (interaction.customId.includes("modo_dice_validation_")) {
-		await new MacroFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).couldBeValidatedDice();
-		//await macro.couldBeValidatedDice();
-	} else if (interaction.customId.includes("modo_dice_cancel_")) {
-		await new MacroFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).cancelDiceModeration();
-		//await macro.cancelDiceModeration();
-	} else if (interaction.customId.includes("modo_dice_add_validation_")) {
-		await new MacroFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).couldBeValidatedDiceAdd();
-		//await macro.couldBeValidatedDiceAdd();
-	} else if (interaction.customId.includes("modo_dice_add_cancel_")) {
-		await new MacroFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).cancelDiceAddModeration();
-		//await macro.cancelDiceAddModeration();
-	} else if (interaction.customId.includes("mark_as_valid")) {
-		const isModerator = interaction.guild?.members.cache
-			.get(interactionUser.id)
-			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (isModerator) {
-			await interaction.reply({
-				content: ul("register.markAsValid"),
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+	// Check prefix-based handlers first
+	for (const { prefix, handler } of BUTTON_PREFIX_HANDLERS) {
+		if (interaction.customId.includes(prefix)) {
+			await handler(interaction, ul, interactionUser, template, client);
+			profiler.stopProfiler();
 			return;
-		} //update the button of the message and send a DM
-		const button = MacroFeature.buttons(ul, false, true);
-		await interaction.message.edit({ components: [button] });
-		//send the message
-		await new UserFeature({
-			client,
-			interaction,
-			interactionUser,
-			ul,
-		}).sendValidationMessage();
-		//await user.sendValidationMessage();
-		await interaction.reply({
-			content: ul("register.confirm"),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-	} else if (interaction.customId === "moderation_refuse")
-		// Follow the cancel process but with another name
-		await cancel(interaction, ul, client, interactionUser, true);
-	else if (interaction.customId === "cancel_by_user")
-		await cancel(interaction, ul, client, interactionUser, false, true);
+		}
+	}
+
+	// Check exact match handlers
+	const handler = BUTTON_HANDLERS[interaction.customId];
+	if (handler) {
+		await handler(interaction, ul, interactionUser, template, client);
+	}
+
 	profiler.stopProfiler();
 }
+
+/**
+ * Dispatch map for select menu handlers
+ */
+const SELECT_VALUE_HANDLERS: Record<string, SelectHandler> = {
+	name: async (interaction, ul, interactionUser, db) => {
+		await new RenameFeature({
+			db,
+			interaction,
+			interactionUser,
+			ul,
+		}).start();
+	},
+	avatar: async (interaction, ul, interactionUser, db) => {
+		await new AvatarFeature({
+			db,
+			interaction,
+			interactionUser,
+			ul,
+		}).start();
+	},
+	user: async (interaction, ul, interactionUser, db) => {
+		await new MoveFeature({
+			interaction,
+			interactionUser,
+			ul,
+		}).start();
+	},
+};
 
 async function selectSubmit(
 	interaction: Djs.StringSelectMenuInteraction,
@@ -311,36 +465,9 @@ async function selectSubmit(
 	profiler.startProfiler();
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
-		switch (value) {
-			case "name": {
-				await new RenameFeature({
-					db,
-					interaction,
-					interactionUser,
-					ul,
-				}).start();
-				//await rename.start();
-				break;
-			}
-			case "avatar": {
-				await new AvatarFeature({
-					db,
-					interaction,
-					interactionUser,
-					ul,
-				}).start();
-				//await avatar.start();
-				break;
-			}
-			case "user": {
-				await new MoveFeature({
-					interaction,
-					interactionUser,
-					ul,
-				}).start();
-				//await move.start();
-				break;
-			}
+		const handler = SELECT_VALUE_HANDLERS[value];
+		if (handler) {
+			await handler(interaction, ul, interactionUser, db);
 		}
 	}
 	profiler.stopProfiler();
