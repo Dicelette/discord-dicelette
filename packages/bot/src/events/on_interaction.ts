@@ -200,6 +200,7 @@ async function modalSubmit(
 /**
  * Dispatch maps for button handlers
  */
+// biome-ignore lint/style/useNamingConvention: Object keys must match Discord customId values
 const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 	avatar: async (interaction, ul, _interactionUser, _template, _client) => {
 		await resetButton(interaction.message, ul);
