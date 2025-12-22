@@ -50,11 +50,6 @@ type SelectHandler = (
 	db: Settings
 ) => Promise<void>;
 
-type PrefixMatcher = {
-	prefix: string;
-	handler: ButtonHandler;
-};
-
 /**
  * Dispatch maps for modal handlers
  */

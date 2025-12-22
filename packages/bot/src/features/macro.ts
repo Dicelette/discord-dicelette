@@ -94,6 +94,10 @@ interface MacroEditorAuth {
  * Consolidates authorization logic used across add, edit, store methods.
  *
  * @param params - Parameters including interaction, ul translation, and optional message
+ * @param params.interaction - The Discord interaction (button, modal, or select menu)
+ * @param params.ul - Translation utility for localized responses
+ * @param params.interactionUser - The user initiating the interaction
+ * @param params.message - Optional message to check, defaults to interaction.message
  * @returns Authorization result with user info and permissions
  */
 async function ensureMacroEditor(params: {

@@ -79,7 +79,7 @@ const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
  *
  * @param prototypes - Array of constructor prototypes to extend
  */
-function applyLocalizationMethods(prototypes: any[]) {
+function applyLocalizationMethods(prototypes: (object | undefined)[]) {
 	for (const prototype of prototypes) {
 		if (prototype) {
 			Object.defineProperty(prototype, "setNames", { value: SET_NAMES_IMPL });
