@@ -63,11 +63,6 @@ declare module "discord.js" {
 		setNames(key: string): this;
 		setDescriptions(key: string): this;
 	}
-
-	interface SlashCommandAttachmentOption {
-		setNames(key: string): this;
-		setDescriptions(key: string): this;
-	}
 }
 
 const SET_NAMES_IMPL = function (this: any, key: string) {
@@ -78,51 +73,37 @@ const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
 	return this.setDescription(t(key)).setDescriptionLocalizations(cmdLn(key));
 };
 
-Object.defineProperty(Djs.SlashCommandBuilder.prototype, "setNames", {
-	value: SET_NAMES_IMPL,
-});
+/**
+ * Generic helper to apply setNames and setDescriptions methods to multiple prototypes.
+ * Reduces duplication and ensures consistency across all builder types.
+ *
+ * @param prototypes - Array of constructor prototypes to extend
+ */
+function applyLocalizationMethods(prototypes: any[]) {
+	for (const prototype of prototypes) {
+		if (prototype) {
+			Object.defineProperty(prototype, "setNames", { value: SET_NAMES_IMPL });
+			Object.defineProperty(prototype, "setDescriptions", {
+				value: SET_DESCRIPTIONS_IMPL,
+			});
+		}
+	}
+}
 
-Object.defineProperty(Djs.SlashCommandBuilder.prototype, "setDescriptions", {
-	value: SET_DESCRIPTIONS_IMPL,
-});
-
-Object.defineProperty(Djs.SlashCommandSubcommandBuilder.prototype, "setNames", {
-	value: SET_NAMES_IMPL,
-});
-
-Object.defineProperty(Djs.SlashCommandSubcommandBuilder.prototype, "setDescriptions", {
-	value: SET_DESCRIPTIONS_IMPL,
-});
-
-Object.defineProperty(Djs.SlashCommandSubcommandGroupBuilder.prototype, "setNames", {
-	value: SET_NAMES_IMPL,
-});
-
-Object.defineProperty(
+// Apply localization methods to all Discord.js builders and options
+applyLocalizationMethods([
+	// Command builders
+	Djs.SlashCommandBuilder.prototype,
+	Djs.SlashCommandSubcommandBuilder.prototype,
 	Djs.SlashCommandSubcommandGroupBuilder.prototype,
-	"setDescriptions",
-	{
-		value: SET_DESCRIPTIONS_IMPL,
-	}
-);
-
-const OPTION_TYPES = [
-	{ class: Djs.SlashCommandStringOption, name: "String" },
-	{ class: Djs.SlashCommandBooleanOption, name: "Boolean" },
-	{ class: Djs.SlashCommandChannelOption, name: "Channel" },
-	{ class: Djs.SlashCommandRoleOption, name: "Role" },
-	{ class: Djs.SlashCommandNumberOption, name: "Number" },
-	{ class: Djs.SlashCommandMentionableOption, name: "Mentionable" },
-	{ class: Djs.SlashCommandUserOption, name: "User" },
-	{ class: Djs.SlashCommandAttachmentOption, name: "Attachment" },
-	{ class: Djs.SlashCommandIntegerOption, name: "Integer" },
-];
-
-OPTION_TYPES.forEach(({ class: optionClass }) => {
-	if (optionClass?.prototype) {
-		Object.defineProperty(optionClass.prototype, "setNames", { value: SET_NAMES_IMPL });
-		Object.defineProperty(optionClass.prototype, "setDescriptions", {
-			value: SET_DESCRIPTIONS_IMPL,
-		});
-	}
-});
+	// Option types
+	Djs.SlashCommandStringOption.prototype,
+	Djs.SlashCommandBooleanOption.prototype,
+	Djs.SlashCommandChannelOption.prototype,
+	Djs.SlashCommandRoleOption.prototype,
+	Djs.SlashCommandNumberOption.prototype,
+	Djs.SlashCommandIntegerOption.prototype,
+	Djs.SlashCommandMentionableOption.prototype,
+	Djs.SlashCommandUserOption.prototype,
+	Djs.SlashCommandAttachmentOption.prototype,
+]);
