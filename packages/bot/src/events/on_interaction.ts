@@ -1,4 +1,9 @@
-import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import {
+	type ButtonHandler,
+	getInteractionContext as getLangAndConfig,
+	type ModalHandler,
+	type SelectHandler,
+} from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Settings, Translation } from "@dicelette/types";
@@ -24,31 +29,6 @@ import {
 import { embedError } from "messages";
 import { cancel } from "utils";
 import { interactionError } from "./on_error";
-
-/**
- * Type definitions for interaction handlers
- */
-type ModalHandler = (
-	interaction: Djs.ModalSubmitInteraction,
-	ul: Translation,
-	interactionUser: Djs.User,
-	client: EClient
-) => Promise<void>;
-
-type ButtonHandler = (
-	interaction: Djs.ButtonInteraction,
-	ul: Translation,
-	interactionUser: Djs.User,
-	template: StatisticalTemplate,
-	client: EClient
-) => Promise<void>;
-
-type SelectHandler = (
-	interaction: Djs.StringSelectMenuInteraction,
-	ul: Translation,
-	interactionUser: Djs.User,
-	db: Settings
-) => Promise<void>;
 
 /**
  * Dispatch maps for modal handlers
@@ -195,7 +175,6 @@ async function modalSubmit(
 /**
  * Dispatch maps for button handlers
  */
-// biome-ignore lint/style/useNamingConvention: Object keys must match Discord customId values
 const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 	avatar: async (interaction, ul, _interactionUser, _template, _client) => {
 		await resetButton(interaction.message, ul);
@@ -207,6 +186,7 @@ const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 	cancel: async (interaction, ul, interactionUser, _template, client) => {
 		await cancel(interaction, ul, client, interactionUser);
 	},
+	// biome-ignore lint/style/useNamingConvention: Must match customId discord
 	cancel_by_user: async (interaction, ul, interactionUser, _template, client) => {
 		await cancel(interaction, ul, client, interactionUser, false, true);
 	},
@@ -220,6 +200,7 @@ const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 			ul,
 		}).continuePage();
 	},
+	// biome-ignore lint/style/useNamingConvention: Must match customId discord
 	edit_dice: async (interaction, ul, interactionUser, _template, client) => {
 		await new MacroFeature({
 			db: client.settings,
@@ -229,6 +210,7 @@ const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 		}).edit();
 		await resetButton(interaction.message, ul);
 	},
+	// biome-ignore lint/style/useNamingConvention: Must match customId discord
 	edit_stats: async (interaction, ul, interactionUser, _template, client) => {
 		await new StatsFeature({
 			db: client.settings,
@@ -238,6 +220,7 @@ const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 		}).edit();
 		await resetButton(interaction.message, ul);
 	},
+	// biome-ignore lint/style/useNamingConvention: Must match customId discord
 	moderation_refuse: async (interaction, ul, interactionUser, _template, client) => {
 		await cancel(interaction, ul, client, interactionUser, true);
 	},
@@ -462,9 +445,7 @@ async function selectSubmit(
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
 		const handler = SELECT_VALUE_HANDLERS[value];
-		if (handler) {
-			await handler(interaction, ul, interactionUser, db);
-		}
+		if (handler) await handler(interaction, ul, interactionUser, db);
 	}
 	profiler.stopProfiler();
 }
