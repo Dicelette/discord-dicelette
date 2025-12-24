@@ -541,7 +541,7 @@ export async function getUserNameAndChar(
  *
  * @param interaction
  * @param client
- * @param skipNotFound
+ * @param skipNotFound - If true, suppresses error replies and returns early when no user data is found.
  * @param user - Optional user to retrieve statistics for. If not provided, uses the interaction user.
  *
  * @returns An object containing the user's statistics, translation object, selected character name, and interaction options, or `undefined` if data is unavailable.

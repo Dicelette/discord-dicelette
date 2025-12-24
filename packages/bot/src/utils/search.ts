@@ -14,6 +14,7 @@ import { isValidChannel, isValidInteraction } from "utils";
  * @param ul - Function for localized message translation.
  * @param channelId - The ID of the channel to fetch and validate.
  * @param register - If true, skips further processing for forum channels.
+ * @param skipNoFound
  * @returns The fetched and validated Discord channel, or `undefined` if not found or invalid.
  */
 export async function searchUserChannel(

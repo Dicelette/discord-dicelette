@@ -9,7 +9,6 @@ import {
 } from "@dicelette/utils";
 import { move, resetButton } from "commands";
 import { getUserByEmbed } from "database";
-import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, reply } from "messages";
 import { isUserNameOrId } from "utils";
@@ -70,9 +69,7 @@ export class MoveFeature extends BaseFeature {
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
 		if (!this.client) return;
 		profiler.startProfiler();
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const user = interaction.fields.getSelectedUsers("user")?.first();
 		if (!user) return;

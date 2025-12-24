@@ -1,7 +1,8 @@
+// noinspection ExceptionCaughtLocallyJS
+
 import {
-	autoComplete,
+	autoCompleteEdit,
 	charUserOptions,
-	haveAccess,
 	reuploadAvatar,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
@@ -13,13 +14,7 @@ import type {
 	UserMessageId,
 	UserRegistration,
 } from "@dicelette/types";
-import {
-	BotError,
-	BotErrorLevel,
-	type BotErrorOptions,
-	filterChoices,
-	logger,
-} from "@dicelette/utils";
+import { BotError, BotErrorLevel, type BotErrorOptions, logger } from "@dicelette/utils";
 import {
 	deleteUser,
 	getRecordChar,
@@ -40,25 +35,7 @@ const botErrorOptions: BotErrorOptions = {
 
 export const editAvatar = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const param = autoComplete(interaction, client);
-		if (!param) return;
-		const { guildData, ul, userID, fixed, choices } = param;
-
-		if (fixed.name === t("common.character")) {
-			const guildChars = guildData.user?.[userID];
-			if (!guildChars) return;
-			for (const data of guildChars) {
-				const allowed = await haveAccess(interaction, data.messageId[1], userID);
-				const toPush = data.charName ? data.charName : ul("common.default");
-				if (!data.isPrivate) choices.push(toPush);
-				else if (allowed) choices.push(toPush);
-			}
-		}
-		if (choices.length === 0) return;
-		const filter = filterChoices(choices, interaction.options.getFocused());
-		await interaction.respond(
-			filter.map((result) => ({ name: result.capitalize(), value: result }))
-		);
+		await autoCompleteEdit(interaction, client);
 	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("edit.title")
@@ -301,7 +278,8 @@ export async function rename(
 	},
 	thread: DiscordChannel
 ) {
-	if (name === "/" || name?.toLowerCase() === ul("common.default").toLowerCase())
+	const findKey = name ? findln(name) : null;
+	if (name === "/" || findKey === "common.noSet" || findKey === "common.default")
 		name = null;
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");

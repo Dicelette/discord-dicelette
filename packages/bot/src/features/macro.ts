@@ -45,7 +45,6 @@ import {
 	registerUser,
 	updateMemory,
 } from "database";
-import type { EmbedBuilder, TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -72,6 +71,86 @@ const botErrorOptionsValidation: BotErrorOptions = {
 	cause: "DICE_VALIDATION",
 	level: BotErrorLevel.Warning,
 };
+
+/**
+ * Authorization result for macro editing operations
+ */
+interface MacroEditorAuth {
+	/** Whether the user is authorized */
+	authorized: boolean;
+	/** The target user ID from the embed */
+	targetUserId?: string;
+	/** The target user's character name */
+	targetUserName?: string;
+	/** Whether the user has moderator permissions */
+	isModerator: boolean;
+	/** Whether the user is the same as the target */
+	isSameUser: boolean;
+}
+
+/**
+ * Helper function to check macro editor authorization and extract user information.
+ * Consolidates authorization logic used across add, edit, store methods.
+ *
+ * @param params - Parameters including interaction, ul translation, and optional message
+ * @param params.interaction - The Discord interaction (button, modal, or select menu)
+ * @param params.ul - Translation utility for localized responses
+ * @param params.interactionUser - The user initiating the interaction
+ * @param params.message - Optional message to check, defaults to interaction.message
+ * @returns Authorization result with user info and permissions
+ */
+async function ensureMacroEditor(params: {
+	interaction:
+		| Djs.ButtonInteraction
+		| Djs.ModalSubmitInteraction
+		| Djs.StringSelectMenuInteraction;
+	ul: Translation;
+	interactionUser: Djs.User;
+	message?: Djs.Message;
+}): Promise<MacroEditorAuth> {
+	const { interaction, interactionUser, message } = params;
+	const msg = message ?? interaction.message;
+
+	if (!msg) {
+		return {
+			authorized: false,
+			isModerator: false,
+			isSameUser: false,
+		};
+	}
+
+	// Extract user info from embed
+	const embed = ensureEmbed(msg);
+	const userMention = embed.fields.find(
+		(field) => findln(field.name) === "common.user"
+	)?.value;
+	const targetUserId = getIdFromMention(userMention);
+
+	// Get character name
+	const charNameField = embed.fields.find(
+		(field) => findln(field.name) === "common.character"
+	);
+	const targetUserName =
+		charNameField && findln(charNameField.value) !== "common.noSet"
+			? charNameField.value
+			: undefined;
+
+	// Check permissions
+	const isSameUser = targetUserId === interactionUser.id;
+	const isModerator = !!interaction.guild?.members.cache
+		.get(interactionUser.id)
+		?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+
+	const authorized = isSameUser || isModerator;
+
+	return {
+		authorized,
+		isModerator,
+		isSameUser,
+		targetUserId,
+		targetUserName,
+	};
+}
 
 /**
  * MacroFeature handles all macro/damage dice operations for characters.
@@ -194,21 +273,23 @@ export class MacroFeature extends BaseFeature {
 			});
 			return;
 		}
-		const embed = ensureEmbed(interaction.message ?? undefined);
-		const userMention = embed.fields.find(
-			(field) => findln(field.name) === "common.user"
-		)?.value;
-		const sameUser = getIdFromMention(userMention) === this.interactionUser.id;
-		const isModerator = interaction.guild?.members.cache
-			.get(this.interactionUser.id)
-			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (sameUser || isModerator)
-			await this.registerDamageDice(interaction.customId.includes("first"));
-		else
+
+		const auth = await ensureMacroEditor({
+			interaction,
+			interactionUser: this.interactionUser,
+			ul: this.ul,
+		});
+
+		if (!auth.authorized) {
 			await reply(interaction, {
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
+			profiler.stopProfiler();
+			return;
+		}
+
+		await this.registerDamageDice(interaction.customId.includes("first"));
 		profiler.stopProfiler();
 	}
 
@@ -216,15 +297,15 @@ export class MacroFeature extends BaseFeature {
 	 * Static method to generate buttons for user registration process
 	 * (adding the "add dice" button).
 	 */
-	static buttons(ul: Translation, markAsValidated = false, moderationSent = false) {
+	static buttons(ul: Translation, sendToValidation = false, moderationSent = false) {
 		const validateButton = new Djs.ButtonBuilder()
 			.setCustomId("validate")
 			.setLabel(ul("button.validate"))
 			.setStyle(Djs.ButtonStyle.Success);
-		if (markAsValidated) {
+		if (sendToValidation) {
 			validateButton
 				.setLabel(ul("button.confirm"))
-				.setCustomId("mark_as_valid")
+				.setCustomId("send_to_validation")
 				.setStyle(Djs.ButtonStyle.Primary)
 				.setEmoji("📤");
 		}
@@ -471,7 +552,7 @@ export class MacroFeature extends BaseFeature {
 		return await sendLogs(`${msg}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 	}
 
-	static findDuplicate(diceEmbed: EmbedBuilder, name: string) {
+	static findDuplicate(diceEmbed: Djs.EmbedBuilder, name: string) {
 		if (!diceEmbed.toJSON().fields) return false;
 		return (
 			diceEmbed
@@ -490,9 +571,7 @@ export class MacroFeature extends BaseFeature {
 		profiler.startProfiler();
 		const db = this.client.settings;
 		if (!interaction.message) return;
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		const allowance = selfRegisterAllowance(
 			this.client.settings.get(interaction.guild!.id, "allowSelfRegister")
 		);

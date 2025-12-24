@@ -20,7 +20,6 @@ import {
 	verifyAvatarUrl,
 } from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
-import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { MacroFeature, StatsFeature } from "features";
 import * as Messages from "messages";
@@ -175,7 +174,16 @@ export class UserFeature extends BaseFeature {
 			template,
 			ul: this.ul,
 		});
-		await stats.register(Number.parseInt(pageNumberStr, 10));
+
+		const selfRegister = selfRegisterAllowance(
+			this.client.settings.get(interaction.guild!.id, "allowSelfRegister")
+		);
+		const moderator = interaction.guild?.members.cache
+			.get(interaction.user.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+		const moderation = selfRegister.moderation && !moderator;
+
+		await stats.register(Number.parseInt(pageNumberStr, 10), moderation);
 		profiler.stopProfiler();
 	}
 
@@ -272,7 +280,7 @@ export class UserFeature extends BaseFeature {
 			? await fetchChannel(
 					interaction.guild!,
 					sheetId,
-					customChannel as GuildBasedChannel | undefined
+					customChannel as Djs.GuildBasedChannel | undefined
 				)
 			: undefined;
 		if (!existChannel) {

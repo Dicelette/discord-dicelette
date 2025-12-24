@@ -21,27 +21,6 @@ export interface FeatureContext {
 }
 
 /**
- * Interface for feature implementations
- * Features store context as instance properties to reduce parameter passing
- */
-export interface IFeature {
-	/**
-	 * Optional method to handle string select menu interactions
-	 */
-	start?(): Promise<void>;
-
-	/**
-	 * Optional method to handle modal submissions
-	 */
-	edit?(): Promise<void>;
-
-	/**
-	 * Optional method to validate modal submissions
-	 */
-	validate?(): Promise<void>;
-}
-
-/**
  * Base class for features with context management
  * Stores common dependencies as instance properties
  */
