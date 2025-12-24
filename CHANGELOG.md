@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.30.9](https://github.com/Dicelette/discord-dicelette/compare/2.30.8...2.30.9) (2025-12-24)
+
+
+### Bug Fixes
+
+* Add lint suppression for Discord customId property names ([1cb635a](https://github.com/Dicelette/discord-dicelette/commit/1cb635a38d3f17b43f1cd8a445de7b639753756c))
+* **rename:** allow to remove name with recognizing default ([947d022](https://github.com/Dicelette/discord-dicelette/commit/947d0226edd58b6319005aebe69f8ff6f4bb37c6))
+
 ## [2.30.8](https://github.com/Dicelette/discord-dicelette/compare/2.30.7...2.30.8) (2025-12-20)
 
 
