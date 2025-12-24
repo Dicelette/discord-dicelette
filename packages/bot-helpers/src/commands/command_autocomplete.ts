@@ -3,6 +3,7 @@ import { t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { getInteractionContext } from "../interaction_context";
+import { haveAccess } from "../roles";
 
 /**
  * Generic autocomplete helper that extracts common context
@@ -17,6 +18,31 @@ export function autoComplete(interaction: Djs.AutocompleteInteraction, client: E
 	let userID = options.get(t("display.userLowercase"))?.value ?? interaction.user.id;
 	if (typeof userID !== "string") userID = interaction.user.id;
 	return { choices, fixed, guildData, ul, userID };
+}
+
+export async function autoCompleteEdit(
+	interaction: Djs.AutocompleteInteraction,
+	client: EClient
+) {
+	const param = autoComplete(interaction, client);
+	if (!param) return;
+	const { guildData, ul, userID, fixed, choices } = param;
+
+	if (fixed.name === t("common.character")) {
+		const guildChars = guildData.user?.[userID];
+		if (!guildChars) return;
+		for (const data of guildChars) {
+			const allowed = await haveAccess(interaction, data.messageId[1], userID);
+			const toPush = data.charName ? data.charName : ul("common.default");
+			if (!data.isPrivate) choices.push(toPush);
+			else if (allowed) choices.push(toPush);
+		}
+	}
+	if (choices.length === 0) return;
+	const filter = filterChoices(choices, interaction.options.getFocused());
+	await interaction.respond(
+		filter.map((result) => ({ name: result.capitalize(), value: result }))
+	);
 }
 
 /**

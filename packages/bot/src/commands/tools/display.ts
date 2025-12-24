@@ -1,5 +1,5 @@
 import {
-	autoComplete,
+	autoCompleteEdit,
 	charUserOptions,
 	fetchAvatarUrl,
 	haveAccess,
@@ -9,7 +9,7 @@ import type { EClient } from "@dicelette/client";
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
 import type { CharacterData } from "@dicelette/types";
-import { filterChoices, sentry } from "@dicelette/utils";
+import { sentry } from "@dicelette/utils";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import {
@@ -30,24 +30,7 @@ export const displayUser = {
 		interaction: Djs.AutocompleteInteraction,
 		client: EClient
 	): Promise<void> {
-		const param = autoComplete(interaction, client);
-		if (!param) return;
-		const { fixed, guildData, userID, ul, choices } = param;
-		if (fixed.name === t("common.character")) {
-			const guildChars = guildData.user?.[userID];
-			if (!guildChars) return;
-			for (const data of guildChars) {
-				const allowed = await haveAccess(interaction, data.messageId[1], userID);
-				const toPush = data.charName ? data.charName : ul("common.default");
-				if (!data.isPrivate) choices.push(toPush);
-				else if (allowed) choices.push(toPush);
-			}
-		}
-		if (choices.length === 0) return;
-		const filter = filterChoices(choices, interaction.options.getFocused());
-		await interaction.respond(
-			filter.map((result) => ({ name: result.capitalize(), value: result }))
-		);
+		await autoCompleteEdit(interaction, client);
 	},
 	data: (charUserOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("display.title")
