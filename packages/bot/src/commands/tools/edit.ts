@@ -301,7 +301,7 @@ export async function rename(
 	},
 	thread: DiscordChannel
 ) {
-	if (name === "/" || name?.toLowerCase() === ul("common.default").toLowerCase())
+	if (name === "/" || name?.toLowerCase() === findln("common.default").toLowerCase())
 		name = null;
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
