@@ -1,3 +1,5 @@
+// noinspection ExceptionCaughtLocallyJS
+
 import {
 	autoComplete,
 	charUserOptions,
