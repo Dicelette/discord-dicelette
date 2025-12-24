@@ -6,6 +6,7 @@ import { profiler } from "@dicelette/utils";
 import { desktopLink, mobileLink, resetButton } from "commands";
 import * as Djs from "discord.js";
 import { MacroFeature, StatsFeature, UserFeature } from "features";
+import { reply } from "messages";
 import { cancel } from "utils";
 
 /**
@@ -14,7 +15,7 @@ import { cancel } from "utils";
 const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 	avatar: async (interaction, ul, _interactionUser, _template, _client) => {
 		await resetButton(interaction.message, ul);
-		await interaction.reply({
+		await reply(interaction, {
 			content: ul("refresh"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -183,9 +184,13 @@ const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
 			const isModerator = interaction.guild?.members.cache
 				.get(interactionUser.id)
 				?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+			/*
+				If the moderation want to validate the sheet before the user mark it as finished
+				we should return early
+		  */
 			if (isModerator) {
-				await interaction.reply({
-					content: ul("register.markAsValid"),
+				await reply(interaction, {
+					content: ul("register.notFinished"),
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 				return;
@@ -198,12 +203,12 @@ const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
 				interactionUser,
 				ul,
 			}).sendValidationMessage();
-			await interaction.reply({
+			await reply(interaction, {
 				content: ul("register.confirm"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 		},
-		prefix: "mark_as_valid",
+		prefix: "send_to_validation",
 	},
 ];
 

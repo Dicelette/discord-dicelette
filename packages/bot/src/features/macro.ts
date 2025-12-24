@@ -297,15 +297,15 @@ export class MacroFeature extends BaseFeature {
 	 * Static method to generate buttons for user registration process
 	 * (adding the "add dice" button).
 	 */
-	static buttons(ul: Translation, markAsValidated = false, moderationSent = false) {
+	static buttons(ul: Translation, sendToValidation = false, moderationSent = false) {
 		const validateButton = new Djs.ButtonBuilder()
 			.setCustomId("validate")
 			.setLabel(ul("button.validate"))
 			.setStyle(Djs.ButtonStyle.Success);
-		if (markAsValidated) {
+		if (sendToValidation) {
 			validateButton
 				.setLabel(ul("button.confirm"))
-				.setCustomId("mark_as_valid")
+				.setCustomId("send_to_validation")
 				.setStyle(Djs.ButtonStyle.Primary)
 				.setEmoji("📤");
 		}

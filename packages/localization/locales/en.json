@@ -865,8 +865,8 @@
 			"registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are enabled for all user by default.\n\nYou can restrict to your player only with following the tutorial:\n",
 			"updated": "The template was successfully updated! You can found it here: {{- msg.url}}."
 		},
-		"markAsValid": "The user didn't finish their sheet. Please wait.",
 		"name": "register",
+		"notFinished": "The user didn't finish their sheet. Please wait.",
 		"options": {
 			"channel": "The channel where the template and users will be registered",
 			"delete": {

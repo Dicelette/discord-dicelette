@@ -865,8 +865,8 @@
 			"registered": "Modèle enregistré !\nPar défaut, les commandes de dés et d'affichage (ainsi que le graphique) sont activés pour tous les utilisateurs par défaut. \nPour restreindre à vos joueurs uniquement en suivant le tutoriel suivant:\n",
 			"updated": "Le modèle a bien été mis-à-jour. Vous pouvez le retrouver ici  : {{- msg.url}}"
 		},
-		"markAsValid": "L'utilisateur n'a pas fini sa fiche, merci d'attendre.",
 		"name": "enregistrer",
+		"notFinished": "L'utilisateur n'a pas fini sa fiche, merci d'attendre.",
 		"options": {
 			"channel": "Le channel où le modèle et les utilisateurs seront enregistrés",
 			"delete": {
