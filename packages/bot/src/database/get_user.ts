@@ -539,9 +539,9 @@ export async function getUserNameAndChar(
  *
  * Attempts to obtain the user's character statistics based on the interaction options and guild configuration. Handles cases where statistics are required by the dice template, falling back to the first registered character or a minimal template if necessary. Replies with error messages if required data is missing.
  *
- * @param interaction
- * @param client
- * @param skipNotFound
+ * @param interaction {Djs.ChatInputCommandInteraction}
+ * @param client {EClient}
+ * @param skipNotFound - If true, suppresses error replies and returns early when no user data is found.
  * @param user - Optional user to retrieve statistics for. If not provided, uses the interaction user.
  *
  * @returns An object containing the user's statistics, translation object, selected character name, and interaction options, or `undefined` if data is unavailable.
