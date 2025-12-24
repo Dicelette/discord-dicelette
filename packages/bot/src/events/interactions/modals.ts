@@ -79,7 +79,7 @@ export async function handleModalSubmit(
 	client: EClient
 ) {
 	for (const { prefix, handler } of MODAL_PREFIX_HANDLERS) {
-		if (interaction.customId.includes(prefix)) {
+		if (interaction.customId.startsWith(prefix)) {
 			await handler(interaction, ul, interactionUser, client);
 			return;
 		}

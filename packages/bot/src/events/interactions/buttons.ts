@@ -217,7 +217,7 @@ export async function handleButtonSubmit(
 	profiler.startProfiler();
 
 	for (const { prefix, handler } of BUTTON_PREFIX_HANDLERS) {
-		if (interaction.customId.includes(prefix)) {
+		if (interaction.customId.startsWith(prefix)) {
 			await handler(interaction, ul, interactionUser, template, client);
 			profiler.stopProfiler();
 			return;
@@ -225,9 +225,7 @@ export async function handleButtonSubmit(
 	}
 
 	const handler = BUTTON_HANDLERS[interaction.customId];
-	if (handler) {
-		await handler(interaction, ul, interactionUser, template, client);
-	}
+	if (handler) await handler(interaction, ul, interactionUser, template, client);
 
 	profiler.stopProfiler();
 }
