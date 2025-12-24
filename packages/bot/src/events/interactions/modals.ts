@@ -86,7 +86,5 @@ export async function handleModalSubmit(
 	}
 
 	const handler = MODAL_HANDLERS[interaction.customId];
-	if (handler) {
-		await handler(interaction, ul, interactionUser, client);
-	}
+	if (handler) await handler(interaction, ul, interactionUser, client);
 }

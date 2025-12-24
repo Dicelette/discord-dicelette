@@ -175,7 +175,16 @@ export class UserFeature extends BaseFeature {
 			template,
 			ul: this.ul,
 		});
-		await stats.register(Number.parseInt(pageNumberStr, 10));
+
+		const selfRegister = selfRegisterAllowance(
+			this.client.settings.get(interaction.guild!.id, "allowSelfRegister")
+		);
+		const moderator = interaction.guild?.members.cache
+			.get(interaction.user.id)
+			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
+		const moderation = selfRegister.moderation && !moderator;
+
+		await stats.register(Number.parseInt(pageNumberStr, 10), moderation);
 		profiler.stopProfiler();
 	}
 

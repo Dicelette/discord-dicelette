@@ -278,7 +278,8 @@ export async function rename(
 	},
 	thread: DiscordChannel
 ) {
-	if (name === "/" || name?.toLowerCase() === findln("common.default").toLowerCase())
+	const findKey = name ? findln(name) : null;
+	if (name === "/" || findKey === "common.noSet" || findKey === "common.default")
 		name = null;
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
