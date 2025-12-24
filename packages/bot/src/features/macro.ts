@@ -45,7 +45,6 @@ import {
 	registerUser,
 	updateMemory,
 } from "database";
-import type { EmbedBuilder, TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import {
 	createDiceEmbed,
@@ -109,7 +108,7 @@ async function ensureMacroEditor(params: {
 	interactionUser: Djs.User;
 	message?: Djs.Message;
 }): Promise<MacroEditorAuth> {
-	const { interaction, ul, interactionUser, message } = params;
+	const { interaction, interactionUser, message } = params;
 	const msg = message ?? interaction.message;
 
 	if (!msg) {
@@ -553,7 +552,7 @@ export class MacroFeature extends BaseFeature {
 		return await sendLogs(`${msg}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 	}
 
-	static findDuplicate(diceEmbed: EmbedBuilder, name: string) {
+	static findDuplicate(diceEmbed: Djs.EmbedBuilder, name: string) {
 		if (!diceEmbed.toJSON().fields) return false;
 		return (
 			diceEmbed
@@ -572,9 +571,7 @@ export class MacroFeature extends BaseFeature {
 		profiler.startProfiler();
 		const db = this.client.settings;
 		if (!interaction.message) return;
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		const allowance = selfRegisterAllowance(
 			this.client.settings.get(interaction.guild!.id, "allowSelfRegister")
 		);

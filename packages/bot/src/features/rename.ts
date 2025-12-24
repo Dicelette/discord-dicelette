@@ -11,7 +11,6 @@ import {
 } from "@dicelette/utils";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
-import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { getEmbeds } from "messages";
 import { allowEdit } from "utils";
@@ -91,9 +90,7 @@ export class RenameFeature extends BaseFeature {
 		if (!interaction.message) return;
 		if (!this.client) return;
 		profiler.startProfiler();
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const newName = interaction.fields.getTextInputValue("newName");
 		if (!newName || !interaction.channel) return;

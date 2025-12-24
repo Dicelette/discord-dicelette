@@ -215,9 +215,7 @@ export class StatsFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.template || !interaction.message) return;
 
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		const isModerator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
@@ -297,7 +295,7 @@ export class StatsFeature extends BaseFeature {
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 				userEmbed.setFooter({ text: this.ul("common.page", { nb: 1 }) });
-				message.edit({
+				await message.edit({
 					components: [continueCancelButtons(this.ul)],
 					embeds: [userEmbed],
 					files: uniqueFiles,
@@ -310,7 +308,7 @@ export class StatsFeature extends BaseFeature {
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 				userEmbed.setFooter({ text: this.ul("common.page", { nb: 1 }) });
-				message.edit({
+				await message.edit({
 					components: [continueCancelButtons(this.ul)],
 					embeds: [userEmbed],
 					files: uniqueFiles,
@@ -331,7 +329,7 @@ export class StatsFeature extends BaseFeature {
 			}
 			userEmbed.setFooter({ text: this.ul("common.page", { nb: page + 1 }) });
 
-			message.edit({
+			await message.edit({
 				components: [MacroFeature.buttons(this.ul, moderation && !isModerator)],
 				embeds: [userEmbed, statEmbeds],
 				files: uniqueFiles,
@@ -352,7 +350,7 @@ export class StatsFeature extends BaseFeature {
 				})()
 			: "";
 
-		message.edit({
+		await message.edit({
 			components: [continueCancelButtons(this.ul)],
 			embeds: [userEmbed, statEmbeds],
 			files: uniqueFiles,

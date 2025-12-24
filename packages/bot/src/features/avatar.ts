@@ -8,7 +8,6 @@ import {
 	QUERY_URL_PATTERNS,
 	verifyAvatarUrl,
 } from "@dicelette/utils";
-import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
 import { allowEdit } from "utils";
@@ -86,9 +85,7 @@ export class AvatarFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
 		profiler.startProfiler();
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const files: Djs.AttachmentBuilder[] = [];
 		const uploaded = interaction.fields.getUploadedFiles("avatarFile")?.first();
