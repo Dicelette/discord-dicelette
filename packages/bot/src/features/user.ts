@@ -20,7 +20,6 @@ import {
 	verifyAvatarUrl,
 } from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
-import type { GuildBasedChannel } from "discord.js";
 import * as Djs from "discord.js";
 import { MacroFeature, StatsFeature } from "features";
 import * as Messages from "messages";
@@ -281,7 +280,7 @@ export class UserFeature extends BaseFeature {
 			? await fetchChannel(
 					interaction.guild!,
 					sheetId,
-					customChannel as GuildBasedChannel | undefined
+					customChannel as Djs.GuildBasedChannel | undefined
 				)
 			: undefined;
 		if (!existChannel) {

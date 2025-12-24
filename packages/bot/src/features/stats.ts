@@ -34,7 +34,6 @@ import {
 	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
-import type { TextChannel } from "discord.js";
 import * as Djs from "discord.js";
 import * as Messages from "messages";
 import {
@@ -419,9 +418,7 @@ export class StatsFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client || !interaction.message) return;
 
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 		if (!statsEmbeds) return;
@@ -637,9 +634,7 @@ export class StatsFeature extends BaseFeature {
 			return;
 		}
 		if (!interaction.message) return;
-		const message = await (interaction.channel as TextChannel).messages.fetch(
-			interaction.message.id
-		);
+		const message = interaction.message;
 		const statsEmbeds = getEmbeds(message ?? undefined, "stats");
 		if (!statsEmbeds) return;
 		const fieldsToAppend = await this.getFieldsToAppend(statsEmbeds);
