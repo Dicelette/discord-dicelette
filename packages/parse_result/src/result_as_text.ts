@@ -17,10 +17,10 @@ export class ResultAsText {
 	error?: boolean;
 	output: string;
 	private readonly data: Server;
-	private readonly ul: Translation;
+	readonly ul: Translation;
 	private readonly charName?: string;
 	private readonly infoRoll?: { name: string; standardized: string };
-	private readonly resultat?: Resultat;
+	readonly resultat?: Resultat;
 	private headerCompare?: ComparedValue;
 	private readonly statsPerSegment?: string[];
 	private readonly commentsPerSegment?: string[];

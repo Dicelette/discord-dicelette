@@ -1,5 +1,6 @@
 import { findln } from "@dicelette/localization";
 import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
+import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 
 /**
@@ -76,6 +77,38 @@ function addCount(
 		failure: existingCount.failure + messageCount.failure,
 		success: existingCount.success + messageCount.success,
 	};
+	if (messageCount.failure || messageCount.criticalFailure) {
+		newCount.consecutive = {
+			failure:
+				(existingCount.consecutive?.failure ?? 0) +
+				messageCount.failure +
+				messageCount.criticalFailure,
+			success: 0,
+		};
+		newCount.longestStreak = {
+			failure: Math.max(
+				existingCount.longestStreak?.failure ?? 0,
+				newCount.consecutive.failure
+			),
+			success: existingCount.longestStreak?.success ?? 0,
+		};
+	} else {
+		newCount.consecutive = {
+			failure: 0,
+			success:
+				(existingCount.consecutive?.success ?? 0) +
+				messageCount.success +
+				messageCount.criticalSuccess,
+		};
+		newCount.longestStreak = {
+			failure: existingCount.longestStreak?.failure ?? 0,
+			success: Math.max(
+				existingCount.longestStreak?.success ?? 0,
+				newCount.consecutive.success
+			),
+		};
+	}
+	logger.trace(`Saving new count for user ${userId} in guild ${guildId}`, newCount);
 	criticalCount.set(guildId, newCount, userId);
 }
 

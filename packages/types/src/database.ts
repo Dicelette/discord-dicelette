@@ -84,6 +84,7 @@ export interface GuildData {
 	 * @see LinksVariables
 	 */
 	createLinkTemplate?: TemplateResult;
+	pity?: number;
 }
 
 export interface TemplateResult {

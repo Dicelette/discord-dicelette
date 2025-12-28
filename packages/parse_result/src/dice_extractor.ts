@@ -96,7 +96,8 @@ export function processChainedComments(
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
-	infoRoll?: string
+	infoRoll?: string,
+	pity?: boolean
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
@@ -110,7 +111,7 @@ export function performDiceRoll(
 			.replace(/ @\w+/, "")
 			.trimEnd();
 		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
-		return { infoRoll, resultat: roll(rollContent) };
+		return { infoRoll, resultat: roll(rollContent, undefined, pity) };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -132,7 +133,8 @@ export function applyCommentsToResult(
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
-	statsName?: string[]
+	statsName?: string[],
+	pity?: boolean
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -173,7 +175,7 @@ export function processChainedDiceRoll(
 	try {
 		// Remove critical blocks before rolling
 		const cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const rollResult = roll(cleaned);
+		const rollResult = roll(cleaned, undefined, pity);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
 		// For chained rolls with & and ;, only add comment if it's a true # comment
@@ -192,7 +194,8 @@ export function processChainedDiceRoll(
 export function isRolling(
 	content: string,
 	userData?: UserData,
-	statsName?: string[]
+	statsName?: string[],
+	pity?: boolean
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -267,7 +270,12 @@ export function isRolling(
 
 	if (diceData.bracketRoll) {
 		const cleanedForRoll = processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, res?.infoRoll);
+		const diceRoll = performDiceRoll(
+			cleanedForRoll,
+			diceData.bracketRoll,
+			res?.infoRoll,
+			pity
+		);
 		if (diceRoll?.resultat)
 			return {
 				detectRoll: diceData.bracketRoll,
@@ -284,7 +292,8 @@ export function isRolling(
 		const diceRoll = processChainedDiceRoll(
 			originalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
 			userData,
-			statsName
+			statsName,
+			pity
 		);
 		if (diceRoll)
 			return {
@@ -306,7 +315,7 @@ export function isRolling(
 
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll);
+		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return {
@@ -319,10 +328,10 @@ export function isRolling(
 	return undefined;
 }
 
-function getRollInShared(dice: string) {
+function getRollInShared(dice: string, pity?: boolean) {
 	const main = DICE_PATTERNS.GLOBAL_COMMENTS_GROUP.exec(dice)?.groups?.comment;
 	dice = dice.replace(DICE_PATTERNS.GLOBAL_COMMENTS_GROUP, "");
-	const rollDice = roll(dice);
+	const rollDice = roll(dice, undefined, pity);
 	if (!rollDice) return undefined;
 
 	rollDice.dice = dice;
@@ -336,7 +345,7 @@ function isSharedRoll(dice: string): boolean {
 	return cleanedDice.includes(";");
 }
 
-export function getRoll(dice: string): Resultat | undefined {
+export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
 	logger.trace("Getting roll for dice:", dice);
 	if (isSharedRoll(dice)) return getRollInShared(dice);
 	const comments = dice
@@ -346,7 +355,7 @@ export function getRoll(dice: string): Resultat | undefined {
 
 	dice = dice.trim();
 	try {
-		const rollDice = roll(dice);
+		const rollDice = roll(dice, undefined, pity);
 		if (!rollDice) return undefined;
 		if (comments) {
 			rollDice.comment = comments;

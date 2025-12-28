@@ -58,7 +58,10 @@
 			"better-sqlite3",
 			"canvas",
 			"esbuild"
-		]
+		],
+		"overrides": {
+			"@dicelette/core": "link:../core"
+		}
 	},
 	"commit-and-tag-version": {
 		"bumpFiles": [

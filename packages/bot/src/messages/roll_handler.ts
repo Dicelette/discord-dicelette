@@ -1,10 +1,10 @@
 import type { EClient } from "@dicelette/client";
 import type { ComparedValue, Critical, CustomCritical, Resultat } from "@dicelette/core";
 import { ResultAsText } from "@dicelette/parse_result";
-import type { DiscordTextChannel, Translation } from "@dicelette/types";
-import { COMPILED_COMMENTS } from "@dicelette/utils";
+import type { DiscordTextChannel, Settings, Translation } from "@dicelette/types";
+import { COMPILED_COMMENTS, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, reply, threadToSend } from "messages";
+import { deleteAfter, findMessageBefore, reply, sendLogs, threadToSend } from "messages";
 
 interface RollHandlerOptions {
 	/** Result of the dice roll */
@@ -95,7 +95,8 @@ export async function handleRollResult(
 			author.id,
 			logUrl,
 			deleteInput,
-			hideResult
+			hideResult,
+			client.settings
 		);
 	}
 
@@ -124,7 +125,8 @@ export async function handleRollResult(
 			author.id,
 			logUrl,
 			deleteInput,
-			hideResult
+			hideResult,
+			client.settings
 		);
 		if (deleteInput && source instanceof Djs.Message) await source.delete();
 		return reply;
@@ -159,7 +161,8 @@ export async function handleRollResult(
 			author.id,
 			logUrl,
 			deleteInput,
-			hideResult
+			hideResult,
+			client.settings
 		);
 	}
 
@@ -174,7 +177,8 @@ export async function handleRollResult(
 		author.id,
 		undefined,
 		deleteInput,
-		hideResult
+		hideResult,
+		client.settings
 	);
 
 	// Find thread and create empty message in background
@@ -223,8 +227,19 @@ async function replyToSource(
 	authorId: string,
 	idMessage?: string,
 	deleteInput = false,
-	hideResult?: boolean
+	hideResult?: boolean,
+	settings?: Settings
 ): Promise<Djs.Message | Djs.InteractionResponse> {
+	console.log(resultAsText.resultat?.pityLogs);
+	if (resultAsText.resultat?.pityLogs && source.guild && settings) {
+		const { ul } = resultAsText;
+		logger.trace(ul("pity.logs.title", { nb: resultAsText.resultat.pityLogs }));
+		await sendLogs(
+			ul("pity.logs.title", { nb: resultAsText.resultat.pityLogs }),
+			source.guild,
+			settings
+		);
+	}
 	const content: string | undefined = resultAsText.onMessageSend(idMessage, authorId);
 	const replyOptions: Djs.MessageCreateOptions = {
 		allowedMentions: { repliedUser: true },

@@ -63,7 +63,12 @@ export default (client: EClient): void => {
 			}
 			const ctx = getGuildContext(client, message.guild.id);
 			const statsName = ctx?.templateID?.statsName ?? [];
-			const isRoll = isRolling(content, userData, statsName);
+			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
+				?.failure;
+			const pityThreshold = client.settings.get(message.guild.id, "pity");
+			const pity = !!(pityThreshold && pityNb && pityNb > pityThreshold);
+			logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
+			const isRoll = isRolling(content, userData, statsName, pity);
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);

@@ -200,6 +200,16 @@
 		"logs": "Logging",
 		"name": "config",
 		"noTemplate": "There is no template configured for the server.",
+		"pity": {
+			"delete": "Pity is disabled.",
+			"description": "Allows you to count the number of consecutive failures and force a reroll until success.",
+			"name": "pity",
+			"option": {
+				"description": "Number of consecutive failures before pity",
+				"name": "threshold"
+			},
+			"success": "Pity is enabled. It will take {{- pity}} consecutive failures before a roll is rerolled to achieve success.\n\n⚠️ **Pity only works on comparison rolls.**"
+		},
 		"privateChan": "Private characters channel",
 		"result": {
 			"desc": "Allows you to save all dice results in a single channel.",
@@ -725,8 +735,17 @@
 	},
 	"luckMeter": {
 		"count": {
+			"consecutive": {
+				"failure": "Current failure streak",
+				"success": "Current success streak"
+			},
 			"desc": "Know results for {{- user}} :",
 			"including": "Including",
+			"longest": {
+				"failure": "Longest consecutive failure streak",
+				"success": "Longest consecutive success streak"
+			},
+			"none": "None",
 			"note": "Critical are included in the count of their normal rolls. ",
 			"title": "bilan",
 			"total_one": "Total: {{count}} roll",
@@ -838,6 +857,11 @@
 		"steps": "User Registration - Page {{- page}}/{{- max}}",
 		"user": {
 			"description": "Enter the user attached to the character (id or global username)"
+		}
+	},
+	"pity": {
+		"logs": {
+			"title": "The dice roll was re-rolled {{- nb}} times."
 		}
 	},
 	"rAtq": {

@@ -46,36 +46,83 @@ function getTitle(option: Options, ul: Translation) {
 	return titles[option];
 }
 
-function generateFieldsForBilan(count: Count, ul: Translation) {
+function gaugeEmoji(type: "success" | "failure", value: number) {
+	const successEmoji = ["😎", "🔥", "🐐"];
+	const failureEmoji = ["😔", "💔", "💀"];
+	const emoji = type === "success" ? successEmoji : failureEmoji;
+	if (value > 1 && value <= 5) return emoji[0];
+	if (value > 5 && value <= 10) return emoji[1];
+	if (value > 10) return emoji[2];
+	return "";
+}
+
+async function generateComponentsForBilan(
+	count: Count,
+	ul: Translation,
+	user: Djs.GuildMember,
+	guild: Djs.Guild
+) {
 	const totalRoll = count.success + count.failure;
-	const fields: Djs.EmbedField[] = [
-		{
-			inline: true,
-			name: ul("roll.success"),
-			value: `${count.success} (${percentage(count.success, totalRoll)}%)`,
-		},
+	const avatar = await fetchAvatarUrl(guild, user.user, user);
+
+	const buildStatSection = (countType: "success" | "failure") => {
+		const lines = [
+			`- __**${ul(`roll.${countType}`)}**__${ul("common.space")}: ${count[countType]} (${percentage(count[countType], totalRoll)}%)`,
+		];
+
+		if (countType === "success" && count.criticalSuccess > 0) {
+			lines.push(
+				`  - **${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}**${ul("common.space")}: ${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`
+			);
+		} else if (countType === "failure" && count.criticalFailure > 0) {
+			lines.push(
+				`  - **${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}**${ul("common.space")}: ${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`
+			);
+		}
+
+		if (count.consecutive?.[countType] && count.consecutive[countType]! > 0) {
+			const emoji = gaugeEmoji(countType, count.consecutive[countType]!);
+			lines.push(
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${count.consecutive[countType]} ${count.consecutive[countType]! > 5 ? emoji : ""}`
+			);
+		} else {
+			lines.push(
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${ul("common.noSet")}`
+			);
+		}
+
+		if (count.longestStreak?.[countType]) {
+			lines.push(
+				`  - **${ul(`luckMeter.count.longest.${countType}`)}**${ul("common.space")}: ${count.longestStreak[countType]}`
+			);
+		}
+
+		return lines;
+	};
+
+	const allLines = [
+		`# ${ul("luckMeter.count.title").toTitle()}`,
+		ul("luckMeter.count.desc", { user: Djs.userMention(user.id) }),
+		...buildStatSection("success"),
+		"",
+		...buildStatSection("failure"),
 	];
-	if (count.criticalSuccess > 0) {
-		fields.push({
-			inline: true,
-			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
-			value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
-		});
-	}
-	fields.push({ inline: false, name: "\u200B", value: "\u200B" });
-	fields.push({
-		inline: true,
-		name: ul("roll.failure"),
-		value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
-	});
-	if (count.criticalFailure > 0) {
-		fields.push({
-			inline: true,
-			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
-			value: `${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`,
-		});
-	}
-	return fields;
+
+	return [
+		new Djs.ContainerBuilder()
+			.setAccentColor(generateRandomColor())
+			.addSectionComponents((section) =>
+				section
+					.setThumbnailAccessory((access) => access.setURL(avatar))
+					.addTextDisplayComponents((text) => text.setContent(allLines.join("\n")))
+			)
+			.addSeparatorComponents((sep) =>
+				sep.setSpacing(Djs.SeparatorSpacingSize.Small).setDivider(true)
+			)
+			.addTextDisplayComponents((text) =>
+				text.setContent(`-# __${ul("luckMeter.count.total", { count: totalRoll })}__`)
+			),
+	];
 }
 
 /**
@@ -99,8 +146,7 @@ async function bilan(
 		return;
 	}
 
-	const totalRoll = count.success + count.failure;
-
+	/**
 	const resultEmbed = new Djs.EmbedBuilder()
 		.setTitle(ul("luckMeter.count.title").toTitle())
 		.setThumbnail(await fetchAvatarUrl(interaction.guild!, user))
@@ -109,9 +155,22 @@ async function bilan(
 		.setColor(Djs.Colors.Blurple)
 		.setFooter({ text: ul("luckMeter.count.total", { count: totalRoll }) })
 		.setTimestamp();
-
+	
 	await interaction.editReply({
 		embeds: [resultEmbed],
+	});
+	*/
+	const member = await interaction.guild!.members.fetch(user.id);
+	const components = await generateComponentsForBilan(
+		count,
+		ul,
+		member,
+		interaction.guild!
+	);
+	await interaction.editReply({
+		allowedMentions: { parse: [], repliedUser: false, roles: [], users: [] },
+		components,
+		flags: Djs.MessageFlags.IsComponentsV2,
 	});
 }
 

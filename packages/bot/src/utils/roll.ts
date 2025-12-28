@@ -61,7 +61,11 @@ export async function rollWithInteraction(
 		lang: langToUse,
 		userId: user?.id ?? interaction.user.id,
 	};
-	const result = getRoll(dice);
+	const pityNb = client.criticalCount.get(interaction.guildId!, data.userId!)?.consecutive
+		?.failure;
+	const pityThreshold = client.settings.get(interaction.guildId!, "pity");
+	const pity = !!pityNb && !!pityThreshold && pityNb > pityThreshold;
+	const result = getRoll(dice, pity);
 	if (!result) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],

@@ -13,8 +13,15 @@ export type Count = {
 	criticalFailure: number;
 	criticalSuccess: number;
 	total?: number;
+	consecutive?: Series;
+	longestStreak?: Series;
 };
 export type DBCount = Record<string, Count>;
+
+export type Series = {
+	failure: number;
+	success: number;
+};
 
 export type DataToFooter = {
 	userID: string;

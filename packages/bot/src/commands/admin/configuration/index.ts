@@ -18,6 +18,7 @@ import {
 } from "../../userSettings";
 import { resetTemplate } from "../../userSettings/setTemplate";
 import { editMeCommand } from "./editMe";
+import { setPity } from "./pity";
 
 export const configuration = {
 	data: new Djs.SlashCommandBuilder()
@@ -317,7 +318,23 @@ export const configuration = {
 					.setNames("userSettings.createLink.title")
 					.setDescriptions("userSettings.createLink.description")
 			)
+		)
+		/**
+		 * Pity
+		 */
+		.addSubcommand((sub) =>
+			sub
+				.setNames("config.pity.name")
+				.setDescriptions("config.pity.description")
+				.addIntegerOption((option) =>
+					option
+						.setNames("config.pity.option.name")
+						.setDescriptions("config.pity.option.description")
+						.setRequired(false)
+						.setMinValue(0)
+				)
 		),
+
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
 		const { ul } = getLangAndConfig(client, interaction);
@@ -374,6 +391,8 @@ export const configuration = {
 				return await stripOOC(options, client, interaction, ul);
 			case t("editMe.name"):
 				return await editMeCommand(interaction, ul);
+			case t("config.pity.name"):
+				return await setPity(interaction, options, client, ul);
 		}
 	},
 };

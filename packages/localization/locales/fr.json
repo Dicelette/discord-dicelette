@@ -200,6 +200,16 @@
 		"logs": "Journalisation",
 		"name": "config",
 		"noTemplate": "Il n'y a pas de modèle configurée pour ce serveur.",
+		"pity": {
+			"delete": "La pitié est désactivé.",
+			"description": "Permet de compter le nombre d'échec consécutif et forcer une relance jusqu'à un succès.",
+			"name": "pitié",
+			"option": {
+				"description": "Nombre d'échec consécutif avant la pitié",
+				"name": "seuil"
+			},
+			"success": "La pitié est activé. Il faudra {{- pity}} échec consécutif avant qu'un jet soit relancé pour atteindre un succès.\n\n⚠️ **La pitié ne fonctionne uniquement sur les jets de comparaison.**"
+		},
 		"privateChan": "Channel des personnages privés",
 		"result": {
 			"desc": "Permet de sauvegarder tous les résultats de lancer dans un seul et même channel.",
@@ -725,8 +735,17 @@
 	},
 	"luckMeter": {
 		"count": {
+			"consecutive": {
+				"failure": "Série actuelle d'échecs",
+				"success": "Série actuelle de succès"
+			},
 			"desc": "Résultats connus de {{- user}}:",
 			"including": "Dont",
+			"longest": {
+				"failure": "Plus longue série d'échec consécutif",
+				"success": "Plus longue série de succès consécutif"
+			},
+			"none": "Aucune",
 			"note": "Les critiques sont inclus dans le décompte des jets normaux.",
 			"title": "bilan",
 			"total_one": "Total : {{count}} jet",
@@ -838,6 +857,11 @@
 		"steps": "Enregistrement de l'utilisateur - Page {{- page}}/{{- max}}",
 		"user": {
 			"description": "Entrez l'utilisateur attaché au personnage (id ou nom d'utilisateur global)"
+		}
+	},
+	"pity": {
+		"logs": {
+			"title": "Le jet a été relancé {{- nb}} fois."
 		}
 	},
 	"rAtq": {
