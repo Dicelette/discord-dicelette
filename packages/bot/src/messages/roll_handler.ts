@@ -146,11 +146,13 @@ export async function handleRollResult(
 		if (messageBefore) messageId = messageBefore.id;
 	}
 
-	const context = {
-		channelId: channel.id,
-		guildId: guild.id,
-		messageId,
-	};
+	const context = useContext
+		? {
+				channelId: channel.id,
+				guildId: guild.id,
+				messageId,
+			}
+		: undefined;
 
 	// Ensure we're not in a DM before using threadToSend
 	if (channel.type === Djs.ChannelType.DM) {
