@@ -26,7 +26,7 @@ import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import {
 	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
-	profiler,
+	profiler, triggerPity,
 } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
@@ -64,7 +64,7 @@ export async function rollWithInteraction(
 	const pityNb = client.criticalCount.get(interaction.guildId!, data.userId!)?.consecutive
 		?.failure;
 	const pityThreshold = client.settings.get(interaction.guildId!, "pity");
-	const pity = !!pityNb && !!pityThreshold && pityNb > pityThreshold;
+	const pity = triggerPity(pityThreshold, pityNb);
 	const result = getRoll(dice, pity);
 	if (!result) {
 		await reply(interaction, {
