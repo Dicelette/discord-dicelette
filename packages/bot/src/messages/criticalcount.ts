@@ -125,33 +125,39 @@ function removeCount(
 	criticalCount: CriticalCount,
 	userId: string,
 	guildId: string,
-	messageCount: Count
+	messageCount: Count,
+	isTrivial = false
 ) {
 	const existingCount = criticalCount.get(guildId, userId);
 	if (!existingCount) return; //we can't remove what doesn't exist
 
+	const consecutive = existingCount.consecutive ?? { failure: 0, success: 0 };
+	const newConsecutive = isTrivial
+		? consecutive
+		: {
+				// We remove only if we are in the consecutive serie
+				failure:
+					consecutive.failure > 0
+						? Math.max(
+								0,
+								consecutive.failure -
+									messageCount.failure -
+									messageCount.criticalFailure
+							)
+						: 0,
+				success:
+					consecutive.success > 0
+						? Math.max(
+								0,
+								consecutive.success -
+									messageCount.success -
+									messageCount.criticalSuccess
+							)
+						: 0,
+		  };
+
 	const newCount: Count = {
-		consecutive: {
-			// We remove only if we are in the consecutive serie
-			failure:
-				existingCount.consecutive && existingCount.consecutive.failure > 0
-					? Math.max(
-							0,
-							existingCount.consecutive.failure -
-								messageCount.failure -
-								messageCount.criticalFailure
-						)
-					: 0,
-			success:
-				existingCount.consecutive && existingCount.consecutive.success > 0
-					? Math.max(
-							0,
-							existingCount.consecutive.success -
-								messageCount.success -
-								messageCount.criticalSuccess
-						)
-					: 0,
-		},
+		consecutive: newConsecutive,
 		criticalFailure: Math.max(
 			0,
 			existingCount.criticalFailure - messageCount.criticalFailure
@@ -196,5 +202,5 @@ export function saveCount(
 		logger.trace("Is trivial?", { cacheKey, isTrivial, messageTimestamp: timeMin });
 	}
 	if (type === "add") addCount(criticalCount, userId, guildId, count, isTrivial);
-	else removeCount(criticalCount, userId, guildId, count);
+	else removeCount(criticalCount, userId, guildId, count, isTrivial);
 }
