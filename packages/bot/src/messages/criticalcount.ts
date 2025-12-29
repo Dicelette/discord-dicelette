@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -63,7 +64,8 @@ function addCount(
 	criticalCount: CriticalCount,
 	userId: string,
 	guildId: string,
-	messageCount: Count
+	messageCount: Count,
+	isTrivial = false
 ) {
 	const existingCount = criticalCount.get(guildId, userId);
 	if (!existingCount) {
@@ -77,7 +79,12 @@ function addCount(
 		failure: existingCount.failure + messageCount.failure,
 		success: existingCount.success + messageCount.success,
 	};
-	if (messageCount.failure || messageCount.criticalFailure) {
+
+	// We should ignore the consecutive if the comparison is trivial (as it will be always a success or fail)
+	if (isTrivial) {
+		newCount.consecutive = existingCount.consecutive ?? { failure: 0, success: 0 };
+		newCount.longestStreak = existingCount.longestStreak ?? { failure: 0, success: 0 };
+	} else if (messageCount.failure || messageCount.criticalFailure) {
 		newCount.consecutive = {
 			failure:
 				(existingCount.consecutive?.failure ?? 0) +
@@ -108,7 +115,9 @@ function addCount(
 			),
 		};
 	}
-	logger.trace(`Saving new count for user ${userId} in guild ${guildId}`, newCount);
+	logger.trace(
+		`Saving new count for user ${userId} in guild ${guildId} ${JSON.stringify(newCount)}`
+	);
 	criticalCount.set(guildId, newCount, userId);
 }
 
@@ -122,6 +131,27 @@ function removeCount(
 	if (!existingCount) return; //we can't remove what doesn't exist
 
 	const newCount: Count = {
+		consecutive: {
+			// We remove only if we are in the consecutive serie
+			failure:
+				existingCount.consecutive && existingCount.consecutive.failure > 0
+					? Math.max(
+							0,
+							existingCount.consecutive.failure -
+								messageCount.failure -
+								messageCount.criticalFailure
+						)
+					: 0,
+			success:
+				existingCount.consecutive && existingCount.consecutive.success > 0
+					? Math.max(
+							0,
+							existingCount.consecutive.success -
+								messageCount.success -
+								messageCount.criticalSuccess
+						)
+					: 0,
+		},
 		criticalFailure: Math.max(
 			0,
 			existingCount.criticalFailure - messageCount.criticalFailure
@@ -131,6 +161,8 @@ function removeCount(
 			existingCount.criticalSuccess - messageCount.criticalSuccess
 		),
 		failure: Math.max(0, existingCount.failure - messageCount.failure),
+		// longestStreak is a historical record; it is not modified during deletions.
+		longestStreak: existingCount.longestStreak ?? { failure: 0, success: 0 },
 		success: Math.max(0, existingCount.success - messageCount.success),
 	};
 	criticalCount.set(guildId, newCount, userId);
@@ -140,6 +172,7 @@ export function saveCount(
 	message: Djs.Message | Djs.PartialMessage,
 	criticalCount: CriticalCount,
 	guildId: string,
+	client: EClient,
 	type: "add" | "remove" = "add"
 ) {
 	const count = getTypeFroMessage(message);
@@ -149,6 +182,19 @@ export function saveCount(
 	//verify that the user is not a bot
 	const author = message.client.users.cache.get(userId);
 	if (!author) userId = message.client.user?.id ?? "0";
-	if (type === "add") addCount(criticalCount, userId, guildId, count);
+	const pity = client.settings.get(guildId, "pity");
+	let isTrivial = false;
+	//only check the cache if pity is enabled
+	if (pity) {
+		// Check if this roll has a trivial comparison
+		//use a cache + a prev key around the minute
+		const timeMin = Math.floor(message.createdTimestamp / 60000);
+		const cacheKey = `${guildId}:${userId}:${timeMin}`;
+		const prevCacheKey = `${guildId}:${userId}:${timeMin - 1}`;
+		const trivialCache = client.trivialCache;
+		isTrivial = trivialCache.has(cacheKey) ?? trivialCache.has(prevCacheKey) ?? false;
+		logger.trace("Is trivial?", { cacheKey, isTrivial, messageTimestamp: timeMin });
+	}
+	if (type === "add") addCount(criticalCount, userId, guildId, count, isTrivial);
 	else removeCount(criticalCount, userId, guildId, count);
 }

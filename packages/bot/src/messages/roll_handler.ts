@@ -81,6 +81,23 @@ export async function handleRollResult(
 		opposition,
 		statsPerSegment
 	);
+	const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
+
+	const enableCache = source.guild ? client.settings.get(source.guild.id, "pity") : undefined;
+	
+	if (result.compare?.trivial === true && enableCache) {
+		logger.trace("Caching trivial comparison for message");
+		//how to generate a key without the messageId? we should use the source
+		const guild = source.guildId ? source.guild : null;
+		if (guild) {
+			const timestampMin = Math.floor(source.createdTimestamp / 60000);
+			const cacheKey = `${guild.id}:${author.id}:${timestampMin}`;
+			logger.trace(cacheKey);
+			client.trivialCache.add(cacheKey);
+			// Auto-cleanup after 5 minutes
+			setTimeout(() => client.trivialCache.delete(cacheKey), 300000);
+		}
+	}
 
 	const parser = resultAsText.parser;
 	if (!parser) return;
@@ -88,7 +105,6 @@ export async function handleRollResult(
 	const guild = source instanceof Djs.Message ? source.guild : source.guild;
 	// If we're in DM (no guild), just reply directly without guild/thread handling
 	if (!guild) {
-		const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
 		return await replyToSource(
 			source,
 			resultAsText,
@@ -107,8 +123,6 @@ export async function handleRollResult(
 	if (!channel) return;
 	// Allow direct messages; only block deprecated GroupDM channels
 	if (channel.type === Djs.ChannelType.GroupDM) return;
-
-	const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
 
 	const channelName = "name" in channel ? (channel.name ?? "") : "";
 	const isRollChannel =
@@ -183,6 +197,8 @@ export async function handleRollResult(
 		client.settings
 	);
 
+	// Cache trivial comparison if present
+
 	// Find thread and create empty message in background
 	const thread = await threadToSend(
 		client.settings,
@@ -232,7 +248,6 @@ async function replyToSource(
 	hideResult?: boolean,
 	settings?: Settings
 ): Promise<Djs.Message | Djs.InteractionResponse> {
-	console.log(resultAsText.resultat?.pityLogs);
 	if (resultAsText.resultat?.pityLogs && source.guild && settings) {
 		const { ul } = resultAsText;
 		logger.trace(ul("pity.logs.title", { nb: resultAsText.resultat.pityLogs }));

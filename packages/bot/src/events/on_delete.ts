@@ -80,8 +80,17 @@ export const onDeleteMessage = (client: EClient): void => {
 		try {
 			if (!message.guild) return;
 			const messageId = message.id;
-			if (message.author?.bot && message.author.id === client.user?.id)
-				saveCount(message, client.criticalCount, message.guild.id, "remove");
+			if (message.author?.bot && message.author.id === client.user?.id) {
+				saveCount(message, client.criticalCount, message.guild.id, client, "remove");
+				// Clean up cache entry after processing
+				if (client.settings.get(message.guild.id, "pity")) {
+					const timeMin = Math.floor(message.createdTimestamp / 60000);
+					const cacheKey = `${message.guild.id}:${message.author.id}:${timeMin}`;
+					const prevCacheKey = `${message.guild.id}:${message.author.id}:${timeMin - 1}`;
+					client.trivialCache.delete(cacheKey);
+					client.trivialCache.delete(prevCacheKey);
+				}
+			}
 
 			//search channelID in database and delete it
 			const guildID = message.guild.id;

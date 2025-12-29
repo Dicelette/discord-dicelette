@@ -35,7 +35,7 @@ export default (client: EClient): void => {
 			const ul = ln(userLang);
 
 			if (message.author.bot && message.author.id === client.user?.id)
-				return saveCount(message, client.criticalCount, message.guild.id);
+				return saveCount(message, client.criticalCount, message.guild.id, client);
 			let content = message.content;
 			if (message.content.match(/^`.*`$/)) return await stripOOC(message, client, ul);
 			let author = message.author;
