@@ -59,11 +59,11 @@ function gaugeEmoji(type: "success" | "failure", value: number) {
 async function generateComponentsForBilan(
 	count: Count,
 	ul: Translation,
-	user: Djs.GuildMember,
+	member: Djs.GuildMember,
 	guild: Djs.Guild
 ) {
 	const totalRoll = count.success + count.failure;
-	const avatar = await fetchAvatarUrl(guild, user.user, user);
+	const avatar = await fetchAvatarUrl(guild, member.user, member);
 
 	const buildStatSection = (countType: "success" | "failure") => {
 		const lines = [
@@ -81,9 +81,8 @@ async function generateComponentsForBilan(
 		}
 
 		if (count.consecutive?.[countType] && count.consecutive[countType]! > 0) {
-			const emoji = gaugeEmoji(countType, count.consecutive[countType]!);
 			lines.push(
-				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${count.consecutive[countType]} ${count.consecutive[countType]! > 5 ? emoji : ""}`
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${count.consecutive[countType]} ${count.consecutive[countType]! > 5 ? gaugeEmoji(countType, count.consecutive[countType]!) : ""}`
 			);
 		} else {
 			lines.push(
@@ -102,7 +101,7 @@ async function generateComponentsForBilan(
 
 	const allLines = [
 		`# ${ul("luckMeter.count.title").toTitle()}`,
-		ul("luckMeter.count.desc", { user: Djs.userMention(user.id) }),
+		ul("luckMeter.count.desc", { user: Djs.userMention(member.id) }),
 		...buildStatSection("success"),
 		"",
 		...buildStatSection("failure"),
