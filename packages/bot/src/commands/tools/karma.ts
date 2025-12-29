@@ -80,9 +80,11 @@ async function generateComponentsForBilan(
 			);
 		}
 
-		if (count.consecutive?.[countType] && count.consecutive[countType]! > 0) {
+		const consecutive = count.consecutive?.[countType]
+		if (consecutive && consecutive > 0) {
+			
 			lines.push(
-				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${count.consecutive[countType]} ${count.consecutive[countType]! > 5 ? gaugeEmoji(countType, count.consecutive[countType]!) : ""}`
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${consecutive > 5 ? gaugeEmoji(countType, consecutive) : ""}`
 			);
 		} else {
 			lines.push(
@@ -90,9 +92,10 @@ async function generateComponentsForBilan(
 			);
 		}
 
-		if (count.longestStreak?.[countType]) {
+		const longestStreak = count.longestStreak?.[countType];
+		if (longestStreak && longestStreak > 0) {
 			lines.push(
-				`  - **${ul(`luckMeter.count.longest.${countType}`)}**${ul("common.space")}: ${count.longestStreak[countType]}`
+				`  - **${ul(`luckMeter.count.longest.${countType}`)}**${ul("common.space")}: ${longestStreak}`
 			);
 		}
 
