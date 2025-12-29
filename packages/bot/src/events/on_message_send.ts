@@ -13,7 +13,8 @@ import {
 	logger,
 	profiler,
 	REMOVER_PATTERN,
-	sentry, triggerPity,
+	sentry,
+	triggerPity,
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
@@ -66,7 +67,7 @@ export default (client: EClient): void => {
 			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
 				?.failure;
 			const pityThreshold = client.settings.get(message.guild.id, "pity");
-			const pity = triggerPity(pityThreshold, pityNb)
+			const pity = triggerPity(pityThreshold, pityNb);
 			logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
 			const isRoll = isRolling(content, userData, statsName, pity);
 

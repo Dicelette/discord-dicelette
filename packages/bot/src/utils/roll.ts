@@ -26,7 +26,8 @@ import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import {
 	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
-	profiler, triggerPity,
+	profiler,
+	triggerPity,
 } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";

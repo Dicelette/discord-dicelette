@@ -140,21 +140,17 @@ function removeCount(
 					consecutive.failure > 0
 						? Math.max(
 								0,
-								consecutive.failure -
-									messageCount.failure -
-									messageCount.criticalFailure
+								consecutive.failure - messageCount.failure - messageCount.criticalFailure
 							)
 						: 0,
 				success:
 					consecutive.success > 0
 						? Math.max(
 								0,
-								consecutive.success -
-									messageCount.success -
-									messageCount.criticalSuccess
+								consecutive.success - messageCount.success - messageCount.criticalSuccess
 							)
 						: 0,
-		  };
+			};
 
 	const newCount: Count = {
 		consecutive: newConsecutive,

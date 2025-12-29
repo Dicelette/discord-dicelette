@@ -117,21 +117,21 @@ export function allValueUndefOrEmptyString(obj: unknown): boolean {
  * @param {number} userFailNb Number of consecutive failures of the user
  * @returns {boolean} True if pity is triggered, False otherwise
  */
-export function triggerPity(threshold?: number, userFailNb?: number):boolean {
+export function triggerPity(threshold?: number, userFailNb?: number): boolean {
 	if (!threshold || !userFailNb) return false;
 	//at 75% of threshold, we trigger 75% chance to trigger pity
 	//at 100% of threshold, we trigger 100% chance to trigger pity
 	//otherwise, no pity
 	const triggerChance = Math.min(userFailNb / threshold, 1);
-	if (triggerChance <0.75) return false;
-	if (triggerChance >=1) return true;
+	if (triggerChance < 0.75) return false;
+	if (triggerChance >= 1) return true;
 	//the roll should be lower and lower when we approach the threshold so we need to set the max to something that decrease with triggerChance
 	const t = (triggerChance - 0.75) / 0.25; // normalise sur [0,1]
-  const alpha = 1;
+	const alpha = 1;
 	// Probability calculation
 	//starting at 0.5 when t=0, going to 1 when t=1
 	const p = 0.5 + 0.5 * t ** alpha;
-	
+
 	// Perform the random trial
 	const u = random.real(0, 1, false);
 	return u <= p;
