@@ -1,10 +1,10 @@
 import type { EClient } from "@dicelette/client";
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import { DATABASE_NAMES } from "commands";
+import { createCacheKey, DATABASE_NAMES } from "commands";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import * as Djs from "discord.js";
-import { saveCount, sendLogs } from "messages";
+import { getAuthor, saveCount, sendLogs } from "messages";
 
 export const onDeleteChannel = (client: EClient): void => {
 	client.on("channelDelete", async (channel) => {
@@ -84,11 +84,12 @@ export const onDeleteMessage = (client: EClient): void => {
 				saveCount(message, client.criticalCount, message.guild.id, client, "remove");
 				// Clean up cache entry after processing
 				if (client.settings.get(message.guild.id, "pity")) {
-					const timeMin = Math.floor(message.createdTimestamp / 60000);
-					const cacheKey = `${message.guild.id}:${message.author.id}:${timeMin}`;
-					const prevCacheKey = `${message.guild.id}:${message.author.id}:${timeMin - 1}`;
-					client.trivialCache.delete(cacheKey);
-					client.trivialCache.delete(prevCacheKey);
+					const userId = getAuthor(message);
+					if (userId) {
+						const { cacheKey, prevCacheKey } = createCacheKey(message, userId);
+						client.trivialCache.delete(cacheKey);
+						client.trivialCache.delete(prevCacheKey);
+					}
 				}
 			}
 

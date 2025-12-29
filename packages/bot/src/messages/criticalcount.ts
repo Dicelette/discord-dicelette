@@ -53,7 +53,7 @@ function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 	return count;
 }
 
-function getAuthor(message: Djs.Message | Djs.PartialMessage): string | undefined {
+export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | undefined {
 	if (message.interactionMetadata?.user && !message.content)
 		return message.interactionMetadata.user.id;
 	if (!message.content) return undefined;
