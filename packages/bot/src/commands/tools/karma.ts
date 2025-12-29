@@ -145,21 +145,7 @@ async function bilan(
 		});
 		return;
 	}
-
-	/**
-	const resultEmbed = new Djs.EmbedBuilder()
-		.setTitle(ul("luckMeter.count.title").toTitle())
-		.setThumbnail(await fetchAvatarUrl(interaction.guild!, user))
-		.setDescription(`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}`)
-		.addFields(generateFieldsForBilan(count, ul))
-		.setColor(Djs.Colors.Blurple)
-		.setFooter({ text: ul("luckMeter.count.total", { count: totalRoll }) })
-		.setTimestamp();
 	
-	await interaction.editReply({
-		embeds: [resultEmbed],
-	});
-	*/
 	const member = await interaction.guild!.members.fetch(user.id);
 	const components = await generateComponentsForBilan(
 		count,
