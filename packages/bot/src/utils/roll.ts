@@ -27,11 +27,11 @@ import {
 	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
 	profiler,
-	triggerPity,
 } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";
+import { triggerPity } from "../commands";
 import { findBestMatchingDice } from "./find_macro";
 
 /**

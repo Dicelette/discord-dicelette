@@ -14,12 +14,12 @@ import {
 	profiler,
 	REMOVER_PATTERN,
 	sentry,
-	triggerPity,
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
 import { getCritical } from "utils";
+import { triggerPity } from "../commands";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {

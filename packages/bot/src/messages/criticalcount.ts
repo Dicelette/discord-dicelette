@@ -3,7 +3,8 @@ import { findln } from "@dicelette/localization";
 import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-import { createCacheKey } from "utils";
+
+import { createCacheKey } from "../commands";
 
 /**
  * Get if the message is a success or a failure

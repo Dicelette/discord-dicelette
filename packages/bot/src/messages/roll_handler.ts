@@ -5,7 +5,7 @@ import type { DiscordTextChannel, Settings, Translation } from "@dicelette/types
 import { COMPILED_COMMENTS, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, reply, sendLogs, threadToSend } from "messages";
-import { createCacheKey } from "utils";
+import { createCacheKey } from "../commands";
 
 interface RollHandlerOptions {
 	/** Result of the dice roll */

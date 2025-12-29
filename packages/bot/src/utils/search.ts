@@ -4,6 +4,7 @@ import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError, sendLogs } from "messages";
 import { isValidChannel, isValidInteraction } from "utils";
+
 /**
  * Fetches and validates a Discord channel by ID within a guild context, handling errors and localization.
  *
@@ -66,14 +67,4 @@ export async function searchUserChannel(
 	}
 	if (thread.isThread() && thread.archived) await thread.setArchived(false);
 	return thread as DiscordChannel;
-}
-
-export function createCacheKey(
-	source: Djs.Message | Djs.PartialMessage | Djs.CommandInteraction,
-	userId: string
-) {
-	const timeMin = Math.floor(source.createdTimestamp / 60000);
-	const cacheKey = `${source.guildId}:${userId}:${source.channelId}:${timeMin}`;
-	const prevCacheKey = `${source.guildId}:${userId}:${timeMin - 1}`;
-	return { cacheKey, prevCacheKey, timeMin };
 }
