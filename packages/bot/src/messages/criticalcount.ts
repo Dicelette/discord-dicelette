@@ -191,7 +191,7 @@ export function saveCount(
 	//only check the cache if pity is enabled
 	if (pity) {
 		// Check if this roll has a trivial comparison
-		//use a cache + a prev key around the minute
+		// Check both the current minute's cache key and the previous minute's key to handle edge cases around minute boundaries.
 		const { cacheKey, prevCacheKey, timeMin } = createCacheKey(message, userId);
 		const trivialCache = client.trivialCache;
 		isTrivial = trivialCache.has(cacheKey) || trivialCache.has(prevCacheKey);

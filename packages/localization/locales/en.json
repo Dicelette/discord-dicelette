@@ -208,7 +208,7 @@
 				"description": "Number of consecutive failures before pity",
 				"name": "threshold"
 			},
-			"success": "Pity is enabled. It will take {{- pity}} consecutive failure before a roll is rerolled to achieve success.\n\n⚠️ **Pity only works on comparison rolls.**"
+			"success": "Pity is enabled. It will take {{- pity}} consecutive failures before a roll is rerolled to achieve success.\n\n⚠️ **Pity only works on comparison rolls.**"
 		},
 		"privateChan": "Private characters channel",
 		"result": {

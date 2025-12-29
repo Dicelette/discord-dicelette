@@ -90,7 +90,7 @@ export async function handleRollResult(
 
 	if (result.compare?.trivial === true && enableCache) {
 		logger.trace("Caching trivial comparison for message", result.compare);
-		//how to generate a key without the messageId? we should use the source
+		// Generate a cache key based on the source and author, without relying on messageId
 		const guild = source.guildId ? source.guild : null;
 		if (guild) {
 			const { cacheKey } = createCacheKey(source, author.id);
@@ -197,9 +197,7 @@ export async function handleRollResult(
 		hideResult,
 		client.settings
 	);
-
-	// Cache trivial comparison if present
-
+	
 	// Find thread and create empty message in background
 	const thread = await threadToSend(
 		client.settings,

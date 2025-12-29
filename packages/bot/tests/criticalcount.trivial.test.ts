@@ -29,7 +29,7 @@ function addCountLogic(
 		success: existing.success + messageCount.success,
 	};
 
-	// Si la comparaison est triviale, on ignore les séries consécutives
+	// If the comparison is trivial, we ignore consecutive series
 	if (isTrivial) {
 		newCount.consecutive = existing.consecutive ?? { failure: 0, success: 0 };
 		newCount.longestStreak = existing.longestStreak ?? { failure: 0, success: 0 };
