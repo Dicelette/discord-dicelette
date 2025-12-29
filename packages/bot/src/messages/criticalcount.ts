@@ -7,11 +7,10 @@ import type * as Djs from "discord.js";
 import { createCacheKey } from "../commands";
 
 /**
- * Get if the message is a success or a failure
- * @param message {Djs.Message} The message to check
- * @returns {"failure" | "success"} The type of the message
- * @example of template
- * - Simple message : `  Succès — 1d100 ⟶ [67] = [67] > 20`
+ * Extracts counts of critical and regular successes and failures from a Discord message's content.
+ *
+ * @param message - The Discord message to parse for roll outcome lines (Djs.Message or Djs.PartialMessage).
+ * @returns A Count object with `criticalFailure`, `criticalSuccess`, `failure`, and `success` fields representing the number of occurrences found in the message content.
  */
 function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 	const count: Count = {
@@ -53,6 +52,12 @@ function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 	return count;
 }
 
+/**
+ * Extracts the author user ID from a Discord message, if present.
+ *
+ * @param message - The message to inspect for an author identifier
+ * @returns The extracted user ID if found, `undefined` otherwise
+ */
 export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | undefined {
 	if (message.interactionMetadata?.user && !message.content)
 		return message.interactionMetadata.user.id;
@@ -62,6 +67,15 @@ export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | u
 	return match ? match?.[1] : undefined;
 }
 
+/**
+ * Update a user's cumulative counts for a guild by adding the provided message counts and adjusting consecutive and longest streaks.
+ *
+ * @param criticalCount - Store managing per-guild/per-user counts
+ * @param userId - ID of the user to update
+ * @param guildId - ID of the guild where the counts apply
+ * @param messageCount - Counts extracted from a single message to add
+ * @param isTrivial - When true, preserve existing consecutive and longestStreak values (do not modify streaks)
+ */
 function addCount(
 	criticalCount: CriticalCount,
 	userId: string,
@@ -123,6 +137,21 @@ function addCount(
 	criticalCount.set(guildId, newCount, userId);
 }
 
+/**
+ * Subtracts a message's counts from a user's stored counts for a guild.
+ *
+ * Adjusts the user's cumulative fields (criticalFailure, criticalSuccess, failure, success)
+ * by subtracting the provided `messageCount`, clamps each field at zero, and updates
+ * the stored consecutive values unless `isTrivial` is true. The historical `longestStreak`
+ * is preserved and not modified by removals. If no existing record is found for the user
+ * in the guild, the function returns without effect.
+ *
+ * @param criticalCount - The per-guild/per-user counts store to update.
+ * @param userId - The user identifier whose counts will be decreased.
+ * @param guildId - The guild identifier where the counts are stored.
+ * @param messageCount - The counts to subtract from the stored totals.
+ * @param isTrivial - When true, preserve existing `consecutive` values and do not adjust streak logic.
+ */
 function removeCount(
 	criticalCount: CriticalCount,
 	userId: string,
@@ -172,6 +201,19 @@ function removeCount(
 	criticalCount.set(guildId, newCount, userId);
 }
 
+/**
+ * Compute outcome counts from a message and update the per-guild user critical counts store.
+ *
+ * Determines the author for the message, computes the count of successes/failures (including criticals),
+ * checks the guild's "pity" setting and a per-user trivial-roll cache to decide whether the update is trivial,
+ * and then either adds to or removes from the provided CriticalCount store.
+ *
+ * @param message - The Discord message to analyze for roll outcomes
+ * @param criticalCount - The per-guild/per-user counts store to update
+ * @param guildId - The guild identifier where the message originated
+ * @param client - The bot client (used to read settings and the trivial-roll cache)
+ * @param type - Whether to add the computed counts to the store or remove them (`"add"` or `"remove"`)
+ */
 export function saveCount(
 	message: Djs.Message | Djs.PartialMessage,
 	criticalCount: CriticalCount,

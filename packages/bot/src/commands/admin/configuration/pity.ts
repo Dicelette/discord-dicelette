@@ -5,6 +5,16 @@ import { random } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { reply } from "messages";
 
+/**
+ * Set or clear the guild's pity threshold and reply with a localized confirmation.
+ *
+ * If a numeric pity value is provided, stores it in the guild settings under the key `"pity"` and replies with a success message including the value.
+ * If no pity value is provided (falsy), deletes the guild's pity setting and replies with a deletion message.
+ *
+ * @param options - Command options resolver used to read the pity integer option
+ * @param ul - Translation helper for localized reply messages
+ * @returns The reply sent to the interaction
+ */
 export async function setPity(
 	interaction: Djs.CommandInteraction,
 	options: Djs.CommandInteractionOptionResolver,
@@ -25,12 +35,13 @@ export async function setPity(
 }
 
 /**
- * Between 75% and 100% of threshold, the chance to trigger pity increases smoothly
- * from 50% (at 75% of threshold) up to 100% (at 100% of threshold).
- * When userFailNb >= threshold, pity is always triggered.
- * @param {number} threshold Threshold to trigger pity in the guild settings
- * @param {number} userFailNb Number of consecutive failures of the user
- * @returns {boolean} True if pity is triggered, False otherwise
+ * Determine whether the pity mechanic triggers for a user based on the configured threshold and the user's consecutive failures.
+ *
+ * Between 75% and 100% of the threshold, the trigger probability increases linearly from 50% to 100%; at or above the threshold pity always triggers, below 75% it never triggers.
+ *
+ * @param threshold - Guild-configured failure threshold for pity
+ * @param userFailNb - Number of consecutive failures for the user
+ * @returns `true` if pity triggers, `false` otherwise
  */
 export function triggerPity(threshold?: number, userFailNb?: number): boolean {
 	if (!threshold || !userFailNb) return false;
@@ -52,6 +63,13 @@ export function triggerPity(threshold?: number, userFailNb?: number): boolean {
 	return u <= p;
 }
 
+/**
+ * Build minute-granular cache keys for a user within the context of a guild channel message or interaction.
+ *
+ * @param source - The message or command interaction used to derive guildId, channelId and timestamp
+ * @param userId - The target user's ID included in the key prefix
+ * @returns An object containing `cacheKey` for the current minute, `prevCacheKey` for the previous minute, and `timeMin` (minutes since epoch)
+ */
 export function createCacheKey(
 	source: Djs.Message | Djs.PartialMessage | Djs.CommandInteraction,
 	userId: string

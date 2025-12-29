@@ -35,7 +35,13 @@ import { triggerPity } from "../commands";
 import { findBestMatchingDice } from "./find_macro";
 
 /**
- * create the roll dice, parse interaction etc... When the slash-commands is used for dice
+ * Create and execute a dice roll from a command interaction and present its result according to provided options.
+ *
+ * @param interaction - The originating command interaction
+ * @param dice - The dice expression or template string to roll
+ * @param client - The bot client and services used to resolve templates, settings, and state
+ * @param opts - Roll presentation and calculation options (e.g., user, charName, infoRoll, critical, customCritical, opposition, hideResult, silent, statsPerSegment)
+ * @returns The value returned by the roll result handler when the roll is presented, `undefined` otherwise
  */
 export async function rollWithInteraction(
 	interaction: Djs.CommandInteraction,

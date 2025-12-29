@@ -30,10 +30,11 @@ const ALL_OPTIONS: Options[] = [
 ];
 
 /**
- * Get the title for a given option
- * @param option The option to get the title for
- * @param ul The translation function
- * @returns The title for the option
+ * Return the localized title corresponding to the given option.
+ *
+ * @param option - The option key to localize
+ * @param ul - Translation helper that maps localization keys to strings
+ * @returns The localized title for `option`
  */
 function getTitle(option: Options, ul: Translation) {
 	const titles: Record<Options, string> = {
@@ -46,6 +47,13 @@ function getTitle(option: Options, ul: Translation) {
 	return titles[option];
 }
 
+/**
+ * Selects an emoji representing a consecutive success or failure streak.
+ *
+ * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
+ * @param value - The consecutive-streak length
+ * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji (`"😎"` or `"😔"`); for `value` > 5 and ≤ 10 the second emoji (`"🔥"` or `"💔"`); for `value` > 10 the third emoji (`"🐐"` or `"💀"`)
+ */
 function gaugeEmoji(type: "success" | "failure", value: number) {
 	const successEmoji = ["😎", "🔥", "🐐"];
 	const failureEmoji = ["😔", "💔", "💀"];
@@ -56,6 +64,15 @@ function gaugeEmoji(type: "success" | "failure", value: number) {
 	return "";
 }
 
+/**
+ * Build a component-based bilan (stat summary) display for a member's luck meter.
+ *
+ * @param count - The user's counts (expects `success`, `failure`, `criticalSuccess`, `criticalFailure`, optional `consecutive` and `longestStreak` objects).
+ * @param ul - Translation helper used to localize titles and labels.
+ * @param member - Guild member whose avatar and mention are shown.
+ * @param guild - Guild used to resolve the member's avatar URL.
+ * @returns An array containing a single `ContainerBuilder` configured with thumbnail, localized text sections, separators, and a final total line representing the member's bilan.
+ */
 async function generateComponentsForBilan(
 	count: Count,
 	ul: Translation,
@@ -128,10 +145,13 @@ async function generateComponentsForBilan(
 }
 
 /**
- * Display the count of successes and failures for a user
- * @param interaction The interaction that triggered the command
- * @param client The bot client
- * @param ul The translation function
+ * Shows a user's success and failure counts for the current guild using component-based output.
+ *
+ * If the user has no recorded counts, edits the reply with a localized error message.
+ *
+ * @param interaction - The command interaction used to read options and edit the deferred reply
+ * @param client - The bot client instance that stores user counts
+ * @param ul - Localization function for generating translated messages
  */
 async function bilan(
 	interaction: Djs.ChatInputCommandInteraction,
