@@ -83,8 +83,10 @@ export async function handleRollResult(
 	);
 	const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
 
-	const enableCache = source.guild ? client.settings.get(source.guild.id, "pity") : undefined;
-	
+	const enableCache = source.guild
+		? client.settings.get(source.guild.id, "pity")
+		: undefined;
+
 	if (result.compare?.trivial === true && enableCache) {
 		logger.trace("Caching trivial comparison for message");
 		//how to generate a key without the messageId? we should use the source
