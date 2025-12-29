@@ -331,7 +331,7 @@ export const configuration = {
 						.setNames("config.pity.option.name")
 						.setDescriptions("config.pity.option.description")
 						.setRequired(false)
-						.setMinValue(0)
+						.setMinValue(2)
 				)
 		),
 

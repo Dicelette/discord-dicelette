@@ -64,6 +64,16 @@ export async function searchUserChannel(
 		} else await sendLogs(msg, interaction.guild as Djs.Guild, guildData);
 		return;
 	}
-	if (thread.isThread() && thread.archived) thread.setArchived(false);
+	if (thread.isThread() && thread.archived) await thread.setArchived(false);
 	return thread as DiscordChannel;
+}
+
+export function createCacheKey(
+	source: Djs.Message | Djs.PartialMessage | Djs.CommandInteraction,
+	userId: string
+) {
+	const timeMin = Math.floor(source.createdTimestamp / 60000);
+	const cacheKey = `${source.guildId}:${userId}:${source.channelId}:${timeMin}`;
+	const prevCacheKey = `${source.guildId}:${userId}:${timeMin - 1}`;
+	return { cacheKey, prevCacheKey, timeMin };
 }

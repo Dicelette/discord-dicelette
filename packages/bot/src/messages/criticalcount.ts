@@ -3,6 +3,7 @@ import { findln } from "@dicelette/localization";
 import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
+import { createCacheKey } from "utils";
 
 /**
  * Get if the message is a success or a failure
@@ -190,9 +191,7 @@ export function saveCount(
 	if (pity) {
 		// Check if this roll has a trivial comparison
 		//use a cache + a prev key around the minute
-		const timeMin = Math.floor(message.createdTimestamp / 60000);
-		const cacheKey = `${guildId}:${userId}:${timeMin}`;
-		const prevCacheKey = `${guildId}:${userId}:${timeMin - 1}`;
+		const { cacheKey, prevCacheKey, timeMin } = createCacheKey(message, userId);
 		const trivialCache = client.trivialCache;
 		isTrivial = trivialCache.has(cacheKey) ?? trivialCache.has(prevCacheKey) ?? false;
 		logger.trace("Is trivial?", { cacheKey, isTrivial, messageTimestamp: timeMin });

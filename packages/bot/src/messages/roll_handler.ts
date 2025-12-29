@@ -5,6 +5,7 @@ import type { DiscordTextChannel, Settings, Translation } from "@dicelette/types
 import { COMPILED_COMMENTS, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { deleteAfter, findMessageBefore, reply, sendLogs, threadToSend } from "messages";
+import { createCacheKey } from "utils";
 
 interface RollHandlerOptions {
 	/** Result of the dice roll */
@@ -88,13 +89,11 @@ export async function handleRollResult(
 		: undefined;
 
 	if (result.compare?.trivial === true && enableCache) {
-		logger.trace("Caching trivial comparison for message");
+		logger.trace("Caching trivial comparison for message", result.compare);
 		//how to generate a key without the messageId? we should use the source
 		const guild = source.guildId ? source.guild : null;
 		if (guild) {
-			const timestampMin = Math.floor(source.createdTimestamp / 60000);
-			const cacheKey = `${guild.id}:${author.id}:${timestampMin}`;
-			logger.trace(cacheKey);
+			const { cacheKey } = createCacheKey(source, author.id);
 			client.trivialCache.add(cacheKey);
 			// Auto-cleanup after 5 minutes
 			setTimeout(() => client.trivialCache.delete(cacheKey), 300000);
