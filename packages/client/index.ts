@@ -49,8 +49,8 @@ export class EClient extends Djs.Client {
 	 * - Used to avoid updating consecutive streak on trivial rolls
 	 * - Also and more important, prevent the pity to trigger if an user use a "fake" failure (`1d10>11` for example)
 	 * @important **Only used if pity is enabled in the server settings**
-	 * @key `guildId:authorId:(timestamp/60_000)`
-	 * @key `guildId:authorId:(timestamp/60_000 - 1)` *(to avoid edge cases around minute changes)*
+	 * @key `guildId:authorId:channelId:(timestamp/60_000)`
+	 * @key `guildId:authorId:channelId:(timestamp/60_000 - 1)` *(to avoid edge cases around minute changes)*
 	 */
 	public trivialCache: Set<string> = new Set();
 

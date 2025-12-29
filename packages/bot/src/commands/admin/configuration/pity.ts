@@ -56,8 +56,9 @@ export function createCacheKey(
 	source: Djs.Message | Djs.PartialMessage | Djs.CommandInteraction,
 	userId: string
 ) {
+	const prefix = `${source.guildId}:${userId}:${source.channelId}`
 	const timeMin = Math.floor(source.createdTimestamp / 60000);
-	const cacheKey = `${source.guildId}:${userId}:${source.channelId}:${timeMin}`;
-	const prevCacheKey = `${source.guildId}:${userId}:${timeMin - 1}`;
+	const cacheKey = `${prefix}:${timeMin}`;
+	const prevCacheKey = `${prefix}:${timeMin - 1}`;
 	return { cacheKey, prevCacheKey, timeMin };
 }
