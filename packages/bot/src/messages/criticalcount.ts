@@ -102,10 +102,7 @@ function addCount(
 		newCount.longestStreak = existingCount.longestStreak ?? { failure: 0, success: 0 };
 	} else if (messageCount.failure || messageCount.criticalFailure) {
 		newCount.consecutive = {
-			failure:
-				(existingCount.consecutive?.failure ?? 0) +
-				messageCount.failure +
-				messageCount.criticalFailure,
+			failure: (existingCount.consecutive?.failure ?? 0) + messageCount.failure,
 			success: 0,
 		};
 		newCount.longestStreak = {
@@ -118,10 +115,7 @@ function addCount(
 	} else {
 		newCount.consecutive = {
 			failure: 0,
-			success:
-				(existingCount.consecutive?.success ?? 0) +
-				messageCount.success +
-				messageCount.criticalSuccess,
+			success: (existingCount.consecutive?.success ?? 0) + messageCount.success,
 		};
 		newCount.longestStreak = {
 			failure: existingCount.longestStreak?.failure ?? 0,
@@ -169,17 +163,11 @@ function removeCount(
 				// We remove only if we are in the consecutive serie
 				failure:
 					consecutive.failure > 0
-						? Math.max(
-								0,
-								consecutive.failure - messageCount.failure - messageCount.criticalFailure
-							)
+						? Math.max(0, consecutive.failure - messageCount.failure)
 						: 0,
 				success:
 					consecutive.success > 0
-						? Math.max(
-								0,
-								consecutive.success - messageCount.success - messageCount.criticalSuccess
-							)
+						? Math.max(0, consecutive.success - messageCount.success)
 						: 0,
 			};
 
