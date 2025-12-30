@@ -254,7 +254,9 @@ export class ResultAsText {
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
-		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join("\n ");
+		// Use double space indentation when there's a comment, single space otherwise
+		const separator = hasComment ? "\n  " : "\n ";
+		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join(separator);
 		// If comment contains only whitespace/newline, don't add extra space
 		if (hasComment) return ` ${comment} ${joinedRes.trimEnd()}`;
 
