@@ -97,11 +97,10 @@ async function generateComponentsForBilan(
 			);
 		}
 
-		const consecutive = count.consecutive?.[countType]
+		const consecutive = count.consecutive?.[countType];
 		if (consecutive && consecutive > 0) {
-			
 			lines.push(
-				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${consecutive > 5 ? gaugeEmoji(countType, consecutive) : ""}`
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${consecutive > 1 ? gaugeEmoji(countType, consecutive) : ""}`
 			);
 		} else {
 			lines.push(
@@ -167,7 +166,7 @@ async function bilan(
 		});
 		return;
 	}
-	
+
 	const member = await interaction.guild!.members.fetch(user.id);
 	const components = await generateComponentsForBilan(
 		count,
