@@ -55,6 +55,7 @@ function getTitle(option: Options, ul: Translation) {
  * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji (`"😎"` or `"😔"`); for `value` > 5 and ≤ 10 the second emoji (`"🔥"` or `"💔"`); for `value` > 10 the third emoji (`"🐐"` or `"💀"`)
  */
 function gaugeEmoji(type: "success" | "failure", value: number) {
+	if (value <= 1) return "";
 	const successEmoji = ["😎", "🔥", "🐐"];
 	const failureEmoji = ["😔", "💔", "💀"];
 	const emoji = type === "success" ? successEmoji : failureEmoji;
@@ -100,7 +101,7 @@ async function generateComponentsForBilan(
 		const consecutive = count.consecutive?.[countType];
 		if (consecutive && consecutive > 0) {
 			lines.push(
-				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${consecutive > 1 ? gaugeEmoji(countType, consecutive) : ""}`
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${gaugeEmoji(countType, consecutive)}`
 			);
 		} else {
 			lines.push(
