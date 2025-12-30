@@ -280,10 +280,10 @@ export class ResultAsText {
 		};
 	} {
 		let msgSuccess = "";
-		let total = 0;
-		const natural: number[] = [];
-		let isCritical: undefined | "failure" | "success" | "custom";
-		let successOrFailure = "";
+		let lastCriticalState: {
+			isCritical?: "failure" | "success" | "custom";
+			successOrFailure?: string;
+		} = {};
 
 		for (const r of messageResult) {
 			if (r.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
@@ -291,9 +291,11 @@ export class ResultAsText {
 				continue;
 			}
 
+			const natural: number[] = [];
+			let isCritical: undefined | "failure" | "success" | "custom";
 			const result = this.roll(r, opposition);
-			total = result.total;
-			successOrFailure = result.successOrFailure;
+			const total = result.total;
+			let successOrFailure = result.successOrFailure;
 			const oldCompare = result.oldCompare;
 
 			this.naturalDice(r, natural);
@@ -302,9 +304,10 @@ export class ResultAsText {
 			if (criticalResult) {
 				successOrFailure = criticalResult.successOrFailure;
 				isCritical = criticalResult.isCritical;
-			}
+				lastCriticalState = { ...criticalResult };
+			} else lastCriticalState = { isCritical: undefined, successOrFailure };
 
-			const messageFormatted = this.display(
+			msgSuccess += this.display(
 				r,
 				total,
 				oldCompare,
@@ -313,11 +316,9 @@ export class ResultAsText {
 				successOrFailure,
 				customCritical
 			);
-			msgSuccess += messageFormatted;
-			total = 0;
 		}
 
-		return { criticalState: { isCritical, successOrFailure }, msgSuccess };
+		return { criticalState: lastCriticalState, msgSuccess };
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
@@ -365,13 +366,23 @@ export class ResultAsText {
 		| { successOrFailure: string; isCritical: "failure" | "success" | "custom" }
 		| undefined {
 		if (critical) {
-			if (critical.failure && natural.includes(critical.failure))
+			// Some templates may store critical thresholds as strings; coerce to numbers for comparison
+			const failure =
+				critical.failure !== undefined && !Number.isNaN(Number(critical.failure))
+					? Number(critical.failure)
+					: undefined;
+			const success =
+				critical.success !== undefined && !Number.isNaN(Number(critical.success))
+					? Number(critical.success)
+					: undefined;
+
+			if (failure !== undefined && natural.includes(failure))
 				return {
 					isCritical: "failure",
 					successOrFailure: `**${this.ul("roll.critical.failure")}**`,
 				};
 
-			if (critical.success && natural.includes(critical.success))
+			if (success !== undefined && natural.includes(success))
 				return {
 					isCritical: "success",
 					successOrFailure: `**${this.ul("roll.critical.success")}**`,

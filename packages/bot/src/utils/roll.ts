@@ -26,6 +26,7 @@ import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import {
 	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
+	logger,
 	profiler,
 } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
@@ -385,5 +386,18 @@ export async function getCritical(
 				serverData,
 			};
 	}
-	return { criticalsFromDice, serverData };
+
+	// Only apply server criticals (basic success/failure thresholds) if the dice type matches
+	// This prevents criticals from being applied to incorrect dice types
+	const diceMatches =
+		serverData && includeDiceType(dice, serverData.diceType, !!userData?.stats);
+	logger.trace("Dice matches server template dice type:", {
+		dice,
+		diceMatches,
+		serverDiceType: serverData?.diceType,
+	});
+	return {
+		criticalsFromDice,
+		serverData: diceMatches ? serverData : undefined,
+	};
 }

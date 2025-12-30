@@ -86,6 +86,8 @@ export default (client: EClient): void => {
 				rollCustomCriticalsFromDice(content, ul)
 			);
 
+			logger.trace(criticalsFromDice, serverData);
+
 			const opposition = parseComparator(content, userData?.stats, infoRoll);
 
 			// Build infoRoll using helper to recover original accented name if available

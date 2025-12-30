@@ -626,7 +626,14 @@ export function findStatInDiceFormula(
 }
 
 export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
+	logger.trace("Include dice type check:", { dice, diceType, userStats });
 	if (!diceType) return false;
+	logger.trace("Dice type to find:", diceType, "in dice:", dice);
+
+	// Normalize leading implicit single dice: treat `1d100` and `d100` as equivalent
+	const normalizeSingleDie = (str: string) => str.replace(/\b1d(\d+)/gi, "d$1");
+	diceType = normalizeSingleDie(diceType);
+	dice = normalizeSingleDie(dice);
 	if (userStats && diceType.includes("$")) {
 		//replace the $ in the diceType by a regex (like .+?)
 		diceType = diceType.replace("$", ".+?");

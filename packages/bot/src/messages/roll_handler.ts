@@ -85,7 +85,7 @@ export async function handleRollResult(
 		? client.settings.get(source.guild.id, "pity")
 		: undefined;
 
-	if ((result.compare?.trivial === true || result.trivial === true) && enableCache) {
+	if ((result.compare?.trivial === true || result?.trivial === true) && enableCache) {
 		logger.trace("Caching trivial comparison for message", result.compare);
 		// Generate a cache key based on the source and author, without relying on messageId
 		const guild = source.guildId ? source.guild : null;
