@@ -194,7 +194,7 @@ export async function handleRollResult(
 		hideResult,
 		client.settings
 	);
-	
+
 	// Find thread and create empty message in background
 	const thread = await threadToSend(
 		client.settings,
