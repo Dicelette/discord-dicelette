@@ -396,4 +396,4 @@ export const configuration = {
 		}
 	},
 };
-export { createCacheKey, triggerPity } from "./pity";
+export { clearCacheKey, createCacheKey, triggerPity } from "./pity";
