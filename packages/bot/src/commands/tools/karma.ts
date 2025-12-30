@@ -139,7 +139,7 @@ async function generateComponentsForBilan(
 				sep.setSpacing(Djs.SeparatorSpacingSize.Small).setDivider(true)
 			)
 			.addTextDisplayComponents((text) =>
-				text.setContent(`-# __${ul("luckMeter.count.total", { count: totalRoll })}__`)
+				text.setContent(`-# __${ul("common.total", { count: totalRoll })}__`)
 			),
 	];
 }
