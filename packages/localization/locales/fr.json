@@ -199,7 +199,7 @@
 		},
 		"logs": "Journalisation",
 		"name": "config",
-		"noTemplate": "Il n'y a pas de modèle configurée pour ce serveur.",
+		"noTemplate": "Il n'y a pas de modèle configuré pour ce serveur.",
 		"pity": {
 			"delete": "La pitié a été désactivée.",
 			"description": "Permet de compter le nombre d'échec consécutif et forcer une relance jusqu'à un succès.",
@@ -742,8 +742,8 @@
 			"desc": "Résultats connus de {{- user}}:",
 			"including": "Dont",
 			"longest": {
-				"failure": "Plus longue série d'échec consécutif",
-				"success": "Plus longue série de succès consécutif"
+				"failure": "Plus longue série d'échecs consécutifs",
+				"success": "Plus longue série de succès consécutifs"
 			},
 			"none": "Aucune",
 			"note": "Les critiques sont inclus dans le décompte des jets normaux.",
