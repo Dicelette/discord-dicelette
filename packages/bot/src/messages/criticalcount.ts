@@ -64,7 +64,7 @@ export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | u
 	if (!message.content) return undefined;
 	const regAuthor = /\*<?@(.*?)>?\*/;
 	const match = regAuthor.exec(message.content);
-	return match ? match?.[1] : undefined;
+	return match?.[1];
 }
 
 /**
