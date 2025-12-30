@@ -19,6 +19,7 @@ import { getCharFromText, getUserFromMessage } from "database";
 import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
 import { getCritical } from "utils";
+import { triggerPity } from "../commands";
 import { isApiError } from "./on_error";
 
 export default (client: EClient): void => {
@@ -35,7 +36,7 @@ export default (client: EClient): void => {
 			const ul = ln(userLang);
 
 			if (message.author.bot && message.author.id === client.user?.id)
-				return saveCount(message, client.criticalCount, message.guild.id);
+				return saveCount(message, client.criticalCount, message.guild.id, client);
 			let content = message.content;
 			if (message.content.match(/^`.*`$/)) return await stripOOC(message, client, ul);
 			let author = message.author;
@@ -63,7 +64,12 @@ export default (client: EClient): void => {
 			}
 			const ctx = getGuildContext(client, message.guild.id);
 			const statsName = ctx?.templateID?.statsName ?? [];
-			const isRoll = isRolling(content, userData, statsName);
+			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
+				?.failure;
+			const pityThreshold = client.settings.get(message.guild.id, "pity");
+			const pity = triggerPity(pityThreshold, pityNb);
+			logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
+			const isRoll = isRolling(content, userData, statsName, pity);
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);

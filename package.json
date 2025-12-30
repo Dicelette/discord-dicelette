@@ -1,80 +1,80 @@
 {
-	"name": "dicelette",
-	"version": "2.30.9",
-	"private": true,
-	"author": "",
-	"license": "GNU GPLv3",
-	"keywords": [],
-	"engineStrict": true,
-	"engines": {
-		"node": "^20.0.0"
-	},
-	"scripts": {
-		"analyze": "pnpm --filter @testing/analyzeroll run analyze",
-		"build": "pnpm run --recursive build",
-		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-		"lint": "biome check --write ./packages/ --unsafe",
-		"pm2:delete": "pm2 delete dicelette",
-		"pm2:restart": "pnpm run build && pm2 restart dicelette",
-		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
-		"pm2:stop": "pm2 stop dicelette",
-		"predev": "pnpm run --recursive prebuild",
-		"prepare": "husky",
-		"prerelease": "pnpm run --recursive tsc",
-		"release": "commit-and-tag-version",
-		"test": "pnpm -r test"
-	},
-	"dependencies": {
-		"@dicelette/core": "^1.22.3",
-		"@sentry/node": "^10.31.0",
-		"@sentry/profiling-node": "^10.31.0",
-		"@types/node": "^22.19.3",
-		"dedent": "^1.7.1",
-		"discord.js": "14.25.0",
-		"dotenv": "^17.2.3",
-		"tslog": "^4.10.2",
-		"tsx": "^4.21.0",
-		"uniformize": "^2.5.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.3.10",
-		"commit-and-tag-version": "^12.6.1",
-		"cross-env": "^7.0.3",
-		"husky": "^9.1.7",
-		"i18next": "^25.7.3",
-		"rimraf": "^6.1.2",
-		"ts-loader": "^9.5.4",
-		"tsc-alias": "^1.8.16",
-		"tsconfig-paths": "^4.2.0",
-		"typescript": "^5.9.3",
-		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "^4.0.16"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"@sentry-internal/node-cpu-profiler",
-			"better-sqlite3",
-			"canvas",
-			"esbuild"
-		]
-	},
-	"commit-and-tag-version": {
-		"bumpFiles": [
-			{
-				"filename": "packages/bot/package.json",
-				"type": "json"
-			},
-			{
-				"filename": "package.json",
-				"type": "json"
-			},
-			{
-				"filename": "packages/utils/package.json",
-				"type": "json"
-			}
-		],
-		"t": ""
-	}
+  "name": "dicelette",
+  "version": "2.30.9",
+  "private": true,
+  "author": "",
+  "license": "GNU GPLv3",
+  "keywords": [],
+  "engineStrict": true,
+  "engines": {
+    "node": "^20.0.0"
+  },
+  "scripts": {
+    "analyze": "pnpm --filter @testing/analyzeroll run analyze",
+    "build": "pnpm run --recursive build",
+    "dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+    "dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+    "lint": "biome check --write ./packages/ --unsafe",
+    "pm2:delete": "pm2 delete dicelette",
+    "pm2:restart": "pnpm run build && pm2 restart dicelette",
+    "pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
+    "pm2:stop": "pm2 stop dicelette",
+    "predev": "pnpm run --recursive prebuild",
+    "prepare": "husky",
+    "prerelease": "pnpm run --recursive tsc",
+    "release": "commit-and-tag-version",
+    "test": "pnpm -r test"
+  },
+  "dependencies": {
+    "@dicelette/core": "^1.22.3",
+    "@sentry/node": "^10.31.0",
+    "@sentry/profiling-node": "^10.31.0",
+    "@types/node": "^22.19.3",
+    "dedent": "^1.7.1",
+    "discord.js": "14.25.0",
+    "dotenv": "^17.2.3",
+    "tslog": "^4.10.2",
+    "tsx": "^4.21.0",
+    "uniformize": "^2.5.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.10",
+    "commit-and-tag-version": "^12.6.1",
+    "cross-env": "^7.0.3",
+    "husky": "^9.1.7",
+    "i18next": "^25.7.3",
+    "rimraf": "^6.1.2",
+    "ts-loader": "^9.5.4",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.16"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "@sentry-internal/node-cpu-profiler",
+      "better-sqlite3",
+      "canvas",
+      "esbuild"
+    ]
+  },
+  "commit-and-tag-version": {
+    "bumpFiles": [
+      {
+        "filename": "packages/bot/package.json",
+        "type": "json"
+      },
+      {
+        "filename": "package.json",
+        "type": "json"
+      },
+      {
+        "filename": "packages/utils/package.json",
+        "type": "json"
+      }
+    ],
+    "t": ""
+  }
 }

@@ -30,10 +30,11 @@ const ALL_OPTIONS: Options[] = [
 ];
 
 /**
- * Get the title for a given option
- * @param option The option to get the title for
- * @param ul The translation function
- * @returns The title for the option
+ * Return the localized title corresponding to the given option.
+ *
+ * @param option - The option key to localize
+ * @param ul - Translation helper that maps localization keys to strings
+ * @returns The localized title for `option`
  */
 function getTitle(option: Options, ul: Translation) {
 	const titles: Record<Options, string> = {
@@ -46,43 +47,111 @@ function getTitle(option: Options, ul: Translation) {
 	return titles[option];
 }
 
-function generateFieldsForBilan(count: Count, ul: Translation) {
-	const totalRoll = count.success + count.failure;
-	const fields: Djs.EmbedField[] = [
-		{
-			inline: true,
-			name: ul("roll.success"),
-			value: `${count.success} (${percentage(count.success, totalRoll)}%)`,
-		},
-	];
-	if (count.criticalSuccess > 0) {
-		fields.push({
-			inline: true,
-			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}`,
-			value: `${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`,
-		});
-	}
-	fields.push({ inline: false, name: "\u200B", value: "\u200B" });
-	fields.push({
-		inline: true,
-		name: ul("roll.failure"),
-		value: `${count.failure} (${percentage(count.failure, totalRoll)}%)`,
-	});
-	if (count.criticalFailure > 0) {
-		fields.push({
-			inline: true,
-			name: `${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}`,
-			value: `${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`,
-		});
-	}
-	return fields;
+/**
+ * Selects an emoji representing a consecutive success or failure streak.
+ *
+ * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
+ * @param value - The consecutive-streak length
+ * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji (`"😎"` or `"😔"`); for `value` > 5 and ≤ 10 the second emoji (`"🔥"` or `"💔"`); for `value` > 10 the third emoji (`"🐐"` or `"💀"`)
+ */
+function gaugeEmoji(type: "success" | "failure", value: number) {
+	if (value <= 1) return "";
+	const successEmoji = ["😎", "🔥", "🐐"];
+	const failureEmoji = ["😔", "💔", "💀"];
+	const emoji = type === "success" ? successEmoji : failureEmoji;
+	if (value > 1 && value <= 5) return emoji[0];
+	if (value > 5 && value <= 10) return emoji[1];
+	if (value > 10) return emoji[2];
+	return "";
 }
 
 /**
- * Display the count of successes and failures for a user
- * @param interaction The interaction that triggered the command
- * @param client The bot client
- * @param ul The translation function
+ * Build a component-based bilan (stat summary) display for a member's luck meter.
+ *
+ * @param count - The user's counts (expects `success`, `failure`, `criticalSuccess`, `criticalFailure`, optional `consecutive` and `longestStreak` objects).
+ * @param ul - Translation helper used to localize titles and labels.
+ * @param member - Guild member whose avatar and mention are shown.
+ * @param guild - Guild used to resolve the member's avatar URL.
+ * @returns An array containing a single `ContainerBuilder` configured with thumbnail, localized text sections, separators, and a final total line representing the member's bilan.
+ */
+async function generateComponentsForBilan(
+	count: Count,
+	ul: Translation,
+	member: Djs.GuildMember,
+	guild: Djs.Guild
+) {
+	const totalRoll = count.success + count.failure;
+	const avatar = await fetchAvatarUrl(guild, member.user, member);
+
+	const buildStatSection = (countType: "success" | "failure") => {
+		const lines = [
+			`- __**${ul(`roll.${countType}`)}**__${ul("common.space")}: ${count[countType]} (${percentage(count[countType], totalRoll)}%)`,
+		];
+
+		if (countType === "success" && count.criticalSuccess > 0) {
+			lines.push(
+				`  - **${ul("luckMeter.count.including")} ${ul("roll.critical.success").toLowerCase()}**${ul("common.space")}: ${count.criticalSuccess} (${percentage(count.criticalSuccess, totalRoll)}%)`
+			);
+		} else if (countType === "failure" && count.criticalFailure > 0) {
+			lines.push(
+				`  - **${ul("luckMeter.count.including")} ${ul("roll.critical.failure").toLowerCase()}**${ul("common.space")}: ${count.criticalFailure} (${percentage(count.criticalFailure, totalRoll)}%)`
+			);
+		}
+
+		const consecutive = count.consecutive?.[countType];
+		if (consecutive && consecutive > 0) {
+			lines.push(
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${gaugeEmoji(countType, consecutive)}`
+			);
+		} else {
+			lines.push(
+				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${ul("common.noSet")}`
+			);
+		}
+
+		const longestStreak = count.longestStreak?.[countType];
+		if (longestStreak && longestStreak > 0) {
+			lines.push(
+				`  - **${ul(`luckMeter.count.longest.${countType}`)}**${ul("common.space")}: ${longestStreak}`
+			);
+		}
+
+		return lines;
+	};
+
+	const allLines = [
+		`# ${ul("luckMeter.count.title").toTitle()}`,
+		ul("luckMeter.count.desc", { user: Djs.userMention(member.id) }),
+		...buildStatSection("success"),
+		"",
+		...buildStatSection("failure"),
+	];
+
+	return [
+		new Djs.ContainerBuilder()
+			.setAccentColor(generateRandomColor())
+			.addSectionComponents((section) =>
+				section
+					.setThumbnailAccessory((access) => access.setURL(avatar))
+					.addTextDisplayComponents((text) => text.setContent(allLines.join("\n")))
+			)
+			.addSeparatorComponents((sep) =>
+				sep.setSpacing(Djs.SeparatorSpacingSize.Small).setDivider(true)
+			)
+			.addTextDisplayComponents((text) =>
+				text.setContent(`-# __${ul("luckMeter.count.total", { count: totalRoll })}__`)
+			),
+	];
+}
+
+/**
+ * Shows a user's success and failure counts for the current guild using component-based output.
+ *
+ * If the user has no recorded counts, edits the reply with a localized error message.
+ *
+ * @param interaction - The command interaction used to read options and edit the deferred reply
+ * @param client - The bot client instance that stores user counts
+ * @param ul - Localization function for generating translated messages
  */
 async function bilan(
 	interaction: Djs.ChatInputCommandInteraction,
@@ -99,19 +168,17 @@ async function bilan(
 		return;
 	}
 
-	const totalRoll = count.success + count.failure;
-
-	const resultEmbed = new Djs.EmbedBuilder()
-		.setTitle(ul("luckMeter.count.title").toTitle())
-		.setThumbnail(await fetchAvatarUrl(interaction.guild!, user))
-		.setDescription(`${ul("luckMeter.count.desc", { user: Djs.userMention(user.id) })}`)
-		.addFields(generateFieldsForBilan(count, ul))
-		.setColor(Djs.Colors.Blurple)
-		.setFooter({ text: ul("luckMeter.count.total", { count: totalRoll }) })
-		.setTimestamp();
-
+	const member = await interaction.guild!.members.fetch(user.id);
+	const components = await generateComponentsForBilan(
+		count,
+		ul,
+		member,
+		interaction.guild!
+	);
 	await interaction.editReply({
-		embeds: [resultEmbed],
+		allowedMentions: { parse: [], repliedUser: false, roles: [], users: [] },
+		components,
+		flags: Djs.MessageFlags.IsComponentsV2,
 	});
 }
 

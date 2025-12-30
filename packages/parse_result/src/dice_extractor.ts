@@ -93,10 +93,20 @@ export function processChainedComments(
 	};
 }
 
+/**
+ * Execute a cleaned dice roll from given content or an explicit bracketed roll and return the roll result.
+ *
+ * @param content - Original message content containing a dice expression and optional comment markers
+ * @param bracketRoll - Optional explicit bracketed dice expression to prioritize over `content`
+ * @param infoRoll - Optional metadata about the roll (e.g., resolved stat name) to include in the result
+ * @param pity - Optional flag passed to the underlying roll engine to alter roll behavior
+ * @returns An object with `resultat` containing the roll result (if the roll ran) and optional `infoRoll`, or `undefined` when the content is invalid or an error occurred
+ */
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
-	infoRoll?: string
+	infoRoll?: string,
+	pity?: boolean
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
@@ -110,7 +120,7 @@ export function performDiceRoll(
 			.replace(/ @\w+/, "")
 			.trimEnd();
 		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
-		return { infoRoll, resultat: roll(rollContent) };
+		return { infoRoll, resultat: roll(rollContent, undefined, pity) };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -129,10 +139,22 @@ export function applyCommentsToResult(
 	return result;
 }
 
+/**
+ * Process a chained dice expression (supports shared segments and stat substitutions) and execute the resulting roll.
+ *
+ * Replaces stat tokens using the provided user stats, cleans global comments and opposition clauses, executes the roll (honoring the optional `pity` flag), and attaches comment/info metadata when appropriate.
+ *
+ * @param content - The raw dice expression to process (may include chained segments, global comments, opposition, and stat tokens)
+ * @param userData - Optional user data containing `stats` to substitute into the formula
+ * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
+ * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
+ */
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
-	statsName?: string[]
+	statsName?: string[],
+	pity?: boolean
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -173,7 +195,7 @@ export function processChainedDiceRoll(
 	try {
 		// Remove critical blocks before rolling
 		const cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const rollResult = roll(cleaned);
+		const rollResult = roll(cleaned, undefined, pity);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
 		// For chained rolls with & and ;, only add comment if it's a true # comment
@@ -189,10 +211,20 @@ export function processChainedDiceRoll(
 	}
 }
 
+/**
+ * Determine whether a message contains a dice roll and, if so, extract, process (including stat substitution and chained/shared syntax), and execute the roll.
+ *
+ * @param content - The raw message or formula to analyze for dice expressions
+ * @param userData - Optional user data containing stats used to substitute stat tokens in formulas
+ * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
+ * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
+ */
 export function isRolling(
 	content: string,
 	userData?: UserData,
-	statsName?: string[]
+	statsName?: string[],
+	pity?: boolean
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -267,7 +299,12 @@ export function isRolling(
 
 	if (diceData.bracketRoll) {
 		const cleanedForRoll = processedContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const diceRoll = performDiceRoll(cleanedForRoll, diceData.bracketRoll, res?.infoRoll);
+		const diceRoll = performDiceRoll(
+			cleanedForRoll,
+			diceData.bracketRoll,
+			res?.infoRoll,
+			pity
+		);
 		if (diceRoll?.resultat)
 			return {
 				detectRoll: diceData.bracketRoll,
@@ -284,7 +321,8 @@ export function isRolling(
 		const diceRoll = processChainedDiceRoll(
 			originalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
 			userData,
-			statsName
+			statsName,
+			pity
 		);
 		if (diceRoll)
 			return {
@@ -306,7 +344,7 @@ export function isRolling(
 
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll);
+		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return {
@@ -319,10 +357,17 @@ export function isRolling(
 	return undefined;
 }
 
-function getRollInShared(dice: string) {
+/**
+ * Execute a shared roll expression (semicolon-separated) and attach any top-level global comment.
+ *
+ * @param dice - The shared dice expression, possibly containing a global comment group and multiple segments separated by `;`.
+ * @param pity - If `true`, enable pity mode for the underlying roll which may alter roll behavior.
+ * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
+ */
+function getRollInShared(dice: string, pity?: boolean) {
 	const main = DICE_PATTERNS.GLOBAL_COMMENTS_GROUP.exec(dice)?.groups?.comment;
 	dice = dice.replace(DICE_PATTERNS.GLOBAL_COMMENTS_GROUP, "");
-	const rollDice = roll(dice);
+	const rollDice = roll(dice, undefined, pity);
 	if (!rollDice) return undefined;
 
 	rollDice.dice = dice;
@@ -330,15 +375,28 @@ function getRollInShared(dice: string) {
 	return rollDice;
 }
 
+/**
+ * Detects whether a dice expression represents a shared roll (multiple segments separated by semicolons) after stripping inline comment markers.
+ *
+ * @param dice - The dice expression to inspect
+ * @returns `true` if the cleaned expression contains a semicolon, `false` otherwise
+ */
 function isSharedRoll(dice: string): boolean {
 	//we need to remove the comments to avoid false positive
 	const cleanedDice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 	return cleanedDice.includes(";");
 }
 
-export function getRoll(dice: string): Resultat | undefined {
+/**
+ * Obtain a roll result for a dice expression, handling shared rolls and inline comments.
+ *
+ * @param dice - Dice expression to evaluate; may contain inline comment markers or shared-segment syntax.
+ * @param pity - Optional flag forwarded to the rolling engine that alters roll behavior.
+ * @returns The computed Resultat with embedded comment and adjusted dice string when present, or `undefined` if the expression is invalid or rolling failed.
+ */
+export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
 	logger.trace("Getting roll for dice:", dice);
-	if (isSharedRoll(dice)) return getRollInShared(dice);
+	if (isSharedRoll(dice)) return getRollInShared(dice, pity);
 	const comments = dice
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
 		.replaceAll("*", "\\*");
@@ -346,7 +404,7 @@ export function getRoll(dice: string): Resultat | undefined {
 
 	dice = dice.trim();
 	try {
-		const rollDice = roll(dice);
+		const rollDice = roll(dice, undefined, pity);
 		if (!rollDice) return undefined;
 		if (comments) {
 			rollDice.comment = comments;

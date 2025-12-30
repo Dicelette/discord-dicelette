@@ -1,10 +1,11 @@
 import type { EClient } from "@dicelette/client";
 import type { ComparedValue, Critical, CustomCritical, Resultat } from "@dicelette/core";
 import { ResultAsText } from "@dicelette/parse_result";
-import type { DiscordTextChannel, Translation } from "@dicelette/types";
-import { COMPILED_COMMENTS } from "@dicelette/utils";
+import type { DiscordTextChannel, Settings, Translation } from "@dicelette/types";
+import { COMPILED_COMMENTS, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, reply, threadToSend } from "messages";
+import { deleteAfter, findMessageBefore, reply, sendLogs, threadToSend } from "messages";
+import { createCacheKey } from "../commands";
 
 interface RollHandlerOptions {
 	/** Result of the dice roll */
@@ -40,13 +41,10 @@ interface RollHandlerOptions {
 }
 
 /**
- * Handles the complete flow of sending a dice roll result:
- * - Creates ResultAsText
- * - Determines channel/thread destination
- * - Handles roll channels vs regular channels
- * - Manages thread creation and log forwarding
- * - Applies delete timers
- * - Returns the sent message for further processing
+ * Orchestrates sending a dice roll result to the appropriate destination (direct reply, channel reply, or threaded message) and handles caching, logging links, and cleanup timers.
+ *
+ * @param opts - Options describing the roll result, source (Message or CommandInteraction), visibility settings, caching/logging settings, and related metadata
+ * @returns The message or interaction response sent to the user, or `undefined` if no reply was produced
  */
 export async function handleRollResult(
 	opts: RollHandlerOptions
@@ -81,6 +79,27 @@ export async function handleRollResult(
 		opposition,
 		statsPerSegment
 	);
+	const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
+
+	const enableCache = source.guild
+		? client.settings.get(source.guild.id, "pity")
+		: undefined;
+
+	if (result.compare?.trivial === true && enableCache) {
+		logger.trace("Caching trivial comparison for message", result.compare);
+		// Generate a cache key based on the source and author, without relying on messageId
+		const guild = source.guildId ? source.guild : null;
+		if (guild) {
+			const { cacheKey } = createCacheKey(source, author.id);
+			client.trivialCache.add(cacheKey);
+			// Auto-cleanup after 5 minutes
+			const timeoutId = setTimeout(() => {
+				client.trivialCache.delete(cacheKey);
+				client.trivialCacheTimeouts.delete(cacheKey);
+			}, 300000);
+			client.trivialCacheTimeouts.set(cacheKey, timeoutId);
+		}
+	}
 
 	const parser = resultAsText.parser;
 	if (!parser) return;
@@ -88,14 +107,14 @@ export async function handleRollResult(
 	const guild = source instanceof Djs.Message ? source.guild : source.guild;
 	// If we're in DM (no guild), just reply directly without guild/thread handling
 	if (!guild) {
-		const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
 		return await replyToSource(
 			source,
 			resultAsText,
 			author.id,
 			logUrl,
 			deleteInput,
-			hideResult
+			hideResult,
+			client.settings
 		);
 	}
 
@@ -106,8 +125,6 @@ export async function handleRollResult(
 	if (!channel) return;
 	// Allow direct messages; only block deprecated GroupDM channels
 	if (channel.type === Djs.ChannelType.GroupDM) return;
-
-	const author = user ?? (source instanceof Djs.Message ? source.author : source.user);
 
 	const channelName = "name" in channel ? (channel.name ?? "") : "";
 	const isRollChannel =
@@ -124,7 +141,8 @@ export async function handleRollResult(
 			author.id,
 			logUrl,
 			deleteInput,
-			hideResult
+			hideResult,
+			client.settings
 		);
 		if (deleteInput && source instanceof Djs.Message) await source.delete();
 		return reply;
@@ -144,11 +162,13 @@ export async function handleRollResult(
 		if (messageBefore) messageId = messageBefore.id;
 	}
 
-	const context = {
-		channelId: channel.id,
-		guildId: guild.id,
-		messageId,
-	};
+	const context = useContext
+		? {
+				channelId: channel.id,
+				guildId: guild.id,
+				messageId,
+			}
+		: undefined;
 
 	// Ensure we're not in a DM before using threadToSend
 	if (channel.type === Djs.ChannelType.DM) {
@@ -159,7 +179,8 @@ export async function handleRollResult(
 			author.id,
 			logUrl,
 			deleteInput,
-			hideResult
+			hideResult,
+			client.settings
 		);
 	}
 
@@ -174,7 +195,8 @@ export async function handleRollResult(
 		author.id,
 		undefined,
 		deleteInput,
-		hideResult
+		hideResult,
+		client.settings
 	);
 
 	// Find thread and create empty message in background
@@ -215,7 +237,24 @@ export async function handleRollResult(
 }
 
 /**
- * Helper to reply to either a Message or CommandInteraction
+ * Sends the rendered roll result to the originating Message or CommandInteraction, handling large-content fallback, ephemeral responses, and optional log forwarding.
+ *
+ * If `resultAsText.resultat.pityLogs` exists and `source.guild` + `settings` are provided, a pity log message is forwarded to the guild logs.
+ *
+ * Behavior details:
+ * - If rendered content length is > 2000 and <= 4000 characters, the content is sent as a Components-v2 text display.
+ * - If rendered content length is > 4000 characters, the first line is kept as the message summary and the remaining content is attached as a file named `roll_result.md`. Compiled comment blocks (matching COMPILED_COMMENTS) are appended to the summary when present.
+ * - For Message sources, `deleteInput = true` sends a new message to the channel; otherwise the function replies to the original message.
+ * - For CommandInteraction sources, `hideResult = true` marks the response ephemeral.
+ *
+ * @param source - The original Message or CommandInteraction to reply to
+ * @param resultAsText - Prepared result renderer that produces the message content and may include pity log data
+ * @param authorId - The ID of the roll's author (used when rendering the message)
+ * @param idMessage - Optional context message id passed to the renderer
+ * @param deleteInput - When true and `source` is a Message, send a new message instead of replying to the original input
+ * @param hideResult - When true and `source` is a CommandInteraction, mark the reply ephemeral
+ * @param settings - Optional guild settings used when forwarding pity logs
+ * @returns The sent Message for message-based replies, or the interaction reply result for interaction-based replies
  */
 async function replyToSource(
 	source: Djs.Message | Djs.CommandInteraction,
@@ -223,8 +262,18 @@ async function replyToSource(
 	authorId: string,
 	idMessage?: string,
 	deleteInput = false,
-	hideResult?: boolean
+	hideResult?: boolean,
+	settings?: Settings
 ): Promise<Djs.Message | Djs.InteractionResponse> {
+	if (resultAsText.resultat?.pityLogs && source.guild && settings) {
+		const { ul } = resultAsText;
+		logger.trace(ul("pity.logs.title", { nb: resultAsText.resultat.pityLogs }));
+		await sendLogs(
+			ul("pity.logs.title", { nb: resultAsText.resultat.pityLogs }),
+			source.guild,
+			settings
+		);
+	}
 	const content: string | undefined = resultAsText.onMessageSend(idMessage, authorId);
 	const replyOptions: Djs.MessageCreateOptions = {
 		allowedMentions: { repliedUser: true },

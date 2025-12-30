@@ -31,10 +31,17 @@ import {
 import { getRightValue, getTemplate } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";
+import { triggerPity } from "../commands";
 import { findBestMatchingDice } from "./find_macro";
 
 /**
- * create the roll dice, parse interaction etc... When the slash-commands is used for dice
+ * Create and execute a dice roll from a command interaction and present its result according to provided options.
+ *
+ * @param interaction - The originating command interaction
+ * @param dice - The dice expression or template string to roll
+ * @param client - The bot client and services used to resolve templates, settings, and state
+ * @param opts - Roll presentation and calculation options (e.g., user, charName, infoRoll, critical, customCritical, opposition, hideResult, silent, statsPerSegment)
+ * @returns The value returned by the roll result handler when the roll is presented, `undefined` otherwise
  */
 export async function rollWithInteraction(
 	interaction: Djs.CommandInteraction,
@@ -61,7 +68,14 @@ export async function rollWithInteraction(
 		lang: langToUse,
 		userId: user?.id ?? interaction.user.id,
 	};
-	const result = getRoll(dice);
+	let pity = false;
+	if (interaction.guild) {
+		const pityNb = client.criticalCount.get(interaction.guild.id, data.userId!)
+			?.consecutive?.failure;
+		const pityThreshold = client.settings.get(interaction.guild.id, "pity");
+		pity = triggerPity(pityThreshold, pityNb);
+	}
+	const result = getRoll(dice, pity);
 	if (!result) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],

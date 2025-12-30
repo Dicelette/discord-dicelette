@@ -43,6 +43,7 @@ export const DATABASE_NAMES = [
 export const ALL_COMMANDS = COMMANDS.concat(PRIVATES_COMMANDS);
 
 export * from "./admin";
+export { createCacheKey, triggerPity } from "./admin/configuration/pity";
 export * from "./context_menus";
 export * from "./private";
 export * from "./roll";

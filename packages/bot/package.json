@@ -12,7 +12,8 @@
 	"scripts": {
 		"build": "tsc --outdir dist --project tsconfig.json && tsc-alias -p tsconfig.json",
 		"prebuild": "rimraf dist",
-		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
+		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@dicelette/bot-helpers": "workspace:*",
