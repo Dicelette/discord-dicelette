@@ -208,7 +208,7 @@
 				"description": "Nombre d'échec consécutif avant la pitié",
 				"name": "seuil"
 			},
-			"success": "La pitié est activé. Il faudra {{- pity}} échecs consécutifs avant qu'un jet soit relancé pour atteindre un succès.\n\n⚠️ **La pitié ne fonctionne que sur les jets de comparaison.**"
+			"success": "La pitié est activée. Il faudra {{- pity}} échecs consécutifs avant qu'un jet soit relancé pour atteindre un succès.\n\n⚠️ **La pitié ne fonctionne que sur les jets de comparaison.**"
 		},
 		"privateChan": "Channel des personnages privés",
 		"result": {
