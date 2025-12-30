@@ -114,8 +114,8 @@
 		"cancel": "Cancel",
 		"cancelled": "Deletion has been canceled.",
 		"channel": "channel",
-		"character": "character",
 		"charName": "Character name",
+		"character": "character",
 		"comments": "comments",
 		"confirm": "Confirm deletion",
 		"context": "Context",
@@ -160,6 +160,10 @@
 		"damageName": "Saved macro list (global)",
 		"defaultSheet": "Default channel",
 		"description": "Allows you to configure the bot for the server",
+		"disableCompare": {
+			"description": "Edit the dice's output that contains a comparison (only for base roll)",
+			"name": "disable_compare"
+		},
 		"disableThread": {
 			"desc": "Disables global saving and auto-deletion of results, leaving the dice roll where it was done.",
 			"title": "Disabling results threads"
@@ -348,6 +352,12 @@
 		"success": "The {{- user}} character has been deleted!",
 		"user": "The player to delete"
 	},
+	"disableCompare": {
+		"success": {
+			"disabled": "Die comparisons are enabled. Now, when a die is written as `XdY>Z`, the output will indicate whether the die is a failure or a success.\n>>> __Exemple__ :\n{{- example}}",
+			"enabled": "Die comparisons are disabled. Now, when a die is written as `XdY>Z`, the *output* will no longer indicate whether the die is a failure or a success and will show a `0` or `1` instead.\n>>> __Example__:\n{{- example}}"
+		}
+	},
 	"disableThread": {
 		"description": "Disable/enable automatic thread creation and use the configured channel for logs.",
 		"disable": {
@@ -412,19 +422,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Host a file rather than using a link.",
-			"name": "file"
-		},
-		"default": "The image used will be your actual avatar !",
-		"desc": "Edit the avatar of a character sheet",
-		"name": "avatar",
-		"url": {
-			"desc": "Link to the image to put (no discord link!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "The avatar to set",
@@ -445,6 +442,19 @@
 			"name": "nick"
 		},
 		"success": "The bot was edited successfully."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Host a file rather than using a link.",
+			"name": "file"
+		},
+		"default": "The image used will be your actual avatar !",
+		"desc": "Edit the avatar of a character sheet",
+		"name": "avatar",
+		"url": {
+			"desc": "Link to the image to put (no discord link!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "User registration",
@@ -727,12 +737,6 @@
 		},
 		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Player leaderboard",
-			"title": "leaderboard"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -788,6 +792,12 @@
 		"user": "{{- user}}'s throwing results:",
 		"userOption": {
 			"description": "Displays another user's throw results."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Player leaderboard",
+			"title": "leaderboard"
 		}
 	},
 	"math": {

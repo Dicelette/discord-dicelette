@@ -85,6 +85,12 @@ export interface GuildData {
 	 */
 	createLinkTemplate?: TemplateResult;
 	pity?: number;
+	/**
+	 * If enabled, all dice throw will be encapsulated with `{}` to match the diceroller library
+	 * The Fail/Success won't never be displayed.
+	 * @default false
+	 */
+	disableCompare?: boolean;
 }
 
 export interface TemplateResult {

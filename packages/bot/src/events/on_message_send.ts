@@ -69,7 +69,8 @@ export default (client: EClient): void => {
 			const pityThreshold = client.settings.get(message.guild.id, "pity");
 			const pity = triggerPity(pityThreshold, pityNb);
 			logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
-			const isRoll = isRolling(content, userData, statsName, pity);
+			const disableCompare = client.settings.get(message.guild.id, "disableCompare");
+			const isRoll = isRolling(content, userData, statsName, pity, disableCompare);
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);

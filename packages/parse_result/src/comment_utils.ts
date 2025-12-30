@@ -1,5 +1,22 @@
 import { DICE_PATTERNS } from "@dicelette/utils";
-import { extractDiceData, getComments } from "./dice_extractor";
+import { extractDiceData } from "./dice_extractor";
+
+export function getComments(content: string, comments?: string) {
+	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
+	if (!globalComments && !comments)
+		globalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
+	if (comments && !globalComments) globalComments = comments;
+
+	const statValue = content.match(DICE_PATTERNS.INFO_STATS_COMMENTS);
+	if (statValue)
+		globalComments =
+			statValue[0] +
+			(globalComments
+				? ` ${globalComments.replace(DICE_PATTERNS.INFO_STATS_COMMENTS, "").trim()}`
+				: "");
+
+	return globalComments;
+}
 
 /**
  * Extract and merge comments from multiple sources (dice formula, user input)

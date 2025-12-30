@@ -17,6 +17,7 @@ import {
 	setTemplate,
 } from "../../userSettings";
 import { resetTemplate } from "../../userSettings/setTemplate";
+import { disableCompare } from "./disableCompare";
 import { editMeCommand } from "./editMe";
 import { setPity } from "./pity";
 
@@ -333,6 +334,20 @@ export const configuration = {
 						.setRequired(false)
 						.setMinValue(2)
 				)
+		)
+		/*
+			Disable compare results
+	  */
+		.addSubcommand((sub) =>
+			sub
+				.setNames("config.disableCompare.name")
+				.setDescriptions("config.disableCompare.description")
+				.addBooleanOption((option) =>
+					option
+						.setNames("disableThread.options.name")
+						.setDescriptions("linkToLog.options")
+						.setRequired(true)
+				)
 		),
 
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -393,6 +408,8 @@ export const configuration = {
 				return await editMeCommand(interaction, ul);
 			case t("config.pity.name"):
 				return await setPity(interaction, options, client, ul);
+			case t("config.disableCompare.name"):
+				return await disableCompare(interaction, options, client, ul);
 		}
 	},
 };

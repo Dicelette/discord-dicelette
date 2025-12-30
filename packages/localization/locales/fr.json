@@ -114,8 +114,8 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"character": "personnage",
 		"charName": "Nom du personnage",
+		"character": "personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -160,6 +160,10 @@
 		"damageName": "Liste des macro sauvegardées (global)",
 		"defaultSheet": "Channel par défaut",
 		"description": "Permet de configurer le bot pour le serveur",
+		"disableCompare": {
+			"description": "Modifie l'output des dés contenant une comparaison (seulement sur les jets de base)",
+			"name": "désactiver_comparaison"
+		},
 		"disableThread": {
 			"desc": "Désactive la sauvegarde globale et l'auto-suppression des résultats, laissant donc le lancer de dés là où il a été fait.",
 			"title": "Désactivation des fils de résultats"
@@ -348,6 +352,12 @@
 		"success": "Le personnage de {{- user}} a bien été supprimé !",
 		"user": "Le joueur à supprimer"
 	},
+	"disableCompare": {
+		"success": {
+			"disabled": "Les comparaisons de dés sont activés. Maintenant, quand un dé sera écrit tel que `XdY>Z`, l'*output* indiquera si le dé est un échec ou un succès.\n>>> __Example__:\n{{- example}}",
+			"enabled": "Les comparaisons de dés sont désactivés. Maintenant, quand un dé sera écrit tel que `XdY>Z`, l'*output* n'indiquera plus si le dé est un échec ou un succès et indiquera un `0` ou `1` à la place.\n>>> __Exemple__ :\n{{- example}}"
+		}
+	},
 	"disableThread": {
 		"description": "Désactive/active la création automatique des threads et utilise le channel configuré pour les logs",
 		"disable": {
@@ -412,19 +422,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -445,6 +442,19 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -727,12 +737,6 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -788,6 +792,12 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
 		}
 	},
 	"math": {

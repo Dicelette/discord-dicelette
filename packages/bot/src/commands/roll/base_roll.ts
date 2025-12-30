@@ -63,11 +63,13 @@ export async function baseRoll(
 ): Promise<void> {
 	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
+	
+	
 	let firstChara: string | undefined;
 	if (dice.match(REMOVER_PATTERN.STAT_MATCHER) && interaction.guild)
 		firstChara = await getCharFromText(client, interaction.guild.id, user.id, dice);
 	if (firstChara) dice = dice.replace(CHARACTER_DETECTION, "").trim();
-
+ 
 	const data = interaction.guild
 		? await getUserFromInteraction(client, user.id, interaction, firstChara, {
 				skipNotFound: true,
@@ -86,7 +88,8 @@ export async function baseRoll(
 	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
 	logger.trace("Evaluated dice regex result" + ":", evaluated);
-	if (!evaluated) {
+	const disableMatch = client.settings.get(interaction.guildId!, "disableCompare");
+	if (!evaluated && !disableMatch) {
 		// Preclean to ignore {cs|cf:...} blocs before checking for opposition
 		const contentForOpposition = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
@@ -95,7 +98,7 @@ export async function baseRoll(
 		logger.trace("Opposition match regex result:", oppositionMatch, opposition);
 		if (oppositionMatch?.groups?.second)
 			dice = dice.replace(oppositionMatch.groups.second, "").trim();
-	} else if (evaluated.groups) {
+	} else if (evaluated?.groups) {
 		//also find the comments and preserve them
 		//dice is group 1
 		//comments can be group 2
@@ -105,6 +108,16 @@ export async function baseRoll(
 		if (doubleTarget?.groups?.dice) dice = value;
 		else dice = `{${value}}`;
 		if (comments) dice = `${dice} ${comments}`;
+	} else if (disableMatch) {
+		logger.trace("Comparison disabled on this server");
+		//find comments first to preserve them
+		const commentsMatch = DICE_COMPILED_PATTERNS.COMMENTS_REGEX.exec(dice);
+		let comments = "";
+		if (commentsMatch?.[0]) {
+			comments = ` ${commentsMatch[0]}`;
+			dice = dice.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trim();
+		}
+		dice = `{${dice}}${comments}`;
 	}
 
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);

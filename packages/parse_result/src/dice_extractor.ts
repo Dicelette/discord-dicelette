@@ -14,6 +14,7 @@ import {
 	logger,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
+import { extractAndMergeComments, getComments } from "./comment_utils";
 import { trimAll } from "./utils";
 
 export function extractDiceData(content: string): DiceData {
@@ -38,23 +39,6 @@ export function hasValidDice(diceData: DiceData): boolean {
 	const { bracketRoll, comments, diceValue } = diceData;
 	if (comments && !bracketRoll) return !!diceValue;
 	return true;
-}
-
-export function getComments(content: string, comments?: string) {
-	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
-	if (!globalComments && !comments)
-		globalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
-	if (comments && !globalComments) globalComments = comments;
-
-	const statValue = content.match(DICE_PATTERNS.INFO_STATS_COMMENTS);
-	if (statValue)
-		globalComments =
-			statValue[0] +
-			(globalComments
-				? ` ${globalComments.replace(DICE_PATTERNS.INFO_STATS_COMMENTS, "").trim()}`
-				: "");
-
-	return globalComments;
 }
 
 export function processChainedComments(
@@ -148,13 +132,15 @@ export function applyCommentsToResult(
  * @param userData - Optional user data containing `stats` to substitute into the formula
  * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @param disableCompare
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
 	statsName?: string[],
-	pity?: boolean
+	pity?: boolean,
+	disableCompare?: boolean
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -194,7 +180,8 @@ export function processChainedDiceRoll(
 
 	try {
 		// Remove critical blocks before rolling
-		const cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
+		let cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
+		if (disableCompare) cleaned = `{${cleaned}}`;
 		const rollResult = roll(cleaned, undefined, pity);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
@@ -218,13 +205,15 @@ export function processChainedDiceRoll(
  * @param userData - Optional user data containing stats used to substitute stat tokens in formulas
  * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @param disableCompare
  * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
  */
 export function isRolling(
 	content: string,
 	userData?: UserData,
 	statsName?: string[],
-	pity?: boolean
+	pity?: boolean,
+	disableCompare?: boolean
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -232,7 +221,9 @@ export function isRolling(
 	// Preserve original content before any modifications for processChainedDiceRoll
 	const originalContent = content;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
+	logger.trace("Evaluated regex result:", evaluated, "disableCompare:", disableCompare);
 	if (!evaluated) {
+		logger.trace("Évaluated is null, checking for opposition or disableCompare");
 		// Preclean to ignore {cs|cf:...} blocs
 		const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
@@ -254,12 +245,20 @@ export function isRolling(
 
 			content = content.replace(reg.groups.second, "").trim();
 
+			if (disableCompare) content = `{${content}}`;
+			logger.trace("Content after opposition removal:", content);
 			// Re-append the comment if it was lost during opposition removal
 			if (preservedComments && !content.includes(preservedComments)) {
 				// Add back the comment as an inline comment (without #)
 				// The processing pipeline will handle it correctly
 				content = `${content} ${preservedComments}`;
 			}
+		} else if (disableCompare) {
+			//preserve comments
+			const val = extractAndMergeComments(content);
+			content = `{${val.cleanedDice}}`;
+			if (val.mergedComments) content = `${content} ${val.mergedComments.trim()}`;
+			logger.trace("Content after disableCompare:", content);
 		}
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
@@ -322,7 +321,8 @@ export function isRolling(
 			originalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
 			userData,
 			statsName,
-			pity
+			pity,
+			disableCompare
 		);
 		if (diceRoll)
 			return {
