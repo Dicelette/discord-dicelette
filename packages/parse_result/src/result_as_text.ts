@@ -42,7 +42,10 @@ export class ResultAsText {
 		this.ul = ln(data.lang);
 		this.resultat = result;
 		this.ignoreCount = this.setIgnoreCount();
-		this.statsPerSegment = statsPerSegment;
+		// Treat empty stats/comments as absent to avoid shared-roll placeholders when nothing is provided
+		this.statsPerSegment = statsPerSegment?.some((s) => s?.trim().length)
+			? statsPerSegment
+			: undefined;
 		this.commentsPerSegment = this.extractCommentsPerSegment();
 		let parser = "";
 		if (!result) {
@@ -215,6 +218,7 @@ export class ResultAsText {
 		this.headerCompare = undefined;
 
 		const messageResult = this.resultat.result.split(";");
+		const isSharedRoll = messageResult.length > 1;
 		let msgSuccess: string;
 		let criticalState: {
 			isCritical?: "failure" | "success" | "custom";
@@ -241,7 +245,8 @@ export class ResultAsText {
 					}
 					// Add a marker that formatMultipleRes can detect
 					const marker = hasStatsPerSegment ? "⚐" : "";
-					msgSuccess += `${marker}${this.message(r, " = ` [$1] `")}\n`;
+					msgSuccess += `${marker}${this.message(r, " = ` [$1] `")}`;
+					msgSuccess += "\n";
 				}
 			} else msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
 		}
@@ -254,7 +259,7 @@ export class ResultAsText {
 		if (hasComment) return ` ${comment} ${joinedRes.trimEnd()}`;
 
 		// For interaction without comment, comment() returns "\n", so prepend newline to joinedRes
-		if (comment === "\n") return `\n ${joinedRes}`;
+		if (comment === "\n") return `${isSharedRoll ? " " : "\n "}${joinedRes}`;
 
 		// Default case (non-interaction without comment): add space before result
 		return ` ${joinedRes}`;
@@ -467,7 +472,8 @@ export class ResultAsText {
 			comments.push(commentMatch ? commentMatch[1] : "");
 		}
 
-		return comments.length > 0 ? comments : undefined;
+		// If no actual comment is present, treat as undefined to avoid extra formatting
+		return comments.some((c) => c.trim().length > 0) ? comments : undefined;
 	}
 
 	private removeIgnore(comment: string | undefined): string | undefined {

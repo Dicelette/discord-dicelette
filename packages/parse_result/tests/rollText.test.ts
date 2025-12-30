@@ -233,3 +233,38 @@ describe("interaction formatting with infoRoll", () => {
 		expect(messageText).toMatch(/\[__Dextérité__\]\s*\n\s*`1d45`/);
 	});
 });
+
+describe("shared roll without comment newline handling", () => {
+	it("should not add an empty line for shared roll interactions without comment", () => {
+		const result: Resultat = {
+			compare: { sign: ">", value: 100 },
+			dice: "1d6;&>100",
+			result: "※ 1d6: [3] = 3;✕ [1d6]>100: [3]>100 = 3>100",
+			total: 3,
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, {
+			name: "Force",
+			standardized: "force",
+		});
+		const text = res.defaultMessage();
+
+		expect(text).not.toMatch(/\[__Force__\]\s*\n\s*\n/);
+		expect(text).toMatch(/\[__Force__\]\s*\n\s*[※◈]/);
+	});
+
+	it("should not add an empty line for shared roll defaults without comment", () => {
+		const result: Resultat = {
+			compare: { sign: ">", value: 100 },
+			dice: "1d6;&>100",
+			result: "※ 1d6: [4] = 4;✕ [1d6]>100: [4]>100 = 4>100",
+			total: 4,
+		};
+
+		const res = new ResultAsText(result, DATA);
+		const text = res.defaultMessage();
+
+		expect(text).not.toMatch(/\n\s*\n\s*[※◈]/);
+		expect(text).toMatch(/[※◈]/);
+	});
+});
