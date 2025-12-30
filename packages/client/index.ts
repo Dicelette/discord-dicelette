@@ -55,6 +55,13 @@ export class EClient extends Djs.Client {
 	public trivialCache: Set<string> = new Set();
 
 	/**
+	 * Map of timeouts for trivial cache cleanup
+	 * - Used to prevent memory leaks by clearing timeouts when cache entries are manually deleted
+	 * @key `guildId:authorId:channelId:(timestamp/60_000)`
+	 */
+	public trivialCacheTimeouts: Map<string, NodeJS.Timeout> = new Map();
+
+	/**
 	 * Key the last status when the bot restarts
 	 */
 	public status: BotStatus = {

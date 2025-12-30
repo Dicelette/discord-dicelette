@@ -93,7 +93,11 @@ export async function handleRollResult(
 			const { cacheKey } = createCacheKey(source, author.id);
 			client.trivialCache.add(cacheKey);
 			// Auto-cleanup after 5 minutes
-			setTimeout(() => client.trivialCache.delete(cacheKey), 300000);
+			const timeoutId = setTimeout(() => {
+				client.trivialCache.delete(cacheKey);
+				client.trivialCacheTimeouts.delete(cacheKey);
+			}, 300000);
+			client.trivialCacheTimeouts.set(cacheKey, timeoutId);
 		}
 	}
 

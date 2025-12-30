@@ -86,7 +86,17 @@ export const onDeleteMessage = (client: EClient): void => {
 				if (client.settings.get(message.guild.id, "pity")) {
 					const userId = getAuthor(message);
 					if (userId) {
-						const { cacheKey, prevCacheKey } = createCacheKey(message, userId);
+						const { cacheKey, prevCacheKey } = createCacheKey(message, userId); // Clear timeouts to prevent memory leaks
+						const timeoutId = client.trivialCacheTimeouts.get(cacheKey);
+						if (timeoutId) {
+							clearTimeout(timeoutId);
+							client.trivialCacheTimeouts.delete(cacheKey);
+						}
+						const prevTimeoutId = client.trivialCacheTimeouts.get(prevCacheKey);
+						if (prevTimeoutId) {
+							clearTimeout(prevTimeoutId);
+							client.trivialCacheTimeouts.delete(prevCacheKey);
+						}
 						client.trivialCache.delete(cacheKey);
 						client.trivialCache.delete(prevCacheKey);
 					}
