@@ -93,6 +93,15 @@ export function processChainedComments(
 	};
 }
 
+/**
+ * Execute a cleaned dice roll from given content or an explicit bracketed roll and return the roll result.
+ *
+ * @param content - Original message content containing a dice expression and optional comment markers
+ * @param bracketRoll - Optional explicit bracketed dice expression to prioritize over `content`
+ * @param infoRoll - Optional metadata about the roll (e.g., resolved stat name) to include in the result
+ * @param pity - Optional flag passed to the underlying roll engine to alter roll behavior
+ * @returns An object with `resultat` containing the roll result (if the roll ran) and optional `infoRoll`, or `undefined` when the content is invalid or an error occurred
+ */
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
@@ -130,6 +139,17 @@ export function applyCommentsToResult(
 	return result;
 }
 
+/**
+ * Process a chained dice expression (supports shared segments and stat substitutions) and execute the resulting roll.
+ *
+ * Replaces stat tokens using the provided user stats, cleans global comments and opposition clauses, executes the roll (honoring the optional `pity` flag), and attaches comment/info metadata when appropriate.
+ *
+ * @param content - The raw dice expression to process (may include chained segments, global comments, opposition, and stat tokens)
+ * @param userData - Optional user data containing `stats` to substitute into the formula
+ * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
+ * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
+ */
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
@@ -191,6 +211,15 @@ export function processChainedDiceRoll(
 	}
 }
 
+/**
+ * Determine whether a message contains a dice roll and, if so, extract, process (including stat substitution and chained/shared syntax), and execute the roll.
+ *
+ * @param content - The raw message or formula to analyze for dice expressions
+ * @param userData - Optional user data containing stats used to substitute stat tokens in formulas
+ * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
+ * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
+ */
 export function isRolling(
 	content: string,
 	userData?: UserData,
@@ -328,6 +357,13 @@ export function isRolling(
 	return undefined;
 }
 
+/**
+ * Execute a shared roll expression (semicolon-separated) and attach any top-level global comment.
+ *
+ * @param dice - The shared dice expression, possibly containing a global comment group and multiple segments separated by `;`.
+ * @param pity - If `true`, enable pity mode for the underlying roll which may alter roll behavior.
+ * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
+ */
 function getRollInShared(dice: string, pity?: boolean) {
 	const main = DICE_PATTERNS.GLOBAL_COMMENTS_GROUP.exec(dice)?.groups?.comment;
 	dice = dice.replace(DICE_PATTERNS.GLOBAL_COMMENTS_GROUP, "");
@@ -339,12 +375,25 @@ function getRollInShared(dice: string, pity?: boolean) {
 	return rollDice;
 }
 
+/**
+ * Detects whether a dice expression represents a shared roll (multiple segments separated by semicolons) after stripping inline comment markers.
+ *
+ * @param dice - The dice expression to inspect
+ * @returns `true` if the cleaned expression contains a semicolon, `false` otherwise
+ */
 function isSharedRoll(dice: string): boolean {
 	//we need to remove the comments to avoid false positive
 	const cleanedDice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 	return cleanedDice.includes(";");
 }
 
+/**
+ * Obtain a roll result for a dice expression, handling shared rolls and inline comments.
+ *
+ * @param dice - Dice expression to evaluate; may contain inline comment markers or shared-segment syntax.
+ * @param pity - Optional flag forwarded to the rolling engine that alters roll behavior.
+ * @returns The computed Resultat with embedded comment and adjusted dice string when present, or `undefined` if the expression is invalid or rolling failed.
+ */
 export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
 	logger.trace("Getting roll for dice:", dice);
 	if (isSharedRoll(dice)) return getRollInShared(dice, pity);
