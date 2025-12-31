@@ -1,25 +1,30 @@
+/** biome-ignore-all lint/style/useNamingConvention: Discord naming convention doesn't follow TS */
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { t } from "@dicelette/localization";
+import { SortOrder } from "@dicelette/core";
+import { cmdLn, t } from "@dicelette/localization";
+
 import * as Djs from "discord.js";
 import { localeList } from "locales";
-import { dice, stats } from "./auto_role";
-import { changeLanguage } from "./change_language";
-import { display, displayTemplate } from "./display";
-import { hiddenRoll, resultChannel, setErrorLogs } from "./logs";
-import { deleteAfter, linkToLog, setContextLink, timestamp } from "./results";
-import { allowSelfRegistration } from "./self_registration";
-import { stripOOC } from "./strip_ooc";
 import "discord_ext";
+
 import {
 	createLinksCmdOptions,
 	getTemplateValues,
 	setTemplate,
 } from "../../userSettings";
 import { resetTemplate } from "../../userSettings/setTemplate";
+import { dice, stats } from "./auto_role";
+import { changeLanguage } from "./change_language";
 import { disableCompare } from "./disableCompare";
+import { display, displayTemplate } from "./display";
 import { editMeCommand } from "./editMe";
+import { hiddenRoll, resultChannel, setErrorLogs } from "./logs";
 import { setPity } from "./pity";
+import { deleteAfter, linkToLog, setContextLink, timestamp } from "./results";
+import { allowSelfRegistration } from "./self_registration";
+import { setSortOrder } from "./sortOrder";
+import { stripOOC } from "./strip_ooc";
 
 export const configuration = {
 	data: new Djs.SlashCommandBuilder()
@@ -348,6 +353,37 @@ export const configuration = {
 						.setDescriptions("linkToLog.options")
 						.setRequired(true)
 				)
+		)
+		/**
+		 * Sort order
+		 */
+		.addSubcommand((sub) =>
+			sub
+				.setNames("config.sort.name")
+				.setDescriptions("config.sort.description")
+				.addStringOption((option) =>
+					option
+						.setNames("config.sort.option.name")
+						.setDescriptions("config.sort.option.description")
+						.setRequired(false)
+						.addChoices(
+							{
+								name: t("config.sort.options.ascending"),
+								name_localizations: cmdLn("config.sort.options.ascending"),
+								value: SortOrder.Ascending,
+							},
+							{
+								name: t("config.sort.options.descending"),
+								name_localizations: cmdLn("config.sort.options.descending"),
+								value: SortOrder.Descending,
+							},
+							{
+								name: t("config.sort.options.none"),
+								name_localizations: cmdLn("config.sort.options.none"),
+								value: SortOrder.None,
+							}
+						)
+				)
 		),
 
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -410,6 +446,8 @@ export const configuration = {
 				return await setPity(interaction, options, client, ul);
 			case t("config.disableCompare.name"):
 				return await disableCompare(interaction, options, client, ul);
+			case t("config.sort.name"):
+				return await setSortOrder(interaction, options, client, ul);
 		}
 	},
 };

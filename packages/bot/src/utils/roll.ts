@@ -76,7 +76,8 @@ export async function rollWithInteraction(
 		const pityThreshold = client.settings.get(interaction.guild.id, "pity");
 		pity = triggerPity(pityThreshold, pityNb);
 	}
-	const result = getRoll(dice, pity);
+	const sort = client.settings.get(interaction.guildId!, "sortOrder");
+	const result = getRoll(dice, pity, sort);
 	if (!result) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],

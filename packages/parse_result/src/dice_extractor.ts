@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
-import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
+import { type Resultat, roll, SIGN_REGEX, type SortOrder } from "@dicelette/core";
 import type {
 	ChainedComments,
 	DiceData,
@@ -84,13 +84,15 @@ export function processChainedComments(
  * @param bracketRoll - Optional explicit bracketed dice expression to prioritize over `content`
  * @param infoRoll - Optional metadata about the roll (e.g., resolved stat name) to include in the result
  * @param pity - Optional flag passed to the underlying roll engine to alter roll behavior
+ * @param sort
  * @returns An object with `resultat` containing the roll result (if the roll ran) and optional `infoRoll`, or `undefined` when the content is invalid or an error occurred
  */
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
 	infoRoll?: string,
-	pity?: boolean
+	pity?: boolean,
+	sort?: SortOrder
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
@@ -104,7 +106,7 @@ export function performDiceRoll(
 			.replace(/ @\w+/, "")
 			.trimEnd();
 		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
-		return { infoRoll, resultat: roll(rollContent, undefined, pity) };
+		return { infoRoll, resultat: roll(rollContent, undefined, pity, sort) };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -133,6 +135,7 @@ export function applyCommentsToResult(
  * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
  * @param disableCompare
+ * @param sortOrder
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
 export function processChainedDiceRoll(
@@ -140,7 +143,8 @@ export function processChainedDiceRoll(
 	userData?: UserData,
 	statsName?: string[],
 	pity?: boolean,
-	disableCompare?: boolean
+	disableCompare?: boolean,
+	sortOrder?: SortOrder
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -182,7 +186,7 @@ export function processChainedDiceRoll(
 		// Remove critical blocks before rolling
 		let cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		if (disableCompare) cleaned = `{${cleaned}}`;
-		const rollResult = roll(cleaned, undefined, pity);
+		const rollResult = roll(cleaned, undefined, pity, sortOrder);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
 		// For chained rolls with & and ;, only add comment if it's a true # comment
@@ -205,7 +209,8 @@ export function processChainedDiceRoll(
  * @param userData - Optional user data containing stats used to substitute stat tokens in formulas
  * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
- * @param disableCompare
+ * @param disableCompare - If true, encapsulate the roll in `{}` to disable success/failure comparison
+ * @param sortOrder - Optional sort order for the roll results
  * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
  */
 export function isRolling(
@@ -213,7 +218,8 @@ export function isRolling(
 	userData?: UserData,
 	statsName?: string[],
 	pity?: boolean,
-	disableCompare?: boolean
+	disableCompare?: boolean,
+	sortOrder?: SortOrder
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -221,9 +227,9 @@ export function isRolling(
 	// Preserve original content before any modifications for processChainedDiceRoll
 	const originalContent = content;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
-	logger.trace("Evaluated regex result:", evaluated, "disableCompare:", disableCompare);
+	//logger.trace("Evaluated regex result:", evaluated, "disableCompare:", disableCompare);
 	if (!evaluated) {
-		logger.trace("Évaluated is null, checking for opposition or disableCompare");
+		//logger.trace("Évaluated is null, checking for opposition or disableCompare");
 		// Preclean to ignore {cs|cf:...} blocs
 		const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
@@ -246,7 +252,7 @@ export function isRolling(
 			content = content.replace(reg.groups.second, "").trim();
 
 			if (disableCompare) content = `{${content}}`;
-			logger.trace("Content after opposition removal:", content);
+			//logger.trace("Content after opposition removal:", content);
 			// Re-append the comment if it was lost during opposition removal
 			if (preservedComments && !content.includes(preservedComments)) {
 				// Add back the comment as an inline comment (without #)
@@ -262,7 +268,7 @@ export function isRolling(
 		}
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
-		logger.trace("Double target", doubleTarget);
+		//logger.trace("Double target", doubleTarget);
 		const { dice, comments } = evaluated.groups;
 		if (doubleTarget?.groups?.dice) {
 			content = dice.trim();
@@ -302,7 +308,8 @@ export function isRolling(
 			cleanedForRoll,
 			diceData.bracketRoll,
 			res?.infoRoll,
-			pity
+			pity,
+			sortOrder
 		);
 		if (diceRoll?.resultat)
 			return {
@@ -322,7 +329,8 @@ export function isRolling(
 			userData,
 			statsName,
 			pity,
-			disableCompare
+			disableCompare,
+			sortOrder
 		);
 		if (diceRoll)
 			return {
@@ -344,7 +352,13 @@ export function isRolling(
 
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity);
+		const diceRoll = performDiceRoll(
+			finalContent,
+			undefined,
+			res.infoRoll,
+			pity,
+			sortOrder
+		);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return {
@@ -362,12 +376,13 @@ export function isRolling(
  *
  * @param dice - The shared dice expression, possibly containing a global comment group and multiple segments separated by `;`.
  * @param pity - If `true`, enable pity mode for the underlying roll which may alter roll behavior.
+ * @param sort
  * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
  */
-function getRollInShared(dice: string, pity?: boolean) {
+function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
 	const main = DICE_PATTERNS.GLOBAL_COMMENTS_GROUP.exec(dice)?.groups?.comment;
 	dice = dice.replace(DICE_PATTERNS.GLOBAL_COMMENTS_GROUP, "");
-	const rollDice = roll(dice, undefined, pity);
+	const rollDice = roll(dice, undefined, pity, sort);
 	if (!rollDice) return undefined;
 
 	rollDice.dice = dice;
@@ -392,11 +407,16 @@ function isSharedRoll(dice: string): boolean {
  *
  * @param dice - Dice expression to evaluate; may contain inline comment markers or shared-segment syntax.
  * @param pity - Optional flag forwarded to the rolling engine that alters roll behavior.
+ * @param sort
  * @returns The computed Resultat with embedded comment and adjusted dice string when present, or `undefined` if the expression is invalid or rolling failed.
  */
-export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
+export function getRoll(
+	dice: string,
+	pity?: boolean,
+	sort?: SortOrder
+): Resultat | undefined {
 	logger.trace("Getting roll for dice:", dice);
-	if (isSharedRoll(dice)) return getRollInShared(dice, pity);
+	if (isSharedRoll(dice)) return getRollInShared(dice, pity, sort);
 	const comments = dice
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
 		.replaceAll("*", "\\*");
@@ -404,7 +424,7 @@ export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
 
 	dice = dice.trim();
 	try {
-		const rollDice = roll(dice, undefined, pity);
+		const rollDice = roll(dice, undefined, pity, sort);
 		if (!rollDice) return undefined;
 		if (comments) {
 			rollDice.comment = comments;

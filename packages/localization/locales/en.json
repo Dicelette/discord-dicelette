@@ -114,8 +114,8 @@
 		"cancel": "Cancel",
 		"cancelled": "Deletion has been canceled.",
 		"channel": "channel",
-		"character": "character",
 		"charName": "Character name",
+		"character": "character",
 		"comments": "comments",
 		"confirm": "Confirm deletion",
 		"context": "Context",
@@ -236,6 +236,23 @@
 			"name": "self_register"
 		},
 		"sheet": "Sheet",
+		"sort": {
+			"description": "Allows sorting the dice output results",
+			"name": "sort_order",
+			"option": {
+				"description": "The chosen order",
+				"name": "order"
+			},
+			"options": {
+				"ascending": "Ascending",
+				"descending": "Descending",
+				"none": "Disabled"
+			},
+			"order": {
+				"reset": "The dice results will no longer be sorted.",
+				"set": "The dice results will be sorted by {{- order}} order."
+			}
+		},
 		"statsName": "Name of statistics",
 		"stripOOC": {
 			"categories": "Channels",
@@ -422,19 +439,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Host a file rather than using a link.",
-			"name": "file"
-		},
-		"default": "The image used will be your actual avatar !",
-		"desc": "Edit the avatar of a character sheet",
-		"name": "avatar",
-		"url": {
-			"desc": "Link to the image to put (no discord link!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "The avatar to set",
@@ -455,6 +459,19 @@
 			"name": "nick"
 		},
 		"success": "The bot was edited successfully."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Host a file rather than using a link.",
+			"name": "file"
+		},
+		"default": "The image used will be your actual avatar !",
+		"desc": "Edit the avatar of a character sheet",
+		"name": "avatar",
+		"url": {
+			"desc": "Link to the image to put (no discord link!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "User registration",
@@ -737,12 +754,6 @@
 		},
 		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Player leaderboard",
-			"title": "leaderboard"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -798,6 +809,12 @@
 		"user": "{{- user}}'s throwing results:",
 		"userOption": {
 			"description": "Displays another user's throw results."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Player leaderboard",
+			"title": "leaderboard"
 		}
 	},
 	"math": {

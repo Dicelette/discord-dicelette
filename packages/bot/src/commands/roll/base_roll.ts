@@ -88,12 +88,13 @@ export async function baseRoll(
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
 	logger.trace("Evaluated dice regex result" + ":", evaluated);
 	const disableMatch = client.settings.get(interaction.guildId!, "disableCompare");
+	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	if (!evaluated && !disableMatch) {
 		// Preclean to ignore {cs|cf:...} blocs before checking for opposition
 		const contentForOpposition = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
 		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
-		opposition = parseComparator(dice, userData?.stats, undefined);
+		opposition = parseComparator(dice, userData?.stats, undefined, sortOrder);
 		logger.trace("Opposition match regex result:", oppositionMatch, opposition);
 		if (oppositionMatch?.groups?.second)
 			dice = dice.replace(oppositionMatch.groups.second, "").trim();
