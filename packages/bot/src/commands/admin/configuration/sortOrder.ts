@@ -16,7 +16,7 @@ export function setSortOrder(
 		client.settings.delete(interaction.guild!.id, "sortOrder");
 		return reply(interaction, ul("config.sort.order.reset"));
 	}
-	client.settings.set(interaction.guild!.id, "sortOrder", sortOrder);
+	client.settings.set(interaction.guild!.id, sortOrder, "sortOrder");
 	return reply(
 		interaction,
 		ul("config.sort.order.set", {

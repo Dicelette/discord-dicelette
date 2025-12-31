@@ -5,7 +5,7 @@ import {
 	getStatisticOption,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
+import type { CustomCritical, SortOrder, StatisticalTemplate } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
 	buildInfoRollFromStats,
@@ -26,7 +26,6 @@ import type { RollOptions, Translation, UserData } from "@dicelette/types";
 import {
 	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
-	logger,
 	profiler,
 } from "@dicelette/utils";
 import { getRightValue, getTemplate } from "database";
@@ -126,6 +125,7 @@ export async function rollMacro(
 	hideResult?: boolean | null
 ) {
 	profiler.startProfiler();
+	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
 		name: atq,
@@ -213,7 +213,8 @@ export async function rollMacro(
 				oppositionVal,
 				comparator,
 				userStatistique.stats,
-				dollarValue?.total
+				dollarValue?.total,
+				sortOrder
 			)
 		: undefined;
 	const roll = composed.roll;
@@ -222,7 +223,8 @@ export async function rollMacro(
 		customCritical: skillCustomCritical(
 			rCC || userStatistique.template.customCritical,
 			userStatistique.stats,
-			dollarValue?.total
+			dollarValue?.total,
+			sortOrder
 		),
 		hideResult,
 		infoRoll,
@@ -253,6 +255,7 @@ export async function rollStatistique(
 ) {
 	profiler.startProfiler();
 	const ctx = getGuildContext(client, interaction.guildId!);
+	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
 	let dice = template.diceType;
@@ -315,7 +318,13 @@ export async function rollStatistique(
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	const findStatsExpr = expr.statsFound;
-	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
+	const rCc = rollCustomCriticalsFromDice(
+		dice,
+		ul,
+		userStat,
+		userStatistique.stats,
+		sortOrder
+	);
 	// Unified composition for statistique variant
 	const composed = composeRollBase(
 		dice,
@@ -334,7 +343,8 @@ export async function rollStatistique(
 				oppositionVal,
 				composed.comparatorEvaluated,
 				userStatistique.stats,
-				userStatStr
+				userStatStr,
+				sortOrder
 			)
 		: undefined;
 	let infoRoll =
@@ -346,7 +356,13 @@ export async function rollStatistique(
 
 	const roll = composed.roll;
 	const customCritical =
-		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
+		rCc ||
+		rollCustomCritical(
+			template.customCritical,
+			userStat,
+			userStatistique.stats,
+			sortOrder
+		);
 
 	const opts: RollOptions = {
 		charName: optionChar,
@@ -369,7 +385,8 @@ export async function getCritical(
 	dice: string,
 	guild?: Djs.Guild,
 	userData?: UserData,
-	criticalsFromDice?: Record<string, CustomCritical>
+	criticalsFromDice?: Record<string, CustomCritical>,
+	sortOrder?: SortOrder
 ) {
 	let serverData: StatisticalTemplate | undefined;
 	if (guild)
@@ -380,7 +397,12 @@ export async function getCritical(
 		serverData?.customCritical &&
 		includeDiceType(dice, serverData.diceType, !!userData?.stats)
 	) {
-		const serverCriticals = rollCustomCritical(serverData.customCritical);
+		const serverCriticals = rollCustomCritical(
+			serverData.customCritical,
+			undefined,
+			undefined,
+			sortOrder
+		);
 		if (serverCriticals)
 			return {
 				criticalsFromDice: Object.assign(serverCriticals, criticalsFromDice),
@@ -392,11 +414,6 @@ export async function getCritical(
 	// This prevents criticals from being applied to incorrect dice types
 	const diceMatches =
 		serverData && includeDiceType(dice, serverData.diceType, !!userData?.stats);
-	logger.trace("Dice matches server template dice type:", {
-		dice,
-		diceMatches,
-		serverDiceType: serverData?.diceType,
-	});
 	return {
 		criticalsFromDice,
 		serverData: diceMatches ? serverData : undefined,

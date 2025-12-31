@@ -71,6 +71,7 @@ export default (client: EClient): void => {
 			//logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
 			const disableCompare = client.settings.get(message.guild.id, "disableCompare");
 			const sortOrder = client.settings.get(message.guild.id, "sortOrder");
+			logger.trace("Sort order for roll:", sortOrder);
 			const isRoll = isRolling(
 				content,
 				userData,
@@ -91,12 +92,15 @@ export default (client: EClient): void => {
 				result.dice,
 				message.guild,
 				userData,
-				rollCustomCriticalsFromDice(content, ul)
+				rollCustomCriticalsFromDice(content, ul, undefined, userData?.stats, sortOrder),
+				sortOrder
 			);
 
 			//logger.trace(criticalsFromDice, serverData);
 
 			const opposition = parseComparator(content, userData?.stats, infoRoll, sortOrder);
+
+			// Build infoRoll using helper to recover original accented name if available
 			const formattedInfoRoll = buildInfoRollFromStats(
 				infoRoll ? [infoRoll] : undefined,
 				statsName

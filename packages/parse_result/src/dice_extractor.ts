@@ -240,9 +240,8 @@ export function isRolling(
 			// Extract any comments from the content before removing the opposition
 			// Use DETECT_DICE_MESSAGE which captures comments without the leading "#"
 			const commentMatch = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
-			if (commentMatch?.[3]) {
-				preservedComments = commentMatch[3];
-			}
+			if (commentMatch?.[3]) preservedComments = commentMatch[3];
+
 			// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
 			if (!preservedComments) {
 				const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
@@ -264,7 +263,7 @@ export function isRolling(
 			const val = extractAndMergeComments(content);
 			content = `{${val.cleanedDice}}`;
 			if (val.mergedComments) content = `${content} ${val.mergedComments.trim()}`;
-			logger.trace("Content after disableCompare:", content);
+			//			logger.trace("Content after disableCompare:", content);
 		}
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
@@ -646,9 +645,9 @@ export function findStatInDiceFormula(
 }
 
 export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
-	logger.trace("Include dice type check:", { dice, diceType, userStats });
+	//	logger.trace("Include dice type check:", { dice, diceType, userStats });
 	if (!diceType) return false;
-	logger.trace("Dice type to find:", diceType, "in dice:", dice);
+	//	logger.trace("Dice type to find:", diceType, "in dice:", dice);
 
 	// Normalize leading implicit single dice: treat `1d100` and `d100` as equivalent
 	const normalizeSingleDie = (str: string) => str.replace(/\b1d(\d+)/gi, "d$1");

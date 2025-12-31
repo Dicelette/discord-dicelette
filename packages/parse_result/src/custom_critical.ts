@@ -194,9 +194,10 @@ export function rollCustomCriticalsFromDice(
 	dice: string,
 	ul: Translation,
 	statValue?: number,
-	statistics?: Record<string, number>
+	statistics?: Record<string, number>,
+	sortOrder?: SortOrder
 ): Record<string, CustomCriticalRoll> | undefined {
 	const customCritical = getCriticalFromDice(dice, ul);
 	if (!customCritical) return undefined;
-	return rollCustomCritical(customCritical, statValue, statistics);
+	return rollCustomCritical(customCritical, statValue, statistics, sortOrder);
 }

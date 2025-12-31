@@ -134,7 +134,8 @@ export async function baseRoll(
 		res.formula,
 		interaction.guild || undefined,
 		userData,
-		rollCustomCriticalsFromDice(dice, ul)
+		rollCustomCriticalsFromDice(dice, ul, undefined, userData?.stats, sortOrder),
+		sortOrder
 	);
 
 	// Build infoRoll using helper to recover original accented name if available
