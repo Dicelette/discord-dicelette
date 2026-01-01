@@ -221,7 +221,6 @@ export function saveCount(
 		const { cacheKey, prevCacheKey, timeMin } = createCacheKey(message, userId);
 		const trivialCache = client.trivialCache;
 		isTrivial = trivialCache.has(cacheKey) || trivialCache.has(prevCacheKey);
-//		logger.trace("Is trivial?", { cacheKey, isTrivial, messageTimestamp: timeMin });
 		if (isTrivial) clearCacheKey(message, userId, client);
 	}
 	if (type === "add") addCount(criticalCount, userId, guildId, count, isTrivial);
