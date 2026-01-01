@@ -139,6 +139,7 @@ export async function calculate(
 
 	let originalFormula = formula;
 	let totalFormula = formula;
+	const sortResult = client.settings.get(interaction.guildId!, "sortOrder");
 
 	let statInfo:
 		| {
@@ -178,7 +179,7 @@ export async function calculate(
 			userStatistique.stats,
 			`${statInfo.value}`
 		);
-		const isRoll = getRoll(formulaWithStats);
+		const isRoll = getRoll(formulaWithStats, undefined, sortResult);
 		originalFormula = `${statInfo.value}${sign}(${formula})`;
 		if (isNumber(formula)) originalFormula = `${statInfo.value}${sign}${formula}`;
 		if (isRoll?.total != null) {
@@ -189,7 +190,7 @@ export async function calculate(
 		if (isNumber(formulaWithStats))
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
-		const isRoll = getRoll(formula);
+		const isRoll = getRoll(formula, undefined, sortResult);
 		if (isRoll?.total != null) {
 			originalFormula = isRoll.result;
 			totalFormula = isRoll.total.toString();

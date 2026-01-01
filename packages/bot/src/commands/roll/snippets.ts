@@ -60,6 +60,7 @@ export default {
 		const macroName = interaction.options.getString(t("common.name"), true).standardize();
 		const snippets = client.userSettings.get(guildId, userId)?.snippets ?? {};
 		const expressionOpt = interaction.options.getString(t("common.expression")) ?? "0";
+		const sortOrder = client.settings.get(guildId)?.sortOrder;
 		const threshold = interaction.options
 			.getString(t("dbRoll.options.override.name"))
 			?.trimAll();
@@ -114,7 +115,7 @@ export default {
 			);
 
 			const opts: RollOptions = {
-				customCritical: skillCustomCritical(rCCShared),
+				customCritical: skillCustomCritical(rCCShared, undefined, undefined, sortOrder),
 				user: interaction.user,
 			};
 			await rollWithInteraction(interaction, composed.roll, client, opts);
@@ -149,12 +150,18 @@ export default {
 		);
 
 		const opposition = oppositionVal
-			? parseOpposition(oppositionVal, composed.comparatorEvaluated)
+			? parseOpposition(
+					oppositionVal,
+					composed.comparatorEvaluated,
+					undefined,
+					undefined,
+					sortOrder
+				)
 			: undefined;
 
 		const opts: RollOptions = {
 			charName: charOptions,
-			customCritical: skillCustomCritical(rCC),
+			customCritical: skillCustomCritical(rCC, undefined, undefined, sortOrder),
 			opposition,
 			user: interaction.user,
 		};

@@ -234,6 +234,30 @@ describe("interaction formatting with infoRoll", () => {
 	});
 });
 
+describe("bulk comparison rolls", () => {
+	it("should not propagate critical status across bulk results", () => {
+		const result: Resultat = {
+			compare: { sign: ">", value: 2 },
+			dice: "d5",
+			result: "d5: [4] = 4; d5: [1] = 1; d5: [2] = 2; d5: [5] = 5",
+			total: 12,
+		};
+
+		const res = new ResultAsText(result, DATA, { success: 1 });
+		const text = res.defaultMessage();
+		const lines = text
+			.split("\n")
+			.map((l) => l.trim())
+			.filter((l) => l.length > 0)
+			.slice(1); // remove header line
+
+		expect(lines[0]).toContain("**Success**");
+		expect(lines[1]).toContain("**Critical success**");
+		expect(lines[2]).toContain("**Failure**");
+		expect(lines[3]).toContain("**Success**");
+	});
+});
+
 describe("shared roll without comment newline handling", () => {
 	it("should not add an empty line for shared roll interactions without comment", () => {
 		const result: Resultat = {

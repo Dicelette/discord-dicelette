@@ -1,5 +1,6 @@
 import "uniformize";
 import type { EClient } from "@dicelette/client";
+import type { SortOrder } from "@dicelette/core";
 import type { GuildData } from "@dicelette/types";
 
 /**
@@ -15,6 +16,8 @@ export interface GuildContext {
 	standardizedStatsNames?: string[];
 	/** Template ID data */
 	templateID?: GuildData["templateID"];
+	sortOrder?: SortOrder;
+	disableCompare?: boolean;
 }
 
 /**

@@ -5,7 +5,7 @@ import {
 	getStatisticOption,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import type { CustomCritical, StatisticalTemplate } from "@dicelette/core";
+import type { CustomCritical, SortOrder, StatisticalTemplate } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
 	buildInfoRollFromStats,
@@ -69,13 +69,15 @@ export async function rollWithInteraction(
 		userId: user?.id ?? interaction.user.id,
 	};
 	let pity = false;
+	let sort: SortOrder | undefined;
 	if (interaction.guild) {
 		const pityNb = client.criticalCount.get(interaction.guild.id, data.userId!)
 			?.consecutive?.failure;
 		const pityThreshold = client.settings.get(interaction.guild.id, "pity");
 		pity = triggerPity(pityThreshold, pityNb);
+		sort = client.settings.get(interaction.guild.id, "sortOrder");
 	}
-	const result = getRoll(dice, pity);
+	const result = getRoll(dice, pity, sort);
 	if (!result) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],
@@ -124,6 +126,7 @@ export async function rollMacro(
 	hideResult?: boolean | null
 ) {
 	profiler.startProfiler();
+	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
 		name: atq,
@@ -211,7 +214,8 @@ export async function rollMacro(
 				oppositionVal,
 				comparator,
 				userStatistique.stats,
-				dollarValue?.total
+				dollarValue?.total,
+				sortOrder
 			)
 		: undefined;
 	const roll = composed.roll;
@@ -220,7 +224,8 @@ export async function rollMacro(
 		customCritical: skillCustomCritical(
 			rCC || userStatistique.template.customCritical,
 			userStatistique.stats,
-			dollarValue?.total
+			dollarValue?.total,
+			sortOrder
 		),
 		hideResult,
 		infoRoll,
@@ -251,6 +256,7 @@ export async function rollStatistique(
 ) {
 	profiler.startProfiler();
 	const ctx = getGuildContext(client, interaction.guildId!);
+	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
 	let dice = template.diceType;
@@ -313,7 +319,13 @@ export async function rollStatistique(
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	const findStatsExpr = expr.statsFound;
-	const rCc = rollCustomCriticalsFromDice(dice, ul, userStat, userStatistique.stats);
+	const rCc = rollCustomCriticalsFromDice(
+		dice,
+		ul,
+		userStat,
+		userStatistique.stats,
+		sortOrder
+	);
 	// Unified composition for statistique variant
 	const composed = composeRollBase(
 		dice,
@@ -332,7 +344,8 @@ export async function rollStatistique(
 				oppositionVal,
 				composed.comparatorEvaluated,
 				userStatistique.stats,
-				userStatStr
+				userStatStr,
+				sortOrder
 			)
 		: undefined;
 	let infoRoll =
@@ -344,7 +357,13 @@ export async function rollStatistique(
 
 	const roll = composed.roll;
 	const customCritical =
-		rCc || rollCustomCritical(template.customCritical, userStat, userStatistique.stats);
+		rCc ||
+		rollCustomCritical(
+			template.customCritical,
+			userStat,
+			userStatistique.stats,
+			sortOrder
+		);
 
 	const opts: RollOptions = {
 		charName: optionChar,
@@ -367,7 +386,8 @@ export async function getCritical(
 	dice: string,
 	guild?: Djs.Guild,
 	userData?: UserData,
-	criticalsFromDice?: Record<string, CustomCritical>
+	criticalsFromDice?: Record<string, CustomCritical>,
+	sortOrder?: SortOrder
 ) {
 	let serverData: StatisticalTemplate | undefined;
 	if (guild)
@@ -378,12 +398,25 @@ export async function getCritical(
 		serverData?.customCritical &&
 		includeDiceType(dice, serverData.diceType, !!userData?.stats)
 	) {
-		const serverCriticals = rollCustomCritical(serverData.customCritical);
+		const serverCriticals = rollCustomCritical(
+			serverData.customCritical,
+			undefined,
+			undefined,
+			sortOrder
+		);
 		if (serverCriticals)
 			return {
 				criticalsFromDice: Object.assign(serverCriticals, criticalsFromDice),
 				serverData,
 			};
 	}
-	return { criticalsFromDice, serverData };
+
+	// Only apply server criticals (basic success/failure thresholds) if the dice type matches
+	// This prevents criticals from being applied to incorrect dice types
+	const diceMatches =
+		serverData && includeDiceType(dice, serverData.diceType, !!userData?.stats);
+	return {
+		criticalsFromDice,
+		serverData: diceMatches ? serverData : undefined,
+	};
 }

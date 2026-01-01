@@ -63,6 +63,7 @@ export async function baseRoll(
 ): Promise<void> {
 	profiler.startProfiler();
 	const { ul } = getLangAndConfig(client, interaction);
+
 	let firstChara: string | undefined;
 	if (dice.match(REMOVER_PATTERN.STAT_MATCHER) && interaction.guild)
 		firstChara = await getCharFromText(client, interaction.guild.id, user.id, dice);
@@ -85,17 +86,18 @@ export async function baseRoll(
 
 	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
-	logger.trace("Evaluated dice regex result" + ":", evaluated);
-	if (!evaluated) {
+	const disableMatch = ctx?.disableCompare;
+	const sortOrder = ctx?.settings.sortOrder;
+	if (!evaluated && !disableMatch) {
 		// Preclean to ignore {cs|cf:...} blocs before checking for opposition
 		const contentForOpposition = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		// Remove the second comparator for opposition rolls (e.g., 1d20>15>20 becomes 1d20>15)
 		const oppositionMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
-		opposition = parseComparator(dice, userData?.stats, undefined);
+		opposition = parseComparator(dice, userData?.stats, undefined, sortOrder);
 		logger.trace("Opposition match regex result:", oppositionMatch, opposition);
 		if (oppositionMatch?.groups?.second)
 			dice = dice.replace(oppositionMatch.groups.second, "").trim();
-	} else if (evaluated.groups) {
+	} else if (evaluated?.groups) {
 		//also find the comments and preserve them
 		//dice is group 1
 		//comments can be group 2
@@ -105,6 +107,12 @@ export async function baseRoll(
 		if (doubleTarget?.groups?.dice) dice = value;
 		else dice = `{${value}}`;
 		if (comments) dice = `${dice} ${comments}`;
+	} else if (disableMatch) {
+		//find comments first to preserve them
+		const allComments = dice.match(DICE_COMPILED_PATTERNS.COMMENTS_REGEX);
+		const comments = allComments ? ` ${allComments.join(" ")}` : "";
+		dice = dice.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trim();
+		dice = `{${dice}}${comments}`;
 	}
 
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
@@ -121,7 +129,8 @@ export async function baseRoll(
 		res.formula,
 		interaction.guild || undefined,
 		userData,
-		rollCustomCriticalsFromDice(dice, ul)
+		rollCustomCriticalsFromDice(dice, ul, undefined, userData?.stats, sortOrder),
+		sortOrder
 	);
 
 	// Build infoRoll using helper to recover original accented name if available

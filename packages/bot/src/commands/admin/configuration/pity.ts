@@ -11,7 +11,9 @@ import { reply } from "messages";
  * If a numeric pity value is provided, stores it in the guild settings under the key `"pity"` and replies with a success message including the value.
  * If no pity value is provided (falsy), deletes the guild's pity setting and replies with a deletion message.
  *
+ * @param interaction
  * @param options - Command options resolver used to read the pity integer option
+ * @param client
  * @param ul - Translation helper for localized reply messages
  * @returns The reply sent to the interaction
  */
@@ -79,4 +81,24 @@ export function createCacheKey(
 	const cacheKey = `${prefix}:${timeMin}`;
 	const prevCacheKey = `${prefix}:${timeMin - 1}`;
 	return { cacheKey, prevCacheKey, timeMin };
+}
+
+export function clearCacheKey(
+	message: Djs.Message | Djs.PartialMessage,
+	userId: string,
+	client: EClient
+) {
+	const { cacheKey, prevCacheKey } = createCacheKey(message, userId); // Clear timeouts to prevent memory leaks
+	const timeoutId = client.trivialCacheTimeouts.get(cacheKey);
+	if (timeoutId) {
+		clearTimeout(timeoutId);
+		client.trivialCacheTimeouts.delete(cacheKey);
+	}
+	const prevTimeoutId = client.trivialCacheTimeouts.get(prevCacheKey);
+	if (prevTimeoutId) {
+		clearTimeout(prevTimeoutId);
+		client.trivialCacheTimeouts.delete(prevCacheKey);
+	}
+	client.trivialCache.delete(cacheKey);
+	client.trivialCache.delete(prevCacheKey);
 }

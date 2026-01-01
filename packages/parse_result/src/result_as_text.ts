@@ -254,7 +254,9 @@ export class ResultAsText {
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
-		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join("\n ");
+		// Use double space indentation when there's a comment, single space otherwise
+		const separator = hasComment ? "\n  " : "\n ";
+		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join(separator);
 		// If comment contains only whitespace/newline, don't add extra space
 		if (hasComment) return ` ${comment} ${joinedRes.trimEnd()}`;
 
@@ -278,10 +280,10 @@ export class ResultAsText {
 		};
 	} {
 		let msgSuccess = "";
-		let total = 0;
-		const natural: number[] = [];
-		let isCritical: undefined | "failure" | "success" | "custom";
-		let successOrFailure = "";
+		let currentCriticalState: {
+			isCritical?: "failure" | "success" | "custom";
+			successOrFailure?: string;
+		} = {};
 
 		for (const r of messageResult) {
 			if (r.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
@@ -289,9 +291,11 @@ export class ResultAsText {
 				continue;
 			}
 
+			const natural: number[] = [];
+			let isCritical: undefined | "failure" | "success" | "custom";
 			const result = this.roll(r, opposition);
-			total = result.total;
-			successOrFailure = result.successOrFailure;
+			const total = result.total;
+			let successOrFailure = result.successOrFailure;
 			const oldCompare = result.oldCompare;
 
 			this.naturalDice(r, natural);
@@ -300,9 +304,10 @@ export class ResultAsText {
 			if (criticalResult) {
 				successOrFailure = criticalResult.successOrFailure;
 				isCritical = criticalResult.isCritical;
-			}
+				currentCriticalState = { ...criticalResult };
+			} else currentCriticalState = { isCritical: undefined, successOrFailure };
 
-			const messageFormatted = this.display(
+			msgSuccess += this.display(
 				r,
 				total,
 				oldCompare,
@@ -311,11 +316,9 @@ export class ResultAsText {
 				successOrFailure,
 				customCritical
 			);
-			msgSuccess += messageFormatted;
-			total = 0;
 		}
 
-		return { criticalState: { isCritical, successOrFailure }, msgSuccess };
+		return { criticalState: currentCriticalState, msgSuccess };
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
@@ -363,13 +366,16 @@ export class ResultAsText {
 		| { successOrFailure: string; isCritical: "failure" | "success" | "custom" }
 		| undefined {
 		if (critical) {
-			if (critical.failure && natural.includes(critical.failure))
+			//if 0 is passed, ignore criticals
+			const failure = critical.failure || undefined
+			const success = critical.success || undefined;
+			if (failure !== undefined && natural.includes(failure))
 				return {
 					isCritical: "failure",
 					successOrFailure: `**${this.ul("roll.critical.failure")}**`,
 				};
 
-			if (critical.success && natural.includes(critical.success))
+			if (success !== undefined && natural.includes(success))
 				return {
 					isCritical: "success",
 					successOrFailure: `**${this.ul("roll.critical.success")}**`,

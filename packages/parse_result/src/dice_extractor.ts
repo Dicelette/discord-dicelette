@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
-import { type Resultat, roll, SIGN_REGEX } from "@dicelette/core";
+import { type Resultat, roll, SIGN_REGEX, type SortOrder } from "@dicelette/core";
 import type {
 	ChainedComments,
 	DiceData,
@@ -12,8 +12,10 @@ import {
 	findBestStatMatch,
 	getCachedRegex,
 	logger,
+	NORMALIZE_SINGLE_DICE,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
+import { extractAndMergeComments, getComments } from "./comment_utils";
 import { trimAll } from "./utils";
 
 export function extractDiceData(content: string): DiceData {
@@ -38,23 +40,6 @@ export function hasValidDice(diceData: DiceData): boolean {
 	const { bracketRoll, comments, diceValue } = diceData;
 	if (comments && !bracketRoll) return !!diceValue;
 	return true;
-}
-
-export function getComments(content: string, comments?: string) {
-	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
-	if (!globalComments && !comments)
-		globalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
-	if (comments && !globalComments) globalComments = comments;
-
-	const statValue = content.match(DICE_PATTERNS.INFO_STATS_COMMENTS);
-	if (statValue)
-		globalComments =
-			statValue[0] +
-			(globalComments
-				? ` ${globalComments.replace(DICE_PATTERNS.INFO_STATS_COMMENTS, "").trim()}`
-				: "");
-
-	return globalComments;
 }
 
 export function processChainedComments(
@@ -100,13 +85,15 @@ export function processChainedComments(
  * @param bracketRoll - Optional explicit bracketed dice expression to prioritize over `content`
  * @param infoRoll - Optional metadata about the roll (e.g., resolved stat name) to include in the result
  * @param pity - Optional flag passed to the underlying roll engine to alter roll behavior
+ * @param sort
  * @returns An object with `resultat` containing the roll result (if the roll ran) and optional `infoRoll`, or `undefined` when the content is invalid or an error occurred
  */
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
 	infoRoll?: string,
-	pity?: boolean
+	pity?: boolean,
+	sort?: SortOrder
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
@@ -120,7 +107,7 @@ export function performDiceRoll(
 			.replace(/ @\w+/, "")
 			.trimEnd();
 		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
-		return { infoRoll, resultat: roll(rollContent, undefined, pity) };
+		return { infoRoll, resultat: roll(rollContent, undefined, pity, sort) };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -148,13 +135,17 @@ export function applyCommentsToResult(
  * @param userData - Optional user data containing `stats` to substitute into the formula
  * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @param disableCompare - Encapsulate the roll with `{}`
+ * @param sort - Sort the result passed to roll
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
 	statsName?: string[],
-	pity?: boolean
+	pity?: boolean,
+	disableCompare?: boolean,
+	sort?: SortOrder
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -194,8 +185,9 @@ export function processChainedDiceRoll(
 
 	try {
 		// Remove critical blocks before rolling
-		const cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-		const rollResult = roll(cleaned, undefined, pity);
+		let cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
+		if (disableCompare) cleaned = `{${cleaned}}`;
+		const rollResult = roll(cleaned, undefined, pity, sort);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
 		// For chained rolls with & and ;, only add comment if it's a true # comment
@@ -218,13 +210,17 @@ export function processChainedDiceRoll(
  * @param userData - Optional user data containing stats used to substitute stat tokens in formulas
  * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
+ * @param disableCompare - If true, encapsulate the roll in `{}` to disable success/failure comparison
+ * @param sort - Optional sort order for the roll results
  * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
  */
 export function isRolling(
 	content: string,
 	userData?: UserData,
 	statsName?: string[],
-	pity?: boolean
+	pity?: boolean,
+	disableCompare?: boolean,
+	sort?: SortOrder
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -243,9 +239,8 @@ export function isRolling(
 			// Extract any comments from the content before removing the opposition
 			// Use DETECT_DICE_MESSAGE which captures comments without the leading "#"
 			const commentMatch = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
-			if (commentMatch?.[3]) {
-				preservedComments = commentMatch[3];
-			}
+			if (commentMatch?.[3]) preservedComments = commentMatch[3];
+
 			// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
 			if (!preservedComments) {
 				const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
@@ -254,25 +249,25 @@ export function isRolling(
 
 			content = content.replace(reg.groups.second, "").trim();
 
+			if (disableCompare) content = `{${content}}`;
 			// Re-append the comment if it was lost during opposition removal
 			if (preservedComments && !content.includes(preservedComments)) {
 				// Add back the comment as an inline comment (without #)
 				// The processing pipeline will handle it correctly
 				content = `${content} ${preservedComments}`;
 			}
+		} else if (disableCompare) {
+			//preserve comments
+			const val = extractAndMergeComments(content);
+			content = `{${val.cleanedDice}}`;
+			if (val.mergedComments) content = `${content} ${val.mergedComments.trim()}`;
 		}
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
-		logger.trace("Double target", doubleTarget);
 		const { dice, comments } = evaluated.groups;
-		if (doubleTarget?.groups?.dice) {
-			content = dice.trim();
-		} else {
-			//also find the comments and preserve them
-			//dice is group 1
-			//comments can be group 2
-			content = `{${dice.trim()}}`;
-		}
+		if (doubleTarget?.groups?.dice) content = dice.trim();
+		else content = `{${dice.trim()}}`;
+
 		if (comments) content = `${content} ${comments}`;
 	}
 
@@ -303,7 +298,8 @@ export function isRolling(
 			cleanedForRoll,
 			diceData.bracketRoll,
 			res?.infoRoll,
-			pity
+			pity,
+			sort
 		);
 		if (diceRoll?.resultat)
 			return {
@@ -322,7 +318,9 @@ export function isRolling(
 			originalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, ""),
 			userData,
 			statsName,
-			pity
+			pity,
+			disableCompare,
+			sort
 		);
 		if (diceRoll)
 			return {
@@ -344,7 +342,7 @@ export function isRolling(
 
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity);
+		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity, sort);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return {
@@ -362,12 +360,13 @@ export function isRolling(
  *
  * @param dice - The shared dice expression, possibly containing a global comment group and multiple segments separated by `;`.
  * @param pity - If `true`, enable pity mode for the underlying roll which may alter roll behavior.
+ * @param sort
  * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
  */
-function getRollInShared(dice: string, pity?: boolean) {
+function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
 	const main = DICE_PATTERNS.GLOBAL_COMMENTS_GROUP.exec(dice)?.groups?.comment;
 	dice = dice.replace(DICE_PATTERNS.GLOBAL_COMMENTS_GROUP, "");
-	const rollDice = roll(dice, undefined, pity);
+	const rollDice = roll(dice, undefined, pity, sort);
 	if (!rollDice) return undefined;
 
 	rollDice.dice = dice;
@@ -392,11 +391,16 @@ function isSharedRoll(dice: string): boolean {
  *
  * @param dice - Dice expression to evaluate; may contain inline comment markers or shared-segment syntax.
  * @param pity - Optional flag forwarded to the rolling engine that alters roll behavior.
+ * @param sort
  * @returns The computed Resultat with embedded comment and adjusted dice string when present, or `undefined` if the expression is invalid or rolling failed.
  */
-export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
+export function getRoll(
+	dice: string,
+	pity?: boolean,
+	sort?: SortOrder
+): Resultat | undefined {
 	logger.trace("Getting roll for dice:", dice);
-	if (isSharedRoll(dice)) return getRollInShared(dice, pity);
+	if (isSharedRoll(dice)) return getRollInShared(dice, pity, sort);
 	const comments = dice
 		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
 		.replaceAll("*", "\\*");
@@ -404,7 +408,7 @@ export function getRoll(dice: string, pity?: boolean): Resultat | undefined {
 
 	dice = dice.trim();
 	try {
-		const rollDice = roll(dice, undefined, pity);
+		const rollDice = roll(dice, undefined, pity, sort);
 		if (!rollDice) return undefined;
 		if (comments) {
 			rollDice.comment = comments;
@@ -627,6 +631,9 @@ export function findStatInDiceFormula(
 
 export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
 	if (!diceType) return false;
+	// Normalize leading implicit single dice: treat `1d100` and `d100` as equivalent
+	diceType = NORMALIZE_SINGLE_DICE(diceType);
+	dice = NORMALIZE_SINGLE_DICE(dice);
 	if (userStats && diceType.includes("$")) {
 		//replace the $ in the diceType by a regex (like .+?)
 		diceType = diceType.replace("$", ".+?");

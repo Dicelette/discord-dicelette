@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome allow to set a specific rules for property of a global object, we stick against the naming convention */
+
+import type { SortOrder } from "@dicelette/core";
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import type { Translation } from "@dicelette/types";
 import { DICE_COMPILED_PATTERNS, logger, REMOVER_PATTERN } from "@dicelette/utils";
@@ -181,7 +183,8 @@ export function filterStatsInDamage(
 export function parseComparator(
 	dice: string,
 	userStatistique?: Record<string, number>,
-	userStatStr?: string
+	userStatStr?: string,
+	sort?: SortOrder
 ) {
 	// Ignore les blocs de critiques personnalisés lors de la détection
 	const cleanedDice = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
@@ -193,6 +196,6 @@ export function parseComparator(
 		opposition = comparatorMatch.groups?.second;
 	}
 	if (opposition)
-		return parseOpposition(opposition, comparator, userStatistique, userStatStr);
+		return parseOpposition(opposition, comparator, userStatistique, userStatStr, sort);
 	return undefined;
 }

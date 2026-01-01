@@ -1,4 +1,4 @@
-import type { Critical, CustomCritical } from "@dicelette/core";
+import type { Critical, CustomCritical, SortOrder } from "@dicelette/core";
 import type * as Djs from "discord.js";
 
 export interface GuildData {
@@ -85,6 +85,17 @@ export interface GuildData {
 	 */
 	createLinkTemplate?: TemplateResult;
 	pity?: number;
+	/**
+	 * If enabled, all dice throw will be encapsulated with `{}` to match the diceroller library
+	 * The Fail/Success won't never be displayed.
+	 * @default false
+	 */
+	disableCompare?: boolean;
+	/**
+	 * Sort output results
+	 * @default undefined
+	 */
+	sortOrder?: SortOrder;
 }
 
 export interface TemplateResult {

@@ -3,6 +3,7 @@ import {
 	type CustomCritical,
 	generateStatsDice,
 	isNumber,
+	type SortOrder,
 } from "@dicelette/core";
 import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import {
@@ -50,7 +51,8 @@ export function parseOpposition(
 	opposition: string,
 	diceComparator: string,
 	userStatistique?: Record<string, number>,
-	userStatStr?: string
+	userStatStr?: string,
+	sort?: SortOrder
 ): ComparedValue | undefined {
 	const replaced = generateStatsDice(opposition, userStatistique, userStatStr);
 	const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
@@ -59,7 +61,7 @@ export function parseOpposition(
 	const comp = signRegex.exec(diceComparator);
 	let sign = match?.groups?.sign || comp?.groups?.sign;
 	if (!sign || !comparator) return;
-	const rolledValue = getRoll(comparator);
+	const rolledValue = getRoll(comparator, undefined, sort);
 	if (sign === "=") sign = "==";
 	if (rolledValue?.total) {
 		return {
@@ -76,8 +78,8 @@ export function parseOpposition(
 	};
 }
 
-function rollOneCustomCritical(critical: CustomCritical) {
-	const rolledValue = getRoll(critical.value);
+function rollOneCustomCritical(critical: CustomCritical, sort?: SortOrder) {
+	const rolledValue = getRoll(critical.value, undefined, sort);
 	if (rolledValue?.total)
 		return {
 			affectSkill: critical.affectSkill,
@@ -100,14 +102,15 @@ function rollOneCustomCritical(critical: CustomCritical) {
 export function rollCustomCritical(
 	custom?: Record<string, CustomCritical>,
 	statValue?: number,
-	statistics?: Record<string, number>
+	statistics?: Record<string, number>,
+	sort?: SortOrder
 ) {
 	if (!custom) return undefined;
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
 		value.value = generateStatsDice(value.value, statistics, statValue?.toString());
 		if (value.value.includes("$")) continue;
-		customCritical[name] = rollOneCustomCritical(value);
+		customCritical[name] = rollOneCustomCritical(value, sort);
 	}
 	return customCritical;
 }
@@ -125,7 +128,8 @@ export function rollCustomCritical(
 export function skillCustomCritical(
 	customCritical?: Record<string, CustomCritical>,
 	statistics?: Record<string, number>,
-	dollarsValue?: string | number
+	dollarsValue?: string | number,
+	sort?: SortOrder
 ): Record<string, CustomCritical> | undefined {
 	if (!customCritical) return undefined;
 	const customCriticalFiltered: Record<string, CustomCritical> = {};
@@ -134,7 +138,7 @@ export function skillCustomCritical(
 		if (!dollarsValue && !value.value.includes("$")) customCriticalFiltered[name] = value;
 		else if (dollarsValue && value.value.includes("$")) {
 			value.value = generateStatsDice(value.value, statistics, dollarsValue.toString());
-			customCriticalFiltered[name] = rollOneCustomCritical(value);
+			customCriticalFiltered[name] = rollOneCustomCritical(value, sort);
 		}
 	}
 	if (Object.keys(customCriticalFiltered).length === 0) return undefined;
@@ -190,9 +194,10 @@ export function rollCustomCriticalsFromDice(
 	dice: string,
 	ul: Translation,
 	statValue?: number,
-	statistics?: Record<string, number>
+	statistics?: Record<string, number>,
+	sortOrder?: SortOrder
 ): Record<string, CustomCriticalRoll> | undefined {
 	const customCritical = getCriticalFromDice(dice, ul);
 	if (!customCritical) return undefined;
-	return rollCustomCritical(customCritical, statValue, statistics);
+	return rollCustomCritical(customCritical, statValue, statistics, sortOrder);
 }

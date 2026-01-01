@@ -25,8 +25,7 @@ export const DICE_COMPILED_PATTERNS = {
 	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
 	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
-	//old version: /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))
-	OPPOSITION: /(?<first>(([><=]|!=)+)(.+?))(?<second>(([><=]|!=)+)(.+))/,
+	OPPOSITION: /(?<first>(([><=]|!=)+)([^<>=!]+))(?<second>(([><=]|!=)+)([^<>=!]+))/,
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 	TARGET_VALUE: /^\{(?<dice>.*?)}(?<comments>(?:^|\s)# ?(.*))?$/,
 } as const;
@@ -60,6 +59,7 @@ export const PARSE_RESULT_PATTERNS = {
 export const CHARACTER_DETECTION = / @([\p{L}\p{M}._-]+)/u;
 export const MENTION_ID_DETECTION = /<[@#]&?(\d+)>>?/;
 export const COMPILED_COMMENTS = /^(_ _|\s+)?(?<comment>\*.*?\*)$/gm;
+export const NORMALIZE_SINGLE_DICE = (str: string) => str.replace(/\b1d(\d+)/gi, "d$1");
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;

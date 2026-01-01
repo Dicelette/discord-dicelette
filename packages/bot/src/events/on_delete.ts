@@ -1,10 +1,11 @@
 import type { EClient } from "@dicelette/client";
 import type { PersonnageIds } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
-import { createCacheKey, DATABASE_NAMES } from "commands";
+import { DATABASE_NAMES } from "commands";
 import { deleteIfChannelOrThread, deleteUserInChar } from "database";
 import * as Djs from "discord.js";
 import { getAuthor, saveCount, sendLogs } from "messages";
+import { clearCacheKey } from "../commands";
 
 export const onDeleteChannel = (client: EClient): void => {
 	client.on("channelDelete", async (channel) => {
@@ -85,21 +86,7 @@ export const onDeleteMessage = (client: EClient): void => {
 				// Clean up cache entry after processing
 				if (client.settings.get(message.guild.id, "pity")) {
 					const userId = getAuthor(message);
-					if (userId) {
-						const { cacheKey, prevCacheKey } = createCacheKey(message, userId); // Clear timeouts to prevent memory leaks
-						const timeoutId = client.trivialCacheTimeouts.get(cacheKey);
-						if (timeoutId) {
-							clearTimeout(timeoutId);
-							client.trivialCacheTimeouts.delete(cacheKey);
-						}
-						const prevTimeoutId = client.trivialCacheTimeouts.get(prevCacheKey);
-						if (prevTimeoutId) {
-							clearTimeout(prevTimeoutId);
-							client.trivialCacheTimeouts.delete(prevCacheKey);
-						}
-						client.trivialCache.delete(cacheKey);
-						client.trivialCache.delete(prevCacheKey);
-					}
+					if (userId) clearCacheKey(message, userId, client);
 				}
 			}
 

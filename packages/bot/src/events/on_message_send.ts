@@ -68,8 +68,16 @@ export default (client: EClient): void => {
 				?.failure;
 			const pityThreshold = client.settings.get(message.guild.id, "pity");
 			const pity = triggerPity(pityThreshold, pityNb);
-			logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
-			const isRoll = isRolling(content, userData, statsName, pity);
+			const disableCompare = client.settings.get(message.guild.id, "disableCompare");
+			const sortOrder = client.settings.get(message.guild.id, "sortOrder");
+			const isRoll = isRolling(
+				content,
+				userData,
+				statsName,
+				pity,
+				disableCompare,
+				sortOrder
+			);
 
 			if (!isRoll || allValuesUndefined(isRoll))
 				return await stripOOC(message, client, ul);
@@ -82,10 +90,11 @@ export default (client: EClient): void => {
 				result.dice,
 				message.guild,
 				userData,
-				rollCustomCriticalsFromDice(content, ul)
+				rollCustomCriticalsFromDice(content, ul, undefined, userData?.stats, sortOrder),
+				sortOrder
 			);
 
-			const opposition = parseComparator(content, userData?.stats, infoRoll);
+			const opposition = parseComparator(content, userData?.stats, infoRoll, sortOrder);
 
 			// Build infoRoll using helper to recover original accented name if available
 			const formattedInfoRoll = buildInfoRollFromStats(

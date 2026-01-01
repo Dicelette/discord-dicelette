@@ -1,10 +1,8 @@
 import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-
-import { createCacheKey } from "../commands";
+import { clearCacheKey, createCacheKey } from "../commands";
 
 /**
  * Extracts counts of critical and regular successes and failures from a Discord message's content.
@@ -125,9 +123,7 @@ function addCount(
 			),
 		};
 	}
-	logger.trace(
-		`Saving new count for user ${userId} in guild ${guildId} ${JSON.stringify(newCount)}`
-	);
+
 	criticalCount.set(guildId, newCount, userId);
 }
 
@@ -222,10 +218,10 @@ export function saveCount(
 	if (pity) {
 		// Check if this roll has a trivial comparison
 		// Check both the current minute's cache key and the previous minute's key to handle edge cases around minute boundaries.
-		const { cacheKey, prevCacheKey, timeMin } = createCacheKey(message, userId);
+		const { cacheKey, prevCacheKey } = createCacheKey(message, userId);
 		const trivialCache = client.trivialCache;
 		isTrivial = trivialCache.has(cacheKey) || trivialCache.has(prevCacheKey);
-		logger.trace("Is trivial?", { cacheKey, isTrivial, messageTimestamp: timeMin });
+		if (isTrivial) clearCacheKey(message, userId, client);
 	}
 	if (type === "add") addCount(criticalCount, userId, guildId, count, isTrivial);
 	else removeCount(criticalCount, userId, guildId, count, isTrivial);
