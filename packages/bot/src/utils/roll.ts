@@ -69,13 +69,14 @@ export async function rollWithInteraction(
 		userId: user?.id ?? interaction.user.id,
 	};
 	let pity = false;
+	let sort: SortOrder | undefined;
 	if (interaction.guild) {
 		const pityNb = client.criticalCount.get(interaction.guild.id, data.userId!)
 			?.consecutive?.failure;
 		const pityThreshold = client.settings.get(interaction.guild.id, "pity");
 		pity = triggerPity(pityThreshold, pityNb);
+		sort = client.settings.get(interaction.guild.id, "sortOrder");
 	}
-	const sort = client.settings.get(interaction.guildId!, "sortOrder");
 	const result = getRoll(dice, pity, sort);
 	if (!result) {
 		await reply(interaction, {

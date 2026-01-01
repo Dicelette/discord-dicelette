@@ -87,8 +87,8 @@ export async function baseRoll(
 	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
 	logger.trace("Evaluated dice regex result" + ":", evaluated);
-	const disableMatch = client.settings.get(interaction.guildId!, "disableCompare");
-	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
+	const disableMatch = ctx?.disableCompare;
+	const sortOrder = ctx?.settings.sortOrder;
 	if (!evaluated && !disableMatch) {
 		// Preclean to ignore {cs|cf:...} blocs before checking for opposition
 		const contentForOpposition = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
