@@ -68,10 +68,8 @@ export default (client: EClient): void => {
 				?.failure;
 			const pityThreshold = client.settings.get(message.guild.id, "pity");
 			const pity = triggerPity(pityThreshold, pityNb);
-			//logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
 			const disableCompare = client.settings.get(message.guild.id, "disableCompare");
 			const sortOrder = client.settings.get(message.guild.id, "sortOrder");
-			//logger.trace("Sort order for roll:", sortOrder);
 			const isRoll = isRolling(
 				content,
 				userData,
@@ -95,8 +93,6 @@ export default (client: EClient): void => {
 				rollCustomCriticalsFromDice(content, ul, undefined, userData?.stats, sortOrder),
 				sortOrder
 			);
-
-			//logger.trace(criticalsFromDice, serverData);
 
 			const opposition = parseComparator(content, userData?.stats, infoRoll, sortOrder);
 
