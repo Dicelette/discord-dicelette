@@ -71,7 +71,7 @@ export default (client: EClient): void => {
 			//logger.trace("Should be pity?", { pity, pityNb, pityThreshold });
 			const disableCompare = client.settings.get(message.guild.id, "disableCompare");
 			const sortOrder = client.settings.get(message.guild.id, "sortOrder");
-			logger.trace("Sort order for roll:", sortOrder);
+			//logger.trace("Sort order for roll:", sortOrder);
 			const isRoll = isRolling(
 				content,
 				userData,
