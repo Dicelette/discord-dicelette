@@ -263,7 +263,6 @@ export function isRolling(
 			const val = extractAndMergeComments(content);
 			content = `{${val.cleanedDice}}`;
 			if (val.mergedComments) content = `${content} ${val.mergedComments.trim()}`;
-			//			logger.trace("Content after disableCompare:", content);
 		}
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
