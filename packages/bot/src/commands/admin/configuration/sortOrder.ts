@@ -5,7 +5,7 @@ import type { Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
 import { reply } from "messages";
 
-export function setSortOrder(
+export async function setSortOrder(
 	interaction: Djs.CommandInteraction,
 	options: Djs.CommandInteractionOptionResolver,
 	client: EClient,
@@ -14,10 +14,10 @@ export function setSortOrder(
 	const sortOrder = options.getString(t("config.sort.option.name"));
 	if (!sortOrder || sortOrder === SortOrder.None) {
 		client.settings.delete(interaction.guild!.id, "sortOrder");
-		return reply(interaction, ul("config.sort.order.reset"));
+		return await reply(interaction, ul("config.sort.order.reset"));
 	}
 	client.settings.set(interaction.guild!.id, sortOrder, "sortOrder");
-	return reply(
+	return await reply(
 		interaction,
 		ul("config.sort.order.set", {
 			order:
