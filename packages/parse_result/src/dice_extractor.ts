@@ -249,7 +249,6 @@ export function isRolling(
 			content = content.replace(reg.groups.second, "").trim();
 
 			if (disableCompare) content = `{${content}}`;
-			//logger.trace("Content after opposition removal:", content);
 			// Re-append the comment if it was lost during opposition removal
 			if (preservedComments && !content.includes(preservedComments)) {
 				// Add back the comment as an inline comment (without #)
@@ -264,16 +263,12 @@ export function isRolling(
 		}
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
-		//logger.trace("Double target", doubleTarget);
 		const { dice, comments } = evaluated.groups;
-		if (doubleTarget?.groups?.dice) {
+		if (doubleTarget?.groups?.dice)
 			content = dice.trim();
-		} else {
-			//also find the comments and preserve them
-			//dice is group 1
-			//comments can be group 2
+		 else
 			content = `{${dice.trim()}}`;
-		}
+		
 		if (comments) content = `${content} ${comments}`;
 	}
 
