@@ -61,7 +61,6 @@ export const MENTION_ID_DETECTION = /<[@#]&?(\d+)>>?/;
 export const COMPILED_COMMENTS = /^(_ _|\s+)?(?<comment>\*.*?\*)$/gm;
 export const NORMALIZE_SINGLE_DICE = (str: string) => str.replace(/\b1d(\d+)/gi, "d$1");
 
-
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;
 	// Reset lastIndex for global regex to avoid issues

@@ -11,7 +11,7 @@ import {
 	DICE_PATTERNS,
 	findBestStatMatch,
 	getCachedRegex,
-	logger,
+	logger, NORMALIZE_SINGLE_DICE,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
 import { extractAndMergeComments, getComments } from "./comment_utils";
@@ -227,9 +227,7 @@ export function isRolling(
 	// Preserve original content before any modifications for processChainedDiceRoll
 	const originalContent = content;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
-	//logger.trace("Evaluated regex result:", evaluated, "disableCompare:", disableCompare);
 	if (!evaluated) {
-		//logger.trace("Évaluated is null, checking for opposition or disableCompare");
 		// Preclean to ignore {cs|cf:...} blocs
 		const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
@@ -644,14 +642,10 @@ export function findStatInDiceFormula(
 }
 
 export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
-	//	logger.trace("Include dice type check:", { dice, diceType, userStats });
 	if (!diceType) return false;
-	//	logger.trace("Dice type to find:", diceType, "in dice:", dice);
-
 	// Normalize leading implicit single dice: treat `1d100` and `d100` as equivalent
-	const normalizeSingleDie = (str: string) => str.replace(/\b1d(\d+)/gi, "d$1");
-	diceType = normalizeSingleDie(diceType);
-	dice = normalizeSingleDie(dice);
+	diceType = NORMALIZE_SINGLE_DICE(diceType);
+	dice = NORMALIZE_SINGLE_DICE(dice);
 	if (userStats && diceType.includes("$")) {
 		//replace the $ in the diceType by a regex (like .+?)
 		diceType = diceType.replace("$", ".+?");
