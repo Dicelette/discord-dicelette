@@ -11,7 +11,8 @@ import {
 	DICE_PATTERNS,
 	findBestStatMatch,
 	getCachedRegex,
-	logger, NORMALIZE_SINGLE_DICE,
+	logger,
+	NORMALIZE_SINGLE_DICE,
 	REMOVER_PATTERN,
 } from "@dicelette/utils";
 import { extractAndMergeComments, getComments } from "./comment_utils";
@@ -134,8 +135,8 @@ export function applyCommentsToResult(
  * @param userData - Optional user data containing `stats` to substitute into the formula
  * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
- * @param disableCompare
- * @param sortOrder
+ * @param disableCompare - Encapsulate the roll with `{}`
+ * @param sort - Sort the result passed to roll
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
 export function processChainedDiceRoll(
@@ -144,7 +145,7 @@ export function processChainedDiceRoll(
 	statsName?: string[],
 	pity?: boolean,
 	disableCompare?: boolean,
-	sortOrder?: SortOrder
+	sort?: SortOrder
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -186,7 +187,7 @@ export function processChainedDiceRoll(
 		// Remove critical blocks before rolling
 		let cleaned = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 		if (disableCompare) cleaned = `{${cleaned}}`;
-		const rollResult = roll(cleaned, undefined, pity, sortOrder);
+		const rollResult = roll(cleaned, undefined, pity, sort);
 		if (!rollResult) return undefined;
 		rollResult.dice = cleaned;
 		// For chained rolls with & and ;, only add comment if it's a true # comment
@@ -210,7 +211,7 @@ export function processChainedDiceRoll(
  * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
  * @param disableCompare - If true, encapsulate the roll in `{}` to disable success/failure comparison
- * @param sortOrder - Optional sort order for the roll results
+ * @param sort - Optional sort order for the roll results
  * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
  */
 export function isRolling(
@@ -219,7 +220,7 @@ export function isRolling(
 	statsName?: string[],
 	pity?: boolean,
 	disableCompare?: boolean,
-	sortOrder?: SortOrder
+	sort?: SortOrder
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -264,11 +265,9 @@ export function isRolling(
 	} else if (evaluated.groups) {
 		const doubleTarget = DICE_COMPILED_PATTERNS.DOUBLE_TARGET.exec(content);
 		const { dice, comments } = evaluated.groups;
-		if (doubleTarget?.groups?.dice)
-			content = dice.trim();
-		 else
-			content = `{${dice.trim()}}`;
-		
+		if (doubleTarget?.groups?.dice) content = dice.trim();
+		else content = `{${dice.trim()}}`;
+
 		if (comments) content = `${content} ${comments}`;
 	}
 
@@ -300,7 +299,7 @@ export function isRolling(
 			diceData.bracketRoll,
 			res?.infoRoll,
 			pity,
-			sortOrder
+			sort
 		);
 		if (diceRoll?.resultat)
 			return {
@@ -321,7 +320,7 @@ export function isRolling(
 			statsName,
 			pity,
 			disableCompare,
-			sortOrder
+			sort
 		);
 		if (diceRoll)
 			return {
@@ -343,13 +342,7 @@ export function isRolling(
 
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
-		const diceRoll = performDiceRoll(
-			finalContent,
-			undefined,
-			res.infoRoll,
-			pity,
-			sortOrder
-		);
+		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity, sort);
 		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return {
