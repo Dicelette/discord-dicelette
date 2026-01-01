@@ -280,7 +280,7 @@ export class ResultAsText {
 		};
 	} {
 		let msgSuccess = "";
-		let lastCriticalState: {
+		let currentCriticalState: {
 			isCritical?: "failure" | "success" | "custom";
 			successOrFailure?: string;
 		} = {};
@@ -304,8 +304,8 @@ export class ResultAsText {
 			if (criticalResult) {
 				successOrFailure = criticalResult.successOrFailure;
 				isCritical = criticalResult.isCritical;
-				lastCriticalState = { ...criticalResult };
-			} else lastCriticalState = { isCritical: undefined, successOrFailure };
+				currentCriticalState = { ...criticalResult };
+			} else currentCriticalState = { isCritical: undefined, successOrFailure };
 
 			msgSuccess += this.display(
 				r,
@@ -318,7 +318,7 @@ export class ResultAsText {
 			);
 		}
 
-		return { criticalState: lastCriticalState, msgSuccess };
+		return { criticalState: currentCriticalState, msgSuccess };
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
@@ -366,16 +366,8 @@ export class ResultAsText {
 		| { successOrFailure: string; isCritical: "failure" | "success" | "custom" }
 		| undefined {
 		if (critical) {
-			// Some templates may store critical thresholds as strings; coerce to numbers for comparison
-			const failure =
-				critical.failure !== undefined && !Number.isNaN(Number(critical.failure))
-					? Number(critical.failure)
-					: undefined;
-			const success =
-				critical.success !== undefined && !Number.isNaN(Number(critical.success))
-					? Number(critical.success)
-					: undefined;
-
+			const failure = critical.failure || undefined
+			const success = critical.success || undefined;
 			if (failure !== undefined && natural.includes(failure))
 				return {
 					isCritical: "failure",
