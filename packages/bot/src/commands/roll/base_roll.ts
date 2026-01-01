@@ -86,7 +86,6 @@ export async function baseRoll(
 
 	let opposition: ComparedValue | undefined;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(dice);
-	logger.trace("Evaluated dice regex result" + ":", evaluated);
 	const disableMatch = ctx?.disableCompare;
 	const sortOrder = ctx?.settings.sortOrder;
 	if (!evaluated && !disableMatch) {
@@ -109,14 +108,10 @@ export async function baseRoll(
 		else dice = `{${value}}`;
 		if (comments) dice = `${dice} ${comments}`;
 	} else if (disableMatch) {
-		logger.trace("Comparison disabled on this server");
 		//find comments first to preserve them
-		const commentsMatch = DICE_COMPILED_PATTERNS.COMMENTS_REGEX.exec(dice);
-		let comments = "";
-		if (commentsMatch?.[0]) {
-			comments = ` ${commentsMatch[0]}`;
-			dice = dice.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trim();
-		}
+		const allComments = dice.match(DICE_COMPILED_PATTERNS.COMMENTS_REGEX);
+		const comments = allComments ? ` ${allComments.join(" ")}` : "";
+		dice = dice.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, "").trim();
 		dice = `{${dice}}${comments}`;
 	}
 
