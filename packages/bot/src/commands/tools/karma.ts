@@ -99,18 +99,14 @@ async function generateComponentsForBilan(
 		}
 
 		const consecutive = count.consecutive?.[countType];
-		if (consecutive && consecutive > 0) {
+		if (consecutive && consecutive > 1) {
 			lines.push(
 				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${consecutive} ${gaugeEmoji(countType, consecutive)}`
-			);
-		} else {
-			lines.push(
-				`  - **${ul(`luckMeter.count.consecutive.${countType}`)}**${ul("common.space")}: ${ul("common.noSet")}`
 			);
 		}
 
 		const longestStreak = count.longestStreak?.[countType];
-		if (longestStreak && longestStreak > 0) {
+		if (longestStreak && longestStreak > 1) {
 			lines.push(
 				`  - **${ul(`luckMeter.count.longest.${countType}`)}**${ul("common.space")}: ${longestStreak}`
 			);
