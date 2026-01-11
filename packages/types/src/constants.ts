@@ -13,6 +13,11 @@ export const TUTORIAL_IMAGES = [
 ];
 
 export const LINKS = {
+	buttons: {
+		discord: "https://discord.gg/cfduUxFaZR",
+		github: "https://github.com/Dicelette/discord-dicelette/",
+		kofi: "https://ko-fi.com/mara__li",
+	},
 	en: {
 		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=bug%2Ctriage%2Cenglish&projects=&template=bug_english.yml&title=%5BBug%5D%3A+",
 		docs: "https://dicelette.github.io/en/",
@@ -22,6 +27,18 @@ export const LINKS = {
 		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=bug%2Ctriage%2Cfrench&projects=&template=bug_french.yml&title=%5BBug%5D%3A+",
 		docs: "https://dicelette.github.io/",
 		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=lisandra-dev&labels=enhancement%2Ctriage%2Cfrench&projects=&template=Request_french.yml&title=%5BFR%5D%3A+",
+	},
+	icons: {
+		dev: {
+			discord: "1459934829385875690",
+			github: "1459936027769700621",
+			kofi: "1459935650173292853",
+		},
+		prod: {
+			discord: "1459974851006562396",
+			github: "1459974906312917167",
+			kofi: "1459974972570075441",
+		},
 	},
 } as const;
 

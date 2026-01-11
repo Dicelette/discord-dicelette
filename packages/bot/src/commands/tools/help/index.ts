@@ -8,7 +8,6 @@ import {
 	getAllVersions,
 	getChangelogSince,
 	getOptionsVersion,
-	humanizeDuration,
 	normalizeChangelogFormat,
 	splitChangelogByVersion,
 } from "@dicelette/utils";
@@ -55,9 +54,6 @@ export const help = {
 			sub.setNames("register.name").setDescriptions("help.register.description")
 		)
 		.addSubcommand((sub) =>
-			sub.setNames("help.docs.name").setDescriptions("help.docs.description")
-		)
-		.addSubcommand((sub) =>
 			sub
 				.setNames("help.changelog.name")
 				.setDescriptions("help.changelog.description")
@@ -68,9 +64,6 @@ export const help = {
 						.setRequired(false)
 						.setAutocomplete(true)
 				)
-		)
-		.addSubcommand((sub) =>
-			sub.setNames("help.stats.name").setDescriptions("help.stats.description")
 		),
 
 	async execute(
@@ -85,9 +78,6 @@ export const help = {
 		if (!commandsID) return;
 		const getInfo = new GetInfo(interaction, client, ul, link);
 		switch (subcommand) {
-			case t("help.docs.name"):
-				await getInfo.getDocLinks();
-				break;
 			case t("help.info.name"): {
 				await getInfo.getInfo();
 				break;
@@ -108,10 +98,6 @@ export const help = {
 			}
 			case t("help.changelog.name"): {
 				await getInfo.getChangelog();
-				break;
-			}
-			case t("help.stats.name"): {
-				await getInfo.getBotStats();
 				break;
 			}
 		}
@@ -264,15 +250,6 @@ class GetInfo {
 		});
 	}
 
-	async getDocLinks() {
-		return await reply(this.interaction, {
-			content: dedent(
-				`→  **__${this.ul("help.docs.message", { link: this.link.docs })}__**`
-			),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-	}
-
 	async getBugReportLink() {
 		await reply(this.interaction, {
 			content: dedent(this.ul("help.bug.message", { link: this.link.bug })),
@@ -299,46 +276,6 @@ class GetInfo {
 					graph: helpDBCmd?.[t("graph.name")],
 					macro: helpDBCmd?.[t("common.macro")],
 					register: helpDBCmd?.[t("register.name")],
-				})
-			),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-	}
-
-	async getBotStats() {
-		const guildCount = this.client.guilds.cache.size;
-		const uptime = humanizeDuration(this.client.uptime ?? 0);
-		const latency = `${Math.round(this.client.ws.ping)}`;
-		const status = this.client.ws.status;
-		switch (status) {
-			case Djs.Status.Ready:
-				break;
-			case Djs.Status.Reconnecting:
-				latency.concat(` (${this.ul("help.stats.reconnecting")})`);
-				break;
-			case Djs.Status.Resuming:
-				latency.concat(` (${this.ul("help.stats.resuming")})`);
-				break;
-			case Djs.Status.Connecting:
-				latency.concat(` (${this.ul("help.stats.connecting")})`);
-				break;
-			case Djs.Status.Idle:
-				latency.concat(` (${this.ul("help.stats.idle")})`);
-				break;
-			case Djs.Status.Nearly:
-				latency.concat(` (${this.ul("help.stats.nearly")})`);
-				break;
-			default:
-				latency.concat(` (${this.ul("help.stats.disconnected")})`);
-				break;
-		}
-		await reply(this.interaction, {
-			content: dedent(
-				this.ul("help.stats.message", {
-					guildCount,
-					latency,
-					uptime,
-					VERSION,
 				})
 			),
 			flags: Djs.MessageFlags.Ephemeral,

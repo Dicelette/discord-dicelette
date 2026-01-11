@@ -66,6 +66,7 @@ const MODAL_PREFIX_HANDLERS: { prefix: string; handler: ModalHandler }[] = [
 	},
 	{
 		handler: async (interaction, ul, interactionUser, client) => {
+			await interaction.deferReply();
 			await new UserFeature({ client, interaction, interactionUser, ul }).pageNumber();
 		},
 		prefix: "page",
