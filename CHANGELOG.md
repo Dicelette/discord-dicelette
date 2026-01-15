@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.32.0](https://github.com/Dicelette/discord-dicelette/compare/2.31.0...2.32.0) (2026-01-15)
+
+
+### Features
+
+* add new social media links and icons to constants ([2cf58db](https://github.com/Dicelette/discord-dicelette/commit/2cf58db35b8d4825946da35b6f0462f32b08cd0a))
+* ephemeral for info & global context cmd ([3c911dd](https://github.com/Dicelette/discord-dicelette/commit/3c911dda4afc00b8668786d6f4fb113c04cb04cc))
+
 ## [2.31.0](https://github.com/Dicelette/discord-dicelette/compare/2.30.9...2.31.0) (2026-01-02)
 
 
