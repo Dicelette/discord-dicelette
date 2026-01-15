@@ -4,7 +4,7 @@ import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
 import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST, ROLL_DB } from "./roll";
 import snippets from "./roll/snippets";
-import { choose, GIMMICK, getCount, help, info } from "./tools";
+import { choose, GIMMICK, getCount, help } from "./tools";
 import newScene from "./tools/new_scene";
 import { userSettings } from "./userSettings";
 
@@ -28,7 +28,6 @@ export const COMMANDS = [
 	...GLOBAL_CMD,
 	userSettings,
 	choose,
-	info
 ];
 
 export const DATABASE_COMMANDS = [...GIMMICK, ...ROLL_DB];

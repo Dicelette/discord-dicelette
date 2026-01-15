@@ -9,12 +9,17 @@ import { VERSION } from "../../..";
 export const info = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("info.title")
+		.setContexts(
+			Djs.InteractionContextType.BotDM,
+			Djs.InteractionContextType.Guild,
+			Djs.InteractionContextType.PrivateChannel
+		)
 		.setDescriptions("info.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { ul, langToUse } = getLangAndConfig(client, interaction);
 		const botStats = getBotStats(client, ul);
 		const buttons = buttonsLinks(ul, langToUse);
-		const pres = dedent(ul("info.presentation"))
+		const pres = dedent(ul("info.presentation"));
 		const embeds: Djs.EmbedBuilder = new Djs.EmbedBuilder()
 			.setDescription(pres)
 			.addFields(botStats)
@@ -26,12 +31,12 @@ export const info = {
 			.setThumbnail("https://dicelette.github.io/img/dicelette.png")
 			.setTimestamp();
 		return await interaction.reply({
-			embeds: [embeds],
 			components: [new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(buttons)],
+			embeds: [embeds],
+			flags: Djs.MessageFlags.Ephemeral,
 		});
 	},
 };
-
 
 function getBotStats(client: EClient, ul: Translation) {
 	const guildCount = client.guilds.cache.size;
@@ -60,7 +65,7 @@ function getBotStats(client: EClient, ul: Translation) {
 			latency.concat(` (${ul("help.stats.disconnected")})`);
 			break;
 	}
-	
+
 	return [
 		{
 			name: ul("info.count"),
@@ -77,7 +82,7 @@ function getBotStats(client: EClient, ul: Translation) {
 		{
 			name: ul("info.version"),
 			value: `\`${VERSION}\``,
-		}
+		},
 	];
 }
 

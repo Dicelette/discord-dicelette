@@ -1,1105 +1,1105 @@
 {
-  "activities": {
-    "competing": "Competing",
-    "custom": "Statut",
-    "description": "Change the bot activities",
-    "listening": "Listening",
-    "name": "activities",
-    "playing": "Playing",
-    "set": "Activity updated.",
-    "streaming": "Streaming",
-    "text": {
-      "description": "Set an activity description",
-      "name": "text"
-    },
-    "type": {
-      "description": "Set activity type",
-      "name": "type"
-    },
-    "watching": "Watching"
-  },
-  "anchor": {
-    "description": "Allows you to add a link to the message closest to the die",
-    "enabled": {
-      "logs": "The dice logs will now return to an \"anchor\" which allows you to obtain the context of the die (the anchor is the message preceding the die).",
-      "noDelete": "Dice logs will now link to the original die."
-    },
-    "name": "context",
-    "options": "Enable/disable context anchor"
-  },
-  "autoRole": {
-    "description": "Automatically adds a role when a record is validated.",
-    "dice": {
-      "desc": "Adds a role when macros are added",
-      "remove": "No roles will be added to players when macros are added.",
-      "set": "{{- role}} will now be added to players when macros are saved."
-    },
-    "name": "auto_role",
-    "options": "Role to add",
-    "stat": {
-      "desc": "Add a role when statistics are added (dbroll)",
-      "remove": "No roles will be added to players when their stats are saved.",
-      "set": "{{- role}} will now be added to players when their stats are validated."
-    }
-  },
-  "button": {
-    "avatar": {
-      "description": "Edit a character's image"
-    },
-    "confirm": "Send to validation",
-    "continue": "Continue",
-    "dice": "Save a macro",
-    "edit": {
-      "dice": "Edit macros",
-      "name": "Rename a character",
-      "select": "Edit user data",
-      "stats": "Edit statistics"
-    },
-    "name": "Change character name",
-    "refuse": "Refuse",
-    "user": "Edit associated user",
-    "validate": "Validate"
-  },
-  "calc": {
-    "description": "Calculate value based on a statistic",
-    "formula": {
-      "desc": "Formula to use (support dice)"
-    },
-    "sign": {
-      "desc": "Mathematicals signs",
-      "title": "sign"
-    },
-    "statistic": "Statistic to use",
-    "title": "calc",
-    "transform": {
-      "abs": "Absolute",
-      "ceil": "Ceil",
-      "desc": "round, ceil, floor or cube the result",
-      "floor": "Floor",
-      "round": "Round",
-      "sqrt": "Square root",
-      "square": "Square",
-      "title": "transform"
-    }
-  },
-  "changeThread": {
-    "delete": "Dice results will no longer be sent",
-    "description": "Register a channel to send dice results there or use a automatic thread.",
-    "name": "result_channel",
-    "noChan": "No backup channel has been configured: cancellation of the command.\n\nIf you want to disable the auto-thread creation, use `/config result_channel true`.",
-    "options": "Results channel",
-    "set": "The channel {{- channel}} has been registered to send the dice results."
-  },
-  "choose": {
-    "description": "Choose a random value in a list",
-    "list": {
-      "description": "Separate value by a space, comma and/or semicolon",
-      "name": "list"
-    },
-    "name": "choose",
-    "noItems": "The list contains no items!",
-    "number": {
-      "description": "Number of values to select",
-      "name": "how_many"
-    },
-    "result": "__Result__: {{items}}",
-    "seed": {
-      "description": "Initialize the number generator with a seed to get the same sequence of number",
-      "name": "seed"
-    },
-    "select": "select",
-    "tooMany": "You can't select more items than the list contains!"
-  },
-  "common": {
-    "cancel": "Cancel",
-    "cancelled": "Deletion has been canceled.",
-    "channel": "channel",
-    "charName": "Character name",
-    "character": "character",
-    "comments": "comments",
-    "confirm": "Confirm deletion",
-    "context": "Context",
-    "critical": "critical",
-    "default": "Default",
-    "dice": "dice",
-    "ephemeral": "ephemeral",
-    "error": "Error",
-    "expression": "expression",
-    "failure": "fail",
-    "false": "False",
-    "isPrivate": "Private character",
-    "macro": "macro",
-    "name": "name",
-    "no": "✕",
-    "noSet": "/",
-    "ooc": "OOC",
-    "page": "Page {{- nb}}",
-    "role": "role",
-    "sheet": "[ SHEET ]",
-    "snippets": "snippets",
-    "space": "",
-    "statistic": "statistic",
-    "statistics": "statistics",
-    "template": "template",
-    "total": "Total",
-    "true": "True",
-    "user": "Player",
-    "yes": "✓"
-  },
-  "config": {
-    "admin": {
-      "desc": "Allows to log all character modifications and creations in a channel.",
-      "title": "Administration"
-    },
-    "autoRole": "Automatic roles",
-    "context": {
-      "desc": "In saving the result, allows you to display a link to the message preceding the die roll, or the roll itself, depending on the auto-deletion settings.",
-      "title": "[Save dice result] Link to die context"
-    },
-    "customCritical": "Custom Critical",
-    "damageName": "Saved macro list (global)",
-    "defaultSheet": "Default channel",
-    "description": "Allows you to configure the bot for the server",
-    "disableCompare": {
-      "description": "Edit the dice's output that contains a comparison (only for base roll)",
-      "name": "disable_compare"
-    },
-    "disableThread": {
-      "desc": "Disables global saving and auto-deletion of results, leaving the dice roll where it was done.",
-      "title": "Disabling results threads"
-    },
-    "display": {
-      "description": "Shows server configuration",
-      "general": {
-        "description": "Display the general configuration of the server",
-        "name": "general"
-      },
-      "template": {
-        "description": "Display the model configuration if any."
-      }
-    },
-    "displayResult": "Displaying results",
-    "excludedStats": "Excluded statistics",
-    "hiddenRoll": {
-      "desc": "Allows you to hide the dice results from GMs and send them to a specific channel or in a ephemeral message.",
-      "title": "[GM] Roll display"
-    },
-    "lang": {
-      "description": "Allows to change the language of the bot manually",
-      "name": "change_language",
-      "options": {
-        "desc": "Language to use",
-        "name": "language"
-      },
-      "set": "The bot will now use \"{{-lang}}\" as its primary language."
-    },
-    "linkToLog": {
-      "desc": "In the result of the dice, allows you to display a link to saving the result.",
-      "title": "[Result] Link to save dice result"
-    },
-    "logLink": {
-      "description": "Activate the link to the logs in the die result",
-      "name": "save_link"
-    },
-    "logs": "Logging",
-    "name": "config",
-    "noTemplate": "There is no template configured for the server.",
-    "pity": {
-      "delete": "Pity has been disabled.",
-      "description": "Allows you to count the number of consecutive failures and force a reroll until success.",
-      "name": "pity",
-      "option": {
-        "description": "Number of consecutive failures before pity",
-        "name": "threshold"
-      },
-      "success": "Pity is enabled. It will take {{- pity}} consecutive failures before a roll is rerolled to achieve success.\n\n⚠️ **Pity only works on comparison rolls.**"
-    },
-    "privateChan": "Private characters channel",
-    "result": {
-      "desc": "Allows you to save all dice results in a single channel.",
-      "title": "Saving results"
-    },
-    "selfRegister": {
-      "channel": {
-        "desc": "Disallow user to send the sheet in any channel.",
-        "name": "disallow_channel"
-      },
-      "description": "Allow player to register their characters directly.",
-      "disable": "The self-registration is disabled: player need a moderator to register their characters.",
-      "disableChannel": "User can't send their sheet in any channel : it will be sent into the default configured channel.",
-      "enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n> 💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
-      "enableModeration": "Only moderators can validate the self-registered sheet or the statistics and macro editions.",
-      "moderation": {
-        "desc": "Only the moderation can validate a self registered sheet or an edition.",
-        "name": "validation_moderation"
-      },
-      "name": "self_register"
-    },
-    "sheet": "Sheet",
-    "sort": {
-      "description": "Allows sorting the dice output results",
-      "name": "sort_order",
-      "option": {
-        "description": "The chosen order",
-        "name": "order"
-      },
-      "options": {
-        "ascending": "Ascending",
-        "descending": "Descending",
-        "none": "Disabled"
-      },
-      "order": {
-        "reset": "The dice results will no longer be sorted.",
-        "set": "The dice results will be sorted by {{- order}} order."
-      }
-    },
-    "statsName": "Name of statistics",
-    "stripOOC": {
-      "categories": "Channels",
-      "category": {
-        "error": "The strip ooc fonction can only be enabled with a selected channel.",
-        "name": "category"
-      },
-      "channel": {
-        "description": "Optional channel to transfer OOC.",
-        "placeholder": "Select at last one channel."
-      },
-      "delete": "OOC won't be deleted.",
-      "description": "Delete any text between prefix/suffix (or regex) after a timer.",
-      "error": "You must provide at least one of prefix and suffix or regex.",
-      "forward": "Transfert des messages",
-      "name": "strip_ooc",
-      "noSelection": "You need to select at last one channel or category.",
-      "prefix": {
-        "description": "Prefix string",
-        "name": "prefix"
-      },
-      "regex": {
-        "description": "regex. Need to contains only one groups (advanced user only)",
-        "end": " Regex must end with `$`.",
-        "error": "The regex is invalid: {{- e}}",
-        "name": "regex",
-        "start": "Regex must starts with `^`."
-      },
-      "select": "Choose channel where the OOC will be deleted.",
-      "success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n- Thread mode: {{- threadMode}}\n\nAnd will be done in:\n- {{- categories}}",
-      "suffix": {
-        "description": "suffix string",
-        "name": "suffix"
-      },
-      "thread_mode": {
-        "description": "Send the OOC into a thread instead of a global channel.",
-        "name": "thread_mode"
-      },
-      "timeOut": "Timeout! Cancellation.",
-      "timer": {
-        "description": "Time before OOC deletion (in seconds)",
-        "error": "You must provide a timer for HRP deletion.",
-        "name": "timer"
-      },
-      "title": "OOC's message deletion"
-    },
-    "template": "Model setup",
-    "templateMessage": "Link to model",
-    "timer": {
-      "desc": "At the end of the timer, the dice roll will be deleted but its results will be saved in the appropriate channel.",
-      "title": "Time before deletion"
-    },
-    "timestamp": {
-      "desc": "Display of the time/date in the dice result aggregator.",
-      "title": "Displaying timestamps"
-    },
-    "title": "{{- guild}} configuration"
-  },
-  "context": {
-    "disabled": "Adding a link to context is disabled."
-  },
-  "copyRollResult": {
-    "error": {
-      "noResult": "No result was found in the message.",
-      "notBot": "This message is not from Dicelette. No link can be created!"
-    },
-    "info": "The message you should copy to create a shortcut to the result varies by platform:\n- __Mobile__: Select the second message and tap “Copy text.”\n- __PC__: Copy the code block below.",
-    "name": "Create link to this result"
-  },
-  "csv_generation": {
-    "description": "Used to generate the CSV file for the add_mass command.",
-    "name": "csv",
-    "success": "Here is your CSV file! \nPlease note, by default, the delimiter used is `;`. \nDon't forget to specify it when importing into your software (excel/google sheet...).\n\nPlease note that you must calculate the combinations yourself!"
-  },
-  "dbRoll": {
-    "description": "Roll a die with a recorded statistic",
-    "name": "dbroll",
-    "options": {
-      "character": "The character where to take the value.",
-      "comments": {
-        "description": "Action description"
-      },
-      "hidden": {
-        "description": "Hides the die result (ignored if configuration is not done)",
-        "name": "hidden"
-      },
-      "modificator": {
-        "description": "Mathematical expression applied to the dice"
-      },
-      "opposition": {
-        "description": "secondary threshold against an opponent.",
-        "name": "opposition"
-      },
-      "override": {
-        "description": "Replace success threshold",
-        "name": "success_threshold"
-      },
-      "statistic": "The statistic to use"
-    }
-  },
-  "deleteChar": {
-    "all": "Are you sure do you want to delete {{- user}} data?",
-    "allMany": "Are you sure you want to **delete all** {{-user}} characters?\n__Characters found__:\n- {{- chara}}",
-    "allOne": "Are you sure you want to delete {{-user}} character?",
-    "allSuccess": "{{- user}}'s data has been deleted.",
-    "character": "The name of the character to delete",
-    "confirm": {
-      "all": "Are you sure you want to delete all {{-user}} characters?",
-      "title": "Delete characters"
-    },
-    "description": "Delete a character/user",
-    "name": "delete_char",
-    "noCharacters": "The user {{- user}} is not registered in the database.",
-    "success": "The {{- user}} character has been deleted!",
-    "user": "The player to delete"
-  },
-  "disableCompare": {
-    "success": {
-      "disabled": "Die comparisons are enabled. Now, when a die is written as `XdY>Z`, the output will indicate whether the die is a failure or a success.\n>>> __Example__:\n{{- example}}",
-      "enabled": "Die comparisons are disabled. Now, when a die is written as `XdY>Z`, the *output* will no longer indicate whether the die is a failure or a success and will show a `0` or `1` instead.\n>>> __Example__:\n{{- example}}"
-    }
-  },
-  "disableThread": {
-    "description": "Disable/enable automatic thread creation and use the configured channel for logs.",
-    "disable": {
-      "autoDelete": "Auto-deletion of results has been disabled.",
-      "mention": "The {{- mention}} channel will no longer receive dice logs.",
-      "prefix": "Channels prefixed with `🎲` will no longer receive logs either.",
-      "reply": "Automatic thread creation has been disabled: dice results will now be kept in the channel where the command was used."
-    },
-    "enable": {
-      "autoDelete": "The auto-deletion of reply has been authorized. You can configure it with `/config delete_after`.",
-      "mention": "The {{- mention}} channel will receive new dice logs.",
-      "prefix": "Channels prefixed with `:game_die:` will again receive dice results.",
-      "reply": "The dice results will be automatically sent to an automatically created thread."
-    },
-    "name": "disable_thread",
-    "options": {
-      "name": "toggle"
-    }
-  },
-  "display": {
-    "allowSelfRegister": "Self registration:",
-    "character": "The character to display",
-    "description": "Allows you to display the profile of a player/character",
-    "disallowChannel": "Disallow any channel:",
-    "moderation": "Validate by moderation:",
-    "persistant": {
-      "description": "Make the data (notably thumbnail) persistant by reuploading it.",
-      "name": "persistent"
-    },
-    "title": "display",
-    "user": "The user to display",
-    "userLowercase": "player"
-  },
-  "edit": {
-    "avatar": {
-      "success": "Avatar changed for {{- name}} ([→ link to the file]({{- link}}))!"
-    },
-    "desc": "Allows you to edit the data of a file",
-    "name": {
-      "success": "The character's name has been changed! \nYou can find it here: {{- url}}"
-    },
-    "opts": {
-      "character": "Character to edit",
-      "user": "User to edit"
-    },
-    "rename": {
-      "desc": "Change a character's name",
-      "option": {
-        "desc": "New name to use",
-        "title": "new_name"
-      },
-      "title": "rename"
-    },
-    "title": "edit",
-    "user": {
-      "desc": "Modify the user associated with a character",
-      "option": {
-        "desc": "The new owner of the character",
-        "title": "new_user"
-      },
-      "success": "The user was successfully edited.",
-      "title": "user"
-    }
-  },
-  "editMe": {
-    "asset": {
-      "description": "The avatar to set",
-      "name": "avatar"
-    },
-    "banner": {
-      "description": "The banner to set",
-      "name": "banner"
-    },
-    "bio": {
-      "description": "The bio to set",
-      "name": "bio"
-    },
-    "description": "Edit the bot information: avatar, banner, bio and nick.",
-    "name": "edit_me",
-    "nick": {
-      "description": "The nickname to set",
-      "name": "nick"
-    },
-    "success": "The bot was edited successfully."
-  },
-  "edit_avatar": {
-    "attachment": {
-      "desc": "Host a file rather than using a link.",
-      "name": "file"
-    },
-    "default": "The image used will be your actual avatar !",
-    "desc": "Edit the avatar of a character sheet",
-    "name": "avatar",
-    "url": {
-      "desc": "Link to the image to put (no discord link!)",
-      "name": "url"
-    }
-  },
-  "embed": {
-    "add": "User registration",
-    "dice": "Macro",
-    "display": "Character",
-    "edit": {
-      "dice_one": "Macro modified",
-      "dice_other": "Macro modified",
-      "stats_one": "Statistic modified",
-      "stats_other": "Statistics modified"
-    },
-    "old": "Registered player",
-    "template": "Model",
-    "user": "⌈⌋ Sheet ⌈⌋"
-  },
-  "error": {
-    "avatar": {
-      "cdn": "The image provided is invalid: as the images hosted on Discord are now temporary, they are no longer accepted. \nPlease upload the image or host it elsewhere.",
-      "format": "The image provided is invalid: it must be in the correct format: `JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`.",
-      "missing": "There is no file provided.",
-      "url": "The image provided is invalid: it must contain the image format (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) and be an `https` link."
-    },
-    "botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
-    "calc": "An error occured with the formula used.",
-    "channel": {
-      "defaultChannel": "You must provide at least one default channel to save the records.",
-      "notFound": "The channel `{{-channel}}` does not exist on this server.",
-      "thread": "No valid channel found - Please re-register the template if the channel was deleted"
-    },
-    "colon": "A dice name with a colon is not allowed.",
-    "createCriticalCustom": "The critical die is invalid: $ cannot be used without statistics.",
-    "criticalDiceType": "The dice type `{{- dice}}` cannot contains critics.\nUse custom critics instead.",
-    "csvContent": "The content of {{- fichier}} is invalid.",
-    "customCritical": {
-      "type_error": "{{- type}} is not recognized. Valid value are `cs` or `cf`"
-    },
-    "damage": {
-      "empty": "You have no macros saved.",
-      "notFound": "`{{- atq}}` is not saved in `{{- charName}}`."
-    },
-    "discord": "## [DISCORD] :warning: __Error__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nPlease report the bug on [the official server](https://discord.gg/2PUqwWeQYZ).",
-    "duplicate": "The name is already used for another character! \nSo you can't use it here. \nEach name must be unique!",
-    "embed": {
-      "notFound": "No embeds found",
-      "old": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}})."
-    },
-    "failedReply": "Failed to send the initial message or get the response.",
-    "generic": {
-      "e": "{{- e.message}}",
-      "withWarning": "## [{{- e.name}}]\n{{- e.message}}"
-    },
-    "guild": {
-      "data": "No data found for server {{-server}}.",
-      "empty": "No guilds found"
-    },
-    "invalidDice": {
-      "default": "The dice type `{{- dice}}` is invalid. Logs:\n`{{- error}}`",
-      "embeds": "No macro embeds detected",
-      "eval": "Invalid die: `{{-dice}}` during evaluation validation.",
-      "minus": "Dices cannot be negative !\n\n-# Dice used: `{{- dice}}`.",
-      "notFound": "No dice were found in the command!",
-      "withDice": "The dice `{{- dice}}` is invalid."
-    },
-    "invalidFormula": "Invalid formula: `{{- formula}}`",
-    "malformedMacros": "Macros seems to be malformed.",
-    "maxGreater": "The maximum must be superior to the minimum.",
-    "missingPermission": "## [DISCORD] **MISSING PERMISSIONS**\nThe bot does not have the permissions to perform the requested action. Check that it has access to the requested channel/thread!",
-    "mustBeGreater": "\nThe {{- value}} value must be greater than {{- min}}",
-    "mustBeLower": "The `{{- value}}` value must be smaller than `{{- max}}`",
-    "noBulkRoll": "Bulk roll are not allowed in shared rolls.",
-    "noDice": "You cannot use this command without having a registered die type!",
-    "noDiceType": "Custom critics cannot be used without a type die.",
-    "noMessage": "No messages found.",
-    "noPermission": "You do not have permissions to change another user's image. \nOnly people with \"MANAGE ROLES\" permissions can use this command for other players.",
-    "noRollResult": "The macro named `{{- dice}}` ({{- formula}}) doesn't seems to be a dice.",
-    "private": "This character sheet is private! \nYou do not have permission to read it.",
-    "public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
-    "roll": {
-      "channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration."
-    },
-    "sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
-    "stats": {
-      "char": "{{- char}} cannot be found.\nYou must select the user with this character to roll on `{{- stat}}`.",
-      "empty": "This combination is invalid: no statistics exist!",
-      "excluded": "This statistic is excluded: you cannot roll for it.",
-      "notFound": "Statistic `{{-value}}` not found! Did you make a typing error?",
-      "notFound_plural": "This command cannot be used: no statistics have been recorded.",
-      "notFound_singular": "The statistic `{{- stat}}` cannot be found on the selected character {{ char, optional}}.",
-      "shouldSelect": "You need to select a statistic to roll a dice.",
-      "tooMuch": "Too many statistics have been saved! You cannot have more than 25 statistics",
-      "user": "An user should be selected to roll a dice on `{{- stat}}`."
-    },
-    "template": {
-      "id": "No messages found with data saved in database:\n- Channel: `{{-channelId}}`\n- Message ID: `{{- messageId}}`",
-      "invalid": "The model was not found correctly, please try again.",
-      "json": "You must provide a JSON file.",
-      "notFound": "No template or channel configured."
-    },
-    "tooMuchDice": "Too many macros have been saved! You cannot have more than 25 macros saved.",
-    "totalExceededBy": "The total of points is exceeded by `{{- max}}`.",
-    "user": {
-      "charName": "The character {{- charName}} is not registered.",
-      "data": "No user data nor template dice found.",
-      "notAccess": "You don't have the permissions to check the specified character.",
-      "notFound": {
-        "charData": "The character data was not found at {{- url}}!\n$t(error.user.notFound.default)",
-        "default": "- This may be a temporary error caused by updating the cache,\n- The record cannot be found because it has been deleted (or its channel) but the data has not been deleted from the database. \nIf so, you need to use the `/delete_char` command.",
-        "generic": "User not found.\n$t(error.user.notFound.default)",
-        "oldUser": "The member <@{{- oldUserId}}> was not found on the server.\n$t(error.user.notFound.default)",
-        "userId": "The old user (`{{- oldUserId}}`) is not found.\n$t(error.user.notFound.default)"
-      },
-      "registered": "{{- user}} is not registered.",
-      "rename": "Your character does not have a name: it cannot therefore be renamed!",
-      "sameUser": "The old and new users are identical. Therefore, the move operation is not possible.",
-      "youRegistered": "You are not registered"
-    }
-  },
-  "export": {
-    "description": "Export all saved characters to a csv file",
-    "error": {
-      "noData": "No users are registered."
-    },
-    "name": "export",
-    "options": {
-      "desc": "Export only characters marked as private",
-      "name": "private_sheet_only"
-    }
-  },
-  "graph": {
-    "bg": {
-      "description": "Background color of the chart. By default: #0e47b2",
-      "name": "background"
-    },
-    "description": "Generate a graph of the user's stats",
-    "invert": {
-      "description": "Invert the graph for system that use \"better is little\" number.",
-      "name": "invert"
-    },
-    "line": {
-      "description": "Line color. By default: #0e47b2",
-      "name": "line"
-    },
-    "max": {
-      "description": "Maximum value for chart generation",
-      "name": "max"
-    },
-    "min": {
-      "description": "Minimum value for graph generation",
-      "name": "min"
-    },
-    "name": "graph"
-  },
-  "help": {
-    "admin": {
-      "description": "Displays the bot's administrative commands",
-      "messageDB": "# Delete a Character\r\n- **</delete_char:{{- delete_char }}>**: Deletes a character from the database. If the character sheet message is still present on the server, it will also be removed.\r\n\r\n# Automatic Roles\r\nThese commands allow automatic role assignment during file validation:\r\n- **</config auto_role statistics:{{- stat}}>**: Adds a role when statistics are validated.\r\n- **</config auto_role dice:{{- dice}}>**: Adds a role when a die is registered. \r\n\r\nThis allows the use of the commands </dbroll:{{- dbroll}}>, </macro:{{- macro}}> and </calc:{{- calc}}> if they are restricted to users with these roles.\r\n\r\n# \"Game Master\" Dice Rolls\r\nThese commands allow game masters to roll dice for all registered players:\r\n- **</gm dbroll:{{- gm.dbRoll}}>**: Rolls a statistics die, similar to </dbroll:{{- dbroll}}>.\r\n- **</gm macro:{{- gm.macro}}>**: Rolls a registered die, similar to </macro:{{- macro}}>.\r\n- **</gm calc:{{- gm.calc}}>**: Rolls a calculation die, similar to </calc:{{- calc}}>.\r\n\r\n",
-      "messageNoDB": "The bot has different administration commands that allow you to personalize your experience.\r\n\r\nYou will find [here](<https://dicelette.github.io/en/docs/config>) detailed explanations of the commands shown here:\r\n- </config display general:{{- display}}>: Display the server configuration\r\n- </config logs:{{- logs}}>: Records a channel to display errors and modifications made to records.\r\n- </config result_channel:{{- result}}>: Allows you to define a channel or enable/disable the automatic thread creation to receive the results of all dice rolls from the server.\r\n- </config delete_after:{{- delete}}>: Allow to change the timer before result message deletion (only if </config result_channel:{{- result}}> is disabled). If set to `0`, messages won't be deleted. By default, message will be deleted after 3 minutes.\r\n- </config timestamp:{{-timestamp}}> : Display (or not) the timestamp in the dice roll logs.\r\n- </config self_register:{{- self_register}}> : Allow users to register themselves to the bot, when a template is set, and with the option to restrict validation to moderators only and prevent users from creating in channels other than the default one.\r\n- </config change_language:{{- language}}> : Allows you to change the bot's language. The default language depends on the server's language, but is English if the server's language is not supported or not set. ",
-      "name": "admin"
-    },
-    "bug": {
-      "description": "Report a bug",
-      "message": "Please file your bug report [here](<{{- link}}>).\r\n\r\n### Before Reporting:\r\n1. **Check Existing Reports**: Ensure there isn't already a report for your bug.\r\n2. **Read the Documentation**: Visit the [documentation](<https://dicelette.github.io/en/>) to find answers to common questions.\r\n\r\n### What to Include in Your Report:\r\n- **Command Used**: Specify the command and arguments that caused the issue.\r\n- **Observed Behavior**: Describe what happened when the bug occurred.\r\n- **Screenshots**: Attach images related to the bug, such as error messages or affected character sheets.\r\n- **Logs**: Provide any error logs generated by the bot.\r\n- **Server Template**: If the bug is related to the database or template, include the server template.\r\n\r\nThank you for helping us improve the bot!",
-      "name": "bug"
-    },
-    "changelog": {
-      "description": "Get the changelog since a version or get the last changelog.",
-      "loading": "Fetching changelog…",
-      "name": "changelog",
-      "noChanges": "No files found, error",
-      "version": {
-        "description": "Version number",
-        "name": "version"
-      }
-    },
-    "description": "Display help",
-    "diceNotation": "# Dice Notation Guide\r\n- **Basic Dice Rolls**: Perform standard dice rolls using the format `XdY`, where `X` is the number of dice and `Y` is the number of sides. Example: `2d6` rolls two 6-sided dice.\r\n- **[Dice Groups](<https://dice-roller.github.io/documentation/guide/notation/group-rolls.html>)**: Group multiple dice rolls together for complex scenarios. Example: `(1d6, 2d8)`.\r\n- **[Modifiers](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)**: Apply mathematical operations to dice rolls, such as adding or subtracting values. Example: `1d20+5`.\r\n- **[Comments](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)**: Add descriptions to your rolls for clarity. Example: `1d6 // Attack damage`.\r\n- **[Math](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)**: Perform advanced calculations using dice rolls. Example: `(1d6+2)*3`.\r\n- **[Bulk Rolls](<https://dicelette.github.io/en/docs/introduction/expression#bulk-rolls>)**: Roll multiple dice simultaneously using the format `[number of dice]#[dice]`. Example: `2#d6` rolls two 6-sided dice.\r\n- **[Shared Rolls](<https://dicelette.github.io/en/docs/introduction/expression#shared-unique-rolls-reusing-results>)**: Reuse the result of a previous roll in subsequent calculations. Example: `1d6;&+10`.\r\n- **[Critical by Die](<https://dicelette.github.io/en/docs/introduction/expression#critical-successes-and-failures>)**: Specify critical conditions for dice rolls. Example: `1d20{cs:>=10}>=20` means the roll is a critical success if the result is greater than or equal to 10.",
-    "docs": {
-      "description": "Send the link to the documentation",
-      "message": "[Documentation](<{{- link}}>)",
-      "name": "docs"
-    },
-    "fr": {
-      "description": "Make a feature request",
-      "message": "Do you have an idea to improve the bot?\r\nIn this case, you can suggest it [here](<{{- link}}>)!\r\n\r\n### Before Submitting Your Request:\r\n1. **Check Existing Requests**: Ensure a similar request has not already been submitted.\r\n2. **Consult the Documentation**: Visit the [documentation](<https://dicelette.github.io/en/>) to see if your idea is already covered or if a solution exists.\r\n\r\n### Information to Include in Your Request:\r\n- **Detailed Description**: Clearly explain the feature you would like to see added.\r\n- **Use Cases**: Specify the context in which you plan to use this feature and the problem it would solve.\r\n- **Benefits**: Describe the advantages this feature would bring to the community or users.\r\n- **Considered Alternatives**: Mention any alternative solutions or approaches you have considered.\r\n\r\nThank you for contributing to the improvement of the bot!",
-      "name": "request"
-    },
-    "info": {
-      "description": "Displays general bot information",
-      "name": "info"
-    },
-    "invit": {
-      "change_language": "__By default__, I'll respond in {{- lang}}, but this can be changed with </config change_language:{{- id.lang}}>.\nFor the moment, however, only French and English are available!",
-      "channel": "With **`channel`** = **`#channel`** → Instead of creating threads automatically, the results will be copied into this channel!",
-      "copy": "In addition, I can __copy__ the results of dice rolls into threads starting with `🎲`, which will be created automatically when a roll is made.\nThis can be modified by the command </config result_channel:{{-id.result}}>.\nBy default, this behavior is **disabled** : all roll will be left where they are.",
-      "default": "Simply set to `0` to disable auto-delete.",
-      "disable": "With **`disable_thread`** = **`True`** → Results will be kept where the command was made, without auto-deletion after 3 minutes.",
-      "link": "You can find [the documentation here]({{- docLink}}), as I still have lots of customization options!",
-      "serv": "Hello ! I'm Dicelette !\nThank you for adding me to {{- serv}}.",
-      "timer": "If you want to change the time before results are deleted after configuring it, just use </config delete_after:{{-id.delete}}>. I'm set to delete after 3 minutes!"
-    },
-    "message": "# :game_die: **Dicelette** :game_die: `v.{{- version}}`\r\n\r\n## Resources:\r\n- Find the *bot* on [GitHub](<https://github.com/Dicelette/discord-dicelette/>)\r\n- Access the [Documentation](<https://dicelette.github.io/en>) for detailed usage instructions.\r\n\r\n## Usage:\r\n### Commands:\r\n- **</roll:{{- rollId}}>**: Roll a die. Example: `d6` or `2d6`.\r\n- **</scene:{{- sceneId}}>**: Creates a new thread for dice rolls. Automatically archives all previous threads.\r\n- **</math:{{- mathId}}>**: Perform mathematical operations, such as `2+2`, `3*4`, or `sqrt(16)`.\r\n\r\n### Advanced Features:\r\n- **Time Bubble**: Use `/scene tempo:True` to create a thread named with the current date.\r\n- **Direct Dice**: Roll dice directly in a message, e.g., `d6` or `2d6`.\r\n- **Indirect Dice**: Include dice rolls in a message, e.g., `*Phibi jumps on Wumpus and inflicts [2d6] damage*`.\r\n- **Semi-Direct Dice**: Combine dice rolls with a message, e.g., `1d100 Phibi jumps on Wumpus and inflicts damage`.",
-    "messageDB": "# Commands Linked to Character Sheets\r\nThese commands allow you to interact with character sheets, perform dice rolls, and analyze statistics.\r\n\r\n- **</dbroll:{{- dbroll}}>:** Rolls a statistics dice based on the data saved in a character sheet. Useful for evaluating character abilities or traits.\r\n- **</macro:{{- macro}}>:** Rolls a die recorded in your character sheet. Ideal for predefined dice rolls linked to specific actions or abilities.\r\n- **</graph:{{- graph}}>:** Generates a graph from a character's statistics. This is helpful for visualizing data trends or comparing attributes.\r\n- **</display:{{- display}}>:** Displays the statistics and dice of a character. Use this to review or share character details.\r\n- **</calc:{{- calc}}>:** Performs calculations using the statistics of a character. Perfect for deriving values or outcomes based on character data.",
-    "name": "help",
-    "register": {
-      "description": "Displays general help for activating the record save function.",
-      "message": "The bot allows you to configure a server model, enabling the creation and management of character sheets and dice rolls.\r\n\r\n### Key Features:\r\n- **Privacy and Control**: All data is stored locally on your server.\r\n- **Adaptability**: The model is designed to meet diverse needs, making it highly customizable.\r\n\r\n### Getting Started:\r\n1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.\r\n2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}>. \r\n\r\n### Commands Overview:\r\nAfter setting up the model, you can use the following commands to interact with character sheets:\r\n- **</macro:{{-macro}}>**: Roll dice based on saved data.\r\n- **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.\r\n- **</graph:{{-graph}}>**: Generate graphs from character statistics.\r\n- **</calc:{{-calc}}>**: Calculate values using character statistics.\r\n\r\n### Additional Resources:\r\n- **Documentation**: For more advanced configurations and features, visit the [official documentation](<https://dicelette.github.io/en/>).\r\n- **Support**: If you encounter issues, consult the documentation or reach out to the support team."
-    },
-    "stats": {
-      "connecting": "Connection",
-      "disconnected": "Disconnected",
-      "idle": "Idle",
-      "message": "- Number of servers: `{{- guildCount}}`\n- Latency: `{{- latency}}`\n- Uptime: `{{- uptime}}`\n- Version: `{{- VERSION}}`",
-      "name": "stats",
-      "nearly": "Nearly",
-      "reconnecting": "Reconnecting",
-      "resuming": "Resuming"
-    }
-  },
-  "hidden": {
-    "description": "Allows you to hide the results of the GM roll dice",
-    "disabled": "GM dice results now use the normal dice configuration.",
-    "enabled": "The GM dice will now be hidden and their results sent in an ephemeral message.",
-    "enabledChan": "GM dice results will now be sent to {{- channel}} directly.",
-    "options": "Allows you to send the results to this channel (otherwise, they will be sent as ephemeral)",
-    "title": "hidden_roll"
-  },
-  "import": {
-    "all_success": "All users have been registered.",
-    "delete": {
-      "description": "Delete old character (if exist)",
-      "title": "delete"
-    },
-    "description": "Add multiple characters at once",
-    "errors": {
-      "duplicate_charName": "The character {{- charName}} (from {{- user}}) already exists in the database.",
-      "global": "The following errors were found:",
-      "headers": "The column names do not match your model. \nPlease refer to the documentation and your template to check the column names.\n\n\nThe columns :\n- {{-name}}\nis/are missing.",
-      "invalid_file": "The file must be a CSV file. \nYou have provided a {{-ext}} file.",
-      "missing_charName": "Character name is missing for {{- user}}. \nHowever, it is mandatory in the template!",
-      "missing_header": "Your CSV has no column names!",
-      "missing_stats": "Missing statistics for {{- user}}.\n\nThe missing statistics are:\n\n- {{-stats}}",
-      "no_user": "No members exist on this server.",
-      "user_not_found": "{{- user}} was not found on the server. \nIt is possible that the cache is not up to date, or that there is an error in the ID or username."
-    },
-    "name": "import",
-    "options": {
-      "description": "The CSV file to import"
-    },
-    "success": "{{- user}} has been added."
-  },
-  "info": {
-    "author": "Made with 💖 by Mara__Li",
-    "count": "Number of servers",
-    "description": "Display generic information on the bot",
-    "docs": "Documentation",
-    "kofi": "\nKofi",
-    "latency": "Latency",
-    "presentation": "Dicelette is a bot written in Typescript and open-source dedicated to dice rolls:\n- Complex expression support,\n- Automatic results organization and logging,\n- Creation of snippets\n- Character template creation\n- Advanced customization: auto-role, HRP deletion, etc.",
-    "title": "info",
-    "uptime": "Uptime",
-    "version": "Version"
-  },
-  "legacy": {
-    "dice": "Skill Dice"
-  },
-  "linkToLog": {
-    "disabled": "Links to dice logs are disabled.",
-    "enabled": "Links to dice logs are now enabled.",
-    "options": "Enables/disables the option"
-  },
-  "logs": {
-    "delete": "Logs will no longer be sent",
-    "description": "Choose a channel where to send error logs",
-    "dice": {
-      "add_one": "{{- user}} added the macro `{{- dice}}` for {{- char}} (in {{- file}})",
-      "add_other": "{{- user}} added macros for {{- char}} (in {{- file}})",
-      "edit_one": "{{- user}} modified the macro `{{- dice}}` of {{- char}} (in {{- file}})",
-      "edit_other": "{{- user}} modified the macros of {{- char}} (in {{- file}})",
-      "moderationRequest": "{{- char}} is waiting for its sheet to be validated ({{- fiche}})\n-# {{- mentions}}",
-      "remove_one": "{{- user}} deleted the macro `{{- dice}}` of {{- char}} (in {{- file}})",
-      "remove_other": "{{- user}} deleted the macros of {{-char}} (in {{- file}})"
-    },
-    "editWaiting": "The <@{{-user}}> file is awaiting validation.{{- role}}",
-    "inChan": "to {{- chan}}.",
-    "name": "logs",
-    "options": "The channel to send logs to",
-    "set": "Logs will be sent into {{- channel}}.",
-    "stats": {
-      "added": "{{- user}} modified the statistics of {{- char}} (in {{- file}})",
-      "removed": "{{- user}} deleted the statistics of {{- char}} (in {{- file}})"
-    },
-    "validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
-  },
-  "luckMeter": {
-    "count": {
-      "consecutive": {
-        "failure": "Current failure streak",
-        "success": "Current success streak"
-      },
-      "desc": "Know results for {{- user}} :",
-      "including": "Including",
-      "longest": {
-        "failure": "Longest consecutive failure streak",
-        "success": "Longest consecutive success streak"
-      },
-      "none": "None",
-      "note": "Critical are included in the count of their normal rolls. ",
-      "title": "bilan",
-      "total_one": "Total: {{count}} roll",
-      "total_other": "Total: {{count}} rolls"
-    },
-    "description": "Get the number of success, failures (and critical ones) of an user.",
-    "ephemeral": "Send the reply in an ephemeral message",
-    "error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
-    "leaderboard": {
-      "noData": "No data available for this server yet!",
-      "option": {
-        "description": "Type of classification (failure, success, critical, etc.)",
-        "title": "type",
-        "total": "Total"
-      }
-    },
-    "moy": {
-      "desc": "Get number and mean of each roll type in the server",
-      "result": "Total rolls: {{- rollTotal}} by {{- usersWithCounts}} users",
-      "title": "server"
-    },
-    "reset": {
-      "all": {
-        "description": "Completely resets the ranking",
-        "name": "everyone",
-        "success": "The server leaderboard has been correctly reset."
-      },
-      "description": "Reset ranking",
-      "noPermission": "You don't have the permissions to do that.",
-      "self": {
-        "success": "Your ranking has been correctly reset."
-      },
-      "title": "reset",
-      "user": {
-        "description": "Resets the leaderboard for another person.",
-        "success": "The {{- user}} ranking has been correctly reset."
-      }
-    },
-    "title": "karma",
-    "user": "{{- user}}'s throwing results:",
-    "userOption": {
-      "description": "Displays another user's throw results."
-    }
-  },
-  "luckerMeter": {
-    "leaderboard": {
-      "description": "Player leaderboard",
-      "title": "leaderboard"
-    }
-  },
-  "math": {
-    "description": "Basic calculus supporting Math.js evaluation (support rolling dice)",
-    "result": "Basic calculus",
-    "title": "math"
-  },
-  "mjRoll": {
-    "description": "Allows you to roll dice for other players",
-    "name": "gm",
-    "user": "Player to roll the die on"
-  },
-  "modals": {
-    "added": {
-      "dice": "Dice added",
-      "stats": "Statistics added"
-    },
-    "alreadySet": "All statistics are already defined",
-    "avatar": {
-      "description": "The link to the character image (by default, uses the user's avatar)",
-      "file": {
-        "description": "Upload a file to be the avatar."
-      },
-      "name": "Avatar"
-    },
-    "cancelled": "The requested edit has been rejected on {{- url}} by the moderators.",
-    "cancelled_by_user": "You have cancelled the editing of {{- url}}.",
-    "cancelled_moderator": "The requested edit has been rejected on {{- url}}.",
-    "channel": {
-      "description": "Allows you to post the file elsewhere than in the default channels",
-      "name": "Channel where to post the sheet"
-    },
-    "charName": {
-      "description": "Enter your character's name"
-    },
-    "dice": {
-      "max": "You cannot have more than 25 registered dice (discord field limits).",
-      "name": "Name",
-      "placeholder": "Enter a valid die",
-      "value": "Value"
-    },
-    "edit": {
-      "dice": "! Follow the syntax. \nDelete with X or 0.",
-      "stats": "! Follow the syntax. \nDelete with X."
-    },
-    "enterValue": {
-      "maxOnly": "Enter a value smaller than {{- max}}",
-      "minAndMax": "Enter a value between {{- min}} and {{- max}}",
-      "minOnly": "Enter a value greater than {{- min}}"
-    },
-    "finished": "Completed statistics",
-    "firstPage": "User Registration - Page 1/{{- page}}",
-    "noPermission": "You do not have permissions to do this.",
-    "onlyModerator": "Only moderator (with manage role) can validate a sheet. A notification was send to finish the registration.",
-    "private": {
-      "description": "If this record is private, put \"x\".",
-      "name": "Private character sheet"
-    },
-    "removed": {
-      "dice": "The dice have been removed from the user",
-      "stats": "The statistics have been deleted"
-    },
-    "stats": {
-      "forceDistrib": "Points must be ditributed in full. There are `{{- reste}}` points to put in.\nYour sheet cannot be validated.",
-      "reste": "You still have {{- reste}}/{{- total}} points to distribute between {{- nbStats}} statistics."
-    },
-    "steps": "User Registration - Page {{- page}}/{{- max}}",
-    "user": {
-      "description": "Enter the user attached to the character (id or global username)"
-    }
-  },
-  "pity": {
-    "logs": {
-      "title": "The dice roll was re-rolled {{- nb}} times."
-    }
-  },
-  "rAtq": {
-    "atq_name": {
-      "description": "The name of the macro"
-    },
-    "description": "Roll a registered die for a macro"
-  },
-  "refresh": "Following an update, the buttons have been modified! \nNow you need to select the “Avatar” option from the drop-down menu to edit the image.\n\nNew options have also been added!",
-  "register": {
-    "button": "Register a character",
-    "cancelled": "The registration has been canceled.",
-    "confirm": "The sheet was send into the validation process.",
-    "delete": {
-      "confirm": "Are you sure do you want to delete **all** users data ?",
-      "done": "The characters sheets has been deleted."
-    },
-    "description": "Register a new template for the database (macro, dbroll...) command",
-    "embed": {
-      "comparator": "Comparator:",
-      "description": "-# Click on the button to register a character",
-      "exclude": "Excluded",
-      "forceDistrib": "Force point's distribution",
-      "noValue": "No value",
-      "registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are enabled for all user by default.\n\nYou can restrict to your player only with following the tutorial:\n",
-      "updated": "The template was successfully updated! You can found it here: {{- msg.url}}."
-    },
-    "name": "register",
-    "notFinished": "The user didn't finish their sheet. Please wait.",
-    "options": {
-      "channel": "The channel where the template and users will be registered",
-      "delete": {
-        "description": "Delete all character sheets",
-        "name": "delete_characters"
-      },
-      "private": {
-        "description": "Allows you to choose a channel in which the “private” characters will be sent",
-        "name": "private_channel"
-      },
-      "public": {
-        "description": "Allows you to choose a channel in which the “public” characters will be sent",
-        "name": "public_channel"
-      },
-      "template": {
-        "description": "The template to be registered"
-      },
-      "update": {
-        "description": "Update old character sheets",
-        "name": "update_characters"
-      }
-    },
-    "refusalSent": "Your sheet on {{- guild}} was refused by {{- mention}}."
-  },
-  "roll": {
-    "base": " (__base__)",
-    "cc": " (__{{- custom}}__)",
-    "critical": {
-      "failure": "Critical failure",
-      "success": "Critical success"
-    },
-    "description": "Roll a die",
-    "failure": "Failure",
-    "mp_name": "r",
-    "name": "roll",
-    "opposition": " (__opposition__) ",
-    "option": {
-      "description": "roll die"
-    },
-    "other": " ",
-    "reason": "New roll thread",
-    "success": "Success"
-  },
-  "scene": {
-    "description": "Creates a new thread for dice",
-    "interaction": "New scene thread created: {{- scene}}",
-    "name": "scene",
-    "noScene": "No scene specified",
-    "option": {
-      "description": "The name of the scene"
-    },
-    "reason": "New scene",
-    "time": {
-      "description": "Time bubble: replace die with clock. By default, use date as thread name",
-      "name": "tempo"
-    },
-    "underscore": "__New scene__:"
-  },
-  "snippets": {
-    "description": "Roll a snippet"
-  },
-  "template": {
-    "description": "Configure server template"
-  },
-  "timer": {
-    "delete": "Dice rolling messages will no longer be deleted.",
-    "description": "Allows you to change the message deletion time",
-    "error": "The auto-deletion of roll result can't be enabled without a saved result channel.",
-    "name": "delete_after",
-    "option": {
-      "description": "Time (in seconds) before deletion, set to 0 to disable.",
-      "name": "time"
-    },
-    "success": "Messages will now be deleted after `{{- timer}}`."
-  },
-  "timestamp": {
-    "description": "Display or name the time in the die roll log",
-    "disabled": "Timestamps are no longer displayed.",
-    "enabled": "Timestamps are now displayed",
-    "name": "timestamp",
-    "options": "Enables or disables the timestamp"
-  },
-  "update": {
-    "description": "Update the template without editing the others options",
-    "name": "update"
-  },
-  "userSettings": {
-    "createLink": {
-      "character": "Character's name if found",
-      "description": "Adjusts the format of the link created by the “create link” menu.",
-      "dice": "Specific format for dice results only",
-      "display": {
-        "description": "Displays the different templates used and an example of a link created",
-        "name": "display"
-      },
-      "final": {
-        "description": "Format of the final text to be sent",
-        "name": "final"
-      },
-      "format": {
-        "name": "format"
-      },
-      "info": {
-        "description": "Critical/Results text format",
-        "name": "info"
-      },
-      "joinResult": {
-        "description": "Joining results when they are a list",
-        "name": "join_results"
-      },
-      "name": "Format of statistical/macro text, if present",
-      "originalDice": {
-        "description": "Format of the die that was originally rolled",
-        "name": "original_dice"
-      },
-      "reset": {
-        "description": "Reset to the default settings",
-        "name": "reset",
-        "success": "Settings was successfully reset."
-      },
-      "result": {
-        "description": "Format of the results list (contains total and possible critical text)",
-        "name": "results"
-      },
-      "success": "Template saved.\n__Preview__: {{- preview}}",
-      "title": "create_link"
-    },
-    "description": "Allows users to configure certain non-critical functions of the bot.",
-    "name": "user_config",
-    "snippets": {
-      "create": {
-        "content": {
-          "description": "Dice that will be throw",
-          "name": "content"
-        },
-        "description": "Add a new snippet",
-        "name": "Snippet's name",
-        "success": "The snippet **{{- name}}** was successfully saved.",
-        "title": "create"
-      },
-      "delete": {
-        "description": "Delete a snippet",
-        "name": "Snippet name to delete",
-        "notFound": "The macro {{- name}} was not found.",
-        "success": "The macro {{- name}} was successfully deleted.",
-        "title": "delete"
-      },
-      "description": "Add macro not linked to a template or a sheet",
-      "export": {
-        "description": "Export saved snippets in JSON",
-        "empty": "No snippets to export.",
-        "success": "Snippets were successfully exported. You can import them with `/user_config snippets import`."
-      },
-      "import": {
-        "description": "Import snippets from a JSON file",
-        "file": {
-          "description": "JSON file to import",
-          "title": "file"
-        },
-        "invalidContent": "The content of the file is invalid. The content should be formatted as follow: \n```json\n{{- ex}}\n```",
-        "invalidFile": "The extension is not valid. The file must be a JSON.",
-        "partialErrors_one": "Following snippet is invalid:",
-        "partialErrors_other": "Following snippets are invalid:",
-        "success_one": "{{- count}} snippet was imported successfully.",
-        "success_other": "{{- count}} snippets were imported successfully."
-      },
-      "list": {
-        "description": "Display all registered snippet",
-        "empty": "No saved snippets.",
-        "title": "list"
-      }
-    }
-  }
+	"activities": {
+		"competing": "Competing",
+		"custom": "Statut",
+		"description": "Change the bot activities",
+		"listening": "Listening",
+		"name": "activities",
+		"playing": "Playing",
+		"set": "Activity updated.",
+		"streaming": "Streaming",
+		"text": {
+			"description": "Set an activity description",
+			"name": "text"
+		},
+		"type": {
+			"description": "Set activity type",
+			"name": "type"
+		},
+		"watching": "Watching"
+	},
+	"anchor": {
+		"description": "Allows you to add a link to the message closest to the die",
+		"enabled": {
+			"logs": "The dice logs will now return to an \"anchor\" which allows you to obtain the context of the die (the anchor is the message preceding the die).",
+			"noDelete": "Dice logs will now link to the original die."
+		},
+		"name": "context",
+		"options": "Enable/disable context anchor"
+	},
+	"autoRole": {
+		"description": "Automatically adds a role when a record is validated.",
+		"dice": {
+			"desc": "Adds a role when macros are added",
+			"remove": "No roles will be added to players when macros are added.",
+			"set": "{{- role}} will now be added to players when macros are saved."
+		},
+		"name": "auto_role",
+		"options": "Role to add",
+		"stat": {
+			"desc": "Add a role when statistics are added (dbroll)",
+			"remove": "No roles will be added to players when their stats are saved.",
+			"set": "{{- role}} will now be added to players when their stats are validated."
+		}
+	},
+	"button": {
+		"avatar": {
+			"description": "Edit a character's image"
+		},
+		"confirm": "Send to validation",
+		"continue": "Continue",
+		"dice": "Save a macro",
+		"edit": {
+			"dice": "Edit macros",
+			"name": "Rename a character",
+			"select": "Edit user data",
+			"stats": "Edit statistics"
+		},
+		"name": "Change character name",
+		"refuse": "Refuse",
+		"user": "Edit associated user",
+		"validate": "Validate"
+	},
+	"calc": {
+		"description": "Calculate value based on a statistic",
+		"formula": {
+			"desc": "Formula to use (support dice)"
+		},
+		"sign": {
+			"desc": "Mathematicals signs",
+			"title": "sign"
+		},
+		"statistic": "Statistic to use",
+		"title": "calc",
+		"transform": {
+			"abs": "Absolute",
+			"ceil": "Ceil",
+			"desc": "round, ceil, floor or cube the result",
+			"floor": "Floor",
+			"round": "Round",
+			"sqrt": "Square root",
+			"square": "Square",
+			"title": "transform"
+		}
+	},
+	"changeThread": {
+		"delete": "Dice results will no longer be sent",
+		"description": "Register a channel to send dice results there or use a automatic thread.",
+		"name": "result_channel",
+		"noChan": "No backup channel has been configured: cancellation of the command.\n\nIf you want to disable the auto-thread creation, use `/config result_channel true`.",
+		"options": "Results channel",
+		"set": "The channel {{- channel}} has been registered to send the dice results."
+	},
+	"choose": {
+		"description": "Choose a random value in a list",
+		"list": {
+			"description": "Separate value by a space, comma and/or semicolon",
+			"name": "list"
+		},
+		"name": "choose",
+		"noItems": "The list contains no items!",
+		"number": {
+			"description": "Number of values to select",
+			"name": "how_many"
+		},
+		"result": "__Result__: {{items}}",
+		"seed": {
+			"description": "Initialize the number generator with a seed to get the same sequence of number",
+			"name": "seed"
+		},
+		"select": "select",
+		"tooMany": "You can't select more items than the list contains!"
+	},
+	"common": {
+		"cancel": "Cancel",
+		"cancelled": "Deletion has been canceled.",
+		"channel": "channel",
+		"charName": "Character name",
+		"character": "character",
+		"comments": "comments",
+		"confirm": "Confirm deletion",
+		"context": "Context",
+		"critical": "critical",
+		"default": "Default",
+		"dice": "dice",
+		"ephemeral": "ephemeral",
+		"error": "Error",
+		"expression": "expression",
+		"failure": "fail",
+		"false": "False",
+		"isPrivate": "Private character",
+		"macro": "macro",
+		"name": "name",
+		"no": "✕",
+		"noSet": "/",
+		"ooc": "OOC",
+		"page": "Page {{- nb}}",
+		"role": "role",
+		"sheet": "[ SHEET ]",
+		"snippets": "snippets",
+		"space": "",
+		"statistic": "statistic",
+		"statistics": "statistics",
+		"template": "template",
+		"total": "Total",
+		"true": "True",
+		"user": "Player",
+		"yes": "✓"
+	},
+	"config": {
+		"admin": {
+			"desc": "Allows to log all character modifications and creations in a channel.",
+			"title": "Administration"
+		},
+		"autoRole": "Automatic roles",
+		"context": {
+			"desc": "In saving the result, allows you to display a link to the message preceding the die roll, or the roll itself, depending on the auto-deletion settings.",
+			"title": "[Save dice result] Link to die context"
+		},
+		"customCritical": "Custom Critical",
+		"damageName": "Saved macro list (global)",
+		"defaultSheet": "Default channel",
+		"description": "Allows you to configure the bot for the server",
+		"disableCompare": {
+			"description": "Edit the dice's output that contains a comparison (only for base roll)",
+			"name": "disable_compare"
+		},
+		"disableThread": {
+			"desc": "Disables global saving and auto-deletion of results, leaving the dice roll where it was done.",
+			"title": "Disabling results threads"
+		},
+		"display": {
+			"description": "Shows server configuration",
+			"general": {
+				"description": "Display the general configuration of the server",
+				"name": "general"
+			},
+			"template": {
+				"description": "Display the model configuration if any."
+			}
+		},
+		"displayResult": "Displaying results",
+		"excludedStats": "Excluded statistics",
+		"hiddenRoll": {
+			"desc": "Allows you to hide the dice results from GMs and send them to a specific channel or in a ephemeral message.",
+			"title": "[GM] Roll display"
+		},
+		"lang": {
+			"description": "Allows to change the language of the bot manually",
+			"name": "change_language",
+			"options": {
+				"desc": "Language to use",
+				"name": "language"
+			},
+			"set": "The bot will now use \"{{-lang}}\" as its primary language."
+		},
+		"linkToLog": {
+			"desc": "In the result of the dice, allows you to display a link to saving the result.",
+			"title": "[Result] Link to save dice result"
+		},
+		"logLink": {
+			"description": "Activate the link to the logs in the die result",
+			"name": "save_link"
+		},
+		"logs": "Logging",
+		"name": "config",
+		"noTemplate": "There is no template configured for the server.",
+		"pity": {
+			"delete": "Pity has been disabled.",
+			"description": "Allows you to count the number of consecutive failures and force a reroll until success.",
+			"name": "pity",
+			"option": {
+				"description": "Number of consecutive failures before pity",
+				"name": "threshold"
+			},
+			"success": "Pity is enabled. It will take {{- pity}} consecutive failures before a roll is rerolled to achieve success.\n\n⚠️ **Pity only works on comparison rolls.**"
+		},
+		"privateChan": "Private characters channel",
+		"result": {
+			"desc": "Allows you to save all dice results in a single channel.",
+			"title": "Saving results"
+		},
+		"selfRegister": {
+			"channel": {
+				"desc": "Disallow user to send the sheet in any channel.",
+				"name": "disallow_channel"
+			},
+			"description": "Allow player to register their characters directly.",
+			"disable": "The self-registration is disabled: player need a moderator to register their characters.",
+			"disableChannel": "User can't send their sheet in any channel : it will be sent into the default configured channel.",
+			"enable": "The self-registration is enabled: player can now register their characters freely, if they have access to the template message{{- url}}.\n\n> 💡You can restrict the channel/thread where the template is saved to a role to allow authorized users to access it!",
+			"enableModeration": "Only moderators can validate the self-registered sheet or the statistics and macro editions.",
+			"moderation": {
+				"desc": "Only the moderation can validate a self registered sheet or an edition.",
+				"name": "validation_moderation"
+			},
+			"name": "self_register"
+		},
+		"sheet": "Sheet",
+		"sort": {
+			"description": "Allows sorting the dice output results",
+			"name": "sort_order",
+			"option": {
+				"description": "The chosen order",
+				"name": "order"
+			},
+			"options": {
+				"ascending": "Ascending",
+				"descending": "Descending",
+				"none": "Disabled"
+			},
+			"order": {
+				"reset": "The dice results will no longer be sorted.",
+				"set": "The dice results will be sorted by {{- order}} order."
+			}
+		},
+		"statsName": "Name of statistics",
+		"stripOOC": {
+			"categories": "Channels",
+			"category": {
+				"error": "The strip ooc fonction can only be enabled with a selected channel.",
+				"name": "category"
+			},
+			"channel": {
+				"description": "Optional channel to transfer OOC.",
+				"placeholder": "Select at last one channel."
+			},
+			"delete": "OOC won't be deleted.",
+			"description": "Delete any text between prefix/suffix (or regex) after a timer.",
+			"error": "You must provide at least one of prefix and suffix or regex.",
+			"forward": "Transfert des messages",
+			"name": "strip_ooc",
+			"noSelection": "You need to select at last one channel or category.",
+			"prefix": {
+				"description": "Prefix string",
+				"name": "prefix"
+			},
+			"regex": {
+				"description": "regex. Need to contains only one groups (advanced user only)",
+				"end": " Regex must end with `$`.",
+				"error": "The regex is invalid: {{- e}}",
+				"name": "regex",
+				"start": "Regex must starts with `^`."
+			},
+			"select": "Choose channel where the OOC will be deleted.",
+			"success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n- Thread mode: {{- threadMode}}\n\nAnd will be done in:\n- {{- categories}}",
+			"suffix": {
+				"description": "suffix string",
+				"name": "suffix"
+			},
+			"thread_mode": {
+				"description": "Send the OOC into a thread instead of a global channel.",
+				"name": "thread_mode"
+			},
+			"timeOut": "Timeout! Cancellation.",
+			"timer": {
+				"description": "Time before OOC deletion (in seconds)",
+				"error": "You must provide a timer for HRP deletion.",
+				"name": "timer"
+			},
+			"title": "OOC's message deletion"
+		},
+		"template": "Model setup",
+		"templateMessage": "Link to model",
+		"timer": {
+			"desc": "At the end of the timer, the dice roll will be deleted but its results will be saved in the appropriate channel.",
+			"title": "Time before deletion"
+		},
+		"timestamp": {
+			"desc": "Display of the time/date in the dice result aggregator.",
+			"title": "Displaying timestamps"
+		},
+		"title": "{{- guild}} configuration"
+	},
+	"context": {
+		"disabled": "Adding a link to context is disabled."
+	},
+	"copyRollResult": {
+		"error": {
+			"noResult": "No result was found in the message.",
+			"notBot": "This message is not from Dicelette. No link can be created!"
+		},
+		"info": "The message you should copy to create a shortcut to the result varies by platform:\n- __Mobile__: Select the second message and tap “Copy text.”\n- __PC__: Copy the code block below.",
+		"name": "Create link to this result"
+	},
+	"csv_generation": {
+		"description": "Used to generate the CSV file for the add_mass command.",
+		"name": "csv",
+		"success": "Here is your CSV file! \nPlease note, by default, the delimiter used is `;`. \nDon't forget to specify it when importing into your software (excel/google sheet...).\n\nPlease note that you must calculate the combinations yourself!"
+	},
+	"dbRoll": {
+		"description": "Roll a die with a recorded statistic",
+		"name": "dbroll",
+		"options": {
+			"character": "The character where to take the value.",
+			"comments": {
+				"description": "Action description"
+			},
+			"hidden": {
+				"description": "Hides the die result (ignored if configuration is not done)",
+				"name": "hidden"
+			},
+			"modificator": {
+				"description": "Mathematical expression applied to the dice"
+			},
+			"opposition": {
+				"description": "secondary threshold against an opponent.",
+				"name": "opposition"
+			},
+			"override": {
+				"description": "Replace success threshold",
+				"name": "success_threshold"
+			},
+			"statistic": "The statistic to use"
+		}
+	},
+	"deleteChar": {
+		"all": "Are you sure do you want to delete {{- user}} data?",
+		"allMany": "Are you sure you want to **delete all** {{-user}} characters?\n__Characters found__:\n- {{- chara}}",
+		"allOne": "Are you sure you want to delete {{-user}} character?",
+		"allSuccess": "{{- user}}'s data has been deleted.",
+		"character": "The name of the character to delete",
+		"confirm": {
+			"all": "Are you sure you want to delete all {{-user}} characters?",
+			"title": "Delete characters"
+		},
+		"description": "Delete a character/user",
+		"name": "delete_char",
+		"noCharacters": "The user {{- user}} is not registered in the database.",
+		"success": "The {{- user}} character has been deleted!",
+		"user": "The player to delete"
+	},
+	"disableCompare": {
+		"success": {
+			"disabled": "Die comparisons are enabled. Now, when a die is written as `XdY>Z`, the output will indicate whether the die is a failure or a success.\n>>> __Example__:\n{{- example}}",
+			"enabled": "Die comparisons are disabled. Now, when a die is written as `XdY>Z`, the *output* will no longer indicate whether the die is a failure or a success and will show a `0` or `1` instead.\n>>> __Example__:\n{{- example}}"
+		}
+	},
+	"disableThread": {
+		"description": "Disable/enable automatic thread creation and use the configured channel for logs.",
+		"disable": {
+			"autoDelete": "Auto-deletion of results has been disabled.",
+			"mention": "The {{- mention}} channel will no longer receive dice logs.",
+			"prefix": "Channels prefixed with `🎲` will no longer receive logs either.",
+			"reply": "Automatic thread creation has been disabled: dice results will now be kept in the channel where the command was used."
+		},
+		"enable": {
+			"autoDelete": "The auto-deletion of reply has been authorized. You can configure it with `/config delete_after`.",
+			"mention": "The {{- mention}} channel will receive new dice logs.",
+			"prefix": "Channels prefixed with `:game_die:` will again receive dice results.",
+			"reply": "The dice results will be automatically sent to an automatically created thread."
+		},
+		"name": "disable_thread",
+		"options": {
+			"name": "toggle"
+		}
+	},
+	"display": {
+		"allowSelfRegister": "Self registration:",
+		"character": "The character to display",
+		"description": "Allows you to display the profile of a player/character",
+		"disallowChannel": "Disallow any channel:",
+		"moderation": "Validate by moderation:",
+		"persistant": {
+			"description": "Make the data (notably thumbnail) persistant by reuploading it.",
+			"name": "persistent"
+		},
+		"title": "display",
+		"user": "The user to display",
+		"userLowercase": "player"
+	},
+	"edit": {
+		"avatar": {
+			"success": "Avatar changed for {{- name}} ([→ link to the file]({{- link}}))!"
+		},
+		"desc": "Allows you to edit the data of a file",
+		"name": {
+			"success": "The character's name has been changed! \nYou can find it here: {{- url}}"
+		},
+		"opts": {
+			"character": "Character to edit",
+			"user": "User to edit"
+		},
+		"rename": {
+			"desc": "Change a character's name",
+			"option": {
+				"desc": "New name to use",
+				"title": "new_name"
+			},
+			"title": "rename"
+		},
+		"title": "edit",
+		"user": {
+			"desc": "Modify the user associated with a character",
+			"option": {
+				"desc": "The new owner of the character",
+				"title": "new_user"
+			},
+			"success": "The user was successfully edited.",
+			"title": "user"
+		}
+	},
+	"editMe": {
+		"asset": {
+			"description": "The avatar to set",
+			"name": "avatar"
+		},
+		"banner": {
+			"description": "The banner to set",
+			"name": "banner"
+		},
+		"bio": {
+			"description": "The bio to set",
+			"name": "bio"
+		},
+		"description": "Edit the bot information: avatar, banner, bio and nick.",
+		"name": "edit_me",
+		"nick": {
+			"description": "The nickname to set",
+			"name": "nick"
+		},
+		"success": "The bot was edited successfully."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Host a file rather than using a link.",
+			"name": "file"
+		},
+		"default": "The image used will be your actual avatar !",
+		"desc": "Edit the avatar of a character sheet",
+		"name": "avatar",
+		"url": {
+			"desc": "Link to the image to put (no discord link!)",
+			"name": "url"
+		}
+	},
+	"embed": {
+		"add": "User registration",
+		"dice": "Macro",
+		"display": "Character",
+		"edit": {
+			"dice_one": "Macro modified",
+			"dice_other": "Macro modified",
+			"stats_one": "Statistic modified",
+			"stats_other": "Statistics modified"
+		},
+		"old": "Registered player",
+		"template": "Model",
+		"user": "⌈⌋ Sheet ⌈⌋"
+	},
+	"error": {
+		"avatar": {
+			"cdn": "The image provided is invalid: as the images hosted on Discord are now temporary, they are no longer accepted. \nPlease upload the image or host it elsewhere.",
+			"format": "The image provided is invalid: it must be in the correct format: `JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`.",
+			"missing": "There is no file provided.",
+			"url": "The image provided is invalid: it must contain the image format (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) and be an `https` link."
+		},
+		"botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
+		"calc": "An error occured with the formula used.",
+		"channel": {
+			"defaultChannel": "You must provide at least one default channel to save the records.",
+			"notFound": "The channel `{{-channel}}` does not exist on this server.",
+			"thread": "No valid channel found - Please re-register the template if the channel was deleted"
+		},
+		"colon": "A dice name with a colon is not allowed.",
+		"createCriticalCustom": "The critical die is invalid: $ cannot be used without statistics.",
+		"criticalDiceType": "The dice type `{{- dice}}` cannot contains critics.\nUse custom critics instead.",
+		"csvContent": "The content of {{- fichier}} is invalid.",
+		"customCritical": {
+			"type_error": "{{- type}} is not recognized. Valid value are `cs` or `cf`"
+		},
+		"damage": {
+			"empty": "You have no macros saved.",
+			"notFound": "`{{- atq}}` is not saved in `{{- charName}}`."
+		},
+		"discord": "## [DISCORD] :warning: __Error__ : \n- **Code** : `{{- code}}`\n- **Source** : `{{- stack}}`\n\nPlease report the bug on [the official server](https://discord.gg/2PUqwWeQYZ).",
+		"duplicate": "The name is already used for another character! \nSo you can't use it here. \nEach name must be unique!",
+		"embed": {
+			"notFound": "No embeds found",
+			"old": "This record does not match the one in the database. \nYou will find the new sheet [here]({{- sheet}})."
+		},
+		"failedReply": "Failed to send the initial message or get the response.",
+		"generic": {
+			"e": "{{- e.message}}",
+			"withWarning": "## [{{- e.name}}]\n{{- e.message}}"
+		},
+		"guild": {
+			"data": "No data found for server {{-server}}.",
+			"empty": "No guilds found"
+		},
+		"invalidDice": {
+			"default": "The dice type `{{- dice}}` is invalid. Logs:\n`{{- error}}`",
+			"embeds": "No macro embeds detected",
+			"eval": "Invalid die: `{{-dice}}` during evaluation validation.",
+			"minus": "Dices cannot be negative !\n\n-# Dice used: `{{- dice}}`.",
+			"notFound": "No dice were found in the command!",
+			"withDice": "The dice `{{- dice}}` is invalid."
+		},
+		"invalidFormula": "Invalid formula: `{{- formula}}`",
+		"malformedMacros": "Macros seems to be malformed.",
+		"maxGreater": "The maximum must be superior to the minimum.",
+		"missingPermission": "## [DISCORD] **MISSING PERMISSIONS**\nThe bot does not have the permissions to perform the requested action. Check that it has access to the requested channel/thread!",
+		"mustBeGreater": "\nThe {{- value}} value must be greater than {{- min}}",
+		"mustBeLower": "The `{{- value}}` value must be smaller than `{{- max}}`",
+		"noBulkRoll": "Bulk roll are not allowed in shared rolls.",
+		"noDice": "You cannot use this command without having a registered die type!",
+		"noDiceType": "Custom critics cannot be used without a type die.",
+		"noMessage": "No messages found.",
+		"noPermission": "You do not have permissions to change another user's image. \nOnly people with \"MANAGE ROLES\" permissions can use this command for other players.",
+		"noRollResult": "The macro named `{{- dice}}` ({{- formula}}) doesn't seems to be a dice.",
+		"private": "This character sheet is private! \nYou do not have permission to read it.",
+		"public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
+		"roll": {
+			"channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration."
+		},
+		"sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
+		"stats": {
+			"char": "{{- char}} cannot be found.\nYou must select the user with this character to roll on `{{- stat}}`.",
+			"empty": "This combination is invalid: no statistics exist!",
+			"excluded": "This statistic is excluded: you cannot roll for it.",
+			"notFound": "Statistic `{{-value}}` not found! Did you make a typing error?",
+			"notFound_plural": "This command cannot be used: no statistics have been recorded.",
+			"notFound_singular": "The statistic `{{- stat}}` cannot be found on the selected character {{ char, optional}}.",
+			"shouldSelect": "You need to select a statistic to roll a dice.",
+			"tooMuch": "Too many statistics have been saved! You cannot have more than 25 statistics",
+			"user": "An user should be selected to roll a dice on `{{- stat}}`."
+		},
+		"template": {
+			"id": "No messages found with data saved in database:\n- Channel: `{{-channelId}}`\n- Message ID: `{{- messageId}}`",
+			"invalid": "The model was not found correctly, please try again.",
+			"json": "You must provide a JSON file.",
+			"notFound": "No template or channel configured."
+		},
+		"tooMuchDice": "Too many macros have been saved! You cannot have more than 25 macros saved.",
+		"totalExceededBy": "The total of points is exceeded by `{{- max}}`.",
+		"user": {
+			"charName": "The character {{- charName}} is not registered.",
+			"data": "No user data nor template dice found.",
+			"notAccess": "You don't have the permissions to check the specified character.",
+			"notFound": {
+				"charData": "The character data was not found at {{- url}}!\n$t(error.user.notFound.default)",
+				"default": "- This may be a temporary error caused by updating the cache,\n- The record cannot be found because it has been deleted (or its channel) but the data has not been deleted from the database. \nIf so, you need to use the `/delete_char` command.",
+				"generic": "User not found.\n$t(error.user.notFound.default)",
+				"oldUser": "The member <@{{- oldUserId}}> was not found on the server.\n$t(error.user.notFound.default)",
+				"userId": "The old user (`{{- oldUserId}}`) is not found.\n$t(error.user.notFound.default)"
+			},
+			"registered": "{{- user}} is not registered.",
+			"rename": "Your character does not have a name: it cannot therefore be renamed!",
+			"sameUser": "The old and new users are identical. Therefore, the move operation is not possible.",
+			"youRegistered": "You are not registered"
+		}
+	},
+	"export": {
+		"description": "Export all saved characters to a csv file",
+		"error": {
+			"noData": "No users are registered."
+		},
+		"name": "export",
+		"options": {
+			"desc": "Export only characters marked as private",
+			"name": "private_sheet_only"
+		}
+	},
+	"graph": {
+		"bg": {
+			"description": "Background color of the chart. By default: #0e47b2",
+			"name": "background"
+		},
+		"description": "Generate a graph of the user's stats",
+		"invert": {
+			"description": "Invert the graph for system that use \"better is little\" number.",
+			"name": "invert"
+		},
+		"line": {
+			"description": "Line color. By default: #0e47b2",
+			"name": "line"
+		},
+		"max": {
+			"description": "Maximum value for chart generation",
+			"name": "max"
+		},
+		"min": {
+			"description": "Minimum value for graph generation",
+			"name": "min"
+		},
+		"name": "graph"
+	},
+	"help": {
+		"admin": {
+			"description": "Displays the bot's administrative commands",
+			"messageDB": "# Delete a Character\r\n- **</delete_char:{{- delete_char }}>**: Deletes a character from the database. If the character sheet message is still present on the server, it will also be removed.\r\n\r\n# Automatic Roles\r\nThese commands allow automatic role assignment during file validation:\r\n- **</config auto_role statistics:{{- stat}}>**: Adds a role when statistics are validated.\r\n- **</config auto_role dice:{{- dice}}>**: Adds a role when a die is registered. \r\n\r\nThis allows the use of the commands </dbroll:{{- dbroll}}>, </macro:{{- macro}}> and </calc:{{- calc}}> if they are restricted to users with these roles.\r\n\r\n# \"Game Master\" Dice Rolls\r\nThese commands allow game masters to roll dice for all registered players:\r\n- **</gm dbroll:{{- gm.dbRoll}}>**: Rolls a statistics die, similar to </dbroll:{{- dbroll}}>.\r\n- **</gm macro:{{- gm.macro}}>**: Rolls a registered die, similar to </macro:{{- macro}}>.\r\n- **</gm calc:{{- gm.calc}}>**: Rolls a calculation die, similar to </calc:{{- calc}}>.\r\n\r\n",
+			"messageNoDB": "The bot has different administration commands that allow you to personalize your experience.\r\n\r\nYou will find [here](<https://dicelette.github.io/en/docs/config>) detailed explanations of the commands shown here:\r\n- </config display general:{{- display}}>: Display the server configuration\r\n- </config logs:{{- logs}}>: Records a channel to display errors and modifications made to records.\r\n- </config result_channel:{{- result}}>: Allows you to define a channel or enable/disable the automatic thread creation to receive the results of all dice rolls from the server.\r\n- </config delete_after:{{- delete}}>: Allow to change the timer before result message deletion (only if </config result_channel:{{- result}}> is disabled). If set to `0`, messages won't be deleted. By default, message will be deleted after 3 minutes.\r\n- </config timestamp:{{-timestamp}}> : Display (or not) the timestamp in the dice roll logs.\r\n- </config self_register:{{- self_register}}> : Allow users to register themselves to the bot, when a template is set, and with the option to restrict validation to moderators only and prevent users from creating in channels other than the default one.\r\n- </config change_language:{{- language}}> : Allows you to change the bot's language. The default language depends on the server's language, but is English if the server's language is not supported or not set. ",
+			"name": "admin"
+		},
+		"bug": {
+			"description": "Report a bug",
+			"message": "Please file your bug report [here](<{{- link}}>).\r\n\r\n### Before Reporting:\r\n1. **Check Existing Reports**: Ensure there isn't already a report for your bug.\r\n2. **Read the Documentation**: Visit the [documentation](<https://dicelette.github.io/en/>) to find answers to common questions.\r\n\r\n### What to Include in Your Report:\r\n- **Command Used**: Specify the command and arguments that caused the issue.\r\n- **Observed Behavior**: Describe what happened when the bug occurred.\r\n- **Screenshots**: Attach images related to the bug, such as error messages or affected character sheets.\r\n- **Logs**: Provide any error logs generated by the bot.\r\n- **Server Template**: If the bug is related to the database or template, include the server template.\r\n\r\nThank you for helping us improve the bot!",
+			"name": "bug"
+		},
+		"changelog": {
+			"description": "Get the changelog since a version or get the last changelog.",
+			"loading": "Fetching changelog…",
+			"name": "changelog",
+			"noChanges": "No files found, error",
+			"version": {
+				"description": "Version number",
+				"name": "version"
+			}
+		},
+		"description": "Display help",
+		"diceNotation": "# Dice Notation Guide\r\n- **Basic Dice Rolls**: Perform standard dice rolls using the format `XdY`, where `X` is the number of dice and `Y` is the number of sides. Example: `2d6` rolls two 6-sided dice.\r\n- **[Dice Groups](<https://dice-roller.github.io/documentation/guide/notation/group-rolls.html>)**: Group multiple dice rolls together for complex scenarios. Example: `(1d6, 2d8)`.\r\n- **[Modifiers](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)**: Apply mathematical operations to dice rolls, such as adding or subtracting values. Example: `1d20+5`.\r\n- **[Comments](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)**: Add descriptions to your rolls for clarity. Example: `1d6 // Attack damage`.\r\n- **[Math](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)**: Perform advanced calculations using dice rolls. Example: `(1d6+2)*3`.\r\n- **[Bulk Rolls](<https://dicelette.github.io/en/docs/introduction/expression#bulk-rolls>)**: Roll multiple dice simultaneously using the format `[number of dice]#[dice]`. Example: `2#d6` rolls two 6-sided dice.\r\n- **[Shared Rolls](<https://dicelette.github.io/en/docs/introduction/expression#shared-unique-rolls-reusing-results>)**: Reuse the result of a previous roll in subsequent calculations. Example: `1d6;&+10`.\r\n- **[Critical by Die](<https://dicelette.github.io/en/docs/introduction/expression#critical-successes-and-failures>)**: Specify critical conditions for dice rolls. Example: `1d20{cs:>=10}>=20` means the roll is a critical success if the result is greater than or equal to 10.",
+		"docs": {
+			"description": "Send the link to the documentation",
+			"message": "[Documentation](<{{- link}}>)",
+			"name": "docs"
+		},
+		"fr": {
+			"description": "Make a feature request",
+			"message": "Do you have an idea to improve the bot?\r\nIn this case, you can suggest it [here](<{{- link}}>)!\r\n\r\n### Before Submitting Your Request:\r\n1. **Check Existing Requests**: Ensure a similar request has not already been submitted.\r\n2. **Consult the Documentation**: Visit the [documentation](<https://dicelette.github.io/en/>) to see if your idea is already covered or if a solution exists.\r\n\r\n### Information to Include in Your Request:\r\n- **Detailed Description**: Clearly explain the feature you would like to see added.\r\n- **Use Cases**: Specify the context in which you plan to use this feature and the problem it would solve.\r\n- **Benefits**: Describe the advantages this feature would bring to the community or users.\r\n- **Considered Alternatives**: Mention any alternative solutions or approaches you have considered.\r\n\r\nThank you for contributing to the improvement of the bot!",
+			"name": "request"
+		},
+		"info": {
+			"description": "Displays general bot information",
+			"name": "info"
+		},
+		"invit": {
+			"change_language": "__By default__, I'll respond in {{- lang}}, but this can be changed with </config change_language:{{- id.lang}}>.\nFor the moment, however, only French and English are available!",
+			"channel": "With **`channel`** = **`#channel`** → Instead of creating threads automatically, the results will be copied into this channel!",
+			"copy": "In addition, I can __copy__ the results of dice rolls into threads starting with `🎲`, which will be created automatically when a roll is made.\nThis can be modified by the command </config result_channel:{{-id.result}}>.\nBy default, this behavior is **disabled** : all roll will be left where they are.",
+			"default": "Simply set to `0` to disable auto-delete.",
+			"disable": "With **`disable_thread`** = **`True`** → Results will be kept where the command was made, without auto-deletion after 3 minutes.",
+			"link": "You can find [the documentation here]({{- docLink}}), as I still have lots of customization options!",
+			"serv": "Hello ! I'm Dicelette !\nThank you for adding me to {{- serv}}.",
+			"timer": "If you want to change the time before results are deleted after configuring it, just use </config delete_after:{{-id.delete}}>. I'm set to delete after 3 minutes!"
+		},
+		"message": "# :game_die: **Dicelette** :game_die: `v.{{- version}}`\r\n\r\n## Resources:\r\n- Find the *bot* on [GitHub](<https://github.com/Dicelette/discord-dicelette/>)\r\n- Access the [Documentation](<https://dicelette.github.io/en>) for detailed usage instructions.\r\n\r\n## Usage:\r\n### Commands:\r\n- **</roll:{{- rollId}}>**: Roll a die. Example: `d6` or `2d6`.\r\n- **</scene:{{- sceneId}}>**: Creates a new thread for dice rolls. Automatically archives all previous threads.\r\n- **</math:{{- mathId}}>**: Perform mathematical operations, such as `2+2`, `3*4`, or `sqrt(16)`.\r\n\r\n### Advanced Features:\r\n- **Time Bubble**: Use `/scene tempo:True` to create a thread named with the current date.\r\n- **Direct Dice**: Roll dice directly in a message, e.g., `d6` or `2d6`.\r\n- **Indirect Dice**: Include dice rolls in a message, e.g., `*Phibi jumps on Wumpus and inflicts [2d6] damage*`.\r\n- **Semi-Direct Dice**: Combine dice rolls with a message, e.g., `1d100 Phibi jumps on Wumpus and inflicts damage`.",
+		"messageDB": "# Commands Linked to Character Sheets\r\nThese commands allow you to interact with character sheets, perform dice rolls, and analyze statistics.\r\n\r\n- **</dbroll:{{- dbroll}}>:** Rolls a statistics dice based on the data saved in a character sheet. Useful for evaluating character abilities or traits.\r\n- **</macro:{{- macro}}>:** Rolls a die recorded in your character sheet. Ideal for predefined dice rolls linked to specific actions or abilities.\r\n- **</graph:{{- graph}}>:** Generates a graph from a character's statistics. This is helpful for visualizing data trends or comparing attributes.\r\n- **</display:{{- display}}>:** Displays the statistics and dice of a character. Use this to review or share character details.\r\n- **</calc:{{- calc}}>:** Performs calculations using the statistics of a character. Perfect for deriving values or outcomes based on character data.",
+		"name": "help",
+		"register": {
+			"description": "Displays general help for activating the record save function.",
+			"message": "The bot allows you to configure a server model, enabling the creation and management of character sheets and dice rolls.\r\n\r\n### Key Features:\r\n- **Privacy and Control**: All data is stored locally on your server.\r\n- **Adaptability**: The model is designed to meet diverse needs, making it highly customizable.\r\n\r\n### Getting Started:\r\n1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.\r\n2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}>. \r\n\r\n### Commands Overview:\r\nAfter setting up the model, you can use the following commands to interact with character sheets:\r\n- **</macro:{{-macro}}>**: Roll dice based on saved data.\r\n- **</dbroll:{{-dbroll}}>**: Perform statistical dice rolls.\r\n- **</graph:{{-graph}}>**: Generate graphs from character statistics.\r\n- **</calc:{{-calc}}>**: Calculate values using character statistics.\r\n\r\n### Additional Resources:\r\n- **Documentation**: For more advanced configurations and features, visit the [official documentation](<https://dicelette.github.io/en/>).\r\n- **Support**: If you encounter issues, consult the documentation or reach out to the support team."
+		},
+		"stats": {
+			"connecting": "Connection",
+			"disconnected": "Disconnected",
+			"idle": "Idle",
+			"message": "- Number of servers: `{{- guildCount}}`\n- Latency: `{{- latency}}`\n- Uptime: `{{- uptime}}`\n- Version: `{{- VERSION}}`",
+			"name": "stats",
+			"nearly": "Nearly",
+			"reconnecting": "Reconnecting",
+			"resuming": "Resuming"
+		}
+	},
+	"hidden": {
+		"description": "Allows you to hide the results of the GM roll dice",
+		"disabled": "GM dice results now use the normal dice configuration.",
+		"enabled": "The GM dice will now be hidden and their results sent in an ephemeral message.",
+		"enabledChan": "GM dice results will now be sent to {{- channel}} directly.",
+		"options": "Allows you to send the results to this channel (otherwise, they will be sent as ephemeral)",
+		"title": "hidden_roll"
+	},
+	"import": {
+		"all_success": "All users have been registered.",
+		"delete": {
+			"description": "Delete old character (if exist)",
+			"title": "delete"
+		},
+		"description": "Add multiple characters at once",
+		"errors": {
+			"duplicate_charName": "The character {{- charName}} (from {{- user}}) already exists in the database.",
+			"global": "The following errors were found:",
+			"headers": "The column names do not match your model. \nPlease refer to the documentation and your template to check the column names.\n\n\nThe columns :\n- {{-name}}\nis/are missing.",
+			"invalid_file": "The file must be a CSV file. \nYou have provided a {{-ext}} file.",
+			"missing_charName": "Character name is missing for {{- user}}. \nHowever, it is mandatory in the template!",
+			"missing_header": "Your CSV has no column names!",
+			"missing_stats": "Missing statistics for {{- user}}.\n\nThe missing statistics are:\n\n- {{-stats}}",
+			"no_user": "No members exist on this server.",
+			"user_not_found": "{{- user}} was not found on the server. \nIt is possible that the cache is not up to date, or that there is an error in the ID or username."
+		},
+		"name": "import",
+		"options": {
+			"description": "The CSV file to import"
+		},
+		"success": "{{- user}} has been added."
+	},
+	"info": {
+		"author": "Made with 💖 by Mara__Li",
+		"count": "Number of servers",
+		"description": "Display generic information on the bot",
+		"docs": "Documentation",
+		"kofi": "\nKofi",
+		"latency": "Latency",
+		"presentation": "Dicelette is a bot written in Typescript and open-source dedicated to dice rolls:\n- Complex expression support,\n- Automatic results organization and logging,\n- Creation of snippets\n- Character template creation\n- Advanced customization: auto-role, HRP deletion, etc.",
+		"title": "info",
+		"uptime": "Uptime",
+		"version": "Version"
+	},
+	"legacy": {
+		"dice": "Skill Dice"
+	},
+	"linkToLog": {
+		"disabled": "Links to dice logs are disabled.",
+		"enabled": "Links to dice logs are now enabled.",
+		"options": "Enables/disables the option"
+	},
+	"logs": {
+		"delete": "Logs will no longer be sent",
+		"description": "Choose a channel where to send error logs",
+		"dice": {
+			"add_one": "{{- user}} added the macro `{{- dice}}` for {{- char}} (in {{- file}})",
+			"add_other": "{{- user}} added macros for {{- char}} (in {{- file}})",
+			"edit_one": "{{- user}} modified the macro `{{- dice}}` of {{- char}} (in {{- file}})",
+			"edit_other": "{{- user}} modified the macros of {{- char}} (in {{- file}})",
+			"moderationRequest": "{{- char}} is waiting for its sheet to be validated ({{- fiche}})\n-# {{- mentions}}",
+			"remove_one": "{{- user}} deleted the macro `{{- dice}}` of {{- char}} (in {{- file}})",
+			"remove_other": "{{- user}} deleted the macros of {{-char}} (in {{- file}})"
+		},
+		"editWaiting": "The <@{{-user}}> file is awaiting validation.{{- role}}",
+		"inChan": "to {{- chan}}.",
+		"name": "logs",
+		"options": "The channel to send logs to",
+		"set": "Logs will be sent into {{- channel}}.",
+		"stats": {
+			"added": "{{- user}} modified the statistics of {{- char}} (in {{- file}})",
+			"removed": "{{- user}} deleted the statistics of {{- char}} (in {{- file}})"
+		},
+		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
+	},
+	"luckMeter": {
+		"count": {
+			"consecutive": {
+				"failure": "Current failure streak",
+				"success": "Current success streak"
+			},
+			"desc": "Know results for {{- user}} :",
+			"including": "Including",
+			"longest": {
+				"failure": "Longest consecutive failure streak",
+				"success": "Longest consecutive success streak"
+			},
+			"none": "None",
+			"note": "Critical are included in the count of their normal rolls. ",
+			"title": "bilan",
+			"total_one": "Total: {{count}} roll",
+			"total_other": "Total: {{count}} rolls"
+		},
+		"description": "Get the number of success, failures (and critical ones) of an user.",
+		"ephemeral": "Send the reply in an ephemeral message",
+		"error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
+		"leaderboard": {
+			"noData": "No data available for this server yet!",
+			"option": {
+				"description": "Type of classification (failure, success, critical, etc.)",
+				"title": "type",
+				"total": "Total"
+			}
+		},
+		"moy": {
+			"desc": "Get number and mean of each roll type in the server",
+			"result": "Total rolls: {{- rollTotal}} by {{- usersWithCounts}} users",
+			"title": "server"
+		},
+		"reset": {
+			"all": {
+				"description": "Completely resets the ranking",
+				"name": "everyone",
+				"success": "The server leaderboard has been correctly reset."
+			},
+			"description": "Reset ranking",
+			"noPermission": "You don't have the permissions to do that.",
+			"self": {
+				"success": "Your ranking has been correctly reset."
+			},
+			"title": "reset",
+			"user": {
+				"description": "Resets the leaderboard for another person.",
+				"success": "The {{- user}} ranking has been correctly reset."
+			}
+		},
+		"title": "karma",
+		"user": "{{- user}}'s throwing results:",
+		"userOption": {
+			"description": "Displays another user's throw results."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Player leaderboard",
+			"title": "leaderboard"
+		}
+	},
+	"math": {
+		"description": "Basic calculus supporting Math.js evaluation (support rolling dice)",
+		"result": "Basic calculus",
+		"title": "math"
+	},
+	"mjRoll": {
+		"description": "Allows you to roll dice for other players",
+		"name": "gm",
+		"user": "Player to roll the die on"
+	},
+	"modals": {
+		"added": {
+			"dice": "Dice added",
+			"stats": "Statistics added"
+		},
+		"alreadySet": "All statistics are already defined",
+		"avatar": {
+			"description": "The link to the character image (by default, uses the user's avatar)",
+			"file": {
+				"description": "Upload a file to be the avatar."
+			},
+			"name": "Avatar"
+		},
+		"cancelled": "The requested edit has been rejected on {{- url}} by the moderators.",
+		"cancelled_by_user": "You have cancelled the editing of {{- url}}.",
+		"cancelled_moderator": "The requested edit has been rejected on {{- url}}.",
+		"channel": {
+			"description": "Allows you to post the file elsewhere than in the default channels",
+			"name": "Channel where to post the sheet"
+		},
+		"charName": {
+			"description": "Enter your character's name"
+		},
+		"dice": {
+			"max": "You cannot have more than 25 registered dice (discord field limits).",
+			"name": "Name",
+			"placeholder": "Enter a valid die",
+			"value": "Value"
+		},
+		"edit": {
+			"dice": "! Follow the syntax. \nDelete with X or 0.",
+			"stats": "! Follow the syntax. \nDelete with X."
+		},
+		"enterValue": {
+			"maxOnly": "Enter a value smaller than {{- max}}",
+			"minAndMax": "Enter a value between {{- min}} and {{- max}}",
+			"minOnly": "Enter a value greater than {{- min}}"
+		},
+		"finished": "Completed statistics",
+		"firstPage": "User Registration - Page 1/{{- page}}",
+		"noPermission": "You do not have permissions to do this.",
+		"onlyModerator": "Only moderator (with manage role) can validate a sheet. A notification was send to finish the registration.",
+		"private": {
+			"description": "If this record is private, put \"x\".",
+			"name": "Private character sheet"
+		},
+		"removed": {
+			"dice": "The dice have been removed from the user",
+			"stats": "The statistics have been deleted"
+		},
+		"stats": {
+			"forceDistrib": "Points must be ditributed in full. There are `{{- reste}}` points to put in.\nYour sheet cannot be validated.",
+			"reste": "You still have {{- reste}}/{{- total}} points to distribute between {{- nbStats}} statistics."
+		},
+		"steps": "User Registration - Page {{- page}}/{{- max}}",
+		"user": {
+			"description": "Enter the user attached to the character (id or global username)"
+		}
+	},
+	"pity": {
+		"logs": {
+			"title": "The dice roll was re-rolled {{- nb}} times."
+		}
+	},
+	"rAtq": {
+		"atq_name": {
+			"description": "The name of the macro"
+		},
+		"description": "Roll a registered die for a macro"
+	},
+	"refresh": "Following an update, the buttons have been modified! \nNow you need to select the “Avatar” option from the drop-down menu to edit the image.\n\nNew options have also been added!",
+	"register": {
+		"button": "Register a character",
+		"cancelled": "The registration has been canceled.",
+		"confirm": "The sheet was send into the validation process.",
+		"delete": {
+			"confirm": "Are you sure do you want to delete **all** users data ?",
+			"done": "The characters sheets has been deleted."
+		},
+		"description": "Register a new template for the database (macro, dbroll...) command",
+		"embed": {
+			"comparator": "Comparator:",
+			"description": "-# Click on the button to register a character",
+			"exclude": "Excluded",
+			"forceDistrib": "Force point's distribution",
+			"noValue": "No value",
+			"registered": "Registered model!\n\nBy default, the dice and display controls (as well as the graph) are enabled for all user by default.\n\nYou can restrict to your player only with following the tutorial:\n",
+			"updated": "The template was successfully updated! You can found it here: {{- msg.url}}."
+		},
+		"name": "register",
+		"notFinished": "The user didn't finish their sheet. Please wait.",
+		"options": {
+			"channel": "The channel where the template and users will be registered",
+			"delete": {
+				"description": "Delete all character sheets",
+				"name": "delete_characters"
+			},
+			"private": {
+				"description": "Allows you to choose a channel in which the “private” characters will be sent",
+				"name": "private_channel"
+			},
+			"public": {
+				"description": "Allows you to choose a channel in which the “public” characters will be sent",
+				"name": "public_channel"
+			},
+			"template": {
+				"description": "The template to be registered"
+			},
+			"update": {
+				"description": "Update old character sheets",
+				"name": "update_characters"
+			}
+		},
+		"refusalSent": "Your sheet on {{- guild}} was refused by {{- mention}}."
+	},
+	"roll": {
+		"base": " (__base__)",
+		"cc": " (__{{- custom}}__)",
+		"critical": {
+			"failure": "Critical failure",
+			"success": "Critical success"
+		},
+		"description": "Roll a die",
+		"failure": "Failure",
+		"mp_name": "r",
+		"name": "roll",
+		"opposition": " (__opposition__) ",
+		"option": {
+			"description": "roll die"
+		},
+		"other": " ",
+		"reason": "New roll thread",
+		"success": "Success"
+	},
+	"scene": {
+		"description": "Creates a new thread for dice",
+		"interaction": "New scene thread created: {{- scene}}",
+		"name": "scene",
+		"noScene": "No scene specified",
+		"option": {
+			"description": "The name of the scene"
+		},
+		"reason": "New scene",
+		"time": {
+			"description": "Time bubble: replace die with clock. By default, use date as thread name",
+			"name": "tempo"
+		},
+		"underscore": "__New scene__:"
+	},
+	"snippets": {
+		"description": "Roll a snippet"
+	},
+	"template": {
+		"description": "Configure server template"
+	},
+	"timer": {
+		"delete": "Dice rolling messages will no longer be deleted.",
+		"description": "Allows you to change the message deletion time",
+		"error": "The auto-deletion of roll result can't be enabled without a saved result channel.",
+		"name": "delete_after",
+		"option": {
+			"description": "Time (in seconds) before deletion, set to 0 to disable.",
+			"name": "time"
+		},
+		"success": "Messages will now be deleted after `{{- timer}}`."
+	},
+	"timestamp": {
+		"description": "Display or name the time in the die roll log",
+		"disabled": "Timestamps are no longer displayed.",
+		"enabled": "Timestamps are now displayed",
+		"name": "timestamp",
+		"options": "Enables or disables the timestamp"
+	},
+	"update": {
+		"description": "Update the template without editing the others options",
+		"name": "update"
+	},
+	"userSettings": {
+		"createLink": {
+			"character": "Character's name if found",
+			"description": "Adjusts the format of the link created by the “create link” menu.",
+			"dice": "Specific format for dice results only",
+			"display": {
+				"description": "Displays the different templates used and an example of a link created",
+				"name": "display"
+			},
+			"final": {
+				"description": "Format of the final text to be sent",
+				"name": "final"
+			},
+			"format": {
+				"name": "format"
+			},
+			"info": {
+				"description": "Critical/Results text format",
+				"name": "info"
+			},
+			"joinResult": {
+				"description": "Joining results when they are a list",
+				"name": "join_results"
+			},
+			"name": "Format of statistical/macro text, if present",
+			"originalDice": {
+				"description": "Format of the die that was originally rolled",
+				"name": "original_dice"
+			},
+			"reset": {
+				"description": "Reset to the default settings",
+				"name": "reset",
+				"success": "Settings was successfully reset."
+			},
+			"result": {
+				"description": "Format of the results list (contains total and possible critical text)",
+				"name": "results"
+			},
+			"success": "Template saved.\n__Preview__: {{- preview}}",
+			"title": "create_link"
+		},
+		"description": "Allows users to configure certain non-critical functions of the bot.",
+		"name": "user_config",
+		"snippets": {
+			"create": {
+				"content": {
+					"description": "Dice that will be throw",
+					"name": "content"
+				},
+				"description": "Add a new snippet",
+				"name": "Snippet's name",
+				"success": "The snippet **{{- name}}** was successfully saved.",
+				"title": "create"
+			},
+			"delete": {
+				"description": "Delete a snippet",
+				"name": "Snippet name to delete",
+				"notFound": "The macro {{- name}} was not found.",
+				"success": "The macro {{- name}} was successfully deleted.",
+				"title": "delete"
+			},
+			"description": "Add macro not linked to a template or a sheet",
+			"export": {
+				"description": "Export saved snippets in JSON",
+				"empty": "No snippets to export.",
+				"success": "Snippets were successfully exported. You can import them with `/user_config snippets import`."
+			},
+			"import": {
+				"description": "Import snippets from a JSON file",
+				"file": {
+					"description": "JSON file to import",
+					"title": "file"
+				},
+				"invalidContent": "The content of the file is invalid. The content should be formatted as follow: \n```json\n{{- ex}}\n```",
+				"invalidFile": "The extension is not valid. The file must be a JSON.",
+				"partialErrors_one": "Following snippet is invalid:",
+				"partialErrors_other": "Following snippets are invalid:",
+				"success_one": "{{- count}} snippet was imported successfully.",
+				"success_other": "{{- count}} snippets were imported successfully."
+			},
+			"list": {
+				"description": "Display all registered snippet",
+				"empty": "No saved snippets.",
+				"title": "list"
+			}
+		}
+	}
 }
