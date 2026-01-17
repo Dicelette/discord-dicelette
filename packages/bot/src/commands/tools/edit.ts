@@ -41,6 +41,7 @@ export const editAvatar = {
 		.setNames("edit.title")
 		.setDescriptions("edit.desc")
 		.setDefaultMemberPermissions(0)
+		.setContexts(Djs.InteractionContextType.Guild)
 		.addSubcommand(
 			(subcommand) =>
 				charUserOptions(

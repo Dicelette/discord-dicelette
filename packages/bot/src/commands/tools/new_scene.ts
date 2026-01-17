@@ -9,6 +9,7 @@ import "discord_ext";
 export default {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("scene.name")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("scene.description")
 		.addStringOption((option) =>
 			option

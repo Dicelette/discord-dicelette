@@ -35,6 +35,7 @@ export const calc = {
 	},
 	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("calc.title")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("calc.description")
 		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {

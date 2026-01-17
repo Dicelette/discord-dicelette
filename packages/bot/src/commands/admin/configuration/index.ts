@@ -30,6 +30,7 @@ export const configuration = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("config.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("config.description")
 		/* CHANGE LANG*/
 		.addSubcommand((subcommand) =>

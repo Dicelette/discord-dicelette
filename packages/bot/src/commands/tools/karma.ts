@@ -503,6 +503,7 @@ const getCount = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("luckMeter.title")
 		.setDescriptions("luckMeter.description")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setNames("luckMeter.count.title")

@@ -1,6 +1,6 @@
 import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
-import { cmdLn, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import type { DiscordChannel, UserData } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserFromInteraction } from "database";
@@ -286,6 +286,7 @@ async function processCharacter(params: {
  */
 export const bulkAdd = {
 	data: new Djs.SlashCommandBuilder()
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setNames("import.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setDescriptions("import.description")
@@ -382,10 +383,10 @@ export const bulkAdd = {
 export const bulkAddTemplate = {
 	data: new Djs.SlashCommandBuilder()
 		.setName(t("csv_generation.name"))
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
-		.setNameLocalizations(cmdLn("csv_generation.name"))
-		.setDescription(t("csv_generation.description"))
-		.setDescriptionLocalizations(cmdLn("csv_generation.description")),
+		.setNames("csv_generation.name")
+		.setDescriptions("csv_generation.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;
 		const { ul } = getLangAndConfig(client, interaction);

@@ -35,6 +35,8 @@ const botErrorOptions: BotErrorOptions = {
 export const templateManager = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("common.template")
+		.setContexts(Djs.InteractionContextType.Guild)
+
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setDescriptions("template.description")
 		.addSubcommand((subcommand) =>

@@ -31,13 +31,17 @@ export function filterChoices(choices: string[], focused: string) {
 }
 
 function uniqueValues(array: string[]) {
-	const uniqueArray: Set<string> = new Set();
+	const uniqueArray: string[] = [];
+	const isUnique: Map<string, boolean> = new Map();
 
 	for (const item of array) {
 		const formattedItem = item.standardize();
-		if (!uniqueArray.has(formattedItem)) uniqueArray.add(formattedItem);
+		if (!isUnique.get(formattedItem)) {
+			uniqueArray.push(item);
+			isUnique.set(formattedItem, true);
+		}
 	}
-	return Array.from(uniqueArray);
+	return uniqueArray;
 }
 
 /**

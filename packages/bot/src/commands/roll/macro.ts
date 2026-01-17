@@ -24,6 +24,7 @@ export default {
 	},
 	data: (macroOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("common.macro")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("rAtq.description")
 		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {

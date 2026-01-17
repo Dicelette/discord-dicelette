@@ -17,6 +17,7 @@ export const dbRoll = {
 		);
 	},
 	data: (dbRollOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setNames("dbRoll.name")
 		.setDescriptions("dbRoll.description")
 		.setDefaultMemberPermissions(0),

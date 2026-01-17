@@ -11,6 +11,7 @@ export default {
 		.setNames("activities.name")
 		.setDescriptions("activities.description")
 		.setContexts(Djs.InteractionContextType.Guild)
+
 		.setDefaultMemberPermissions(0)
 		.addStringOption((option) =>
 			option

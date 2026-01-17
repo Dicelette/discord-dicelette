@@ -40,6 +40,7 @@ function pLimit(concurrency: number) {
 export const exportData = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("export.name")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("export.description")
 		.addBooleanOption((option) =>
 			option

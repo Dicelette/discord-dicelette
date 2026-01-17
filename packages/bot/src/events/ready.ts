@@ -42,7 +42,9 @@ export default (client: EClient): void => {
 			GLOBAL_CMD.map((cmd) => cmd.data.toJSON())
 		);
 		try {
-			await client.application?.commands.set(globalCommands);
+			if (process.env.NODE_ENV === "development") {
+				await client.application?.commands.set(GLOBAL_CMD.map((x) => x.data.toJSON()));
+			} else await client.application?.commands.set(globalCommands);
 			logger.info(`Global commands updated (${globalCommands.length})`);
 		} catch (err) {
 			logger.error("Failed to update global commands:", err);

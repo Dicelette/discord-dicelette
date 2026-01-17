@@ -31,6 +31,7 @@ export const userSettings = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("userSettings.name")
 		.setDescriptions("userSettings.description")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.addSubcommandGroup((group) =>
 			createLinksCmdOptions(
 				group

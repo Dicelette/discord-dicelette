@@ -52,6 +52,9 @@ export default {
 	},
 	data: (macroOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("common.snippets")
+		.setContexts(Djs.InteractionContextType.Guild)
+
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("snippets.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { ul } = getLangAndConfig(client, interaction);

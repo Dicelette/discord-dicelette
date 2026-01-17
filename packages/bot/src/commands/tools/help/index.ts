@@ -37,6 +37,7 @@ export const help = {
 	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("help.name")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("help.description")
 		.addSubcommand((sub) =>
 			sub.setNames("help.info.name").setDescriptions("help.info.description")

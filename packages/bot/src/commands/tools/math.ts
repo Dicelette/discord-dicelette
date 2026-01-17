@@ -18,6 +18,7 @@ export const math = {
 	},
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("math.title")
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("math.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
