@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.32.5](https://github.com/Dicelette/discord-dicelette/compare/2.32.4...2.32.5) (2026-01-17)
+
+
+### Bug Fixes
+
+* cmds appear event outside of the bot ([f6be554](https://github.com/Dicelette/discord-dicelette/commit/f6be55481e56d25fc7e661b3450b8bbc3981b808))
+* organization in commands ([af43049](https://github.com/Dicelette/discord-dicelette/commit/af4304970c8c80f807584730cfb17d8b5787e8dc))
+
 ## [2.32.4](https://github.com/Dicelette/discord-dicelette/compare/2.32.3...2.32.4) (2026-01-17)
 
 
