@@ -35,7 +35,11 @@ export const diceRoll = {
 				.setDescriptions("roll.option.description")
 				.setRequired(true)
 		)
-		.setContexts(Djs.InteractionContextType.Guild)
+		.setContexts(
+			Djs.InteractionContextType.Guild,
+			Djs.InteractionContextType.BotDM,
+			Djs.InteractionContextType.PrivateChannel
+		)
 		.addBooleanOption((option) =>
 			option
 				.setNames("dbRoll.options.hidden.name")
@@ -46,6 +50,9 @@ export const diceRoll = {
 		interaction: Djs.ChatInputCommandInteraction,
 		client: EClient
 	): Promise<void> {
+		console.log(
+			`Log: Executing /roll cmds for ${interaction.user.username} in ${interaction.guild?.name} - DM:${interaction.channel?.type === Djs.ChannelType.DM}`
+		);
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		const dice = option.getString(t("common.dice"), true);
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));

@@ -11,9 +11,8 @@ export * from "./display";
 export * from "./edit";
 export * from "./graph";
 export * from "./help";
-export * from "./info";
-
 export { createHelpMessageDB, helpAtInvit } from "./help/createHelpMessage";
+export * from "./info";
 export { default as getCount } from "./karma";
 export * from "./math";
 export * from "./new_scene";

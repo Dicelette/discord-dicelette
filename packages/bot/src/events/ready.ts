@@ -37,28 +37,54 @@ export default (client: EClient): void => {
 			contextMenus.map((cmd) => cmd.toJSON())
 		);
 
+		// Deploy global commands once (COMMANDS + contextMenus + GLOBAL_CMD)
+		const globalCommands = serializedCommands.concat(
+			GLOBAL_CMD.map((cmd) => cmd.data.toJSON())
+		);
+		try {
+			await client.application?.commands.set(globalCommands);
+			logger.info(`Global commands updated (${globalCommands.length})`);
+		} catch (err) {
+			logger.error("Failed to update global commands:", err);
+		}
+
 		const guildPromises = Array.from(client.guilds.cache.values()).map(async (guild) => {
-			let guildCommands = [...serializedCommands];
-
 			const enabled = client.settings.get(guild.id, "templateID.messageId");
-			if (enabled) {
-				for (const cmd of serializedDbCmds) {
-					cmd.default_member_permissions = undefined;
-				}
-				guildCommands = guildCommands.filter(
-					(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name)
-				);
-				guildCommands = guildCommands.concat(serializedDbCmds);
-			}
 
-			logger.trace(`Registering commands for \`${guild.name}\``);
-			if (guild.id === PRIVATE_ID) {
-				guildCommands = guildCommands.concat(
-					PRIVATES_COMMANDS.map((x) => x.data.toJSON())
-				);
-			}
 			try {
-				await guild.commands.set(guildCommands);
+				if (process.env.NODE_ENV === "development") {
+					// For fast local testing, register full set (globals + per-guild) on the guild
+					let devCommands = [...serializedCommands];
+					if (enabled) {
+						devCommands = devCommands.filter(
+							(cmd) => !serializedDbCmds.find((c) => c.name === cmd.name)
+						);
+						devCommands = devCommands.concat(serializedDbCmds);
+					}
+					if (guild.id === PRIVATE_ID) {
+						devCommands = devCommands.concat(
+							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
+						);
+					}
+					await guild.commands.set(devCommands);
+				} else {
+					let guildCommands: Djs.ApplicationCommandDataResolvable[] = [];
+
+					if (enabled) {
+						for (const cmd of serializedDbCmds) {
+							cmd.default_member_permissions = undefined;
+						}
+						guildCommands = guildCommands.concat(serializedDbCmds);
+					}
+
+					logger.trace(`Registering commands for \`${guild.name}\``);
+					if (guild.id === PRIVATE_ID) {
+						guildCommands = guildCommands.concat(
+							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
+						);
+					}
+					await guild.commands.set(guildCommands);
+				}
 
 				const cachePromises = [
 					fetchAllCharacter(client, guild),
@@ -75,7 +101,6 @@ export default (client: EClient): void => {
 		});
 
 		await Promise.all(guildPromises);
-		await client.application?.commands.set(GLOBAL_CMD.map((cmd) => cmd.data.toJSON()));
 
 		important.info("Bot is ready");
 		logger.info(

@@ -10,29 +10,8 @@ const REPEAT_CHOOSE = /(?<word>.*?)\* ?(?<repeat>\d+)/;
 export const choose = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("choose.name")
-		.setDescriptions("choose.description")
-		.addStringOption((option) =>
-			option
-				.setNames("choose.list.name")
-				.setDescriptions("choose.list.description")
-				.setRequired(true)
-		)
-		.addIntegerOption((option) =>
-			option
-				.setNames("choose.number.name")
-				.setDescriptions("choose.number.description")
-				.setRequired(false)
-		),
-
-	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
-		await command(interaction, client);
-	},
-};
-
-export const select = {
-	data: new Djs.SlashCommandBuilder()
-		.setNames("choose.select")
 		.setContexts(
+			Djs.InteractionContextType.Guild,
 			Djs.InteractionContextType.BotDM,
 			Djs.InteractionContextType.PrivateChannel
 		)
@@ -49,6 +28,7 @@ export const select = {
 				.setDescriptions("choose.number.description")
 				.setRequired(false)
 		),
+
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		await command(interaction, client);
 	},
