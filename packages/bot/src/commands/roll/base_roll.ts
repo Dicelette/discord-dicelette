@@ -50,7 +50,7 @@ export const diceRoll = {
 		interaction: Djs.ChatInputCommandInteraction,
 		client: EClient
 	): Promise<void> {
-		console.log(
+		logger.info(
 			`Log: Executing /roll cmds for ${interaction.user.username} in ${interaction.guild?.name} - DM:${interaction.channel?.type === Djs.ChannelType.DM}`
 		);
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
