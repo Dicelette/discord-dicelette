@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.32.4](https://github.com/Dicelette/discord-dicelette/compare/2.32.3...2.32.4) (2026-01-17)
+
+
+### Bug Fixes
+
+* should  have context for guild ([dd55d32](https://github.com/Dicelette/discord-dicelette/commit/dd55d32aa94d8862d4aa1dfde180cdb230fadb6f))
+
 ## [2.32.3](https://github.com/Dicelette/discord-dicelette/compare/2.32.2...2.32.3) (2026-01-17)
 
 
