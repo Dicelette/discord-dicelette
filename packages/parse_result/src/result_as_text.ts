@@ -367,7 +367,7 @@ export class ResultAsText {
 		| undefined {
 		if (critical) {
 			//if 0 is passed, ignore criticals
-			const failure = critical.failure || undefined
+			const failure = critical.failure || undefined;
 			const success = critical.success || undefined;
 			if (failure !== undefined && natural.includes(failure))
 				return {

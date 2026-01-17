@@ -114,8 +114,8 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"charName": "Nom du personnage",
 		"character": "personnage",
+		"charName": "Nom du personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -439,6 +439,19 @@
 			"title": "user"
 		}
 	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
+	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -459,19 +472,6 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
-	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -765,6 +765,12 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
+		}
+	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -820,12 +826,6 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
-		}
-	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
 		}
 	},
 	"math": {
