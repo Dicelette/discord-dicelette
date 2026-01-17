@@ -33,13 +33,16 @@ export async function autoCompleteEdit(
 		if (!guildChars) return;
 		for (const data of guildChars) {
 			const allowed = await haveAccess(interaction, data.messageId[1], userID);
-			if (data.charName && findln(data.charName) === "common.default") data.charName = undefined;
+			if (data.charName && findln(data.charName) === "common.default")
+				data.charName = undefined;
 			const toPush = data.charName ? data.charName : "common.default";
 			if (!data.isPrivate || allowed) choices.push(toPush);
 		}
 	}
 	if (choices.length === 0) return;
-	const filter = filterChoices(choices, interaction.options.getFocused()).map(x=>x === "common.default" ? ul("common.default") : x);
+	const filter = filterChoices(choices, interaction.options.getFocused()).map((x) =>
+		x === "common.default" ? ul("common.default") : x
+	);
 	await interaction.respond(
 		filter.map((result) => ({ name: result.capitalize(), value: result }))
 	);

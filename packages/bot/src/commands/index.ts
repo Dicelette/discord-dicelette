@@ -4,8 +4,7 @@ import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
 import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST } from "./roll";
 import snippets from "./roll/snippets";
-import { GIMMICK, getCount, help } from "./tools";
-import newScene from "./tools/new_scene";
+import { GIMMICK, getCount, help, newScene } from "./tools";
 import { userSettings } from "./userSettings";
 
 export const AUTOCOMPLETE_COMMANDS = [
@@ -38,7 +37,7 @@ export const DATABASE_NAMES = [
 	t("edit.title"),
 ];
 
-export const ALL_COMMANDS = COMMANDS.concat(PRIVATES_COMMANDS, GLOBAL_CMD);
+export const ALL_COMMANDS = COMMANDS.concat(PRIVATES_COMMANDS);
 
 export * from "./admin";
 export { clearCacheKey, createCacheKey, triggerPity } from "./admin/configuration/pity";

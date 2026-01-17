@@ -15,4 +15,4 @@ export { createHelpMessageDB, helpAtInvit } from "./help/createHelpMessage";
 export * from "./info";
 export { default as getCount } from "./karma";
 export * from "./math";
-export * from "./new_scene";
+export { default as newScene } from "./new_scene";
