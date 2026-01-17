@@ -1,4 +1,5 @@
 import { t } from "@dicelette/localization";
+import * as Djs from "discord.js";
 import { ADMIN } from "./admin";
 import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
@@ -27,6 +28,10 @@ export const COMMANDS = [
 	getCount,
 	userSettings,
 ];
+
+for (const cmd of COMMANDS) {
+	if (!cmd.data.contexts) cmd.data.setContexts(Djs.InteractionContextType.Guild);
+}
 
 export const DATABASE_COMMANDS = [...GIMMICK, ...ROLL_DB];
 export const DATABASE_NAMES = [

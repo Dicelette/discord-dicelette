@@ -23,7 +23,7 @@
 		"prepare": "husky",
 		"prerelease": "pnpm run --recursive tsc",
 		"release": "commit-and-tag-version",
-		"postrelease": "pnpm run prebuild",
+		"postrelease": "git push --follow-tags origin main",
 		"test": "pnpm -r test"
 	},
 	"dependencies": {

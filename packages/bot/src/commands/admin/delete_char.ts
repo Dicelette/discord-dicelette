@@ -45,6 +45,7 @@ export const deleteChar = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("deleteChar.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
+		.setContexts(Djs.InteractionContextType.Guild)
 		.setDescriptions("deleteChar.description")
 		.addUserOption((option) =>
 			option
