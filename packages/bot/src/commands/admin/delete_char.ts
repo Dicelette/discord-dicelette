@@ -51,6 +51,8 @@ export const deleteChar = {
 		.setNames("deleteChar.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+
 		.setDescriptions("deleteChar.description")
 		.addUserOption((option) =>
 			option

@@ -37,6 +37,7 @@ export const displayUser = {
 		.setDescriptions("display.description")
 		.setDefaultMemberPermissions(0)
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.addBooleanOption((input) =>
 			input
 				.setName(t("display.persistant.name"))

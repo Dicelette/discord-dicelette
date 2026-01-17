@@ -288,6 +288,8 @@ export const bulkAdd = {
 	data: new Djs.SlashCommandBuilder()
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setNames("import.name")
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setDescriptions("import.description")
 		.addAttachmentOption((option) =>
@@ -386,6 +388,8 @@ export const bulkAddTemplate = {
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setNames("csv_generation.name")
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+
 		.setDescriptions("csv_generation.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild) return;

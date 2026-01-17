@@ -2,7 +2,7 @@ import { t } from "@dicelette/localization";
 import { ADMIN } from "./admin";
 import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
-import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST, ROLL_DB } from "./roll";
+import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST } from "./roll";
 import snippets from "./roll/snippets";
 import { GIMMICK, getCount, help } from "./tools";
 import newScene from "./tools/new_scene";
@@ -16,18 +16,19 @@ export const AUTOCOMPLETE_COMMANDS = [
 	snippets,
 	userSettings,
 ];
-export const COMMANDS = [
-	...ROLL_AUTO,
-	...ROLL_CMDLIST,
-	...GIMMICK,
+export const COMMANDS_GLOBAL = [
 	...ADMIN,
+	...ROLL_CMDLIST,
 	deleteChar,
 	help,
 	newScene,
 	getCount,
 	userSettings,
+	...GLOBAL_CMD,
 ];
-export const DATABASE_COMMANDS = [...GIMMICK, ...ROLL_DB];
+
+export const GUILD_ONLY_COMMANDS = [...ROLL_AUTO, ...GIMMICK];
+export const COMMANDS = [...GUILD_ONLY_COMMANDS, ...COMMANDS_GLOBAL];
 export const DATABASE_NAMES = [
 	t("common.macro"),
 	t("dbRoll.name"),

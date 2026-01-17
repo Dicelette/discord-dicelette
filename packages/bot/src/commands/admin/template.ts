@@ -36,6 +36,7 @@ export const templateManager = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("common.template")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setDescriptions("template.description")

@@ -7,6 +7,8 @@ export default {
 		.setName("test")
 		.setDescription("test")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+
 		.setDefaultMemberPermissions(0),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, _client: EClient) => {
 		const rolled = roll("1d20");

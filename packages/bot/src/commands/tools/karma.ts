@@ -504,6 +504,7 @@ const getCount = {
 		.setNames("luckMeter.title")
 		.setDescriptions("luckMeter.description")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setNames("luckMeter.count.title")

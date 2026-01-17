@@ -158,6 +158,7 @@ export const graph = {
 		.setNames("graph.name")
 		.setDefaultMemberPermissions(0)
 		.setDescriptions("graph.description")
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setContexts(Djs.InteractionContextType.Guild)
 		.addBooleanOption((option) =>
 			option

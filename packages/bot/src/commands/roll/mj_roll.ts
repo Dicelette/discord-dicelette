@@ -91,7 +91,7 @@ export const mjRoll = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("mjRoll.name")
 		.setContexts(Djs.InteractionContextType.Guild)
-
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("mjRoll.description")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.addSubcommand(

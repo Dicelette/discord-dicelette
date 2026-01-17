@@ -41,6 +41,7 @@ export const exportData = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("export.name")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("export.description")
 		.addBooleanOption((option) =>
 			option

@@ -40,6 +40,11 @@ export const diceRoll = {
 			Djs.InteractionContextType.BotDM,
 			Djs.InteractionContextType.PrivateChannel
 		)
+		.setIntegrationTypes(
+			Djs.ApplicationIntegrationType.GuildInstall,
+			Djs.ApplicationIntegrationType.UserInstall
+		)
+
 		.addBooleanOption((option) =>
 			option
 				.setNames("dbRoll.options.hidden.name")

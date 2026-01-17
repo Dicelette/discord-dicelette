@@ -10,6 +10,10 @@ const REPEAT_CHOOSE = /(?<word>.*?)\* ?(?<repeat>\d+)/;
 export const choose = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("choose.name")
+		.setIntegrationTypes(
+			Djs.ApplicationIntegrationType.GuildInstall,
+			Djs.ApplicationIntegrationType.UserInstall
+		)
 		.setContexts(
 			Djs.InteractionContextType.Guild,
 			Djs.InteractionContextType.BotDM,

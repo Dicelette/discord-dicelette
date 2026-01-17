@@ -10,6 +10,7 @@ export default {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("scene.name")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("scene.description")
 		.addStringOption((option) =>
 			option

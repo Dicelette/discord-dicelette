@@ -20,6 +20,7 @@ export const dbRoll = {
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setNames("dbRoll.name")
 		.setDescriptions("dbRoll.description")
+		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { userStatistique, options, ul, optionChar } =

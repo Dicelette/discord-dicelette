@@ -7,10 +7,10 @@ import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { dev, important, logger } from "@dicelette/utils";
 import {
-	COMMANDS,
+	COMMANDS_GLOBAL,
 	contextMenus,
-	DATABASE_COMMANDS,
 	GLOBAL_CMD,
+	GUILD_ONLY_COMMANDS,
 	PRIVATES_COMMANDS,
 } from "commands";
 import { getTemplate, getUser } from "database";
@@ -24,10 +24,17 @@ export default (client: EClient): void => {
 	client.on("clientReady", async () => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
-		let serializedCommands = COMMANDS.map((command) => command.data.toJSON()).filter(
-			(x) => (x.contexts ? x.contexts.includes(Djs.InteractionContextType.Guild) : true)
-		);
-		const serializedDbCmds = DATABASE_COMMANDS.map((command) => command.data.toJSON());
+		let serializedCommands = COMMANDS_GLOBAL.map((x) => {
+			if (!x.data.contexts) x.data.setContexts(Djs.InteractionContextType.Guild);
+			if (
+				!x.data.integration_types &&
+				x.data.contexts?.includes(Djs.InteractionContextType.Guild)
+			)
+				x.data.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall);
+
+			return x.data.toJSON();
+		});
+		const serializedDbCmds = GUILD_ONLY_COMMANDS.map((command) => command.data.toJSON());
 
 		client.user.setActivity(client.status.text, {
 			type: client.status.type,
@@ -37,15 +44,11 @@ export default (client: EClient): void => {
 			contextMenus.map((cmd) => cmd.toJSON())
 		);
 
-		// Deploy global commands once (COMMANDS + contextMenus + GLOBAL_CMD)
-		const globalCommands = serializedCommands.concat(
-			GLOBAL_CMD.map((cmd) => cmd.data.toJSON())
-		);
 		try {
 			if (process.env.NODE_ENV === "development") {
 				await client.application?.commands.set(GLOBAL_CMD.map((x) => x.data.toJSON()));
-			} else await client.application?.commands.set(globalCommands);
-			logger.info(`Global commands updated (${globalCommands.length})`);
+			} else await client.application?.commands.set(serializedCommands);
+			logger.info(`Global commands updated (${serializedCommands.length})`);
 		} catch (err) {
 			logger.error("Failed to update global commands:", err);
 		}
@@ -76,8 +79,8 @@ export default (client: EClient): void => {
 						for (const cmd of serializedDbCmds) {
 							cmd.default_member_permissions = undefined;
 						}
-						guildCommands = guildCommands.concat(serializedDbCmds);
 					}
+					guildCommands = guildCommands.concat(serializedDbCmds);
 
 					logger.trace(`Registering commands for \`${guild.name}\``);
 					if (guild.id === PRIVATE_ID) {
