@@ -403,7 +403,7 @@ export async function getRecordChar(
 ): Promise<Record<string, UserGuildData> | undefined> {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const guildData = client.settings.get(interaction.guildId as string);
-	const ul = ln(interaction.locale as Djs.Locale);
+	const ul = ln(interaction.locale);
 	if (!guildData) {
 		await reply(interaction, {
 			embeds: [
@@ -419,7 +419,7 @@ export async function getRecordChar(
 	}
 	const user = options.getUser(t("display.userLowercase"));
 	let charName = options.getString(t("common.character"))?.toLowerCase();
-	if (charName?.includes(ul("common.default").toLowerCase())) charName = undefined;
+	if (charName && findln(charName) === "common.default") charName = undefined;
 
 	if (!user && charName) {
 		//get the character data in the database

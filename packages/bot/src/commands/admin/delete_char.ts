@@ -14,6 +14,7 @@ import i18next from "i18next";
 import { embedError, reply } from "messages";
 import { optionInteractions, searchUserChannel } from "utils";
 import "discord_ext";
+import { findln } from "@dicelette/localization";
 export const t = i18next.getFixedT("en");
 
 export const deleteChar = {
@@ -33,11 +34,15 @@ export const deleteChar = {
 			const guildChars = guildData.user[user];
 			if (!guildChars) return;
 			for (const data of guildChars) {
-				choices.push(data.charName ? data.charName : ul("common.default"));
+				if (data.charName && findln(data.charName) === "common.default")
+					data.charName = undefined;
+				choices.push(data.charName ? data.charName : "common.default");
 			}
 		}
 		if (choices.length === 0) return;
-		const filter = filterChoices(choices, interaction.options.getFocused());
+		const filter = filterChoices(choices, interaction.options.getFocused()).map((x) =>
+			x === "common.default" ? ul("common.default") : x
+		);
 		await interaction.respond(
 			filter.map((result) => ({ name: result.capitalize(), value: result }))
 		);

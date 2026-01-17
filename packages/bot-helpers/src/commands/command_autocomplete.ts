@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { t } from "@dicelette/localization";
+import { findln, t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { getInteractionContext } from "../interaction_context";
@@ -33,13 +33,13 @@ export async function autoCompleteEdit(
 		if (!guildChars) return;
 		for (const data of guildChars) {
 			const allowed = await haveAccess(interaction, data.messageId[1], userID);
-			const toPush = data.charName ? data.charName : ul("common.default");
-			if (!data.isPrivate) choices.push(toPush);
-			else if (allowed) choices.push(toPush);
+			if (data.charName && findln(data.charName) === "common.default") data.charName = undefined;
+			const toPush = data.charName ? data.charName : "common.default";
+			if (!data.isPrivate || allowed) choices.push(toPush);
 		}
 	}
 	if (choices.length === 0) return;
-	const filter = filterChoices(choices, interaction.options.getFocused());
+	const filter = filterChoices(choices, interaction.options.getFocused()).map(x=>x === "common.default" ? ul("common.default") : x);
 	await interaction.respond(
 		filter.map((result) => ({ name: result.capitalize(), value: result }))
 	);
