@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.32.1](https://github.com/Dicelette/discord-dicelette/compare/2.32.0...2.32.1) (2026-01-17)
+
+
+### Bug Fixes
+
+* simplify cmds with removing /r and /select ([7293e7e](https://github.com/Dicelette/discord-dicelette/commit/7293e7e7462b0dd84eeab64fba8eb83d9612c513))
+
 ## [2.32.0](https://github.com/Dicelette/discord-dicelette/compare/2.31.0...2.32.0) (2026-01-15)
 
 
