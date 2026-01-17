@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.32.3](https://github.com/Dicelette/discord-dicelette/compare/2.32.2...2.32.3) (2026-01-17)
+
+
+### Bug Fixes
+
+* forgot to remove console.log for course example ([db0a536](https://github.com/Dicelette/discord-dicelette/commit/db0a536bea25db0ba1e165c9efeec1c9a5a5d977))
+* improve character name handling and filtering in autocomplete functions ([a848487](https://github.com/Dicelette/discord-dicelette/commit/a848487067d4b647b8e93a789a2c52662a9fc26d))
+
 ## [2.32.2](https://github.com/Dicelette/discord-dicelette/compare/2.32.1...2.32.2) (2026-01-17)
 
 
