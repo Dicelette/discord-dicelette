@@ -33,6 +33,7 @@ export const userSettings = {
 		.setDescriptions("userSettings.description")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+		.setType("userSettings")
 		.addSubcommandGroup((group) =>
 			createLinksCmdOptions(
 				group

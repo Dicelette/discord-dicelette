@@ -37,6 +37,8 @@ export const help = {
 	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("help.name")
+		.setType("tools")
+		.isAutocompleted()
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("help.description")

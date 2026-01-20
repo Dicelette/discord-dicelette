@@ -24,6 +24,9 @@ export default {
 	},
 	data: (macroOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("common.macro")
+		.setType("roll")
+		.isDatabaseNeeded()
+		.isAutocompleted()
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("rAtq.description")

@@ -37,7 +37,7 @@ export const templateManager = {
 		.setNames("common.template")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
-
+		.setType("admin")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setDescriptions("template.description")
 		.addSubcommand((subcommand) =>

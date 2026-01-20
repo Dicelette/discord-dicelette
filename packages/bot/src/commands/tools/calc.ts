@@ -36,6 +36,9 @@ export const calc = {
 	data: (calcOptions(new Djs.SlashCommandBuilder()) as Djs.SlashCommandBuilder)
 		.setNames("calc.title")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.isDatabaseNeeded()
+		.setType("tools")
+		.isAutocompleted()
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("calc.description")
 		.setDefaultMemberPermissions(0),

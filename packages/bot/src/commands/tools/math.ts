@@ -15,6 +15,7 @@ import { t } from "@dicelette/localization";
 export const math = {
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("math.title")
+		.setType("tools")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(
 			Djs.ApplicationIntegrationType.GuildInstall,

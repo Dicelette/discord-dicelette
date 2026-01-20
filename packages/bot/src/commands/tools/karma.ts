@@ -501,6 +501,7 @@ function leaderBoardChoices() {
 
 const getCount = {
 	data: new Djs.SlashCommandBuilder()
+		.setType("tools")
 		.setNames("luckMeter.title")
 		.setDescriptions("luckMeter.description")
 		.setContexts(Djs.InteractionContextType.Guild)

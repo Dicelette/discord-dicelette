@@ -29,6 +29,7 @@ export const diceRoll = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("roll.name")
 		.setDescriptions("roll.description")
+		.setType("roll")
 		.addStringOption((option) =>
 			option
 				.setNames("common.dice")

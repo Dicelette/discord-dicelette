@@ -289,7 +289,7 @@ export const bulkAdd = {
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setNames("import.name")
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
-
+		.setType("admin")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setDescriptions("import.description")
 		.addAttachmentOption((option) =>

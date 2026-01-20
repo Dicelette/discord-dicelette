@@ -13,6 +13,7 @@ import { getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "discord_ext";
+import { CommandFlags } from "@dicelette/types";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -42,6 +43,8 @@ export const exportData = {
 		.setNames("export.name")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+		.setFlags(CommandFlags.GUILD_ONLY)
+		.setType("admin")
 		.setDescriptions("export.description")
 		.addBooleanOption((option) =>
 			option

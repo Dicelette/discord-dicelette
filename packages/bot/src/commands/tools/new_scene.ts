@@ -9,6 +9,7 @@ import "discord_ext";
 export default {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("scene.name")
+		.setType("tools")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("scene.description")

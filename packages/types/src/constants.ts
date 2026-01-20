@@ -85,3 +85,10 @@ export const DEFAULT_TEMPLATE = (ul: Translation): TemplateResult => {
 		results: `${LinksVariables.INFO} \`${LinksVariables.DICE}\``,
 	};
 };
+
+export enum CommandFlags {
+	NEED_DATABASE = "need_database",
+	AUTOCOMPLETE = "autocomplete",
+	GLOBAL = "global",
+	GUILD_ONLY = "guild_only",
+}

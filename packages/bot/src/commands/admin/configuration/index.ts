@@ -8,6 +8,7 @@ import * as Djs from "discord.js";
 import { localeList } from "locales";
 import "discord_ext";
 
+import { CommandFlags } from "@dicelette/types";
 import {
 	createLinksCmdOptions,
 	getTemplateValues,
@@ -32,6 +33,7 @@ export const configuration = {
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setType("admin")
 		.setDescriptions("config.description")
 		/* CHANGE LANG*/
 		.addSubcommand((subcommand) =>

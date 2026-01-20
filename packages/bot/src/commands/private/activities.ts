@@ -12,7 +12,7 @@ export default {
 		.setDescriptions("activities.description")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
-
+		.setType("admin")
 		.setDefaultMemberPermissions(0)
 		.addStringOption((option) =>
 			option

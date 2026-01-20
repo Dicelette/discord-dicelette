@@ -41,6 +41,9 @@ export const editAvatar = {
 		.setNames("edit.title")
 		.setDescriptions("edit.desc")
 		.setDefaultMemberPermissions(0)
+		.setType("tools")
+		.isDatabaseNeeded()
+		.isAutocompleted()
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setContexts(Djs.InteractionContextType.Guild)
 		.addSubcommand(

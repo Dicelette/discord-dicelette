@@ -1,11 +1,12 @@
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import type {
-	DiscordChannel,
-	GuildData,
-	PersonnageIds,
-	Translation,
-	UserMessageId,
+import {
+	CommandFlags,
+	type DiscordChannel,
+	type GuildData,
+	type PersonnageIds,
+	type Translation,
+	type UserMessageId,
 } from "@dicelette/types";
 import { filterChoices, logger } from "@dicelette/utils";
 import { deleteUser, deleteUserInChar, getRecordChar } from "database";
@@ -50,6 +51,10 @@ export const deleteChar = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("deleteChar.name")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
+		.setFlags(CommandFlags.AUTOCOMPLETE, CommandFlags.NEED_DATABASE)
+		.isAutocompleted()
+		.isDatabaseNeeded()
+		.setType("admin")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("deleteChar.description")

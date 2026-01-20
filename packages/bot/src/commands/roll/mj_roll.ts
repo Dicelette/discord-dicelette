@@ -92,6 +92,9 @@ export const mjRoll = {
 		.setNames("mjRoll.name")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+		.setType("roll")
+		.isDatabaseNeeded()
+		.isAutocompleted()
 		.setDescriptions("mjRoll.description")
 		.setDefaultMemberPermissions(Djs.PermissionFlagsBits.ManageRoles)
 		.addSubcommand(

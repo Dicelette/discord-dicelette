@@ -9,6 +9,7 @@ import { VERSION } from "../../..";
 export const info = {
 	data: new Djs.SlashCommandBuilder()
 		.setNames("info.title")
+		.setType("tools")
 		.setIntegrationTypes(
 			Djs.ApplicationIntegrationType.GuildInstall,
 			Djs.ApplicationIntegrationType.UserInstall

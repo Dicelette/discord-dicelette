@@ -53,6 +53,8 @@ export default {
 	data: (macroOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("common.snippets")
 		.setContexts(Djs.InteractionContextType.Guild)
+		.setType("roll")
+		.isAutocompleted()
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
 		.setDescriptions("snippets.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {

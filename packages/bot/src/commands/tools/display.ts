@@ -38,6 +38,9 @@ export const displayUser = {
 		.setDefaultMemberPermissions(0)
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+		.isAutocompleted()
+		.isDatabaseNeeded()
+		.setType("tools")
 		.addBooleanOption((input) =>
 			input
 				.setName(t("display.persistant.name"))

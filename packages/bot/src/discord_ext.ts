@@ -1,12 +1,21 @@
 //biome-ignore-all lint/suspicious/noExplicitAny: Allow explicit any for this extension file because it's simpler.
 
 import { cmdLn, t } from "@dicelette/localization";
+import type { CommandFlags } from "@dicelette/types";
 import * as Djs from "discord.js";
 
 declare module "discord.js" {
 	interface SlashCommandBuilder {
 		setNames(key: string): this;
 		setDescriptions(key: string): this;
+		setFlags(...flags: CommandFlags[]): this;
+		flags?: CommandFlags[];
+		type?: "admin" | "private" | "roll" | "tools" | "userSettings";
+		needDatabase?: boolean;
+		autocompleted?: boolean;
+		setType(type: "admin" | "private" | "roll" | "tools" | "userSettings"): this;
+		isDatabaseNeeded(): this;
+		isAutocompleted(): this;
 	}
 
 	interface SlashCommandSubcommandBuilder {
@@ -107,3 +116,29 @@ applyLocalizationMethods([
 	Djs.SlashCommandUserOption.prototype,
 	Djs.SlashCommandAttachmentOption.prototype,
 ]);
+
+Djs.SlashCommandBuilder.prototype.setFlags = function (
+	this: any,
+	...flags: CommandFlags[]
+) {
+	this.flags = flags;
+	return this;
+};
+
+Djs.SlashCommandBuilder.prototype.setType = function (
+	this: any,
+	type: "admin" | "private" | "roll" | "tools" | "userSettings"
+) {
+	this.type = type;
+	return this;
+};
+
+Djs.SlashCommandBuilder.prototype.isDatabaseNeeded = function (this: any) {
+	this.needDatabase = true;
+	return this;
+};
+
+Djs.SlashCommandBuilder.prototype.isAutocompleted = function (this: any) {
+	this.autocompleted = true;
+	return this;
+};
