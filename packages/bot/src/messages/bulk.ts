@@ -129,7 +129,7 @@ export async function bulkDeleteCharacters(
 			await deleteMessageChar(client, interaction, ul);
 			guildData.delete(interaction.guild!.id, "user");
 			client.characters.delete(interaction.guild!.id);
-			rep.edit({
+			await rep.edit({
 				components: [],
 				content: ul("register.delete.done"),
 				embeds: [],

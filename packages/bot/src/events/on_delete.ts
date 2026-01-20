@@ -62,12 +62,6 @@ export const onDeleteThread = (client: EClient): void => {
 export async function addRestriction(client: EClient, guildId: string) {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
 	const cmds = guildCommmands?.filter((cmd) => DATABASE_NAMES.includes(cmd.name));
-	/*
-	for (const cmd of cmds?.values() ?? []) {
-		await cmd.edit({ defaultMemberPermissions: Djs.PermissionFlagsBits.Administrator });
-	}
-	logger.trace("Restrictions added to commands for guild", guildId);
-	*/
 	//convert to promise to be faster
 	await Promise.all(
 		cmds?.map(async (cmd) => {

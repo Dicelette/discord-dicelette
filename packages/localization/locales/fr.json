@@ -114,13 +114,14 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"character": "personnage",
 		"charName": "Nom du personnage",
+		"character": "personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
 		"critical": "critique",
 		"default": "Défaut",
+		"delete": "supprimer",
 		"dice": "dé",
 		"ephemeral": "éphémère",
 		"error": "Erreur",
@@ -353,6 +354,9 @@
 			"statistic": "La statistique à utiliser"
 		}
 	},
+	"delete": {
+		"done": "Les données associées au modèle ont été supprimé."
+	},
 	"deleteChar": {
 		"all": "Êtes vous sûre de vouloir supprimer les données de {{- user}} ?",
 		"allMany": "Êtes-vous sûr·e de vouloir **supprimer tous les personnages** de {{- user}} ?\n__Personnages trouvés__ :\n- {{- chara}}",
@@ -368,6 +372,15 @@
 		"noCharacters": "L'utilisateur {{- user}} n'est pas inscrit·e dans la base.",
 		"success": "Le personnage de {{- user}} a bien été supprimé !",
 		"user": "Le joueur à supprimer"
+	},
+	"deleteTemplate": {
+		"description": "Supprimer le modèle et les données associées.",
+		"loading": "Suppression des données en cours...",
+		"success": "Les données associées au modèle ont été supprimé.",
+		"user": {
+			"description": "Supprime tous les personnages enregistré.",
+			"title": "supprimer_personnage"
+		}
 	},
 	"disableCompare": {
 		"success": {
@@ -439,19 +452,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -472,6 +472,19 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -701,8 +714,7 @@
 	"import": {
 		"all_success": "Tous les utilisateurs ont été enregistrés.",
 		"delete": {
-			"description": "Supprimer l'ancien personnage (si existant)",
-			"title": "suppression"
+			"description": "Supprimer l'ancien personnage (si existant)"
 		},
 		"description": "Ajouter plusieurs personnages d'un coup",
 		"errors": {
@@ -765,12 +777,6 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -826,6 +832,12 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
 		}
 	},
 	"math": {
@@ -1073,8 +1085,7 @@
 				"description": "Supprimer un snippet",
 				"name": "Nom du snippet à supprimer",
 				"notFound": "La macro {{- name}} n'a pas été trouvée.",
-				"success": "La macro {{-name}} a bien été supprimée.",
-				"title": "supprimer"
+				"success": "La macro {{-name}} a bien été supprimée."
 			},
 			"description": "Ajouter une macro non lié à un modèle ou une fiche",
 			"export": {

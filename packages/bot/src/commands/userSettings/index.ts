@@ -17,7 +17,7 @@ export const userSettings = {
 		const group = interaction.options.getSubcommandGroup(true);
 		const subcommand = interaction.options.getSubcommand(true);
 		if (group === t("common.snippets")) {
-			if (subcommand === t("userSettings.snippets.delete.title")) {
+			if (subcommand === t("common.delete")) {
 				const choices = getSnippetAutocomplete(interaction, client);
 				await interaction.respond(
 					choices.slice(0, 25).map((choice) => ({
@@ -63,7 +63,7 @@ export const userSettings = {
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
-						.setNames("userSettings.snippets.delete.title")
+						.setNames("common.delete")
 						.setDescriptions("userSettings.snippets.delete.description")
 						.addStringOption((option) =>
 							option
@@ -109,7 +109,7 @@ export const userSettings = {
 		} else if (group === t("common.snippets")) {
 			if (subcommand === t("userSettings.snippets.create.title"))
 				return await snippets.register(client, interaction);
-			if (subcommand === t("userSettings.snippets.delete.title"))
+			if (subcommand === t("common.delete"))
 				return await snippets.remove(client, interaction);
 			if (subcommand === t("userSettings.snippets.list.title"))
 				return await snippets.displayList(client, interaction);

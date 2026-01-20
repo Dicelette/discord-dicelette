@@ -82,23 +82,14 @@ export class EClient extends Djs.Client {
 		super(options);
 
 		const enmapSettings: EnmapOptions<GuildData, unknown> = {
-			autoFetch: true,
-			cloneLevel: "deep",
-			fetchAll: false,
 			name: "settings",
 		};
 
 		this.criticalCount = new Enmap({
-			autoFetch: true,
-			cloneLevel: "deep",
-			fetchAll: false,
 			name: "criticalCount",
 		});
 
 		this.userSettings = new Enmap({
-			autoFetch: true,
-			cloneLevel: "deep",
-			fetchAll: false,
 			name: "userSettings",
 		});
 

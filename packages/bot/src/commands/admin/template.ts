@@ -25,7 +25,7 @@ import {
 import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";
-import { interactionError } from "event";
+import { addRestriction, interactionError } from "event";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "CUSTOM_CRITICAL",
@@ -117,6 +117,16 @@ export const templateManager = {
 						.setNames("register.options.delete.name")
 						.setDescriptions("register.options.delete.description")
 				)
+		)
+		.addSubcommand((sub) =>
+			sub
+				.setNames("common.delete")
+				.setDescriptions("deleteTemplate.description")
+				.addBooleanOption((opt) =>
+					opt
+						.setNames("deleteTemplate.user.title")
+						.setDescriptions("deleteTemplate.user.description")
+				)
 		),
 	async execute(
 		interaction: Djs.ChatInputCommandInteraction,
@@ -132,6 +142,8 @@ export const templateManager = {
 				await registerTemplate(options, interaction, ul, client);
 			} else if (subcommand === t("update.name")) {
 				await updateTemplateFile(options, interaction, ul, client);
+			} else if (subcommand === t("common.delete")) {
+				await deleteTemplate(client, interaction, ul);
 			}
 		} catch (e) {
 			logger.fatal(e, "updateTemplateFile: error while updating template");
@@ -141,15 +153,59 @@ export const templateManager = {
 	},
 };
 
+async function deleteTemplate(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction,
+	ul: Translation
+) {
+	const guildId = interaction.guild!.id;
+	const oldData = client.settings.get(interaction.guild!.id, "templateID");
+	const opts = interaction.options;
+	const deleteAllUsers = opts.getBoolean(t("deleteTemplate.user.title"));
+	if (deleteAllUsers) {
+		await interaction.editReply({ content: ul("deleteTemplate.loading") });
+		const toResolves: Promise<void>[] = [
+			addRestriction(client, guildId),
+			bulkDeleteCharacters(client, interaction, ul),
+		];
+		await Promise.all(toResolves);
+		await removeMessage(client, guildId, oldData);
+		client.settings.delete(guildId, "templateID");
+		client.template.delete(guildId);
+		await interaction.followUp({ content: ul("deleteTemplate.success") });
+	} else {
+		await removeMessage(client, guildId, oldData);
+		client.settings.delete(guildId, "templateID");
+		client.template.delete(guildId);
+		await interaction.editReply({
+			content: ul("deleteTemplate.success"),
+		});
+		await addRestriction(client, guildId);
+	}
+}
+
+async function removeMessage(
+	client: EClient,
+	guildId: string,
+	oldData?: GuildData["templateID"]
+) {
+	if (oldData) {
+		const { channelId, messageId } = oldData;
+		try {
+			const channel = await fetchChannel(client.guilds.cache.get(guildId)!, channelId);
+			if (channel?.isTextBased()) {
+				const msg = await channel.messages.fetch(messageId);
+				await msg.delete();
+			}
+		} catch (e) {
+			logger.warn(e, "deleteTemplate: delete message");
+		}
+	}
+}
+
 async function removeRestriction(guildId: string, client: EClient): Promise<void> {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
 	const cmds = guildCommmands?.filter((cmd) => DATABASE_NAMES.includes(cmd.name));
-	/*
-	for (const cmd of cmds?.values() ?? []) {
-		logger.trace("Removing defaultMemberPermissions from command", cmd.name);
-		await cmd.edit({ defaultMemberPermissions: null });
-	}
-	*/
 	//convert to promise to be faster
 	await Promise.all(
 		cmds?.map(async (cmd) => {

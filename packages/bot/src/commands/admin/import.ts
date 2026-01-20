@@ -299,7 +299,7 @@ export const bulkAdd = {
 				.setRequired(true)
 		)
 		.addBooleanOption((option) =>
-			option.setNames("import.delete.title").setDescriptions("import.delete.description")
+			option.setNames("common.delete").setDescriptions("import.delete.description")
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;

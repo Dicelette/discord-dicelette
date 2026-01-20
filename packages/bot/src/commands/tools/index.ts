@@ -2,9 +2,9 @@ import { calc } from "./calc";
 import { displayUser } from "./display";
 import { editAvatar } from "./edit";
 import { graph } from "./graph";
-import { math } from "./math";
+export { math } from "./math";
 
-export const GIMMICK = [displayUser, graph, editAvatar, calc, math];
+export const GIMMICK = [displayUser, graph, editAvatar, calc];
 export * from "./calc";
 export * from "./choose";
 export * from "./display";

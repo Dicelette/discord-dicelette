@@ -2,9 +2,9 @@ import { t } from "@dicelette/localization";
 import { ADMIN } from "./admin";
 import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
-import { GLOBAL_CMD, ROLL_AUTO, ROLL_CMDLIST } from "./roll";
+import { GLOBAL_CMD, mjRoll, ROLL_AUTO, ROLL_CMDLIST } from "./roll";
 import snippets from "./roll/snippets";
-import { GIMMICK, getCount, help, newScene } from "./tools";
+import {GIMMICK, getCount, help, newScene, math} from "./tools";
 import { userSettings } from "./userSettings";
 
 export const AUTOCOMPLETE_COMMANDS = [
@@ -14,6 +14,7 @@ export const AUTOCOMPLETE_COMMANDS = [
 	help,
 	snippets,
 	userSettings,
+	mjRoll,
 ];
 export const COMMANDS_GLOBAL = [
 	...ADMIN,
@@ -24,6 +25,8 @@ export const COMMANDS_GLOBAL = [
 	getCount,
 	userSettings,
 	...GLOBAL_CMD,
+	mjRoll,
+	math,
 ];
 
 export const GUILD_ONLY_COMMANDS = [...ROLL_AUTO, ...GIMMICK];

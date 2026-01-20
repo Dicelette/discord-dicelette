@@ -43,9 +43,10 @@ export default (client: EClient): void => {
 			//@ts-ignore
 			contextMenus.map((cmd) => cmd.toJSON())
 		);
+		const isDev = process.env.NODE_ENV === "development" && !process.env.DEV_COMMANDS;
 
 		try {
-			if (process.env.NODE_ENV === "development") {
+			if (isDev) {
 				await client.application?.commands.set(GLOBAL_CMD.map((x) => x.data.toJSON()));
 			} else await client.application?.commands.set(serializedCommands);
 			logger.info(`Global commands updated (${serializedCommands.length})`);
@@ -57,7 +58,7 @@ export default (client: EClient): void => {
 			const enabled = client.settings.get(guild.id, "templateID.messageId");
 
 			try {
-				if (process.env.NODE_ENV === "development") {
+				if (isDev) {
 					// For fast local testing, register full set (globals + per-guild) on the guild
 					let devCommands = [...serializedCommands];
 					if (enabled) {
@@ -77,7 +78,19 @@ export default (client: EClient): void => {
 
 					if (enabled) {
 						for (const cmd of serializedDbCmds) {
+							console.log("Enabling command:", cmd.name);
 							cmd.default_member_permissions = undefined;
+						}
+					} else {
+						//verify that we should **enable** the commands with a filter with checking the cmd.default_member_permissions
+						const shouldBeRemoved = serializedDbCmds.filter((cmd) => {
+							return cmd.default_member_permissions === undefined;
+						});
+						for (const cmd of shouldBeRemoved) {
+							logger.trace(
+								`Disabling command ${cmd.name} for guild ${guild.name}`
+							);
+							cmd.default_member_permissions = Djs.PermissionFlagsBits.Administrator.toString();
 						}
 					}
 					guildCommands = guildCommands.concat(serializedDbCmds);

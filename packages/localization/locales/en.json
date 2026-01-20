@@ -114,13 +114,14 @@
 		"cancel": "Cancel",
 		"cancelled": "Deletion has been canceled.",
 		"channel": "channel",
-		"character": "character",
 		"charName": "Character name",
+		"character": "character",
 		"comments": "comments",
 		"confirm": "Confirm deletion",
 		"context": "Context",
 		"critical": "critical",
 		"default": "Default",
+		"delete": "delete",
 		"dice": "dice",
 		"ephemeral": "ephemeral",
 		"error": "Error",
@@ -353,6 +354,9 @@
 			"statistic": "The statistic to use"
 		}
 	},
+	"delete": {
+		"done": "Data associated to the template as been deleted."
+	},
 	"deleteChar": {
 		"all": "Are you sure do you want to delete {{- user}} data?",
 		"allMany": "Are you sure you want to **delete all** {{-user}} characters?\n__Characters found__:\n- {{- chara}}",
@@ -368,6 +372,15 @@
 		"noCharacters": "The user {{- user}} is not registered in the database.",
 		"success": "The {{- user}} character has been deleted!",
 		"user": "The player to delete"
+	},
+	"deleteTemplate": {
+		"description": "Delete template and associated data.",
+		"loading": "Data deletion in progress...",
+		"success": "Data associated to the modele was deleted.",
+		"user": {
+			"description": "Delete all registered characters.",
+			"title": "delete_user"
+		}
 	},
 	"disableCompare": {
 		"success": {
@@ -439,19 +452,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Host a file rather than using a link.",
-			"name": "file"
-		},
-		"default": "The image used will be your actual avatar !",
-		"desc": "Edit the avatar of a character sheet",
-		"name": "avatar",
-		"url": {
-			"desc": "Link to the image to put (no discord link!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "The avatar to set",
@@ -472,6 +472,19 @@
 			"name": "nick"
 		},
 		"success": "The bot was edited successfully."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Host a file rather than using a link.",
+			"name": "file"
+		},
+		"default": "The image used will be your actual avatar !",
+		"desc": "Edit the avatar of a character sheet",
+		"name": "avatar",
+		"url": {
+			"desc": "Link to the image to put (no discord link!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "User registration",
@@ -701,8 +714,7 @@
 	"import": {
 		"all_success": "All users have been registered.",
 		"delete": {
-			"description": "Delete old character (if exist)",
-			"title": "delete"
+			"description": "Delete old character (if exist)"
 		},
 		"description": "Add multiple characters at once",
 		"errors": {
@@ -765,12 +777,6 @@
 		},
 		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Player leaderboard",
-			"title": "leaderboard"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -826,6 +832,12 @@
 		"user": "{{- user}}'s throwing results:",
 		"userOption": {
 			"description": "Displays another user's throw results."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Player leaderboard",
+			"title": "leaderboard"
 		}
 	},
 	"math": {
@@ -1073,8 +1085,7 @@
 				"description": "Delete a snippet",
 				"name": "Snippet name to delete",
 				"notFound": "The macro {{- name}} was not found.",
-				"success": "The macro {{- name}} was successfully deleted.",
-				"title": "delete"
+				"success": "The macro {{- name}} was successfully deleted."
 			},
 			"description": "Add macro not linked to a template or a sheet",
 			"export": {
