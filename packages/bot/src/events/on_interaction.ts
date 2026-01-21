@@ -21,14 +21,14 @@ export default (client: EClient): void => {
 				const command = ALL_COMMANDS.find(
 					(cmd) => cmd.data.name === interaction.commandName
 				);
-				if (!command) return;
+				if (!command || !command.execute) return;
 				await command.execute(interaction, client);
 			} else if (interaction.isAutocomplete()) {
 				const autocompleteInteraction = interaction as Djs.AutocompleteInteraction;
 				const command = AUTOCOMPLETE_COMMANDS.find(
 					(cmd) => cmd.data.name === autocompleteInteraction.commandName
 				);
-				if (!command) return;
+				if (!command || !command.autocomplete) return;
 				await command.autocomplete(autocompleteInteraction, client);
 			} else if (interaction.isButton()) {
 				let template = await fetchTemplate(interaction.message, client.settings);
