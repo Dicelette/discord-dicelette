@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.33.0](https://github.com/Dicelette/discord-dicelette/compare/2.32.5...2.33.0) (2026-01-21)
+
+
+### Features
+
+* add delete template functionality ([dfbeb10](https://github.com/Dicelette/discord-dicelette/commit/dfbeb1058379cf728f361049cf340f03eaeea13f))
+
 ## [2.32.5](https://github.com/Dicelette/discord-dicelette/compare/2.32.4...2.32.5) (2026-01-17)
 
 
