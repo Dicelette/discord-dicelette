@@ -19,8 +19,7 @@
 	"dependencies": {
 		"@dicelette/types": "workspace:*",
 		"@dicelette/utils": "workspace:*",
-		"discord.js": "^14.16.3",
-		"enmap": "^6.0.4"
+		"discord.js": "^14.16.3"
 	},
 	"devDependencies": {
 		"typescript": "^5.7.2"

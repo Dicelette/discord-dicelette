@@ -11,7 +11,6 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.0",
   "dependencies": {
-    "@dicelette/types": "workspace:^",
-    "enmap": "6.0.3"
+    "@dicelette/types": "workspace:^"
   }
 }

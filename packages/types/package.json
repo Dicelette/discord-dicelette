@@ -15,7 +15,6 @@
 		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
 	},
 	"dependencies": {
-		"@dicelette/utils": "workspace:*",
-		"enmap": "^6.0.3"
+		"@dicelette/utils": "workspace:*"
 	}
 }
