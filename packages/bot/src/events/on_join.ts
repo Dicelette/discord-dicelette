@@ -1,6 +1,6 @@
 import type { EClient } from "@dicelette/client";
-import { logger, sentry } from "@dicelette/utils";
-import { COMMANDS, contextMenus, helpAtInvit } from "commands";
+import { logger } from "@dicelette/utils";
+import { GUILD_ONLY_COMMANDS, helpAtInvit } from "commands";
 
 export default (client: EClient): void => {
 	client.on("guildCreate", async (guild) => {
@@ -11,15 +11,16 @@ export default (client: EClient): void => {
 			client.settings.set(guild.id, true, "disableThread");
 			client.criticalCount.set(guild.id, {});
 			client.userSettings.set(guild.id, {});
-
-			const allCommands = [...COMMANDS.map((command) => command.data), ...contextMenus];
-
-			await guild.commands.set(allCommands);
-
+			const serializedDbCmds = GUILD_ONLY_COMMANDS.map((command) =>
+				command.data.toJSON()
+			);
+			await guild.commands.set(serializedDbCmds);
+			logger.info(
+				`Guild commands added for ${guild.name} (${guild.id}) - Total: ${serializedDbCmds.length}`
+			);
 			await helpAtInvit(guild);
 		} catch (e) {
 			logger.fatal(e);
-			sentry.fatal(e);
 		}
 	});
 };
