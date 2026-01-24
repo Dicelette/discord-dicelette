@@ -27,7 +27,7 @@ export function getInteractionContext(
 	const langToUse = getLangFromInteraction(interaction, client, guildId);
 	const ul = ln(langToUse);
 	if (interaction.guild) {
-		const config = client.settings.get(guildId ?? interaction.guild.id);
+		const config = client.settings.get(guildId ?? interaction.guild.id) || undefined;
 		return { config, langToUse, ul };
 	}
 	return { langToUse, ul };
@@ -77,7 +77,7 @@ export function getGuildSetting<K extends keyof GuildData>(
 	guildId: string,
 	key: K
 ): GuildData[K] | undefined {
-	return client.settings.get(guildId, key);
+	return client.settings.get(guildId, key) || undefined;
 }
 
 /**

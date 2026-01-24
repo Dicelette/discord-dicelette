@@ -10,7 +10,7 @@ import { logger } from "./logger";
 
 const TESTING_DIRECTORY = "@testing";
 
-export default function (template: Enmap<string, StatisticalTemplate, unknown>) {
+export default function (template: Enmap<StatisticalTemplate>) {
 	try {
 		const allFiles = fs.readdirSync(TESTING_DIRECTORY);
 		for (const file of allFiles) {

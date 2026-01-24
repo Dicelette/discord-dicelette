@@ -1,11 +1,12 @@
 import * as fs from "node:fs";
 import path from "node:path";
-import type { StatisticalTemplate } from "@dicelette/core";
 import type {
 	BotStatus,
+	Characters,
 	CriticalCount,
 	GuildData,
-	UserDatabase,
+	Settings,
+	Template,
 	UserSettings,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -20,14 +21,14 @@ export class EClient extends Djs.Client {
 	/**
 	 * Settings in long-term memory for the bot.
 	 */
-	public settings: Enmap<string, GuildData, unknown>;
+	public settings: Settings;
 
 	/**
 	 * Enmap for storing user data to accelerate the bot when fetching user data.
 	 * Initialized when the bot starts.
 	 * Stored in memory, and flushed when the bot restarts.
 	 */
-	public characters: Enmap<string, UserDatabase, unknown>;
+	public characters: Characters;
 
 	/**
 	 * Enmap for storing templates to accelerate the bot when fetching templates.
@@ -35,12 +36,12 @@ export class EClient extends Djs.Client {
 	 * Initialized when the bot starts.
 	 * Stored in memory, and flushed when the bot restarts.
 	 */
-	public template: Enmap<string, StatisticalTemplate, unknown>;
+	public template: Template;
 
 	/**
 	 * Enmap for guild locale
 	 */
-	public guildLocale: Enmap<string, Djs.Locale, unknown>;
+	public guildLocale: Enmap<Djs.Locale>;
 
 	public criticalCount: CriticalCount;
 
@@ -76,12 +77,12 @@ export class EClient extends Djs.Client {
 	 */
 	public statusPath = path.resolve("./data/status.json");
 
-	public userSettings: Enmap<string, UserSettings, unknown>;
+	public userSettings: Enmap<UserSettings>;
 
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
-		const enmapSettings: EnmapOptions<GuildData, unknown> = {
+		const enmapSettings: EnmapOptions<GuildData> = {
 			name: "settings",
 		};
 
@@ -108,11 +109,8 @@ export class EClient extends Djs.Client {
 
 		logger.info(`Settings loaded on ${path.resolve(enmapSettings.dataDir ?? ".\\data")}`);
 
-		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.characters = new Enmap({ inMemory: true });
-		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.template = new Enmap({ inMemory: true });
-		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.guildLocale = new Enmap({ inMemory: true });
 	}
 }
