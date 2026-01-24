@@ -1,11 +1,12 @@
 import * as fs from "node:fs";
 import path from "node:path";
-import type { StatisticalTemplate } from "@dicelette/core";
 import type {
 	BotStatus,
+	Characters,
 	CriticalCount,
 	GuildData,
-	UserDatabase,
+	Settings,
+	TemplateData,
 	UserSettings,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -20,14 +21,14 @@ export class EClient extends Djs.Client {
 	/**
 	 * Settings in long-term memory for the bot.
 	 */
-	public settings: Enmap<string, GuildData, unknown>;
+	public settings: Settings;
 
 	/**
 	 * Enmap for storing user data to accelerate the bot when fetching user data.
 	 * Initialized when the bot starts.
 	 * Stored in memory, and flushed when the bot restarts.
 	 */
-	public characters: Enmap<string, UserDatabase, unknown>;
+	public characters: Characters;
 
 	/**
 	 * Enmap for storing templates to accelerate the bot when fetching templates.
@@ -35,7 +36,7 @@ export class EClient extends Djs.Client {
 	 * Initialized when the bot starts.
 	 * Stored in memory, and flushed when the bot restarts.
 	 */
-	public template: Enmap<string, StatisticalTemplate, unknown>;
+	public template: TemplateData;
 
 	/**
 	 * Enmap for guild locale
