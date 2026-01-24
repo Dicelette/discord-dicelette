@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.33.1](https://github.com/Dicelette/discord-dicelette/compare/2.33.0...2.33.1) (2026-01-24)
+
+
+### Bug Fixes
+
+* duplicate commands when adding the bot ([27220eb](https://github.com/Dicelette/discord-dicelette/commit/27220ebfa0fc775f50271b66b0ae6a04e2808c6b))
+
 ## [2.33.0](https://github.com/Dicelette/discord-dicelette/compare/2.32.5...2.33.0) (2026-01-21)
 
 
