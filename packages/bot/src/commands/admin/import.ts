@@ -337,7 +337,7 @@ export const bulkAdd = {
 
 		const guildMembers = await interaction.guild?.members.fetch();
 
-		const toDelete = !!options.getBoolean(t("import.delete.title"));
+		const toDelete = !!options.getBoolean(t("common.delete"));
 		const limit = pLimit(3); // Keep a low concurrency to respect Discord rate limits
 		const asyncJobs: Promise<unknown>[] = [];
 		const collectedErrors = [...errors];
