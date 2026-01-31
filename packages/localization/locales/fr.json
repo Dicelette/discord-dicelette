@@ -114,8 +114,8 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"character": "personnage",
 		"charName": "Nom du personnage",
+		"character": "personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -452,19 +452,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -485,6 +472,19 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -777,12 +777,6 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -838,6 +832,12 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
 		}
 	},
 	"math": {
@@ -1101,6 +1101,10 @@
 				},
 				"invalidContent": "Le contenu du fichier est invalide. Le fichier doit être formatté tel que : \n```json\n{{- ex}}\n```",
 				"invalidFile": "L'extension est invalide. Le fichier doit être un JSON.",
+				"overwrite": {
+					"description": "Remplace les données complètes plutôt que de les rajouter",
+					"title": "écraser"
+				},
 				"partialErrors_one": "Le snippet suivant est invalide :",
 				"partialErrors_other": "Les snippets suivants sont invalides :",
 				"success_one": "{{- count}} snippet a été importé avec succès.",
