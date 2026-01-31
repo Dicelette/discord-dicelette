@@ -3,7 +3,7 @@ import type { EClient } from "@dicelette/client";
 import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression } from "@dicelette/parse_result";
-import type { Snippets } from "@dicelette/types";
+import type { Snippets, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { embedError, reply } from "messages";
 import { baseRoll } from "../roll";
@@ -44,23 +44,14 @@ export async function register(
 	}
 }
 
-export async function displayList(
-	client: EClient,
+export async function chunkMessage(
+	entries: [string, string | number][],
+	ul: Translation,
 	interaction: Djs.ChatInputCommandInteraction
 ) {
-	const { ul } = getLangAndConfig(client, interaction);
-	const userId = interaction.user.id;
-	const guildId = interaction.guild!.id;
-	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
-	const entries = Object.entries(macros);
-	if (entries.length === 0) {
-		const text = ul("userSettings.snippets.list.empty");
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
-		return;
-	}
 	const lines = entries.map(
 		([name, content]) =>
-			`- **${name.toTitle()}**${ul("common.space")}: \`${content.replaceAll("`", "\\`")}\``
+			`- **${name.toTitle()}**${ul("common.space")}: \`${content.toString().replaceAll("`", "\\`")}\``
 	);
 	const chunkedLines: string[][] = [];
 	const chunkSize = 10;
@@ -77,6 +68,23 @@ export async function displayList(
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
 	}
+}
+
+export async function displayList(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const { ul } = getLangAndConfig(client, interaction);
+	const userId = interaction.user.id;
+	const guildId = interaction.guild!.id;
+	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	const entries = Object.entries(macros);
+	if (entries.length === 0) {
+		const text = ul("userSettings.snippets.list.empty");
+		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		return;
+	}
+	await chunkMessage(entries, ul, interaction);
 }
 
 export async function remove(
@@ -129,7 +137,7 @@ export async function exportSnippets(
 	});
 }
 
-export async function importSnippets(
+export async function getContentFile(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction
 ) {
@@ -150,6 +158,35 @@ export async function importSnippets(
 	}
 	const response = await fetch(file.url);
 	const fileContent = await response.text();
+	return { fileContent, guildId, overwrite, ul, userId };
+}
+
+export function errorMessage(
+	type: "expander" | "snippets",
+	ul: Translation,
+	errors: Record<string, unknown>,
+	count: number
+) {
+	let text = ul(`userSettings.${type}.import.success`, { count });
+
+	if (Object.keys(errors).length > 0) {
+		const errorLines = Object.entries(errors)
+			.map(
+				([name, value]) => `- **${name.toTitle()}**${ul("common.space")}: \`${value}\``
+			)
+			.join("\n");
+		text += `\n\n${ul(`userSettings.${type}.import.partialErrors`, { count: Object.keys(errors).length })}\n${errorLines}`;
+	}
+	return text;
+}
+
+export async function importSnippets(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const data = await getContentFile(client, interaction);
+	if (!data) return;
+	const { fileContent, guildId, overwrite, ul, userId } = data;
 	let importedMacros: Record<string, unknown>;
 	const ex: Record<string, string> = {
 		anotherMacro: "1d20",
@@ -192,16 +229,6 @@ export async function importSnippets(
 		}
 	}
 	client.userSettings.set(guildId, macros, key);
-	let text = ul("userSettings.snippets.import.success", {
-		count,
-	});
-	if (Object.keys(errors).length > 0) {
-		const errorLines = Object.entries(errors)
-			.map(
-				([name, value]) => `- **${name.toTitle()}**${ul("common.space")}: \`${value}\``
-			)
-			.join("\n");
-		text += `\n\n${ul("userSettings.snippets.import.partialErrors", { count: Object.keys(errors).length })}\n${errorLines}`;
-	}
+	const text = errorMessage("snippets", ul, errors, count);
 	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 }

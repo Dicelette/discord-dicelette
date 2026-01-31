@@ -114,8 +114,8 @@
 		"cancel": "Annulation",
 		"cancelled": "La suppression a été annulée.",
 		"channel": "channel",
-		"charName": "Nom du personnage",
 		"character": "personnage",
+		"charName": "Nom du personnage",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -452,6 +452,19 @@
 			"title": "user"
 		}
 	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
+			"name": "fichier"
+		},
+		"default": "L'image utilisée sera votre avatar actuel !",
+		"desc": "Modifier l'avatar d'une fiche de personnage",
+		"name": "avatar",
+		"url": {
+			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
+			"name": "url"
+		}
+	},
 	"editMe": {
 		"asset": {
 			"description": "L'avatar à mettre",
@@ -472,19 +485,6 @@
 			"name": "pseudo"
 		},
 		"success": "Le bot a été modifié."
-	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Héberger un fichier plutôt que d'utiliser un lien.",
-			"name": "fichier"
-		},
-		"default": "L'image utilisée sera votre avatar actuel !",
-		"desc": "Modifier l'avatar d'une fiche de personnage",
-		"name": "avatar",
-		"url": {
-			"desc": "Lien vers l'image à mettre (pas de lien discord!)",
-			"name": "url"
-		}
 	},
 	"embed": {
 		"add": "Enregistrement de l'utilisateur",
@@ -777,6 +777,12 @@
 		},
 		"validationWaiting": "La fiche de <@{{- user}}> est en attente de validation ({{- url}}).{{- role}} "
 	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Classements des joueurs ",
+			"title": "classement"
+		}
+	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -832,12 +838,6 @@
 		"user": "Bilan des lancers de {{- user}} :",
 		"userOption": {
 			"description": "Affiche les résultats des lancers d'un autre utilisateur."
-		}
-	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Classements des joueurs ",
-			"title": "classement"
 		}
 	},
 	"math": {
@@ -1069,6 +1069,29 @@
 			"title": "créer_lien"
 		},
 		"description": "Permets de configurer certaines fonctions non-critique du bot par les utilisateurs.",
+		"expander": {
+			"delete": {
+				"notFound": "L'expansion {{- name}} n'a pas été trouvée.",
+				"success": "{{- name}} a été supprimé."
+			},
+			"export": {
+				"empty": "Aucune expansion n'a été trouvée.",
+				"success": "Les expansions ont été importée correctement."
+			},
+			"import": {
+				"invalidStat": "L'expansion {{- name}} est invalide.",
+				"partialErrors_one": "L'expansion suivante est invalide :",
+				"partialErrors_other": "Les expansions suivantes sont invalides :",
+				"success_one": "L'expansion a été importée avec succès.",
+				"success_other": "{{- count}} expansions ont été importés avec succès."
+			},
+			"register": {
+				"success": "L'expansion {{- name}} a été créé avec succès."
+			},
+			"stats": {
+				"empty": "Il n'y a pas de données sauvegardées."
+			}
+		},
 		"name": "user_config",
 		"snippets": {
 			"create": {
