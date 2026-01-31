@@ -2,6 +2,7 @@ import { calc } from "./calc";
 import { displayUser } from "./display";
 import { editAvatar } from "./edit";
 import { graph } from "./graph";
+
 export { math } from "./math";
 
 export const GIMMICK = [displayUser, graph, editAvatar, calc];

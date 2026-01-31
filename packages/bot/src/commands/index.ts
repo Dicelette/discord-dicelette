@@ -4,7 +4,7 @@ import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
 import { GLOBAL_CMD, mjRoll, ROLL_AUTO, ROLL_CMDLIST } from "./roll";
 import snippets from "./roll/snippets";
-import {GIMMICK, getCount, help, newScene, math} from "./tools";
+import { GIMMICK, getCount, help, math, newScene } from "./tools";
 import { userSettings } from "./userSettings";
 
 export const AUTOCOMPLETE_COMMANDS = [

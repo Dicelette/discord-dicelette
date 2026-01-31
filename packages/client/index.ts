@@ -41,7 +41,7 @@ export class EClient extends Djs.Client {
 	/**
 	 * Enmap for guild locale
 	 */
-	public guildLocale: Enmap<string, Djs.Locale, unknown>;
+	public guildLocale: Enmap<Djs.Locale>;
 
 	public criticalCount: CriticalCount;
 
@@ -77,12 +77,12 @@ export class EClient extends Djs.Client {
 	 */
 	public statusPath = path.resolve("./data/status.json");
 
-	public userSettings: Enmap<string, UserSettings, unknown>;
+	public userSettings: Enmap<UserSettings>;
 
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
-		const enmapSettings: EnmapOptions<GuildData, unknown> = {
+		const enmapSettings: EnmapOptions<GuildData> = {
 			name: "settings",
 		};
 
@@ -109,11 +109,8 @@ export class EClient extends Djs.Client {
 
 		logger.info(`Settings loaded on ${path.resolve(enmapSettings.dataDir ?? ".\\data")}`);
 
-		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.characters = new Enmap({ inMemory: true });
-		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.template = new Enmap({ inMemory: true });
-		//@ts-expect-error: Needed because enmap.d.ts issue with inMemory options
 		this.guildLocale = new Enmap({ inMemory: true });
 	}
 }

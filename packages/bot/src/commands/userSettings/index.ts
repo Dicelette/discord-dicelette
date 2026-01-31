@@ -93,6 +93,11 @@ export const userSettings = {
 								.setDescriptions("userSettings.snippets.import.file.description")
 								.setRequired(true)
 						)
+						.addBooleanOption((option) =>
+							option
+								.setNames("userSettings.snippets.import.overwrite.title")
+								.setDescriptions("userSettings.snippets.import.overwrite.description")
+						)
 				)
 		),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {

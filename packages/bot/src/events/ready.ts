@@ -87,10 +87,9 @@ export default (client: EClient): void => {
 							return cmd.default_member_permissions === undefined;
 						});
 						for (const cmd of shouldBeRemoved) {
-							logger.trace(
-								`Disabling command ${cmd.name} for guild ${guild.name}`
-							);
-							cmd.default_member_permissions = Djs.PermissionFlagsBits.Administrator.toString();
+							logger.trace(`Disabling command ${cmd.name} for guild ${guild.name}`);
+							cmd.default_member_permissions =
+								Djs.PermissionFlagsBits.Administrator.toString();
 						}
 					}
 					guildCommands = guildCommands.concat(serializedDbCmds);

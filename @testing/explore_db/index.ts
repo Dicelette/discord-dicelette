@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-//@ts-ignore
+//@ts-expect-error
 import type { GuildData } from "@dicelette/types";
 import Enmap from "enmap";
 
-const db: Enmap<string, GuildData, unknown> = new Enmap({
+const db: Enmap<string, GuildData> = new Enmap({
 	name: "settings",
 });
 
@@ -14,7 +14,7 @@ if (!fs.existsSync(pathDataRoots)) {
 	fs.mkdirSync(pathDataRoots);
 }
 
-const sett: Enmap<string, GuildData, unknown> = new Enmap({
+const sett: Enmap<string, GuildData> = new Enmap({
 	dataDir: pathDataRoots,
 	name: "settings",
 });

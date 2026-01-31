@@ -140,6 +140,9 @@ export async function importSnippets(
 		t("userSettings.snippets.import.file.title"),
 		true
 	);
+	const overwrite = interaction.options.getBoolean(
+		t("userSettings.snippets.import.overwrite.title")
+	);
 	if (!file.name.endsWith(".json")) {
 		const text = ul("userSettings.snippets.import.invalidFile");
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
@@ -169,7 +172,8 @@ export async function importSnippets(
 		return;
 	}
 	const key = `${userId}.snippets`;
-	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	let macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	if (overwrite) macros = {};
 	//verify and merge the imported macros
 	const errors: Snippets = {};
 	let count = 0;

@@ -1101,6 +1101,10 @@
 				},
 				"invalidContent": "The content of the file is invalid. The content should be formatted as follow: \n```json\n{{- ex}}\n```",
 				"invalidFile": "The extension is not valid. The file must be a JSON.",
+				"overwrite": {
+					"description": "Replace complete data instead of adding them",
+					"title": "overwrite"
+				},
 				"partialErrors_one": "Following snippet is invalid:",
 				"partialErrors_other": "Following snippets are invalid:",
 				"success_one": "{{- count}} snippet was imported successfully.",
