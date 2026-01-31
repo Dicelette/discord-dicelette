@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.34.0](https://github.com/Dicelette/discord-dicelette/compare/2.33.1...2.34.0) (2026-01-31)
+
+
+### Features
+
+* overwrite existing snippets ([d51025a](https://github.com/Dicelette/discord-dicelette/commit/d51025a3c6ae07eda7e2bf3e7f2c3e743b3d6bb8))
+
+
+### Bug Fixes
+
+* key doesn't exists ([c5c5abc](https://github.com/Dicelette/discord-dicelette/commit/c5c5abc74ac89f752ab47a53540b950bfea4ae17))
+
 ## [2.33.1](https://github.com/Dicelette/discord-dicelette/compare/2.33.0...2.33.1) (2026-01-24)
 
 
