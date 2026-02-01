@@ -26,9 +26,17 @@ export async function register(
 	try {
 		await baseRoll(getExpression(diceValue, "0").dice, interaction, client, false, true);
 		// store using generic helper
-		await registerEntry(client, interaction, "snippets", macroName, diceValue, ul, (name) => ({
-			name: name.toTitle(),
-		}));
+		await registerEntry(
+			client,
+			interaction,
+			"snippets",
+			macroName,
+			diceValue,
+			ul,
+			(name) => ({
+				name: name.toTitle(),
+			})
+		);
 	} catch (error) {
 		if (error instanceof DiceTypeError) {
 			const text = ul("error.invalidDice.eval", { dice: error.dice });
@@ -159,11 +167,9 @@ export async function importSnippets(
 		}
 	});
 
-	for (const [name, value] of Object.entries(validated)) {
-		macros[name] = value as string;
-	}
+	for (const [name, value] of Object.entries(validated)) macros[name] = value as string;
 
 	client.userSettings.set(guildId, macros, key);
-	const text = errorMessage("snippets", ul, errors, count);
+	const text = errorMessage("snippets", ul, errors, count, validated);
 	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 }

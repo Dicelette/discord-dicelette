@@ -1,4 +1,5 @@
 import type { EClient } from "@dicelette/client";
+import { t } from "@dicelette/localization";
 import type { Snippets, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 
@@ -28,13 +29,34 @@ export async function chunkMessage(
 	}
 }
 
+function formatSuccessImport(
+	count: number,
+	success: Record<string, unknown>,
+	type: "attributes" | "snippets",
+	ul: Translation
+) {
+	if (count === 1) {
+		const name = Object.keys(success)[0];
+		return ul(`userSettings.${type}.import.success`, {
+			count,
+			name: `**${name.toTitle()}**`,
+		});
+	}
+	const res = `\n- ${Object.keys(success)
+		.map((name) => `**${name.toTitle()}**`)
+		.join("\n- ")}`;
+	return ul(`userSettings.${type}.import.success`, { count }) + res;
+}
+
 export function errorMessage(
 	type: "attributes" | "snippets",
 	ul: Translation,
 	errors: Record<string, unknown>,
-	count: number
+	count: number,
+	success: Record<string, unknown> = {}
 ) {
-	let text = ul(`userSettings.${type}.import.success`, { count });
+	let text = "";
+	if (count > 0) text = formatSuccessImport(count, success, type, ul);
 
 	if (Object.keys(errors).length > 0) {
 		const errorLines = Object.entries(errors)
@@ -121,12 +143,11 @@ export async function removeEntry(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction,
 	type: "attributes" | "snippets",
-	optionName: string,
 	ul: Translation
 ) {
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const name = interaction.options.getString(optionName, true);
+	const name = interaction.options.getString(t("common.name"), true);
 	const store = client.userSettings.get(guildId, userId)?.[type] ?? {};
 	if (!(name in store)) {
 		const text = ul(`userSettings.${type}.delete.notFound`, {

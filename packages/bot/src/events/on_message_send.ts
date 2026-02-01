@@ -53,8 +53,8 @@ export default (client: EClient): void => {
 				firstChara = await getCharFromText(client, message.guild.id, author.id, content);
 			if (firstChara) content = content.replace(CHARACTER_DETECTION, "").trim();
 			const data = await getUserFromMessage(client, author.id, message, firstChara, {
-				skipNotFound: true,
 				attributes: true,
+				skipNotFound: true,
 			});
 			const userData = data?.userData;
 			let charName = data?.charName ?? firstChara;

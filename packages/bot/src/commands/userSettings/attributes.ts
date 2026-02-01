@@ -29,32 +29,6 @@ export async function display(
 	await chunkMessage(entries, ul, interaction);
 }
 
-export async function remove(
-	client: EClient,
-	interaction: Djs.ChatInputCommandInteraction
-) {
-	const { ul } = getLangAndConfig(client, interaction);
-	const userId = interaction.user.id;
-	const guildId = interaction.guild!.id;
-	const statName = interaction.options.getString("name", true);
-	const userSettings = client.userSettings.get(guildId, userId);
-	const userStats = userSettings?.attributes ?? {};
-	if (!(statName in userStats)) {
-		const text = ul("userSettings.attributes.delete.notFound", {
-			name: `**${statName.toTitle()}**`,
-		});
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
-		return;
-	}
-	delete userStats[statName];
-	const key = `${userId}.stats`;
-	client.userSettings.set(guildId, userStats, key);
-	const text = ul("userSettings.attributes.delete.success", {
-		name: `**${statName.toTitle()}**`,
-	});
-	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
-}
-
 export async function exportStats(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction
@@ -99,7 +73,7 @@ export async function importattributes(
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	const key = `${userId}.stats`;
+	const key = `${userId}.attributes`;
 	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	if (overwrite) currentStats = {};
 	const {
@@ -112,12 +86,10 @@ export async function importattributes(
 		return { ok: true, value: value as number };
 	});
 
-	for (const [name, val] of Object.entries(validated)) {
-		currentStats[name] = val as number;
-	}
+	for (const [name, val] of Object.entries(validated)) currentStats[name] = val as number;
 
 	client.userSettings.set(guildId, currentStats, key);
-	const text = errorMessage("attributes", ul, errors, count);
+	const text = errorMessage("attributes", ul, errors, count, validated);
 	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 

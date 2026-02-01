@@ -1,6 +1,7 @@
 import {
 	getInteractionContext as getLangAndConfig,
 	getSettingsAutoComplete,
+	removeEntry,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
@@ -33,14 +34,11 @@ export const userSettings = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const group = interaction.options.getSubcommandGroup(true);
 		const subcommand = interaction.options.getSubcommand(true);
-		if (group === t("common.snippets")) {
-			if (subcommand === t("common.delete")) {
-				await autoComplete(interaction, client, "snippets");
-			}
-		} else if (group === t("userSettings.attributes.title")) {
-			if (subcommand === t("userSettings.attributes.remove.name")) {
-				await autoComplete(interaction, client, "attributes");
-			}
+		const validGroup = [t("common.snippets"), t("userSettings.attributes.title")];
+		if (subcommand === t("common.delete") && validGroup.includes(group)) {
+			const type =
+				group === t("userSettings.attributes.title") ? "attributes" : "snippets";
+			await autoComplete(interaction, client, type);
 		}
 	},
 	data: new Djs.SlashCommandBuilder()
@@ -190,7 +188,7 @@ export const userSettings = {
 			if (subcommand === t("userSettings.snippets.create.title"))
 				return await snippets.register(client, interaction);
 			if (subcommand === t("common.delete"))
-				return await snippets.remove(client, interaction);
+				return await removeEntry(client, interaction, "snippets", ul);
 			if (subcommand === t("userSettings.snippets.list.title"))
 				return await snippets.displayList(client, interaction);
 			if (subcommand === t("export.name"))
@@ -202,7 +200,7 @@ export const userSettings = {
 				case t("userSettings.snippets.create.title"):
 					return await attributes.register(client, interaction);
 				case t("common.delete"):
-					return await attributes.remove(client, interaction);
+					return await removeEntry(client, interaction, "attributes", ul);
 				case t("userSettings.snippets.list.title"):
 					return await attributes.display(client, interaction);
 				case t("export.name"):

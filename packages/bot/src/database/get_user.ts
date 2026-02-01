@@ -216,8 +216,9 @@ async function getUserFrom(
 		!options?.fetchMessage
 	) {
 		if (options?.attributes) {
-			const expansion = client.userSettings.get(guildId, userId)?.attributes;
-			if (expansion) getChara.stats = Object.assign({}, expansion, getChara.stats ?? {});
+			const attributes = client.userSettings.get(guildId, userId)?.attributes;
+			if (attributes)
+				getChara.stats = Object.assign({}, attributes, getChara.stats ?? {});
 		}
 		return { charName: charName?.capitalize(), userData: getChara };
 	}
@@ -315,9 +316,9 @@ async function getUserFrom(
 		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
 		if (options?.attributes) {
-			const expansion = client.userSettings.get(guildId, userId)?.attributes;
-			if (expansion)
-				userData!.stats = Object.assign({}, expansion, userData?.stats ?? {});
+			const attributes = client.userSettings.get(guildId, userId)?.attributes;
+			if (attributes)
+				userData!.stats = Object.assign({}, attributes, userData?.stats ?? {});
 		}
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
