@@ -299,6 +299,7 @@ export async function rollStatistique(
 
 		dice = dice.replaceAll("$", userStat.toString());
 	}
+	console.log("Dice after stat replacement:", dice);
 	if (!dice) {
 		await reply(interaction, {
 			content: ul("error.noDice"),

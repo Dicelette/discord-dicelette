@@ -1,5 +1,6 @@
 import {
 	getInteractionContext as getLangAndConfig,
+	getSettingsAutoComplete,
 	macroOptions,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
@@ -23,29 +24,9 @@ import {
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
 
-export function getSnippetAutocomplete(
-	interaction: Djs.AutocompleteInteraction,
-	client: EClient,
-	type: "snippets" | "expander" = "snippets"
-) {
-	const options = interaction.options as Djs.CommandInteractionOptionResolver;
-	const focused = options.getFocused(true);
-	const userId = interaction.user.id;
-	const guildId = interaction.guild!.id;
-	const data = client.userSettings.get(guildId, userId);
-	let macros: Snippets | Record<string, number> = data?.snippets ?? {};
-	if (type === "expander") macros = data?.stats ?? {};
-	let choices: string[] = [];
-	if (focused.name === "name") {
-		const input = options.getString("name")?.standardize() ?? "";
-		choices = Object.keys(macros).filter((macroName) => macroName.subText(input));
-	}
-	return choices;
-}
-
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const choices = getSnippetAutocomplete(interaction, client, "snippets");
+		const choices = getSettingsAutoComplete(interaction, client, "snippets");
 		await interaction.respond(
 			choices.slice(0, 25).map((choice) => ({
 				name: capitalizeBetweenPunct(choice.capitalize()),

@@ -46,7 +46,7 @@ type GetOptions = {
 	fetchMessage: boolean;
 	guildId: string;
 	cleanUrl: boolean;
-	expander: boolean;
+	attributes: boolean;
 };
 
 export function getUserByEmbed(
@@ -215,8 +215,8 @@ async function getUserFrom(
 		!options?.fetchChannel &&
 		!options?.fetchMessage
 	) {
-		if (options?.expander) {
-			const expansion = client.userSettings.get(guildId, userId)?.stats;
+		if (options?.attributes) {
+			const expansion = client.userSettings.get(guildId, userId)?.attributes;
 			if (expansion) getChara.stats = Object.assign({}, expansion, getChara.stats ?? {});
 		}
 		return { charName: charName?.capitalize(), userData: getChara };
@@ -314,8 +314,8 @@ async function getUserFrom(
 		});
 		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
-		if (options?.expander) {
-			const expansion = client.userSettings.get(guildId, userId)?.stats;
+		if (options?.attributes) {
+			const expansion = client.userSettings.get(guildId, userId)?.attributes;
 			if (expansion)
 				userData!.stats = Object.assign({}, expansion, userData?.stats ?? {});
 		}
@@ -599,9 +599,9 @@ export async function getMacro(
 			userName: charName,
 		};
 	}
-	const expander = client.userSettings.get(interaction.guild!.id, user.id)?.stats;
-	if (expander) {
-		userStatistique!.stats = Object.assign({}, expander, userStatistique?.stats ?? {});
+	const attributes = client.userSettings.get(interaction.guild!.id, user.id)?.attributes;
+	if (attributes) {
+		userStatistique!.stats = Object.assign({}, attributes, userStatistique?.stats ?? {});
 	}
 	return { optionChar: charOptions, userStatistique };
 }
@@ -706,7 +706,10 @@ export async function getStatistics(
 		});
 	}
 
-	const expansions = client.userSettings.get(interaction.guild!.id, targetUserId)?.stats;
+	const expansions = client.userSettings.get(
+		interaction.guild!.id,
+		targetUserId
+	)?.attributes;
 	if (expansions) {
 		userStatistique!.stats = Object.assign({}, expansions, userStatistique?.stats ?? {});
 	}

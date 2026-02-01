@@ -19,10 +19,10 @@ export async function display(
 	const { ul } = getLangAndConfig(client, interaction);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const userStats = client.userSettings.get(guildId, userId)?.stats ?? {};
+	const userStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	const entries = Object.entries(userStats);
 	if (entries.length === 0) {
-		const text = ul("userSettings.expander.stats.empty");
+		const text = ul("userSettings.attributes.stats.empty");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
@@ -38,9 +38,9 @@ export async function remove(
 	const guildId = interaction.guild!.id;
 	const statName = interaction.options.getString("name", true);
 	const userSettings = client.userSettings.get(guildId, userId);
-	const userStats = userSettings?.stats ?? {};
+	const userStats = userSettings?.attributes ?? {};
 	if (!(statName in userStats)) {
-		const text = ul("userSettings.expander.delete.notFound", {
+		const text = ul("userSettings.attributes.delete.notFound", {
 			name: `**${statName.toTitle()}**`,
 		});
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
@@ -49,7 +49,7 @@ export async function remove(
 	delete userStats[statName];
 	const key = `${userId}.stats`;
 	client.userSettings.set(guildId, userStats, key);
-	const text = ul("userSettings.expander.delete.success", {
+	const text = ul("userSettings.attributes.delete.success", {
 		name: `**${statName.toTitle()}**`,
 	});
 	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
@@ -62,14 +62,14 @@ export async function exportStats(
 	const { ul } = getLangAndConfig(client, interaction);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const userStats = client.userSettings.get(guildId, userId)?.stats ?? {};
+	const userStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	if (Object.keys(userStats).length === 0) {
-		const text = ul("userSettings.expander.export.empty");
+		const text = ul("userSettings.attributes.export.empty");
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	const attachment = buildJsonAttachment(userStats, `expander-stats-${userId}.json`);
-	const text = ul("userSettings.expander.export.success");
+	const attachment = buildJsonAttachment(userStats, `attributes-stats-${userId}.json`);
+	const text = ul("userSettings.attributes.export.success");
 	await reply(interaction, {
 		content: text,
 		files: [attachment],
@@ -77,7 +77,7 @@ export async function exportStats(
 	});
 }
 
-export async function importExpander(
+export async function importattributes(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction
 ) {
@@ -100,7 +100,7 @@ export async function importExpander(
 		return;
 	}
 	const key = `${userId}.stats`;
-	let currentStats = client.userSettings.get(guildId, userId)?.stats ?? {};
+	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	if (overwrite) currentStats = {};
 	const {
 		result: validated,
@@ -117,7 +117,7 @@ export async function importExpander(
 	}
 
 	client.userSettings.set(guildId, currentStats, key);
-	const text = errorMessage("expander", ul, errors, count);
+	const text = errorMessage("attributes", ul, errors, count);
 	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 
@@ -128,13 +128,13 @@ export async function register(
 	const { ul } = getLangAndConfig(client, interaction);
 	const statName = interaction.options.getString(t("common.name"), true);
 	const initialValue = interaction.options.getNumber(
-		t("userSettings.expander.create.value.title"),
+		t("userSettings.attributes.create.value.title"),
 		true
 	);
 	await registerEntry(
 		client,
 		interaction,
-		"expander",
+		"attributes",
 		statName,
 		initialValue,
 		ul,

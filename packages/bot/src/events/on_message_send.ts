@@ -54,7 +54,7 @@ export default (client: EClient): void => {
 			if (firstChara) content = content.replace(CHARACTER_DETECTION, "").trim();
 			const data = await getUserFromMessage(client, author.id, message, firstChara, {
 				skipNotFound: true,
-				expander: true,
+				attributes: true,
 			});
 			const userData = data?.userData;
 			let charName = data?.charName ?? firstChara;

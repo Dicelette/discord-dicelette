@@ -1,9 +1,12 @@
-import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+import {
+	getInteractionContext as getLangAndConfig,
+	getSettingsAutoComplete,
+} from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { getSnippetAutocomplete } from "../roll/snippets";
+import * as attributes from "./attributes";
 import {
 	createLinksCmdOptions,
 	getTemplateValues,
@@ -11,16 +14,19 @@ import {
 	setTemplate,
 } from "./setTemplate";
 import * as snippets from "./snippets";
-import * as expander from "./expander";
 
-async function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient, type: "expander" | "snippets" = "snippets") {
-	const choices = getSnippetAutocomplete(interaction, client, type);
+async function autoComplete(
+	interaction: Djs.AutocompleteInteraction,
+	client: EClient,
+	type: "attributes" | "snippets" = "snippets"
+) {
+	const choices = getSettingsAutoComplete(interaction, client, type);
 	await interaction.respond(
-					choices.slice(0, 25).map((choice) => ({
-						name: capitalizeBetweenPunct(choice.capitalize()),
-						value: choice,
-					}))
-				);
+		choices.slice(0, 25).map((choice) => ({
+			name: capitalizeBetweenPunct(choice.capitalize()),
+			value: choice,
+		}))
+	);
 }
 
 export const userSettings = {
@@ -31,10 +37,9 @@ export const userSettings = {
 			if (subcommand === t("common.delete")) {
 				await autoComplete(interaction, client, "snippets");
 			}
-		}
-		else if (group === t("userSettings.expander.title")) {
-			if (subcommand === t("userSettings.expander.remove.name")) {
-				await autoComplete(interaction, client, "expander");
+		} else if (group === t("userSettings.attributes.title")) {
+			if (subcommand === t("userSettings.attributes.remove.name")) {
+				await autoComplete(interaction, client, "attributes");
 			}
 		}
 	},
@@ -110,52 +115,53 @@ export const userSettings = {
 						)
 				)
 		)
-		.addSubcommandGroup((group) => group
-		.setNames("userSettings.expander.title")
-		.setDescriptions("userSettings.expander.description")
-			.addSubcommand((subcommand) =>
+		.addSubcommandGroup((group) =>
+			group
+				.setNames("userSettings.attributes.title")
+				.setDescriptions("userSettings.attributes.description")
+				.addSubcommand((subcommand) =>
 					subcommand
 						.setNames("userSettings.snippets.create.title")
-						.setDescriptions("userSettings.expander.create.description")
+						.setDescriptions("userSettings.attributes.create.description")
 						.addStringOption((option) =>
 							option
 								.setNames("common.name")
-								.setDescriptions("userSettings.expander.create.name")
+								.setDescriptions("userSettings.attributes.create.name")
 								.setRequired(true)
 						)
 						.addNumberOption((option) =>
 							option
-								.setNames("userSettings.expander.create.value.title")
-								.setDescriptions("userSettings.expander.create.value.description")
+								.setNames("userSettings.attributes.create.value.title")
+								.setDescriptions("userSettings.attributes.create.value.description")
 								.setRequired(true)
 						)
 				)
-			.addSubcommand((subcommand) =>
+				.addSubcommand((subcommand) =>
 					subcommand
 						.setNames("common.delete")
-						.setDescriptions("userSettings.expander.delete.description")
+						.setDescriptions("userSettings.attributes.delete.description")
 						.addStringOption((option) =>
 							option
 								.setNames("common.name")
-								.setDescriptions("userSettings.expander.delete.name")
+								.setDescriptions("userSettings.attributes.delete.name")
 								.setRequired(true)
 								.setAutocomplete(true)
 						)
 				)
-			.addSubcommand((subcommand) =>
+				.addSubcommand((subcommand) =>
 					subcommand
 						.setNames("userSettings.snippets.list.title")
-						.setDescriptions("userSettings.expander.list.description")
+						.setDescriptions("userSettings.attributes.list.description")
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
 						.setNames("export.name")
-						.setDescriptions("userSettings.expander.export.description")
+						.setDescriptions("userSettings.attributes.export.description")
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
 						.setNames("import.name")
-						.setDescriptions("userSettings.expander.import.description")
+						.setDescriptions("userSettings.attributes.import.description")
 						.addAttachmentOption((option) =>
 							option
 								.setNames("userSettings.snippets.import.file.title")
@@ -168,9 +174,7 @@ export const userSettings = {
 								.setDescriptions("userSettings.snippets.import.overwrite.description")
 						)
 				)
-		)
-	
-	,
+		),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		const group = interaction.options.getSubcommandGroup(true);
 		const subcommand = interaction.options.getSubcommand(true);
@@ -193,18 +197,18 @@ export const userSettings = {
 				return await snippets.exportSnippets(client, interaction);
 			if (subcommand === t("import.name"))
 				return await snippets.importSnippets(client, interaction);
-		} else if (group === t("userSettings.expander.title")) {
+		} else if (group === t("userSettings.attributes.title")) {
 			switch (subcommand) {
 				case t("userSettings.snippets.create.title"):
-					return await expander.register(client, interaction);
+					return await attributes.register(client, interaction);
 				case t("common.delete"):
-					return await expander.remove(client, interaction);
+					return await attributes.remove(client, interaction);
 				case t("userSettings.snippets.list.title"):
-					return await expander.display(client, interaction);
+					return await attributes.display(client, interaction);
 				case t("export.name"):
-					return await expander.exportStats(client, interaction);
+					return await attributes.exportStats(client, interaction);
 				case t("import.name"):
-					return await expander.importExpander(client, interaction);
+					return await attributes.importattributes(client, interaction);
 			}
 		}
 	},

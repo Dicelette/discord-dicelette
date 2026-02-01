@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import type { Translation } from "@dicelette/types";
+import type { Snippets, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 
 export async function chunkMessage(
@@ -29,7 +29,7 @@ export async function chunkMessage(
 }
 
 export function errorMessage(
-	type: "expander" | "snippets",
+	type: "attributes" | "snippets",
 	ul: Translation,
 	errors: Record<string, unknown>,
 	count: number
@@ -103,13 +103,12 @@ export function buildJsonAttachment(content: unknown, name: string) {
 export async function displayEntries(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction,
-	type: "expander" | "snippets",
+	type: "attributes" | "snippets",
 	ul: Translation
 ) {
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const field = type === "expander" ? "stats" : "snippets";
-	const entries = Object.entries(client.userSettings.get(guildId, userId)?.[field] ?? {});
+	const entries = Object.entries(client.userSettings.get(guildId, userId)?.[type] ?? {});
 	if (entries.length === 0) {
 		const text = ul(`userSettings.${type}.list.empty`);
 		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
@@ -121,15 +120,14 @@ export async function displayEntries(
 export async function removeEntry(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction,
-	type: "expander" | "snippets",
+	type: "attributes" | "snippets",
 	optionName: string,
 	ul: Translation
 ) {
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
 	const name = interaction.options.getString(optionName, true);
-	const field = type === "expander" ? "stats" : "snippets";
-	const store = client.userSettings.get(guildId, userId)?.[field] ?? {};
+	const store = client.userSettings.get(guildId, userId)?.[type] ?? {};
 	if (!(name in store)) {
 		const text = ul(`userSettings.${type}.delete.notFound`, {
 			name: `**${name.toTitle()}**`,
@@ -138,7 +136,7 @@ export async function removeEntry(
 		return;
 	}
 	delete store[name];
-	const key = `${userId}.${field}`;
+	const key = `${userId}.${type}`;
 	client.userSettings.set(guildId, store, key);
 	const text = ul(`userSettings.${type}.delete.success`, {
 		name: `**${name.toTitle()}**`,
@@ -149,19 +147,18 @@ export async function removeEntry(
 export async function exportEntries(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction,
-	type: "expander" | "snippets",
+	type: "attributes" | "snippets",
 	ul: Translation
 ) {
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const field = type === "expander" ? "stats" : "snippets";
-	const store = client.userSettings.get(guildId, userId)?.[field] ?? {};
+	const store = client.userSettings.get(guildId, userId)?.[type] ?? {};
 	if (Object.keys(store).length === 0) {
 		const text = ul(`userSettings.${type}.export.empty`);
 		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	const name = `${type}-${field}-${userId}.json`;
+	const name = `${type}-${userId}.json`;
 	const attachment = buildJsonAttachment(store, name);
 	const text = ul(`userSettings.${type}.export.success`);
 	await interaction.reply({
@@ -174,7 +171,7 @@ export async function exportEntries(
 export async function registerEntry<T>(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction,
-	type: "expander" | "snippets",
+	type: "attributes" | "snippets",
 	name: string,
 	value: T,
 	ul: Translation,
@@ -182,11 +179,10 @@ export async function registerEntry<T>(
 ) {
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const field = type === "expander" ? "stats" : "snippets";
 	const store: Record<string, unknown> =
-		client.userSettings.get(guildId, userId)?.[field] ?? {};
+		client.userSettings.get(guildId, userId)?.[type] ?? {};
 	store[name] = value as unknown;
-	const key = `${userId}.${field}`;
+	const key = `${userId}.${type}`;
 	client.userSettings.set(guildId, store, key);
 	const args = formatArgs ? formatArgs(name, value) : { name: `**${name.toTitle()}**` };
 	const text = ul(`userSettings.${type}.create.success`, args);
@@ -196,7 +192,7 @@ export async function registerEntry<T>(
 export async function importEntries(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction,
-	type: "expander" | "snippets",
+	type: "attributes" | "snippets",
 	validate: (
 		name: string,
 		value: unknown
@@ -224,10 +220,9 @@ export async function importEntries(
 		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	const field = type === "expander" ? "stats" : "snippets";
-	const key = `${userId}.${field}`;
+	const key = `${userId}.${type}`;
 	let current: Record<string, unknown> =
-		client.userSettings.get(guildId, userId)?.[field] ?? {};
+		client.userSettings.get(guildId, userId)?.[type] ?? {};
 	if (overwrite) current = {};
 	const { result: validated, errors, count } = await processEntries(imported, validate);
 	for (const [name, value] of Object.entries(validated)) {
@@ -236,4 +231,23 @@ export async function importEntries(
 	client.userSettings.set(guildId, current, key);
 	const text = errorMessage(type, ul, errors, count);
 	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
+}
+
+export function getSettingsAutoComplete(
+	interaction: Djs.AutocompleteInteraction,
+	client: EClient,
+	type: "snippets" | "attributes" = "snippets"
+) {
+	const options = interaction.options as Djs.CommandInteractionOptionResolver;
+	const focused = options.getFocused(true);
+	const userId = interaction.user.id;
+	const guildId = interaction.guild!.id;
+	const data = client.userSettings.get(guildId, userId);
+	const macros: Snippets | Record<string, number> = data?.[type] ?? {};
+	let choices: string[] = [];
+	if (focused.name === "name") {
+		const input = options.getString("name")?.standardize() ?? "";
+		choices = Object.keys(macros).filter((macroName) => macroName.subText(input));
+	}
+	return choices;
 }
