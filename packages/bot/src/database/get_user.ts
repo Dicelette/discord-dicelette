@@ -14,6 +14,7 @@ import {
 } from "@dicelette/parse_result";
 import type {
 	CharDataWithName,
+	GuildData,
 	PersonnageIds,
 	Settings,
 	Translation,
@@ -27,12 +28,13 @@ import {
 	type BotErrorOptions,
 	cleanAvatarUrl,
 	logger,
+	uniformizeRecords,
 } from "@dicelette/utils";
 import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
-import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
+import { embedError, ensureEmbed, getEmbeds, reply, replyEphemeralError } from "messages";
 import { isSerializedNameEquals, searchUserChannel } from "utils";
 
 type GetOptions = {
@@ -45,7 +47,7 @@ type GetOptions = {
 	guildId: string;
 	cleanUrl: boolean;
 	expander: boolean;
-}
+};
 
 export function getUserByEmbed(
 	data: { message?: Message; embeds?: EmbedBuilder[] },
@@ -217,7 +219,7 @@ async function getUserFrom(
 			const expansion = client.userSettings.get(guildId, userId)?.stats;
 			if (expansion) getChara.stats = Object.assign({}, expansion, getChara.stats ?? {});
 		}
-		return {charName: charName?.capitalize(), userData: getChara};
+		return { charName: charName?.capitalize(), userData: getChara };
 	}
 
 	if (!options)
@@ -314,7 +316,8 @@ async function getUserFrom(
 
 		if (options?.expander) {
 			const expansion = client.userSettings.get(guildId, userId)?.stats;
-			if (expansion) userData!.stats = Object.assign({}, expansion, userData?.stats ?? {});
+			if (expansion)
+				userData!.stats = Object.assign({}, expansion, userData?.stats ?? {});
 		}
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
@@ -529,6 +532,80 @@ export async function getUserNameAndChar(
 	return { thread: interaction.channel, userID, userName };
 }
 
+export async function getMacro(
+	client: EClient,
+	ul: Translation,
+	interaction: Djs.ChatInputCommandInteraction,
+	skipNotFound?: boolean,
+	user?: Djs.User
+) {
+	const db = client.settings.get(interaction.guild!.id);
+	if (!db || !interaction.guild || !interaction.channel) return;
+	let charOptions = interaction.options.getString(t("common.character")) ?? undefined;
+	const charName = charOptions?.normalize();
+	if (!user) user = interaction.user;
+	let userStatistique = (
+		await getUserFromInteraction(client, user.id, interaction, charName, {
+			skipNotFound,
+		})
+	)?.userData;
+	const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
+	if (charOptions && !selectedCharByQueries) {
+		const text = ul("error.user.charName", { charName: charOptions.capitalize() });
+		await replyEphemeralError(interaction, text, ul);
+		return;
+	}
+	charOptions = userStatistique?.userName ?? undefined;
+	if (!userStatistique && !charName) {
+		const char = await getFirstChar(client, interaction, ul, true);
+		userStatistique = char?.userStatistique?.userData;
+		charOptions = char?.optionChar ?? undefined;
+	}
+	console.log("char: ", charOptions, "data: ", userStatistique);
+	if (!db.templateID?.damageName) {
+		if (!userStatistique) {
+			await replyEphemeralError(interaction, ul("error.user.youRegistered"), ul);
+			return;
+		}
+		if (!userStatistique.damage) {
+			await replyEphemeralError(interaction, ul("error.damage.empty"), ul);
+			return;
+		}
+	} else if (!userStatistique || !userStatistique.damage) {
+		//allow global damage with constructing a new userStatistique with only the damageName and their value
+		//get the damageName from the global template
+		const template = await getTemplateByInteraction(interaction, client);
+		if (!template) {
+			const text = ul("error.template.notFound", {
+				guildId: interaction.guild!.name,
+			});
+			await replyEphemeralError(interaction, text, ul);
+			return;
+		}
+		const damage = template.damage
+			? (uniformizeRecords(template.damage) as Record<string, string>)
+			: undefined;
+		logger.trace("The template use:", damage);
+
+		//create the userStatistique with the value got from the template & the commands
+		userStatistique = {
+			damage,
+			isFromTemplate: true,
+			template: {
+				critical: template.critical,
+				customCritical: template.customCritical,
+				diceType: template.diceType,
+			},
+			userName: charName,
+		};
+	}
+	const expander = client.userSettings.get(interaction.guild!.id, user.id)?.stats;
+	if (expander) {
+		userStatistique!.stats = Object.assign({}, expander, userStatistique?.stats ?? {});
+	}
+	return { optionChar: charOptions, userStatistique };
+}
+
 /**
  * Retrieves user statistics and related data for a command interaction.
  *
@@ -588,10 +665,14 @@ export async function getStatistics(
 	}
 
 	if (!needStats && !userStatistique && template) {
+		const tempDamage = template.damage
+			? (uniformizeRecords(template.damage) as Record<string, string>)
+			: undefined;
 		optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
 		userStatistique = {
-			damage: template?.damage,
+			damage: tempDamage,
+			isFromTemplate: true,
 			template: {
 				critical: template?.critical,
 				customCritical: template?.customCritical,
@@ -624,15 +705,10 @@ export async function getStatistics(
 			userData: userStatistique,
 		});
 	}
-	
-	const expansions = client.userSettings.get(interaction.guild!.id, targetUserId)
-		?.stats;
+
+	const expansions = client.userSettings.get(interaction.guild!.id, targetUserId)?.stats;
 	if (expansions) {
-		userStatistique!.stats = Object.assign(
-			{},
-			expansions,
-			userStatistique?.stats ?? {}
-		);
+		userStatistique!.stats = Object.assign({}, expansions, userStatistique?.stats ?? {});
 	}
 
 	return { optionChar, options, ul, userStatistique };

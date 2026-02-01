@@ -3,7 +3,7 @@ import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import { filterChoices } from "@dicelette/utils";
-import { getStatistics } from "database";
+import { getMacro, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
 import { rollMacro, rollStatistique } from "utils";
@@ -144,7 +144,10 @@ export const mjRoll = {
 			);
 
 		// For all other subcommands (dbRoll, macro, calc), get character data
-		const result = await getStatistics(interaction, client, true, user);
+		const isMacro = subcommand === ul("common.macro");
+		const result = isMacro
+			? await getMacro(client, ul, interaction, true, user)
+			: await getStatistics(interaction, client, true, user);
 		if (!result) return;
 		const { userStatistique: charData, optionChar } = result;
 
@@ -165,7 +168,7 @@ export const mjRoll = {
 				user,
 				hide
 			);
-		if (subcommand === ul("common.macro"))
+		if (subcommand === ul("common.macro")) {
 			return await rollMacro(
 				interaction,
 				client,
@@ -176,6 +179,7 @@ export const mjRoll = {
 				user,
 				hide
 			);
+		}
 		if (subcommand === ul("calc.title"))
 			return await calculate(
 				options,
