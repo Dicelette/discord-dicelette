@@ -25,13 +25,16 @@ import { rollWithInteraction } from "utils";
 
 export function getSnippetAutocomplete(
 	interaction: Djs.AutocompleteInteraction,
-	client: EClient
+	client: EClient,
+	type: "snippets" | "expander" = "snippets"
 ) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
+	const data = client.userSettings.get(guildId, userId);
+	let macros: Snippets | Record<string, number> = data?.snippets ?? {};
+	if (type === "expander") macros = data?.stats ?? {};
 	let choices: string[] = [];
 	if (focused.name === "name") {
 		const input = options.getString("name")?.standardize() ?? "";
@@ -42,7 +45,7 @@ export function getSnippetAutocomplete(
 
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const choices = getSnippetAutocomplete(interaction, client);
+		const choices = getSnippetAutocomplete(interaction, client, "snippets");
 		await interaction.respond(
 			choices.slice(0, 25).map((choice) => ({
 				name: capitalizeBetweenPunct(choice.capitalize()),

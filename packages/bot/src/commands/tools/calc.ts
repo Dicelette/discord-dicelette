@@ -1,16 +1,15 @@
-import { autoCompleteCharacters, calcOptions } from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
-import { generateStatsDice, isNumber } from "@dicelette/core";
-import { ln, t } from "@dicelette/localization";
-import { getRoll, timestamp } from "@dicelette/parse_result";
-import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
-import { logger, profiler } from "@dicelette/utils";
-import { getRightValue, getStatistics } from "database";
+import {autoCompleteCharacters, calcOptions} from "@dicelette/bot-helpers";
+import type {EClient} from "@dicelette/client";
+import {generateStatsDice, isNumber} from "@dicelette/core";
+import {ln, t} from "@dicelette/localization";
+import {getRoll, timestamp} from "@dicelette/parse_result";
+import {EMOJI_MATH, type Translation, type UserData} from "@dicelette/types";
+import {capitalizeBetweenPunct, logger, profiler} from "@dicelette/utils";
+import {getRightValue, getStatistics} from "database";
 import * as Djs from "discord.js";
-import { evaluate } from "mathjs";
-import { embedError, sendResult } from "messages";
+import {evaluate} from "mathjs";
+import {embedError, sendResult} from "messages";
 import "discord_ext";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export async function autocompleteCalc(
 	interaction: Djs.AutocompleteInteraction,
@@ -192,6 +191,11 @@ export async function calculate(
 		if (isNumber(formulaWithStats))
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
+		const expansion = client.userSettings.get(
+			interaction.guildId!,
+			interaction.user.id
+		)?.stats;
+		formula = generateStatsDice(formula, expansion);
 		const isRoll = getRoll(formula, undefined, sortResult);
 		if (isRoll?.total != null) {
 			originalFormula = isRoll.result;

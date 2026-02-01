@@ -3,6 +3,7 @@ import type { EClient } from "@dicelette/client";
 import * as Djs from "discord.js";
 import { reply } from "../../messages";
 import { chunkMessage, errorMessage, getContentFile } from "./snippets";
+import { t } from "@dicelette/localization";
 
 export async function display(
 	client: EClient,
@@ -102,7 +103,7 @@ export async function importExpander(
 	let count = 0;
 	for (const [statName, statValue] of Object.entries(importedStats)) {
 		if (typeof statValue !== "number" || Number.isNaN(statValue)) {
-			errors[statName] = statValue;
+			errors[statName] = JSON.stringify(statValue);
 			continue;
 		}
 		currentStats[statName] = statValue;
@@ -120,8 +121,8 @@ export async function register(
 	const { ul } = getLangAndConfig(client, interaction);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const statName = interaction.options.getString("name", true);
-	const initialValue = interaction.options.getNumber("value", true);
+	const statName = interaction.options.getString(t("common.name"), true);
+	const initialValue = interaction.options.getNumber(t("userSettings.expander.create.value.title"), true);
 	const userSettings = client.userSettings.get(guildId, userId);
 	const userStats = userSettings?.stats ?? {};
 	userStats[statName] = initialValue;

@@ -35,6 +35,18 @@ import equal from "fast-deep-equal";
 import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
 import { isSerializedNameEquals, searchUserChannel } from "utils";
 
+type GetOptions = {
+	integrateCombinaison: boolean;
+	allowAccess: boolean;
+	skipNotFound: boolean;
+	fetchAvatar: boolean;
+	fetchChannel: boolean;
+	fetchMessage: boolean;
+	guildId: string;
+	cleanUrl: boolean;
+	expander: boolean;
+}
+
 export function getUserByEmbed(
 	data: { message?: Message; embeds?: EmbedBuilder[] },
 	first: boolean | undefined = false,
@@ -180,16 +192,7 @@ async function getUserFrom(
 	context:
 		| { type: "interaction"; interaction: Djs.BaseInteraction }
 		| { type: "message"; message: Djs.Message },
-	options?: {
-		integrateCombinaison?: boolean;
-		allowAccess?: boolean;
-		skipNotFound?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		fetchMessage?: boolean;
-		guildId?: string;
-		cleanUrl?: boolean;
-	}
+	options?: Partial<GetOptions>
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	const botErrorOptions: BotErrorOptions = {
 		cause: "USER_FETCH",
@@ -209,8 +212,13 @@ async function getUserFrom(
 		!options?.fetchAvatar &&
 		!options?.fetchChannel &&
 		!options?.fetchMessage
-	)
-		return { charName: charName?.capitalize(), userData: getChara };
+	) {
+		if (options?.expander) {
+			const expansion = client.userSettings.get(guildId, userId)?.stats;
+			if (expansion) getChara.stats = Object.assign({}, expansion, getChara.stats ?? {});
+		}
+		return {charName: charName?.capitalize(), userData: getChara};
+	}
 
 	if (!options)
 		options = {
@@ -304,6 +312,10 @@ async function getUserFrom(
 		});
 		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
+		if (options?.expander) {
+			const expansion = client.userSettings.get(guildId, userId)?.stats;
+			if (expansion) userData!.stats = Object.assign({}, expansion, userData?.stats ?? {});
+		}
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
 		if (skipNotFound) return;
@@ -332,15 +344,7 @@ export async function getUserFromMessage(
 	userId: string,
 	message: Djs.Message,
 	charName?: string | null,
-	options?: {
-		integrateCombinaison?: boolean;
-		allowAccess?: boolean;
-		skipNotFound?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		fetchMessage?: boolean;
-		guildId?: string;
-	}
+	options?: Partial<GetOptions>
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	return getUserFrom(client, userId, charName, { message, type: "message" }, options);
 }
@@ -364,16 +368,7 @@ export async function getUserFromInteraction(
 	userId: string,
 	interaction: Djs.BaseInteraction,
 	charName?: string | null,
-	options?: {
-		integrateCombinaison?: boolean;
-		allowAccess?: boolean;
-		skipNotFound?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		fetchMessage?: boolean;
-		guildId?: string;
-		cleanUrl?: boolean;
-	}
+	options?: Partial<GetOptions>
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	return getUserFrom(
 		client,
@@ -628,6 +623,16 @@ export async function getStatistics(
 		await updateMemory(client.characters, interaction.guild!.id, targetUserId, ul, {
 			userData: userStatistique,
 		});
+	}
+	
+	const expansions = client.userSettings.get(interaction.guild!.id, targetUserId)
+		?.stats;
+	if (expansions) {
+		userStatistique!.stats = Object.assign(
+			{},
+			expansions,
+			userStatistique?.stats ?? {}
+		);
 	}
 
 	return { optionChar, options, ul, userStatistique };
