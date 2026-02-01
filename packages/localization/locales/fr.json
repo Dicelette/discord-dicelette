@@ -1073,6 +1073,7 @@
       "create": {
         "description": "Créer une nouvelle expansion",
         "name": "Nom de l'expansion",
+        "success": "L'expansion {{- name}} a été créé avec succès.",
         "value": {
           "description": "Nombre qui sera utilisé",
           "title": "valeur"
@@ -1098,12 +1099,7 @@
         "success_other": "{{- count}} expansions ont été importés avec succès."
       },
       "list": {
-        "description": "Afficher toutes les expansions enregistrées."
-      },
-      "register": {
-        "success": "L'expansion {{- name}} a été créé avec succès."
-      },
-      "stats": {
+        "description": "Afficher toutes les expansions enregistrées.",
         "empty": "Il n'y a pas de données sauvegardées."
       },
       "title": "expansion"

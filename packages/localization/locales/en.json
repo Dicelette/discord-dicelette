@@ -1073,6 +1073,7 @@
       "create": {
         "description": "Create a new text expander",
         "name": "Expander's name",
+        "success": "The {{- name}} expander has been created successfully.",
         "value": {
           "description": "Number that will be used",
           "title": "value"
@@ -1098,12 +1099,7 @@
         "success_other": "{{- count}} expanders has been imported successfully."
       },
       "list": {
-        "description": "Display all registered expander."
-      },
-      "register": {
-        "success": "The {{- name}} expander has been created successfully."
-      },
-      "stats": {
+        "description": "Display all registered expander.",
         "empty": "There is no saved data."
       },
       "title": "expander"

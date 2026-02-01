@@ -9,3 +9,4 @@ export * from "./src/moderation_cache";
 // Alias for backward compatibility
 export { buildModerationButtons as makeValidationRow } from "./src/moderation_cache";
 export * from "./src/roles";
+export * from "./src/userSettings";
