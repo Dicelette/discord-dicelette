@@ -1085,7 +1085,11 @@
         "success": "{{- name}} has been deleted."
       },
       "description": "Save text snippets that will be replaced by their values in dice.",
-      "export": "Export saved expander",
+      "export": {
+        "description": "Export expander saved in a JSON file.",
+        "empty": "There is no expander data.",
+        "success": "Expanders has been exported successfully. You can import them with `/user_config expander import`. "
+      },
       "import": {
         "description": "Import a JSON file with expander data.",
         "partialErrors_one": "Following expander is invalid:",

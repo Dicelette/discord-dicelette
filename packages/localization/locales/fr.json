@@ -1085,7 +1085,11 @@
         "success": "{{- name}} a été supprimé."
       },
       "description": "Enregistrer des extraits de texte qui seront remplacés par leur valeur dans les dés.",
-      "export": "Exporter les expansions sauvegardées.",
+      "export": {
+        "description": "Exporter les expansions sauvegardés dans un fichier JSON.",
+        "empty": "Il n'y a pas d'expansion sauvegardées.",
+        "success": "Les expansions ont été exportés avec succès. Vous pouvez les importer à l'aide de la commande `/user_config expansion import`."
+      },
       "import": {
         "description": "Importer un fichier JSON contenant des expansions.",
         "partialErrors_one": "L'expansion suivante est invalide :",

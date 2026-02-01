@@ -150,7 +150,7 @@ export const userSettings = {
 				.addSubcommand((subcommand) =>
 					subcommand
 						.setNames("export.name")
-						.setDescriptions("userSettings.expander.export")
+						.setDescriptions("userSettings.expander.export.description")
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
