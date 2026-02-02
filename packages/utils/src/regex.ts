@@ -36,7 +36,7 @@ export const REMOVER_PATTERN = {
 	EXP_REMOVER: /\{exp(.*?)\}/g,
 	SIGN_REMOVER: /([><=]|!=)+.*$/,
 	STAT_COMMENTS_REMOVER: /%%.*%%/,
-	STAT_MATCHER: /\(?\$([\p{L}\p{M}_][\p{L}\p{M}0-9_]*)\)?/giu,
+	STAT_MATCHER: /\(?\$([\p{L}\p{M}_.-][\p{L}\p{M}0-9_.-]*)\)?/giu,
 } as const;
 
 export const PARSE_RESULT_PATTERNS = {
