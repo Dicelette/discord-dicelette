@@ -13,12 +13,13 @@ import {
 	parseTemplateField,
 } from "@dicelette/parse_result";
 import type {
-	CharDataWithName, PersonnageIds,
+	CharDataWithName,
+	PersonnageIds,
 	Settings,
 	Translation,
 	UserData,
 	UserGuildData,
-	UserMessageId
+	UserMessageId,
 } from "@dicelette/types";
 import {
 	BotError,
@@ -28,7 +29,12 @@ import {
 	logger,
 	uniformizeRecords,
 } from "@dicelette/utils";
-import { getCharaInMemory, getTemplateByInteraction, updateMemory, mergeAttribute } from "database";
+import {
+	getCharaInMemory,
+	getTemplateByInteraction,
+	mergeAttribute,
+	updateMemory,
+} from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
@@ -311,8 +317,9 @@ async function getUserFrom(
 		});
 		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
-		if (options?.attributes) userData!.stats = mergeAttribute(client, userData, guildId, userId);
-		
+		if (options?.attributes)
+			userData!.stats = mergeAttribute(client, userData, guildId, userId);
+
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
 		if (skipNotFound) return;
@@ -555,7 +562,6 @@ export async function getMacro(
 		userStatistique = char?.userStatistique?.userData;
 		charOptions = char?.optionChar ?? undefined;
 	}
-	console.log("char: ", charOptions, "data: ", userStatistique);
 	if (!db.templateID?.damageName) {
 		if (!userStatistique) {
 			await replyEphemeralError(interaction, ul("error.user.youRegistered"), ul);
@@ -593,7 +599,12 @@ export async function getMacro(
 			userName: charName,
 		};
 	}
-	userStatistique.stats = mergeAttribute(client, userStatistique, interaction.guild!.id, user.id);
+	userStatistique.stats = mergeAttribute(
+		client,
+		userStatistique,
+		interaction.guild!.id,
+		user.id
+	);
 	return { optionChar: charOptions, userStatistique };
 }
 
@@ -697,7 +708,12 @@ export async function getStatistics(
 		});
 	}
 
-	userStatistique!.stats = mergeAttribute(client, userStatistique, interaction.guild!.id, targetUserId);
+	userStatistique!.stats = mergeAttribute(
+		client,
+		userStatistique,
+		interaction.guild!.id,
+		targetUserId
+	);
 
 	return { optionChar, options, ul, userStatistique };
 }

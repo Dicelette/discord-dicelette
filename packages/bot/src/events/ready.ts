@@ -78,7 +78,7 @@ export default (client: EClient): void => {
 
 					if (enabled) {
 						for (const cmd of serializedDbCmds) {
-							console.log("Enabling command:", cmd.name);
+							logger.trace("Enabling command:", cmd.name);
 							cmd.default_member_permissions = undefined;
 						}
 					} else {

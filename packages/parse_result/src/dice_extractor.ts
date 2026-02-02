@@ -484,7 +484,6 @@ export function replaceStatsInDiceFormula(
 					searchTerm,
 					normalizedStats
 				);
-
 				if (foundStat) {
 					const [original, statValue] = foundStat;
 					const capitalizedStat = original.capitalize();
@@ -526,7 +525,6 @@ export function replaceStatsInDiceFormula(
 			if (!processedFormula.includes(fullMatch)) continue;
 
 			const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats);
-
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
