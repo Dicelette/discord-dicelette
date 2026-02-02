@@ -80,7 +80,12 @@ export async function importattributes(
 		result: validated,
 		errors,
 		count,
-	} = await processEntries<number>(importedStats, async (_name, value) => {
+	} = await processEntries<number>(importedStats, async (name, value) => {
+		if (name.split(" ").length > 1)
+			return {
+				error: ul("userSettings.attributes.import.invalidName"),
+				ok: false,
+			};
 		if (typeof value !== "number" || Number.isNaN(value))
 			return { error: JSON.stringify(value), ok: false };
 		return { ok: true, value: value as number };

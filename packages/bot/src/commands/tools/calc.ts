@@ -191,11 +191,13 @@ export async function calculate(
 		if (isNumber(formulaWithStats))
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
-		const expansion = client.userSettings.get(
-			interaction.guildId!,
-			interaction.user.id
-		)?.attributes;
-		formula = generateStatsDice(formula, expansion);
+		if (interaction.guild) {
+			const expansion = client.userSettings.get(
+				interaction.guild.id,
+				interaction.user.id
+			)?.attributes;
+			if (expansion) formula = generateStatsDice(formula, expansion);
+		}
 		const isRoll = getRoll(formula, undefined, sortResult);
 		if (isRoll?.total != null) {
 			originalFormula = isRoll.result;
