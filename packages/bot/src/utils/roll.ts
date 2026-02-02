@@ -297,7 +297,7 @@ export async function rollStatistique(
 		standardizedStatistic = res.standardizedStatistic;
 		userStat = res.userStat;
 
-		dice = dice.replaceAll(/\$\B/, userStat.toString());
+		dice = dice.replaceAll("$", userStat.toString());
 	}
 	if (!dice) {
 		await reply(interaction, {
