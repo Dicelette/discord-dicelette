@@ -13,14 +13,12 @@ import {
 	parseTemplateField,
 } from "@dicelette/parse_result";
 import type {
-	CharDataWithName,
-	GuildData,
-	PersonnageIds,
+	CharDataWithName, PersonnageIds,
 	Settings,
 	Translation,
 	UserData,
 	UserGuildData,
-	UserMessageId,
+	UserMessageId
 } from "@dicelette/types";
 import {
 	BotError,
@@ -30,7 +28,7 @@ import {
 	logger,
 	uniformizeRecords,
 } from "@dicelette/utils";
-import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
+import { getCharaInMemory, getTemplateByInteraction, updateMemory, mergeAttribute } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
@@ -216,9 +214,7 @@ async function getUserFrom(
 		!options?.fetchMessage
 	) {
 		if (options?.attributes) {
-			const attributes = client.userSettings.get(guildId, userId)?.attributes;
-			if (attributes)
-				getChara.stats = Object.assign({}, attributes, getChara.stats ?? {});
+			getChara.stats = mergeAttribute(client, getChara, guildId, userId);
 		}
 		return { charName: charName?.capitalize(), userData: getChara };
 	}
@@ -315,11 +311,8 @@ async function getUserFrom(
 		});
 		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
 
-		if (options?.attributes) {
-			const attributes = client.userSettings.get(guildId, userId)?.attributes;
-			if (attributes)
-				userData!.stats = Object.assign({}, attributes, userData?.stats ?? {});
-		}
+		if (options?.attributes) userData!.stats = mergeAttribute(client, userData, guildId, userId);
+		
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
 		if (skipNotFound) return;
@@ -600,10 +593,7 @@ export async function getMacro(
 			userName: charName,
 		};
 	}
-	const attributes = client.userSettings.get(interaction.guild!.id, user.id)?.attributes;
-	if (attributes) {
-		userStatistique!.stats = Object.assign({}, attributes, userStatistique?.stats ?? {});
-	}
+	userStatistique.stats = mergeAttribute(client, userStatistique, interaction.guild!.id, user.id);
 	return { optionChar: charOptions, userStatistique };
 }
 
@@ -707,13 +697,7 @@ export async function getStatistics(
 		});
 	}
 
-	const expansions = client.userSettings.get(
-		interaction.guild!.id,
-		targetUserId
-	)?.attributes;
-	if (expansions) {
-		userStatistique!.stats = Object.assign({}, expansions, userStatistique?.stats ?? {});
-	}
+	userStatistique!.stats = mergeAttribute(client, userStatistique, interaction.guild!.id, targetUserId);
 
 	return { optionChar, options, ul, userStatistique };
 }
