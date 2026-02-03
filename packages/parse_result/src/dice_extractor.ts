@@ -407,18 +407,13 @@ export function getRoll(
 	if (comments) dice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1");
 
 	dice = dice.trim();
-	try {
-		const rollDice = roll(dice, undefined, pity, sort);
-		if (!rollDice) return undefined;
-		if (comments) {
-			rollDice.comment = comments;
-			rollDice.dice = `${dice} /* ${comments} */`;
-		}
-		return rollDice;
-	} catch (error) {
-		logger.warn(error);
-		return undefined;
+	const rollDice = roll(dice, undefined, pity, sort);
+	if (!rollDice) return undefined;
+	if (comments) {
+		rollDice.comment = comments;
+		rollDice.dice = `${dice} /* ${comments} */`;
 	}
+	return rollDice;
 }
 
 /**
