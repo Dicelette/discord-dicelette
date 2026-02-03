@@ -22,8 +22,10 @@ export async function display(
 	const userStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	const entries = Object.entries(userStats);
 	if (entries.length === 0) {
-		const text = ul("userSettings.attributes.stats.empty");
-		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		await reply(interaction, {
+			content: ul("userSettings.attributes.stats.empty"),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		return;
 	}
 	await chunkMessage(entries, ul, interaction);
@@ -73,9 +75,6 @@ export async function importattributes(
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	const key = `${userId}.attributes`;
-	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
-	if (overwrite) currentStats = {};
 	const {
 		result: validated,
 		errors,
@@ -85,6 +84,9 @@ export async function importattributes(
 			return { error: JSON.stringify(value), ok: false };
 		return { ok: true, value: value as number };
 	});
+	const key = `${userId}.attributes`;
+	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
+	if (overwrite) currentStats = {};
 
 	for (const [name, val] of Object.entries(validated)) currentStats[name] = val as number;
 
