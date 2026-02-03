@@ -3,9 +3,8 @@ import {
 	macroOptions,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { t } from "@dicelette/localization";
 import { logger, sentry } from "@dicelette/utils";
-import { getMacro, getStatistics } from "database";
+import { getMacro } from "database";
 import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
 import { buildDamageAutocompleteChoices, rollMacro } from "utils";
@@ -43,7 +42,7 @@ export default {
 			const stats = await getMacro(client, ul, interaction, true);
 			if (!stats) return;
 			const { optionChar, userStatistique } = stats;
-			// Note: getStatistics already merged any user settings expansions into userStatistique.stats
+			// Note: getMacro already merged any user settings expansions into userStatistique.stats
 			return await rollMacro(
 				interaction,
 				client,
