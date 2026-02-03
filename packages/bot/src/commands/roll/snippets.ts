@@ -44,13 +44,14 @@ export default {
 		const userId = interaction.user.id;
 		const guildId = interaction.guild!.id;
 		const macroName = interaction.options.getString(t("common.name"), true).standardize();
-		const snippets = client.userSettings.get(guildId, userId)?.snippets ?? {};
+		const userSettings = client.userSettings.get(guildId, userId);
+		const snippets = userSettings?.snippets ?? {};
+		const attributes = userSettings?.attributes;
 		const expressionOpt = interaction.options.getString(t("common.expression")) ?? "0";
 		const sortOrder = client.settings.get(guildId)?.sortOrder;
 		const threshold = interaction.options
 			.getString(t("dbRoll.options.override.name"))
 			?.trimAll();
-		const attributes = client.userSettings.get(guildId, userId)?.attributes;
 
 		const oppositionVal = interaction.options.getString(
 			t("dbRoll.options.opposition.name")
