@@ -85,8 +85,8 @@ export default {
 			if (hashIndex !== -1) {
 				const before = dice.slice(0, hashIndex).trimEnd();
 				const after = dice.slice(hashIndex);
-				dice = `${generateStatsDice(before)} ${after}`.trim();
-			} else dice = generateStatsDice(dice);
+				dice = `${generateStatsDice(before, attributes)} ${after}`.trim();
+			} else dice = generateStatsDice(dice, attributes);
 
 			const rCCShared = getCriticalFromDice(dice, ul);
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
