@@ -40,6 +40,7 @@ import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
 import { embedError, ensureEmbed, getEmbeds, reply, replyEphemeralError } from "messages";
 import { isSerializedNameEquals, searchUserChannel } from "utils";
+import {StatisticalTemplate} from "@dicelette/core";
 
 type GetOptions = {
 	integrateCombinaison: boolean;
@@ -575,14 +576,10 @@ export async function getMacro(
 		//allow global damage with constructing a new userStatistique with only the damageName and their value
 		//get the damageName from the global template
 		const template = await getTemplateByInteraction(interaction, client);
-		if (!template) {
-			const text = ul("error.template.notFound", {
-				guildId: interaction.guild!.name,
-			});
-			await replyEphemeralError(interaction, text, ul);
-			return;
-		}
-		const damage = template.damage
+		
+		
+		
+		const damage = template?.damage
 			? (uniformizeRecords(template.damage) as Record<string, string>)
 			: undefined;
 		logger.trace("The template use:", damage);
@@ -592,9 +589,9 @@ export async function getMacro(
 			damage,
 			isFromTemplate: true,
 			template: {
-				critical: template.critical,
-				customCritical: template.customCritical,
-				diceType: template.diceType,
+				critical: template?.critical,
+				customCritical: template?.customCritical,
+				diceType: template?.diceType,
 			},
 			userName: charName,
 		};
@@ -665,14 +662,14 @@ export async function getStatistics(
 		userStatistique = char?.userStatistique?.userData;
 		optionChar = char?.optionChar;
 	}
-
-	if (!needStats && !userStatistique && template) {
+	
+	function generateMinimalTemplate(template: StatisticalTemplate) {
 		const tempDamage = template.damage
 			? (uniformizeRecords(template.damage) as Record<string, string>)
 			: undefined;
-		optionChar = originalOptionChar;
+		const optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
-		userStatistique = {
+		return {res:{
 			damage: tempDamage,
 			isFromTemplate: true,
 			template: {
@@ -680,7 +677,13 @@ export async function getStatistics(
 				customCritical: template?.customCritical,
 				diceType: template?.diceType,
 			},
-		};
+		}, optionChar};
+	}
+
+	if (!needStats && !userStatistique && template) {
+		const minTemp = generateMinimalTemplate(template);
+		userStatistique = minTemp.res;
+		optionChar = minTemp.optionChar;
 	}
 	if (!userStatistique && !skipNotFound) {
 		await reply(interaction, {
@@ -708,7 +711,20 @@ export async function getStatistics(
 		});
 	}
 
-	userStatistique!.stats = mergeAttribute(
+	if (!userStatistique) {//at this point we can just use the default value from the template
+		if (template) {
+			const res = generateMinimalTemplate(template);
+			userStatistique = res.res;
+			optionChar = res.optionChar;
+		} else {
+			userStatistique = {
+				isFromTemplate: false,
+				stats: {},
+				template: {}
+			}
+		}
+	}
+	userStatistique.stats = mergeAttribute(
 		client,
 		userStatistique,
 		interaction.guild!.id,
