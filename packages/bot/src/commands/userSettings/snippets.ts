@@ -8,12 +8,10 @@ import {
 	registerEntry,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { DiceTypeError } from "@dicelette/core";
 import { t } from "@dicelette/localization";
-import { getExpression } from "@dicelette/parse_result";
-
+import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
 import * as Djs from "discord.js";
-import { embedError, reply } from "messages";
+import { reply } from "messages";
 import { baseRoll } from "../roll";
 
 export async function register(
@@ -23,35 +21,27 @@ export async function register(
 	const { ul } = getLangAndConfig(client, interaction);
 	const macroName = interaction.options.getString(t("common.name"), true);
 	const diceValue = interaction.options.getString(t("common.dice"), true);
-	try {
-		await baseRoll(getExpression(diceValue, "0").dice, interaction, client, false, true);
-		// store using generic helper
-		await registerEntry(
-			client,
-			interaction,
-			"snippets",
-			macroName,
-			diceValue,
-			ul,
-			(name) => ({
-				name: name.toTitle(),
-			})
-		);
-	} catch (error) {
-		if (error instanceof DiceTypeError) {
-			const text = ul("error.invalidDice.eval", { dice: error.dice });
-			await reply(interaction, {
-				embeds: [embedError(text, ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-		} else {
-			const text = ul("error.generic.e", { message: (error as Error).message });
-			await reply(interaction, {
-				embeds: [embedError(text, ul)],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-		}
-	}
+	const attributes = client.userSettings.get(
+		interaction.guild!.id,
+		interaction.user.id
+	)?.attributes;
+	const dice = replaceStatsInDiceFormula(
+		getExpression(diceValue, "0", attributes).dice,
+		attributes
+	);
+	await baseRoll(dice.formula, interaction, client, false, true);
+	// store using generic helper
+	await registerEntry(
+		client,
+		interaction,
+		"snippets",
+		macroName,
+		diceValue,
+		ul,
+		(name) => ({
+			name: name.toTitle(),
+		})
+	);
 }
 
 export async function displayList(

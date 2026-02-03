@@ -50,6 +50,7 @@ export default {
 		const threshold = interaction.options
 			.getString(t("dbRoll.options.override.name"))
 			?.trimAll();
+		const attributes = client.userSettings.get(guildId, userId)?.attributes;
 
 		const oppositionVal = interaction.options.getString(
 			t("dbRoll.options.opposition.name")
@@ -94,14 +95,14 @@ export default {
 				dice,
 				threshold,
 				DICE_COMPILED_PATTERNS.COMPARATOR,
-				undefined,
+				attributes,
 				undefined,
 				"",
 				""
 			);
 
 			const opts: RollOptions = {
-				customCritical: skillCustomCritical(rCCShared, undefined, undefined, sortOrder),
+				customCritical: skillCustomCritical(rCCShared, attributes, undefined, sortOrder),
 				user: interaction.user,
 			};
 			await rollWithInteraction(interaction, composed.roll, client, opts);
@@ -113,7 +114,7 @@ export default {
 			dice,
 			userComments
 		);
-		let processedDice = generateStatsDice(diceWithoutComments);
+		let processedDice = generateStatsDice(diceWithoutComments, attributes);
 		const rCC = getCriticalFromDice(processedDice, ul);
 
 		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);
@@ -129,7 +130,7 @@ export default {
 			processedDice,
 			threshold,
 			DICE_COMPILED_PATTERNS.COMPARATOR,
-			undefined,
+			attributes,
 			undefined,
 			expressionStr,
 			mergedComments ?? ""
@@ -139,7 +140,7 @@ export default {
 			? parseOpposition(
 					oppositionVal,
 					composed.comparatorEvaluated,
-					undefined,
+					attributes,
 					undefined,
 					sortOrder
 				)
@@ -147,7 +148,7 @@ export default {
 
 		const opts: RollOptions = {
 			charName: charOptions,
-			customCritical: skillCustomCritical(rCC, undefined, undefined, sortOrder),
+			customCritical: skillCustomCritical(rCC, attributes, undefined, sortOrder),
 			opposition,
 			user: interaction.user,
 		};
