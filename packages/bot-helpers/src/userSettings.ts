@@ -210,50 +210,6 @@ export async function registerEntry<T>(
 	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 
-export async function importEntries(
-	client: EClient,
-	interaction: Djs.ChatInputCommandInteraction,
-	type: "attributes" | "snippets",
-	validate: (
-		name: string,
-		value: unknown
-	) => Promise<{ ok: true; value: unknown } | { ok: false; error: unknown }>,
-	t: (key: string) => string,
-	ul: Translation
-) {
-	const data = await getContentFile(interaction, t, ul);
-	if (!data) return;
-	const { fileContent, guildId, overwrite, userId } = data;
-	let imported: Record<string, unknown>;
-	try {
-		imported = JSON.parse(fileContent);
-	} catch {
-		const text = ul("userSettings.snippets.import.invalidContent", {
-			ex: JSON.stringify({ example: "example" }, null, 2),
-		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
-		return;
-	}
-	if (typeof imported !== "object" || Array.isArray(imported)) {
-		const text = ul("userSettings.snippets.import.invalidContent", {
-			ex: JSON.stringify({ example: "example" }, null, 2),
-		});
-		await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
-		return;
-	}
-	const key = `${userId}.${type}`;
-	let current: Record<string, unknown> =
-		client.userSettings.get(guildId, userId)?.[type] ?? {};
-	if (overwrite) current = {};
-	const { result: validated, errors, count } = await processEntries(imported, validate);
-	for (const [name, value] of Object.entries(validated)) {
-		current[name] = value as unknown;
-	}
-	client.userSettings.set(guildId, current, key);
-	const text = errorMessage(type, ul, errors, count, validated);
-	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
-}
-
 export function getSettingsAutoComplete(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,
