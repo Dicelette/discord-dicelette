@@ -75,7 +75,11 @@ export async function importattributes(
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	if (typeof importedStats !== "object" || importedStats === null || Array.isArray(importedStats)) {
+	if (
+		typeof importedStats !== "object" ||
+		importedStats === null ||
+		Array.isArray(importedStats)
+	) {
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
