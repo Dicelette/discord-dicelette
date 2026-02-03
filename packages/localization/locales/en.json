@@ -1047,15 +1047,15 @@
 			"description": "Register attributes that will be replaced by their values when dice are rolled.",
 			"export": {
 				"description": "Export attributes saved in a JSON file.",
-				"empty": "There is no attributes data.",
-				"success": "Attributes has been exported successfully. You can import them with `/user_config attributes import`. "
+				"empty": "There are no attributes data.",
+				"success": "Attributes have been exported successfully. You can import them with `/user_config attributes import`. "
 			},
 			"import": {
 				"description": "Import a JSON file with attributes data.",
 				"partialErrors_one": "Following attribute is invalid:",
 				"partialErrors_other": "Following attributes are invalid:",
-				"success_one": "The {{-name}} attribute has been imported successfully.",
-				"success_other": "{{- count}} attributes has been imported successfully:"
+				"success_one": "The {{- name}} attribute has been imported successfully.",
+				"success_other": "{{- count}} attributes have been imported successfully:"
 			},
 			"list": {
 				"description": "Display all registered attributes.",

@@ -1058,7 +1058,7 @@
 				"success_other": "{{- count}} attributs ont été importés avec succès :"
 			},
 			"list": {
-				"description": "Afficher tous les attributs enregistrées.",
+				"description": "Afficher tous les attributs enregistrés.",
 				"empty": "Il n'y a pas de données sauvegardées."
 			},
 			"title": "attributs"
