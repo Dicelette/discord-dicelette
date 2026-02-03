@@ -3,8 +3,7 @@
 	"assist": {
 		"actions": {
 			"source": {
-				"organizeImports": "on",
-				"useSortedKeys": "on"
+				"organizeImports": "on"
 			}
 		}
 	},
@@ -117,7 +116,6 @@
 			},
 			"suspicious": {
 				"noAssignInExpressions": "off",
-				"noAsyncPromiseExecutor": "error",
 				"noCatchAssign": "error",
 				"noClassAssign": "error",
 				"noCompareNegZero": "error",

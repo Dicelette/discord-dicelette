@@ -210,6 +210,7 @@ export async function registerEntry<T>(
 	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 
+
 export function getSettingsAutoComplete(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,

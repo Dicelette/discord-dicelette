@@ -5,6 +5,7 @@ import {
 	haveAccess,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import type { StatisticalTemplate } from "@dicelette/core";
 import { findln, ln, t } from "@dicelette/localization";
 import {
 	parseDamageFields,
@@ -40,7 +41,6 @@ import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
 import { embedError, ensureEmbed, getEmbeds, reply, replyEphemeralError } from "messages";
 import { isSerializedNameEquals, searchUserChannel } from "utils";
-import {StatisticalTemplate} from "@dicelette/core";
 
 type GetOptions = {
 	integrateCombinaison: boolean;
@@ -576,9 +576,7 @@ export async function getMacro(
 		//allow global damage with constructing a new userStatistique with only the damageName and their value
 		//get the damageName from the global template
 		const template = await getTemplateByInteraction(interaction, client);
-		
-		
-		
+
 		const damage = template?.damage
 			? (uniformizeRecords(template.damage) as Record<string, string>)
 			: undefined;
@@ -662,22 +660,25 @@ export async function getStatistics(
 		userStatistique = char?.userStatistique?.userData;
 		optionChar = char?.optionChar;
 	}
-	
+
 	function generateMinimalTemplate(template: StatisticalTemplate) {
 		const tempDamage = template.damage
 			? (uniformizeRecords(template.damage) as Record<string, string>)
 			: undefined;
 		const optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
-		return {res:{
-			damage: tempDamage,
-			isFromTemplate: true,
-			template: {
-				critical: template?.critical,
-				customCritical: template?.customCritical,
-				diceType: template?.diceType,
+		return {
+			res: {
+				damage: tempDamage,
+				isFromTemplate: true,
+				template: {
+					critical: template?.critical,
+					customCritical: template?.customCritical,
+					diceType: template?.diceType,
+				},
 			},
-		}, optionChar};
+			optionChar,
+		};
 	}
 
 	if (!needStats && !userStatistique && template) {
@@ -711,7 +712,8 @@ export async function getStatistics(
 		});
 	}
 
-	if (!userStatistique) {//at this point we can just use the default value from the template
+	if (!userStatistique) {
+		//at this point we can just use the default value from the template
 		if (template) {
 			const res = generateMinimalTemplate(template);
 			userStatistique = res.res;
@@ -720,8 +722,8 @@ export async function getStatistics(
 			userStatistique = {
 				isFromTemplate: false,
 				stats: {},
-				template: {}
-			}
+				template: {},
+			};
 		}
 	}
 	userStatistique.stats = mergeAttribute(

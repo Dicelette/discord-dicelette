@@ -132,7 +132,11 @@ export async function importSnippets(
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	if (typeof importedMacros !== "object" || Array.isArray(importedMacros) || importedMacros === null) {
+	if (
+		typeof importedMacros !== "object" ||
+		Array.isArray(importedMacros) ||
+		importedMacros === null
+	) {
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
@@ -142,6 +146,10 @@ export async function importSnippets(
 	const key = `${userId}.snippets`;
 	let macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
 	if (overwrite) macros = {};
+	const attributes = client.userSettings.get(
+		interaction.guild!.id,
+		interaction.user.id
+	)?.attributes;
 	// validate and merge the imported macros
 	const {
 		result: validated,
@@ -150,7 +158,11 @@ export async function importSnippets(
 	} = await processEntries<string>(importedMacros, async (_name, content) => {
 		if (typeof content !== "string") return { error: String(content), ok: false };
 		try {
-			await baseRoll(getExpression(content, "0").dice, interaction, client, false, true);
+			const dice = replaceStatsInDiceFormula(
+				getExpression(content, "0", attributes).dice,
+				attributes
+			);
+			await baseRoll(dice.formula, interaction, client, false, true);
 			return { ok: true, value: content };
 		} catch {
 			return { error: String(content), ok: false };
