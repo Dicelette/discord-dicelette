@@ -39,11 +39,11 @@ function formatSuccessImport(
 		const name = Object.keys(success)[0];
 		return ul(`userSettings.${type}.import.success`, {
 			count,
-			name: `**${name.toTitle()}**`,
+			name: `**${name.toTitle()}** (\`${success[name]}\`)`,
 		});
 	}
-	const res = `\n- ${Object.keys(success)
-		.map((name) => `**${name.toTitle()}**`)
+	const res = `\n- ${Object.entries(success)
+		.map(([name, value]) => `**${name.toTitle()}**${ul("common.space")}: \`${value}\``)
 		.join("\n- ")}`;
 	return ul(`userSettings.${type}.import.success`, { count }) + res;
 }
@@ -250,7 +250,7 @@ export async function importEntries(
 		current[name] = value as unknown;
 	}
 	client.userSettings.set(guildId, current, key);
-	const text = errorMessage(type, ul, errors, count);
+	const text = errorMessage(type, ul, errors, count, validated);
 	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 
