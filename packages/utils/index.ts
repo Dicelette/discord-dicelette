@@ -107,4 +107,3 @@ export function allValueUndefOrEmptyString(obj: unknown): boolean {
 			(typeof value === "object" && allValueUndefOrEmptyString(value))
 	);
 }
-
