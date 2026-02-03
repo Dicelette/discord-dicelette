@@ -127,6 +127,7 @@ export function rollCustomCritical(
  * @param customCritical - The set of custom critical conditions to filter and process.
  * @param statistics - Optional statistics used for dice expression generation.
  * @param dollarsValue - Optional value used to substitute into dice expressions containing a dollar sign.
+ * @param sort
  * @returns A record of processed custom criticals affecting skills, or `undefined` if none match.
  */
 export function skillCustomCritical(
