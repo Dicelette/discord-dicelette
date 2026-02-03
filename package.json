@@ -27,7 +27,7 @@
 		"test": "pnpm -r test"
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.24.2",
+		"@dicelette/core": "^1.25.1",
 		"@sentry/node": "^10.31.0",
 		"@sentry/profiling-node": "^10.31.0",
 		"@types/node": "^22.19.3",
