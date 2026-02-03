@@ -132,7 +132,7 @@ export async function importSnippets(
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
-	if (typeof importedMacros !== "object" || Array.isArray(importedMacros)) {
+	if (typeof importedMacros !== "object" || Array.isArray(importedMacros) || importedMacros === null) {
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
