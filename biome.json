@@ -83,10 +83,8 @@
 				"useAsConstAssertion": "error",
 				"useConst": "error",
 				"useDefaultParameterLast": "error",
-
 				"useEnumInitializers": "error",
 				"useExponentiationOperator": "error",
-
 				"useExportType": "error",
 				"useFilenamingConvention": "error",
 				"useImportType": "error",
@@ -174,16 +172,6 @@
 				"!**/node_modules/**"
 			],
 			"assist": { "actions": { "source": { "useSortedKeys": "off" } } }
-		},
-		{
-			"includes": ["biome.json", "**/package.json", "!**/node_modules/**"],
-			"assist": {
-				"actions": {
-					"source": {
-						"useSortedKeys": "off"
-					}
-				}
-			}
 		}
 	]
 }
