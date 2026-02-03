@@ -63,6 +63,11 @@ export async function interactionError(
 	ul: Translation,
 	langToUse?: Djs.Locale
 ) {
+	if (
+		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
+		(interaction.replied || interaction.deferred)
+	)
+		return;
 	console.error(e);
 	sentry.error(e);
 	if (!interaction.guild) return;
@@ -70,11 +75,13 @@ export async function interactionError(
 	if (msgError.length === 0) return;
 	const cause = (e as Error).cause ? ((e as Error).cause as string) : undefined;
 	const embed = embedError(msgError, ul, cause);
-	if (interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand())
+	if (interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) {
+		if (interaction.replied || interaction.deferred) return;
 		await reply(interaction, {
 			embeds: [embed],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+	}
 	if (client.settings.has(interaction.guild.id)) {
 		const db = client.settings.get(interaction.guild.id, "logs");
 		if (!db) return;
