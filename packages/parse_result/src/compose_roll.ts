@@ -48,7 +48,7 @@ export function composeRollBase(
 	comparatorPattern: RegExp,
 	stats: Record<string, number> | undefined,
 	statTotal: string | number | undefined,
-	expressionStr: string,
+	dollarValue: string,
 	comments: string
 ): {
 	diceWithoutComparator: string;
@@ -68,7 +68,7 @@ export function composeRollBase(
 		stats,
 		statTotal?.toString()
 	);
-	const roll = `${trimAll(noComparator)}${expressionStr}${comparatorEvaluated} ${comments}`;
+	const roll = `${trimAll(noComparator)}${dollarValue}${comparatorEvaluated} ${comments}`;
 	return {
 		comparatorEvaluated,
 		diceWithoutComparator: noComparator,

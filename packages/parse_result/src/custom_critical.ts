@@ -51,10 +51,10 @@ export function parseOpposition(
 	opposition: string,
 	diceComparator: string,
 	userStatistique?: Record<string, number>,
-	userStatStr?: string,
+	dollarValue?: string,
 	sort?: SortOrder
 ): ComparedValue | undefined {
-	const replaced = generateStatsDice(opposition, userStatistique, userStatStr);
+	const replaced = generateStatsDice(opposition, userStatistique, dollarValue);
 	const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
 	const match = signRegex.exec(replaced);
 	const comparator = match?.groups?.comparator || replaced;
