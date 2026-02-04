@@ -1,5 +1,6 @@
 import {
 	buildJsonAttachment,
+	chunkErrorMessage,
 	chunkMessage,
 	errorMessage,
 	getContentFile,
@@ -103,7 +104,7 @@ export async function importattributes(
 
 	client.userSettings.set(guildId, currentStats, key);
 	const text = errorMessage("attributes", ul, errors, count, validated);
-	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+	await chunkErrorMessage(text, interaction);
 }
 
 export async function register(

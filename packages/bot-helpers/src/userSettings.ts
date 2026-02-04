@@ -12,6 +12,25 @@ export async function chunkMessage(
 		([name, content]) =>
 			`- **${name.toTitle()}**${ul("common.space")}: \`${content.toString().replaceAll("`", "\\`")}\``
 	);
+	const lineLinked = lines.join("\n");
+	if (lineLinked.length <= 2000) {
+		//send as normal message
+		await interaction.reply({
+			content: lineLinked,
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	if (lineLinked.length <= 4000) {
+		//send as component v2
+		const textDisplay = new Djs.TextDisplayBuilder().setContent(lineLinked);
+		await interaction.reply({
+			components: [textDisplay],
+			flags: [Djs.MessageFlags.Ephemeral, Djs.MessageFlags.IsComponentsV2],
+		});
+		return;
+	}
+
 	const chunkedLines: string[][] = [];
 	const chunkSize = 10;
 	for (let i = 0; i < lines.length; i += chunkSize) {
@@ -26,6 +45,48 @@ export async function chunkMessage(
 	for (const chunk of chunkedLines.slice(1)) {
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
+	}
+}
+
+export async function chunkErrorMessage(
+	error: string,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const maxLength = 4000;
+	const mindLength = 2000;
+	if (error.length <= mindLength) {
+		//send as normal message
+		await interaction.reply({
+			content: error,
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	if (error.length <= maxLength) {
+		//send as component v2
+		const textDisplay = new Djs.TextDisplayBuilder().setContent(error);
+		await interaction.reply({
+			components: [textDisplay],
+			flags: [Djs.MessageFlags.Ephemeral, Djs.MessageFlags.IsComponentsV2],
+		});
+		return;
+	}
+	const errorLines = error.split("\n");
+	//send the first message
+	await interaction.reply({
+		content: errorLines[0],
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+	const chunkedLines: string[][] = [];
+	const chunkSize = 10;
+	for (let i = 0; i < errorLines.length; i += chunkSize) {
+		chunkedLines.push(errorLines.slice(i, i + chunkSize));
+	}
+	//send the rest as follow ups
+	for (const chunk of chunkedLines.slice(1)) {
+		const text = chunk.join("\n");
+		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
+		return;
 	}
 }
 
@@ -56,15 +117,16 @@ export function errorMessage(
 	success: Record<string, unknown> = {}
 ) {
 	let text = "";
-	if (count > 0) text = formatSuccessImport(count, success, type, ul);
+	if (count > 0) text = `${formatSuccessImport(count, success, type, ul)}\n\n`;
 
 	if (Object.keys(errors).length > 0) {
-		const errorLines = Object.entries(errors)
+		let errorLines = Object.entries(errors)
 			.map(
 				([name, value]) => `- **${name.toTitle()}**${ul("common.space")}: \`${value}\``
 			)
 			.join("\n");
-		text += `\n\n${ul(`userSettings.${type}.import.partialErrors`, { count: Object.keys(errors).length })}\n${errorLines}`;
+		errorLines = errorLines.length > 0 ? `\n${errorLines}` : "";
+		text += `${ul(`userSettings.${type}.import.partialErrors`, { count: Object.keys(errors).length })}${errorLines}`;
 	}
 	return text;
 }

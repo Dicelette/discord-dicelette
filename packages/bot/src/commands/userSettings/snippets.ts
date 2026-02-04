@@ -1,5 +1,6 @@
 import {
 	buildJsonAttachment,
+	chunkErrorMessage,
 	chunkMessage,
 	errorMessage,
 	getContentFile,
@@ -173,5 +174,5 @@ export async function importSnippets(
 
 	client.userSettings.set(guildId, macros, key);
 	const text = errorMessage("snippets", ul, errors, count, validated);
-	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+	await chunkErrorMessage(text, interaction);
 }
