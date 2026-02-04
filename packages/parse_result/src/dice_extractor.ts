@@ -7,10 +7,11 @@ import {
 	type SortOrder,
 } from "@dicelette/core";
 import {
-	ChainedComments,
-	DiceData,
-	DiceExtractionResult, MIN_THRESHOLD_MATCH,
-	UserData,
+	type ChainedComments,
+	type DiceData,
+	type DiceExtractionResult,
+	MIN_THRESHOLD_MATCH,
+	type UserData,
 } from "@dicelette/types";
 import {
 	DICE_COMPILED_PATTERNS,
@@ -525,7 +526,11 @@ export function replaceStatsInDiceFormula(
 
 			if (!processedFormula.includes(fullMatch)) continue;
 
-			const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats, MIN_THRESHOLD_MATCH);
+			const foundStat = findBestStatMatch<[string, number]>(
+				searchTerm,
+				normalizedStats,
+				MIN_THRESHOLD_MATCH
+			);
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
@@ -571,7 +576,11 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	const unNormalized: string[] = [];
 	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
-		const found = findBestStatMatch<string>(stat.standardize(), normalizedStats, MIN_THRESHOLD_MATCH);
+		const found = findBestStatMatch<string>(
+			stat.standardize(),
+			normalizedStats,
+			MIN_THRESHOLD_MATCH
+		);
 		if (found) unNormalized.push(found);
 		else unNormalized.push(stat);
 	}

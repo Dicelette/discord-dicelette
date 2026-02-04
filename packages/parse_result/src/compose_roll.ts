@@ -1,7 +1,7 @@
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
+import { MIN_THRESHOLD_MATCH } from "@dicelette/types";
 import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
-import {MIN_THRESHOLD_MATCH} from "@dicelette/types";
 
 /**
  * Extract a comparator token (e.g. ">=12" or "<=5") from a dice string.

@@ -114,8 +114,8 @@
 		"cancel": "Cancel",
 		"cancelled": "Deletion has been canceled.",
 		"channel": "channel",
-		"character": "character",
 		"charName": "Character name",
+		"character": "character",
 		"comments": "comments",
 		"confirm": "Confirm deletion",
 		"context": "Context",
@@ -452,19 +452,6 @@
 			"title": "user"
 		}
 	},
-	"edit_avatar": {
-		"attachment": {
-			"desc": "Host a file rather than using a link.",
-			"name": "file"
-		},
-		"default": "The image used will be your actual avatar !",
-		"desc": "Edit the avatar of a character sheet",
-		"name": "avatar",
-		"url": {
-			"desc": "Link to the image to put (no discord link!)",
-			"name": "url"
-		}
-	},
 	"editMe": {
 		"asset": {
 			"description": "The avatar to set",
@@ -485,6 +472,19 @@
 			"name": "nick"
 		},
 		"success": "The bot was edited successfully."
+	},
+	"edit_avatar": {
+		"attachment": {
+			"desc": "Host a file rather than using a link.",
+			"name": "file"
+		},
+		"default": "The image used will be your actual avatar !",
+		"desc": "Edit the avatar of a character sheet",
+		"name": "avatar",
+		"url": {
+			"desc": "Link to the image to put (no discord link!)",
+			"name": "url"
+		}
 	},
 	"embed": {
 		"add": "User registration",
@@ -777,12 +777,6 @@
 		},
 		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
 	},
-	"luckerMeter": {
-		"leaderboard": {
-			"description": "Player leaderboard",
-			"title": "leaderboard"
-		}
-	},
 	"luckMeter": {
 		"count": {
 			"consecutive": {
@@ -838,6 +832,12 @@
 		"user": "{{- user}}'s throwing results:",
 		"userOption": {
 			"description": "Displays another user's throw results."
+		}
+	},
+	"luckerMeter": {
+		"leaderboard": {
+			"description": "Player leaderboard",
+			"title": "leaderboard"
 		}
 	},
 	"math": {
@@ -1051,6 +1051,7 @@
 				"success": "Attributes have been exported successfully. You can import them with `/user_config attributes import`. "
 			},
 			"import": {
+				"containsHyphen": "Name can't include hyphen",
 				"description": "Import a JSON file with attributes data.",
 				"partialErrors_one": "Following attribute is invalid:",
 				"partialErrors_other": "Following attributes are invalid:",

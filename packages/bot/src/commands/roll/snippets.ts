@@ -14,7 +14,7 @@ import {
 	parseOpposition,
 	skillCustomCritical,
 } from "@dicelette/parse_result";
-import {MIN_THRESHOLD_MATCH, RollOptions} from "@dicelette/types";
+import { MIN_THRESHOLD_MATCH, type RollOptions } from "@dicelette/types";
 import { CHARACTER_DETECTION, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
@@ -76,7 +76,8 @@ export default {
 			if (hashIndex !== -1) {
 				const before = dice.slice(0, hashIndex).trimEnd();
 				const after = dice.slice(hashIndex);
-				dice = `${generateStatsDice(before, attributes, MIN_THRESHOLD_MATCH)} ${after}`.trim();
+				dice =
+					`${generateStatsDice(before, attributes, MIN_THRESHOLD_MATCH)} ${after}`.trim();
 			} else dice = generateStatsDice(dice, attributes, MIN_THRESHOLD_MATCH);
 
 			const rCCShared = getCriticalFromDice(dice, ul);
@@ -105,7 +106,11 @@ export default {
 			dice,
 			userComments
 		);
-		let processedDice = generateStatsDice(diceWithoutComments, attributes, MIN_THRESHOLD_MATCH);
+		let processedDice = generateStatsDice(
+			diceWithoutComments,
+			attributes,
+			MIN_THRESHOLD_MATCH
+		);
 		const rCC = getCriticalFromDice(processedDice, ul);
 
 		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);

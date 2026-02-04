@@ -3,7 +3,12 @@ import type { EClient } from "@dicelette/client";
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
-import {EMOJI_MATH, MIN_THRESHOLD_MATCH, type Translation, type UserData} from "@dicelette/types";
+import {
+	EMOJI_MATH,
+	MIN_THRESHOLD_MATCH,
+	type Translation,
+	type UserData,
+} from "@dicelette/types";
 import { capitalizeBetweenPunct, logger, profiler } from "@dicelette/utils";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
@@ -179,7 +184,7 @@ export async function calculate(
 			formula,
 			userStatistique.stats,
 			MIN_THRESHOLD_MATCH,
-			`${statInfo.value}`,
+			`${statInfo.value}`
 		);
 		const isRoll = getRoll(formulaWithStats, undefined, sortResult);
 		originalFormula = `${statInfo.value}${sign}(${formula})`;
