@@ -91,9 +91,11 @@ export async function importattributes(
 		result: validated,
 		errors,
 		count,
-	} = await processEntries<number>(importedStats, async (_, value) => {
+	} = await processEntries<number>(importedStats, async (name, value) => {
 		if (typeof value !== "number" || Number.isNaN(value))
 			return { error: JSON.stringify(value), ok: false };
+		if (name.match(/-/))
+			return { error: ul("userSettings.attributes.import.containsHyphen"), ok: false };
 		return { ok: true, value: value as number };
 	});
 	const key = `${userId}.attributes`;
