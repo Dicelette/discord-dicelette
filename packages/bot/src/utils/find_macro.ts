@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { calculateSimilarity, logger } from "@dicelette/utils";
+import { calculateSimilarity, logger, MIN_THRESHOLD_MATCH } from "@dicelette/utils";
 import { getUserFromInteraction } from "database";
 import type * as Djs from "discord.js";
 
@@ -34,8 +34,7 @@ async function findMacroName(
 	userData: { charName?: string | null; damageName?: string[] },
 	atqName: string,
 	searchTerm: string,
-	bestSimilarity: number,
-	minSimilarity: number
+	bestSimilarity: number
 ): Promise<{
 	perfectMatch?: {
 		dice: string;
@@ -74,7 +73,7 @@ async function findMacroName(
 		}
 	}
 
-	if (similarity >= minSimilarity && similarity > bestSimilarity) {
+	if (similarity >= MIN_THRESHOLD_MATCH && similarity > bestSimilarity) {
 		const dice = await getDamageDiceForUser(
 			client,
 			interaction,
@@ -120,7 +119,6 @@ export async function findBestMatchingDice(
 		similarity: number;
 	} | null = null;
 	let bestSimilarity = 0;
-	const minSimilarity = 0.2;
 
 	const processUserData = async (applyCharFilter: boolean) => {
 		for (const userData of allUserData) {
@@ -144,8 +142,7 @@ export async function findBestMatchingDice(
 					userData,
 					atqName,
 					searchTerm,
-					bestSimilarity,
-					minSimilarity
+					bestSimilarity
 				);
 				if (result.perfectMatch) return result.perfectMatch;
 				if (result.newBestMatch && result.newBestSimilarity) {

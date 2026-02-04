@@ -2,6 +2,8 @@
  * Utility functions for string similarity and distance calculations.
  */
 
+export const MIN_THRESHOLD_MATCH = 0.5;
+
 /**
  * Calculates the similarity between two strings as a value between 0 and 1.
  */
@@ -39,7 +41,7 @@ export function levenshteinDistance(str1: string, str2: string): number {
 export function findBestStatMatch<T>(
 	searchTerm: string,
 	normalizedStats: Map<string, T>,
-	similarityThreshold = 0.6
+	similarityThreshold = MIN_THRESHOLD_MATCH
 ): T | undefined {
 	// recherche exacte
 	const exact = normalizedStats.get(searchTerm);
@@ -65,10 +67,35 @@ export function findBestStatMatch<T>(
 	let bestSimilarity = 0;
 	for (const [normalizedKey, original] of normalizedStats) {
 		const similarity = calculateSimilarity(searchTerm, normalizedKey);
+		if (similarity === 1) return original;
 		if (similarity > bestSimilarity && similarity >= similarityThreshold) {
 			bestSimilarity = similarity;
 			bestMatch = original;
 		}
 	}
 	return bestMatch;
+}
+
+/**
+ * Find the snippet name with the highest similarity to `macroName`.
+ * Single-pass O(n) algorithm: keeps the best (name, similarity) seen so far.
+ * Returns `null` if no snippets or if the best similarity is < `minSimilarity`.
+ * Tie-breaker: first encountered best similarity (deterministic).
+ */
+export function findBestSnippets(
+	snippets: Record<string, string>,
+	macroName: string
+): string | null {
+	let bestMatch: string | null = null;
+	let bestSimilarity = -1; // so even 0 similarity is considered when snippets non-empty
+
+	for (const name of Object.keys(snippets)) {
+		const similarity = calculateSimilarity(macroName.normalize(), name.normalize());
+		if (similarity === 1) return name;
+		if (similarity > bestSimilarity) {
+			bestSimilarity = similarity;
+			bestMatch = name;
+		}
+	}
+	return bestMatch && bestSimilarity >= MIN_THRESHOLD_MATCH ? bestMatch : null;
 }

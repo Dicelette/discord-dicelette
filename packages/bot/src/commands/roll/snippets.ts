@@ -14,11 +14,11 @@ import {
 	parseOpposition,
 	skillCustomCritical,
 } from "@dicelette/parse_result";
-import type { RollOptions, Snippets } from "@dicelette/types";
+import type { RollOptions } from "@dicelette/types";
 import {
 	CHARACTER_DETECTION,
-	calculateSimilarity,
 	DICE_COMPILED_PATTERNS,
+	findBestSnippets,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
@@ -53,7 +53,7 @@ export default {
 		const userComments = interaction.options.getString(t("common.comments")) ?? undefined;
 		let dice = snippets[macroName];
 		if (!dice) {
-			const bestMatch = findBestMatch(snippets, macroName);
+			const bestMatch = findBestSnippets(snippets, macroName);
 			if (bestMatch) dice = snippets[bestMatch];
 		}
 		if (!dice) {
@@ -150,24 +150,3 @@ export default {
 		await rollWithInteraction(interaction, composed.roll, client, opts);
 	},
 };
-
-/**
- * Find the snippet name with the highest similarity to `macroName`.
- * Single-pass O(n) algorithm: keeps the best (name, similarity) seen so far.
- * Returns `null` if no snippets or if the best similarity is < `minSimilarity`.
- * Tie-breaker: first encountered best similarity (deterministic).
- */
-export function findBestMatch(snippets: Snippets, macroName: string): string | null {
-	let bestMatch: string | null = null;
-	let bestSimilarity = -1; // so even 0 similarity is considered when snippets non-empty
-
-	for (const name of Object.keys(snippets)) {
-		const similarity = calculateSimilarity(macroName, name);
-		if (similarity === 1) return name;
-		if (similarity > bestSimilarity) {
-			bestSimilarity = similarity;
-			bestMatch = name;
-		}
-	}
-	return bestMatch && bestSimilarity >= 0 ? bestMatch : null;
-}
