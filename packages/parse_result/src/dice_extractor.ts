@@ -1,15 +1,20 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
-import { type Resultat, roll, SIGN_REGEX, type SortOrder } from "@dicelette/core";
-import type {
+import {
+	findBestStatMatch,
+	type Resultat,
+	roll,
+	SIGN_REGEX,
+	type SortOrder,
+} from "@dicelette/core";
+import {
 	ChainedComments,
 	DiceData,
-	DiceExtractionResult,
+	DiceExtractionResult, MIN_THRESHOLD_MATCH,
 	UserData,
 } from "@dicelette/types";
 import {
 	DICE_COMPILED_PATTERNS,
 	DICE_PATTERNS,
-	findBestStatMatch,
 	getCachedRegex,
 	logger,
 	NORMALIZE_SINGLE_DICE,
@@ -477,7 +482,8 @@ export function replaceStatsInDiceFormula(
 
 				const foundStat = findBestStatMatch<[string, number]>(
 					searchTerm,
-					normalizedStats
+					normalizedStats,
+					MIN_THRESHOLD_MATCH
 				);
 				if (foundStat) {
 					const [original, statValue] = foundStat;
@@ -519,7 +525,7 @@ export function replaceStatsInDiceFormula(
 
 			if (!processedFormula.includes(fullMatch)) continue;
 
-			const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats);
+			const foundStat = findBestStatMatch<[string, number]>(searchTerm, normalizedStats, MIN_THRESHOLD_MATCH);
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
@@ -565,7 +571,7 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	const unNormalized: string[] = [];
 	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
-		const found = findBestStatMatch<string>(stat.standardize(), normalizedStats);
+		const found = findBestStatMatch<string>(stat.standardize(), normalizedStats, MIN_THRESHOLD_MATCH);
 		if (found) unNormalized.push(found);
 		else unNormalized.push(stat);
 	}
@@ -607,13 +613,13 @@ export function findStatInDiceFormula(
 
 	// Normaliser la formule et préparer les tokens (mots) à analyser
 	const text = diceFormula.standardize();
-	const tokens = text.match(/\p{L}[\p{L}0-9_]*/gu) || [];
+	const tokens = text.match(/\p{L}[\p{L}0-9_.]*/gu) || [];
 
 	// Préparer la map des stats normalisées -> original
 	const normalizedStats = normalizedMap(statsToFind);
 
 	for (const token of tokens) {
-		const match = findBestStatMatch<string>(token, normalizedStats);
+		const match = findBestStatMatch<string>(token, normalizedStats, MIN_THRESHOLD_MATCH);
 		if (match) foundStats.push(match.capitalize());
 	}
 

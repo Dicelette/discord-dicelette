@@ -5,7 +5,7 @@ import {
 	isNumber,
 	type SortOrder,
 } from "@dicelette/core";
-import type { CustomCriticalRoll, Translation } from "@dicelette/types";
+import {CustomCriticalRoll, MIN_THRESHOLD_MATCH, Translation} from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -54,7 +54,7 @@ export function parseOpposition(
 	dollarValue?: string,
 	sort?: SortOrder
 ): ComparedValue | undefined {
-	const replaced = generateStatsDice(opposition, userStatistique, dollarValue);
+	const replaced = generateStatsDice(opposition, userStatistique, MIN_THRESHOLD_MATCH, dollarValue);
 	const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
 	const match = signRegex.exec(replaced);
 	const comparator = match?.groups?.comparator || replaced;
@@ -112,7 +112,7 @@ export function rollCustomCritical(
 	if (!custom) return undefined;
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
-		value.value = generateStatsDice(value.value, statistics, statValue?.toString());
+		value.value = generateStatsDice(value.value, statistics, MIN_THRESHOLD_MATCH, statValue?.toString());
 		if (value.value.includes("$")) continue;
 		customCritical[name] = rollOneCustomCritical(value, sort);
 	}
@@ -142,7 +142,7 @@ export function skillCustomCritical(
 		if (!value.affectSkill) continue;
 		if (!dollarsValue && !value.value.includes("$")) customCriticalFiltered[name] = value;
 		else if (dollarsValue && value.value.includes("$")) {
-			value.value = generateStatsDice(value.value, statistics, dollarsValue.toString());
+			value.value = generateStatsDice(value.value, statistics, MIN_THRESHOLD_MATCH, dollarsValue.toString());
 			customCriticalFiltered[name] = rollOneCustomCritical(value, sort);
 		}
 	}

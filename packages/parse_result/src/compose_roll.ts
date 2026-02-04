@@ -1,6 +1,7 @@
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
 import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
+import {MIN_THRESHOLD_MATCH} from "@dicelette/types";
 
 /**
  * Extract a comparator token (e.g. ">=12" or "<=5") from a dice string.
@@ -58,7 +59,7 @@ export function composeRollBase(
 } {
 	let working = dice.replace(DETECT_CRITICAL, "").trim();
 	working = getThreshold(working, threshold);
-	working = generateStatsDice(working, stats, statTotal?.toString());
+	working = generateStatsDice(working, stats, MIN_THRESHOLD_MATCH, statTotal?.toString());
 	const { dice: noComparator, comparator: rawComparator } = extractComparator(
 		working,
 		comparatorPattern
@@ -66,6 +67,7 @@ export function composeRollBase(
 	const comparatorEvaluated = generateStatsDice(
 		rawComparator,
 		stats,
+		MIN_THRESHOLD_MATCH,
 		statTotal?.toString()
 	);
 	const roll = `${trimAll(noComparator)}${dollarValue}${comparatorEvaluated} ${comments}`;

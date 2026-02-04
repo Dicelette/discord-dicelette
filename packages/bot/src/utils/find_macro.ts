@@ -1,7 +1,9 @@
 import type { EClient } from "@dicelette/client";
-import { calculateSimilarity, logger, MIN_THRESHOLD_MATCH } from "@dicelette/utils";
+import { calculateSimilarity } from "@dicelette/core";
+import {logger } from "@dicelette/utils";
 import { getUserFromInteraction } from "database";
 import type * as Djs from "discord.js";
+import {MIN_THRESHOLD_MATCH} from "@dicelette/types";
 
 /**
  * Get damage dice for a specific user and macro name

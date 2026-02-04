@@ -2,7 +2,7 @@
 
 import type { SortOrder } from "@dicelette/core";
 import { generateStatsDice, isNumber } from "@dicelette/core";
-import type { Translation } from "@dicelette/types";
+import { MIN_THRESHOLD_MATCH, type Translation } from "@dicelette/types";
 import { DICE_COMPILED_PATTERNS, logger, REMOVER_PATTERN } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
@@ -41,7 +41,7 @@ export function convertExpression(
 		if (res < 0) return `${res}`;
 		return "";
 	}
-	dice = generateStatsDice(dice, statistics, dollarValue);
+	dice = generateStatsDice(dice, statistics, MIN_THRESHOLD_MATCH, dollarValue);
 	try {
 		const evaluated = evaluate(dice);
 		if (typeof evaluated === "number")
@@ -97,7 +97,7 @@ export function convertNameToValue(
 	const { formula } = match.groups || {};
 	if (!formula) return undefined;
 
-	const result = generateStatsDice(formula, statistics);
+	const result = generateStatsDice(formula, statistics, MIN_THRESHOLD_MATCH);
 	const isRoll = getRoll(result);
 	if (isRoll?.total)
 		return {

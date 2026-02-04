@@ -8,7 +8,7 @@ import {
 import type { EClient } from "@dicelette/client";
 import { generateStatsDice } from "@dicelette/core";
 import { findln, t } from "@dicelette/localization";
-import type { CharacterData } from "@dicelette/types";
+import { type CharacterData, MIN_THRESHOLD_MATCH } from "@dicelette/types";
 import { sentry } from "@dicelette/utils";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
@@ -187,7 +187,11 @@ function generateDice(fields?: Djs.APIEmbedField[], statsFields?: Djs.APIEmbedFi
 		{} as Record<string, number>
 	);
 	for (const field of fields) {
-		const dice = generateStatsDice(field.value.standardize() as string, stats);
+		const dice = generateStatsDice(
+			field.value.standardize() as string,
+			stats,
+			MIN_THRESHOLD_MATCH
+		);
 		if (dice) field.value = `\`${dice}\``;
 	}
 	return fields;

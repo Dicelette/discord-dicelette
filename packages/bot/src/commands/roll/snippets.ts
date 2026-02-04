@@ -4,7 +4,7 @@ import {
 	macroOptions,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
+import { DETECT_CRITICAL, findBestRecord, generateStatsDice } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
 	composeRollBase,
@@ -14,12 +14,8 @@ import {
 	parseOpposition,
 	skillCustomCritical,
 } from "@dicelette/parse_result";
-import type { RollOptions } from "@dicelette/types";
-import {
-	CHARACTER_DETECTION,
-	DICE_COMPILED_PATTERNS,
-	findBestSnippets,
-} from "@dicelette/utils";
+import {MIN_THRESHOLD_MATCH, RollOptions} from "@dicelette/types";
+import { CHARACTER_DETECTION, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
 
@@ -53,7 +49,7 @@ export default {
 		const userComments = interaction.options.getString(t("common.comments")) ?? undefined;
 		let dice = snippets[macroName];
 		if (!dice) {
-			const bestMatch = findBestSnippets(snippets, macroName);
+			const bestMatch = findBestRecord(snippets, macroName, MIN_THRESHOLD_MATCH);
 			if (bestMatch) dice = snippets[bestMatch];
 		}
 		if (!dice) {
@@ -80,8 +76,8 @@ export default {
 			if (hashIndex !== -1) {
 				const before = dice.slice(0, hashIndex).trimEnd();
 				const after = dice.slice(hashIndex);
-				dice = `${generateStatsDice(before, attributes)} ${after}`.trim();
-			} else dice = generateStatsDice(dice, attributes);
+				dice = `${generateStatsDice(before, attributes, MIN_THRESHOLD_MATCH)} ${after}`.trim();
+			} else dice = generateStatsDice(dice, attributes, MIN_THRESHOLD_MATCH);
 
 			const rCCShared = getCriticalFromDice(dice, ul);
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
@@ -109,7 +105,7 @@ export default {
 			dice,
 			userComments
 		);
-		let processedDice = generateStatsDice(diceWithoutComments, attributes);
+		let processedDice = generateStatsDice(diceWithoutComments, attributes, MIN_THRESHOLD_MATCH);
 		const rCC = getCriticalFromDice(processedDice, ul);
 
 		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);
