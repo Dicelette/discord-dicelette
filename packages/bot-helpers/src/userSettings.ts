@@ -87,7 +87,6 @@ export async function chunkErrorMessage(
 	for (const chunk of chunkedLines.slice(1)) {
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
-		return;
 	}
 }
 
