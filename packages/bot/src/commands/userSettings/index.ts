@@ -5,7 +5,6 @@ import {
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import * as attributes from "./attributes";
 import {
@@ -22,12 +21,7 @@ async function autoComplete(
 	type: "attributes" | "snippets" = "snippets"
 ) {
 	const choices = getSettingsAutoComplete(interaction, client, type);
-	await interaction.respond(
-		choices.slice(0, 25).map((choice) => ({
-			name: capitalizeBetweenPunct(choice.capitalize()),
-			value: choice,
-		}))
-	);
+	await interaction.respond(choices);
 }
 
 export const userSettings = {

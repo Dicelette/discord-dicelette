@@ -2,6 +2,7 @@ import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { Snippets, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
+import { capitalizeBetweenPunct } from "packages/utils";
 
 export async function chunkMessage(
 	entries: [string, string | number][],
@@ -288,5 +289,7 @@ export function getSettingsAutoComplete(
 		const input = options.getString("name")?.standardize() ?? "";
 		choices = Object.keys(macros).filter((macroName) => macroName.subText(input));
 	}
-	return choices;
+	return choices
+		.slice(0, 25)
+		.map((choice) => ({ name: capitalizeBetweenPunct(choice), value: choice }));
 }

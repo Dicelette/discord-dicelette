@@ -18,7 +18,6 @@ import type { RollOptions, Snippets } from "@dicelette/types";
 import {
 	CHARACTER_DETECTION,
 	calculateSimilarity,
-	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
@@ -27,12 +26,7 @@ import { rollWithInteraction } from "utils";
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const choices = getSettingsAutoComplete(interaction, client, "snippets");
-		await interaction.respond(
-			choices.slice(0, 25).map((choice) => ({
-				name: capitalizeBetweenPunct(choice.capitalize()),
-				value: choice,
-			}))
-		);
+		await interaction.respond(choices);
 	},
 	data: (macroOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("common.snippets")
