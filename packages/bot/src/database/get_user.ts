@@ -32,6 +32,7 @@ import {
 } from "@dicelette/utils";
 import {
 	getCharaInMemory,
+	getTemplate,
 	getTemplateByInteraction,
 	mergeAttribute,
 	updateMemory,
@@ -313,13 +314,15 @@ async function getUserFrom(
 			options.fetchChannel,
 			options.cleanUrl
 		);
+		if (!userData) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 		await updateMemory(characters, guildId, userId, ul, {
 			userData,
 		});
-		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
+		if (options.fetchMessage) userData.messageId = targetMessage.id;
 
 		if (options?.attributes)
-			userData!.stats = mergeAttribute(client, userData, guildId, userId);
+			userData.stats = mergeAttribute(client, userData, guildId, userId);
+		
 
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
