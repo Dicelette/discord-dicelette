@@ -30,7 +30,8 @@ export async function getTemplateByInteraction(
 	const guild = interaction.guild;
 	const ul = ln(interaction.locale);
 	const hasCache = client.template.get(guild.id);
-	if (!hasCache) return await getTemplate(guild, client.settings, ul, skipNoFound);
+	if (!hasCache)
+		return await getTemplate(guild, client.settings, ul, client, skipNoFound);
 	return hasCache;
 }
 
@@ -42,7 +43,9 @@ export async function getTemplateByInteraction(
  * @param guild - The Discord guild to retrieve the template for.
  * @param enmap - The settings storage containing template configuration.
  * @param ul - Localization function for error messages.
+ * @param client
  * @param skipNoFound - Optional flag to skip the error if the template is not found. Only used when the bot initializes.
+ * @param updateCache
  * @returns The validated statistical template, or undefined if the channel is not a text channel.
  *
  * @throws {Error} If the guild data or template ID is missing in settings.
@@ -52,7 +55,9 @@ export async function getTemplate(
 	guild: Djs.Guild,
 	enmap: Settings,
 	ul: Translation,
-	skipNoFound = false
+	client: EClient,
+	skipNoFound = false,
+	updateCache = true
 ) {
 	const botErrorOptions: BotErrorOptions = {
 		cause: "TEMPLATE",
@@ -76,7 +81,11 @@ export async function getTemplate(
 	try {
 		if (!channel.messages && skipNoFound) return undefined;
 		const message = await channel.messages.fetch(messageId);
-		return fetchTemplate(message, enmap);
+		const template = await fetchTemplate(message, enmap);
+		if (template && updateCache) {
+			client.template.set(guild.id, template);
+			return template;
+		}
 	} catch (error) {
 		if (skipNoFound) return undefined;
 		logger.warn(error);
