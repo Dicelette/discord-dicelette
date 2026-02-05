@@ -1,8 +1,8 @@
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { Snippets, Translation } from "@dicelette/types";
+import { capitalizeBetweenPunct } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { capitalizeBetweenPunct } from "packages/utils";
 
 export async function chunkMessage(
 	entries: [string, string | number][],
