@@ -393,7 +393,7 @@ export async function getCritical(
 	if (guild)
 		serverData =
 			client.template.get(guild.id) ??
-			(await getTemplate(guild, client.settings, ul, true));
+			(await getTemplate(guild, client.settings, ul, client, true));
 	if (
 		serverData?.customCritical &&
 		includeDiceType(dice, serverData.diceType, !!userData?.stats)

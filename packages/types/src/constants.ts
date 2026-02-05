@@ -4,6 +4,8 @@ import process from "node:process";
 import type { Translation } from "..";
 import type { TemplateResult } from "./database";
 
+export const MIN_THRESHOLD_MATCH = 0.5;
+
 export const TUTORIAL_IMAGES = [
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_1.png?raw=true",
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_2.png?raw=true",

@@ -65,6 +65,11 @@ export async function interactionError(
 ) {
 	console.error(e);
 	sentry.error(e);
+	if (
+		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
+		(interaction.replied || interaction.deferred)
+	)
+		return;
 	if (!interaction.guild) return;
 	const msgError = lError(e as Error, interaction, langToUse);
 	if (msgError.length === 0) return;
@@ -75,6 +80,7 @@ export async function interactionError(
 			embeds: [embed],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
+
 	if (client.settings.has(interaction.guild.id)) {
 		const db = client.settings.get(interaction.guild.id, "logs");
 		if (!db) return;

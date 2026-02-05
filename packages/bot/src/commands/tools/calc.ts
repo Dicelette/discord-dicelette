@@ -3,14 +3,18 @@ import type { EClient } from "@dicelette/client";
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
-import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
-import { logger, profiler } from "@dicelette/utils";
+import {
+	EMOJI_MATH,
+	MIN_THRESHOLD_MATCH,
+	type Translation,
+	type UserData,
+} from "@dicelette/types";
+import { capitalizeBetweenPunct, logger, profiler } from "@dicelette/utils";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
 import "discord_ext";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export async function autocompleteCalc(
 	interaction: Djs.AutocompleteInteraction,
@@ -179,6 +183,7 @@ export async function calculate(
 		let formulaWithStats = generateStatsDice(
 			formula,
 			userStatistique.stats,
+			MIN_THRESHOLD_MATCH,
 			`${statInfo.value}`
 		);
 		const isRoll = getRoll(formulaWithStats, undefined, sortResult);
@@ -192,6 +197,13 @@ export async function calculate(
 		if (isNumber(formulaWithStats))
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
+		if (interaction.guild) {
+			const expansion = client.userSettings.get(
+				interaction.guild.id,
+				interaction.user.id
+			)?.attributes;
+			if (expansion) formula = generateStatsDice(formula, expansion, MIN_THRESHOLD_MATCH);
+		}
 		const isRoll = getRoll(formula, undefined, sortResult);
 		if (isRoll?.total != null) {
 			originalFormula = isRoll.result;

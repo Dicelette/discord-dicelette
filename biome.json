@@ -3,8 +3,7 @@
 	"assist": {
 		"actions": {
 			"source": {
-				"organizeImports": "on",
-				"useSortedKeys": "on"
+				"organizeImports": "on"
 			}
 		}
 	},
@@ -13,7 +12,7 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"formatWithErrors": true,
+		"formatWithErrors": false,
 		"includes": ["**", "!**/node_modules/**"],
 		"indentStyle": "tab",
 		"indentWidth": 2,
@@ -33,9 +32,6 @@
 		}
 	},
 	"linter": {
-		"domains": {
-			"project": "recommended"
-		},
 		"rules": {
 			"complexity": {
 				"noAdjacentSpacesInRegex": "error",
@@ -84,10 +80,8 @@
 				"useAsConstAssertion": "error",
 				"useConst": "error",
 				"useDefaultParameterLast": "error",
-
 				"useEnumInitializers": "error",
 				"useExponentiationOperator": "error",
-
 				"useExportType": "error",
 				"useFilenamingConvention": "error",
 				"useImportType": "error",
@@ -114,33 +108,6 @@
 				"useShorthandFunctionType": "error",
 				"useSingleVarDeclarator": "error",
 				"useTemplate": "warn"
-			},
-			"suspicious": {
-				"noAssignInExpressions": "off",
-				"noAsyncPromiseExecutor": "error",
-				"noCatchAssign": "error",
-				"noClassAssign": "error",
-				"noCompareNegZero": "error",
-				"noControlCharactersInRegex": "error",
-				"noDebugger": "error",
-				"noDuplicateCase": "error",
-				"noDuplicateClassMembers": "error",
-				"noDuplicateObjectKeys": "error",
-				"noDuplicateParameters": "error",
-				"noEmptyBlockStatements": "error",
-				"noFallthroughSwitchClause": "error",
-				"noFunctionAssign": "error",
-				"noGlobalAssign": "error",
-				"noImportAssign": "error",
-				"noMisleadingCharacterClass": "error",
-				"noPrototypeBuiltins": "error",
-				"noRedeclare": "error",
-				"noShadowRestrictedNames": "error",
-				"noUnsafeNegation": "error",
-				"noVar": "error",
-				"noWith": "error",
-				"useGetterReturn": "error",
-				"noExtraNonNullAssertion": "off"
 			}
 		}
 	},
@@ -176,16 +143,6 @@
 				"!**/node_modules/**"
 			],
 			"assist": { "actions": { "source": { "useSortedKeys": "off" } } }
-		},
-		{
-			"includes": ["biome.json", "**/package.json", "!**/node_modules/**"],
-			"assist": {
-				"actions": {
-					"source": {
-						"useSortedKeys": "off"
-					}
-				}
-			}
 		}
 	]
 }

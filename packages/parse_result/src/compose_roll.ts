@@ -1,4 +1,5 @@
 import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
+import { MIN_THRESHOLD_MATCH } from "@dicelette/types";
 import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
 
@@ -48,7 +49,7 @@ export function composeRollBase(
 	comparatorPattern: RegExp,
 	stats: Record<string, number> | undefined,
 	statTotal: string | number | undefined,
-	expressionStr: string,
+	dollarValue: string,
 	comments: string
 ): {
 	diceWithoutComparator: string;
@@ -58,7 +59,7 @@ export function composeRollBase(
 } {
 	let working = dice.replace(DETECT_CRITICAL, "").trim();
 	working = getThreshold(working, threshold);
-	working = generateStatsDice(working, stats, statTotal?.toString());
+	working = generateStatsDice(working, stats, MIN_THRESHOLD_MATCH, statTotal?.toString());
 	const { dice: noComparator, comparator: rawComparator } = extractComparator(
 		working,
 		comparatorPattern
@@ -66,9 +67,10 @@ export function composeRollBase(
 	const comparatorEvaluated = generateStatsDice(
 		rawComparator,
 		stats,
+		MIN_THRESHOLD_MATCH,
 		statTotal?.toString()
 	);
-	const roll = `${trimAll(noComparator)}${expressionStr}${comparatorEvaluated} ${comments}`;
+	const roll = `${trimAll(noComparator)}${dollarValue}${comparatorEvaluated} ${comments}`;
 	return {
 		comparatorEvaluated,
 		diceWithoutComparator: noComparator,

@@ -2,20 +2,9 @@ import { reuploadAvatar } from "@dicelette/bot-helpers";
 import type { CustomCritical } from "@dicelette/core";
 import { findln } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
-import {
-	BotErrorLevel,
-	type BotErrorOptions,
-	cleanAvatarUrl,
-	NoEmbed,
-	QUERY_URL_PATTERNS,
-} from "@dicelette/utils";
+import { cleanAvatarUrl, NoEmbed, QUERY_URL_PATTERNS } from "@dicelette/utils";
 import type { Embed, EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
-
-const botErrorOptions: BotErrorOptions = {
-	cause: "EMBEDS",
-	level: BotErrorLevel.Warning,
-};
 
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];

@@ -1028,6 +1028,42 @@
 		"name": "modifier"
 	},
 	"userSettings": {
+		"attributes": {
+			"create": {
+				"description": "Créer un nouvel attribut",
+				"name": "Nom de l'attribut",
+				"success": "L'attribut {{- name}} a été créé avec succès.",
+				"value": {
+					"description": "Nombre qui sera utilisé",
+					"title": "valeur"
+				}
+			},
+			"delete": {
+				"description": "Supprimer un attribut",
+				"name": "Nom de l'attribut à supprimer",
+				"notFound": "L'attribut {{- name}} n'a pas été trouvé.",
+				"success": "{{- name}} a été supprimé."
+			},
+			"description": "Enregistrer des attributs qui seront remplacés par leur valeur lors des jets de dés.",
+			"export": {
+				"description": "Exporter les attributs sauvegardés dans un fichier JSON.",
+				"empty": "Il n'y a pas d'attributs sauvegardés.",
+				"success": "Les attributs ont été exportés avec succès. Vous pouvez les importer à l'aide de la commande `/user_config attributs import`."
+			},
+			"import": {
+				"containsHyphen": "Le nom ne doit pas inclure de tiret",
+				"description": "Importer un fichier JSON contenant des attributs.",
+				"partialErrors_one": "L'attribut suivant est invalide :",
+				"partialErrors_other": "Les attributs suivants sont invalides :",
+				"success_one": "L'attribut {{- name}} a été importé avec succès.",
+				"success_other": "{{- count}} attributs ont été importés avec succès :"
+			},
+			"list": {
+				"description": "Afficher tous les attributs enregistrés.",
+				"empty": "Il n'y a pas de données sauvegardées."
+			},
+			"title": "attributs"
+		},
 		"createLink": {
 			"character": "Nom du personnage dans le jet (si utilisé)",
 			"description": "Ajuste le format du lien créé par le menu \"créer un lien\"",

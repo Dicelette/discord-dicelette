@@ -1028,6 +1028,42 @@
 		"name": "update"
 	},
 	"userSettings": {
+		"attributes": {
+			"create": {
+				"description": "Create a new attribute",
+				"name": "Attribute's name",
+				"success": "The {{- name}} attribute has been created successfully.",
+				"value": {
+					"description": "Number that will be used",
+					"title": "value"
+				}
+			},
+			"delete": {
+				"description": "Delete an attribute",
+				"name": "Attribute name to delete",
+				"notFound": "The {{- name}} attribute was not found.",
+				"success": "{{- name}} has been deleted."
+			},
+			"description": "Register attributes that will be replaced by their values when dice are rolled.",
+			"export": {
+				"description": "Export attributes saved in a JSON file.",
+				"empty": "There are no attributes data.",
+				"success": "Attributes have been exported successfully. You can import them with `/user_config attributes import`. "
+			},
+			"import": {
+				"containsHyphen": "Name can't include hyphen",
+				"description": "Import a JSON file with attributes data.",
+				"partialErrors_one": "Following attribute is invalid:",
+				"partialErrors_other": "Following attributes are invalid:",
+				"success_one": "The {{- name}} attribute has been imported successfully.",
+				"success_other": "{{- count}} attributes have been imported successfully:"
+			},
+			"list": {
+				"description": "Display all registered attributes.",
+				"empty": "There is no saved data."
+			},
+			"title": "attributes"
+		},
 		"createLink": {
 			"character": "Character's name if found",
 			"description": "Adjusts the format of the link created by the “create link” menu.",

@@ -78,7 +78,7 @@ export default (client: EClient): void => {
 
 					if (enabled) {
 						for (const cmd of serializedDbCmds) {
-							console.log("Enabling command:", cmd.name);
+							logger.trace("Enabling command:", cmd.name);
 							cmd.default_member_permissions = undefined;
 						}
 					} else {
@@ -184,7 +184,7 @@ function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
 	const lang = client.settings.get(guild.id, "lang") ?? Djs.Locale.EnglishUS;
 	const ul = ln(lang);
-	const template = await getTemplate(guild, client.settings, ul, true);
+	const template = await getTemplate(guild, client.settings, ul, client, true, false);
 	if (template) client.template.set(guild.id, template);
 }
 /**

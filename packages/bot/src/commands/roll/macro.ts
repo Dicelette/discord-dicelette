@@ -3,12 +3,11 @@ import {
 	macroOptions,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { t } from "@dicelette/localization";
-import { logger, sentry, uniformizeRecords } from "@dicelette/utils";
-import { getFirstChar, getTemplateByInteraction, getUserFromInteraction } from "database";
+import { logger, sentry } from "@dicelette/utils";
+import { getMacro } from "database";
 import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
-import { buildDamageAutocompleteChoices, isSerializedNameEquals, rollMacro } from "utils";
+import { buildDamageAutocompleteChoices, rollMacro } from "utils";
 
 import "discord_ext";
 
@@ -29,7 +28,6 @@ export default {
 		.setDescriptions("rAtq.description")
 		.setDefaultMemberPermissions(0),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
-		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const db = client.settings.get(interaction.guild!.id);
 		if (!db || !interaction.guild || !interaction.channel) return;
 		const user = client.settings.get(interaction.guild.id, `user.${interaction.user.id}`);
@@ -38,70 +36,20 @@ export default {
 			await replyEphemeralError(interaction, ul("error.user.data"), ul);
 			return;
 		}
-		let charOptions = options.getString(t("common.character")) ?? undefined;
-		const charName = charOptions?.normalize();
-		try {
-			let userStatistique = (
-				await getUserFromInteraction(client, interaction.user.id, interaction, charName, {
-					skipNotFound: true,
-				})
-			)?.userData;
-			const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
-			if (charOptions && !selectedCharByQueries) {
-				const text = ul("error.user.charName", { charName: charOptions.capitalize() });
-				await replyEphemeralError(interaction, text, ul);
-				return;
-			}
-			charOptions = userStatistique?.userName ? userStatistique.userName : undefined;
-			if (!userStatistique && !charName) {
-				const char = await getFirstChar(client, interaction, ul, true);
-				userStatistique = char?.userStatistique?.userData;
-				charOptions = char?.optionChar ?? undefined;
-			}
-			if (!db.templateID?.damageName) {
-				if (!userStatistique) {
-					await replyEphemeralError(interaction, ul("error.user.youRegistered"), ul);
-					return;
-				}
-				if (!userStatistique.damage) {
-					await replyEphemeralError(interaction, ul("error.damage.empty"), ul);
-					return;
-				}
-			} else if (!userStatistique || !userStatistique.damage) {
-				//allow global damage with constructing a new userStatistique with only the damageName and their value
-				//get the damageName from the global template
-				const template = await getTemplateByInteraction(interaction, client);
-				if (!template) {
-					const text = ul("error.template.notFound", {
-						guildId: interaction.guild.name,
-					});
-					await replyEphemeralError(interaction, text, ul);
-					return;
-				}
-				const damage = template.damage
-					? (uniformizeRecords(template.damage) as Record<string, string>)
-					: undefined;
-				logger.trace("The template use:", damage);
 
-				//create the userStatistique with the value got from the template & the commands
-				userStatistique = {
-					damage,
-					isFromTemplate: true,
-					template: {
-						critical: template.critical,
-						customCritical: template.customCritical,
-						diceType: template.diceType,
-					},
-					userName: charName,
-				};
-			}
+		try {
+			// Use centralized helper to fetch user statistics and related context
+			const stats = await getMacro(client, ul, interaction, true);
+			if (!stats) return;
+			const { optionChar, userStatistique } = stats;
+			// Note: getMacro already merged any user settings expansions into userStatistique.stats
 			return await rollMacro(
 				interaction,
 				client,
 				userStatistique,
-				options,
+				interaction.options as Djs.CommandInteractionOptionResolver,
 				ul,
-				charOptions
+				optionChar
 			);
 		} catch (e) {
 			logger.fatal(e);

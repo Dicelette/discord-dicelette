@@ -245,5 +245,6 @@ export type UserSettings = Record<string, UserSettingsData>;
 
 export type UserSettingsData = {
 	createLinkTemplate: TemplateResult;
-	snippets: Snippets;
+	snippets?: Snippets;
+	attributes?: Record<string, number>;
 };

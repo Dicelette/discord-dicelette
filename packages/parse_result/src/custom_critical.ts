@@ -5,7 +5,11 @@ import {
 	isNumber,
 	type SortOrder,
 } from "@dicelette/core";
-import type { CustomCriticalRoll, Translation } from "@dicelette/types";
+import {
+	type CustomCriticalRoll,
+	MIN_THRESHOLD_MATCH,
+	type Translation,
+} from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,
@@ -51,31 +55,40 @@ export function parseOpposition(
 	opposition: string,
 	diceComparator: string,
 	userStatistique?: Record<string, number>,
-	userStatStr?: string,
+	dollarValue?: string,
 	sort?: SortOrder
 ): ComparedValue | undefined {
-	const replaced = generateStatsDice(opposition, userStatistique, userStatStr);
+	const replaced = generateStatsDice(
+		opposition,
+		userStatistique,
+		MIN_THRESHOLD_MATCH,
+		dollarValue
+	);
 	const signRegex = /(?<sign>[><=!]+)(?<comparator>(.+))/;
 	const match = signRegex.exec(replaced);
 	const comparator = match?.groups?.comparator || replaced;
 	const comp = signRegex.exec(diceComparator);
 	let sign = match?.groups?.sign || comp?.groups?.sign;
 	if (!sign || !comparator) return;
-	const rolledValue = getRoll(comparator, undefined, sort);
-	if (sign === "=") sign = "==";
-	if (rolledValue?.total) {
+	try {
+		const rolledValue = getRoll(comparator, undefined, sort);
+		if (sign === "=") sign = "==";
+		if (rolledValue?.total) {
+			return {
+				originalDice: rolledValue.dice,
+				rollValue: rolledValue.result,
+				sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
+				value: rolledValue.total,
+			};
+		}
+		if (!isNumber(comparator)) return undefined;
 		return {
-			originalDice: rolledValue.dice,
-			rollValue: rolledValue.result,
 			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
-			value: rolledValue.total,
+			value: Number(comparator),
 		};
+	} catch {
+		return undefined;
 	}
-	if (!isNumber(comparator)) return undefined;
-	return {
-		sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
-		value: Number(comparator),
-	};
 }
 
 function rollOneCustomCritical(critical: CustomCritical, sort?: SortOrder) {
@@ -108,7 +121,12 @@ export function rollCustomCritical(
 	if (!custom) return undefined;
 	const customCritical: Record<string, CustomCriticalRoll> = {};
 	for (const [name, value] of Object.entries(custom)) {
-		value.value = generateStatsDice(value.value, statistics, statValue?.toString());
+		value.value = generateStatsDice(
+			value.value,
+			statistics,
+			MIN_THRESHOLD_MATCH,
+			statValue?.toString()
+		);
 		if (value.value.includes("$")) continue;
 		customCritical[name] = rollOneCustomCritical(value, sort);
 	}
@@ -123,6 +141,7 @@ export function rollCustomCritical(
  * @param customCritical - The set of custom critical conditions to filter and process.
  * @param statistics - Optional statistics used for dice expression generation.
  * @param dollarsValue - Optional value used to substitute into dice expressions containing a dollar sign.
+ * @param sort
  * @returns A record of processed custom criticals affecting skills, or `undefined` if none match.
  */
 export function skillCustomCritical(
@@ -137,7 +156,12 @@ export function skillCustomCritical(
 		if (!value.affectSkill) continue;
 		if (!dollarsValue && !value.value.includes("$")) customCriticalFiltered[name] = value;
 		else if (dollarsValue && value.value.includes("$")) {
-			value.value = generateStatsDice(value.value, statistics, dollarsValue.toString());
+			value.value = generateStatsDice(
+				value.value,
+				statistics,
+				MIN_THRESHOLD_MATCH,
+				dollarsValue.toString()
+			);
 			customCriticalFiltered[name] = rollOneCustomCritical(value, sort);
 		}
 	}

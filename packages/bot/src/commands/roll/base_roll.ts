@@ -83,6 +83,7 @@ export async function baseRoll(
 
 	const data = interaction.guild
 		? await getUserFromInteraction(client, user.id, interaction, firstChara, {
+				attributes: true,
 				skipNotFound: true,
 			})
 		: undefined;

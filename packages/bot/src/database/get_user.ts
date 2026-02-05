@@ -5,6 +5,7 @@ import {
 	haveAccess,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import type { StatisticalTemplate } from "@dicelette/core";
 import { findln, ln, t } from "@dicelette/localization";
 import {
 	parseDamageFields,
@@ -27,13 +28,32 @@ import {
 	type BotErrorOptions,
 	cleanAvatarUrl,
 	logger,
+	uniformizeRecords,
 } from "@dicelette/utils";
-import { getCharaInMemory, getTemplateByInteraction, updateMemory } from "database";
+import {
+	getCharaInMemory,
+	getTemplate,
+	getTemplateByInteraction,
+	mergeAttribute,
+	updateMemory,
+} from "database";
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
-import { embedError, ensureEmbed, getEmbeds, reply } from "messages";
+import { embedError, ensureEmbed, getEmbeds, reply, replyEphemeralError } from "messages";
 import { isSerializedNameEquals, searchUserChannel } from "utils";
+
+type GetOptions = {
+	integrateCombinaison: boolean;
+	allowAccess: boolean;
+	skipNotFound: boolean;
+	fetchAvatar: boolean;
+	fetchChannel: boolean;
+	fetchMessage: boolean;
+	guildId: string;
+	cleanUrl: boolean;
+	attributes: boolean;
+};
 
 export function getUserByEmbed(
 	data: { message?: Message; embeds?: EmbedBuilder[] },
@@ -180,16 +200,7 @@ async function getUserFrom(
 	context:
 		| { type: "interaction"; interaction: Djs.BaseInteraction }
 		| { type: "message"; message: Djs.Message },
-	options?: {
-		integrateCombinaison?: boolean;
-		allowAccess?: boolean;
-		skipNotFound?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		fetchMessage?: boolean;
-		guildId?: string;
-		cleanUrl?: boolean;
-	}
+	options?: Partial<GetOptions>
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	const botErrorOptions: BotErrorOptions = {
 		cause: "USER_FETCH",
@@ -209,8 +220,12 @@ async function getUserFrom(
 		!options?.fetchAvatar &&
 		!options?.fetchChannel &&
 		!options?.fetchMessage
-	)
+	) {
+		if (options?.attributes) {
+			getChara.stats = mergeAttribute(client, getChara, guildId, userId);
+		}
 		return { charName: charName?.capitalize(), userData: getChara };
+	}
 
 	if (!options)
 		options = {
@@ -299,10 +314,15 @@ async function getUserFrom(
 			options.fetchChannel,
 			options.cleanUrl
 		);
+		if (!userData) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 		await updateMemory(characters, guildId, userId, ul, {
 			userData,
 		});
-		if (options.fetchMessage) userData!.messageId = targetMessage!.id;
+		if (options.fetchMessage) userData.messageId = targetMessage.id;
+
+		if (options?.attributes)
+			userData.stats = mergeAttribute(client, userData, guildId, userId);
+		
 
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
@@ -332,15 +352,7 @@ export async function getUserFromMessage(
 	userId: string,
 	message: Djs.Message,
 	charName?: string | null,
-	options?: {
-		integrateCombinaison?: boolean;
-		allowAccess?: boolean;
-		skipNotFound?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		fetchMessage?: boolean;
-		guildId?: string;
-	}
+	options?: Partial<GetOptions>
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	return getUserFrom(client, userId, charName, { message, type: "message" }, options);
 }
@@ -364,16 +376,7 @@ export async function getUserFromInteraction(
 	userId: string,
 	interaction: Djs.BaseInteraction,
 	charName?: string | null,
-	options?: {
-		integrateCombinaison?: boolean;
-		allowAccess?: boolean;
-		skipNotFound?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		fetchMessage?: boolean;
-		guildId?: string;
-		cleanUrl?: boolean;
-	}
+	options?: Partial<GetOptions>
 ): Promise<{ userData?: UserData; charName?: string } | undefined> {
 	return getUserFrom(
 		client,
@@ -534,6 +537,75 @@ export async function getUserNameAndChar(
 	return { thread: interaction.channel, userID, userName };
 }
 
+export async function getMacro(
+	client: EClient,
+	ul: Translation,
+	interaction: Djs.ChatInputCommandInteraction,
+	skipNotFound?: boolean,
+	user?: Djs.User
+) {
+	const db = client.settings.get(interaction.guild!.id);
+	if (!db || !interaction.guild || !interaction.channel) return;
+	let charOptions = interaction.options.getString(t("common.character")) ?? undefined;
+	const charName = charOptions?.normalize();
+	if (!user) user = interaction.user;
+	let userStatistique = (
+		await getUserFromInteraction(client, user.id, interaction, charName, {
+			skipNotFound,
+		})
+	)?.userData;
+	const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
+	if (charOptions && !selectedCharByQueries) {
+		const text = ul("error.user.charName", { charName: charOptions.capitalize() });
+		await replyEphemeralError(interaction, text, ul);
+		return;
+	}
+	charOptions = userStatistique?.userName ?? undefined;
+	if (!userStatistique && !charName) {
+		const char = await getFirstChar(client, interaction, ul, true);
+		userStatistique = char?.userStatistique?.userData;
+		charOptions = char?.optionChar ?? undefined;
+	}
+	if (!db.templateID?.damageName) {
+		if (!userStatistique) {
+			await replyEphemeralError(interaction, ul("error.user.youRegistered"), ul);
+			return;
+		}
+		if (!userStatistique.damage) {
+			await replyEphemeralError(interaction, ul("error.damage.empty"), ul);
+			return;
+		}
+	} else if (!userStatistique || !userStatistique.damage) {
+		//allow global damage with constructing a new userStatistique with only the damageName and their value
+		//get the damageName from the global template
+		const template = await getTemplateByInteraction(interaction, client);
+
+		const damage = template?.damage
+			? (uniformizeRecords(template.damage) as Record<string, string>)
+			: undefined;
+		logger.trace("The template use:", damage);
+
+		//create the userStatistique with the value got from the template & the commands
+		userStatistique = {
+			damage,
+			isFromTemplate: true,
+			template: {
+				critical: template?.critical,
+				customCritical: template?.customCritical,
+				diceType: template?.diceType,
+			},
+			userName: charName,
+		};
+	}
+	userStatistique.stats = mergeAttribute(
+		client,
+		userStatistique,
+		interaction.guild!.id,
+		user.id
+	);
+	return { optionChar: charOptions, userStatistique };
+}
+
 /**
  * Retrieves user statistics and related data for a command interaction.
  *
@@ -592,17 +664,30 @@ export async function getStatistics(
 		optionChar = char?.optionChar;
 	}
 
-	if (!needStats && !userStatistique && template) {
-		optionChar = originalOptionChar;
+	function generateMinimalTemplate(template: StatisticalTemplate) {
+		const tempDamage = template.damage
+			? (uniformizeRecords(template.damage) as Record<string, string>)
+			: undefined;
+		const optionChar = originalOptionChar;
 		//we can use the dice without an user i guess
-		userStatistique = {
-			damage: template?.damage,
-			template: {
-				critical: template?.critical,
-				customCritical: template?.customCritical,
-				diceType: template?.diceType,
+		return {
+			res: {
+				damage: tempDamage,
+				isFromTemplate: true,
+				template: {
+					critical: template?.critical,
+					customCritical: template?.customCritical,
+					diceType: template?.diceType,
+				},
 			},
+			optionChar,
 		};
+	}
+
+	if (!needStats && !userStatistique && template) {
+		const minTemp = generateMinimalTemplate(template);
+		userStatistique = minTemp.res;
+		optionChar = minTemp.optionChar;
 	}
 	if (!userStatistique && !skipNotFound) {
 		await reply(interaction, {
@@ -629,6 +714,27 @@ export async function getStatistics(
 			userData: userStatistique,
 		});
 	}
+
+	if (!userStatistique) {
+		//at this point we can just use the default value from the template
+		if (template) {
+			const res = generateMinimalTemplate(template);
+			userStatistique = res.res;
+			optionChar = res.optionChar;
+		} else {
+			userStatistique = {
+				isFromTemplate: false,
+				stats: {},
+				template: {},
+			};
+		}
+	}
+	userStatistique.stats = mergeAttribute(
+		client,
+		userStatistique,
+		interaction.guild!.id,
+		targetUserId
+	);
 
 	return { optionChar, options, ul, userStatistique };
 }

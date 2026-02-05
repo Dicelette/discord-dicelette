@@ -9,7 +9,6 @@ export { default as dev } from "./src/dev";
 export * from "./src/humanizeDuration";
 export * from "./src/logger";
 export * from "./src/regex";
-export * from "./src/similarity";
 
 /**
  * Get the random engine using node's crypto module

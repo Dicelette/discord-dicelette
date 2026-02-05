@@ -1,9 +1,10 @@
 import {
 	getInteractionContext as getLangAndConfig,
+	getSettingsAutoComplete,
 	macroOptions,
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
-import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
+import { DETECT_CRITICAL, findBestRecord, generateStatsDice } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import {
 	composeRollBase,
@@ -13,42 +14,15 @@ import {
 	parseOpposition,
 	skillCustomCritical,
 } from "@dicelette/parse_result";
-import type { RollOptions, Snippets } from "@dicelette/types";
-import {
-	CHARACTER_DETECTION,
-	calculateSimilarity,
-	capitalizeBetweenPunct,
-	DICE_COMPILED_PATTERNS,
-} from "@dicelette/utils";
+import { MIN_THRESHOLD_MATCH, type RollOptions } from "@dicelette/types";
+import { CHARACTER_DETECTION, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";
 
-export function getSnippetAutocomplete(
-	interaction: Djs.AutocompleteInteraction,
-	client: EClient
-) {
-	const options = interaction.options as Djs.CommandInteractionOptionResolver;
-	const focused = options.getFocused(true);
-	const userId = interaction.user.id;
-	const guildId = interaction.guild!.id;
-	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
-	let choices: string[] = [];
-	if (focused.name === "name") {
-		const input = options.getString("name")?.standardize() ?? "";
-		choices = Object.keys(macros).filter((macroName) => macroName.subText(input));
-	}
-	return choices;
-}
-
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const choices = getSnippetAutocomplete(interaction, client);
-		await interaction.respond(
-			choices.slice(0, 25).map((choice) => ({
-				name: capitalizeBetweenPunct(choice.capitalize()),
-				value: choice,
-			}))
-		);
+		const choices = getSettingsAutoComplete(interaction, client, "snippets");
+		await interaction.respond(choices);
 	},
 	data: (macroOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("common.snippets")
@@ -60,7 +34,9 @@ export default {
 		const userId = interaction.user.id;
 		const guildId = interaction.guild!.id;
 		const macroName = interaction.options.getString(t("common.name"), true).standardize();
-		const snippets = client.userSettings.get(guildId, userId)?.snippets ?? {};
+		const userSettings = client.userSettings.get(guildId, userId);
+		const snippets = userSettings?.snippets ?? {};
+		const attributes = userSettings?.attributes;
 		const expressionOpt = interaction.options.getString(t("common.expression")) ?? "0";
 		const sortOrder = client.settings.get(guildId)?.sortOrder;
 		const threshold = interaction.options
@@ -73,7 +49,7 @@ export default {
 		const userComments = interaction.options.getString(t("common.comments")) ?? undefined;
 		let dice = snippets[macroName];
 		if (!dice) {
-			const bestMatch = findBestMatch(snippets, macroName);
+			const bestMatch = findBestRecord(snippets, macroName, MIN_THRESHOLD_MATCH);
 			if (bestMatch) dice = snippets[bestMatch];
 		}
 		if (!dice) {
@@ -100,8 +76,9 @@ export default {
 			if (hashIndex !== -1) {
 				const before = dice.slice(0, hashIndex).trimEnd();
 				const after = dice.slice(hashIndex);
-				dice = `${generateStatsDice(before)} ${after}`.trim();
-			} else dice = generateStatsDice(dice);
+				dice =
+					`${generateStatsDice(before, attributes, MIN_THRESHOLD_MATCH)} ${after}`.trim();
+			} else dice = generateStatsDice(dice, attributes, MIN_THRESHOLD_MATCH);
 
 			const rCCShared = getCriticalFromDice(dice, ul);
 			dice = dice.replace(DETECT_CRITICAL, "").trim();
@@ -110,14 +87,14 @@ export default {
 				dice,
 				threshold,
 				DICE_COMPILED_PATTERNS.COMPARATOR,
-				undefined,
+				attributes,
 				undefined,
 				"",
 				""
 			);
 
 			const opts: RollOptions = {
-				customCritical: skillCustomCritical(rCCShared, undefined, undefined, sortOrder),
+				customCritical: skillCustomCritical(rCCShared, attributes, undefined, sortOrder),
 				user: interaction.user,
 			};
 			await rollWithInteraction(interaction, composed.roll, client, opts);
@@ -129,7 +106,11 @@ export default {
 			dice,
 			userComments
 		);
-		let processedDice = generateStatsDice(diceWithoutComments);
+		let processedDice = generateStatsDice(
+			diceWithoutComments,
+			attributes,
+			MIN_THRESHOLD_MATCH
+		);
 		const rCC = getCriticalFromDice(processedDice, ul);
 
 		const targetValue = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(processedDice);
@@ -145,7 +126,7 @@ export default {
 			processedDice,
 			threshold,
 			DICE_COMPILED_PATTERNS.COMPARATOR,
-			undefined,
+			attributes,
 			undefined,
 			expressionStr,
 			mergedComments ?? ""
@@ -155,7 +136,7 @@ export default {
 			? parseOpposition(
 					oppositionVal,
 					composed.comparatorEvaluated,
-					undefined,
+					attributes,
 					undefined,
 					sortOrder
 				)
@@ -163,24 +144,10 @@ export default {
 
 		const opts: RollOptions = {
 			charName: charOptions,
-			customCritical: skillCustomCritical(rCC, undefined, undefined, sortOrder),
+			customCritical: skillCustomCritical(rCC, attributes, undefined, sortOrder),
 			opposition,
 			user: interaction.user,
 		};
 		await rollWithInteraction(interaction, composed.roll, client, opts);
 	},
 };
-
-function findBestMatch(snippets: Snippets, macroName: string): string | null {
-	let bestMatch: string | null = null;
-	let highestSimilarity = 0;
-
-	for (const name of Object.keys(snippets)) {
-		const similarity = calculateSimilarity(macroName, name);
-		if (similarity > highestSimilarity) {
-			highestSimilarity = similarity;
-			bestMatch = name;
-		}
-	}
-	return bestMatch;
-}
