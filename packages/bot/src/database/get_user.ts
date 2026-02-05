@@ -32,7 +32,6 @@ import {
 } from "@dicelette/utils";
 import {
 	getCharaInMemory,
-	getTemplate,
 	getTemplateByInteraction,
 	mergeAttribute,
 	updateMemory,
@@ -322,7 +321,6 @@ async function getUserFrom(
 
 		if (options?.attributes)
 			userData.stats = mergeAttribute(client, userData, guildId, userId);
-		
 
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
