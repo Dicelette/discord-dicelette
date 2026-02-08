@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.35.1](https://github.com/Dicelette/discord-dicelette/compare/2.35.0...2.35.1) (2026-02-08)
+
+
+### Bug Fixes
+
+* **export:** set default member permission to moderators ([2233eea](https://github.com/Dicelette/discord-dicelette/commit/2233eeabba0606c67a9593880f4db9ed8edbf0be))
+
 ## [2.35.0](https://github.com/Dicelette/discord-dicelette/compare/2.34.0...2.35.0) (2026-02-05)
 
 
