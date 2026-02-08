@@ -42,6 +42,7 @@ export const exportData = {
 		.setNames("export.name")
 		.setContexts(Djs.InteractionContextType.Guild)
 		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+		.setDefaultMemberPermissions(Djs.PermissionsBitField.Flags.ManageRoles)
 		.setDescriptions("export.description")
 		.addBooleanOption((option) =>
 			option
