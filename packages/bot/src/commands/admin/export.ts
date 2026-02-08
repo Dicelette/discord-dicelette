@@ -23,7 +23,7 @@ function pLimit(concurrency: number) {
 		const job = queue.shift();
 		if (job) job();
 	};
-	return <T>(fn: () => Promise<T>): Promise<T> => {
+	return async <T>(fn: () => Promise<T>): Promise<T> => {
 		if (active >= concurrency) {
 			return new Promise<T>((resolve, reject) => {
 				queue.push(() => {
@@ -33,7 +33,10 @@ function pLimit(concurrency: number) {
 			});
 		}
 		active++;
-		return fn().finally(next);
+		try {
+			return await fn();
+		} finally {
+		}
 	};
 }
 
