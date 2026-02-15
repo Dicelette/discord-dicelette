@@ -189,7 +189,8 @@ export const mjRoll = {
 				charData,
 				optionChar,
 				hide,
-				user
+				user,
+				true
 			);
 	},
 };

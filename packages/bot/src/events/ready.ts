@@ -34,6 +34,10 @@ export default (client: EClient): void => {
 
 			return x.data.toJSON();
 		});
+		logger.trace(
+			"GLOBAL COMMANDS NAME:",
+			serializedCommands.map((x) => x.name)
+		);
 		const serializedDbCmds = GUILD_ONLY_COMMANDS.map((command) => command.data.toJSON());
 
 		client.user.setActivity(client.status.text, {

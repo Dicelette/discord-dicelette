@@ -48,7 +48,17 @@ export const calc = {
 		const { userStatistique, options, ul, optionChar } =
 			(await getStatistics(interaction, client)) ?? {};
 		if (!userStatistique || !ul || !options) return;
-		return await calculate(options, ul, interaction, client, userStatistique, optionChar);
+		return await calculate(
+			options,
+			ul,
+			interaction,
+			client,
+			userStatistique,
+			optionChar,
+			undefined,
+			interaction.user,
+			true
+		);
 	},
 };
 
@@ -126,6 +136,7 @@ function reverseSign(sign: string) {
  * @param hide - Whether to hide the result from other users.
  * @param user - The Discord user to mention in the result; defaults to the interaction user.
  *
+ * @param isCalc
  * @returns A promise that resolves when the result or error message has been sent to the user.
  */
 export async function calculate(
@@ -136,7 +147,8 @@ export async function calculate(
 	userStatistique?: UserData,
 	optionChar?: string,
 	hide?: boolean | null,
-	user: Djs.User = interaction.user
+	user: Djs.User = interaction.user,
+	isCalc = false
 ) {
 	profiler.startProfiler();
 	let formula = options
@@ -145,7 +157,9 @@ export async function calculate(
 
 	let originalFormula = formula;
 	let totalFormula = formula;
-	const sortResult = client.settings.get(interaction.guildId!, "sortOrder");
+	const sortResult = interaction.guild
+		? client.settings.get(interaction.guildId!, "sortOrder")
+		: undefined;
 
 	let statInfo:
 		| {
@@ -155,7 +169,7 @@ export async function calculate(
 		  }
 		| undefined;
 	let needFormat = true;
-	if (userStatistique) {
+	if (userStatistique && isCalc) {
 		const sign = options.getString(t("calc.sign.title"), true);
 		if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
 		if (!sign.match(/^([><]=?|==|!=|[+\-*/%^])$/)) {
@@ -216,9 +230,10 @@ export async function calculate(
 		const result = evaluate(totalFormula);
 		const transform = options.getString(t("calc.transform.title")) ?? undefined;
 		const header = infoUserCalc(
-			client.settings.get(interaction.guildId!, "timestamp") ?? false,
+			interaction.guild
+				? (client.settings.get(interaction.guild.id, "timestamp") ?? false)
+				: false,
 			{
-				guildId: interaction.guildId!,
 				ul,
 				userId: interaction.user.id,
 			},
@@ -256,7 +271,7 @@ function formatDiceResult(input: string) {
 
 function infoUserCalc(
 	time: boolean,
-	data: { guildId: string; userId: string; ul: Translation },
+	data: { userId: string; ul: Translation },
 	stat?: string,
 	comments?: string,
 	charName?: string

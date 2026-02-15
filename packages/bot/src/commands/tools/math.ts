@@ -11,20 +11,33 @@ import * as Djs from "discord.js";
 import { calculate } from "./calc";
 import "discord_ext";
 import { t } from "@dicelette/localization";
+import type { UserData } from "@dicelette/types";
+import { getStatistics } from "../../database";
 
 export const math = {
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("math.title")
-		.setContexts(Djs.InteractionContextType.Guild)
+		.setContexts(
+			Djs.InteractionContextType.BotDM,
+			Djs.InteractionContextType.Guild,
+			Djs.InteractionContextType.PrivateChannel
+		)
 		.setIntegrationTypes(
 			Djs.ApplicationIntegrationType.GuildInstall,
 			Djs.ApplicationIntegrationType.UserInstall
 		)
+
 		.setDescriptions("math.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const ul = getLangAndConfig(client, interaction).ul;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const optionChar = options.getString(t("common.character"), false) ?? undefined;
-		return await calculate(options, ul, interaction, client, undefined, optionChar);
+		let optionChar = options.getString(t("common.character"), false) ?? undefined;
+		let userStatistics: UserData | undefined;
+		if (interaction.guild) {
+			const data = await getStatistics(interaction, client, true);
+			optionChar = data?.optionChar;
+			userStatistics = data?.userStatistique;
+		}
+		return await calculate(options, ul, interaction, client, userStatistics, optionChar);
 	},
 };

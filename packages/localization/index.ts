@@ -12,6 +12,7 @@ await i18next.init({
 	lng: "en",
 	resources,
 	returnNull: false,
+	showSupportNotice: false,
 });
 
 i18next?.services?.formatter?.add("optional", (value, _lng, _options) => {

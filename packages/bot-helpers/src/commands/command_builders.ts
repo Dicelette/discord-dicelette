@@ -37,9 +37,11 @@ export function commonOptions(
 		threshold: boolean;
 		opposition: boolean;
 		character: boolean;
+		autoCompleteChar: boolean;
 	}> = {
 		character: true,
 		expression: true,
+		autoCompleteChar: true,
 	}
 ) {
 	if (opts.character)
@@ -48,7 +50,7 @@ export function commonOptions(
 				.setNames("common.character")
 				.setDescriptions("dbRoll.options.character")
 				.setRequired(false)
-				.setAutocomplete(true)
+				.setAutocomplete(opts.autoCompleteChar ?? true)
 		);
 	if (opts.expression)
 		builder.addStringOption((option) =>
@@ -164,7 +166,11 @@ export function calcOptions(
 				.setRequired(false)
 				.setAutocomplete(true)
 		);
-	return commonOptions(builder, { character: true, expression: false });
+	return commonOptions(builder, {
+		character: true,
+		expression: false,
+		autoCompleteChar: isCalc,
+	});
 }
 
 /**
