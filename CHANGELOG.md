@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.36.0](https://github.com/Dicelette/discord-dicelette/compare/2.35.1...2.36.0) (2026-02-15)
+
+
+### Features
+
+* **math:** allow outside of a guild ([3d12852](https://github.com/Dicelette/discord-dicelette/commit/3d12852d5979f3d32cb358700245d21d9d9004db))
+
 ## [2.35.1](https://github.com/Dicelette/discord-dicelette/compare/2.35.0...2.35.1) (2026-02-08)
 
 
