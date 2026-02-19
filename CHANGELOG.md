@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.37.0](https://github.com/Dicelette/discord-dicelette/compare/2.36.0...2.37.0) (2026-02-19)
+
+
+### Features
+
+* **description:** add command to update guild description ([01a67db](https://github.com/Dicelette/discord-dicelette/commit/01a67db6e2e1d61644603c8e399903f412f4b252))
+
 ## [2.36.0](https://github.com/Dicelette/discord-dicelette/compare/2.35.1...2.36.0) (2026-02-15)
 
 
