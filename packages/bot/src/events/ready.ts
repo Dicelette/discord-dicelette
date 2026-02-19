@@ -67,7 +67,7 @@ export default (client: EClient): void => {
 						);
 						devCommands = devCommands.concat(serializedDbCmds);
 					}
-					if (guild.id === PRIVATE_ID) {
+					if (PRIVATE_ID.includes(guild.id)) {
 						devCommands = devCommands.concat(
 							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
 						);
@@ -95,7 +95,7 @@ export default (client: EClient): void => {
 					guildCommands = guildCommands.concat(serializedDbCmds);
 
 					logger.trace(`Registering commands for \`${guild.name}\``);
-					if (guild.id === PRIVATE_ID) {
+					if (PRIVATE_ID.includes(guild.id)) {
 						guildCommands = guildCommands.concat(
 							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
 						);
