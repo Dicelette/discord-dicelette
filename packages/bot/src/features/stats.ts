@@ -218,7 +218,8 @@ export class StatsFeature extends BaseFeature {
 		const isModerator = interaction.guild?.members.cache
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+		if (!interaction.deferred)
+			await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const userEmbed = getEmbeds(message, "user");
 		if (!userEmbed) return;
 		const thumbnail = userEmbed.toJSON().thumbnail?.url;

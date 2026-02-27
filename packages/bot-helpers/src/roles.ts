@@ -60,19 +60,20 @@ export async function addAutoRole(
 				}
 			);
 
-		//fetch role
-		const diceRole = await fetchDiceRole(diceEmbed, interaction.guild!, autoRole.dice);
-		const statsRole = await fetchStatsRole(
-			statsEmbed,
-			interaction.guild!,
-			autoRole.stats
-		);
+		//fetch roles in parallel
+		const [diceRole, statsRole] = await Promise.all([
+			fetchDiceRole(diceEmbed, interaction.guild!, autoRole.dice),
+			fetchStatsRole(statsEmbed, interaction.guild!, autoRole.stats),
+		]);
 
-		if (diceEmbed && diceRole) await guildMember.roles.add(diceRole);
+		// add roles in parallel
+		const rolePromises: Promise<Djs.GuildMember>[] = [];
+		if (diceEmbed && diceRole) rolePromises.push(guildMember.roles.add(diceRole));
+		if (statsEmbed && statsRole) rolePromises.push(guildMember.roles.add(statsRole));
 
-		if (statsEmbed && statsRole) await guildMember.roles.add(statsRole);
+		if (rolePromises.length > 0) await Promise.all(rolePromises);
 	} catch (e) {
-		logger.warn("\nError while adding role", e);
+		logger.warn("Error while adding role", e);
 		//delete the role from database so it will be skip next time
 		db.delete(interaction.guild!.id, "autoRole");
 		const dbLogs = db.get(interaction.guild!.id, "logs");
