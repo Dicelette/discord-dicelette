@@ -579,6 +579,12 @@
     "noMessage": "No messages found.",
     "noPermission": "You do not have permissions to change another user's image. \nOnly people with \"MANAGE ROLES\" permissions can use this command for other players.",
     "noRollResult": "The macro named `{{- dice}}` ({{- formula}}) doesn't seems to be a dice.",
+    "pin": {
+      "missingPermission": {
+        "desc": "The bot doesn't have the permission to pin the template in this channel.",
+        "title": "Missing permission"
+      }
+    },
     "private": "This character sheet is private! \nYou do not have permission to read it.",
     "public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
     "roll": {

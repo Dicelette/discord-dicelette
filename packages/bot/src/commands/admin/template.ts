@@ -4,7 +4,7 @@ import {
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
-import { t } from "@dicelette/localization";
+import { lError, t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
 import {
 	BotError,
@@ -25,6 +25,7 @@ import {
 import { DATABASE_NAMES } from "../index";
 import "discord_ext";
 import process from "node:process";
+import { DiscordAPIError } from "@discordjs/rest";
 import { addRestriction, interactionError } from "event";
 
 const botErrorOptions: BotErrorOptions = {
@@ -310,7 +311,7 @@ async function registerTemplate(
 		});
 		return;
 	}
-	const msg = await createEmbed(ul, templateData, channel);
+	const msg = await createEmbed(ul, templateData, channel, interaction);
 	await updateMemory(
 		guildId,
 		client,
@@ -350,7 +351,8 @@ async function userDataUpdate(
 async function createEmbed(
 	ul: Translation,
 	templateData: StatisticalTemplate,
-	channel: Djs.AnyThreadChannel | Djs.TextChannel
+	channel: Djs.AnyThreadChannel | Djs.TextChannel,
+	interaction: Djs.ChatInputCommandInteraction
 ) {
 	const button = new Djs.ButtonBuilder()
 		.setCustomId("register")
@@ -448,7 +450,26 @@ async function createEmbed(
 			},
 		],
 	});
-	await msg.pin();
+	try {
+		await msg.pin();
+	} catch (e) {
+		if (e instanceof DiscordAPIError && e.code === "50013") {
+			//missing permission
+			const embedError = new Djs.EmbedBuilder()
+				.setTitle(ul("error.pin.missingPermission.title"))
+				.setDescription(ul("error.pin.missingPermission.desc"))
+				.setColor("Red")
+				.setAuthor({
+					iconURL: "https://i.imgur.com/2ulUJCc.png",
+					name: ul("common.error"),
+				})
+				.setTimestamp();
+			await reply(interaction, {
+				embeds: [embedError],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+		}
+	}
 	return msg;
 }
 
@@ -554,7 +575,7 @@ async function updateTemplateFile(
 		});
 		return;
 	}
-	const msg = await createEmbed(ul, templateData, channel);
+	const msg = await createEmbed(ul, templateData, channel, interaction);
 	await updateMemory(
 		guildId,
 		client,

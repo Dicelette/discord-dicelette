@@ -579,6 +579,12 @@
     "noMessage": "Aucun message trouvé.",
     "noPermission": "Vous n'avez pas les permissions pour changer l'image d'un autre utilisateur. Seuls les personnes ayant les autorisations \"GÉRER LES RÔLES\" peuvent utiliser cette commande pour d'autres joueurs.",
     "noRollResult": "La macro nommée `{{- dice}}` ({{- formula}}) ne semble pas être un dé.",
+    "pin": {
+      "missingPermission": {
+        "desc": "Le bot n'a pas les permission pour épingler le modèle dans ce channel.",
+        "title": "Permission manquante"
+      }
+    },
     "private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
     "public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
     "roll": {

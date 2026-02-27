@@ -64,7 +64,7 @@ export async function interactionError(
 	langToUse?: Djs.Locale
 ) {
 	console.error(e);
-	sentry.error(e);
+	if (!e.name.includes("Invalid_Dice_Type")) sentry.error(e);
 	if (
 		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
 		(interaction.replied || interaction.deferred)
