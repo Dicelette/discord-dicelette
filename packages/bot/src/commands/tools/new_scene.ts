@@ -44,6 +44,22 @@ export default {
 			});
 			return;
 		}
+		//verify the permission for creating thread
+		const botPerms = channel.permissionsFor(interaction.guild.members.me!, true);
+
+		if (
+			!botPerms ||
+			!botPerms.has([
+				Djs.PermissionFlagsBits.CreatePublicThreads,
+				Djs.PermissionFlagsBits.ViewChannel,
+			])
+		) {
+			await reply(interaction, {
+				content: ul("scene.noPermission"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
 		//archive old threads
 		// noinspection SuspiciousTypeOfGuard
 		const isTextChannel = channel instanceof Djs.TextChannel;
