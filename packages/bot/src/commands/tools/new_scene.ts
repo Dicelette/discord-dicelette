@@ -44,8 +44,19 @@ export default {
 			});
 			return;
 		}
+		const noPermMsg = ul("scene.noPermission");
 		//verify the permission for creating thread
-		const botPerms = channel.permissionsFor(interaction.guild.members.me!, true);
+		const botMember =
+			interaction.guild.members.me ??
+			(await interaction.guild.members.fetchMe().catch(() => null));
+		if (!botMember) {
+			await reply(interaction, {
+				content: noPermMsg,
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
+		const botPerms = channel.permissionsFor(botMember, true);
 
 		if (
 			!botPerms ||
@@ -55,7 +66,7 @@ export default {
 			])
 		) {
 			await reply(interaction, {
-				content: ul("scene.noPermission"),
+				content: noPermMsg,
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
