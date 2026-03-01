@@ -4,7 +4,7 @@ import path from "node:path";
 
 type Target = Record<string, string>;
 
-const SOURCE_PATH = path.resolve("./docs/");
+const SOURCE_PATH = import.meta.dirname;
 
 const LANGUAGES = ["en", "fr"];
 
@@ -39,7 +39,7 @@ function replaceInLocales(dryRun?: boolean) {
 			if (fs.existsSync(filePath)) output[key] = fs.readFileSync(filePath, "utf-8");
 			else console.warn(`File not found: ${filePath}`);
 		}
-		const outputPath = path.resolve(`../localization/locales/${lang}.json`);
+		const outputPath = path.resolve(SOURCE_PATH, `../locales/${lang}.json`);
 		if (fs.existsSync(outputPath)) {
 			const existingContent = JSON.parse(fs.readFileSync(outputPath, "utf-8"));
 			//as the key is in the form of "key1.key2.key3" we need to split by . and update the existing content
@@ -57,7 +57,8 @@ function replaceInLocales(dryRun?: boolean) {
 
 replaceInLocales();
 //exec biome
-exec("pnpm biome format --write ../localization/locales", (error, stdout, stderr) => {
+const localesPath = path.resolve(SOURCE_PATH, "../locales");
+exec(`biome format --write ${localesPath}`, (error, stdout, stderr) => {
 	if (error) {
 		console.error(error);
 		return;

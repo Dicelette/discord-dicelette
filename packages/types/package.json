@@ -8,13 +8,5 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Dicelette/discord-dicelette.git"
-	},
-	"scripts": {
-		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-		"prebuild": "rimraf dist",
-		"tsc": "tsc --project tsconfig.json --skipLibCheck --noEmit && tsc-alias -p tsconfig.json"
-	},
-	"dependencies": {
-		"@dicelette/utils": "workspace:*"
 	}
 }

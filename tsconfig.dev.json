@@ -23,6 +23,7 @@
 			"database": ["packages/bot/src/database/index.js"],
 			"discord_ext": ["packages/bot/src/discord_ext.js"],
 			"event": ["packages/bot/src/events/index.js"],
+			"event/*": ["packages/bot/src/events/*"],
 			"features": ["packages/bot/src/features/index.js"],
 			"locales": ["packages/bot/src/locales.js"],
 			"messages": ["packages/bot/src/messages/index.js"],

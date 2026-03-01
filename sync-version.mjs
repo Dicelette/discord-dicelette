@@ -5,10 +5,7 @@ import { fileURLToPath } from "node:url";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const sourcePath = path.resolve(dirname, "package.json");
-const targets = [
-	path.resolve(dirname, "packages/bot/package.json"),
-	path.resolve(dirname, "packages/utils/package.json"),
-];
+const targets = [path.resolve(dirname, "packages/bot/package.json")];
 
 try {
 	const sourceJson = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
