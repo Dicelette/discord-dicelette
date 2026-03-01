@@ -455,7 +455,7 @@ async function createEmbed(
 	} catch (e) {
 		if (e instanceof DiscordAPIError && e.code.toString() === "50013") {
 			//missing permission
-			const embedError = new Djs.EmbedBuilder()
+			const pinPermissionErrorEmbed = new Djs.EmbedBuilder()
 				.setTitle(ul("error.pin.missingPermission.title"))
 				.setDescription(ul("error.pin.missingPermission.desc"))
 				.setColor("Red")
@@ -464,11 +464,18 @@ async function createEmbed(
 					name: ul("common.error"),
 				})
 				.setTimestamp();
-			await reply(interaction, {
-				embeds: [embedError],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-		}
+			if (interaction.deferred || interaction.replied) {
+				await interaction.followUp({
+					embeds: [pinPermissionErrorEmbed],
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+			} else {
+				await interaction.reply({
+					embeds: [pinPermissionErrorEmbed],
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+			}
+		} else logger.warn(e, "registerTemplate: pin message");
 	}
 	return msg;
 }
