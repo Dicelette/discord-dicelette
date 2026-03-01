@@ -2,6 +2,7 @@
 	"name": "dicelette",
 	"version": "2.37.1",
 	"private": true,
+	"type": "module",
 	"author": "",
 	"license": "GNU GPLv3",
 	"keywords": [],

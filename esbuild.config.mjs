@@ -19,6 +19,7 @@ const entryPoints = await glob("packages/**/*.ts", {
 		"packages/**/*.test.ts",
 		"packages/**/vitest.config.ts",
 		"packages/localization/docs/**",
+		"packages/**/node_modules/**",
 	],
 });
 
