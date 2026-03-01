@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.37.1](https://github.com/Dicelette/discord-dicelette/compare/2.37.0...2.37.1) (2026-03-01)
+
+
+### Bug Fixes
+
+* **autocomplete:** return empty array + verify existence of stats before autocomplete ([61ca025](https://github.com/Dicelette/discord-dicelette/commit/61ca0253dfd11956c42cd377a353778ff6164ba0))
+* deferReply to gain time when registering user ([bc47ad4](https://github.com/Dicelette/discord-dicelette/commit/bc47ad45931524a1ed0e62b454f7f6b4cea04965))
+* **error:** e.code can be a number or a string, add a conversion ([7dec0b6](https://github.com/Dicelette/discord-dicelette/commit/7dec0b6360331239523918470b3addfd2af415d6))
+* guarding the fetching of botmember ([ddbae15](https://github.com/Dicelette/discord-dicelette/commit/ddbae15f3dc7b8f2d8eb80b977a4a11f2b2e07ff))
+* improve error handling for missing pin permissions ([6549266](https://github.com/Dicelette/discord-dicelette/commit/654926675a43dde5c6d756a46dd04e2e6ed6897b))
+* **scene:** verify bot permission before trying to create thread ([08c734c](https://github.com/Dicelette/discord-dicelette/commit/08c734cb6e4a1541cacb9bc38cb842d72091d6e0))
+* should use error and not e ([1ba1c38](https://github.com/Dicelette/discord-dicelette/commit/1ba1c382b7e463469f975c4adf8d9c0eb4469b4e))
+* **template:** should add a little message & continue when the template can't be pined ([006691a](https://github.com/Dicelette/discord-dicelette/commit/006691a5ea8c3fb5032ccbd8bfe626377803258f))
+
 ## [2.37.0](https://github.com/Dicelette/discord-dicelette/compare/2.36.0...2.37.0) (2026-02-19)
 
 
