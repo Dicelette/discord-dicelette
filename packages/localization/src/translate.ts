@@ -118,7 +118,8 @@ export function cmdLn(key: string) {
 	for (const [name, Locale] of allValidLocale) {
 		if (allTranslatedLanguages.includes(Locale)) {
 			const ul = ln(name as Djs.Locale);
-			localized[Locale as Djs.Locale] = ul(key);
+			// biome-ignore lint/suspicious/noExplicitAny: cmdLn accepts any valid translation key as a plain string
+			localized[Locale as Djs.Locale] = ul(key as any);
 		}
 	}
 	return localized;
@@ -133,7 +134,8 @@ export function buildTranslationKeyCache() {
 	for (const locale of allLocales) {
 		const ul = ln(locale as Djs.Locale);
 		for (const key of ALL_TRANSLATION_KEYS) {
-			const translation = ul(key).toLowerCase();
+			// biome-ignore lint/suspicious/noExplicitAny: ALL_TRANSLATION_KEYS contains plain strings that are valid keys at runtime
+			const translation = (ul(key as any) as string).toLowerCase();
 			if (!(translation in translationKeyCache)) {
 				translationKeyCache[translation] = key;
 			}
