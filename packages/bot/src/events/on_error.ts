@@ -8,7 +8,6 @@ import { DiscordAPIError } from "@discordjs/rest";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
-import { e } from "mathjs";
 import { embedError, reply } from "messages";
 import { sendErrorToWebhook } from "./on_disconnect";
 
@@ -43,7 +42,7 @@ export function isApiError(error: unknown) {
 export async function sendMessageError(error: unknown, client: EClient): Promise<void> {
 	if (isApiError(error)) return;
 	console.error(error);
-	sentry.error(e);
+	sentry.error(error);
 	if (!process.env.OWNER_ID) return;
 	const dm = await client.users.createDM(process.env.OWNER_ID);
 	await dm.send({ content: formatErrorMessage(error) });
@@ -64,7 +63,7 @@ export async function interactionError(
 	langToUse?: Djs.Locale
 ) {
 	console.error(e);
-	sentry.error(e);
+	if (!e.name.includes("Invalid_Dice_Type")) sentry.error(e);
 	if (
 		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
 		(interaction.replied || interaction.deferred)

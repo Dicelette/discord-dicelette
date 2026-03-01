@@ -130,7 +130,13 @@ export async function repostInThread(
 	const damageName = userTemplate.damage ? Object.keys(userTemplate.damage) : undefined;
 	const channel = interaction.channel;
 	// noinspection SuspiciousTypeOfGuard
-	if (!channel || channel instanceof Djs.CategoryChannel) return;
+	if (
+		!channel ||
+		channel instanceof Djs.CategoryChannel ||
+		channel.isDMBased() ||
+		!interaction.guild
+	)
+		return;
 	if (!guildData)
 		throw new BotError(
 			ul("error.generic.e", {

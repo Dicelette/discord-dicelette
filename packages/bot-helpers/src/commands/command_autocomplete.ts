@@ -25,12 +25,12 @@ export async function autoCompleteEdit(
 	client: EClient
 ) {
 	const param = autoComplete(interaction, client);
-	if (!param) return;
+	if (!param) return await interaction.respond([]);
 	const { guildData, ul, userID, fixed, choices } = param;
 
 	if (fixed.name === t("common.character")) {
 		const guildChars = guildData.user?.[userID];
-		if (!guildChars) return;
+		if (!guildChars) return await interaction.respond([]);
 		for (const data of guildChars) {
 			const allowed = await haveAccess(interaction, data.messageId[1], userID);
 			if (data.charName && findln(data.charName) === "common.default")
@@ -39,11 +39,11 @@ export async function autoCompleteEdit(
 			if (!data.isPrivate || allowed) choices.push(toPush);
 		}
 	}
-	if (choices.length === 0) return;
+	if (choices.length === 0) return await interaction.respond([]);
 	const filter = filterChoices(choices, interaction.options.getFocused()).map((x) =>
 		x === "common.default" ? ul("common.default") : x
 	);
-	await interaction.respond(
+	return await interaction.respond(
 		filter.map((result) => ({ name: result.capitalize(), value: result }))
 	);
 }
@@ -56,16 +56,16 @@ export function autoCompleteCharacters(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,
 	exclude = true
-) {
+): string[] {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
 	const guildData = client.settings.get(interaction.guild!.id);
-	if (!guildData || !guildData.templateID) return;
+	if (!guildData || !guildData.templateID) return [];
 	let choices: string[] = [];
 
 	if (focused.name === t("common.statistic")) {
-		choices = guildData.templateID.statsName;
-		if (exclude)
+		choices = guildData.templateID.statsName || [];
+		if (exclude && choices.length > 0)
 			choices = choices.filter(
 				(item) => !guildData.templateID.excludedStats?.includes(item)
 			);
@@ -75,11 +75,11 @@ export function autoCompleteCharacters(
 			interaction.guild!.id,
 			`user.${interaction.user.id}`
 		);
-		if (!userData) return;
+		if (!userData) return [];
 		choices = userData
 			.map((data) => data.charName ?? "")
 			.filter((data) => data.length > 0);
 	}
-	if (!choices || choices.length === 0) return;
+	if (!choices || choices.length === 0) return [];
 	return filterChoices(choices, interaction.options.getFocused());
 }

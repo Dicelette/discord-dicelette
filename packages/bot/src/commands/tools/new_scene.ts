@@ -44,6 +44,33 @@ export default {
 			});
 			return;
 		}
+		const noPermMsg = ul("scene.noPermission");
+		//verify the permission for creating thread
+		const botMember =
+			interaction.guild.members.me ??
+			(await interaction.guild.members.fetchMe().catch(() => null));
+		if (!botMember) {
+			await reply(interaction, {
+				content: noPermMsg,
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
+		const botPerms = channel.permissionsFor(botMember, true);
+
+		if (
+			!botPerms ||
+			!botPerms.has([
+				Djs.PermissionFlagsBits.CreatePublicThreads,
+				Djs.PermissionFlagsBits.ViewChannel,
+			])
+		) {
+			await reply(interaction, {
+				content: noPermMsg,
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
 		//archive old threads
 		// noinspection SuspiciousTypeOfGuard
 		const isTextChannel = channel instanceof Djs.TextChannel;
