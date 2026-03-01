@@ -4,7 +4,7 @@ import {
 } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
-import { lError, t } from "@dicelette/localization";
+import { t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
 import {
 	BotError,
