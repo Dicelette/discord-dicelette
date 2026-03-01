@@ -483,7 +483,8 @@ export class UserFeature extends BaseFeature {
 	private async validateUser(): Promise<void> {
 		const interaction = this.interaction as Djs.ButtonInteraction;
 		if (!this.template || !this.client || !this.characters) return;
-		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
+		if (!interaction.deferred)
+			await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 
 		const userEmbed = Messages.getEmbeds(interaction.message, "user");
 		if (!userEmbed) throw new NoEmbed();
