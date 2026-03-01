@@ -453,7 +453,7 @@ async function createEmbed(
 	try {
 		await msg.pin();
 	} catch (e) {
-		if (e instanceof DiscordAPIError && e.code === "50013") {
+		if (e instanceof DiscordAPIError && e.code.toString() === "50013") {
 			//missing permission
 			const embedError = new Djs.EmbedBuilder()
 				.setTitle(ul("error.pin.missingPermission.title"))
