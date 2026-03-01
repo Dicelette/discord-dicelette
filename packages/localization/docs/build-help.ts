@@ -1,10 +1,11 @@
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 type Target = Record<string, string>;
 
-const SOURCE_PATH = import.meta.dirname;
+const SOURCE_PATH = path.dirname(fileURLToPath(import.meta.url));
 
 const LANGUAGES = ["en", "fr"];
 
