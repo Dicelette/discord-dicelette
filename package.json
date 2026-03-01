@@ -10,9 +10,7 @@
 		"node": "^20.0.0"
 	},
 	"scripts": {
-		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-		"postbuild": "cp packages/bot/package.json dist/packages/bot/package.json",
-		"prebuild": "rimraf dist && tsx packages/localization/docs/build-help.ts",
+		"build": "node esbuild.config.mjs",
 		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts",
 		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts",
 		"lint": "biome check --write ./packages/ --unsafe",
@@ -61,6 +59,8 @@
 		"@types/semver": "^7.7.0",
 		"commit-and-tag-version": "^12.6.1",
 		"cross-env": "^10.1.0",
+		"esbuild": "^0.27.3",
+		"glob": "^11.0.0",
 		"husky": "^9.1.7",
 		"moment": "^2.30.1",
 		"nodemon": "^3.1.9",

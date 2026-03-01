@@ -5,7 +5,7 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
-import pkgJson from "../package.json" with { type: "json" };
+import pkgJson from "../../../package.json" with { type: "json" };
 import { BotError } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
