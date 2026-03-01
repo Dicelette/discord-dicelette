@@ -24,7 +24,7 @@ export async function display(
 	const entries = Object.entries(userStats);
 	if (entries.length === 0) {
 		await reply(interaction, {
-			content: ul("userSettings.attributes.stats.empty"),
+			content: ul("userSettings.attributes.list.empty"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
