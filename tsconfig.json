@@ -24,7 +24,7 @@
 			"@dicelette/parse_result": ["packages/parse_result/index.js"],
 			"@dicelette/types": ["packages/types/index.js"],
 			"@dicelette/utils": ["packages/utils/index.js"],
-			"@dicelette/discord_ext": ["packages/discord_ext/index.js"],
+			"@dicelette/discord_ext": ["packages/localization/src/discord_ext.js"],
 			"client": ["packages/bot/src/client.js"],
 			"commands": ["packages/bot/src/commands/index.js"],
 			"database": ["packages/bot/src/database/index.js"],
@@ -51,7 +51,8 @@
 		"**/*.test.ts",
 		"packages/**/tests/**",
 		"packages/**/vitest.config.ts",
-		"@testing/**"
+		"@testing/**",
+		"packages/localization/docs/**"
 	],
 	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"],
 	"ts-node": {
