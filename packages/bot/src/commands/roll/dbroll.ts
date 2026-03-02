@@ -3,7 +3,7 @@ import type { EClient } from "@dicelette/client";
 import { getStatistics } from "database";
 import * as Djs from "discord.js";
 import { rollStatistique } from "utils";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 
 export const dbRoll = {

@@ -9,7 +9,7 @@ import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
 import { buildDamageAutocompleteChoices, rollMacro } from "utils";
 
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {

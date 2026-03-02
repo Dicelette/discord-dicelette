@@ -1,41 +1,67 @@
-import { copyFileSync, rmSync } from "node:fs";
-import { execSync } from "node:child_process";
+// esbuild.config.mjs
+import { copyFileSync, mkdirSync, rmSync } from "node:fs";
+import * as path from "node:path";
+import { loadEnvFile } from "node:process";
 import { build } from "esbuild";
+import { fixImportsPlugin, writeFilePlugin } from "esbuild-fix-imports-plugin";
+import { glob } from "glob";
 
-// Update locale files from docs markdown
-execSync("tsx packages/localization/docs/build-help.ts", { stdio: "inherit" });
-
-// Clean previous build
+loadEnvFile(".env");
 rmSync("./dist", { force: true, recursive: true });
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Bundle the bot entry point. esbuild resolves all tsconfig path aliases
-// (@dicelette/*, client, event, …) and inlines locale JSON imports.
-// True npm dependencies are kept external via `packages: "external"`.
+// Trouve tous les fichiers .ts dans packages/ (transpilation pure)
+const entryPoints = await glob("packages/**/*.ts", {
+	ignore: ["packages/**/*.d.ts"], // Ignore les fichiers de déclaration
+});
+
+const aliasPlugin = {
+	name: "alias-plugin",
+	setup(build) {
+		build.onResolve({ filter: /^discord_ext$/ }, (args) => {
+			return {
+				path: path.resolve("./packages/bot/src/discord_ext.ts"),
+			};
+		});
+	},
+};
+
 await build({
-	bundle: true,
+	bundle: false, // Pas de bundling, juste de la transpilation
 	define: {
 		"process.env.NODE_ENV": `"${process.env.NODE_ENV || "development"}"`,
 	},
-	entryPoints: ["packages/bot/index.ts"],
+	entryPoints,
 	format: "esm",
 	minify: false,
-	minifyIdentifiers: false,
-	minifySyntax: isProd,
-	minifyWhitespace: false,
-	outfile: "dist/packages/bot/index.js",
-	packages: "external",
+	outbase: "packages",
+	outdir: "dist/packages",
 	platform: "node",
+	plugins: [fixImportsPlugin(), writeFilePlugin(), aliasPlugin],
 	sourcemap: !isProd,
+	sourceRoot: "packages",
 	target: "esnext",
 	tsconfig: "./tsconfig.json",
+	write: false,
+	minifySyntax: false,
+	minifyWhitespace: false,
+	minifyIdentifiers: false,
 });
 
-// Copy root package.json so dist/ is self-contained and Node.js
-// treats the output as ESM ("type": "module").
 copyFileSync("package.json", "dist/package.json");
 
+mkdirSync("dist/packages/localization/locales", { recursive: true });
+const localeFiles = await glob("packages/localization/locales/*.json", {
+	windowsPathsNoEscape: true,
+});
+for (const file of localeFiles) {
+	const destFile = path.normalize(file.replace("packages", "dist/packages"));
+	//fix path for windows
+	copyFileSync(file, destFile);
+	console.log(`Copy: ${file} -> ${destFile}`);
+}
+
 console.log(
-	`✅ Build ${isProd ? "production" : "development"} done`
+	`✅ Build ${isProd ? "production" : "development"} done ${isProd ? " (without logging)" : ""}`
 );

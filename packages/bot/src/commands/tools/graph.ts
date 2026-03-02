@@ -15,7 +15,7 @@ import * as Djs from "discord.js";
 import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
 import { searchUserChannel } from "utils";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { Statistic, StatisticalTemplate } from "@dicelette/core";
 

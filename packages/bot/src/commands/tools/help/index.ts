@@ -16,7 +16,7 @@ import * as Djs from "discord.js";
 import { reply } from "messages";
 
 import { VERSION } from "../../../../index";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { getConfigIds, getHelpDBCmd, getIDForAdminDB } from "./commandId";
 import { createHelpMessageDB } from "./createHelpMessage";
 

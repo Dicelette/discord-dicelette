@@ -4,7 +4,7 @@ import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { deleteAfter, reply, setTags } from "messages";
 import moment from "moment";
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 export default {
 	data: new Djs.SlashCommandBuilder()

@@ -14,7 +14,7 @@ import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 export async function autocompleteCalc(
 	interaction: Djs.AutocompleteInteraction,

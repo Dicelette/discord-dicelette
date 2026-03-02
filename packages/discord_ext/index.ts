@@ -1,5 +1,3 @@
-//biome-ignore-all lint/suspicious/noExplicitAny: Allow explicit any for this extension file because it's simpler.
-
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 

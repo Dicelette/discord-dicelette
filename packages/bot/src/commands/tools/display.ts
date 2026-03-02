@@ -22,7 +22,7 @@ import {
 } from "messages";
 import { optionInteractions } from "utils";
 
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { cleanAvatarUrl, QUERY_URL_PATTERNS } from "@dicelette/utils";
 
 export const displayUser = {

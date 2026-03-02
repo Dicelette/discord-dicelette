@@ -23,7 +23,7 @@ import {
 	reply,
 } from "messages";
 import { DATABASE_NAMES } from "../index";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import process from "node:process";
 import { DiscordAPIError } from "@discordjs/rest";
 import { addRestriction, interactionError } from "event";

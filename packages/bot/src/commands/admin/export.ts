@@ -12,7 +12,7 @@ import { t } from "@dicelette/localization";
 import { getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
