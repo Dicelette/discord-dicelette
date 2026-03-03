@@ -16,6 +16,8 @@
 		"module": "esnext",
 		"moduleResolution": "node",
 		"outDir": "./dist/",
+		"incremental": true,
+		"tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo",
 		"paths": {
 			"@dicelette/bot": ["packages/bot/index.js"],
 			"@dicelette/bot-helpers": ["packages/bot-helpers/index.js"],

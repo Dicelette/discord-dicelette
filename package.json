@@ -6,9 +6,13 @@
 	"author": "Mara-Li",
 	"license": "GNU GPLv3",
 	"keywords": [],
+	"engines": {
+		"node": ">=24"
+	},
+	"engineStrict": true,
 	"scripts": {
 		"prebuild": "rimraf dist",
-		"build": "tsc && tsc-alias",
+		"build": "tsc --build && tsc-alias",
 		"dev": "tsx watch --clear-screen=false packages/bot/index.ts",
 		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false packages/bot/index.ts",
 		"lint": "biome check --write ./packages/ --unsafe",
@@ -18,7 +22,7 @@
 		"pm2:stop": "pm2 stop dicelette",
 		"predev": "tsx packages/localization/docs/build-help.ts",
 		"prepare": "husky",
-		"prerelease": "tsc --project tsconfig.json --skipLibCheck --noEmit",
+		"prerelease": "tsc --skipLibCheck --noEmit",
 		"release": "commit-and-tag-version",
 		"postrelease": "git push --follow-tags origin main",
 		"test": "vitest run"
@@ -57,11 +61,8 @@
 		"@types/semver": "^7.7.0",
 		"commit-and-tag-version": "^12.6.1",
 		"cross-env": "^10.1.0",
-		"esbuild-fix-imports-plugin": "^1.0.23",
-		"esbuild-plugin-alias-path": "^2.0.2",
 		"glob": "^13.0.6",
 		"husky": "^9.1.7",
-		"load-tsconfig": "^0.2.5",
 		"moment": "^2.30.1",
 		"nodemon": "^3.1.9",
 		"papaparse": "^5.4.1",
