@@ -2,50 +2,74 @@
 	"name": "dicelette",
 	"version": "2.37.1",
 	"private": true,
-	"author": "",
+	"type": "module",
+	"author": "Mara-Li",
 	"license": "GNU GPLv3",
 	"keywords": [],
-	"engineStrict": true,
 	"engines": {
-		"node": "^20.0.0"
+		"node": ">=24"
 	},
+	"engineStrict": true,
 	"scripts": {
-		"analyze": "pnpm --filter @testing/analyzeroll run analyze",
-		"build": "pnpm run --recursive build",
-		"dev": "tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
-		"dev:prod": "cross-env PROD=true tsx watch --tsconfig=tsconfig.dev.json --clear-screen=false packages/bot/index.ts ",
+		"prebuild": "rimraf dist",
+		"build": "tsc --build && tsc-alias",
+		"dev": "tsx watch --clear-screen=false packages/bot/index.ts",
+		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false packages/bot/index.ts",
 		"lint": "biome check --write ./packages/ --unsafe",
 		"pm2:delete": "pm2 delete dicelette",
-		"pm2:restart": "pnpm run build && pm2 restart dicelette",
-		"pm2:start": "pnpm run build && pm2 start packages/bot/dist/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
+		"pm2:restart": "npm run build && pm2 restart dicelette",
+		"pm2:start": "npm run build && pm2 start dist/packages/bot/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
 		"pm2:stop": "pm2 stop dicelette",
-		"predev": "pnpm run --recursive prebuild",
+		"predev": "tsx packages/localization/docs/build-help.ts",
 		"prepare": "husky",
-		"prerelease": "pnpm run --recursive tsc",
+		"prerelease": "tsc --skipLibCheck --noEmit",
 		"release": "commit-and-tag-version",
 		"postrelease": "git push --follow-tags origin main",
-		"test": "pnpm -r test"
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@dicelette/core": "^1.26.0",
+		"@discordjs/rest": "^2.4.2",
 		"@sentry/node": "^10.39.0",
 		"@sentry/profiling-node": "^10.39.0",
+		"canvas": "^3.0.1",
+		"chart.js": "3.5.1",
+		"chartjs-node-canvas": "^4.1.6",
 		"dedent": "^1.7.1",
+		"discord-api-types": "^0.37.115",
+		"discord.js": "14.25.0",
 		"dotenv": "^17.3.1",
 		"enmap": "npm:@dicelette/enmap",
+		"express": "^5.1.0",
+		"fast-deep-equal": "^3.1.3",
+		"i18next": "^25.8.10",
+		"klona": "^2.0.6",
+		"mathjs": "^14.0.1",
+		"parse-color": "^1.0.0",
+		"random-js": "^2.1.0",
 		"tslog": "^4.10.2",
 		"tsx": "^4.21.0",
-		"uniformize": "^2.5.0"
+		"uniformize": "^2.5.0",
+		"zod": "latest"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.4",
+		"@types/express": "^5.0.5",
 		"@types/node": "^22.19.11",
+		"@types/papaparse": "^5.3.15",
+		"@types/parse-color": "^1.0.3",
+		"@types/semver": "^7.7.0",
 		"commit-and-tag-version": "^12.6.1",
 		"cross-env": "^10.1.0",
-		"discord.js": "14.25.0",
+		"glob": "^13.0.6",
 		"husky": "^9.1.7",
-		"i18next": "^25.8.10",
+		"moment": "^2.30.1",
+		"nodemon": "^3.1.9",
+		"papaparse": "^5.4.1",
 		"rimraf": "^6.1.3",
+		"semver": "^7.7.2",
+		"strip-ansi": "^7.1.2",
+		"ts-deepmerge": "^7.0.3",
 		"ts-loader": "^9.5.4",
 		"tsc-alias": "^1.8.16",
 		"tsconfig-paths": "^4.2.0",
@@ -60,21 +84,12 @@
 			"better-sqlite3",
 			"canvas",
 			"esbuild"
-		],
-		"overrides": {}
+		]
 	},
 	"commit-and-tag-version": {
 		"bumpFiles": [
 			{
-				"filename": "packages/bot/package.json",
-				"type": "json"
-			},
-			{
 				"filename": "package.json",
-				"type": "json"
-			},
-			{
-				"filename": "packages/utils/package.json",
 				"type": "json"
 			}
 		],

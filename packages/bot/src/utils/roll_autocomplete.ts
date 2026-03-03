@@ -5,7 +5,7 @@ import { filterStatsInDamage } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
 import type * as Djs from "discord.js";
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 /**
  * Build autocomplete choices for damage/skill names.

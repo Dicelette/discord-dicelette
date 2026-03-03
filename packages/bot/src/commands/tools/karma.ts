@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/useNamingConvention: Discord doesn't use CamelCase in their API */
 import type { EClient } from "@dicelette/client";
 import * as Djs from "discord.js";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import {
 	fetchAvatarUrl,
 	getInteractionContext as getLangAndConfig,

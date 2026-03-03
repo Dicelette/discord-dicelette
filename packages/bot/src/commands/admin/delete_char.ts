@@ -1,5 +1,7 @@
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import "@dicelette/discord_ext";
+import { findln } from "@dicelette/localization";
 import type {
 	DiscordChannel,
 	GuildData,
@@ -13,8 +15,6 @@ import * as Djs from "discord.js";
 import i18next from "i18next";
 import { embedError, reply } from "messages";
 import { optionInteractions, searchUserChannel } from "utils";
-import "discord_ext";
-import { findln } from "@dicelette/localization";
 export const t = i18next.getFixedT("en");
 
 export const deleteChar = {

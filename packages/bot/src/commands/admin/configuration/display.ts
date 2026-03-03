@@ -108,8 +108,10 @@ export async function display(
 
 	const dpTitle = (content: string, toUpperCase?: boolean) => {
 		if (toUpperCase)
-			return `- **__${ul(content)?.capitalize()}__**${ul("common.space")}:`;
-		return `- **__${ul(content)}__**${ul("common.space")}:`;
+			// biome-ignore lint/suspicious/noExplicitAny: dynamic translation key passed at runtime
+			return `- **__${(ul(content as any) as string)?.capitalize()}__**${ul("common.space")}:`;
+		// biome-ignore lint/suspicious/noExplicitAny: dynamic translation key passed at runtime
+		return `- **__${ul(content as any)}__**${ul("common.space")}:`;
 	};
 
 	const dp = (

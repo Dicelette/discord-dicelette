@@ -14,7 +14,7 @@ import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
 import { embedError, sendResult } from "messages";
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 export async function autocompleteCalc(
 	interaction: Djs.AutocompleteInteraction,
@@ -73,7 +73,8 @@ export function autofocusTransform(
 		const keys = ["abs", "ceil", "floor", "round", "sqrt", "square"];
 		return keys
 			.map((k) => ({
-				name: ul(`calc.transform.${k}`),
+				// biome-ignore lint/suspicious/noExplicitAny: calc.transform.* keys are valid at runtime for the fixed set of transform functions
+				name: ul(`calc.transform.${k}` as any) as string,
 				value: k,
 			}))
 			.filter(({ name }) => name.toLowerCase().includes(focused.value.toLowerCase()));

@@ -1,11 +1,10 @@
-import path from "node:path";
-import { defineConfig } from "vitest/config";
+import { defineProject } from "vitest/config";
 
-export default defineConfig({
+export default defineProject({
 	test: {
 		alias: {
-			"@dicelette/types": path.resolve(__dirname, "../types/index.ts"),
-			"@dicelette/utils": path.resolve(__dirname, "../utils/index.ts"),
+			"@dicelette/types": new URL("../types/index.ts", import.meta.url).pathname,
+			"@dicelette/utils": new URL("../utils/index.ts", import.meta.url).pathname,
 		},
 		exclude: ["node_modules"],
 		globals: true,

@@ -14,7 +14,7 @@ import {
 	repostInThread,
 } from "messages";
 import { parseCSV } from "utils";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import {
 	addAutoRole,
 	fetchAvatarUrl,

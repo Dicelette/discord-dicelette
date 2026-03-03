@@ -1,9 +1,4 @@
 {
-	"dependencies": {
-		"@dicelette/parse_result": "workspace:*",
-		"commander": "^14.0.1",
-		"typescript": "^5.9.2"
-	},
 	"description": "",
 	"main": "index.ts",
 	"name": "@testing/analyzeroll",

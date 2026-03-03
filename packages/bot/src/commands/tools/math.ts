@@ -9,7 +9,7 @@ import {
 import type { EClient } from "@dicelette/client";
 import * as Djs from "discord.js";
 import { calculate } from "./calc";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { t } from "@dicelette/localization";
 import type { UserData } from "@dicelette/types";
 import { getStatistics } from "../../database";

@@ -6,7 +6,7 @@ import { cmdLn, t } from "@dicelette/localization";
 
 import * as Djs from "discord.js";
 import { localeList } from "locales";
-import "discord_ext";
+import "@dicelette/discord_ext";
 
 import {
 	createLinksCmdOptions,

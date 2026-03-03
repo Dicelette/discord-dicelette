@@ -1,5 +1,5 @@
 import * as Djs from "discord.js";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";

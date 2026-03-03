@@ -16,7 +16,17 @@
 		"module": "esnext",
 		"moduleResolution": "node",
 		"outDir": "./dist/",
+		"incremental": true,
+		"tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo",
 		"paths": {
+			"@dicelette/bot": ["packages/bot/index.js"],
+			"@dicelette/bot-helpers": ["packages/bot-helpers/index.js"],
+			"@dicelette/client": ["packages/client/index.js"],
+			"@dicelette/localization": ["packages/localization/index.js"],
+			"@dicelette/parse_result": ["packages/parse_result/index.js"],
+			"@dicelette/types": ["packages/types/index.js"],
+			"@dicelette/utils": ["packages/utils/index.js"],
+			"@dicelette/discord_ext": ["packages/localization/src/discord_ext.js"],
 			"client": ["packages/bot/src/client.js"],
 			"commands": ["packages/bot/src/commands/index.js"],
 			"database": ["packages/bot/src/database/index.js"],
@@ -37,7 +47,15 @@
 		"target": "ESNext",
 		"typeRoots": ["packages/@types", "node_modules/@types"]
 	},
-	"exclude": ["node_modules", "dist"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"**/*.test.ts",
+		"packages/**/tests/**",
+		"packages/**/vitest.config.ts",
+		"@testing/**",
+		"packages/localization/docs/**"
+	],
 	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"],
 	"ts-node": {
 		"esm": true,

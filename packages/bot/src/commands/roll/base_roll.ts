@@ -20,7 +20,7 @@ import {
 import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import type { ComparedValue } from "@dicelette/core";
 import type { RollOptions } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction } from "database";

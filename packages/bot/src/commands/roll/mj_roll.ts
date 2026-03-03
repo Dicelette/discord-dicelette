@@ -8,7 +8,7 @@ import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
 import { rollMacro, rollStatistique } from "utils";
 import { autoFocuseSign, autofocusTransform, calculate } from "../tools";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import { baseRoll } from "./base_roll";
 

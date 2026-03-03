@@ -133,7 +133,7 @@ export function errorMessage(
 
 export async function getContentFile(
 	interaction: Djs.ChatInputCommandInteraction,
-	t: (key: string) => string,
+	t: Translation,
 	ul: Translation
 ) {
 	const userId = interaction.user.id;
@@ -268,7 +268,8 @@ export async function registerEntry<T>(
 	const key = `${userId}.${type}`;
 	client.userSettings.set(guildId, store, key);
 	const args = formatArgs ? formatArgs(name, value) : { name: `**${name.toTitle()}**` };
-	const text = ul(`userSettings.${type}.create.success`, args);
+	// biome-ignore lint/suspicious/noExplicitAny: template literal key is valid at runtime for "attributes" | "snippets" type
+	const text = ul(`userSettings.${type}.create.success` as any, args) as any as string;
 	await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 

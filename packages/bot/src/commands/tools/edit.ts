@@ -25,7 +25,7 @@ import {
 import * as Djs from "discord.js";
 import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "messages";
 import { getButton, optionInteractions } from "utils";
-import "discord_ext";
+import "@dicelette/discord_ext";
 import { QUERY_URL_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
 
 const botErrorOptions: BotErrorOptions = {

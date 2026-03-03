@@ -1,5 +1,4 @@
-//biome-ignore-all lint/suspicious/noExplicitAny: Allow explicit any for this extension file because it's simpler.
-
+/** biome-ignore-all lint/suspicious/noExplicitAny: global override for discord_ext */
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 
@@ -66,11 +65,11 @@ declare module "discord.js" {
 }
 
 const SET_NAMES_IMPL = function (this: any, key: string) {
-	return this.setName(t(key)).setNameLocalizations(cmdLn(key));
+	return this.setName(t(key as any)).setNameLocalizations(cmdLn(key));
 };
 
 const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
-	return this.setDescription(t(key)).setDescriptionLocalizations(cmdLn(key));
+	return this.setDescription(t(key as any)).setDescriptionLocalizations(cmdLn(key));
 };
 
 /**
