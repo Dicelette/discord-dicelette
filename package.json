@@ -11,8 +11,7 @@
 	},
 	"engineStrict": true,
 	"scripts": {
-		"prebuild": "rimraf dist",
-		"build": "tsc --build && tsc-alias",
+		"prebuild": "rimraf dist",		"build": "tsc --build && tsc-alias",
 		"dev": "tsx watch --clear-screen=false packages/bot/index.ts",
 		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false packages/bot/index.ts",
 		"lint": "biome check --write ./packages/ --unsafe",
