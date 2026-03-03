@@ -72,7 +72,7 @@ export default {
 			logger.error("Failed to change guild description:", err);
 			await interaction.editReply({
 				// biome-ignore lint/suspicious/noExplicitAny: fallback key for generic API error (no dedicated translation key exists)
-			content: t("description.error" as any),
+				content: t("description.error" as any),
 			});
 		}
 	},

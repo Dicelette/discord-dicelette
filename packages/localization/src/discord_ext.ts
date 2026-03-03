@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: global override for discord_ext */
 import { cmdLn, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 
