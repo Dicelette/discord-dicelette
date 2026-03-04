@@ -17,8 +17,7 @@ jobs:
           port: ${{secrets.PORT}}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            set PATH $PATH:/home/.local/share/nvm/v20.14.0/bin
-            nvm use v20.14.0
+            fnm use lts
             cd dicelette/
             git stash push --include-untracked --message "Locales temporaires"
             git pull --rebase
