@@ -424,7 +424,7 @@ export async function getRecordChar(
 
 	if (!user && charName) {
 		//get the character data in the database
-		const allUsersData = guildData.user;
+		const allUsersData = guildData.user ?? {};
 		const allUsers = Object.entries(allUsersData);
 		for (const [user, data] of allUsers) {
 			const userChar = data.find((char) => {
