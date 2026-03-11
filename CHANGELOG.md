@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.37.2](https://github.com/Dicelette/discord-dicelette/compare/2.37.1...2.37.2) (2026-03-11)
+
+
+### Bug Fixes
+
+* cannot convert null to undefined ([896a486](https://github.com/Dicelette/discord-dicelette/commit/896a486498763b150d40ab368cae04e91e548c93))
+
 ## [2.37.1](https://github.com/Dicelette/discord-dicelette/compare/2.37.0...2.37.1) (2026-03-01)
 
 
