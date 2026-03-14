@@ -687,17 +687,23 @@ export class MacroFeature extends BaseFeature {
 				removed: true,
 			};
 
-		const valuesAsDice = values.split("\n- ").map((dice) => {
-			const match = dice.match(/^([^:]+):(.*)$/s);
-			if (match) {
-				return {
-					name: match[1].trim().replace(/^- /, "").toLowerCase(),
-					value: match[2].trim(),
-				};
-			}
-			const [name, value] = dice.split(/ ?: ?/);
-			return { name: name.replace(/^- /, "").trim().toLowerCase(), value };
-		});
+		const valuesAsDice = values
+			.split("\n- ")
+			.map((dice) => {
+				const match = dice.match(/^([^:]+):(.*)$/s);
+				if (match) {
+					return {
+						name: match[1].trim().replace(/^- /, "").toLowerCase(),
+						value: match[2].trim(),
+					};
+				}
+				const [name, value] = dice.split(/ ?: ?/);
+				return { name: name.replace(/^- /, "").trim().toLowerCase(), value };
+			})
+			.filter(
+				(dice) =>
+					dice.value && dice.value.trim().length > 0 && dice.name && dice.name.length > 0
+			);
 
 		const dices = valuesAsDice.reduce(
 			(acc, { name, value }) => {
