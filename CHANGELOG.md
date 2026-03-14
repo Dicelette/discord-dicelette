@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.37.3](https://github.com/Dicelette/discord-dicelette/compare/2.37.2...2.37.3) (2026-03-14)
+
+
+### Bug Fixes
+
+* Cannot read properties of undefined (reading 'toLowerCase') in Object.entries(dices) ([88b6c10](https://github.com/Dicelette/discord-dicelette/commit/88b6c10de1a118d8fd59dc964650c779444624ff))
+
 ## [2.37.2](https://github.com/Dicelette/discord-dicelette/compare/2.37.1...2.37.2) (2026-03-11)
 
 
