@@ -12,7 +12,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
 		"inlineSourceMap": true,
-		"lib": ["ESNext"],
+		"lib": ["ESNext", "DOM"],
 		"module": "esnext",
 		"moduleResolution": "node",
 		"outDir": "./dist/",
@@ -45,7 +45,8 @@
 		"sourceMap": false,
 		"strict": true,
 		"target": "ESNext",
-		"typeRoots": ["packages/@types", "node_modules/@types"]
+		"typeRoots": ["packages/@types", "node_modules/@types"],
+		"jsx": "react-jsx"
 	},
 	"exclude": [
 		"node_modules",
@@ -56,7 +57,12 @@
 		"@testing/**",
 		"packages/localization/docs/**"
 	],
-	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"],
+	"include": [
+		"packages/**/*.ts",
+		"packages/**/*.tsx",
+		"packages/**/*.d.ts",
+		"package.json"
+	],
 	"ts-node": {
 		"esm": true,
 		"experimentalSpecifierResolution": "node",

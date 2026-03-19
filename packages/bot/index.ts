@@ -8,6 +8,7 @@ import { client } from "client";
 import * as event from "event";
 import express from "express";
 import packageJson from "../../package.json" with { type: "json" };
+import { createDashboardRouter } from "./src/dashboard/routes";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 setupProcessErrorHandlers();
@@ -51,6 +52,8 @@ try {
 }
 
 const app = express();
+app.use(express.json());
+app.use("/api/dashboard", createDashboardRouter(client));
 
 app.get("/healthz", async (req, res) => {
 	if (req.headers["get-status-only"] === "true") {

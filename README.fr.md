@@ -27,3 +27,22 @@ export const resources = {
 		},
 };
 ```
+## Prototype de webdashboard
+
+Un prototype React de dashboard est disponible dans `packages/dashboard`.
+
+### Objectif
+- connexion Discord (prototype OAuth2 côté UI),
+- détection et sélection des serveurs,
+- séparation des vues selon le rôle (`Administrateur` / `Utilisateur`),
+- configuration du bot par serveur avec API dashboard côté bot ; la persistance cible Enmap quand le backend est disponible.
+
+### Lancer le prototype
+```bash
+pnpm dashboard:dev
+```
+
+### Construire le prototype
+```bash
+pnpm dashboard:build
+```

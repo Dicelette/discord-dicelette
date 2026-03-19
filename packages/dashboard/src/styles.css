@@ -1,0 +1,345 @@
+:root {
+	color-scheme: dark;
+	font-family:
+		Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+		sans-serif;
+	background:
+		radial-gradient(circle at top, rgba(88, 101, 242, 0.35), transparent 40%), #0a1020;
+	color: #f5f7ff;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	background: transparent;
+}
+
+button,
+input,
+select {
+	font: inherit;
+}
+
+button {
+	cursor: pointer;
+	border: none;
+}
+
+#root {
+	min-height: 100vh;
+}
+
+.app-shell {
+	position: relative;
+	padding: 32px;
+	overflow: hidden;
+}
+
+.ambient {
+	position: fixed;
+	inset: auto;
+	width: 420px;
+	height: 420px;
+	border-radius: 999px;
+	filter: blur(70px);
+	opacity: 0.35;
+	pointer-events: none;
+}
+
+.ambient-a {
+	top: -120px;
+	right: -50px;
+	background: #5865f2;
+}
+
+.ambient-b {
+	bottom: -160px;
+	left: -80px;
+	background: #33d1ff;
+}
+
+.card {
+	background: rgba(10, 16, 32, 0.72);
+	backdrop-filter: blur(18px);
+	border: 1px solid rgba(152, 161, 192, 0.18);
+	border-radius: 24px;
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 320px;
+	gap: 24px;
+	padding: 32px;
+	margin-bottom: 24px;
+}
+
+.eyebrow,
+.section-header p {
+	margin: 0 0 8px;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	font-size: 0.75rem;
+	color: #95a0c6;
+}
+
+.hero h1,
+.section-header h2 {
+	margin: 0;
+	font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.hero-copy,
+.section-header span,
+.role-card p,
+.helper-copy,
+.empty-state p {
+	color: #b8c1e1;
+	line-height: 1.6;
+}
+
+.pill-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.pill,
+.badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 8px 12px;
+	border-radius: 999px;
+	font-size: 0.82rem;
+	border: 1px solid rgba(152, 161, 192, 0.25);
+	background: rgba(88, 101, 242, 0.12);
+}
+
+.badge.success {
+	background: rgba(80, 200, 120, 0.16);
+	color: #b8ffd0;
+}
+
+.badge.muted {
+	background: rgba(152, 161, 192, 0.12);
+	color: #c5cae2;
+}
+
+.login-card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 12px;
+	padding: 24px;
+	border-radius: 20px;
+	background: linear-gradient(180deg, rgba(88, 101, 242, 0.24), rgba(88, 101, 242, 0.06));
+}
+
+.avatar,
+.guild-icon {
+	display: grid;
+	place-items: center;
+	width: 60px;
+	height: 60px;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.08);
+	font-size: 1.8rem;
+}
+
+.login-card button,
+.inline-form button {
+	background: linear-gradient(135deg, #5865f2, #7b84ff);
+	color: white;
+	padding: 12px 18px;
+	border-radius: 14px;
+	font-weight: 700;
+}
+
+.dashboard-grid {
+	display: grid;
+	grid-template-columns: 320px minmax(0, 1fr);
+	gap: 24px;
+}
+
+.sidebar,
+.section-block {
+	padding: 24px;
+}
+
+.content-column {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.guild-list,
+.role-stack,
+.collection-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.guild-item {
+	display: flex;
+	gap: 14px;
+	align-items: center;
+	padding: 16px;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid transparent;
+	color: inherit;
+	text-align: left;
+}
+
+.guild-item.active {
+	border-color: rgba(88, 101, 242, 0.6);
+	background: rgba(88, 101, 242, 0.16);
+}
+
+.guild-item span,
+.guild-item small {
+	display: block;
+	color: #b8c1e1;
+	margin-top: 4px;
+}
+
+.role-card,
+.sub-card,
+.kv-card {
+	padding: 18px;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.035);
+	border: 1px solid rgba(152, 161, 192, 0.16);
+}
+
+.role-title-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	align-items: center;
+}
+
+.stats-grid,
+.subsection-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.kv-card strong,
+.collection-row strong,
+.sub-card h3 {
+	display: block;
+	margin-bottom: 8px;
+}
+
+.kv-card span,
+.collection-row code {
+	color: #dce2ff;
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.form-grid.compact {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+label {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+input,
+select {
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 14px;
+	border: 1px solid rgba(152, 161, 192, 0.25);
+	background: rgba(1, 7, 20, 0.55);
+	color: #f5f7ff;
+}
+
+.toggle-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.toggle {
+	flex-direction: row;
+	align-items: center;
+	padding: 14px;
+	border-radius: 16px;
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.toggle input {
+	width: 18px;
+	height: 18px;
+}
+
+.sub-card.wide {
+	grid-column: 1 / -1;
+}
+
+.user-panels {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.collection-row {
+	padding: 12px;
+	border-radius: 14px;
+	background: rgba(1, 7, 20, 0.45);
+}
+
+.inline-form {
+	display: grid;
+	grid-template-columns: 1fr 1fr auto;
+	gap: 10px;
+	margin-top: 16px;
+}
+
+.json-preview {
+	margin: 20px 0 0;
+	padding: 18px;
+	border-radius: 18px;
+	background: #050914;
+	border: 1px solid rgba(152, 161, 192, 0.16);
+	overflow: auto;
+	font-size: 0.9rem;
+}
+
+.empty-state {
+	text-align: center;
+}
+
+@media (max-width: 1180px) {
+	.hero,
+	.dashboard-grid,
+	.form-grid,
+	.form-grid.compact,
+	.stats-grid,
+	.subsection-grid,
+	.toggle-grid,
+	.user-panels {
+		grid-template-columns: 1fr;
+	}
+
+	.inline-form {
+		grid-template-columns: 1fr;
+	}
+}
