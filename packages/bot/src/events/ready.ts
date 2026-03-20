@@ -51,7 +51,7 @@ export default (client: EClient): void => {
 			} else await client.application?.commands.set(serializedCommands);
 			logger.info(`Global commands updated (${serializedCommands.length})`);
 		} catch (err) {
-			logger.error("Failed to update global commands:", err);
+			logger.fatal("Failed to update global commands:", err);
 		}
 
 		const guildPromises = Array.from(client.guilds.cache.values()).map(async (guild) => {
@@ -113,7 +113,7 @@ export default (client: EClient): void => {
 				await Promise.all(cachePromises);
 				logger.info(`Commands and data processed for ${guild.name}`);
 			} catch (error) {
-				logger.error(`Failed to process guild ${guild.name}:`, error);
+				logger.fatal(`Failed to process guild ${guild.name}:`, error);
 			}
 		});
 
@@ -122,8 +122,8 @@ export default (client: EClient): void => {
 		important.info("Bot is ready");
 		logger.info(
 			"Invite link: https://discord.com/api/oauth2/authorize?client_id=" +
-				process.env.CLIENT_ID +
-				"&permissions=8&scope=bot%20applications.commands"
+			process.env.CLIENT_ID +
+			"&permissions=8&scope=bot%20applications.commands"
 		);
 		cleanData(client);
 		if (process.env.NODE_ENV === "development") client.template = dev(client.template);

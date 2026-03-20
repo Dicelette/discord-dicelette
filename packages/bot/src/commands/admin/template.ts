@@ -147,7 +147,7 @@ export const templateManager = {
 				await deleteTemplate(client, interaction, ul);
 			}
 		} catch (e) {
-			logger.fatal(e, "updateTemplateFile: error while updating template");
+			logger.warn(e, "updateTemplateFile: error while updating template");
 			const langToUse = getLangAndConfig(client, interaction).langToUse;
 			await interactionError(client, interaction, e as BotError, ul, langToUse);
 		}
@@ -501,10 +501,10 @@ async function updateMemory(
 		: undefined;
 	const excludedStats = templateData.statistics
 		? Object.keys(
-				Object.fromEntries(
-					Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
-				)
+			Object.fromEntries(
+				Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
 			)
+		)
 		: undefined;
 	const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;
 	if (json) {

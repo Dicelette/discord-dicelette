@@ -10,7 +10,7 @@ export const onReactionAdd = (client: EClient): void => {
 			try {
 				await reaction.fetch();
 			} catch (error) {
-				logger.error("Something went wrong when fetching the message: ", error);
+				logger.warn("Something went wrong when fetching the message: ", error);
 				return;
 			}
 		}
