@@ -1,0 +1,48 @@
+{
+	"name": "@dicelette/web",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "concurrently \"vite\" \"tsx watch server/index.ts\"",
+		"dev:frontend": "vite",
+		"dev:server": "tsx watch server/index.ts",
+		"build": "tsc -p tsconfig.app.json && vite build",
+		"preview": "vite preview",
+		"server:build": "tsc -p tsconfig.server.json"
+	},
+	"dependencies": {
+		"@dicelette/types": "workspace:*",
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.0",
+		"@mui/icons-material": "^5.16.14",
+		"@mui/material": "^5.16.14",
+		"axios": "^1.9.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-router-dom": "^6.30.0"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.5",
+		"@types/express-session": "^1.18.1",
+		"@types/node": "^22.0.0",
+		"@types/react": "^18.3.23",
+		"@types/react-dom": "^18.3.7",
+		"@vitejs/plugin-react": "^4.5.2",
+		"autoprefixer": "^10.4.21",
+		"concurrently": "^9.1.2",
+		"cors": "^2.8.5",
+		"dotenv": "^17.3.1",
+		"express": "^5.1.0",
+		"express-session": "^1.18.1",
+		"postcss": "^8.5.4",
+		"tailwindcss": "^3.4.17",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vite": "^5.4.19"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": ["esbuild"]
+	}
+}

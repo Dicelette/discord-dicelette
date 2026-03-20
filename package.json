@@ -13,6 +13,8 @@
 	"scripts": {
 		"build": "tsc --build && tsc-alias",
 		"dev": "tsx watch --clear-screen=false packages/bot/index.ts",
+		"dashboard:dev": "pnpm --filter @dicelette/web dev",
+		"dashboard:build": "pnpm --filter @dicelette/web build",
 		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false packages/bot/index.ts",
 		"lint": "biome check --write ./packages/ --unsafe",
 		"pm2:delete": "pm2 delete dicelette",

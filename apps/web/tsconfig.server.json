@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"lib": ["ES2020"],
+		"outDir": "./dist-server",
+		"strict": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"paths": {
+			"@dicelette/types": ["../../packages/types/index.ts"],
+			"@dicelette/types/*": ["../../packages/types/src/*"]
+		}
+	},
+	"include": ["server", "../../packages/types"]
+}
