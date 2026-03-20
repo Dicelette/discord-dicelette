@@ -69,10 +69,9 @@ export default {
 				content: "Done!",
 			});
 		} catch (err) {
-			logger.error("Failed to change guild description:", err);
+			logger.warn("Failed to change guild description:", err);
 			await interaction.editReply({
-				// biome-ignore lint/suspicious/noExplicitAny: fallback key for generic API error (no dedicated translation key exists)
-				content: t("description.error" as any),
+				content: ul("description.error.generic", { e: err instanceof Error ? err.message : String(err) }),
 			});
 		}
 	},

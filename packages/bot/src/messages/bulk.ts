@@ -136,7 +136,7 @@ export async function bulkDeleteCharacters(
 			});
 		} else await rep.edit({ components: [] });
 	} catch (err) {
-		logger.error(err);
+		logger.warn(err);
 	}
 	return;
 }
@@ -156,7 +156,7 @@ async function deleteMessageChar(
 			try {
 				await thread.messages.delete(messageId);
 			} catch (err) {
-				logger.error(err);
+				logger.warn(err);
 			}
 		}
 	}

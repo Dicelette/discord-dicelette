@@ -64,14 +64,14 @@ export async function parseCSV(
 
 		async complete(results) {
 			if (!results.data) {
-				logger.error("Error while parsing CSV", results.errors);
+				logger.warn("Error while parsing CSV", results.errors);
 				error = "Error while parsing CSV";
 				return;
 			}
 			//throw error if missing header (it shouldn't not throw if a header is added)
 			const dataHeader = results.meta.fields?.map((key) => key.standardize());
 			if (!dataHeader) {
-				logger.error("Error while parsing CSV, missing header");
+				logger.warn("Error while parsing CSV, missing header");
 				if (interaction)
 					await reply(interaction, {
 						content: ul("import.errors.missing_header"),
@@ -229,16 +229,16 @@ async function step(
 		}
 		const dice: Record<string, string> | undefined = data.dice?.replaceAll("'", "")
 			? data.dice.split(/\r?\n/).reduce(
-					(acc, line) => {
-						const match = line.match(/-\s*([^:]+)\s*:\s*(.+)/);
-						if (match) {
-							const key = match[1].trim();
-							acc[key] = match[2].trim();
-						}
-						return acc;
-					},
-					{} as Record<string, string>
-				)
+				(acc, line) => {
+					const match = line.match(/-\s*([^:]+)\s*:\s*(.+)/);
+					if (match) {
+						const key = match[1].trim();
+						acc[key] = match[2].trim();
+					}
+					return acc;
+				},
+				{} as Record<string, string>
+			)
 			: undefined;
 		const newChar: UserData = {
 			avatar: data.avatar ?? undefined,
