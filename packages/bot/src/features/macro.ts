@@ -784,6 +784,8 @@ export class MacroFeature extends BaseFeature {
 			});
 		}
 
+		if (fieldsToAppend.length > 25) 
+			throw new BotError(this.ul("modals.dice.max"), botErrorOptionsValidation);
 		const diceEmbed = createDiceEmbed(this.ul).addFields(fieldsToAppend);
 		const removed = !fieldsToAppend || fieldsToAppend.length === 0;
 		return { diceEmbed, fieldsToAppend, oldFields: oldDice ?? [], removed };
