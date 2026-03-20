@@ -364,36 +364,32 @@ export class MacroFeature extends BaseFeature {
 						.toJSON()
 						.fields?.findIndex(
 							(f) => f.name.standardize() === field.name.standardize()
-						) === -1 && leng + 1 <= 25
+						) === -1 &&
+					leng + 1 <= 25
 				)
 					diceEmbed.addFields(newField);
-
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
-		const originalValue = `${value}`;
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 
-		if ((!MacroFeature.findDuplicate(diceEmbed, name) && (diceEmbed.data.fields?.length || 0) + 1 <= 25) || !diceEmbed.data.fields) {
-			if (!value || !name)
-				throw new BotError(`Tbh it shouldn't never happend. The value (${originalValue}) or the name (${name}) return empty (?). 
-				I won't translate this error message. 
-				Send me a DM asap to understand why this error even exist. I'm @Mara__Li. 
-				
-				Yes, it's a direct message to YOU.`, {
-					cause: "DICE_REGISTER", "level": BotErrorLevel.Critical, code: originalValue,
-				});
-
+		if (
+			!MacroFeature.findDuplicate(diceEmbed, name) ||
+			!diceEmbed.data.fields
+		) {
+			const len = diceEmbed.data.fields ? diceEmbed.data.fields.length : 0;
+			if (len + 1 > 25) throw new BotError(ul("modals.dice.max"), botErrorOptions);
 			diceEmbed.addFields({
 				inline: true,
 				name: capitalizeBetweenPunct(name),
 				value: `\`${value}\``,
 			});
+
 		} else {
-			const allFieldWithoutDuplicate = diceEmbed
-				.data
-				?.fields?.filter((field) => field.name.standardize() !== name.standardize());
+			const allFieldWithoutDuplicate = diceEmbed.data?.fields?.filter(
+				(field) => field.name.standardize() !== name.standardize()
+			);
 			if (allFieldWithoutDuplicate && allFieldWithoutDuplicate.length + 1 <= 25)
 				diceEmbed.setFields([
 					...allFieldWithoutDuplicate,
@@ -403,6 +399,7 @@ export class MacroFeature extends BaseFeature {
 						value: `\`${value}\``,
 					},
 				]);
+			else if (allFieldWithoutDuplicate.length + 1 > 25) throw new BotError(ul("modals.dice.max"), botErrorOptions);
 		}
 
 		const damageName = diceEmbed.data.fields?.reduce(
@@ -567,9 +564,9 @@ export class MacroFeature extends BaseFeature {
 	static findDuplicate(diceEmbed: Djs.EmbedBuilder, name: string) {
 		if (!diceEmbed.data.fields) return false;
 		return (
-			diceEmbed
-				.data
-				.fields?.findIndex((f) => f.name.standardize() === name.standardize()) !== -1
+			diceEmbed.data.fields?.findIndex(
+				(f) => f.name.standardize() === name.standardize()
+			) !== -1
 		);
 	}
 
@@ -772,7 +769,8 @@ export class MacroFeature extends BaseFeature {
 			const name = field.name.toLowerCase();
 			const dice = field.value;
 			if (
-				!dice || !name ||
+				!dice ||
+				!name ||
 				fieldsToAppend.find((f) => this.compareUnidecode(f.name, name)) ||
 				dice.toLowerCase() === "x" ||
 				dice.trim().length === 0 ||
