@@ -377,7 +377,11 @@ export class MacroFeature extends BaseFeature {
 
 		if ((!MacroFeature.findDuplicate(diceEmbed, name) && (diceEmbed.data.fields?.length || 0) + 1 <= 25) || !diceEmbed.data.fields) {
 			if (!value || !name)
-				throw new BotError(`Tbh it shouldn't never happend. The value (${originalValue}) or the name (${name}) return empty (?). I won't translate this error message. Send me a DM asap to understand why this error even exist. I'm Mara__Li. Yes, it's a direct message to YOU.`, {
+				throw new BotError(`Tbh it shouldn't never happend. The value (${originalValue}) or the name (${name}) return empty (?). 
+				I won't translate this error message. 
+				Send me a DM asap to understand why this error even exist. I'm @Mara__Li. 
+				
+				Yes, it's a direct message to YOU.`, {
 					cause: "DICE_REGISTER", "level": BotErrorLevel.Critical, code: originalValue,
 				});
 
