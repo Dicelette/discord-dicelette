@@ -94,8 +94,8 @@ export const displayUser = {
 			const userMessage = await thread?.messages.fetch(sheetLocation.messageId);
 			const statisticEmbed = getEmbeds(userMessage, "stats");
 			const diceEmbed = getEmbeds(userMessage, "damage");
-			const statsFields = statisticEmbed?.toJSON().fields;
-			const diceFields = generateDice(diceEmbed?.toJSON().fields, statsFields);
+			const statsFields = statisticEmbed?.data.fields;
+			const diceFields = generateDice(diceEmbed?.data.fields, statsFields);
 			const dataUserEmbeds = getEmbeds(userMessage, "user");
 			if (!statisticEmbed && !diceEmbed && !diceFields && !statsFields) {
 				await reply(interaction, {
@@ -104,12 +104,12 @@ export const displayUser = {
 				return;
 			}
 			const jsonDataUser = dataUserEmbeds!
-				.toJSON()
+				.data
 				.fields!.find((x) => findln(x.name) === findln("common.user"));
 			const jsonDataChar = dataUserEmbeds!
-				.toJSON()
+				.data
 				.fields!.find((x) => findln(x.name) === findln("common.character"));
-			const thumbnailJson = dataUserEmbeds?.toJSON().thumbnail?.url;
+			const thumbnailJson = dataUserEmbeds?.data.thumbnail?.url;
 			const files = [];
 			let avatar = thumbnailJson
 				? cleanAvatarUrl(thumbnailJson)

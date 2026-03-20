@@ -101,9 +101,9 @@ interface MacroEditorAuth {
  */
 async function ensureMacroEditor(params: {
 	interaction:
-		| Djs.ButtonInteraction
-		| Djs.ModalSubmitInteraction
-		| Djs.StringSelectMenuInteraction;
+	| Djs.ButtonInteraction
+	| Djs.ModalSubmitInteraction
+	| Djs.StringSelectMenuInteraction;
 	ul: Translation;
 	interactionUser: Djs.User;
 	message?: Djs.Message;
@@ -348,31 +348,35 @@ export class MacroFeature extends BaseFeature {
 
 		if (name.includes(":")) throw new BotError(ul("error.colon"), botErrorOptions);
 		const oldDiceEmbeds = getEmbeds(interaction.message ?? undefined, "damage")?.toJSON();
-		const diceEmbed = oldDiceEmbeds
+		const diceEmbed: Djs.EmbedBuilder = oldDiceEmbeds
 			? new Djs.EmbedBuilder(oldDiceEmbeds)
 			: createDiceEmbed(ul);
 		if (oldDiceEmbeds?.fields)
 			for (const field of oldDiceEmbeds.fields) {
+
+
 				const newField = {
 					inline: field.inline,
 					name: capitalizeBetweenPunct(field.name),
 					value: field.value,
 				};
+				const leng = diceEmbed.data.fields?.length || 0;
 				if (
 					diceEmbed
 						.toJSON()
 						.fields?.findIndex(
 							(f) => f.name.standardize() === field.name.standardize()
-						) === -1
+						) === -1 && leng + 1 <= 25
 				)
 					diceEmbed.addFields(newField);
+
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 
-		if (!MacroFeature.findDuplicate(diceEmbed, name) || !diceEmbed.toJSON().fields) {
+		if (!MacroFeature.findDuplicate(diceEmbed, name) || !diceEmbed.data.fields) {
 			diceEmbed.addFields({
 				inline: true,
 				name: capitalizeBetweenPunct(name),
@@ -380,9 +384,9 @@ export class MacroFeature extends BaseFeature {
 			});
 		} else {
 			const allFieldWithoutDuplicate = diceEmbed
-				.toJSON()
+				.data
 				?.fields?.filter((field) => field.name.standardize() !== name.standardize());
-			if (allFieldWithoutDuplicate)
+			if (allFieldWithoutDuplicate && allFieldWithoutDuplicate.length + 1 <= 25)
 				diceEmbed.setFields([
 					...allFieldWithoutDuplicate,
 					{
@@ -393,7 +397,7 @@ export class MacroFeature extends BaseFeature {
 				]);
 		}
 
-		const damageName = diceEmbed.toJSON().fields?.reduce(
+		const damageName = diceEmbed.data.fields?.reduce(
 			(acc, field) => {
 				acc[field.name] = field.value.removeBacktick();
 				return acc;
@@ -428,7 +432,7 @@ export class MacroFeature extends BaseFeature {
 		allEmbeds.push(diceEmbed);
 		const compare = first
 			? undefined
-			: displayOldAndNewStats(oldDiceEmbeds?.fields, diceEmbed.toJSON().fields);
+			: displayOldAndNewStats(oldDiceEmbeds?.fields, diceEmbed.data.fields);
 		if (!first) {
 			const templateEmbed = getEmbeds(interaction.message ?? undefined, "template");
 			if (templateEmbed) allEmbeds.push(templateEmbed);
@@ -553,10 +557,10 @@ export class MacroFeature extends BaseFeature {
 	}
 
 	static findDuplicate(diceEmbed: Djs.EmbedBuilder, name: string) {
-		if (!diceEmbed.toJSON().fields) return false;
+		if (!diceEmbed.data.fields) return false;
 		return (
 			diceEmbed
-				.toJSON()
+				.data
 				.fields?.findIndex((f) => f.name.standardize() === name.standardize()) !== -1
 		);
 	}
@@ -631,14 +635,14 @@ export class MacroFeature extends BaseFeature {
 		const damageNames = removed
 			? undefined
 			: Object.keys(
-					fieldsToAppend.reduce(
-						(acc, field) => {
-							acc[field.name] = field.value;
-							return acc;
-						},
-						{} as Record<string, string>
-					)
-				);
+				fieldsToAppend.reduce(
+					(acc, field) => {
+						acc[field.name] = field.value;
+						return acc;
+					},
+					{} as Record<string, string>
+				)
+			);
 		await this.persistUserAndMemory(
 			userID,
 			userName,
@@ -741,7 +745,7 @@ export class MacroFeature extends BaseFeature {
 			});
 		}
 
-		const oldDice = diceEmbeds.toJSON().fields;
+		const oldDice = diceEmbeds.data.fields;
 		if (oldDice) {
 			for (const field of oldDice) {
 				const name = field.name.toLowerCase();
@@ -946,11 +950,11 @@ export class MacroFeature extends BaseFeature {
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 
 		const message = await getMessageWithKeyPart(this.ul, interaction, embedKey);
-		const newFields = workingEmbed.toJSON().fields ?? [];
+		const newFields = workingEmbed.data.fields ?? [];
 		const removed = newFields.length === 0;
 
 		const oldDamage = getEmbeds(message ?? undefined, "damage");
-		const oldFields = oldDamage?.toJSON().fields ?? [];
+		const oldFields = oldDamage?.data.fields ?? [];
 		workingEmbed = workingEmbed.setFooter(null);
 		const edited = await this.editMessageDiceEmbeds(
 			message,
@@ -961,14 +965,14 @@ export class MacroFeature extends BaseFeature {
 		const damageNames = removed
 			? undefined
 			: Object.keys(
-					(newFields as Djs.APIEmbedField[]).reduce(
-						(acc, field) => {
-							acc[field.name] = field.value;
-							return acc;
-						},
-						{} as Record<string, string>
-					)
-				);
+				(newFields as Djs.APIEmbedField[]).reduce(
+					(acc, field) => {
+						acc[field.name] = field.value;
+						return acc;
+					},
+					{} as Record<string, string>
+				)
+			);
 		const userEmbed = getEmbeds(message ?? undefined, "user");
 		if (!userEmbed)
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
@@ -1064,7 +1068,7 @@ export class MacroFeature extends BaseFeature {
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
 
 		const oldDamage = getEmbeds(message ?? undefined, "damage");
-		const oldFields = oldDamage?.toJSON().fields ?? [];
+		const oldFields = oldDamage?.data.fields ?? [];
 
 		let embedsApplied: Djs.EmbedBuilder[];
 		let hasStats: boolean;
@@ -1073,11 +1077,11 @@ export class MacroFeature extends BaseFeature {
 			embedsApplied = cached.embeds;
 			hasStats = !!getEmbeds(undefined, "stats", cached.embeds);
 			const damage = getEmbeds(undefined, "damage", embedsApplied);
-			if (damage?.toJSON().footer) {
-				const damageTitle = damage.toJSON().title ?? "";
+			if (damage?.data.footer) {
+				const damageTitle = damage.data.title ?? "";
 				const sanitized = stripFooter(damage);
 				embedsApplied = embedsApplied.map((e) =>
-					(e.toJSON().title ?? "") === damageTitle ? sanitized : e
+					(e.data.title ?? "") === damageTitle ? sanitized : e
 				);
 				const userEmbed = getEmbeds(undefined, "user", embedsApplied);
 				const thumbnail = userEmbed?.data.thumbnail?.url;
@@ -1091,7 +1095,7 @@ export class MacroFeature extends BaseFeature {
 					);
 					const sanitizedUserEmbed = userEmbed!.setThumbnail(res.name);
 					embedsApplied = embedsApplied.map((e) =>
-						(e.toJSON().title ?? "") === (userEmbed!.toJSON().title ?? "")
+						(e.data.title ?? "") === (userEmbed!.data.title ?? "")
 							? sanitizedUserEmbed
 							: e
 					);
@@ -1117,17 +1121,17 @@ export class MacroFeature extends BaseFeature {
 		await message.edit({ components, embeds: embedsApplied, files });
 
 		const newDamage = getEmbeds(message ?? undefined, "damage");
-		const newFields = newDamage?.toJSON().fields ?? [];
+		const newFields = newDamage?.data.fields ?? [];
 		const damageNames = newFields.length
 			? Object.keys(
-					(newFields as Djs.APIEmbedField[]).reduce(
-						(acc, f) => {
-							acc[f.name] = f.value;
-							return acc;
-						},
-						{} as Record<string, string>
-					)
+				(newFields as Djs.APIEmbedField[]).reduce(
+					(acc, f) => {
+						acc[f.name] = f.value;
+						return acc;
+					},
+					{} as Record<string, string>
 				)
+			)
 			: undefined;
 
 		if (!userID) {
@@ -1137,7 +1141,7 @@ export class MacroFeature extends BaseFeature {
 			const charNameRaw2 = parsedUser2["common.character"];
 			userName =
 				charNameRaw2 &&
-				charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
+					charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
 					? charNameRaw2
 					: undefined;
 		}

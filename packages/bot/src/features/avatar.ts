@@ -42,7 +42,7 @@ export class AvatarFeature extends BaseFeature {
 				cause: "AVATAR_EDIT",
 				level: BotErrorLevel.Warning,
 			});
-		const jsonEmbed = embed.toJSON().thumbnail?.url;
+		const jsonEmbed = embed.data.thumbnail?.url;
 		let thumbnail = jsonEmbed
 			? cleanAvatarUrl(jsonEmbed)
 			: await fetchAvatarUrl(interaction.guild!, interaction.user);
@@ -131,10 +131,10 @@ export class AvatarFeature extends BaseFeature {
 
 		await message.edit({ embeds: embedsList.list, files });
 		const user = embed
-			.toJSON()
+			.data
 			.fields?.find((field) => findln(field.name) === "common.user")?.value;
 		const charName = embed
-			.toJSON()
+			.data
 			.fields?.find((field) => findln(field.name) === "common.character")?.value;
 		const nameMention =
 			!charName || findln(charName) === "common.noSet" ? user : `${user} (${charName})`;

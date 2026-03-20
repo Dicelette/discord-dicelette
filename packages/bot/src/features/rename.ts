@@ -45,7 +45,7 @@ export class RenameFeature extends BaseFeature {
 		if (!interaction.message) return null;
 		const embeds = getEmbeds(interaction.message, "user", interaction.message.embeds);
 		if (!embeds) return null;
-		const parsedFields = parseEmbedFields(embeds.toJSON() as Djs.Embed, false);
+		const parsedFields = parseEmbedFields(embeds.data as Djs.Embed, false);
 		const charNameFields = [
 			{ key: "common.charName", value: parsedFields?.["common.charName"] },
 			{ key: "common.character", value: parsedFields?.["common.character"] },
@@ -98,7 +98,7 @@ export class RenameFeature extends BaseFeature {
 		const embed = getEmbeds(message, "user");
 		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const userId = getIdFromMention(
-			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
+			embed.data.fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
 		if (!userId)
 			throw new BotError(this.ul("error.user.notFound.generic"), botErrorOptions);

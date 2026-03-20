@@ -124,7 +124,7 @@ export function getEmbeds(
 
 	if (!allEmbeds) return;
 
-	const allEmbedsJson = allEmbeds?.map((embed) => embed.toJSON()) ?? [];
+	const allEmbedsJson = allEmbeds?.map((embed) => embed.data) ?? [];
 	for (const embedJSON of allEmbedsJson) {
 		const titleKey = findln(embedJSON.title ?? "");
 		const userKeys = ["embed.user", "embed.add", "embed.old"];
@@ -208,7 +208,7 @@ export function createDiceEmbed(ul: Translation) {
  * Remove the footer from an EmbedBuilder by cloning its JSON data without the footer field.
  */
 export function stripFooter(embed: Djs.EmbedBuilder) {
-	const data = embed.toJSON() as Djs.APIEmbed;
+	const data = embed.data as Djs.APIEmbed;
 	const { footer: _ignored, ...rest } = data;
 	return new Djs.EmbedBuilder(rest);
 }
@@ -221,7 +221,7 @@ export function removeEmbedsFromList(
 	which: "user" | "stats" | "damage" | "template"
 ) {
 	return embeds.filter((embed) => {
-		const embedTitle = embed.toJSON().title;
+		const embedTitle = embed.data.title;
 		if (!embedTitle) return false;
 		const title = findln(embedTitle);
 		switch (which) {

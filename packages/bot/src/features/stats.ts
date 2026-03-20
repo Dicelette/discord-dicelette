@@ -162,7 +162,7 @@ export class StatsFeature extends BaseFeature {
 		const statistics = getEmbeds(interaction.message, "stats");
 		if (!statistics)
 			throw new BotError(this.ul("error.stats.notFound_plural"), botErrorOptionsModals);
-		const stats = parseEmbedFields(statistics.toJSON() as Djs.Embed, false);
+		const stats = parseEmbedFields(statistics.data as Djs.Embed, false);
 		const originalGuildData = this.db.get(interaction.guild!.id, "templateID.statsName");
 		const registeredStats = originalGuildData?.map((stat) => stat.unidecode());
 		const userStats = Object.keys(stats).map((stat) => stat.unidecode());
@@ -222,7 +222,7 @@ export class StatsFeature extends BaseFeature {
 			await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const userEmbed = getEmbeds(message, "user");
 		if (!userEmbed) return;
-		const thumbnail = userEmbed.toJSON().thumbnail?.url;
+		const thumbnail = userEmbed.data.thumbnail?.url;
 		const files = message.attachments.map(
 			(att) => new Djs.AttachmentBuilder(att.url, { name: att.name })
 		);
@@ -236,7 +236,7 @@ export class StatsFeature extends BaseFeature {
 			(name) => files.find((f) => f.name === name)!
 		);
 		const statsEmbed = getEmbeds(message, "stats");
-		const oldStatsTotal = (statsEmbed?.toJSON().fields ?? [])
+		const oldStatsTotal = (statsEmbed?.data.fields ?? [])
 			.filter((field) => isNumber(field.value.removeBacktick()))
 			.reduce((sum, field) => sum + Number.parseInt(field.value.removeBacktick(), 10), 0);
 		logger.trace(`Old stats total: ${oldStatsTotal}`);
@@ -259,10 +259,10 @@ export class StatsFeature extends BaseFeature {
 		}
 		const statsWithoutCombinaison = this.template.statistics
 			? Object.keys(this.template.statistics)
-					.filter((stat) => !this.template!.statistics![stat].combinaison)
-					.map((name) => name.standardize())
+				.filter((stat) => !this.template!.statistics![stat].combinaison)
+				.map((name) => name.standardize())
 			: [];
-		const embedObject = statEmbeds.toJSON();
+		const embedObject = statEmbeds.data;
 		const fields = embedObject.fields;
 		if (!fields) return;
 		const parsedFields: Record<string, string> = {};
@@ -342,12 +342,12 @@ export class StatsFeature extends BaseFeature {
 		}
 		const restePoints = ilReste
 			? (() => {
-					const allowNegative = Object.values(this.template.statistics || {}).some(
-						(stat) => stat.min !== undefined && stat.min < 0
-					);
-					const displayReste = allowNegative ? ilReste : Math.abs(ilReste);
-					return `\n${this.ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: this.template.total })}`;
-				})()
+				const allowNegative = Object.values(this.template.statistics || {}).some(
+					(stat) => stat.min !== undefined && stat.min < 0
+				);
+				const displayReste = allowNegative ? ilReste : Math.abs(ilReste);
+				return `\n${this.ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: this.template.total })}`;
+			})()
 			: "";
 
 		await message.edit({
@@ -473,10 +473,10 @@ export class StatsFeature extends BaseFeature {
 			await message.edit({ components: [components], embeds: toAdd, files });
 			await reply(
 				interaction as
-					| Djs.ModalSubmitInteraction
-					| Djs.ButtonInteraction
-					| Djs.CommandInteraction
-					| Djs.StringSelectMenuInteraction,
+				| Djs.ModalSubmitInteraction
+				| Djs.ButtonInteraction
+				| Djs.CommandInteraction
+				| Djs.StringSelectMenuInteraction,
 				{
 					content: this.ul("modals.removed.stats"),
 					flags: Djs.MessageFlags.Ephemeral,
@@ -500,15 +500,15 @@ export class StatsFeature extends BaseFeature {
 			message
 		);
 		await message.edit({ embeds: list, files });
-		const compare = displayOldAndNewStats(statsEmbeds.toJSON().fields, fieldsToAppend);
+		const compare = displayOldAndNewStats(statsEmbeds.data.fields, fieldsToAppend);
 		const count = compare.added + compare.changed + compare.removed;
 
 		await reply(
 			interaction as
-				| Djs.ModalSubmitInteraction
-				| Djs.ButtonInteraction
-				| Djs.CommandInteraction
-				| Djs.StringSelectMenuInteraction,
+			| Djs.ModalSubmitInteraction
+			| Djs.ButtonInteraction
+			| Djs.CommandInteraction
+			| Djs.StringSelectMenuInteraction,
 			{
 				content: this.ul("embed.edit.stats", {
 					count,
@@ -592,7 +592,7 @@ export class StatsFeature extends BaseFeature {
 				value: `\`${num}\``,
 			});
 		}
-		const oldStats = statsEmbeds.toJSON().fields;
+		const oldStats = statsEmbeds.data.fields;
 		if (oldStats) {
 			for (const field of oldStats) {
 				const name = field.name.toLowerCase();
@@ -720,7 +720,7 @@ export class StatsFeature extends BaseFeature {
 			const message = await channel.messages.fetch(messageId);
 			const oldStatsEmbed =
 				getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(this.ul);
-			const fieldsToAppend = interaction.message.embeds[0]?.toJSON().fields;
+			const fieldsToAppend = interaction.message.embeds[0]?.data.fields;
 			if (!fieldsToAppend || !message)
 				throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 			await this.validateEdit(
@@ -737,18 +737,18 @@ export class StatsFeature extends BaseFeature {
 		if (!embed) {
 			const apiEmbed = interaction.message.embeds[0];
 			if (!apiEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
-			embed = new Djs.EmbedBuilder(apiEmbed.toJSON() as Djs.APIEmbed);
+			embed = new Djs.EmbedBuilder(apiEmbed.data as Djs.APIEmbed);
 		}
 		//if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const message = await getMessageWithKeyPart(this.ul, interaction, embedKey);
 		const oldStatsEmbed =
 			getEmbeds(message ?? undefined, "stats") ?? createStatsEmbed(this.ul);
-		const fieldsToAppend = embed.toJSON().fields;
+		const fieldsToAppend = embed.data.fields;
 		if (!fieldsToAppend || !message)
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 		const userEmbed = getEmbeds(message ?? undefined, "user");
 		if (!userEmbed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
-		const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
+		const parsedFields = parseEmbedFields(userEmbed.data as Djs.Embed);
 		const mention = parsedFields["common.user"];
 		const ownerId = getIdFromMention(mention);
 		const charNameRaw = parsedFields["common.character"];

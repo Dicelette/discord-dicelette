@@ -7,15 +7,15 @@ export type ModerationKind = "stats-edit" | "dice-edit" | "dice-add";
 
 export type ModerationCacheValue =
 	| {
-			kind: "stats-edit" | "dice-edit";
-			embed: Djs.EmbedBuilder;
-			meta: { userID: string; userName?: string; channelId: string; messageId: string };
-	  }
+		kind: "stats-edit" | "dice-edit";
+		embed: Djs.EmbedBuilder;
+		meta: { userID: string; userName?: string; channelId: string; messageId: string };
+	}
 	| {
-			kind: "dice-add";
-			embeds: Djs.EmbedBuilder[];
-			meta: { userID: string; userName?: string; channelId: string; messageId: string };
-	  };
+		kind: "dice-add";
+		embeds: Djs.EmbedBuilder[];
+		meta: { userID: string; userName?: string; channelId: string; messageId: string };
+	};
 
 const CACHE = new Map<string, ModerationCacheValue>();
 
@@ -127,7 +127,7 @@ export function getUserId(interaction: Djs.ButtonInteraction) {
 	//get footer to find userId
 	const apiEmbed = interaction.message.embeds[0];
 	if (apiEmbed) {
-		const data = getModerationFooter(new Djs.EmbedBuilder(apiEmbed.toJSON()));
+		const data = getModerationFooter(new Djs.EmbedBuilder(apiEmbed.data));
 		userId = data?.userID;
 		url = `https://discord.com/channels/${interaction.guild!.id}/${data?.channelId}/${data?.messageId}`;
 	}

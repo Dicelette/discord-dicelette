@@ -287,7 +287,7 @@ export async function rename(
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const n = embed
-		.toJSON()
+		.data
 		.fields?.find((field) => findln(field.name) === "common.character");
 	if (!n) throw new BotError(ul("error.user.rename"), botErrorOptions);
 	n.value = name ? name : ul("common.noSet");
@@ -397,7 +397,7 @@ export async function move(
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
-	const n = embed.toJSON().fields?.find((field) => findln(field.name) === "common.user");
+	const n = embed.data.fields?.find((field) => findln(field.name) === "common.user");
 
 	if (!n) throw new BotError(ul("error.embed.old"), botErrorOptions);
 	n.value = `<@${newUser.id}>`;

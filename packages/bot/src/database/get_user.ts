@@ -66,7 +66,7 @@ export function getUserByEmbed(
 	const user: Partial<UserData> = {};
 	const userEmbed = first ? ensureEmbed(message) : getEmbeds(message, "user", embeds);
 	if (!userEmbed) return;
-	const parsedFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
+	const parsedFields = parseEmbedFields(userEmbed.data as Djs.Embed);
 	const charNameFields = [
 		{ key: "common.charName", value: parsedFields?.["common.charName"] },
 		{ key: "common.character", value: parsedFields?.["common.character"] },
@@ -74,16 +74,16 @@ export function getUserByEmbed(
 	if (charNameFields && charNameFields.value !== "common.noSet") {
 		user.userName = charNameFields.value;
 	}
-	const statsFields = getEmbeds(message, "stats", embeds)?.toJSON() as Djs.Embed;
+	const statsFields = getEmbeds(message, "stats", embeds)?.data as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
-	const damageFields = getEmbeds(message, "damage", embeds)?.toJSON() as Djs.Embed;
+	const damageFields = getEmbeds(message, "damage", embeds)?.data as Djs.Embed;
 	const templateDamage = parseDamageFields(damageFields);
 	const templateEmbed = first ? userEmbed : getEmbeds(message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(
-		parseEmbedFields(templateEmbed?.toJSON() as Djs.Embed)
+		parseEmbedFields(templateEmbed?.data as Djs.Embed)
 	);
-	if (fetchAvatar) user.avatar = userEmbed.toJSON().thumbnail?.url || undefined;
+	if (fetchAvatar) user.avatar = userEmbed.data.thumbnail?.url || undefined;
 
 	if (user.avatar && cleanUrl) user.avatar = cleanAvatarUrl(user.avatar);
 	if (fetchChannel && message) user.channel = message.channel.id;
@@ -236,9 +236,9 @@ async function getUserFrom(
 
 	const ul = ln(
 		guildData.get(guildId, "lang") ??
-			(context.type === "interaction"
-				? (context.interaction.locale as Djs.Locale)
-				: context.message.guild!.preferredLocale)
+		(context.type === "interaction"
+			? (context.interaction.locale as Djs.Locale)
+			: context.message.guild!.preferredLocale)
 	);
 
 	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {
@@ -513,11 +513,11 @@ export async function getUserNameAndChar(
 	let userEmbed = getEmbeds(interaction?.message ?? undefined, "user");
 	if (first) {
 		const firstEmbed = ensureEmbed(interaction?.message ?? undefined);
-		if (firstEmbed) userEmbed = new Djs.EmbedBuilder(firstEmbed.toJSON());
+		if (firstEmbed) userEmbed = new Djs.EmbedBuilder(firstEmbed.data);
 	}
 	if (!userEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const userID = userEmbed
-		.toJSON()
+		.data
 		.fields?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
@@ -529,7 +529,7 @@ export async function getUserNameAndChar(
 	)
 		throw new BotError(ul("error.channel.thread"), botErrorOptions);
 	let userName = userEmbed
-		.toJSON()
+		.data
 		.fields?.find((field) => findln(field.name) === "common.character")?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
 	return { thread: interaction.channel, userID, userName };

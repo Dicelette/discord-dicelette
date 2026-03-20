@@ -239,13 +239,13 @@ export class UserFeature extends BaseFeature {
 
 		const customChannel = allowCustomChannel
 			? interaction.fields
-					.getSelectedChannels("channelId", false, [
-						Djs.ChannelType.PublicThread,
-						Djs.ChannelType.GuildText,
-						Djs.ChannelType.PrivateThread,
-						Djs.ChannelType.GuildForum,
-					])
-					?.first()
+				.getSelectedChannels("channelId", false, [
+					Djs.ChannelType.PublicThread,
+					Djs.ChannelType.GuildText,
+					Djs.ChannelType.PrivateThread,
+					Djs.ChannelType.GuildForum,
+				])
+				?.first()
 			: undefined;
 
 		const charName = interaction.fields.getTextInputValue("charName");
@@ -278,10 +278,10 @@ export class UserFeature extends BaseFeature {
 		if (avatarStr === "error") verifiedAvatar = false;
 		const existChannel = sheetId
 			? await fetchChannel(
-					interaction.guild!,
-					sheetId,
-					customChannel as Djs.GuildBasedChannel | undefined
-				)
+				interaction.guild!,
+				sheetId,
+				customChannel as Djs.GuildBasedChannel | undefined
+			)
 			: undefined;
 		if (!existChannel) {
 			await Messages.reply(interaction, {
@@ -376,7 +376,7 @@ export class UserFeature extends BaseFeature {
 		);
 
 		const statsAlreadySet = Object.keys(
-			parseEmbedFields(statsEmbed.toJSON() as Djs.Embed, false)
+			parseEmbedFields(statsEmbed.data as Djs.Embed, false)
 		)
 			.filter((stat) => allTemplateStat.includes(stat.unidecode()))
 			.map((stat) => stat.unidecode());
@@ -488,8 +488,8 @@ export class UserFeature extends BaseFeature {
 
 		const userEmbed = Messages.getEmbeds(interaction.message, "user");
 		if (!userEmbed) throw new NoEmbed();
-		const oldEmbedsFields = parseEmbedFields(userEmbed.toJSON() as Djs.Embed);
-		const jsonThumbnail = userEmbed.toJSON().thumbnail?.url;
+		const oldEmbedsFields = parseEmbedFields(userEmbed.data as Djs.Embed);
+		const jsonThumbnail = userEmbed.data.thumbnail?.url;
 		let userID = oldEmbedsFields?.["common.user"];
 		let charName: string | undefined = oldEmbedsFields?.["common.charName"];
 		const isPrivate = oldEmbedsFields["common.isPrivate"] === "common.yes";
@@ -542,9 +542,9 @@ export class UserFeature extends BaseFeature {
 		const oldDiceEmbeds = Messages.getEmbeds(interaction.message, "damage");
 		const oldStatsEmbed = Messages.getEmbeds(interaction.message, "stats");
 		const oldDiceEmbedsFields = oldDiceEmbeds
-			? (oldDiceEmbeds.toJSON().fields ?? [])
+			? (oldDiceEmbeds.data.fields ?? [])
 			: [];
-		const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.toJSON().fields ?? []) : [];
+		const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.data.fields ?? []) : [];
 		let diceEmbed: Djs.EmbedBuilder | undefined;
 		let statsEmbed: Djs.EmbedBuilder | undefined;
 		for (const field of oldDiceEmbedsFields) {
@@ -569,7 +569,7 @@ export class UserFeature extends BaseFeature {
 		}
 
 		const parsedStats = statsEmbed
-			? parseEmbedFields(statsEmbed.toJSON() as Djs.Embed, false)
+			? parseEmbedFields(statsEmbed.data as Djs.Embed, false)
 			: undefined;
 		const stats: Record<string, number> = {};
 		for (const [name, value] of Object.entries(parsedStats ?? {})) {
@@ -583,7 +583,7 @@ export class UserFeature extends BaseFeature {
 			stats[name] = statValue;
 		}
 
-		const macroFields = diceEmbed?.toJSON().fields ?? [];
+		const macroFields = diceEmbed?.data.fields ?? [];
 		let templateMacro: Record<string, string> | undefined;
 		if (macroFields.length > 0) {
 			templateMacro = {};

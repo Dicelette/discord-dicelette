@@ -77,7 +77,7 @@ export class MoveFeature extends BaseFeature {
 		if (!embed) throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 
 		const oldUserId = getIdFromMention(
-			embed.toJSON().fields?.find((field) => findln(field.name) === "common.user")?.value
+			embed.data.fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
 		if (oldUserId === user.id) {
 			await reply(interaction, {

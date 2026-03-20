@@ -89,7 +89,7 @@ async function buildEmbedsForCharacter(
 		char.userName ?? undefined
 	);
 
-	char.avatar = userDataEmbed.toJSON()?.thumbnail?.url;
+	char.avatar = userDataEmbed.data?.thumbnail?.url;
 
 	const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
 	let diceEmbed = guildTemplate.damage ? createDiceEmbed(ul) : undefined;
