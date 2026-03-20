@@ -206,4 +206,4 @@ export const userSettings = {
 	},
 };
 
-export { setTemplate, getTemplateValues, createLinksCmdOptions };
+export { createLinksCmdOptions, getTemplateValues, setTemplate };

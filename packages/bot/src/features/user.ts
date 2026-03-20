@@ -239,13 +239,13 @@ export class UserFeature extends BaseFeature {
 
 		const customChannel = allowCustomChannel
 			? interaction.fields
-				.getSelectedChannels("channelId", false, [
-					Djs.ChannelType.PublicThread,
-					Djs.ChannelType.GuildText,
-					Djs.ChannelType.PrivateThread,
-					Djs.ChannelType.GuildForum,
-				])
-				?.first()
+					.getSelectedChannels("channelId", false, [
+						Djs.ChannelType.PublicThread,
+						Djs.ChannelType.GuildText,
+						Djs.ChannelType.PrivateThread,
+						Djs.ChannelType.GuildForum,
+					])
+					?.first()
 			: undefined;
 
 		const charName = interaction.fields.getTextInputValue("charName");
@@ -278,10 +278,10 @@ export class UserFeature extends BaseFeature {
 		if (avatarStr === "error") verifiedAvatar = false;
 		const existChannel = sheetId
 			? await fetchChannel(
-				interaction.guild!,
-				sheetId,
-				customChannel as Djs.GuildBasedChannel | undefined
-			)
+					interaction.guild!,
+					sheetId,
+					customChannel as Djs.GuildBasedChannel | undefined
+				)
 			: undefined;
 		if (!existChannel) {
 			await Messages.reply(interaction, {
@@ -541,9 +541,7 @@ export class UserFeature extends BaseFeature {
 		const userDataEmbed = Messages.createUserEmbed(this.ul, avatarStr, userID, charName);
 		const oldDiceEmbeds = Messages.getEmbeds(interaction.message, "damage");
 		const oldStatsEmbed = Messages.getEmbeds(interaction.message, "stats");
-		const oldDiceEmbedsFields = oldDiceEmbeds
-			? (oldDiceEmbeds.data.fields ?? [])
-			: [];
+		const oldDiceEmbedsFields = oldDiceEmbeds ? (oldDiceEmbeds.data.fields ?? []) : [];
 		const statEmbedsFields = oldStatsEmbed ? (oldStatsEmbed.data.fields ?? []) : [];
 		let diceEmbed: Djs.EmbedBuilder | undefined;
 		let statsEmbed: Djs.EmbedBuilder | undefined;

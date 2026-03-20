@@ -101,9 +101,9 @@ interface MacroEditorAuth {
  */
 async function ensureMacroEditor(params: {
 	interaction:
-	| Djs.ButtonInteraction
-	| Djs.ModalSubmitInteraction
-	| Djs.StringSelectMenuInteraction;
+		| Djs.ButtonInteraction
+		| Djs.ModalSubmitInteraction
+		| Djs.StringSelectMenuInteraction;
 	ul: Translation;
 	interactionUser: Djs.User;
 	message?: Djs.Message;
@@ -374,10 +374,7 @@ export class MacroFeature extends BaseFeature {
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 
-		if (
-			!MacroFeature.findDuplicate(diceEmbed, name) ||
-			!diceEmbed.data.fields
-		) {
+		if (!MacroFeature.findDuplicate(diceEmbed, name) || !diceEmbed.data.fields) {
 			const len = diceEmbed.data.fields ? diceEmbed.data.fields.length : 0;
 			if (len + 1 > 25) throw new BotError(ul("modals.dice.max"), botErrorOptions);
 			diceEmbed.addFields({
@@ -385,7 +382,6 @@ export class MacroFeature extends BaseFeature {
 				name: capitalizeBetweenPunct(name),
 				value: `\`${value}\``,
 			});
-
 		} else {
 			const allFieldWithoutDuplicate = diceEmbed.data?.fields?.filter(
 				(field) => field.name.standardize() !== name.standardize()
@@ -399,7 +395,8 @@ export class MacroFeature extends BaseFeature {
 						value: `\`${value}\``,
 					},
 				]);
-			else if (allFieldWithoutDuplicate.length + 1 > 25) throw new BotError(ul("modals.dice.max"), botErrorOptions);
+			else if (allFieldWithoutDuplicate.length + 1 > 25)
+				throw new BotError(ul("modals.dice.max"), botErrorOptions);
 		}
 
 		const damageName = diceEmbed.data.fields?.reduce(
@@ -640,14 +637,14 @@ export class MacroFeature extends BaseFeature {
 		const damageNames = removed
 			? undefined
 			: Object.keys(
-				fieldsToAppend.reduce(
-					(acc, field) => {
-						acc[field.name] = field.value;
-						return acc;
-					},
-					{} as Record<string, string>
-				)
-			);
+					fieldsToAppend.reduce(
+						(acc, field) => {
+							acc[field.name] = field.value;
+							return acc;
+						},
+						{} as Record<string, string>
+					)
+				);
 		await this.persistUserAndMemory(
 			userID,
 			userName,
@@ -784,7 +781,7 @@ export class MacroFeature extends BaseFeature {
 			});
 		}
 
-		if (fieldsToAppend.length > 25) 
+		if (fieldsToAppend.length > 25)
 			throw new BotError(this.ul("modals.dice.max"), botErrorOptionsValidation);
 		const diceEmbed = createDiceEmbed(this.ul).addFields(fieldsToAppend);
 		const removed = !fieldsToAppend || fieldsToAppend.length === 0;
@@ -974,14 +971,14 @@ export class MacroFeature extends BaseFeature {
 		const damageNames = removed
 			? undefined
 			: Object.keys(
-				(newFields as Djs.APIEmbedField[]).reduce(
-					(acc, field) => {
-						acc[field.name] = field.value;
-						return acc;
-					},
-					{} as Record<string, string>
-				)
-			);
+					(newFields as Djs.APIEmbedField[]).reduce(
+						(acc, field) => {
+							acc[field.name] = field.value;
+							return acc;
+						},
+						{} as Record<string, string>
+					)
+				);
 		const userEmbed = getEmbeds(message ?? undefined, "user");
 		if (!userEmbed)
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
@@ -1133,14 +1130,14 @@ export class MacroFeature extends BaseFeature {
 		const newFields = newDamage?.data.fields ?? [];
 		const damageNames = newFields.length
 			? Object.keys(
-				(newFields as Djs.APIEmbedField[]).reduce(
-					(acc, f) => {
-						acc[f.name] = f.value;
-						return acc;
-					},
-					{} as Record<string, string>
+					(newFields as Djs.APIEmbedField[]).reduce(
+						(acc, f) => {
+							acc[f.name] = f.value;
+							return acc;
+						},
+						{} as Record<string, string>
+					)
 				)
-			)
 			: undefined;
 
 		if (!userID) {
@@ -1150,7 +1147,7 @@ export class MacroFeature extends BaseFeature {
 			const charNameRaw2 = parsedUser2["common.character"];
 			userName =
 				charNameRaw2 &&
-					charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
+				charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
 					? charNameRaw2
 					: undefined;
 		}

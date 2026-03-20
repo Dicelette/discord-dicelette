@@ -286,9 +286,7 @@ export async function rename(
 	const message = await thread!.messages.fetch(sheetLocation.messageId);
 	const embed = getEmbeds(message, "user");
 	if (!embed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
-	const n = embed
-		.data
-		.fields?.find((field) => findln(field.name) === "common.character");
+	const n = embed.data.fields?.find((field) => findln(field.name) === "common.character");
 	if (!n) throw new BotError(ul("error.user.rename"), botErrorOptions);
 	n.value = name ? name : ul("common.noSet");
 	//update the embed

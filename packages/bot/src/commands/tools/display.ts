@@ -103,12 +103,12 @@ export const displayUser = {
 				});
 				return;
 			}
-			const jsonDataUser = dataUserEmbeds!
-				.data
-				.fields!.find((x) => findln(x.name) === findln("common.user"));
-			const jsonDataChar = dataUserEmbeds!
-				.data
-				.fields!.find((x) => findln(x.name) === findln("common.character"));
+			const jsonDataUser = dataUserEmbeds!.data.fields!.find(
+				(x) => findln(x.name) === findln("common.user")
+			);
+			const jsonDataChar = dataUserEmbeds!.data.fields!.find(
+				(x) => findln(x.name) === findln("common.character")
+			);
 			const thumbnailJson = dataUserEmbeds?.data.thumbnail?.url;
 			const files = [];
 			let avatar = thumbnailJson

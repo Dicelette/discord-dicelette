@@ -80,9 +80,7 @@ export function getUserByEmbed(
 	const templateDamage = parseDamageFields(damageFields);
 	const templateEmbed = first ? userEmbed : getEmbeds(message, "template", embeds);
 	user.damage = templateDamage;
-	user.template = parseTemplateField(
-		parseEmbedFields(templateEmbed?.data as Djs.Embed)
-	);
+	user.template = parseTemplateField(parseEmbedFields(templateEmbed?.data as Djs.Embed));
 	if (fetchAvatar) user.avatar = userEmbed.data.thumbnail?.url || undefined;
 
 	if (user.avatar && cleanUrl) user.avatar = cleanAvatarUrl(user.avatar);
@@ -236,9 +234,9 @@ async function getUserFrom(
 
 	const ul = ln(
 		guildData.get(guildId, "lang") ??
-		(context.type === "interaction"
-			? (context.interaction.locale as Djs.Locale)
-			: context.message.guild!.preferredLocale)
+			(context.type === "interaction"
+				? (context.interaction.locale as Djs.Locale)
+				: context.message.guild!.preferredLocale)
 	);
 
 	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {
@@ -516,9 +514,8 @@ export async function getUserNameAndChar(
 		if (firstEmbed) userEmbed = new Djs.EmbedBuilder(firstEmbed.data);
 	}
 	if (!userEmbed) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
-	const userID = userEmbed
-		.data
-		.fields?.find((field) => findln(field.name) === "common.user")
+	const userID = userEmbed.data.fields
+		?.find((field) => findln(field.name) === "common.user")
 		?.value.replace("<@", "")
 		.replace(">", "");
 	if (!userID) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
@@ -528,9 +525,9 @@ export async function getUserNameAndChar(
 			!(interaction.channel instanceof Djs.TextChannel))
 	)
 		throw new BotError(ul("error.channel.thread"), botErrorOptions);
-	let userName = userEmbed
-		.data
-		.fields?.find((field) => findln(field.name) === "common.character")?.value;
+	let userName = userEmbed.data.fields?.find(
+		(field) => findln(field.name) === "common.character"
+	)?.value;
 	if (userName === ul("common.noSet")) userName = undefined;
 	return { thread: interaction.channel, userID, userName };
 }

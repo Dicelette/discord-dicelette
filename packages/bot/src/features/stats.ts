@@ -259,8 +259,8 @@ export class StatsFeature extends BaseFeature {
 		}
 		const statsWithoutCombinaison = this.template.statistics
 			? Object.keys(this.template.statistics)
-				.filter((stat) => !this.template!.statistics![stat].combinaison)
-				.map((name) => name.standardize())
+					.filter((stat) => !this.template!.statistics![stat].combinaison)
+					.map((name) => name.standardize())
 			: [];
 		const embedObject = statEmbeds.data;
 		const fields = embedObject.fields;
@@ -342,12 +342,12 @@ export class StatsFeature extends BaseFeature {
 		}
 		const restePoints = ilReste
 			? (() => {
-				const allowNegative = Object.values(this.template.statistics || {}).some(
-					(stat) => stat.min !== undefined && stat.min < 0
-				);
-				const displayReste = allowNegative ? ilReste : Math.abs(ilReste);
-				return `\n${this.ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: this.template.total })}`;
-			})()
+					const allowNegative = Object.values(this.template.statistics || {}).some(
+						(stat) => stat.min !== undefined && stat.min < 0
+					);
+					const displayReste = allowNegative ? ilReste : Math.abs(ilReste);
+					return `\n${this.ul("modals.stats.reste", { nbStats: statsWithoutCombinaison.length - nbStats, reste: displayReste, total: this.template.total })}`;
+				})()
 			: "";
 
 		await message.edit({
@@ -473,10 +473,10 @@ export class StatsFeature extends BaseFeature {
 			await message.edit({ components: [components], embeds: toAdd, files });
 			await reply(
 				interaction as
-				| Djs.ModalSubmitInteraction
-				| Djs.ButtonInteraction
-				| Djs.CommandInteraction
-				| Djs.StringSelectMenuInteraction,
+					| Djs.ModalSubmitInteraction
+					| Djs.ButtonInteraction
+					| Djs.CommandInteraction
+					| Djs.StringSelectMenuInteraction,
 				{
 					content: this.ul("modals.removed.stats"),
 					flags: Djs.MessageFlags.Ephemeral,
@@ -505,10 +505,10 @@ export class StatsFeature extends BaseFeature {
 
 		await reply(
 			interaction as
-			| Djs.ModalSubmitInteraction
-			| Djs.ButtonInteraction
-			| Djs.CommandInteraction
-			| Djs.StringSelectMenuInteraction,
+				| Djs.ModalSubmitInteraction
+				| Djs.ButtonInteraction
+				| Djs.CommandInteraction
+				| Djs.StringSelectMenuInteraction,
 			{
 				content: this.ul("embed.edit.stats", {
 					count,

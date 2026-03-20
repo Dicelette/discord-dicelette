@@ -130,12 +130,12 @@ export class AvatarFeature extends BaseFeature {
 		);
 
 		await message.edit({ embeds: embedsList.list, files });
-		const user = embed
-			.data
-			.fields?.find((field) => findln(field.name) === "common.user")?.value;
-		const charName = embed
-			.data
-			.fields?.find((field) => findln(field.name) === "common.character")?.value;
+		const user = embed.data.fields?.find(
+			(field) => findln(field.name) === "common.user"
+		)?.value;
+		const charName = embed.data.fields?.find(
+			(field) => findln(field.name) === "common.character"
+		)?.value;
 		const nameMention =
 			!charName || findln(charName) === "common.noSet" ? user : `${user} (${charName})`;
 		const msgLink = message.url;
