@@ -353,8 +353,6 @@ export class MacroFeature extends BaseFeature {
 			: createDiceEmbed(ul);
 		if (oldDiceEmbeds?.fields)
 			for (const field of oldDiceEmbeds.fields) {
-
-
 				const newField = {
 					inline: field.inline,
 					name: capitalizeBetweenPunct(field.name),
@@ -373,10 +371,16 @@ export class MacroFeature extends BaseFeature {
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
+		const originalValue = `${value}`;
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 
-		if (!MacroFeature.findDuplicate(diceEmbed, name) || !diceEmbed.data.fields) {
+		if ((!MacroFeature.findDuplicate(diceEmbed, name) && (diceEmbed.data.fields?.length || 0) + 1 <= 25) || !diceEmbed.data.fields) {
+			if (!value || !name)
+				throw new BotError(`Tbh it shouldn't never happend. The value (${originalValue}) or the name (${name}) return empty (?). I won't translate this error message. Send me a DM asap to understand why this error even exist. I'm Mara__Li. Yes, it's a direct message to YOU.`, {
+					cause: "DICE_REGISTER", "level": BotErrorLevel.Critical, code: originalValue,
+				});
+
 			diceEmbed.addFields({
 				inline: true,
 				name: capitalizeBetweenPunct(name),
@@ -764,6 +768,7 @@ export class MacroFeature extends BaseFeature {
 			const name = field.name.toLowerCase();
 			const dice = field.value;
 			if (
+				!dice || !name ||
 				fieldsToAppend.find((f) => this.compareUnidecode(f.name, name)) ||
 				dice.toLowerCase() === "x" ||
 				dice.trim().length === 0 ||
