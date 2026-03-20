@@ -54,9 +54,10 @@
 		"packages/**/tests/**",
 		"packages/**/vitest.config.ts",
 		"@testing/**",
-		"packages/localization/docs/**"
+		"packages/localization/docs/**",
+		"apps/web/src/**"
 	],
-	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "package.json"],
+	"include": ["packages/**/*.ts", "packages/**/*.d.ts", "apps/web/server/**/*.ts", "package.json"],
 	"ts-node": {
 		"esm": true,
 		"experimentalSpecifierResolution": "node",

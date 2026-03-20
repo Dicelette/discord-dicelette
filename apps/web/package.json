@@ -4,12 +4,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "concurrently \"vite\" \"tsx watch server/index.ts\"",
-		"dev:frontend": "vite",
-		"dev:server": "tsx watch server/index.ts",
+		"dev": "vite",
 		"build": "tsc -p tsconfig.app.json && vite build",
-		"preview": "vite preview",
-		"server:build": "tsc -p tsconfig.server.json"
+		"preview": "vite preview"
 	},
 	"dependencies": {
 		"@dicelette/types": "workspace:*",

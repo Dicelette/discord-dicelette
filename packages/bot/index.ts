@@ -73,6 +73,19 @@ app.listen(process.env.PORT || 3000, () => {
 	important.info(`Health check server is running on port ${process.env.PORT || 3000}`);
 });
 
+if (process.env.DASHBOARD_ENABLED === "true") {
+	import("../../apps/web/server/index.js")
+		.then(({ startDashboardServer }) => {
+			startDashboardServer({
+				settings: client.settings,
+				userSettings: client.userSettings,
+			});
+		})
+		.catch((err) => {
+			logger.warn("Could not start dashboard server:", err);
+		});
+}
+
 client
 	.login(process.env.DISCORD_TOKEN)
 	.then(() => {
