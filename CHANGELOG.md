@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.37.5](https://github.com/Dicelette/discord-dicelette/compare/2.37.4...2.37.5) (2026-03-20)
+
+
+### Bug Fixes
+
+* should throw an error if the set contains more than 25 fields ([6bff0ee](https://github.com/Dicelette/discord-dicelette/commit/6bff0eead61b2fb9b73f60958ec2661c6e24860f))
+
 ## [2.37.4](https://github.com/Dicelette/discord-dicelette/compare/2.37.3...2.37.4) (2026-03-20)
 
 ## [2.37.3](https://github.com/Dicelette/discord-dicelette/compare/2.37.2...2.37.3) (2026-03-14)
