@@ -3,7 +3,9 @@
     "allow": [
       "Read(//dev/**)",
       "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/fr.ts\")",
-      "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/index.tsx\")"
+      "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/index.tsx\")",
+      "Bash(pnpm run:*)",
+      "Bash(timeout 10 node dist/apps/bot/index.js)"
     ]
   }
 }
