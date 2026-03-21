@@ -20,7 +20,7 @@
 		"tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo",
 		"paths": {
 			"@dicelette/bot": ["apps/bot/index.js"],
-			"@dicelette/helpers": ["packages/helper/index.js"],
+			"@dicelette/helpers": ["packages/helpers/index.js"],
 			"@dicelette/client": ["packages/client/index.js"],
 			"@dicelette/localization": ["packages/localization/index.js"],
 			"@dicelette/parse_result": ["packages/parse_result/index.js"],
