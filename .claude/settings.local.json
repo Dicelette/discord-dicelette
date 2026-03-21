@@ -5,7 +5,8 @@
       "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/fr.ts\")",
       "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/index.tsx\")",
       "Bash(pnpm run:*)",
-      "Bash(timeout 10 node dist/apps/bot/index.js)"
+      "Bash(timeout 10 node dist/apps/bot/index.js)",
+      "Bash(powershell.exe -Command \"Move-Item -Path apps/parse_result -Destination packages/parse_result\")"
     ]
   }
 }
