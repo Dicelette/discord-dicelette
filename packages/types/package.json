@@ -4,11 +4,5 @@
 	"type": "module",
 	"exports": {
 		".": "./index.ts"
-	},
-	"peerDependencies": {
-		"@dicelette/core": "*",
-		"discord.js": "*",
-		"enmap": "*",
-		"i18next": "*"
 	}
 }

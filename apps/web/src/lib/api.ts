@@ -40,6 +40,13 @@ export interface ApiGuildConfig {
 	pity?: number;
 	disableCompare?: boolean;
 	sortOrder?: string;
+	stripOOC?: {
+		regex?: string;
+		forwardId?: string;
+		threadMode?: boolean;
+		timer?: number;
+		categoryId?: string[];
+	};
 	templateID?: {
 		channelId: string;
 		messageId: string;

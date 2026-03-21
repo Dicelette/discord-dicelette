@@ -329,7 +329,7 @@ export const bulkAdd = {
 			langToUse
 		);
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
-		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel");
+		const privateChannel = client.settings.get(interaction.guild!.id, "privateChannel") ?? undefined;
 		if (!defaultChannel)
 			return reply(interaction, {
 				content: ul("error.channel.defaultChannel"),

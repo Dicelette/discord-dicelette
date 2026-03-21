@@ -13,8 +13,10 @@
 	"scripts": {
 		"build": "tsc --build && tsc-alias",
 		"dev": "tsx watch --clear-screen=false packages/bot/index.ts",
+		"bot:watch": "tsx watch --clear-screen=false packages/bot/index.ts",
 		"dashboard:dev": "pnpm --filter @dicelette/web dev",
 		"dashboard:build": "pnpm --filter @dicelette/web build",
+		"dev:dashboard": "concurrently --raw -n bot,web -c cyan,magenta \"tsx watch packages/bot/index.ts\" \"pnpm -C apps/web dev\"",
 		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false packages/bot/index.ts",
 		"lint": "biome check --write ./packages/ --unsafe",
 		"pm2:delete": "pm2 delete dicelette",
@@ -57,6 +59,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.5",
+		"@go-task/cli": "^3.49.1",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.5",
 		"@types/express-session": "^1.18.1",
@@ -65,6 +68,7 @@
 		"@types/parse-color": "^1.0.3",
 		"@types/semver": "^7.7.0",
 		"commit-and-tag-version": "^12.6.1",
+		"concurrently": "^9.1.2",
 		"cross-env": "^10.1.0",
 		"glob": "^13.0.6",
 		"husky": "^9.1.7",
@@ -85,6 +89,7 @@
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"@biomejs/biome",
+			"@go-task/cli",
 			"@sentry-internal/node-cpu-profiler",
 			"better-sqlite3",
 			"canvas",

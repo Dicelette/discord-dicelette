@@ -351,6 +351,97 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 						</>
 					)}
 				</Box>
+
+				<Divider sx={{ my: 3 }} />
+
+				<SectionTitle>Suppression HRP (hors-roleplay)</SectionTitle>
+				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<FormControlLabel
+						control={
+							<Switch
+								checked={!!local.stripOOC}
+								onChange={(e) =>
+									set("stripOOC", e.target.checked ? {} : undefined)
+								}
+							/>
+						}
+						label="Activer la suppression HRP"
+					/>
+				</Box>
+				{local.stripOOC !== undefined && (
+					<Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+						<TextField
+							label="Regex de détection HRP"
+							size="small"
+							fullWidth
+							value={local.stripOOC.regex ?? ""}
+							onChange={(e) =>
+								set("stripOOC", { ...local.stripOOC, regex: e.target.value || undefined })
+							}
+							helperText='Ex: \(\(.*\)\) — entoure les messages hors-jeu'
+						/>
+						<Box>
+							<Typography variant="body2" gutterBottom>
+								Délai avant suppression : {local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0}s
+							</Typography>
+							<Slider
+								value={local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0}
+								min={0}
+								max={3600}
+								step={30}
+								onChange={(_, v) =>
+									set("stripOOC", {
+										...local.stripOOC,
+										timer: (v as number) ? (v as number) * 1000 : undefined,
+									})
+								}
+								valueLabelDisplay="auto"
+								sx={{ maxWidth: 400 }}
+							/>
+						</Box>
+						<FormControl fullWidth size="small">
+							<InputLabel>Canaux/catégories surveillés</InputLabel>
+							<Select
+								multiple
+								value={local.stripOOC.categoryId ?? []}
+								label="Canaux/catégories surveillés"
+								onChange={(e) =>
+									set("stripOOC", {
+										...local.stripOOC,
+										categoryId: (e.target.value as string[]).length
+											? (e.target.value as string[])
+											: undefined,
+									})
+								}
+							>
+								{channels.map((c) => (
+									<MenuItem key={c.id} value={c.id}>
+										{c.type === 4 ? "📂" : "#"} {c.name}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+						{channelSelect(
+							"Canal de renvoi HRP (optionnel)",
+							local.stripOOC.forwardId,
+							(v) => set("stripOOC", { ...local.stripOOC, forwardId: v || undefined }),
+						)}
+						<FormControlLabel
+							control={
+								<Switch
+									checked={!!local.stripOOC.threadMode}
+									onChange={(e) =>
+										set("stripOOC", {
+											...local.stripOOC,
+											threadMode: e.target.checked || undefined,
+										})
+									}
+								/>
+							}
+							label="Mode thread (ignorer le canal de renvoi)"
+						/>
+					</Box>
+				)}
 			</Paper>
 
 			<Box className="flex justify-end">

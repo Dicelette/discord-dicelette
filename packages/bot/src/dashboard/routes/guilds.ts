@@ -1,11 +1,10 @@
-import { Router } from "express";
-import type { Request, Response } from "express";
-import type { DashboardDeps } from "../index.js";
 import type { GuildData } from "@dicelette/types";
+import type { Request, Response } from "express";
+import { Router } from "express";
+import type { DashboardDeps } from "../index.js";
 
 const DISCORD_API = "https://discord.com/api/v10";
 
-/** Auth middleware */
 function requireAuth(req: Request, res: Response, next: () => void) {
 	if (!req.session?.userId) {
 		res.status(401).json({ error: "Not authenticated" });
@@ -14,13 +13,9 @@ function requireAuth(req: Request, res: Response, next: () => void) {
 	next();
 }
 
-/**
- * Check if user has MANAGE_GUILD or ADMINISTRATOR permission on this guild.
- */
 async function userCanManageGuild(userId: string, guildId: string): Promise<boolean> {
 	const botToken = process.env.DISCORD_TOKEN;
 	if (!botToken) return false;
-
 	try {
 		const memberRes = await fetch(`${DISCORD_API}/guilds/${guildId}/members/${userId}`, {
 			headers: { Authorization: `Bot ${botToken}` },
@@ -37,15 +32,14 @@ async function userCanManageGuild(userId: string, guildId: string): Promise<bool
 			permissions: string;
 		}>;
 
-		const MANAGE_GUILD = BigInt(0x20);
-		const ADMINISTRATOR = BigInt(0x8);
+		const ManageGuild = BigInt(0x20);
+		const Administrator = BigInt(0x8);
 
 		for (const role of guildRoles) {
 			if (role.id === guildId || member.roles.includes(role.id)) {
 				const perms = BigInt(role.permissions);
-				if ((perms & MANAGE_GUILD) !== BigInt(0) || (perms & ADMINISTRATOR) !== BigInt(0)) {
+				if ((perms & ManageGuild) !== BigInt(0) || (perms & Administrator) !== BigInt(0))
 					return true;
-				}
 			}
 		}
 		return false;
@@ -58,9 +52,8 @@ export function createGuildRouter(deps: DashboardDeps) {
 	const { settings, userSettings: _userSettings } = deps;
 	const router = Router();
 
-	/** GET /api/guilds/:guildId/config */
 	router.get("/:guildId/config", requireAuth, async (req: Request, res: Response) => {
-		const guildId = req.params["guildId"] as string;
+		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
 		const config = settings.get(guildId);
@@ -75,14 +68,12 @@ export function createGuildRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		// Don't expose the `user` field (contains private character data)
 		const { user: _user, ...safeConfig } = config;
 		res.json(safeConfig);
 	});
 
-	/** PATCH /api/guilds/:guildId/config */
 	router.patch("/:guildId/config", requireAuth, async (req: Request, res: Response) => {
-		const guildId = req.params["guildId"] as string;
+		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
 		const canManage = await userCanManageGuild(userId, guildId);
@@ -127,8 +118,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 			if (value === undefined || value === null) {
 				delete merged[key];
 			} else {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				(merged as any)[key] = value;
+				(merged as Record<keyof GuildData, unknown>)[key] = value;
 			}
 		}
 
@@ -136,16 +126,13 @@ export function createGuildRouter(deps: DashboardDeps) {
 		res.json({ ok: true });
 	});
 
-	/** GET /api/guilds/:guildId/channels */
 	router.get("/:guildId/channels", requireAuth, async (req: Request, res: Response) => {
-		const guildId = req.params["guildId"] as string;
+		const guildId = req.params.guildId as string;
 		const botToken = process.env.DISCORD_TOKEN;
-
 		if (!botToken) {
 			res.status(500).json({ error: "Bot token not configured" });
 			return;
 		}
-
 		try {
 			const r = await fetch(`${DISCORD_API}/guilds/${guildId}/channels`, {
 				headers: { Authorization: `Bot ${botToken}` },
@@ -159,22 +146,20 @@ export function createGuildRouter(deps: DashboardDeps) {
 				name: string;
 				type: number;
 			}>;
-			res.json(channels.filter((c) => c.type === 0 || c.type === 5));
+			// 0=text, 4=category, 5=announcement, 15=forum
+		res.json(channels.filter((c) => [0, 4, 5, 15].includes(c.type)));
 		} catch {
 			res.status(500).json({ error: "Failed to fetch channels" });
 		}
 	});
 
-	/** GET /api/guilds/:guildId/roles */
 	router.get("/:guildId/roles", requireAuth, async (req: Request, res: Response) => {
-		const guildId = req.params["guildId"] as string;
+		const guildId = req.params.guildId as string;
 		const botToken = process.env.DISCORD_TOKEN;
-
 		if (!botToken) {
 			res.status(500).json({ error: "Bot token not configured" });
 			return;
 		}
-
 		try {
 			const r = await fetch(`${DISCORD_API}/guilds/${guildId}/roles`, {
 				headers: { Authorization: `Bot ${botToken}` },
@@ -194,10 +179,9 @@ export function createGuildRouter(deps: DashboardDeps) {
 		}
 	});
 
-	/** GET /api/guilds/:guildId/invite */
 	router.get("/:guildId/invite", requireAuth, (req: Request, res: Response) => {
-		const guildId = req.params["guildId"] as string;
-		const clientId = process.env.DISCORD_CLIENT_ID;
+		const guildId = req.params.guildId as string;
+		const clientId = process.env.DISCORD_CLIENT_ID ?? process.env.CLIENT_ID;
 		if (!clientId) {
 			res.status(500).json({ error: "CLIENT_ID not configured" });
 			return;

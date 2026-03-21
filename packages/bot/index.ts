@@ -1,13 +1,13 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
-import { humanizeDuration, logger, sentry } from "@dicelette/utils";
-import dotenv from "dotenv";
-import "uniformize";
 import process from "node:process";
-import { important, setupProcessErrorHandlers } from "@dicelette/utils";
+import { humanizeDuration, important, logger, sentry, setupProcessErrorHandlers } from "@dicelette/utils";
 import { client } from "client";
+import dotenv from "dotenv";
 import * as event from "event";
 import express from "express";
 import packageJson from "../../package.json" with { type: "json" };
+import { startDashboardServer } from "./src/dashboard/index.js";
+import "uniformize";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 setupProcessErrorHandlers();
@@ -74,16 +74,11 @@ app.listen(process.env.PORT || 3000, () => {
 });
 
 if (process.env.DASHBOARD_ENABLED === "true") {
-	import("../../apps/web/server/index.js")
-		.then(({ startDashboardServer }) => {
-			startDashboardServer({
-				settings: client.settings,
-				userSettings: client.userSettings,
-			});
-		})
-		.catch((err) => {
-			logger.warn("Could not start dashboard server:", err);
-		});
+	logger.trace("Starting dashboard server...");
+	startDashboardServer({
+		settings: client.settings,
+		userSettings: client.userSettings,
+	});
 }
 
 client

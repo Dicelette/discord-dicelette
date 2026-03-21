@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+  default:
+    desc: Start bot + dashboard in parallel (dev mode)
+    deps: [bot, web]
+
+  bot:
+    desc: Start the bot in watch mode
+    cmds:
+      - tsx watch --clear-screen=false packages/bot/index.ts
+
+  web:
+    desc: Start the web dashboard (Vite dev server)
+    cmds:
+      - pnpm -C apps/web dev
+
+  build:
+    desc: Build the project
+    cmds:
+      - tsc --build && tsc-alias
+
+  lint:
+    desc: Lint and auto-fix
+    cmds:
+      - biome check --write ./packages/ --unsafe
