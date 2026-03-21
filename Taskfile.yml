@@ -10,12 +10,12 @@ tasks:
   bot:
     desc: Start the bot in watch mode
     cmds:
-      - tsx watch --clear-screen=false packages/bot/index.ts
+      - tsx watch --clear-screen=false dicelette/bot/index.ts
 
   web:
     desc: Start the web dashboard (Vite dev server)
     cmds:
-      - pnpm -C apps/web dev
+      - pnpm -C web dev
 
   build:
     desc: Build the project
@@ -25,4 +25,4 @@ tasks:
   lint:
     desc: Lint and auto-fix
     cmds:
-      - biome check --write ./packages/ --unsafe
+      - biome check --write ./dicelette/ --unsafe
