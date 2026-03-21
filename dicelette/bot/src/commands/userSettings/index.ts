@@ -1,9 +1,9 @@
+import type { EClient } from "@dicelette/client";
 import {
 	getInteractionContext as getLangAndConfig,
 	getSettingsAutoComplete,
 	removeEntry,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import * as attributes from "./attributes";

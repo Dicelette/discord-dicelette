@@ -1,8 +1,8 @@
+import type { EClient } from "@dicelette/client";
 import {
 	getInteractionContext as getLangAndConfig,
 	macroOptions,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
+} from "@dicelette/helpers";
 import { logger, sentry } from "@dicelette/utils";
 import { getMacro } from "database";
 import * as Djs from "discord.js";

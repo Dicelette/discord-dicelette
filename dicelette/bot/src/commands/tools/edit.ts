@@ -1,11 +1,7 @@
 // noinspection ExceptionCaughtLocallyJS
 
-import {
-	autoCompleteEdit,
-	charUserOptions,
-	reuploadAvatar,
-} from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import { autoCompleteEdit, charUserOptions, reuploadAvatar } from "@dicelette/helpers";
 import { findln, t } from "@dicelette/localization";
 import type {
 	DiscordChannel,

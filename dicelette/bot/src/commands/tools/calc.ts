@@ -1,6 +1,6 @@
-import { autoCompleteCharacters, calcOptions } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
 import { generateStatsDice, isNumber } from "@dicelette/core";
+import { autoCompleteCharacters, calcOptions } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import {
@@ -164,10 +164,10 @@ export async function calculate(
 
 	let statInfo:
 		| {
-				value: number | undefined;
-				stat: string;
-				name: string;
-		  }
+			value: number | undefined;
+			stat: string;
+			name: string;
+		}
 		| undefined;
 	let needFormat = true;
 	if (userStatistique && isCalc) {

@@ -1,5 +1,5 @@
-import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import "@dicelette/discord_ext";
 import { findln } from "@dicelette/localization";
 import type {

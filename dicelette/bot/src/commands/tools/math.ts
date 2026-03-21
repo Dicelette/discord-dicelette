@@ -2,11 +2,11 @@
  * Same as calc but without statistics
  */
 
+import type { EClient } from "@dicelette/client";
 import {
 	calcOptions,
 	getInteractionContext as getLangAndConfig,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
+} from "@dicelette/helpers";
 import * as Djs from "discord.js";
 import { calculate } from "./calc";
 import "@dicelette/discord_ext";

@@ -1,3 +1,4 @@
+import type { EClient } from "@dicelette/client";
 import {
 	buildJsonAttachment,
 	chunkErrorMessage,
@@ -7,8 +8,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	processEntries,
 	registerEntry,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
 import * as Djs from "discord.js";

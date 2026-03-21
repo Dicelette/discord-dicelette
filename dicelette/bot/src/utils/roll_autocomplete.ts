@@ -1,5 +1,5 @@
-import { getGuildContext } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import { getGuildContext } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import { filterStatsInDamage } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";

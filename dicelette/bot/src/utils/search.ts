@@ -1,4 +1,4 @@
-import { fetchChannel } from "@dicelette/bot-helpers";
+import { fetchChannel } from "@dicelette/helpers";
 import type { DiscordChannel, Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import * as Djs from "discord.js";

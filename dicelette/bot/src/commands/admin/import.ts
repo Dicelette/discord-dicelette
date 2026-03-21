@@ -20,7 +20,7 @@ import {
 	fetchAvatarUrl,
 	getInteractionContext as getLangAndConfig,
 	reuploadAvatar,
-} from "@dicelette/bot-helpers";
+} from "@dicelette/helpers";
 import { QUERY_URL_PATTERNS } from "@dicelette/utils";
 
 // Small helpers to reduce repetition and control concurrency

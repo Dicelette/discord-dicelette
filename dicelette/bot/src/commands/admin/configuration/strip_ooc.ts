@@ -1,5 +1,5 @@
-import { fetchChannel } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import { fetchChannel } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
 import { BotError, BotErrorLevel, type BotErrorOptions, sentry } from "@dicelette/utils";
@@ -72,7 +72,7 @@ export async function stripOOC(
 		const collectorFilter: (
 			i: Djs.StringSelectMenuInteraction | Djs.ChannelSelectMenuInteraction
 		) => boolean = (i) =>
-			i.user.id === interaction.user.id && i.customId === "stripOoc_select";
+				i.user.id === interaction.user.id && i.customId === "stripOoc_select";
 		if (!response.resource?.message) {
 			// noinspection ExceptionCaughtLocallyJS
 			throw new BotError(ul("error.failedReply"), botErrorOptions);

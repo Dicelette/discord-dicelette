@@ -1,9 +1,9 @@
+import type { EClient } from "@dicelette/client";
+import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import {
 	fetchChannel,
 	getInteractionContext as getLangAndConfig,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
-import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import { type GuildData, type Translation, TUTORIAL_IMAGES } from "@dicelette/types";
 import {
@@ -501,10 +501,10 @@ async function updateMemory(
 		: undefined;
 	const excludedStats = templateData.statistics
 		? Object.keys(
-				Object.fromEntries(
-					Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
-				)
+			Object.fromEntries(
+				Object.entries(templateData.statistics).filter(([_, value]) => value.exclude)
 			)
+		)
 		: undefined;
 	const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;
 	if (json) {

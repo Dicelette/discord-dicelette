@@ -1,11 +1,11 @@
+import type { EClient } from "@dicelette/client";
+import type { CustomCritical, SortOrder, StatisticalTemplate } from "@dicelette/core";
 import {
 	extractRollOptions,
 	getGuildContext,
 	getInteractionContext as getLangAndConfig,
 	getStatisticOption,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
-import type { CustomCritical, SortOrder, StatisticalTemplate } from "@dicelette/core";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
 	buildInfoRollFromStats,
@@ -211,12 +211,12 @@ export async function rollMacro(
 	}
 	const opposition = oppositionVal
 		? parseOpposition(
-				oppositionVal,
-				comparator,
-				userStatistique.stats,
-				dollarValue?.total,
-				sortOrder
-			)
+			oppositionVal,
+			comparator,
+			userStatistique.stats,
+			dollarValue?.total,
+			sortOrder
+		)
 		: undefined;
 	const roll = composed.roll;
 	const opts: RollOptions = {
@@ -341,12 +341,12 @@ export async function rollStatistique(
 	//const diceEvaluated = replaceFormulaInDice(dice);
 	const opposition = oppositionVal
 		? parseOpposition(
-				oppositionVal,
-				composed.comparatorEvaluated,
-				userStatistique.stats,
-				userStatStr,
-				sortOrder
-			)
+			oppositionVal,
+			composed.comparatorEvaluated,
+			userStatistique.stats,
+			userStatStr,
+			sortOrder
+		)
 		: undefined;
 	let infoRoll =
 		statistic && standardizedStatistic

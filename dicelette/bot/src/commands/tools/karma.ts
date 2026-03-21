@@ -5,7 +5,7 @@ import "@dicelette/discord_ext";
 import {
 	fetchAvatarUrl,
 	getInteractionContext as getLangAndConfig,
-} from "@dicelette/bot-helpers";
+} from "@dicelette/helpers";
 import { cmdLn } from "@dicelette/localization";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import { t } from "i18next";

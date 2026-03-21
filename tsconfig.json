@@ -20,7 +20,7 @@
 		"tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo",
 		"paths": {
 			"@dicelette/bot": ["dicelette/bot/index.js"],
-			"@dicelette/bot-helpers": ["dicelette/bot-helpers/index.js"],
+			"@dicelette/helpers": ["dicelette/helpers/index.js"],
 			"@dicelette/client": ["dicelette/client/index.js"],
 			"@dicelette/localization": ["dicelette/localization/index.js"],
 			"@dicelette/parse_result": ["dicelette/parse_result/index.js"],
@@ -37,7 +37,7 @@
 			"locales": ["dicelette/bot/src/locales.js"],
 			"messages": ["dicelette/bot/src/messages/index.js"],
 			"utils": ["dicelette/bot/src/utils/index.js"],
-			"@dicelette/dashboard" : ["dicelette/dashboard/index.js"]
+			"@dicelette/dashboard": ["dicelette/dashboard/index.js"]
 		},
 		"removeComments": true,
 		"resolveJsonModule": true,

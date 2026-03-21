@@ -2,12 +2,12 @@
  * Allow to export all characters from the database to a CSV file
  */
 
+import type { EClient } from "@dicelette/client";
 import {
 	type CSVRow,
 	getGuildContext,
 	getInteractionContext as getLangAndConfig,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import { getUserFromInteraction } from "database";
 import * as Djs from "discord.js";
@@ -130,8 +130,8 @@ async function exportToCsv(
 					// dice lines with localized separator/space
 					const dice: undefined | string = stats.damage
 						? `'${Object.keys(stats.damage)
-								.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
-								.join("\n")}`
+							.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
+							.join("\n")}`
 						: undefined;
 
 					// map stats according to template names (preserve accented names in CSV header)

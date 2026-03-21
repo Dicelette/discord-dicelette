@@ -1,5 +1,5 @@
-import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import { LINKS, type Translation } from "@dicelette/types";
 import { humanizeDuration } from "@dicelette/utils";
 import dedent from "dedent";

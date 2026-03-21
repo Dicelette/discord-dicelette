@@ -1,7 +1,8 @@
 /** biome-ignore-all lint/style/useNamingConvention: Discord naming convention doesn't follow TS */
-import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
+
 import type { EClient } from "@dicelette/client";
 import { SortOrder } from "@dicelette/core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import { cmdLn, t } from "@dicelette/localization";
 
 import * as Djs from "discord.js";

@@ -1,10 +1,10 @@
+import type { EClient } from "@dicelette/client";
+import { DETECT_CRITICAL, findBestRecord, generateStatsDice } from "@dicelette/core";
 import {
 	getInteractionContext as getLangAndConfig,
 	getSettingsAutoComplete,
 	macroOptions,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
-import { DETECT_CRITICAL, findBestRecord, generateStatsDice } from "@dicelette/core";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
 	composeRollBase,
@@ -134,12 +134,12 @@ export default {
 
 		const opposition = oppositionVal
 			? parseOpposition(
-					oppositionVal,
-					composed.comparatorEvaluated,
-					attributes,
-					undefined,
-					sortOrder
-				)
+				oppositionVal,
+				composed.comparatorEvaluated,
+				attributes,
+				undefined,
+				sortOrder
+			)
 			: undefined;
 
 		const opts: RollOptions = {

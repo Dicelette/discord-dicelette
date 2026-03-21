@@ -1,8 +1,8 @@
+import type { EClient } from "@dicelette/client";
 import {
 	getGuildContext,
 	getInteractionContext as getLangAndConfig,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
 	buildInfoRollFromStats,
@@ -83,9 +83,9 @@ export async function baseRoll(
 
 	const data = interaction.guild
 		? await getUserFromInteraction(client, user.id, interaction, firstChara, {
-				attributes: true,
-				skipNotFound: true,
-			})
+			attributes: true,
+			skipNotFound: true,
+		})
 		: undefined;
 	const userData = data?.userData;
 	let charName = data?.charName ?? firstChara;

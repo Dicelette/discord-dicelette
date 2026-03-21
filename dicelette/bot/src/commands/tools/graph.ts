@@ -1,6 +1,6 @@
 import path from "node:path";
-import { charUserOptions, haveAccess } from "@dicelette/bot-helpers";
 import type { EClient } from "@dicelette/client";
+import { charUserOptions, haveAccess } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
 import { filterChoices, logger, sentry } from "@dicelette/utils";
@@ -16,8 +16,8 @@ import { embedError, reply, sendLogs } from "messages";
 import parse from "parse-color";
 import { searchUserChannel } from "utils";
 import "@dicelette/discord_ext";
-import { getInteractionContext as getLangAndConfig } from "@dicelette/bot-helpers";
 import type { Statistic, StatisticalTemplate } from "@dicelette/core";
+import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 
 async function chart(
 	userData: UserData,

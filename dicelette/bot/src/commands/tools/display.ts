@@ -1,12 +1,12 @@
+import type { EClient } from "@dicelette/client";
+import { generateStatsDice } from "@dicelette/core";
 import {
 	autoCompleteEdit,
 	charUserOptions,
 	fetchAvatarUrl,
 	haveAccess,
 	reuploadAvatar,
-} from "@dicelette/bot-helpers";
-import type { EClient } from "@dicelette/client";
-import { generateStatsDice } from "@dicelette/core";
+} from "@dicelette/helpers";
 import { findln, t } from "@dicelette/localization";
 import { type CharacterData, MIN_THRESHOLD_MATCH } from "@dicelette/types";
 import { sentry } from "@dicelette/utils";
