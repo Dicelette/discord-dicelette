@@ -12,7 +12,7 @@ import dotenv from "dotenv";
 import * as event from "event";
 import express from "express";
 import packageJson from "../../package.json" with { type: "json" };
-import { startDashboardServer } from "./src/dashboard/index.js";
+import { startDashboardServer } from "@dicelette/dashboard";
 import "uniformize";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });

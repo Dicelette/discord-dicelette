@@ -116,6 +116,16 @@
 		{ "includes": ["**/*.js", "!**/node_modules/**"] },
 		{ "includes": ["**/*.json", "!**/node_modules/**"] },
 		{
+			"includes": ["**/web/src/index.css"],
+			"linter": {
+				"rules": {
+					"suspicious" : {
+						"noUnknownAtRules": "off"
+					}
+				}
+			}
+		},
+		{
 			"includes": ["**/dicelette/src/bot/commands/tools/graph.ts", "!**/node_modules/**"],
 			"linter": {
 				"rules": {
@@ -126,7 +136,7 @@
 			}
 		},
 		{
-			"includes": ["**/dashboard/**"],
+			"includes": ["**/dashboard/**", "web/src/lib/api.ts"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -135,6 +145,7 @@
 				}
 			}
 		},
+		
 		{
 			"includes": ["**/tests/constant.ts", "!**/node_modules/**", "**/src/regex.ts"],
 			"linter": {
