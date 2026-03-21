@@ -15,7 +15,7 @@ tasks:
   web:
     desc: Start the web dashboard (Vite dev server)
     cmds:
-      - pnpm -C web dev
+      - pnpm -C apps/web dev
 
   build:
     desc: Build the project

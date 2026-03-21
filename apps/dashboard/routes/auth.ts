@@ -120,6 +120,15 @@ router.post("/logout", (req: Request, res: Response) => {
 	});
 });
 
+router.post("/guilds/refresh", (req: Request, res: Response) => {
+	if (!req.session.accessToken) {
+		res.status(401).json({ error: "Not authenticated" });
+		return;
+	}
+	botGuildCache = null;
+	res.json({ ok: true });
+});
+
 router.get("/guilds", async (req: Request, res: Response) => {
 	if (!req.session.accessToken) {
 		res.status(401).json({ error: "Not authenticated" });
@@ -150,7 +159,13 @@ router.get("/guilds", async (req: Request, res: Response) => {
 	}
 });
 
+let botGuildCache: { ids: Set<string>; expiresAt: number } | null = null;
+const BOT_GUILD_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
 async function getBotGuildIds(): Promise<Set<string>> {
+	if (botGuildCache && Date.now() < botGuildCache.expiresAt) {
+		return botGuildCache.ids;
+	}
 	const botToken = process.env.DISCORD_TOKEN;
 	if (!botToken) return new Set();
 	try {
@@ -159,7 +174,9 @@ async function getBotGuildIds(): Promise<Set<string>> {
 		});
 		if (!res.ok) return new Set();
 		const guilds = (await res.json()) as Array<{ id: string }>;
-		return new Set(guilds.map((g) => g.id));
+		const ids = new Set(guilds.map((g) => g.id));
+		botGuildCache = { ids, expiresAt: Date.now() + BOT_GUILD_CACHE_TTL_MS };
+		return ids;
 	} catch {
 		return new Set();
 	}

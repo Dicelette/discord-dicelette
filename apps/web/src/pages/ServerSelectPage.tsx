@@ -1,4 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
@@ -11,6 +12,7 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,17 +23,33 @@ import { authApi, guildApi } from "../lib/api";
 export default function ServerSelectPage() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
 	const { t } = useI18n();
 
 	useEffect(() => {
+		setLoading(true);
 		authApi
 			.guilds()
 			.then((res) => setGuilds(res.data))
 			.catch(() => setError(t("servers.loadError")))
 			.finally(() => setLoading(false));
 	}, [t]);
+
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		setError(null);
+		try {
+			await authApi.refreshGuilds();
+			const res = await authApi.guilds();
+			setGuilds(res.data);
+		} catch {
+			setError(t("servers.loadError"));
+		} finally {
+			setRefreshing(false);
+		}
+	};
 
 	const botGuilds = guilds.filter((g) => g.botPresent);
 	const adminGuilds = guilds.filter((g) => !g.botPresent);
@@ -54,9 +72,24 @@ export default function ServerSelectPage() {
 
 	return (
 		<Box className="max-w-4xl mx-auto p-6">
-			<Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 1 }}>
-				{t("servers.title")}
-			</Typography>
+			<Box className="flex items-center justify-between" sx={{ mb: 1 }}>
+				<Typography variant="h4" fontWeight={700}>
+					{t("servers.title")}
+				</Typography>
+				<Tooltip title={t("servers.refreshTooltip")}>
+					<span>
+						<Button
+							size="small"
+							variant="outlined"
+							startIcon={refreshing ? <CircularProgress size={14} /> : <RefreshIcon />}
+							onClick={handleRefresh}
+							disabled={refreshing || loading}
+						>
+							{t("servers.refresh")}
+						</Button>
+					</span>
+				</Tooltip>
+			</Box>
 			<Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
 				{t("servers.subtitle")}
 			</Typography>

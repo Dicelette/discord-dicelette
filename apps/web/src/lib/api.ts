@@ -83,6 +83,7 @@ export const authApi = {
 	me: () => api.get<DiscordUser>("/auth/me"),
 	logout: () => api.post("/auth/logout"),
 	guilds: () => api.get<DiscordGuild[]>("/auth/guilds"),
+	refreshGuilds: () => api.post("/auth/guilds/refresh"),
 };
 
 export const guildApi = {

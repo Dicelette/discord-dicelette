@@ -21,7 +21,9 @@
 		"addBotTitle": "Add Dicelette",
 		"addBotDesc": "You are an administrator on these servers — you can add the bot.",
 		"noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
-		"loadError": "Could not load servers."
+		"loadError": "Could not load servers.",
+		"refresh": "Refresh",
+		"refreshTooltip": "The list is cached for 15 min. Click to force an update."
 	},
 	"dashboard": {
 		"title": "Server configuration",

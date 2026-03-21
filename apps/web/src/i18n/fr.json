@@ -21,7 +21,9 @@
 		"addBotTitle": "Ajouter Dicelette",
 		"addBotDesc": "Vous êtes administrateur sur ces serveurs — vous pouvez y ajouter le bot.",
 		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
-		"loadError": "Impossible de charger les serveurs."
+		"loadError": "Impossible de charger les serveurs.",
+		"refresh": "Actualiser",
+		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour."
 	},
 	"dashboard": {
 		"title": "Configuration du serveur",
