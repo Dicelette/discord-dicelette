@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { en } from "./en";
-import { fr } from "./fr";
+import { createContext, type ReactNode, useContext, useState } from "react";
+import en from "./en.json";
+import fr from "./fr.json";
 
 export type Locale = "en" | "fr";
 
@@ -23,7 +23,7 @@ interface I18nContextValue {
 	t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
-const I18nContext = createContext<I18nContextValue | null>(null);
+const i18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
 	const [locale, setLocaleState] = useState<Locale>(() => {
@@ -47,14 +47,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 	};
 
 	return (
-		<I18nContext.Provider value={{ locale, setLocale, t }}>
+		<i18nContext.Provider value={{ locale, setLocale, t }}>
 			{children}
-		</I18nContext.Provider>
+		</i18nContext.Provider>
 	);
 }
 
 export function useI18n() {
-	const ctx = useContext(I18nContext);
+	const ctx = useContext(i18nContext);
 	if (!ctx) throw new Error("useI18n must be used within I18nProvider");
 	return ctx;
 }

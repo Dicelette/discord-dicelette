@@ -1,18 +1,20 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import Alert from "@mui/material/Alert";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Typography from "@mui/material/Typography";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import GuildConfigForm from "../components/GuildConfigForm";
+import { useI18n } from "../i18n";
 import type { ApiGuildConfig } from "../lib/api";
 import { guildApi } from "../lib/api";
-import GuildConfigForm from "../components/GuildConfigForm";
 
 export default function DashboardPage() {
 	const { guildId } = useParams<{ guildId: string }>();
 	const navigate = useNavigate();
+	const { t } = useI18n();
 	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -24,9 +26,9 @@ export default function DashboardPage() {
 		guildApi
 			.getConfig(guildId)
 			.then((res) => setConfig(res.data))
-			.catch(() => setError("Impossible de charger la configuration."))
+			.catch(() => setError(t("dashboard.loadError")))
 			.finally(() => setLoading(false));
-	}, [guildId]);
+	}, [guildId, t]);
 
 	const handleSave = async (updates: Partial<ApiGuildConfig>) => {
 		if (!guildId) return;
@@ -38,7 +40,7 @@ export default function DashboardPage() {
 			setSaveSuccess(true);
 			setTimeout(() => setSaveSuccess(false), 3000);
 		} catch {
-			setError("Erreur lors de la sauvegarde.");
+			setError(t("dashboard.saveError"));
 		} finally {
 			setSaving(false);
 		}
@@ -59,11 +61,11 @@ export default function DashboardPage() {
 				onClick={() => navigate("/")}
 				sx={{ mb: 3 }}
 			>
-				Retour aux serveurs
+				{t("common.back")}
 			</Button>
 
 			<Typography variant="h4" gutterBottom fontWeight={700}>
-				Configuration du serveur
+				{t("dashboard.title")}
 			</Typography>
 
 			{error && (
@@ -73,7 +75,7 @@ export default function DashboardPage() {
 			)}
 			{saveSuccess && (
 				<Alert severity="success" sx={{ mb: 3 }}>
-					Configuration sauvegardée !
+					{t("dashboard.saveSuccess")}
 				</Alert>
 			)}
 

@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Switch from "@mui/material/Switch";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
 import Slider from "@mui/material/Slider";
+import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { useEffect, useState } from "react";
+import { useI18n } from "../i18n";
 import type { ApiGuildConfig } from "../lib/api";
 import { guildApi } from "../lib/api";
 
@@ -49,21 +51,31 @@ const DISCORD_LOCALES = [
 	{ value: "zh-CN", label: "中文 (简体)" },
 ];
 
-const SORT_ORDERS = [
-	{ value: "", label: "Aucun (défaut)" },
-	{ value: "ascending", label: "Croissant" },
-	{ value: "descending", label: "Décroissant" },
-];
-
 export default function GuildConfigForm({ config, guildId, onSave, saving }: Props) {
+	const { t } = useI18n();
 	const [local, setLocal] = useState<ApiGuildConfig>(config);
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [roles, setRoles] = useState<Role[]>([]);
+
+	const isDirty = JSON.stringify(local) !== JSON.stringify(config);
+
+	useEffect(() => {
+		setLocal(config);
+	}, [config]);
 
 	useEffect(() => {
 		guildApi.getChannels(guildId).then((r) => setChannels(r.data)).catch(() => {});
 		guildApi.getRoles(guildId).then((r) => setRoles(r.data)).catch(() => {});
 	}, [guildId]);
+
+	useEffect(() => {
+		if (!isDirty) return;
+		const handler = (e: BeforeUnloadEvent) => {
+			e.preventDefault();
+		};
+		window.addEventListener("beforeunload", handler);
+		return () => window.removeEventListener("beforeunload", handler);
+	}, [isDirty]);
 
 	const textChannels = channels.filter((c) => c.type === 0);
 
@@ -89,13 +101,9 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 	) => (
 		<FormControl fullWidth size="small">
 			<InputLabel>{label}</InputLabel>
-			<Select
-				value={value ?? ""}
-				label={label}
-				onChange={(e) => onChange(e.target.value)}
-			>
+			<Select value={value ?? ""} label={label} onChange={(e) => onChange(e.target.value)}>
 				<MenuItem value="">
-					<em>Aucun</em>
+					<em>{t("common.none")}</em>
 				</MenuItem>
 				{textChannels.map((c) => (
 					<MenuItem key={c.id} value={c.id}>
@@ -113,13 +121,9 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 	) => (
 		<FormControl fullWidth size="small">
 			<InputLabel>{label}</InputLabel>
-			<Select
-				value={value ?? ""}
-				label={label}
-				onChange={(e) => onChange(e.target.value)}
-			>
+			<Select value={value ?? ""} label={label} onChange={(e) => onChange(e.target.value)}>
 				<MenuItem value="">
-					<em>Aucun</em>
+					<em>{t("common.none")}</em>
 				</MenuItem>
 				{roles.map((r) => (
 					<MenuItem key={r.id} value={r.id}>
@@ -130,16 +134,28 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 		</FormControl>
 	);
 
+	const sortOrders = [
+		{ value: "", label: t("config.fields.sortNone") },
+		{ value: "ascending", label: t("config.fields.sortAsc") },
+		{ value: "descending", label: t("config.fields.sortDesc") },
+	];
+
 	return (
 		<Box component="form" onSubmit={handleSubmit}>
+			{isDirty && (
+				<Alert severity="warning" sx={{ mb: 2 }}>
+					{t("config.unsaved")}
+				</Alert>
+			)}
+
 			<Paper sx={{ p: 3, mb: 2 }}>
-				<SectionTitle>Langue & Général</SectionTitle>
+				<SectionTitle>{t("config.sections.general")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<FormControl fullWidth size="small">
-						<InputLabel>Langue</InputLabel>
+						<InputLabel>{t("config.fields.lang")}</InputLabel>
 						<Select
 							value={local.lang ?? "en-US"}
-							label="Langue"
+							label={t("config.fields.lang")}
 							onChange={(e) => set("lang", e.target.value)}
 						>
 							{DISCORD_LOCALES.map((l) => (
@@ -150,13 +166,13 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 						</Select>
 					</FormControl>
 					<FormControl fullWidth size="small">
-						<InputLabel>Ordre de tri des résultats</InputLabel>
+						<InputLabel>{t("config.fields.sortOrder")}</InputLabel>
 						<Select
 							value={local.sortOrder ?? ""}
-							label="Ordre de tri des résultats"
+							label={t("config.fields.sortOrder")}
 							onChange={(e) => set("sortOrder", e.target.value || undefined)}
 						>
-							{SORT_ORDERS.map((s) => (
+							{sortOrders.map((s) => (
 								<MenuItem key={s.value} value={s.value}>
 									{s.label}
 								</MenuItem>
@@ -167,41 +183,37 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>Canaux</SectionTitle>
+				<SectionTitle>{t("config.sections.channels")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{channelSelect("Canal de logs", local.logs, (v) => set("logs", v || undefined))}
-					{channelSelect("Canal de résultats", local.rollChannel, (v) =>
+					{channelSelect(t("config.fields.logs"), local.logs, (v) =>
+						set("logs", v || undefined),
+					)}
+					{channelSelect(t("config.fields.rollChannel"), local.rollChannel, (v) =>
 						set("rollChannel", v || undefined),
 					)}
-					{channelSelect("Canal par défaut (fiches)", local.managerId, (v) =>
+					{channelSelect(t("config.fields.defaultChannel"), local.managerId, (v) =>
 						set("managerId", v || undefined),
 					)}
-					{channelSelect("Canal privé", local.privateChannel, (v) =>
+					{channelSelect(t("config.fields.privateChannel"), local.privateChannel, (v) =>
 						set("privateChannel", v || undefined),
 					)}
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>Rôles automatiques</SectionTitle>
+				<SectionTitle>{t("config.sections.autoRoles")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{roleSelect(
-						"Rôle auto (statistiques)",
-						local.autoRole?.stats,
-						(v) =>
-							set("autoRole", { ...local.autoRole, stats: v || undefined }),
+					{roleSelect(t("config.fields.autoRoleStats"), local.autoRole?.stats, (v) =>
+						set("autoRole", { ...local.autoRole, stats: v || undefined }),
 					)}
-					{roleSelect(
-						"Rôle auto (dés)",
-						local.autoRole?.dice,
-						(v) =>
-							set("autoRole", { ...local.autoRole, dice: v || undefined }),
+					{roleSelect(t("config.fields.autoRoleDice"), local.autoRole?.dice, (v) =>
+						set("autoRole", { ...local.autoRole, dice: v || undefined }),
 					)}
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>Comportement des dés</SectionTitle>
+				<SectionTitle>{t("config.sections.diceBehaviour")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<FormControlLabel
 						control={
@@ -210,7 +222,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 								onChange={(e) => set("disableThread", e.target.checked || undefined)}
 							/>
 						}
-						label="Désactiver les threads de résultats"
+						label={t("config.fields.disableThread")}
 					/>
 					<FormControlLabel
 						control={
@@ -219,7 +231,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 								onChange={(e) => set("timestamp", e.target.checked || undefined)}
 							/>
 						}
-						label="Afficher l'horodatage dans les logs"
+						label={t("config.fields.timestamp")}
 					/>
 					<FormControlLabel
 						control={
@@ -228,7 +240,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 								onChange={(e) => set("context", e.target.checked || undefined)}
 							/>
 						}
-						label="Ajouter un lien de contexte dans les logs"
+						label={t("config.fields.context")}
 					/>
 					<FormControlLabel
 						control={
@@ -237,7 +249,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 								onChange={(e) => set("linkToLogs", e.target.checked || undefined)}
 							/>
 						}
-						label="Lier les résultats aux logs"
+						label={t("config.fields.linkToLogs")}
 					/>
 					<FormControlLabel
 						control={
@@ -246,13 +258,13 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 								onChange={(e) => set("disableCompare", e.target.checked || undefined)}
 							/>
 						}
-						label="Désactiver la comparaison succès/échec"
+						label={t("config.fields.disableCompare")}
 					/>
 				</Box>
 
 				<Box sx={{ mt: 3 }}>
 					<Typography variant="body2" gutterBottom>
-						Suppression automatique (secondes) : {local.deleteAfter ?? 0}s
+						{t("config.fields.deleteAfter", { val: local.deleteAfter ?? 0 })}
 					</Typography>
 					<Slider
 						value={local.deleteAfter ?? 0}
@@ -267,7 +279,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 					<TextField
-						label="Seuil de pitié (échecs critiques consécutifs)"
+						label={t("config.fields.pity")}
 						type="number"
 						size="small"
 						value={local.pity ?? ""}
@@ -280,7 +292,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>Auto-inscription</SectionTitle>
+				<SectionTitle>{t("config.sections.selfRegister")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<FormControlLabel
 						control={
@@ -291,39 +303,35 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 								}
 							/>
 						}
-						label="Autoriser l'auto-inscription"
+						label={t("config.fields.allowSelfRegister")}
 					/>
 					{local.allowSelfRegister && typeof local.allowSelfRegister !== "boolean" && (
 						<TextField
-							label="Canal de modération (optionnel)"
+							label={t("config.fields.moderationChannel")}
 							size="small"
 							value={
 								typeof local.allowSelfRegister === "string"
 									? local.allowSelfRegister
 									: ""
 							}
-							onChange={(e) =>
-								set("allowSelfRegister", e.target.value || true)
-							}
-							helperText="ID du canal pour modérer les inscriptions"
+							onChange={(e) => set("allowSelfRegister", e.target.value || true)}
+							helperText={t("config.fields.moderationChannelHelp")}
 						/>
 					)}
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>Résultats cachés (MJ)</SectionTitle>
+				<SectionTitle>{t("config.sections.hiddenRolls")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<FormControlLabel
 						control={
 							<Switch
 								checked={!!local.hiddenRoll}
-								onChange={(e) =>
-									set("hiddenRoll", e.target.checked || undefined)
-								}
+								onChange={(e) => set("hiddenRoll", e.target.checked || undefined)}
 							/>
 						}
-						label="Activer les jets cachés"
+						label={t("config.fields.hiddenRollEnable")}
 					/>
 					{local.hiddenRoll && (
 						<>
@@ -336,11 +344,11 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 										}
 									/>
 								}
-								label="Envoyer en MP (sinon: canal spécifique)"
+								label={t("config.fields.hiddenRollDm")}
 							/>
 							{local.hiddenRoll !== true && (
 								<TextField
-									label="ID du canal"
+									label={t("config.fields.channelId")}
 									size="small"
 									value={
 										typeof local.hiddenRoll === "string" ? local.hiddenRoll : ""
@@ -354,35 +362,38 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>Suppression HRP (hors-roleplay)</SectionTitle>
+				<SectionTitle>{t("config.sections.stripOoc")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<FormControlLabel
 						control={
 							<Switch
 								checked={!!local.stripOOC}
-								onChange={(e) =>
-									set("stripOOC", e.target.checked ? {} : undefined)
-								}
+								onChange={(e) => set("stripOOC", e.target.checked ? {} : undefined)}
 							/>
 						}
-						label="Activer la suppression HRP"
+						label={t("config.fields.stripOocEnable")}
 					/>
 				</Box>
 				{local.stripOOC !== undefined && (
 					<Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 						<TextField
-							label="Regex de détection HRP"
+							label={t("config.fields.stripOocRegex")}
 							size="small"
 							fullWidth
 							value={local.stripOOC.regex ?? ""}
 							onChange={(e) =>
-								set("stripOOC", { ...local.stripOOC, regex: e.target.value || undefined })
+								set("stripOOC", {
+									...local.stripOOC,
+									regex: e.target.value || undefined,
+								})
 							}
-							helperText='Ex: \(\(.*\)\) — entoure les messages hors-jeu'
+							helperText={t("config.fields.stripOocRegexHelp")}
 						/>
 						<Box>
 							<Typography variant="body2" gutterBottom>
-								Délai avant suppression : {local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0}s
+								{t("config.fields.stripOocDelay", {
+									val: local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0,
+								})}
 							</Typography>
 							<Slider
 								value={local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0}
@@ -400,11 +411,11 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 							/>
 						</Box>
 						<FormControl fullWidth size="small">
-							<InputLabel>Canaux/catégories surveillés</InputLabel>
+							<InputLabel>{t("config.fields.stripOocChannels")}</InputLabel>
 							<Select
 								multiple
 								value={local.stripOOC.categoryId ?? []}
-								label="Canaux/catégories surveillés"
+								label={t("config.fields.stripOocChannels")}
 								onChange={(e) =>
 									set("stripOOC", {
 										...local.stripOOC,
@@ -422,9 +433,10 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 							</Select>
 						</FormControl>
 						{channelSelect(
-							"Canal de renvoi HRP (optionnel)",
+							t("config.fields.stripOocForward"),
 							local.stripOOC.forwardId,
-							(v) => set("stripOOC", { ...local.stripOOC, forwardId: v || undefined }),
+							(v) =>
+								set("stripOOC", { ...local.stripOOC, forwardId: v || undefined }),
 						)}
 						<FormControlLabel
 							control={
@@ -438,13 +450,18 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 									}
 								/>
 							}
-							label="Mode thread (ignorer le canal de renvoi)"
+							label={t("config.fields.stripOocThreadMode")}
 						/>
 					</Box>
 				)}
 			</Paper>
 
-			<Box className="flex justify-end">
+			<Box className="flex justify-end gap-3 items-center">
+				{isDirty && (
+					<Typography variant="body2" color="warning.main">
+						{t("config.unsaved")}
+					</Typography>
+				)}
 				<Button
 					type="submit"
 					variant="contained"
@@ -452,7 +469,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 					disabled={saving}
 					sx={{ minWidth: 160 }}
 				>
-					{saving ? "Sauvegarde..." : "Sauvegarder"}
+					{saving ? t("common.saving") : t("common.save")}
 				</Button>
 			</Box>
 		</Box>

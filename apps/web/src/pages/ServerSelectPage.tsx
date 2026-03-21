@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Alert from "@mui/material/Alert";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
-import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
-import AddIcon from "@mui/icons-material/Add";
-import SettingsIcon from "@mui/icons-material/Settings";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useI18n } from "../i18n";
 import type { DiscordGuild } from "../lib/api";
 import { authApi, guildApi } from "../lib/api";
 
@@ -22,14 +23,15 @@ export default function ServerSelectPage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
+	const { t } = useI18n();
 
 	useEffect(() => {
 		authApi
 			.guilds()
 			.then((res) => setGuilds(res.data))
-			.catch(() => setError("Impossible de charger les serveurs."))
+			.catch(() => setError(t("servers.loadError")))
 			.finally(() => setLoading(false));
-	}, []);
+	}, [t]);
 
 	const botGuilds = guilds.filter((g) => g.botPresent);
 	const adminGuilds = guilds.filter((g) => !g.botPresent);
@@ -55,10 +57,10 @@ export default function ServerSelectPage() {
 	return (
 		<Box className="max-w-4xl mx-auto p-6">
 			<Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 1 }}>
-				Vos serveurs
+				{t("servers.title")}
 			</Typography>
 			<Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-				Sélectionnez un serveur pour gérer sa configuration.
+				{t("servers.subtitle")}
 			</Typography>
 
 			{error && (
@@ -70,7 +72,7 @@ export default function ServerSelectPage() {
 			{botGuilds.length > 0 && (
 				<>
 					<Typography variant="h6" sx={{ mb: 2, opacity: 0.8 }}>
-						Dicelette est présent
+						{t("servers.botPresent")}
 					</Typography>
 					<Grid container spacing={2} sx={{ mb: 4 }}>
 						{botGuilds.map((guild) => (
@@ -89,7 +91,11 @@ export default function ServerSelectPage() {
 													{guild.name}
 												</Typography>
 												{guild.owner && (
-													<Chip label="Propriétaire" size="small" sx={{ mt: 0.5 }} />
+													<Chip
+														label={t("common.owner")}
+														size="small"
+														sx={{ mt: 0.5 }}
+													/>
 												)}
 											</Box>
 											<SettingsIcon sx={{ opacity: 0.4, flexShrink: 0 }} />
@@ -106,10 +112,10 @@ export default function ServerSelectPage() {
 				<>
 					<Divider sx={{ mb: 3 }} />
 					<Typography variant="h6" sx={{ mb: 1, opacity: 0.8 }}>
-						Ajouter Dicelette
+						{t("servers.addBotTitle")}
 					</Typography>
 					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-						Vous êtes administrateur sur ces serveurs — vous pouvez y ajouter le bot.
+						{t("servers.addBotDesc")}
 					</Typography>
 					<Grid container spacing={2}>
 						{adminGuilds.map((guild) => (
@@ -134,7 +140,7 @@ export default function ServerSelectPage() {
 											onClick={() => handleAddBot(guild)}
 											sx={{ flexShrink: 0 }}
 										>
-											Ajouter
+											{t("common.add")}
 										</Button>
 									</CardContent>
 								</Card>
@@ -145,9 +151,7 @@ export default function ServerSelectPage() {
 			)}
 
 			{!loading && guilds.length === 0 && (
-				<Alert severity="info">
-					Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.
-				</Alert>
+				<Alert severity="info">{t("servers.noServers")}</Alert>
 			)}
 		</Box>
 	);
