@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 type Target = Record<string, string>;
 
+//@ts-expect-error: tsx allow this natively
 const SOURCE_PATH = path.dirname(fileURLToPath(import.meta.url));
 
 const args = process.argv.slice(2);
