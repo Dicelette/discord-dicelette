@@ -1,18 +1,24 @@
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useThemeMode } from "../hooks/useThemeMode";
 import { type Locale, useI18n } from "../i18n";
 
 export default function Layout() {
 	const { user, logout } = useAuth();
 	const { locale, setLocale, t } = useI18n();
+	const { mode, toggleMode } = useThemeMode();
 
 	const avatarUrl = user?.avatar
 		? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
@@ -32,6 +38,12 @@ export default function Layout() {
 							Dicelette Dashboard
 						</Typography>
 					</Box>
+
+					<Tooltip title={mode === "dark" ? "Thème clair" : "Thème sombre"}>
+						<IconButton color="inherit" onClick={toggleMode} size="small">
+							{mode === "dark" ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+						</IconButton>
+					</Tooltip>
 
 					<Select
 						value={locale}
