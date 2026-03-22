@@ -1,11 +1,11 @@
 import {
-	Typography,
-	TextField,
-	Switch,
-	Slider,
-	FormControlLabel,
-	Box,
 	Autocomplete,
+	Box,
+	FormControlLabel,
+	Slider,
+	Switch,
+	TextField,
+	Typography,
 } from "@mui/material";
 
 import { useState } from "react";

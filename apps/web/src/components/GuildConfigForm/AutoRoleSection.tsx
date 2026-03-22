@@ -27,7 +27,6 @@ export default function AutoRoleSection({ control, roles }: Props) {
 							label={t("common.statistic").toTitle()}
 							value={field.value}
 							roles={roles}
-		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -40,7 +39,6 @@ export default function AutoRoleSection({ control, roles }: Props) {
 							label={t("common.macro").toTitle()}
 							value={field.value}
 							roles={roles}
-		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}

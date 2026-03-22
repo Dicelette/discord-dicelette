@@ -25,7 +25,6 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 							label={t("config.fields.logs")}
 							value={field.value}
 							channels={textChannels}
-		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -38,7 +37,6 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 							label={t("config.fields.rollChannel")}
 							value={field.value}
 							channels={textChannels}
-		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -51,7 +49,6 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 							label={t("config.fields.defaultChannel")}
 							value={field.value}
 							channels={textChannels}
-		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -64,7 +61,6 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 							label={t("config.fields.privateChannel")}
 							value={field.value}
 							channels={textChannels}
-		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}

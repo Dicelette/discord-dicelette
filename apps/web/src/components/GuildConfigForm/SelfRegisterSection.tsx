@@ -47,7 +47,6 @@ export default function SelfRegisterSection({
 								label={t("config.fields.moderationChannel")}
 								value={typeof field.value === "string" ? field.value : undefined}
 								channels={textChannels}
-			
 								onChange={(v) => field.onChange(v || true)}
 							/>
 						)}

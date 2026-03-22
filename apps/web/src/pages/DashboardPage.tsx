@@ -115,10 +115,7 @@ export default function DashboardPage() {
 				</Box>
 			)}
 			<Box sx={{ display: tab === "user" ? "block" : "none" }}>
-				<UserConfigForm
-					guildId={guildId!}
-					initialConfig={userConfigData}
-				/>
+				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
 			</Box>
 			<Box sx={{ display: tab === "characters" ? "block" : "none" }}>
 				<CharactersTab guildId={guildId!} />
