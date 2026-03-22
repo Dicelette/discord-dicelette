@@ -33,8 +33,6 @@
       "pity": "Seuil de pitié (échecs critiques consécutifs)",
       "privateChannel": "Canal privé",
       "rollChannel": "Canal de résultats",
-      "sortAsc": "Croissant",
-      "sortDesc": "Décroissant",
       "sortNone": "Aucun (défaut)",
       "sortOrder": "Ordre de tri des résultats",
       "stripOocChannels": "Canaux/catégories surveillés",
@@ -47,7 +45,6 @@
       "timestamp": "Afficher l'horodatage dans les logs"
     },
     "sections": {
-      "autoRoles": "Rôles automatiques",
       "channels": "Canaux",
       "diceBehaviour": "Comportement des dés",
       "general": "Langue & Général",
@@ -65,7 +62,6 @@
     "refresh": "Actualiser",
     "refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
     "sheetLink": "Voir la fiche",
-    "stats": "Statistiques",
     "title": "Mes personnages",
     "unnamed": "(Sans nom)"
   },
@@ -98,7 +94,6 @@
     "title": "Vos serveurs"
   },
   "userConfig": {
-    "attrName": "Nom de l'attribut",
     "addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
     "addInvalidDice": "Expression de dés « {name} » invalide.",
     "attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
@@ -109,7 +104,6 @@
     "importPartial": "{ok} entrée(s) importée(s), {err} ignorée(s) (formule invalide).",
     "importTooltip": "Importer depuis un fichier JSON (fusionne avec l'existant)",
     "attrValue": "Valeur",
-    "attributesDesc": "Valeurs de statistiques personnelles utilisées dans les jets.",
     "noAttributes": "Aucun attribut défini.",
     "noSnippets": "Aucun raccourci défini.",
     "resetTemplate": "Réinitialiser",
@@ -117,11 +111,9 @@
     "saveSuccess": "Sauvegardé !",
     "sections": {
       "attributes": "Attributs personnels",
-      "snippets": "Raccourcis de dés",
       "template": "Template de sortie des jets"
     },
     "snippetDice": "Expression de dés",
-    "snippetName": "Nom",
     "snippetsDesc": "Macros de dés nommées utilisables dans les commandes de jets.",
     "templateDesc": "Personnalisez le format d'affichage des résultats lors de la création de liens.",
     "templateFinal": "Format final",

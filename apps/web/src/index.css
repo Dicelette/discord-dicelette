@@ -1,6 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+:root {
+	--ifm-font-family-base: "Atkinson Hyperlegible Next", "Inter", sans-serif;
+	--ifm-heading-font-family: "Karla", sans-serif;
+	--bg-default: #f5f5f5;
+	--bg-paper: #ffffff;
+	--appbar-bg: #960ea5;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-default: var(--color-zinc-900);
+		--bg-paper: var(--color-zinc-750);
+	}
+}
+
+
 
 * {
 	box-sizing: border-box;
@@ -8,5 +23,9 @@
 
 body {
 	margin: 0;
-	font-family: "Atkinson Hyperlegible Next", "Inter", sans-serif;
+	font-family: var(--ifm-font-family-base);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--css-ifm-heading-font-family);
 }

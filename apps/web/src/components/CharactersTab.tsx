@@ -154,7 +154,7 @@ function CharacterCard({ char }: { char: ApiCharacter }) {
 				<>
 					<Divider sx={{ mb: 1.5 }} />
 					<Typography variant="subtitle2" color="text.secondary" gutterBottom>
-						{t("characters.stats")}
+						{t("common.statistics")}
 					</Typography>
 					<Box
 						sx={{

@@ -15,7 +15,8 @@
 		"resolveJsonModule": true,
 		"paths": {
 			"@dicelette/types": ["../../packages/types/index.ts"],
-			"@dicelette/types/*": ["../../packages/types/src/*"]
+			"@dicelette/types/*": ["../../packages/types/src/*"],
+			"@dicelette/localization/*": ["../../packages/localization/*"]
 		}
 	},
 	"include": ["src"]

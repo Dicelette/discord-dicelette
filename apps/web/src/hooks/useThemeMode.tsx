@@ -14,7 +14,7 @@ interface ThemeModeContextValue {
 	toggleMode: () => void;
 }
 
-const ThemeModeContext = createContext<ThemeModeContextValue>({
+const themeModeContext = createContext<ThemeModeContextValue>({
 	mode: "dark",
 	toggleMode: () => {},
 });
@@ -22,10 +22,14 @@ const ThemeModeContext = createContext<ThemeModeContextValue>({
 export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
 	const [mode, setMode] = useState<ThemeMode>(() => {
 		const stored = localStorage.getItem("themeMode");
-		if (stored === "light" || stored === "dark") return stored;
-		return window.matchMedia("(prefers-color-scheme: dark)").matches
-			? "dark"
-			: "light";
+		const initial: ThemeMode =
+			stored === "light" || stored === "dark"
+				? stored
+				: window.matchMedia("(prefers-color-scheme: dark)").matches
+					? "dark"
+					: "light";
+		document.documentElement.classList.toggle("dark", initial === "dark");
+		return initial;
 	});
 
 	useEffect(() => {
@@ -33,18 +37,18 @@ export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
 	}, [mode]);
 
 	const toggleMode = useCallback(() => {
-		setMode((prev) => (prev === "dark" ? "light" : "dark"));
+		setMode((prev) => {
+			const next = prev === "dark" ? "light" : "dark";
+			document.documentElement.classList.toggle("dark", next === "dark");
+			return next;
+		});
 	}, []);
 
 	const value = useMemo(() => ({ mode, toggleMode }), [mode, toggleMode]);
 
-	return (
-		<ThemeModeContext.Provider value={value}>
-			{children}
-		</ThemeModeContext.Provider>
-	);
+	return <themeModeContext.Provider value={value}>{children}</themeModeContext.Provider>;
 }
 
 export function useThemeMode() {
-	return useContext(ThemeModeContext);
+	return useContext(themeModeContext);
 }

@@ -10,16 +10,17 @@ import Select from "@mui/material/Select";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { useColorScheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { useThemeMode } from "../hooks/useThemeMode";
 import { type Locale, useI18n } from "../i18n";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 export default function Layout() {
 	const { user, logout } = useAuth();
 	const { locale, setLocale, t } = useI18n();
-	const { mode, toggleMode } = useThemeMode();
+	const { mode, setMode } = useColorScheme();
+	const toggleMode = () => setMode(mode === "dark" ? "light" : "dark");
 
 	const avatarUrl = user?.avatar
 		? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
@@ -32,7 +33,7 @@ export default function Layout() {
 				elevation={0}
 				sx={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
 			>
-				<Toolbar sx={{ gap: 2 }}>
+				<Toolbar sx={{ gap: 2, backgroundColor: "var(--appbar-bg)" }}>
 					<Box className="flex items-center gap-2" sx={{ flexGrow: 1 }}>
 						<img src="/logo.png" alt="Dicelette" style={{ height: 28, width: 28 }} />
 						<Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>

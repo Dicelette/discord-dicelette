@@ -57,8 +57,8 @@ export default function LoginPage() {
 						onClick={handleLogin}
 						fullWidth
 						sx={{
-							backgroundColor: "#5865f2",
-							"&:hover": { backgroundColor: "#4752c4" },
+							backgroundColor: "var(--discord-color)",
+							"&:hover": { backgroundColor: "var(--discord-color-dark)" },
 							py: 1.5,
 							textTransform: "none",
 							fontSize: "1rem",

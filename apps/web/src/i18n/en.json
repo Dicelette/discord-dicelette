@@ -33,8 +33,6 @@
 			"pity": "Pity threshold (consecutive critical failures)",
 			"privateChannel": "Private channel",
 			"rollChannel": "Roll results channel",
-			"sortAsc": "Ascending",
-			"sortDesc": "Descending",
 			"sortNone": "None (default)",
 			"sortOrder": "Sort results order",
 			"stripOocChannels": "Monitored channels/categories",
@@ -47,7 +45,6 @@
 			"timestamp": "Show timestamp in logs"
 		},
 		"sections": {
-			"autoRoles": "Auto roles",
 			"channels": "Channels",
 			"diceBehaviour": "Dice behaviour",
 			"general": "Language & General",
@@ -65,7 +62,6 @@
 		"refresh": "Refresh",
 		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
 		"sheetLink": "View sheet",
-		"stats": "Statistics",
 		"title": "My characters",
 		"unnamed": "(Unnamed)"
 	},
@@ -101,7 +97,6 @@
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",
 		"addInvalidDice": "Dice expression \"{name}\" is invalid.",
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
-		"attrName": "Attribute's name",
 		"attrValue": "Value",
 		"export": "Export",
 		"exportTooltip": "Download as JSON",
@@ -109,7 +104,6 @@
 		"importError": "Invalid file. Please check the JSON format.",
 		"importPartial": "{ok} entry/entries imported, {err} ignored (invalid formula).",
 		"importTooltip": "Import from a JSON file (merges with existing entries)",
-		"attributesDesc": "Register attributes that will be replaced by their values when dice are rolled.",
 		"noAttributes": "No attributes defined yet.",
 		"noSnippets": "No snippets defined yet.",
 		"resetTemplate": "Reset to defaults",
@@ -117,11 +111,9 @@
 		"saveSuccess": "Saved!",
 		"sections": {
 			"attributes": "Attributes",
-			"snippets": "Snippets",
 			"template": "Link's template"
 		},
 		"snippetDice": "Dice expression",
-		"snippetName": "Name",
 		"snippetsDesc": "Named dices you can use in roll commands.",
 		"templateDesc": "Customize how roll results are formatted when creating links.",
 		"templateFinal": "Final format",

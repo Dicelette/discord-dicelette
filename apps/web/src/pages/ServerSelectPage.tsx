@@ -107,7 +107,7 @@ export default function ServerSelectPage() {
 					</Typography>
 					<Grid container spacing={2} sx={{ mb: 4 }}>
 						{botGuilds.map((guild) => (
-							<Grid item xs={12} sm={6} md={4} key={guild.id}>
+							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id}>
 								<Card>
 									<CardActionArea onClick={() => navigate(`/dashboard/${guild.id}`)}>
 										<CardContent className="flex items-center gap-3 p-4">
@@ -146,7 +146,7 @@ export default function ServerSelectPage() {
 					</Typography>
 					<Grid container spacing={2}>
 						{adminGuilds.map((guild) => (
-							<Grid item xs={12} sm={6} md={4} key={guild.id}>
+							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id}>
 								<Card sx={{ opacity: 0.7 }}>
 									<CardContent className="flex items-center gap-3 p-4">
 										<Avatar

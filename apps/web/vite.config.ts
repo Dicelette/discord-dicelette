@@ -7,6 +7,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@dicelette/types": path.resolve(__dirname, "../../packages/types/index.ts"),
+			"@dicelette/localization": path.resolve(__dirname, "../../packages/localization"),
 		},
 	},
 	server: {

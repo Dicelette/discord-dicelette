@@ -150,8 +150,8 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 	const sortOrders = [
 		{ value: "", label: t("config.fields.sortNone") },
-		{ value: "ascending", label: t("config.fields.sortAsc") },
-		{ value: "descending", label: t("config.fields.sortDesc") },
+		{ value: "ascending", label: t("config.sort.options.ascending") },
+		{ value: "descending", label: t("config.sort.options.descending") },
 	];
 
 	return (
@@ -215,7 +215,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Divider sx={{ my: 3 }} />
 
-				<SectionTitle>{t("config.sections.autoRoles")}</SectionTitle>
+				<SectionTitle>{t("config.autoRole")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{roleSelect(t("config.fields.autoRoleStats"), local.autoRole?.stats, (v) =>
 						set("autoRole", { ...local.autoRole, stats: v || undefined })

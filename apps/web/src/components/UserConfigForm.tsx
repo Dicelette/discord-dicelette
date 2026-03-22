@@ -288,7 +288,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			{/* Snippets */}
 			<Accordion defaultExpanded>
 				<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-					<Typography fontWeight={600}>{t("userConfig.sections.snippets")}</Typography>
+					<Typography fontWeight={600}>{t("common.snippets")}</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
 					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -341,7 +341,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 						<TextField
 							size="small"
-							label={t("userConfig.snippetName")}
+							label={t("common.name")}
 							value={newSnippetName}
 							onChange={(e) => { setNewSnippetName(e.target.value); setSnippetAddError(null); }}
 							sx={{ flex: 1 }}
@@ -429,7 +429,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 				</AccordionSummary>
 				<AccordionDetails>
 					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-						{t("userConfig.attributesDesc")}
+						{t("userSettings.attributes.description")}
 					</Typography>
 					<Stack spacing={1} sx={{ mb: 2 }}>
 						{Object.entries(attributes).map(([name, value]) => (
@@ -478,7 +478,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 						<TextField
 							size="small"
-							label={t("userConfig.attrName")}
+							label={t("userSettings.attributes.create.name")}
 							value={newAttrName}
 							onChange={(e) => { setNewAttrName(e.target.value); setAttrAddError(null); }}
 							sx={{ flex: 2 }}
