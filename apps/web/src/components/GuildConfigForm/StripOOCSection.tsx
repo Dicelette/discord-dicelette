@@ -1,10 +1,13 @@
-import Autocomplete from "@mui/material/Autocomplete";
-import Box from "@mui/material/Box";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Slider from "@mui/material/Slider";
-import Switch from "@mui/material/Switch";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import {
+	Typography,
+	TextField,
+	Switch,
+	Slider,
+	FormControlLabel,
+	Box,
+	Autocomplete,
+} from "@mui/material";
+
 import { useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
@@ -40,9 +43,7 @@ export default function StripOOCSection({
 	const [advancedMode, setAdvancedMode] = useState(() => !!stripOOC?.regex);
 	const [prefix, setPrefix] = useState("");
 	const [suffix, setSuffix] = useState("");
-	const [regexDisplayValue, setRegexDisplayValue] = useState(
-		() => stripOOC?.regex ?? ""
-	);
+	const [regexDisplayValue, setRegexDisplayValue] = useState(() => stripOOC?.regex ?? "");
 	const [regexError, setRegexError] = useState<string | null>(null);
 
 	return (
@@ -187,18 +188,14 @@ export default function StripOOCSection({
 						name="stripOOC.categoryId"
 						control={control}
 						render={({ field }) => {
-							const selected = channels.filter((c) =>
-								(field.value ?? []).includes(c.id)
-							);
+							const selected = channels.filter((c) => (field.value ?? []).includes(c.id));
 							return (
 								<Autocomplete
 									fullWidth
 									size="small"
 									multiple
 									options={channels}
-									getOptionLabel={(c) =>
-										`${c.type === 4 ? "\u{1F4C2}" : "#"} ${c.name}`
-									}
+									getOptionLabel={(c) => `${c.type === 4 ? "\u{1F4C2}" : "#"} ${c.name}`}
 									value={selected}
 									onChange={(_, newValue) =>
 										field.onChange(

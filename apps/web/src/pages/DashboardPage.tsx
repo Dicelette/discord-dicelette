@@ -49,14 +49,6 @@ export default function DashboardPage() {
 			.finally(() => setLoading(false));
 	}, [guildId, t]);
 
-	useEffect(() => {
-		if (tab !== "user" || !guildId) return;
-		userApi
-			.getUserConfig(guildId)
-			.then((res) => setUserConfigData(res.data.userConfig))
-			.catch(() => {});
-	}, [tab, guildId]);
-
 	const handleSave = async (updates: Partial<ApiGuildConfig>) => {
 		if (!guildId) return;
 		setSaving(true);
@@ -112,22 +104,25 @@ export default function DashboardPage() {
 				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 			</Tabs>
 
-			{tab === "admin" && isAdmin && config && (
-				<GuildConfigForm
-					config={config}
-					guildId={guildId!}
-					onSave={handleSave}
-					saving={saving}
-				/>
+			{isAdmin && config && (
+				<Box sx={{ display: tab === "admin" ? "block" : "none" }}>
+					<GuildConfigForm
+						config={config}
+						guildId={guildId!}
+						onSave={handleSave}
+						saving={saving}
+					/>
+				</Box>
 			)}
-			{tab === "user" && (
+			<Box sx={{ display: tab === "user" ? "block" : "none" }}>
 				<UserConfigForm
-					key={JSON.stringify(userConfigData)}
 					guildId={guildId!}
 					initialConfig={userConfigData}
 				/>
-			)}
-			{tab === "characters" && <CharactersTab guildId={guildId!} />}
+			</Box>
+			<Box sx={{ display: tab === "characters" ? "block" : "none" }}>
+				<CharactersTab guildId={guildId!} />
+			</Box>
 		</Box>
 	);
 }
