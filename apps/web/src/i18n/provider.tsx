@@ -1,6 +1,6 @@
-import { type ReactNode, useState } from "react";
 import botEn from "@dicelette/localization/locales/en.json";
 import botFr from "@dicelette/localization/locales/fr.json";
+import { type ReactNode, useState } from "react";
 import en from "./en.json";
 import fr from "./fr.json";
 import { i18nContext, type Locale } from "./index";

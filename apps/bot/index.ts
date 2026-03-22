@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
 import process from "node:process";
+import { startDashboardServer } from "@dicelette/dashboard";
 import {
 	humanizeDuration,
 	important,
@@ -12,7 +13,6 @@ import dotenv from "dotenv";
 import * as event from "event";
 import express from "express";
 import packageJson from "../../package.json" with { type: "json" };
-import { startDashboardServer } from "@dicelette/dashboard";
 import "uniformize";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });

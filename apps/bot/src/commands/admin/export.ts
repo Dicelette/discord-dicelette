@@ -130,8 +130,8 @@ async function exportToCsv(
 					// dice lines with localized separator/space
 					const dice: undefined | string = stats.damage
 						? `'${Object.keys(stats.damage)
-							.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
-							.join("\n")}`
+								.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
+								.join("\n")}`
 						: undefined;
 
 					// map stats according to template names (preserve accented names in CSV header)

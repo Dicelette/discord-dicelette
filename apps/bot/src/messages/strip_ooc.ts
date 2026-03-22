@@ -113,8 +113,8 @@ async function forwardOoc(
 		})
 		.setDescription(
 			replaceOOC(regex, message.content) +
-			"\n\n-# ↪ " +
-			Djs.channelMention(message.channelId)
+				"\n\n-# ↪ " +
+				Djs.channelMention(message.channelId)
 		)
 		.setTimestamp(message.createdTimestamp);
 	if (config.forwardId) {

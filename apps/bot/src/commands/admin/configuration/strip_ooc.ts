@@ -72,7 +72,7 @@ export async function stripOOC(
 		const collectorFilter: (
 			i: Djs.StringSelectMenuInteraction | Djs.ChannelSelectMenuInteraction
 		) => boolean = (i) =>
-				i.user.id === interaction.user.id && i.customId === "stripOoc_select";
+			i.user.id === interaction.user.id && i.customId === "stripOoc_select";
 		if (!response.resource?.message) {
 			// noinspection ExceptionCaughtLocallyJS
 			throw new BotError(ul("error.failedReply"), botErrorOptions);

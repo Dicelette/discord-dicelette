@@ -1,7 +1,8 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import LogoutIcon from "@mui/icons-material/Logout";
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import { useColorScheme } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -13,7 +14,6 @@ import Select from "@mui/material/Select";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useColorScheme } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";

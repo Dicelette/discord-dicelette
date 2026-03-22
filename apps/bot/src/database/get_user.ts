@@ -234,9 +234,9 @@ async function getUserFrom(
 
 	const ul = ln(
 		guildData.get(guildId, "lang") ??
-		(context.type === "interaction"
-			? (context.interaction.locale as Djs.Locale)
-			: context.message.guild!.preferredLocale)
+			(context.type === "interaction"
+				? (context.interaction.locale as Djs.Locale)
+				: context.message.guild!.preferredLocale)
 	);
 
 	const user = guildData.get(guildId, `user.${userId}`)?.find((char) => {

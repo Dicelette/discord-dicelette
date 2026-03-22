@@ -80,11 +80,11 @@ export default {
 		) {
 			const threads = isTextChannel
 				? channel.threads.cache.filter(
-					(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
-				)
+						(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
+					)
 				: (channel.parent as Djs.ForumChannel).threads.cache.filter(
-					(thread) => thread.name === `🎲 ${scene}` && !thread.archived
-				);
+						(thread) => thread.name === `🎲 ${scene}` && !thread.archived
+					);
 			for (const thread of threads) {
 				await thread[1].setArchived(true);
 			}
@@ -97,16 +97,16 @@ export default {
 				threadName = threadName.replace("{{date}}", moment().format("DD-MM-YYYY"));
 			const newThread = isTextChannel
 				? await channel.threads.create({
-					name: threadName,
-					reason: ul("scene.reason"),
-				})
+						name: threadName,
+						reason: ul("scene.reason"),
+					})
 				: await (channel.parent as Djs.ForumChannel).threads.create({
-					appliedTags: [
-						(await setTags(channel.parent as Djs.ForumChannel)).id as string,
-					],
-					message: { content: ul("scene.reason") },
-					name: threadName,
-				});
+						appliedTags: [
+							(await setTags(channel.parent as Djs.ForumChannel)).id as string,
+						],
+						message: { content: ul("scene.reason") },
+						name: threadName,
+					});
 
 			const threadMention = Djs.channelMention(newThread.id);
 			const msgReply = await reply(interaction, {

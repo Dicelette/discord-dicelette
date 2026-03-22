@@ -1,131 +1,131 @@
 {
-  "characters": {
-    "damage": "Dés de compétence",
-    "loadError": "Impossible de charger les personnages.",
-    "noCharacters": "Aucun personnage enregistré sur ce serveur.",
-    "private": "Fiche privée",
-    "refresh": "Actualiser",
-    "refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
-    "sheetLink": "Voir la fiche",
-    "title": "Mes personnages",
-    "unnamed": "(Sans nom)"
-  },
-  "common": {
-    "add": "Ajouter",
-    "back": "Retour aux serveurs",
-    "darkTheme": "Thème sombre",
-    "documentation": "Documentation",
-    "lightTheme": "Thème clair",
-    "loading": "Chargement...",
-    "logout": "Déconnexion",
-    "none": "Aucun",
-    "owner": "Propriétaire",
-    "save": "Sauvegarder",
-    "saving": "Sauvegarde..."
-  },
-  "config": {
-    "fields": {
-      "allowSelfRegister": "Autoriser l'auto-inscription",
-      "autoRoleDice": "Rôle auto (dés)",
-      "autoRoleStats": "Rôle auto (statistiques)",
-      "channelId": "ID du canal",
-      "context": "Ajouter un lien de contexte dans les logs",
-      "defaultChannel": "Canal par défaut (fiches)",
-      "deleteAfter": "Suppression automatique : {val}s",
-      "disableCompare": "Désactiver la comparaison succès/échec",
-      "disableThread": "Désactiver les threads de résultats",
-      "hiddenRollDm": "Envoyer en MP (sinon : canal spécifique)",
-      "hiddenRollEnable": "Activer les jets cachés",
-      "lang": "Langue",
-      "linkToLogs": "Lier les résultats aux logs",
-      "logs": "Canal de logs",
-      "moderationChannel": "Canal de modération (optionnel)",
-      "moderationChannelHelp": "ID du canal pour modérer les inscriptions",
-      "pity": "Seuil de pitié (échecs critiques consécutifs)",
-      "privateChannel": "Canal privé",
-      "rollChannel": "Canal de résultats",
-      "sortNone": "Aucun (défaut)",
-      "sortOrder": "Ordre de tri des résultats",
-      "stripOocChannels": "Canaux/catégories surveillés",
-      "stripOocDelay": "Délai avant suppression : {val}s",
-      "stripOocEnable": "Activer la suppression HRP",
-      "stripOocForward": "Canal de renvoi HRP (optionnel)",
-      "stripOocRegex": "Regex de détection HRP",
-      "stripOocRegexHelp": "Ex : \\(\\(.*\\)\\) — entoure les messages hors-jeu",
-      "stripOocThreadMode": "Mode thread (ignorer le canal de renvoi)",
-      "timestamp": "Afficher l'horodatage dans les logs"
-    },
-    "sections": {
-      "channels": "Canaux",
-      "diceBehaviour": "Comportement des dés",
-      "general": "Langue & Général",
-      "hiddenRolls": "Résultats cachés (MJ)",
-      "selfRegister": "Auto-inscription",
-      "stripOoc": "Suppression HRP (hors-roleplay)"
-    },
-    "unsaved": "Modifications non sauvegardées"
-  },
-  "dashboard": {
-    "loadError": "Impossible de charger la configuration.",
-    "saveError": "Erreur lors de la sauvegarde.",
-    "saveSuccess": "Configuration sauvegardée !",
-    "tabs": {
-      "admin": "Config serveur",
-      "characters": "Mes personnages",
-      "user": "Config personnelle"
-    },
-    "title": "Configuration du serveur",
-    "userOnlyNotice": "Vous n'avez pas les permissions d'administration sur ce serveur. Vous pouvez tout de même gérer vos paramètres personnels ci-dessous."
-  },
-  "login": {
-    "button": "Se connecter avec Discord",
-    "subtitle": "Connectez-vous avec Discord pour gérer la configuration de votre serveur.",
-    "title": "Dashboard Dicelette"
-  },
-  "servers": {
-    "addBotDesc": "Vous êtes administrateur sur ces serveurs — vous pouvez y ajouter le bot.",
-    "addBotTitle": "Ajouter Dicelette",
-    "botPresent": "Dicelette est présent",
-    "loadError": "Impossible de charger les serveurs.",
-    "noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
-    "refresh": "Actualiser",
-    "refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
-    "subtitle": "Sélectionnez un serveur pour gérer sa configuration.",
-    "title": "Vos serveurs"
-  },
-  "userConfig": {
-    "addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
-    "addInvalidDice": "Expression de dés « {name} » invalide.",
-    "attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
-    "attrValue": "Valeur",
-    "export": "Exporter",
-    "exportTooltip": "Télécharger en JSON",
-    "import": "Importer",
-    "importError": "Fichier invalide. Vérifiez le format JSON.",
-    "importPartial": "{ok} entrée(s) importée(s), {err} ignorée(s) (formule invalide).",
-    "importTooltip": "Importer depuis un fichier JSON (fusionne avec l'existant)",
-    "noAttributes": "Aucun attribut défini.",
-    "noSnippets": "Aucun raccourci défini.",
-    "resetTemplate": "Réinitialiser",
-    "saveError": "Erreur lors de la sauvegarde.",
-    "saveSuccess": "Sauvegardé !",
-    "sections": {
-      "attributes": "Attributs personnels",
-      "template": "Template de sortie des jets"
-    },
-    "snippetDice": "Expression de dés",
-    "snippetsDesc": "Macros de dés nommées utilisables dans les commandes de jets.",
-    "templateDesc": "Personnalisez le format d'affichage des résultats lors de la création de liens.",
-    "templateFinal": "Format final",
-    "templateFormat": {
-      "character": "Personnage",
-      "dice": "Dés",
-      "info": "Info",
-      "name": "Nom de la stat",
-      "originalDice": "Dés originaux"
-    },
-    "templateFormatSection": "Sous-formats :",
-    "templateJoin": "Séparateur de résultats",
-    "templateResults": "Format d'une ligne de résultat"
-  }
+	"characters": {
+		"damage": "Dés de compétence",
+		"loadError": "Impossible de charger les personnages.",
+		"noCharacters": "Aucun personnage enregistré sur ce serveur.",
+		"private": "Fiche privée",
+		"refresh": "Actualiser",
+		"refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
+		"sheetLink": "Voir la fiche",
+		"title": "Mes personnages",
+		"unnamed": "(Sans nom)"
+	},
+	"common": {
+		"add": "Ajouter",
+		"back": "Retour aux serveurs",
+		"darkTheme": "Thème sombre",
+		"documentation": "Documentation",
+		"lightTheme": "Thème clair",
+		"loading": "Chargement...",
+		"logout": "Déconnexion",
+		"none": "Aucun",
+		"owner": "Propriétaire",
+		"save": "Sauvegarder",
+		"saving": "Sauvegarde..."
+	},
+	"config": {
+		"fields": {
+			"allowSelfRegister": "Autoriser l'auto-inscription",
+			"autoRoleDice": "Rôle auto (dés)",
+			"autoRoleStats": "Rôle auto (statistiques)",
+			"channelId": "ID du canal",
+			"context": "Ajouter un lien de contexte dans les logs",
+			"defaultChannel": "Canal par défaut (fiches)",
+			"deleteAfter": "Suppression automatique : {val}s",
+			"disableCompare": "Désactiver la comparaison succès/échec",
+			"disableThread": "Désactiver les threads de résultats",
+			"hiddenRollDm": "Envoyer en MP (sinon : canal spécifique)",
+			"hiddenRollEnable": "Activer les jets cachés",
+			"lang": "Langue",
+			"linkToLogs": "Lier les résultats aux logs",
+			"logs": "Canal de logs",
+			"moderationChannel": "Canal de modération (optionnel)",
+			"moderationChannelHelp": "ID du canal pour modérer les inscriptions",
+			"pity": "Seuil de pitié (échecs critiques consécutifs)",
+			"privateChannel": "Canal privé",
+			"rollChannel": "Canal de résultats",
+			"sortNone": "Aucun (défaut)",
+			"sortOrder": "Ordre de tri des résultats",
+			"stripOocChannels": "Canaux/catégories surveillés",
+			"stripOocDelay": "Délai avant suppression : {val}s",
+			"stripOocEnable": "Activer la suppression HRP",
+			"stripOocForward": "Canal de renvoi HRP (optionnel)",
+			"stripOocRegex": "Regex de détection HRP",
+			"stripOocRegexHelp": "Ex : \\(\\(.*\\)\\) — entoure les messages hors-jeu",
+			"stripOocThreadMode": "Mode thread (ignorer le canal de renvoi)",
+			"timestamp": "Afficher l'horodatage dans les logs"
+		},
+		"sections": {
+			"channels": "Canaux",
+			"diceBehaviour": "Comportement des dés",
+			"general": "Langue & Général",
+			"hiddenRolls": "Résultats cachés (MJ)",
+			"selfRegister": "Auto-inscription",
+			"stripOoc": "Suppression HRP (hors-roleplay)"
+		},
+		"unsaved": "Modifications non sauvegardées"
+	},
+	"dashboard": {
+		"loadError": "Impossible de charger la configuration.",
+		"saveError": "Erreur lors de la sauvegarde.",
+		"saveSuccess": "Configuration sauvegardée !",
+		"tabs": {
+			"admin": "Config serveur",
+			"characters": "Mes personnages",
+			"user": "Config personnelle"
+		},
+		"title": "Configuration du serveur",
+		"userOnlyNotice": "Vous n'avez pas les permissions d'administration sur ce serveur. Vous pouvez tout de même gérer vos paramètres personnels ci-dessous."
+	},
+	"login": {
+		"button": "Se connecter avec Discord",
+		"subtitle": "Connectez-vous avec Discord pour gérer la configuration de votre serveur.",
+		"title": "Dashboard Dicelette"
+	},
+	"servers": {
+		"addBotDesc": "Vous êtes administrateur sur ces serveurs — vous pouvez y ajouter le bot.",
+		"addBotTitle": "Ajouter Dicelette",
+		"botPresent": "Dicelette est présent",
+		"loadError": "Impossible de charger les serveurs.",
+		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
+		"refresh": "Actualiser",
+		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
+		"subtitle": "Sélectionnez un serveur pour gérer sa configuration.",
+		"title": "Vos serveurs"
+	},
+	"userConfig": {
+		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
+		"addInvalidDice": "Expression de dés « {name} » invalide.",
+		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
+		"attrValue": "Valeur",
+		"export": "Exporter",
+		"exportTooltip": "Télécharger en JSON",
+		"import": "Importer",
+		"importError": "Fichier invalide. Vérifiez le format JSON.",
+		"importPartial": "{ok} entrée(s) importée(s), {err} ignorée(s) (formule invalide).",
+		"importTooltip": "Importer depuis un fichier JSON (fusionne avec l'existant)",
+		"noAttributes": "Aucun attribut défini.",
+		"noSnippets": "Aucun raccourci défini.",
+		"resetTemplate": "Réinitialiser",
+		"saveError": "Erreur lors de la sauvegarde.",
+		"saveSuccess": "Sauvegardé !",
+		"sections": {
+			"attributes": "Attributs personnels",
+			"template": "Template de sortie des jets"
+		},
+		"snippetDice": "Expression de dés",
+		"snippetsDesc": "Macros de dés nommées utilisables dans les commandes de jets.",
+		"templateDesc": "Personnalisez le format d'affichage des résultats lors de la création de liens.",
+		"templateFinal": "Format final",
+		"templateFormat": {
+			"character": "Personnage",
+			"dice": "Dés",
+			"info": "Info",
+			"name": "Nom de la stat",
+			"originalDice": "Dés originaux"
+		},
+		"templateFormatSection": "Sous-formats :",
+		"templateJoin": "Séparateur de résultats",
+		"templateResults": "Format d'une ligne de résultat"
+	}
 }

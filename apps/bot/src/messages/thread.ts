@@ -222,10 +222,10 @@ export async function findLocation(
 	user?: Djs.User | null
 ): Promise<{
 	thread?:
-	| Djs.PrivateThreadChannel
-	| Djs.TextChannel
-	| Djs.NewsChannel
-	| Djs.PublicThreadChannel;
+		| Djs.PrivateThreadChannel
+		| Djs.TextChannel
+		| Djs.NewsChannel
+		| Djs.PublicThreadChannel;
 	sheetLocation: PersonnageIds;
 }> {
 	const sheetLocation: PersonnageIds = {
@@ -421,10 +421,10 @@ export async function threadToSend(
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)
 		: await findForumChannel(
-			channel.parent as Djs.ForumChannel,
-			channel as Djs.ThreadChannel,
-			db,
-			ul,
-			isHidden
-		);
+				channel.parent as Djs.ForumChannel,
+				channel as Djs.ThreadChannel,
+				db,
+				ul,
+				isHidden
+			);
 }

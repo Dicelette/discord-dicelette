@@ -164,10 +164,10 @@ export async function calculate(
 
 	let statInfo:
 		| {
-			value: number | undefined;
-			stat: string;
-			name: string;
-		}
+				value: number | undefined;
+				stat: string;
+				name: string;
+		  }
 		| undefined;
 	let needFormat = true;
 	if (userStatistique && isCalc) {

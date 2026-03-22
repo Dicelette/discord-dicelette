@@ -101,9 +101,9 @@ interface MacroEditorAuth {
  */
 async function ensureMacroEditor(params: {
 	interaction:
-	| Djs.ButtonInteraction
-	| Djs.ModalSubmitInteraction
-	| Djs.StringSelectMenuInteraction;
+		| Djs.ButtonInteraction
+		| Djs.ModalSubmitInteraction
+		| Djs.StringSelectMenuInteraction;
 	ul: Translation;
 	interactionUser: Djs.User;
 	message?: Djs.Message;
@@ -637,14 +637,14 @@ export class MacroFeature extends BaseFeature {
 		const damageNames = removed
 			? undefined
 			: Object.keys(
-				fieldsToAppend.reduce(
-					(acc, field) => {
-						acc[field.name] = field.value;
-						return acc;
-					},
-					{} as Record<string, string>
-				)
-			);
+					fieldsToAppend.reduce(
+						(acc, field) => {
+							acc[field.name] = field.value;
+							return acc;
+						},
+						{} as Record<string, string>
+					)
+				);
 		await this.persistUserAndMemory(
 			userID,
 			userName,
@@ -971,14 +971,14 @@ export class MacroFeature extends BaseFeature {
 		const damageNames = removed
 			? undefined
 			: Object.keys(
-				(newFields as Djs.APIEmbedField[]).reduce(
-					(acc, field) => {
-						acc[field.name] = field.value;
-						return acc;
-					},
-					{} as Record<string, string>
-				)
-			);
+					(newFields as Djs.APIEmbedField[]).reduce(
+						(acc, field) => {
+							acc[field.name] = field.value;
+							return acc;
+						},
+						{} as Record<string, string>
+					)
+				);
 		const userEmbed = getEmbeds(message ?? undefined, "user");
 		if (!userEmbed)
 			throw new BotError(this.ul("error.embed.notFound"), botErrorOptionsValidation);
@@ -1130,14 +1130,14 @@ export class MacroFeature extends BaseFeature {
 		const newFields = newDamage?.data.fields ?? [];
 		const damageNames = newFields.length
 			? Object.keys(
-				(newFields as Djs.APIEmbedField[]).reduce(
-					(acc, f) => {
-						acc[f.name] = f.value;
-						return acc;
-					},
-					{} as Record<string, string>
+					(newFields as Djs.APIEmbedField[]).reduce(
+						(acc, f) => {
+							acc[f.name] = f.value;
+							return acc;
+						},
+						{} as Record<string, string>
+					)
 				)
-			)
 			: undefined;
 
 		if (!userID) {
@@ -1147,7 +1147,7 @@ export class MacroFeature extends BaseFeature {
 			const charNameRaw2 = parsedUser2["common.character"];
 			userName =
 				charNameRaw2 &&
-					charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
+				charNameRaw2.toLowerCase() !== this.ul("common.noSet").toLowerCase()
 					? charNameRaw2
 					: undefined;
 		}
