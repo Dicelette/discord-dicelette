@@ -4,6 +4,66 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "../index.js";
 
+// ---------------------------------------------------------------------------
+// Character sheet cache: key = `${guildId}:${userId}`, TTL = 5 min
+// ---------------------------------------------------------------------------
+const CHAR_CACHE_TTL = 5 * 60 * 1000;
+const charCache = new Map<string, { data: ApiCharacter[]; ts: number }>();
+
+interface EmbedField {
+	name: string;
+	value: string;
+}
+interface RawEmbed {
+	title?: string;
+	thumbnail?: { url: string };
+	fields?: EmbedField[];
+}
+interface ApiCharacter {
+	charName: string | null;
+	messageId: string;
+	channelId: string;
+	discordLink: string;
+	canLink: boolean;
+	isPrivate: boolean;
+	avatar: string | null;
+	stats: EmbedField[] | null;
+	damage: EmbedField[] | null;
+}
+
+const USER_EMBED_MARKERS = ["⌈⌋", "registration", "enregistrement", "registered player", "joueur enregistré"];
+const STATS_TITLES = ["statistic", "statistique", "statistics", "statistiques"];
+
+function classifyEmbed(embed: RawEmbed): "user" | "stats" | "damage" | null {
+	const title = (embed.title ?? "").toLowerCase();
+	if (USER_EMBED_MARKERS.some((m) => title.includes(m.toLowerCase()))) return "user";
+	if (STATS_TITLES.some((s) => title === s)) return "stats";
+	if (title === "macro") return "damage";
+	return null;
+}
+
+async function fetchCharacterEmbeds(
+	channelId: string,
+	messageId: string,
+	botToken: string
+): Promise<{ avatar: string | null; stats: EmbedField[] | null; damage: EmbedField[] | null }> {
+	const res = await fetch(`${DISCORD_API}/channels/${channelId}/messages/${messageId}`, {
+		headers: { Authorization: `Bot ${botToken}` },
+	});
+	if (!res.ok) return { avatar: null, stats: null, damage: null };
+	const msg = (await res.json()) as { embeds?: RawEmbed[] };
+	let avatar: string | null = null;
+	let stats: EmbedField[] | null = null;
+	let damage: EmbedField[] | null = null;
+	for (const embed of msg.embeds ?? []) {
+		const kind = classifyEmbed(embed);
+		if (kind === "user" && embed.thumbnail?.url) avatar = embed.thumbnail.url;
+		if (kind === "stats" && embed.fields?.length) stats = embed.fields;
+		if (kind === "damage" && embed.fields?.length) damage = embed.fields;
+	}
+	return { avatar, stats, damage };
+}
+
 const DISCORD_API = "https://discord.com/api/v10";
 
 function requireAuth(req: Request, res: Response, next: () => void) {
@@ -261,6 +321,81 @@ export function createGuildRouter(deps: DashboardDeps) {
 
 		res.json({ ok: true });
 	});
+
+	// GET user's characters with their sheet data (cached)
+	router.get(
+		"/:guildId/characters",
+		requireAuth,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+			const cacheKey = `${guildId}:${userId}`;
+			const botToken = process.env.DISCORD_TOKEN;
+
+			const cached = charCache.get(cacheKey);
+			if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+				res.json(cached.data);
+				return;
+			}
+
+			const guildData = settings.get(guildId);
+			if (!guildData) {
+				res.status(404).json({ error: "Guild not found" });
+				return;
+			}
+
+			const userChars = guildData.user?.[userId] ?? [];
+			const canLink =
+				guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+
+			const characters: ApiCharacter[] = await Promise.all(
+				userChars.map(async (char) => {
+					const [messageId, channelId] = char.messageId;
+					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+					let avatar: string | null = null;
+					let stats: EmbedField[] | null = null;
+					let damage: EmbedField[] | null = null;
+					if (botToken) {
+						try {
+							({ avatar, stats, damage } = await fetchCharacterEmbeds(
+								channelId,
+								messageId,
+								botToken
+							));
+						} catch {
+							// silently ignore fetch errors
+						}
+					}
+					return {
+						charName: char.charName ?? null,
+						messageId,
+						channelId,
+						discordLink,
+						canLink,
+						isPrivate: char.isPrivate ?? false,
+						avatar,
+						stats,
+						damage,
+					};
+				})
+			);
+
+			charCache.set(cacheKey, { data: characters, ts: Date.now() });
+			res.json(characters);
+		}
+	);
+
+	// Invalidate character cache for the current user (used by refresh button)
+	router.post(
+		"/:guildId/characters/refresh",
+		requireAuth,
+		(req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+			charCache.delete(`${guildId}:${userId}`);
+			res.json({ ok: true });
+		}
+	);
 
 	return router;
 }

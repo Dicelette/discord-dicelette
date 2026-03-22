@@ -101,6 +101,30 @@ export interface ApiValidationResult {
 	errors: Record<string, string>;
 }
 
+export interface ApiCharacterField {
+	name: string;
+	value: string;
+}
+
+export interface ApiCharacter {
+	charName: string | null;
+	messageId: string;
+	channelId: string;
+	discordLink: string;
+	canLink: boolean;
+	isPrivate: boolean;
+	avatar: string | null;
+	stats: ApiCharacterField[] | null;
+	damage: ApiCharacterField[] | null;
+}
+
+export const charactersApi = {
+	getCharacters: (guildId: string) =>
+		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters`),
+	refresh: (guildId: string) =>
+		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh`),
+};
+
 export const userApi = {
 	getUserConfig: (guildId: string) =>
 		api.get<ApiUserConfig>(`/guilds/${guildId}/user-config`),

@@ -57,12 +57,25 @@
 		},
 		"unsaved": "You have unsaved changes"
 	},
+	"characters": {
+		"damage": "Skill dice",
+		"loadError": "Could not load characters.",
+		"noCharacters": "No characters registered on this server.",
+		"private": "Private sheet",
+		"refresh": "Refresh",
+		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
+		"sheetLink": "View sheet",
+		"stats": "Statistics",
+		"title": "My characters",
+		"unnamed": "(Unnamed)"
+	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
 			"admin": "Server config",
+			"characters": "My characters",
 			"user": "Personal config"
 		},
 		"title": "Server configuration",

@@ -57,12 +57,25 @@
     },
     "unsaved": "Modifications non sauvegardées"
   },
+  "characters": {
+    "damage": "Dés de compétence",
+    "loadError": "Impossible de charger les personnages.",
+    "noCharacters": "Aucun personnage enregistré sur ce serveur.",
+    "private": "Fiche privée",
+    "refresh": "Actualiser",
+    "refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
+    "sheetLink": "Voir la fiche",
+    "stats": "Statistiques",
+    "title": "Mes personnages",
+    "unnamed": "(Sans nom)"
+  },
   "dashboard": {
     "loadError": "Impossible de charger la configuration.",
     "saveError": "Erreur lors de la sauvegarde.",
     "saveSuccess": "Configuration sauvegardée !",
     "tabs": {
       "admin": "Config serveur",
+      "characters": "Mes personnages",
       "user": "Config personnelle"
     },
     "title": "Configuration du serveur",

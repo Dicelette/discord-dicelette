@@ -6,7 +6,9 @@
       "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/index.tsx\")",
       "Bash(pnpm run:*)",
       "Bash(timeout 10 node dist/apps/bot/index.js)",
-      "Bash(powershell.exe -Command \"Move-Item -Path apps/parse_result -Destination packages/parse_result\")"
+      "Bash(powershell.exe -Command \"Move-Item -Path apps/parse_result -Destination packages/parse_result\")",
+      "Bash(grep -r \"CharacterData\\\\|messageId\\\\|charName\\\\|isPrivate\\\\|selfRegistration\\\\|allowSelfRegister\" N:/Documents/Github/dicelette/discord-bot/packages/ --include=*.ts -l)",
+      "Bash(grep -r \"embed.user\\\\|embed.dice\\\\|embed.add\\\\|common.statistic\\\\|common.statistics\\\\|embed.template\\\\|common.macro\\\\|legacy.dice\" N:/Documents/Github/dicelette/discord-bot/packages/localization --include=*.json -l)"
     ]
   }
 }

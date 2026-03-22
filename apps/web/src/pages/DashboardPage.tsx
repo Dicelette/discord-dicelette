@@ -8,6 +8,7 @@ import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import CharactersTab from "../components/CharactersTab";
 import GuildConfigForm from "../components/GuildConfigForm";
 import UserConfigForm from "../components/UserConfigForm";
 import { useI18n } from "../i18n";
@@ -19,7 +20,7 @@ export default function DashboardPage() {
 	const navigate = useNavigate();
 	const { t } = useI18n();
 
-	const [tab, setTab] = useState<"admin" | "user">("admin");
+	const [tab, setTab] = useState<"admin" | "user" | "characters">("admin");
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
@@ -30,15 +31,13 @@ export default function DashboardPage() {
 
 	useEffect(() => {
 		if (!guildId) return;
-		// Always load user config first (tells us isAdmin too)
 		userApi
 			.getUserConfig(guildId)
 			.then(async (res) => {
 				const { isAdmin: admin, userConfig } = res.data;
 				setIsAdmin(admin);
 				setUserConfigData(userConfig);
-				// Default to admin tab if admin, user tab otherwise
-				setTab(admin ? "admin" : "user");
+				setTab(admin ? "admin" : "characters");
 				if (admin) {
 					const configRes = await guildApi.getConfig(guildId);
 					setConfig(configRes.data);
@@ -93,22 +92,15 @@ export default function DashboardPage() {
 				</Alert>
 			)}
 
-			{isAdmin && (
-				<Tabs
-					value={tab}
-					onChange={(_, v) => setTab(v)}
-					sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
-				>
-					<Tab value="admin" label={t("dashboard.tabs.admin")} />
-					<Tab value="user" label={t("dashboard.tabs.user")} />
-				</Tabs>
-			)}
-
-			{!isAdmin && (
-				<Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-					{t("dashboard.userOnlyNotice")}
-				</Typography>
-			)}
+			<Tabs
+				value={tab}
+				onChange={(_, v) => setTab(v)}
+				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
+			>
+				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} />}
+				<Tab value="characters" label={t("dashboard.tabs.characters")} />
+				<Tab value="user" label={t("dashboard.tabs.user")} />
+			</Tabs>
 
 			{tab === "admin" && isAdmin && config && (
 				<GuildConfigForm
@@ -118,6 +110,8 @@ export default function DashboardPage() {
 					saving={saving}
 				/>
 			)}
+
+			{tab === "characters" && <CharactersTab guildId={guildId!} />}
 
 			{tab === "user" && (
 				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
