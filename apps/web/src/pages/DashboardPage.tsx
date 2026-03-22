@@ -108,8 +108,8 @@ export default function DashboardPage() {
 				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} />}
-				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 				<Tab value="user" label={t("dashboard.tabs.user")} />
+				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 			</Tabs>
 
 			{tab === "admin" && isAdmin && config && (
