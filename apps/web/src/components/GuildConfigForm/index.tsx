@@ -57,7 +57,6 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 	}, [isDirty]);
 
 	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
-	const noneLabel = t("common.none");
 
 	const hiddenRoll = watch("hiddenRoll");
 	const allowSelfRegister = watch("allowSelfRegister");
@@ -76,15 +75,11 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Divider sx={{ my: 3 }} />
 
-				<ChannelsSection
-					control={control}
-					textChannels={textChannels}
-					noneLabel={noneLabel}
-				/>
+				<ChannelsSection control={control} textChannels={textChannels} />
 
 				<Divider sx={{ my: 3 }} />
 
-				<AutoRoleSection control={control} roles={roles} noneLabel={noneLabel} />
+				<AutoRoleSection control={control} roles={roles} />
 
 				<Divider sx={{ my: 3 }} />
 
@@ -96,7 +91,6 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 					control={control}
 					allowSelfRegister={allowSelfRegister}
 					textChannels={textChannels}
-					noneLabel={noneLabel}
 				/>
 
 				<Divider sx={{ my: 3 }} />
@@ -110,7 +104,6 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 					stripOOC={stripOOC}
 					channels={channels}
 					textChannels={textChannels}
-					noneLabel={noneLabel}
 				/>
 			</Paper>
 

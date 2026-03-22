@@ -9,10 +9,9 @@ import type { Role } from "./types";
 interface Props {
 	control: Control<ApiGuildConfig>;
 	roles: Role[];
-	noneLabel: string;
 }
 
-export default function AutoRoleSection({ control, roles, noneLabel }: Props) {
+export default function AutoRoleSection({ control, roles }: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -28,7 +27,7 @@ export default function AutoRoleSection({ control, roles, noneLabel }: Props) {
 							label={t("common.statistic").toTitle()}
 							value={field.value}
 							roles={roles}
-							noneLabel={noneLabel}
+		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -41,7 +40,7 @@ export default function AutoRoleSection({ control, roles, noneLabel }: Props) {
 							label={t("common.macro").toTitle()}
 							value={field.value}
 							roles={roles}
-							noneLabel={noneLabel}
+		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}

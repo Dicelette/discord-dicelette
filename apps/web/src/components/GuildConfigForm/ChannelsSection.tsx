@@ -8,10 +8,9 @@ import type { Channel } from "./types";
 interface Props {
 	control: Control<ApiGuildConfig>;
 	textChannels: Channel[];
-	noneLabel: string;
 }
 
-export default function ChannelsSection({ control, textChannels, noneLabel }: Props) {
+export default function ChannelsSection({ control, textChannels }: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -26,7 +25,7 @@ export default function ChannelsSection({ control, textChannels, noneLabel }: Pr
 							label={t("config.fields.logs")}
 							value={field.value}
 							channels={textChannels}
-							noneLabel={noneLabel}
+		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -39,7 +38,7 @@ export default function ChannelsSection({ control, textChannels, noneLabel }: Pr
 							label={t("config.fields.rollChannel")}
 							value={field.value}
 							channels={textChannels}
-							noneLabel={noneLabel}
+		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -52,7 +51,7 @@ export default function ChannelsSection({ control, textChannels, noneLabel }: Pr
 							label={t("config.fields.defaultChannel")}
 							value={field.value}
 							channels={textChannels}
-							noneLabel={noneLabel}
+		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}
@@ -65,7 +64,7 @@ export default function ChannelsSection({ control, textChannels, noneLabel }: Pr
 							label={t("config.fields.privateChannel")}
 							value={field.value}
 							channels={textChannels}
-							noneLabel={noneLabel}
+		
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}

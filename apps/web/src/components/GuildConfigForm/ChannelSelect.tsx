@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import { Autocomplete, FormHelperText, TextField } from "@mui/material";
 import { memo } from "react";
 import type { Channel } from "./types";
 
@@ -6,32 +6,37 @@ interface ChannelSelectProps {
 	label: string;
 	value: string | undefined;
 	channels: Channel[];
-	noneLabel: string;
 	helperText?: string;
 	onChange: (v: string) => void;
 }
 
 const ChannelSelect = memo(
-	({ label, value, channels, noneLabel, helperText, onChange }: ChannelSelectProps) => (
-		<FormControl fullWidth size="small">
-			<InputLabel>{label}</InputLabel>
-			<Select
-				value={value ?? ""}
-				label={label}
-				onChange={(e) => onChange(e.target.value)}
-			>
-				<MenuItem value="">
-					<em>{noneLabel}</em>
-				</MenuItem>
-				{channels.map((c) => (
-					<MenuItem key={c.id} value={c.id}>
-						# {c.name}
-					</MenuItem>
-				))}
-			</Select>
-			{helperText && <FormHelperText>{helperText}</FormHelperText>}
-		</FormControl>
-	)
+	({ label, value, channels, helperText, onChange }: ChannelSelectProps) => {
+		const selected = channels.find((c) => c.id === value) ?? null;
+		return (
+			<>
+				<Autocomplete
+					fullWidth
+					size="small"
+					options={channels}
+					getOptionLabel={(c) => `# ${c.name}`}
+					value={selected}
+					onChange={(_, newValue) => onChange(newValue?.id ?? "")}
+					renderInput={(params) => (
+						<TextField
+							{...params}
+							label={label}
+							slotProps={{
+								input: { ...params.InputProps },
+								htmlInput: { ...params.inputProps },
+							}}
+						/>
+					)}
+				/>
+				{helperText && <FormHelperText>{helperText}</FormHelperText>}
+			</>
+		);
+	}
 );
 ChannelSelect.displayName = "ChannelSelect";
 

@@ -10,14 +10,12 @@ interface Props {
 	control: Control<ApiGuildConfig>;
 	allowSelfRegister: ApiGuildConfig["allowSelfRegister"];
 	textChannels: Channel[];
-	noneLabel: string;
 }
 
 export default function SelfRegisterSection({
 	control,
 	allowSelfRegister,
 	textChannels,
-	noneLabel,
 }: Props) {
 	const { t } = useI18n();
 
@@ -49,7 +47,7 @@ export default function SelfRegisterSection({
 								label={t("config.fields.moderationChannel")}
 								value={typeof field.value === "string" ? field.value : undefined}
 								channels={textChannels}
-								noneLabel={noneLabel}
+			
 								onChange={(v) => field.onChange(v || true)}
 							/>
 						)}

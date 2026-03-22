@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import { useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
@@ -19,7 +19,6 @@ export default function GeneralSection({ control }: Props) {
 
 	const sortOrders = useMemo(
 		() => [
-			{ value: "", label: t("config.fields.sortNone") },
 			{ value: "ascending", label: t("config.sort.options.ascending") },
 			{ value: "descending", label: t("config.sort.options.descending") },
 		],
@@ -33,43 +32,59 @@ export default function GeneralSection({ control }: Props) {
 				<Controller
 					name="lang"
 					control={control}
-					render={({ field }) => (
-						<FormControl fullWidth size="small">
-							<InputLabel>{t("config.fields.lang")}</InputLabel>
-							<Select
-								{...field}
-								value={field.value ?? "en-US"}
-								label={t("config.fields.lang")}
-							>
-								{DISCORD_LOCALES.map((l) => (
-									<MenuItem key={l.value} value={l.value}>
-										{l.label}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
-					)}
+					render={({ field }) => {
+						const selected =
+							DISCORD_LOCALES.find((l) => l.value === (field.value ?? "en-US")) ??
+							DISCORD_LOCALES[0];
+						return (
+							<Autocomplete
+								fullWidth
+								size="small"
+								disableClearable
+								options={DISCORD_LOCALES}
+								getOptionLabel={(l) => l.label}
+								value={selected}
+								onChange={(_, newValue) => field.onChange(newValue.value)}
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label={t("config.fields.lang")}
+										slotProps={{
+											input: { ...params.InputProps },
+											htmlInput: { ...params.inputProps, readOnly: true },
+										}}
+									/>
+								)}
+							/>
+						);
+					}}
 				/>
 				<Controller
 					name="sortOrder"
 					control={control}
-					render={({ field }) => (
-						<FormControl fullWidth size="small">
-							<InputLabel>{t("config.fields.sortOrder")}</InputLabel>
-							<Select
-								{...field}
-								value={field.value ?? ""}
-								label={t("config.fields.sortOrder")}
-								onChange={(e) => field.onChange(e.target.value || undefined)}
-							>
-								{sortOrders.map((s) => (
-									<MenuItem key={s.value} value={s.value}>
-										{s.label}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
-					)}
+					render={({ field }) => {
+						const selected = sortOrders.find((s) => s.value === field.value) ?? null;
+						return (
+							<Autocomplete
+								fullWidth
+								size="small"
+								options={sortOrders}
+								getOptionLabel={(s) => s.label}
+								value={selected}
+								onChange={(_, newValue) => field.onChange(newValue?.value ?? undefined)}
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label={t("config.fields.sortOrder")}
+										slotProps={{
+											input: { ...params.InputProps },
+											htmlInput: { ...params.inputProps, readOnly: true },
+										}}
+									/>
+								)}
+							/>
+						);
+					}}
 				/>
 			</div>
 		</>

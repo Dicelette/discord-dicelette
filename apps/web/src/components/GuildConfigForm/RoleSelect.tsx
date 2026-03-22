@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import { Autocomplete, FormHelperText, TextField } from "@mui/material";
 import { memo } from "react";
 import type { Role } from "./types";
 
@@ -6,32 +6,37 @@ interface RoleSelectProps {
 	label: string;
 	value: string | undefined;
 	roles: Role[];
-	noneLabel: string;
 	helperText?: string;
 	onChange: (v: string) => void;
 }
 
 const RoleSelect = memo(
-	({ label, value, roles, noneLabel, helperText, onChange }: RoleSelectProps) => (
-		<FormControl fullWidth size="small">
-			<InputLabel>{label}</InputLabel>
-			<Select
-				value={value ?? ""}
-				label={label}
-				onChange={(e) => onChange(e.target.value)}
-			>
-				<MenuItem value="">
-					<em>{noneLabel}</em>
-				</MenuItem>
-				{roles.map((r) => (
-					<MenuItem key={r.id} value={r.id}>
-						@ {r.name}
-					</MenuItem>
-				))}
-			</Select>
-			{helperText && <FormHelperText>{helperText}</FormHelperText>}
-		</FormControl>
-	)
+	({ label, value, roles, helperText, onChange }: RoleSelectProps) => {
+		const selected = roles.find((r) => r.id === value) ?? null;
+		return (
+			<>
+				<Autocomplete
+					fullWidth
+					size="small"
+					options={roles}
+					getOptionLabel={(r) => `@ ${r.name}`}
+					value={selected}
+					onChange={(_, newValue) => onChange(newValue?.id ?? "")}
+					renderInput={(params) => (
+						<TextField
+							{...params}
+							label={label}
+							slotProps={{
+								input: { ...params.InputProps },
+								htmlInput: { ...params.inputProps },
+							}}
+						/>
+					)}
+				/>
+				{helperText && <FormHelperText>{helperText}</FormHelperText>}
+			</>
+		);
+	}
 );
 RoleSelect.displayName = "RoleSelect";
 

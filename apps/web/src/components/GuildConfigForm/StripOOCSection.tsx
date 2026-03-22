@@ -1,9 +1,6 @@
+import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
-import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import Slider from "@mui/material/Slider";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
@@ -20,7 +17,6 @@ interface Props {
 	stripOOC: ApiGuildConfig["stripOOC"];
 	channels: Channel[];
 	textChannels: Channel[];
-	noneLabel: string;
 }
 
 export default function StripOOCSection({
@@ -28,7 +24,6 @@ export default function StripOOCSection({
 	stripOOC,
 	channels,
 	textChannels,
-	noneLabel,
 }: Props) {
 	const { t } = useI18n();
 
@@ -96,29 +91,38 @@ export default function StripOOCSection({
 					<Controller
 						name="stripOOC.categoryId"
 						control={control}
-						render={({ field }) => (
-							<FormControl fullWidth size="small">
-								<InputLabel>{t("config.fields.stripOocChannels")}</InputLabel>
-								<Select
+						render={({ field }) => {
+							const selected = channels.filter((c) =>
+								(field.value ?? []).includes(c.id)
+							);
+							return (
+								<Autocomplete
+									fullWidth
+									size="small"
 									multiple
-									value={field.value ?? []}
-									label={t("config.fields.stripOocChannels")}
-									onChange={(e) =>
+									options={channels}
+									getOptionLabel={(c) =>
+										`${c.type === 4 ? "\u{1F4C2}" : "#"} ${c.name}`
+									}
+									value={selected}
+									onChange={(_, newValue) =>
 										field.onChange(
-											(e.target.value as string[]).length
-												? (e.target.value as string[])
-												: undefined
+											newValue.length ? newValue.map((c) => c.id) : undefined
 										)
 									}
-								>
-									{channels.map((c) => (
-										<MenuItem key={c.id} value={c.id}>
-											{c.type === 4 ? "📂" : "#"} {c.name}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-						)}
+									renderInput={(params) => (
+										<TextField
+											{...params}
+											label={t("config.fields.stripOocChannels")}
+											slotProps={{
+												input: { ...params.InputProps },
+												htmlInput: { ...params.inputProps, readOnly: true },
+											}}
+										/>
+									)}
+								/>
+							);
+						}}
 					/>
 					<Controller
 						name="stripOOC.forwardId"
@@ -128,7 +132,6 @@ export default function StripOOCSection({
 								label={t("config.fields.stripOocForward")}
 								value={field.value}
 								channels={textChannels}
-								noneLabel={noneLabel}
 								onChange={(v) => field.onChange(v || undefined)}
 							/>
 						)}
