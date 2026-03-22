@@ -14,6 +14,7 @@ import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { type Locale, useI18n } from "../i18n";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 export default function Layout() {
 	const { user, logout } = useAuth();
@@ -39,9 +40,26 @@ export default function Layout() {
 						</Typography>
 					</Box>
 
-					<Tooltip title={mode === "dark" ? "Thème clair" : "Thème sombre"}>
+					{/* documentation link */}
+					<Tooltip title={t("common.documentation")}>
+						<IconButton
+							color="inherit"
+							onClick={() => window.open("https://dicelette.app", "_blank")}
+							size="small"
+						>
+							<LibraryBooksIcon fontSize="small" />
+						</IconButton>
+					</Tooltip>
+
+					<Tooltip
+						title={mode === "dark" ? t("common.lightTheme") : t("common.darkTheme")}
+					>
 						<IconButton color="inherit" onClick={toggleMode} size="small">
-							{mode === "dark" ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+							{mode === "dark" ? (
+								<LightModeIcon fontSize="small" />
+							) : (
+								<DarkModeIcon fontSize="small" />
+							)}
 						</IconButton>
 					</Tooltip>
 

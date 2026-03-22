@@ -16,4 +16,3 @@ export function useI18n() {
 	return ctx;
 }
 
-export { I18nProvider } from "./provider";

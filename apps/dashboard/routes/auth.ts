@@ -115,6 +115,7 @@ router.get("/me", (req: Request, res: Response) => {
 });
 
 router.post("/logout", (req: Request, res: Response) => {
+	if (req.session.userId) userGuildCache.delete(req.session.userId);
 	req.session.destroy(() => {
 		res.json({ ok: true });
 	});
@@ -126,6 +127,7 @@ router.post("/guilds/refresh", (req: Request, res: Response) => {
 		return;
 	}
 	botGuildCache = null;
+	if (req.session.userId) userGuildCache.delete(req.session.userId);
 	res.json({ ok: true });
 });
 
@@ -136,10 +138,22 @@ router.get("/guilds", async (req: Request, res: Response) => {
 	}
 
 	try {
-		const userGuilds = (await discordFetch(
-			"/users/@me/guilds",
-			req.session.accessToken
-		)) as DiscordGuild[];
+		const userId = req.session.userId!;
+		const cached = userGuildCache.get(userId);
+		const userGuilds: DiscordGuild[] =
+			cached && Date.now() < cached.expiresAt
+				? cached.guilds
+				: await (async () => {
+						const guilds = (await discordFetch(
+							"/users/@me/guilds",
+							req.session.accessToken!
+						)) as DiscordGuild[];
+						userGuildCache.set(userId, {
+							guilds,
+							expiresAt: Date.now() + USER_GUILD_CACHE_TTL_MS,
+						});
+						return guilds;
+					})();
 
 		const botGuildIds = await getBotGuildIds();
 		const ManageGuild = BigInt(0x20);
@@ -158,6 +172,9 @@ router.get("/guilds", async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Failed to fetch guilds" });
 	}
 });
+
+const userGuildCache = new Map<string, { guilds: DiscordGuild[]; expiresAt: number }>();
+const USER_GUILD_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 let botGuildCache: { ids: Set<string>; expiresAt: number } | null = null;
 const BOT_GUILD_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes

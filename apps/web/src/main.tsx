@@ -6,7 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./hooks/useAuth";
 import { ThemeModeProvider, useThemeMode } from "./hooks/useThemeMode";
-import { I18nProvider } from "./i18n";
+import { I18nProvider } from "./i18n/provider";
 import "./index.css";
 
 function ThemedApp() {
