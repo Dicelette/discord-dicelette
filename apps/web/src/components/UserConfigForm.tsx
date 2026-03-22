@@ -20,6 +20,7 @@ import { useRef, useState } from "react";
 import { useI18n } from "../i18n";
 import type { ApiTemplateResult, ApiUserConfig } from "../lib/api";
 import { userApi } from "../lib/api";
+import "uniformize";
 
 interface Props {
 	guildId: string;
@@ -128,11 +129,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		reader.onload = async () => {
 			try {
 				const parsed = JSON.parse(reader.result as string);
-				if (
-					typeof parsed !== "object" ||
-					parsed === null ||
-					Array.isArray(parsed)
-				) {
+				if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
 					setSnippetError(t("userConfig.importError"));
 					return;
 				}
@@ -145,9 +142,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 				const errCount = Object.keys(errors).length;
 				const okCount = Object.keys(valid).length;
 				if (errCount > 0) {
-					setSnippetError(
-						t("userConfig.importPartial", { ok: okCount, err: errCount })
-					);
+					setSnippetError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
 				} else if (okCount > 0) {
 					setSnippetError(null);
 					setSnippetSuccess(true);
@@ -218,11 +213,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		reader.onload = async () => {
 			try {
 				const parsed = JSON.parse(reader.result as string);
-				if (
-					typeof parsed !== "object" ||
-					parsed === null ||
-					Array.isArray(parsed)
-				) {
+				if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
 					setAttrError(t("userConfig.importError"));
 					return;
 				}
@@ -235,9 +226,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 				const errCount = Object.keys(errors).length;
 				const okCount = Object.keys(valid).length;
 				if (errCount > 0) {
-					setAttrError(
-						t("userConfig.importPartial", { ok: okCount, err: errCount })
-					);
+					setAttrError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
 				} else if (okCount > 0) {
 					setAttrError(null);
 					setAttrSuccess(true);
@@ -288,7 +277,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			{/* Snippets */}
 			<Accordion defaultExpanded>
 				<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-					<Typography fontWeight={600}>{t("common.snippets")}</Typography>
+					<Typography fontWeight={600}>{t("common.snippets").toTitle()}</Typography>
 				</AccordionSummary>
 				<AccordionDetails>
 					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -343,7 +332,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							size="small"
 							label={t("common.name")}
 							value={newSnippetName}
-							onChange={(e) => { setNewSnippetName(e.target.value); setSnippetAddError(null); }}
+							onChange={(e) => {
+								setNewSnippetName(e.target.value);
+								setSnippetAddError(null);
+							}}
 							sx={{ flex: 1 }}
 							inputProps={{ style: { fontFamily: "monospace" } }}
 						/>
@@ -351,7 +343,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							size="small"
 							label={t("userConfig.snippetDice")}
 							value={newSnippetValue}
-							onChange={(e) => { setNewSnippetValue(e.target.value); setSnippetAddError(null); }}
+							onChange={(e) => {
+								setNewSnippetValue(e.target.value);
+								setSnippetAddError(null);
+							}}
 							placeholder="2d6+3"
 							sx={{ flex: 2 }}
 							inputProps={{ style: { fontFamily: "monospace" } }}
@@ -361,13 +356,19 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							variant="outlined"
 							startIcon={addingSnippet ? <CircularProgress size={16} /> : <AddIcon />}
 							onClick={addSnippet}
-							disabled={addingSnippet || !newSnippetName.trim() || !newSnippetValue.trim()}
+							disabled={
+								addingSnippet || !newSnippetName.trim() || !newSnippetValue.trim()
+							}
 						>
 							{t("common.add")}
 						</Button>
 					</Box>
 					{snippetAddError && (
-						<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setSnippetAddError(null)}>
+						<Alert
+							severity="warning"
+							sx={{ mb: 1 }}
+							onClose={() => setSnippetAddError(null)}
+						>
 							{snippetAddError}
 						</Alert>
 					)}
@@ -480,7 +481,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							size="small"
 							label={t("userSettings.attributes.create.name")}
 							value={newAttrName}
-							onChange={(e) => { setNewAttrName(e.target.value); setAttrAddError(null); }}
+							onChange={(e) => {
+								setNewAttrName(e.target.value);
+								setAttrAddError(null);
+							}}
 							sx={{ flex: 2 }}
 							inputProps={{ style: { fontFamily: "monospace" } }}
 						/>
@@ -488,7 +492,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							size="small"
 							label={t("userConfig.attrValue")}
 							value={newAttrValue}
-							onChange={(e) => { setNewAttrValue(e.target.value); setAttrAddError(null); }}
+							onChange={(e) => {
+								setNewAttrValue(e.target.value);
+								setAttrAddError(null);
+							}}
 							type="number"
 							sx={{ flex: 1 }}
 							onKeyDown={(e) => e.key === "Enter" && addAttribute()}
@@ -503,7 +510,11 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 						</Button>
 					</Box>
 					{attrAddError && (
-						<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setAttrAddError(null)}>
+						<Alert
+							severity="warning"
+							sx={{ mb: 1 }}
+							onClose={() => setAttrAddError(null)}
+						>
 							{attrAddError}
 						</Alert>
 					)}

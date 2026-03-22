@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "../i18n";
 import type { ApiCharacter } from "../lib/api";
 import { charactersApi } from "../lib/api";
+import "uniformize";
 
 interface Props {
 	guildId: string;
@@ -66,7 +67,14 @@ export default function CharactersTab({ guildId }: Props) {
 
 	return (
 		<Box>
-			<Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "space-between",
+					mb: 3,
+				}}
+			>
 				<Typography variant="h6" fontWeight={600}>
 					{t("characters.title")}
 				</Typography>
@@ -154,7 +162,7 @@ function CharacterCard({ char }: { char: ApiCharacter }) {
 				<>
 					<Divider sx={{ mb: 1.5 }} />
 					<Typography variant="subtitle2" color="text.secondary" gutterBottom>
-						{t("common.statistics")}
+						{t("common.statistics").toTitle()}
 					</Typography>
 					<Box
 						sx={{
@@ -176,7 +184,7 @@ function CharacterCard({ char }: { char: ApiCharacter }) {
 				<>
 					<Divider sx={{ mb: 1.5, mt: char.stats ? 1.5 : 0 }} />
 					<Typography variant="subtitle2" color="text.secondary" gutterBottom>
-						{t("characters.damage")}
+						{t("common.macro").toTitle()}
 					</Typography>
 					<Box
 						sx={{
