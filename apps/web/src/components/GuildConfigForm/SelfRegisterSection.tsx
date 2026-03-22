@@ -1,5 +1,5 @@
 import { FormControlLabel, Switch } from "@mui/material";
-import { type Control, Controller } from "react-hook-form";
+import { type Control, Controller, useWatch } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
 import ChannelSelect from "./ChannelSelect";
@@ -8,15 +8,11 @@ import type { Channel } from "./types";
 
 interface Props {
 	control: Control<ApiGuildConfig>;
-	allowSelfRegister: ApiGuildConfig["allowSelfRegister"];
 	textChannels: Channel[];
 }
 
-export default function SelfRegisterSection({
-	control,
-	allowSelfRegister,
-	textChannels,
-}: Props) {
+export default function SelfRegisterSection({ control, textChannels }: Props) {
+	const allowSelfRegister = useWatch({ control, name: "allowSelfRegister" });
 	const { t } = useI18n();
 
 	return (

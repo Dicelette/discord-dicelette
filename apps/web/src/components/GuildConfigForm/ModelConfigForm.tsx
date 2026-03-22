@@ -29,7 +29,7 @@ export default function ModelConfigForm({
 }: Props) {
 	const { t } = useI18n();
 
-	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
+	const { control, handleSubmit, reset, formState } = useForm<ApiGuildConfig>({
 		defaultValues: config,
 	});
 
@@ -50,9 +50,6 @@ export default function ModelConfigForm({
 
 	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
 
-	const hiddenRoll = watch("hiddenRoll");
-	const allowSelfRegister = watch("allowSelfRegister");
-
 	return (
 		<Stack spacing={2}>
 			{isDirty && <Alert severity="warning">{t("config.unsaved")}</Alert>}
@@ -71,15 +68,11 @@ export default function ModelConfigForm({
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<SelfRegisterSection
-							control={control}
-							allowSelfRegister={allowSelfRegister}
-							textChannels={textChannels}
-						/>
+						<SelfRegisterSection control={control} textChannels={textChannels} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<HiddenRollsSection control={control} hiddenRoll={hiddenRoll} />
+						<HiddenRollsSection control={control} />
 					</Paper>
 				</Stack>
 

@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-import { type Control, Controller } from "react-hook-form";
+import { type Control, Controller, useWatch } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
 import ChannelSelect from "./ChannelSelect";
@@ -27,18 +27,13 @@ function buildRegex(prefix: string, suffix: string): string | undefined {
 
 interface Props {
 	control: Control<ApiGuildConfig>;
-	stripOOC: ApiGuildConfig["stripOOC"];
 	channels: Channel[];
 	textChannels: Channel[];
 }
 
-export default function StripOOCSection({
-	control,
-	stripOOC,
-	channels,
-	textChannels,
-}: Props) {
+export default function StripOOCSection({ control, channels, textChannels }: Props) {
 	const { t } = useI18n();
+	const stripOOC = useWatch({ control, name: "stripOOC" });
 
 	const [advancedMode, setAdvancedMode] = useState(() => !!stripOOC?.regex);
 	const [prefix, setPrefix] = useState("");

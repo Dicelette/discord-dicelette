@@ -20,7 +20,7 @@ interface Props {
 export default function GuildConfigForm({ config, onSave, saving, channels }: Props) {
 	const { t } = useI18n();
 
-	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
+	const { control, handleSubmit, reset, formState } = useForm<ApiGuildConfig>({
 		defaultValues: config,
 	});
 
@@ -40,8 +40,6 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 	}, [isDirty]);
 
 	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
-
-	const stripOOC = watch("stripOOC");
 
 	return (
 		<Stack spacing={2}>
@@ -64,7 +62,6 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 					<Paper sx={{ p: 3 }}>
 						<StripOOCSection
 							control={control}
-							stripOOC={stripOOC}
 							channels={channels}
 							textChannels={textChannels}
 						/>

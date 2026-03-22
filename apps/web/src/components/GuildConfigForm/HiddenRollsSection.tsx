@@ -1,15 +1,15 @@
 import { FormControlLabel, Switch, TextField } from "@mui/material";
-import { type Control, Controller } from "react-hook-form";
+import { type Control, Controller, useWatch } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
 import SectionTitle from "./SectionTitle";
 
 interface Props {
 	control: Control<ApiGuildConfig>;
-	hiddenRoll: ApiGuildConfig["hiddenRoll"];
 }
 
-export default function HiddenRollsSection({ control, hiddenRoll }: Props) {
+export default function HiddenRollsSection({ control }: Props) {
+	const hiddenRoll = useWatch({ control, name: "hiddenRoll" });
 	const { t } = useI18n();
 
 	return (
