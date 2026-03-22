@@ -10,6 +10,7 @@ export interface DiscordUser {
 	username: string;
 	discriminator: string;
 	avatar: string | null;
+	// biome-ignore lint/style/useNamingConvention: Say that to discord
 	global_name: string | null;
 }
 
