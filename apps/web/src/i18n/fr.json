@@ -70,9 +70,9 @@
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
-			"admin": "Config serveur",
-			"characters": "Mes personnages",
-			"user": "Config personnelle"
+			"admin": "Configuration serveur",
+			"characters": "Personnages",
+			"user": "Configuration personnelle"
 		},
 		"title": "Configuration du serveur",
 		"userOnlyNotice": "Vous n'avez pas les permissions d'administration sur ce serveur. Vous pouvez tout de même gérer vos paramètres personnels ci-dessous."

@@ -70,9 +70,9 @@
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
-			"admin": "Server config",
-			"characters": "My characters",
-			"user": "Personal config"
+			"admin": "Server configuration",
+			"characters": "Characters",
+			"user": "Personal configuration"
 		},
 		"title": "Server configuration",
 		"userOnlyNotice": "You don't have admin permissions on this server. You can still manage your personal settings below."
