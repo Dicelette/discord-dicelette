@@ -27,7 +27,7 @@ export default function DashboardPage() {
 	const { t } = useI18n();
 
 	const [tab, setTab] = useState<ActiveTab>("admin");
-	const [templateMounted, setTemplateMounted] = useState(false);
+	const [mountedTabs, setMountedTabs] = useState<Set<ActiveTab>>(() => new Set(["admin"]));
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
@@ -46,7 +46,9 @@ export default function DashboardPage() {
 				const { isAdmin: admin, userConfig } = res.data;
 				setIsAdmin(admin);
 				setUserConfigData(userConfig);
-				setTab(admin ? "admin" : "characters");
+				const initialTab = admin ? "admin" : "characters";
+				setTab(initialTab);
+				setMountedTabs(new Set([initialTab]));
 				if (admin) {
 					const [configRes] = await Promise.all([
 						guildApi.getConfig(guildId),
@@ -113,8 +115,8 @@ export default function DashboardPage() {
 
 			<Tabs
 				value={tab}
-				onChange={(_, v) => {
-					if (v === "template") setTemplateMounted(true);
+				onChange={(_, v: ActiveTab) => {
+					setMountedTabs(prev => prev.has(v) ? prev : new Set([...prev, v]));
 					startTransition(() => setTab(v));
 				}}
 				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
@@ -125,7 +127,7 @@ export default function DashboardPage() {
 				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 			</Tabs>
 
-			{isAdmin && config && (
+			{isAdmin && config && mountedTabs.has("admin") && (
 				<Box sx={{ display: tab === "admin" ? undefined : "none" }}>
 					<GuildConfigForm
 						config={config}
@@ -136,7 +138,7 @@ export default function DashboardPage() {
 					/>
 				</Box>
 			)}
-			{isAdmin && config && templateMounted && (
+			{isAdmin && config && mountedTabs.has("template") && (
 				<Box sx={{ display: tab === "template" ? undefined : "none" }}>
 					<ModelConfigForm
 						config={config}
@@ -148,10 +150,16 @@ export default function DashboardPage() {
 					/>
 				</Box>
 			)}
-			{tab === "user" && (
-				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
+			{mountedTabs.has("user") && (
+				<Box sx={{ display: tab === "user" ? undefined : "none" }}>
+					<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
+				</Box>
 			)}
-			{tab === "characters" && <CharactersTab guildId={guildId!} />}
+			{mountedTabs.has("characters") && (
+				<Box sx={{ display: tab === "characters" ? undefined : "none" }}>
+					<CharactersTab guildId={guildId!} />
+				</Box>
+			)}
 		</Box>
 	);
 }
