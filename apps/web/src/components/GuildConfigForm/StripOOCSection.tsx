@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-import { type Control, Controller, useWatch } from "react-hook-form";
+import { type Control, Controller, useController, useWatch } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
 import ChannelSelect from "./ChannelSelect";
@@ -34,12 +34,20 @@ interface Props {
 export default function StripOOCSection({ control, channels, textChannels }: Props) {
 	const { t } = useI18n();
 	const stripOOC = useWatch({ control, name: "stripOOC" });
+	const { field: regexField } = useController({ name: "stripOOC.regex", control });
 
 	const [advancedMode, setAdvancedMode] = useState(() => !!stripOOC?.regex);
 	const [prefix, setPrefix] = useState("");
 	const [suffix, setSuffix] = useState("");
 	const [regexDisplayValue, setRegexDisplayValue] = useState(() => stripOOC?.regex ?? "");
 	const [regexError, setRegexError] = useState<string | null>(null);
+
+	const handleToggleAdvanced = (checked: boolean) => {
+		setAdvancedMode(checked);
+		setRegexError(null);
+		if (!checked) regexField.onChange(buildRegex(prefix, suffix));
+		else setRegexDisplayValue(regexField.value ?? "");
+	};
 
 	return (
 		<>
@@ -63,93 +71,75 @@ export default function StripOOCSection({ control, channels, textChannels }: Pro
 			</div>
 			{stripOOC !== undefined && (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-					<Controller
-						name="stripOOC.regex"
-						control={control}
-						render={({ field }) => {
-							const handleToggleAdvanced = (checked: boolean) => {
-								setAdvancedMode(checked);
-								setRegexError(null);
-								if (!checked) field.onChange(buildRegex(prefix, suffix));
-								else setRegexDisplayValue(field.value ?? "");
-							};
-
-							return (
-								<>
-									<FormControlLabel
-										control={
-											<Switch
-												checked={advancedMode}
-												onChange={(e) => handleToggleAdvanced(e.target.checked)}
-												size="small"
-											/>
-										}
-										label={t("config.fields.stripOocAdvanced")}
-									/>
-									<div />
-									{!advancedMode ? (
-										<>
-											<TextField
-												label={t("config.fields.stripOocPrefix")}
-												size="small"
-												fullWidth
-												value={prefix}
-												onChange={(e) => setPrefix(e.target.value)}
-												onBlur={() => field.onChange(buildRegex(prefix, suffix))}
-											/>
-											<TextField
-												label={t("config.fields.stripOocSuffix")}
-												size="small"
-												fullWidth
-												value={suffix}
-												onChange={(e) => setSuffix(e.target.value)}
-												onBlur={() => field.onChange(buildRegex(prefix, suffix))}
-											/>
-											{(prefix || suffix) && (
-												<Typography
-													variant="caption"
-													color="text.secondary"
-													sx={{ gridColumn: "span 2" }}
-												>
-													{t("config.fields.stripOocRegexPreview", {
-														regex: buildRegex(prefix, suffix) ?? "",
-													})}
-												</Typography>
-											)}
-										</>
-									) : (
-										<TextField
-											label={t("config.fields.stripOocRegex")}
-											size="small"
-											fullWidth
-											value={regexDisplayValue}
-											onChange={(e) => {
-												const val = e.target.value;
-												setRegexDisplayValue(val);
-												setRegexError(null);
-												if (!val) {
-													field.onChange(undefined);
-													return;
-												}
-												let anchored = val;
-												if (!anchored.startsWith("^")) anchored = `^${anchored}`;
-												if (!anchored.endsWith("$")) anchored = `${anchored}$`;
-												try {
-													new RegExp(anchored);
-													field.onChange(anchored);
-												} catch {
-													setRegexError(t("config.fields.stripOocRegexInvalid"));
-													field.onChange(undefined);
-												}
-											}}
-											error={!!regexError}
-											helperText={regexError ?? t("config.fields.stripOocRegexHelp")}
-										/>
-									)}
-								</>
-							);
-						}}
+					<FormControlLabel
+						sx={{ gridColumn: "span 2" }}
+						control={
+							<Switch
+								checked={advancedMode}
+								onChange={(e) => handleToggleAdvanced(e.target.checked)}
+							/>
+						}
+						label={t("config.fields.stripOocAdvanced")}
 					/>
+					{!advancedMode ? (
+						<>
+							<TextField
+								label={t("config.fields.stripOocPrefix")}
+								size="small"
+								fullWidth
+								value={prefix}
+								onChange={(e) => setPrefix(e.target.value)}
+								onBlur={() => regexField.onChange(buildRegex(prefix, suffix))}
+							/>
+							<TextField
+								label={t("config.fields.stripOocSuffix")}
+								size="small"
+								fullWidth
+								value={suffix}
+								onChange={(e) => setSuffix(e.target.value)}
+								onBlur={() => regexField.onChange(buildRegex(prefix, suffix))}
+							/>
+							{(prefix || suffix) && (
+								<Typography
+									variant="caption"
+									color="text.secondary"
+									sx={{ gridColumn: "span 2" }}
+								>
+									{t("config.fields.stripOocRegexPreview", {
+										regex: buildRegex(prefix, suffix) ?? "",
+									})}
+								</Typography>
+							)}
+						</>
+					) : (
+						<TextField
+							label={t("config.fields.stripOocRegex")}
+							size="small"
+							fullWidth
+							value={regexDisplayValue}
+							onChange={(e) => {
+								const val = e.target.value;
+								setRegexDisplayValue(val);
+								setRegexError(null);
+								if (!val) {
+									regexField.onChange(undefined);
+									return;
+								}
+								let anchored = val;
+								if (!anchored.startsWith("^")) anchored = `^${anchored}`;
+								if (!anchored.endsWith("$")) anchored = `${anchored}$`;
+								try {
+									new RegExp(anchored);
+									regexField.onChange(anchored);
+								} catch {
+									setRegexError(t("config.fields.stripOocRegexInvalid"));
+									regexField.onChange(undefined);
+								}
+							}}
+							error={!!regexError}
+							helperText={regexError ?? t("config.fields.stripOocRegexHelp")}
+						/>
+					)}
 					<Box>
 						<Controller
 							name="stripOOC.timer"
