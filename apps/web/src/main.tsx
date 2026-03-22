@@ -16,9 +16,7 @@ const theme = createTheme({
 		MuiAccordion: {
 			styleOverrides: {
 				root: ({ theme }) => ({
-					borderRadius: theme.shape.borderRadius,
-					"&:first-of-type": { borderRadius: theme.shape.borderRadius },
-					"&:last-of-type": { borderRadius: theme.shape.borderRadius },
+					"&&": { borderRadius: theme.shape.borderRadius },
 					"&::before": { display: "none" },
 				}),
 			},

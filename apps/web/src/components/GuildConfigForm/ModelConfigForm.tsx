@@ -1,9 +1,8 @@
 import { Alert, Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
-import { guildApi } from "../../lib/api";
 import AutoRoleSection from "./AutoRoleSection";
 import HiddenRollsSection from "./HiddenRollsSection";
 import SelfRegisterSection from "./SelfRegisterSection";
@@ -16,9 +15,11 @@ interface Props {
 	guildId: string;
 	onSave: (updates: Partial<ApiGuildConfig>) => Promise<void>;
 	saving: boolean;
+	channels: Channel[];
+	roles: Role[];
 }
 
-export default function ModelConfigForm({ config, guildId, onSave, saving }: Props) {
+export default function ModelConfigForm({ config, guildId, onSave, saving, channels, roles }: Props) {
 	const { t } = useI18n();
 
 	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
@@ -27,23 +28,9 @@ export default function ModelConfigForm({ config, guildId, onSave, saving }: Pro
 
 	const isDirty = formState.isDirty;
 
-	const [channels, setChannels] = useState<Channel[]>([]);
-	const [roles, setRoles] = useState<Role[]>([]);
-
 	useEffect(() => {
 		reset(config);
 	}, [config, reset]);
-
-	useEffect(() => {
-		guildApi
-			.getChannels(guildId)
-			.then((r) => setChannels(r.data))
-			.catch(() => {});
-		guildApi
-			.getRoles(guildId)
-			.then((r) => setRoles(r.data))
-			.catch(() => {});
-	}, [guildId]);
 
 	useEffect(() => {
 		if (!isDirty) return;

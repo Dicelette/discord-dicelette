@@ -19,6 +19,7 @@ const ChannelSelect = memo(
 					fullWidth
 					size="small"
 					options={channels}
+					getOptionKey={(c) => c.id}
 					getOptionLabel={(c) => `# ${c.name}`}
 					value={selected}
 					onChange={(_, newValue) => onChange(newValue?.id ?? "")}

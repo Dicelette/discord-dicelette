@@ -75,11 +75,8 @@ export default function StripOOCSection({
 							const handleToggleAdvanced = (checked: boolean) => {
 								setAdvancedMode(checked);
 								setRegexError(null);
-								if (!checked) {
-									field.onChange(buildRegex(prefix, suffix));
-								} else {
-									setRegexDisplayValue(field.value ?? "");
-								}
+								if (!checked) field.onChange(buildRegex(prefix, suffix));
+								else setRegexDisplayValue(field.value ?? "");
 							};
 
 							return (

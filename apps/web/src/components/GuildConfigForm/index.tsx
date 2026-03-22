@@ -1,9 +1,8 @@
 import { Alert, Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
-import { guildApi } from "../../lib/api";
 import ChannelsSection from "./ChannelsSection";
 import DiceBehaviourSection from "./DiceBehaviourSection";
 import GeneralSection from "./GeneralSection";
@@ -15,9 +14,10 @@ interface Props {
 	guildId: string;
 	onSave: (updates: Partial<ApiGuildConfig>) => Promise<void>;
 	saving: boolean;
+	channels: Channel[];
 }
 
-export default function GuildConfigForm({ config, guildId, onSave, saving }: Props) {
+export default function GuildConfigForm({ config, onSave, saving, channels }: Props) {
 	const { t } = useI18n();
 
 	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
@@ -26,18 +26,9 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 	const isDirty = formState.isDirty;
 
-	const [channels, setChannels] = useState<Channel[]>([]);
-
 	useEffect(() => {
 		reset(config);
 	}, [config, reset]);
-
-	useEffect(() => {
-		guildApi
-			.getChannels(guildId)
-			.then((r) => setChannels(r.data))
-			.catch(() => {});
-	}, [guildId]);
 
 	useEffect(() => {
 		if (!isDirty) return;

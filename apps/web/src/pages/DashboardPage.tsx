@@ -8,9 +8,10 @@ import {
 	Tabs,
 	Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CharactersTab from "../components/CharactersTab";
+import type { Channel, Role } from "../components/GuildConfigForm/types";
 import GuildConfigForm from "../components/GuildConfigForm";
 import ModelConfigForm from "../components/GuildConfigForm/ModelConfigForm";
 import UserConfigForm from "../components/UserConfigForm";
@@ -33,6 +34,8 @@ export default function DashboardPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [saveSuccess, setSaveSuccess] = useState(false);
+	const [channels, setChannels] = useState<Channel[]>([]);
+	const [roles, setRoles] = useState<Role[]>([]);
 
 	useEffect(() => {
 		if (!guildId) return;
@@ -44,7 +47,11 @@ export default function DashboardPage() {
 				setUserConfigData(userConfig);
 				setTab(admin ? "admin" : "characters");
 				if (admin) {
-					const configRes = await guildApi.getConfig(guildId);
+					const [configRes] = await Promise.all([
+						guildApi.getConfig(guildId),
+						guildApi.getChannels(guildId).then((r) => setChannels(r.data)).catch(() => {}),
+						guildApi.getRoles(guildId).then((r) => setRoles(r.data)).catch(() => {}),
+					]);
 					setConfig(configRes.data);
 				}
 			})
@@ -99,7 +106,7 @@ export default function DashboardPage() {
 
 			<Tabs
 				value={tab}
-				onChange={(_, v) => setTab(v)}
+				onChange={(_, v) => startTransition(() => setTab(v))}
 				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} />}
@@ -108,32 +115,31 @@ export default function DashboardPage() {
 				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 			</Tabs>
 
-			{isAdmin && config && (
-				<Box sx={{ display: tab === "admin" ? "block" : "none" }}>
-					<GuildConfigForm
-						config={config}
-						guildId={guildId!}
-						onSave={handleSave}
-						saving={saving}
-					/>
-				</Box>
+			{isAdmin && config && tab === "admin" && (
+				<GuildConfigForm
+					config={config}
+					guildId={guildId!}
+					onSave={handleSave}
+					saving={saving}
+					channels={channels}
+				/>
 			)}
-			{isAdmin && config && (
-				<Box sx={{ display: tab === "template" ? "block" : "none" }}>
-					<ModelConfigForm
-						config={config}
-						guildId={guildId!}
-						onSave={handleSave}
-						saving={saving}
-					/>
-				</Box>
+			{isAdmin && config && tab === "template" && (
+				<ModelConfigForm
+					config={config}
+					guildId={guildId!}
+					onSave={handleSave}
+					saving={saving}
+					channels={channels}
+					roles={roles}
+				/>
 			)}
-			<Box sx={{ display: tab === "user" ? "block" : "none" }}>
+			{tab === "user" && (
 				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
-			</Box>
-			<Box sx={{ display: tab === "characters" ? "block" : "none" }}>
+			)}
+			{tab === "characters" && (
 				<CharactersTab guildId={guildId!} />
-			</Box>
+			)}
 		</Box>
 	);
 }
