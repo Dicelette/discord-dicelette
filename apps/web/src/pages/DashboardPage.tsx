@@ -27,6 +27,7 @@ export default function DashboardPage() {
 	const { t } = useI18n();
 
 	const [tab, setTab] = useState<ActiveTab>("admin");
+	const [templateMounted, setTemplateMounted] = useState(false);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
@@ -112,7 +113,10 @@ export default function DashboardPage() {
 
 			<Tabs
 				value={tab}
-				onChange={(_, v) => startTransition(() => setTab(v))}
+				onChange={(_, v) => {
+					if (v === "template") setTemplateMounted(true);
+					startTransition(() => setTab(v));
+				}}
 				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} />}
@@ -121,24 +125,28 @@ export default function DashboardPage() {
 				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 			</Tabs>
 
-			{isAdmin && config && tab === "admin" && (
-				<GuildConfigForm
-					config={config}
-					guildId={guildId!}
-					onSave={handleSave}
-					saving={saving}
-					channels={channels}
-				/>
+			{isAdmin && config && (
+				<Box sx={{ display: tab === "admin" ? undefined : "none" }}>
+					<GuildConfigForm
+						config={config}
+						guildId={guildId!}
+						onSave={handleSave}
+						saving={saving}
+						channels={channels}
+					/>
+				</Box>
 			)}
-			{isAdmin && config && tab === "template" && (
-				<ModelConfigForm
-					config={config}
-					guildId={guildId!}
-					onSave={handleSave}
-					saving={saving}
-					channels={channels}
-					roles={roles}
-				/>
+			{isAdmin && config && templateMounted && (
+				<Box sx={{ display: tab === "template" ? undefined : "none" }}>
+					<ModelConfigForm
+						config={config}
+						guildId={guildId!}
+						onSave={handleSave}
+						saving={saving}
+						channels={channels}
+						roles={roles}
+					/>
+				</Box>
 			)}
 			{tab === "user" && (
 				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />

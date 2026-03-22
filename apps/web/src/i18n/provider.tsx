@@ -1,6 +1,6 @@
 import botEn from "@dicelette/localization/locales/en.json";
 import botFr from "@dicelette/localization/locales/fr.json";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import en from "./en.json";
 import fr from "./fr.json";
 import { i18nContext, type Locale } from "./index";
@@ -36,23 +36,28 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 		return stored === "en" || stored === "fr" ? stored : "fr";
 	});
 
-	const setLocale = (l: Locale) => {
+	const setLocale = useCallback((l: Locale) => {
 		setLocaleState(l);
 		localStorage.setItem("dicelette-locale", l);
-	};
+	}, []);
 
-	const t = (key: string, vars?: Record<string, string | number>): string => {
-		let str = getPath(locale, key);
-		if (vars) {
-			for (const [k, v] of Object.entries(vars)) {
-				str = str.replace(`{${k}}`, String(v));
+	const t = useCallback(
+		(key: string, vars?: Record<string, string | number>): string => {
+			let str = getPath(locale, key);
+			if (vars) {
+				for (const [k, v] of Object.entries(vars)) {
+					str = str.replace(`{${k}}`, String(v));
+				}
 			}
-		}
-		return str;
-	};
+			return str;
+		},
+		[locale]
+	);
+
+	const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
 
 	return (
-		<i18nContext.Provider value={{ locale, setLocale, t }}>
+		<i18nContext.Provider value={value}>
 			{children}
 		</i18nContext.Provider>
 	);
