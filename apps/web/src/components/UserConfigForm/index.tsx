@@ -117,7 +117,9 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					const errCount = Object.keys(errors).length;
 					const okCount = Object.keys(valid).length;
 					if (errCount > 0) {
-						setSnippetError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
+						setSnippetError(
+							t("userConfig.importPartial", { ok: okCount, err: errCount })
+						);
 					} else if (okCount > 0) {
 						setSnippetError(null);
 						setSnippetSuccess(true);

@@ -19,7 +19,16 @@ interface Props {
 
 export default function TemplateSection({ state }: Props) {
 	const { t } = useI18n();
-	const { value: template, setValue: setTemplate, saving, success, error, setError, onSave, onReset } = state;
+	const {
+		value: template,
+		setValue: setTemplate,
+		saving,
+		success,
+		error,
+		setError,
+		onSave,
+		onReset,
+	} = state;
 
 	return (
 		<Accordion>

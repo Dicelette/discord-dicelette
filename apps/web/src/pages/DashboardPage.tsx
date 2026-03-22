@@ -49,7 +49,10 @@ export default function DashboardPage() {
 
 	useEffect(() => {
 		if (tab !== "user" || !guildId) return;
-		userApi.getUserConfig(guildId).then((res) => setUserConfigData(res.data.userConfig)).catch(() => {});
+		userApi
+			.getUserConfig(guildId)
+			.then((res) => setUserConfigData(res.data.userConfig))
+			.catch(() => {});
 	}, [tab, guildId]);
 
 	const handleSave = async (updates: Partial<ApiGuildConfig>) => {
@@ -119,7 +122,11 @@ export default function DashboardPage() {
 			{tab === "characters" && <CharactersTab guildId={guildId!} />}
 
 			{tab === "user" && (
-				<UserConfigForm key={JSON.stringify(userConfigData)} guildId={guildId!} initialConfig={userConfigData} />
+				<UserConfigForm
+					key={JSON.stringify(userConfigData)}
+					guildId={guildId!}
+					initialConfig={userConfigData}
+				/>
 			)}
 		</Box>
 	);
