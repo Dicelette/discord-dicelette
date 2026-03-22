@@ -72,7 +72,7 @@ export default function Layout() {
 						sx={{
 							color: "inherit",
 							fontSize: "0.8rem",
-							fontFamily: '"Iosevka Charon", monospace',
+							fontFamily: "var(--code-font-family)",
 							"& .MuiOutlinedInput-notchedOutline": {
 								borderColor: "rgba(255,255,255,0.2)",
 							},

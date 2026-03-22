@@ -38,7 +38,15 @@ export default function LoginPage() {
 
 			<Card sx={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
 				<CardContent className="p-8">
-					<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1.5, mb: 2 }}>
+					<Box
+						sx={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							gap: 1.5,
+							mb: 2,
+						}}
+					>
 						<img
 							src="/logo.png"
 							alt="Dicelette"

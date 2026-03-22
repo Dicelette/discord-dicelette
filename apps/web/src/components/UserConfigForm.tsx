@@ -301,14 +301,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 								<Typography
 									variant="body2"
 									fontWeight={600}
-									sx={{ minWidth: 120, fontFamily: "monospace" }}
+									sx={{ minWidth: 120, fontFamily: "var(--code-font-family)" }}
 								>
 									{name}
 								</Typography>
 								<Typography
 									variant="body2"
 									color="text.secondary"
-									sx={{ flex: 1, fontFamily: "monospace" }}
+									sx={{ flex: 1, fontFamily: "var(--code-font-family)" }}
 								>
 									{value}
 								</Typography>
@@ -321,7 +321,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							<Typography
 								variant="body2"
 								color="text.secondary"
-								sx={{ fontStyle: "italic" }}
+								sx={{ fontStyle: "italic", fontFamily: "var(--code-font-family)" }}
 							>
 								{t("userConfig.noSnippets")}
 							</Typography>
@@ -330,26 +330,24 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 						<TextField
 							size="small"
-							label={t("common.name")}
+							label={t("common.name").toTitle()}
 							value={newSnippetName}
 							onChange={(e) => {
 								setNewSnippetName(e.target.value);
 								setSnippetAddError(null);
 							}}
-							sx={{ flex: 1 }}
-							inputProps={{ style: { fontFamily: "monospace" } }}
+							sx={{ flex: 1, fontFamily: "var(--code-font-family)" }}
 						/>
 						<TextField
 							size="small"
-							label={t("userConfig.snippetDice")}
+							label={t("common.dice").toTitle()}
 							value={newSnippetValue}
 							onChange={(e) => {
 								setNewSnippetValue(e.target.value);
 								setSnippetAddError(null);
 							}}
 							placeholder="2d6+3"
-							sx={{ flex: 2 }}
-							inputProps={{ style: { fontFamily: "monospace" } }}
+							sx={{ flex: 2, fontFamily: "var(--code-font-family)" }}
 							onKeyDown={(e) => e.key === "Enter" && addSnippet()}
 						/>
 						<Button
@@ -450,14 +448,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 								<Typography
 									variant="body2"
 									fontWeight={600}
-									sx={{ minWidth: 120, fontFamily: "monospace" }}
+									sx={{ minWidth: 120, fontFamily: "var(--code-font-family)" }}
 								>
 									{name}
 								</Typography>
 								<Typography
 									variant="body2"
 									color="text.secondary"
-									sx={{ flex: 1, fontFamily: "monospace" }}
+									sx={{ flex: 1, fontFamily: "var(--code-font-family)" }}
 								>
 									{value}
 								</Typography>
@@ -470,7 +468,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							<Typography
 								variant="body2"
 								color="text.secondary"
-								sx={{ fontStyle: "italic" }}
+								sx={{ fontStyle: "italic", fontFamily: "var(--code-font-family)" }}
 							>
 								{t("userConfig.noAttributes")}
 							</Typography>
@@ -479,18 +477,17 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 						<TextField
 							size="small"
-							label={t("userSettings.attributes.create.name")}
+							label={t("common.name").toTitle()}
 							value={newAttrName}
 							onChange={(e) => {
 								setNewAttrName(e.target.value);
 								setAttrAddError(null);
 							}}
-							sx={{ flex: 2 }}
-							inputProps={{ style: { fontFamily: "monospace" } }}
+							sx={{ flex: 2, fontFamily: "var(--code-font-family)" }}
 						/>
 						<TextField
 							size="small"
-							label={t("userConfig.attrValue")}
+							label={t("userSettings.attributes.create.value.title").toTitle()}
 							value={newAttrValue}
 							onChange={(e) => {
 								setNewAttrValue(e.target.value);
@@ -585,16 +582,15 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							value={template.final}
 							onChange={(e) => setTemplate((p) => ({ ...p, final: e.target.value }))}
 							fullWidth
-							inputProps={{ style: { fontFamily: "monospace" } }}
 							helperText="{{stats}} {{results}} {{link}}"
 						/>
 						<TextField
 							size="small"
 							label={t("userConfig.templateResults")}
 							value={template.results}
+							sx={{ fontFamily: "var(--code-font-family)" }}
 							onChange={(e) => setTemplate((p) => ({ ...p, results: e.target.value }))}
 							fullWidth
-							inputProps={{ style: { fontFamily: "monospace" } }}
 							helperText="{{info}} {{result}}"
 						/>
 						<TextField
@@ -602,11 +598,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							label={t("userConfig.templateJoin")}
 							value={template.joinResult}
 							onChange={(e) => setTemplate((p) => ({ ...p, joinResult: e.target.value }))}
-							sx={{ maxWidth: 200 }}
-							inputProps={{ style: { fontFamily: "monospace" } }}
+							sx={{ maxWidth: 200, fontFamily: "var(--code-font-family)" }}
 						/>
 						<Divider />
-						<Typography variant="body2" color="text.secondary">
+						<Typography
+							variant="body2"
+							color="text.secondary"
+							sx={{ fontFamily: "var(--code-font-family)" }}
+						>
 							{t("userConfig.templateFormatSection")}
 						</Typography>
 						<Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
@@ -630,8 +629,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 											format: { ...p.format, [field]: e.target.value },
 										}))
 									}
-									sx={{ flex: "1 1 200px" }}
-									inputProps={{ style: { fontFamily: "monospace" } }}
+									sx={{ flex: "1 1 200px", fontFamily: "var(--code-font-family)" }}
 									helperText={hint}
 								/>
 							))}

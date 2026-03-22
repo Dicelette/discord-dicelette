@@ -31,6 +31,10 @@ const theme = createTheme({
 					default: "var(--bg-default)",
 					paper: "var(--bg-paper)",
 				},
+				text: {
+					primary: "rgba(255, 255, 255, 0.87)",
+					secondary: "rgba(255, 255, 255, 0.6)",
+				},
 			},
 		},
 		light: {

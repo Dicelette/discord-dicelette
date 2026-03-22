@@ -37,18 +37,8 @@ interface Props {
 }
 
 const DISCORD_LOCALES = [
-	{ value: "en-US", label: "English (US)" },
-	{ value: "en-GB", label: "English (GB)" },
+	{ value: "en", label: "English" },
 	{ value: "fr", label: "Français" },
-	{ value: "de", label: "Deutsch" },
-	{ value: "es-ES", label: "Español" },
-	{ value: "pt-BR", label: "Português (BR)" },
-	{ value: "it", label: "Italiano" },
-	{ value: "pl", label: "Polski" },
-	{ value: "ru", label: "Русский" },
-	{ value: "ja", label: "日本語" },
-	{ value: "ko", label: "한국어" },
-	{ value: "zh-CN", label: "中文 (简体)" },
 ];
 
 export default function GuildConfigForm({ config, guildId, onSave, saving }: Props) {
