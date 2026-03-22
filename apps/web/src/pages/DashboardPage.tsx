@@ -47,6 +47,11 @@ export default function DashboardPage() {
 			.finally(() => setLoading(false));
 	}, [guildId, t]);
 
+	useEffect(() => {
+		if (tab !== "user" || !guildId) return;
+		userApi.getUserConfig(guildId).then((res) => setUserConfigData(res.data.userConfig)).catch(() => {});
+	}, [tab, guildId]);
+
 	const handleSave = async (updates: Partial<ApiGuildConfig>) => {
 		if (!guildId) return;
 		setSaving(true);
@@ -114,7 +119,7 @@ export default function DashboardPage() {
 			{tab === "characters" && <CharactersTab guildId={guildId!} />}
 
 			{tab === "user" && (
-				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
+				<UserConfigForm key={JSON.stringify(userConfigData)} guildId={guildId!} initialConfig={userConfigData} />
 			)}
 		</Box>
 	);

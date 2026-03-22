@@ -16,7 +16,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { useI18n } from "../i18n";
 import type { ApiTemplateResult, ApiUserConfig } from "../lib/api";
 import { userApi } from "../lib/api";
@@ -49,6 +49,112 @@ const exportJson = (data: unknown, filename: string) => {
 	a.click();
 	URL.revokeObjectURL(url);
 };
+
+// ---------- Row components (memoized to avoid re-renders on parent state changes) ----------
+
+interface SnippetRowProps {
+	name: string;
+	value: string;
+	onRename: (oldName: string, newName: string) => void;
+	onValueChange: (name: string, value: string) => void;
+	onDelete: (name: string) => void;
+}
+
+const SnippetRow = memo(
+	function SnippetRow({ name, value, onRename, onValueChange, onDelete }: SnippetRowProps) {
+		const [localName, setLocalName] = useState(name);
+		const [localValue, setLocalValue] = useState(value);
+		return (
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					gap: 1,
+					p: 1,
+					borderRadius: 1,
+					bgcolor: "background.paper",
+					border: "1px solid",
+					borderColor: "divider",
+				}}
+			>
+				<TextField
+					size="small"
+					value={localName}
+					onChange={(e) => setLocalName(e.target.value)}
+					onBlur={() => { if (localName !== name) onRename(name, localName); }}
+					sx={{ flex: 1 }}
+					slotProps={{ htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } } }}
+				/>
+				<TextField
+					size="small"
+					value={localValue}
+					onChange={(e) => setLocalValue(e.target.value)}
+					onBlur={() => onValueChange(name, localValue)}
+					placeholder="2d6+3"
+					sx={{ flex: 2 }}
+					slotProps={{ htmlInput: { style: { fontFamily: "var(--code-font-family)" } } }}
+				/>
+				<IconButton size="small" onClick={() => onDelete(name)}>
+					<DeleteIcon fontSize="small" />
+				</IconButton>
+			</Box>
+		);
+	}
+);
+
+interface AttributeRowProps {
+	name: string;
+	value: number;
+	onRename: (oldName: string, newName: string) => void;
+	onValueChange: (name: string, value: number) => void;
+	onDelete: (name: string) => void;
+}
+
+const AttributeRow = memo(
+	function AttributeRow({ name, value, onRename, onValueChange, onDelete }: AttributeRowProps) {
+		const [localName, setLocalName] = useState(name);
+		const [localValue, setLocalValue] = useState(String(value));
+		return (
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					gap: 1,
+					p: 1,
+					borderRadius: 1,
+					bgcolor: "background.paper",
+					border: "1px solid",
+					borderColor: "divider",
+				}}
+			>
+				<TextField
+					size="small"
+					value={localName}
+					onChange={(e) => setLocalName(e.target.value)}
+					onBlur={() => { if (localName !== name) onRename(name, localName); }}
+					sx={{ flex: 2 }}
+					slotProps={{ htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } } }}
+				/>
+				<TextField
+					size="small"
+					value={localValue}
+					type="number"
+					onChange={(e) => setLocalValue(e.target.value)}
+					onBlur={() => {
+						const val = Number.parseFloat(localValue);
+						if (!Number.isNaN(val)) onValueChange(name, val);
+					}}
+					sx={{ flex: 1 }}
+				/>
+				<IconButton size="small" onClick={() => onDelete(name)}>
+					<DeleteIcon fontSize="small" />
+				</IconButton>
+			</Box>
+		);
+	}
+);
+
+// ---------- Main form ----------
 
 export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const { t } = useI18n();
@@ -118,6 +224,20 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			delete next[key];
 			return next;
 		});
+	}, []);
+
+	const renameSnippet = useCallback((oldName: string, newName: string) => {
+		setSnippets((prev) => {
+			const entries = Object.entries(prev);
+			const idx = entries.findIndex(([k]) => k === oldName);
+			if (idx === -1) return prev;
+			entries[idx] = [newName, entries[idx][1]];
+			return Object.fromEntries(entries);
+		});
+	}, []);
+
+	const updateSnippetValue = useCallback((name: string, value: string) => {
+		setSnippets((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
 	const importSnippets = useCallback(
@@ -206,6 +326,20 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		});
 	}, []);
 
+	const renameAttribute = useCallback((oldName: string, newName: string) => {
+		setAttributes((prev) => {
+			const entries = Object.entries(prev);
+			const idx = entries.findIndex(([k]) => k === oldName);
+			if (idx === -1) return prev;
+			entries[idx] = [newName, entries[idx][1]];
+			return Object.fromEntries(entries);
+		});
+	}, []);
+
+	const updateAttributeValue = useCallback((name: string, value: number) => {
+		setAttributes((prev) => ({ ...prev, [name]: value }));
+	}, []);
+
 	const importAttributes = useCallback(
 		(e: InputEvent & { target: HTMLInputElement }) => {
 			const file = e.target.files?.[0];
@@ -285,37 +419,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					</Typography>
 					<Stack spacing={1} sx={{ mb: 2 }}>
 						{Object.entries(snippets).map(([name, value]) => (
-							<Box
+							<SnippetRow
 								key={name}
-								sx={{
-									display: "flex",
-									alignItems: "center",
-									gap: 1,
-									p: 1,
-									borderRadius: 1,
-									bgcolor: "background.paper",
-									border: "1px solid",
-									borderColor: "divider",
-								}}
-							>
-								<Typography
-									variant="body2"
-									fontWeight={600}
-									sx={{ minWidth: 120, fontFamily: "var(--code-font-family)" }}
-								>
-									{name}
-								</Typography>
-								<Typography
-									variant="body2"
-									color="text.secondary"
-									sx={{ flex: 1, fontFamily: "var(--code-font-family)" }}
-								>
-									{value}
-								</Typography>
-								<IconButton size="small" onClick={() => deleteSnippet(name)}>
-									<DeleteIcon fontSize="small" />
-								</IconButton>
-							</Box>
+								name={name}
+								value={value}
+								onRename={renameSnippet}
+								onValueChange={updateSnippetValue}
+								onDelete={deleteSnippet}
+							/>
 						))}
 						{Object.keys(snippets).length === 0 && (
 							<Typography
@@ -432,37 +543,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					</Typography>
 					<Stack spacing={1} sx={{ mb: 2 }}>
 						{Object.entries(attributes).map(([name, value]) => (
-							<Box
+							<AttributeRow
 								key={name}
-								sx={{
-									display: "flex",
-									alignItems: "center",
-									gap: 1,
-									p: 1,
-									borderRadius: 1,
-									bgcolor: "background.paper",
-									border: "1px solid",
-									borderColor: "divider",
-								}}
-							>
-								<Typography
-									variant="body2"
-									fontWeight={600}
-									sx={{ minWidth: 120, fontFamily: "var(--code-font-family)" }}
-								>
-									{name}
-								</Typography>
-								<Typography
-									variant="body2"
-									color="text.secondary"
-									sx={{ flex: 1, fontFamily: "var(--code-font-family)" }}
-								>
-									{value}
-								</Typography>
-								<IconButton size="small" onClick={() => deleteAttribute(name)}>
-									<DeleteIcon fontSize="small" />
-								</IconButton>
-							</Box>
+								name={name}
+								value={value}
+								onRename={renameAttribute}
+								onValueChange={updateAttributeValue}
+								onDelete={deleteAttribute}
+							/>
 						))}
 						{Object.keys(attributes).length === 0 && (
 							<Typography
