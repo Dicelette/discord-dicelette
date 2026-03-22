@@ -13,6 +13,17 @@ const theme = createTheme({
 	},
 	components: {
 		// biome-ignore lint/style/useNamingConvention: MUI requires PascalCase component keys
+		MuiAccordion: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					borderRadius: theme.shape.borderRadius,
+					"&:first-of-type": { borderRadius: theme.shape.borderRadius },
+					"&:last-of-type": { borderRadius: theme.shape.borderRadius },
+					"&::before": { display: "none" },
+				}),
+			},
+		},
+		// biome-ignore lint/style/useNamingConvention: MUI requires PascalCase component keys
 		MuiInputBase: {
 			styleOverrides: {
 				input: {

@@ -58,7 +58,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 			<Box component="form" onSubmit={handleSubmit(onSave)}>
 				<Stack spacing={2}>
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={{ p: 3 }} title={t("config.sections.general")}>
 						<GeneralSection control={control} />
 					</Paper>
 

@@ -35,7 +35,7 @@ export default function TemplateSection({ state }: Props) {
 
 	return (
 		<Accordion>
-			<AccordionSummary expandIcon={<ExpandMore />}>
+			<AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: "action.hover" }}>
 				<Typography fontWeight={600}>{t("userConfig.sections.template")}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>

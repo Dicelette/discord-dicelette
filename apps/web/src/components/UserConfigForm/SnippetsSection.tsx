@@ -48,7 +48,7 @@ export default function SnippetsSection({ state }: Props) {
 
 	return (
 		<Accordion defaultExpanded>
-			<AccordionSummary expandIcon={<ExpandMore />}>
+			<AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: "action.hover" }}>
 				<Typography fontWeight={600}>{t("common.snippets").toTitle()}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
