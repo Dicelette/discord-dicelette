@@ -1,7 +1,4 @@
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
 import { memo } from "react";
 import type { Channel } from "./types";
 
@@ -10,11 +7,12 @@ interface ChannelSelectProps {
 	value: string | undefined;
 	channels: Channel[];
 	noneLabel: string;
+	helperText?: string;
 	onChange: (v: string) => void;
 }
 
 const ChannelSelect = memo(
-	({ label, value, channels, noneLabel, onChange }: ChannelSelectProps) => (
+	({ label, value, channels, noneLabel, helperText, onChange }: ChannelSelectProps) => (
 		<FormControl fullWidth size="small">
 			<InputLabel>{label}</InputLabel>
 			<Select
@@ -31,6 +29,7 @@ const ChannelSelect = memo(
 					</MenuItem>
 				))}
 			</Select>
+			{helperText && <FormHelperText>{helperText}</FormHelperText>}
 		</FormControl>
 	)
 );

@@ -64,7 +64,6 @@ export default function StripOOCSection({
 								fullWidth
 								value={field.value ?? ""}
 								onChange={(e) => field.onChange(e.target.value || undefined)}
-								helperText={t("config.fields.stripOocRegexHelp")}
 							/>
 						)}
 					/>

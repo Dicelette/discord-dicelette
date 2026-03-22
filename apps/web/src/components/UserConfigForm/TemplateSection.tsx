@@ -1,14 +1,17 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import { ExpandMore } from "@mui/icons-material";
+import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Alert,
+	Box,
+	Button,
+	CircularProgress,
+	Divider,
+	TextField,
+	Typography,
+} from "@mui/material";
+
 import { useI18n } from "../../i18n";
 import type { ApiTemplateResult } from "../../lib/api";
 import type { TemplateState } from "./types";
@@ -32,7 +35,7 @@ export default function TemplateSection({ state }: Props) {
 
 	return (
 		<Accordion>
-			<AccordionSummary expandIcon={<ExpandMoreIcon />}>
+			<AccordionSummary expandIcon={<ExpandMore />}>
 				<Typography fontWeight={600}>{t("userConfig.sections.template")}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>

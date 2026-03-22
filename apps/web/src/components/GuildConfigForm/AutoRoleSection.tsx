@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
@@ -17,13 +18,14 @@ export default function AutoRoleSection({ control, roles, noneLabel }: Props) {
 	return (
 		<>
 			<SectionTitle>{t("config.autoRole")}</SectionTitle>
+			<Typography variant="subtitle1">{t("autoRole.description")}</Typography>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<Controller
 					name="autoRole.stats"
 					control={control}
 					render={({ field }) => (
 						<RoleSelect
-							label={t("config.fields.autoRoleStats")}
+							label={t("common.statistic").toTitle()}
 							value={field.value}
 							roles={roles}
 							noneLabel={noneLabel}
@@ -36,7 +38,7 @@ export default function AutoRoleSection({ control, roles, noneLabel }: Props) {
 					control={control}
 					render={({ field }) => (
 						<RoleSelect
-							label={t("config.fields.autoRoleDice")}
+							label={t("common.macro").toTitle()}
 							value={field.value}
 							roles={roles}
 							noneLabel={noneLabel}

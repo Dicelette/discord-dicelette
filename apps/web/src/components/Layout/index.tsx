@@ -1,15 +1,15 @@
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import { useColorScheme } from "@mui/material";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+import { DarkMode, LibraryBooks, LightMode } from "@mui/icons-material";
+import {
+	AppBar,
+	Box,
+	IconButton,
+	MenuItem,
+	Select,
+	Toolbar,
+	Tooltip,
+	Typography,
+	useColorScheme,
+} from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { type Locale, useI18n } from "../../i18n";
@@ -46,7 +46,7 @@ export default function Layout() {
 							onClick={() => window.open("https://www.dicelette.app", "_blank")}
 							size="small"
 						>
-							<LibraryBooksIcon fontSize="small" />
+							<LibraryBooks fontSize="small" />
 						</IconButton>
 					</Tooltip>
 
@@ -55,9 +55,9 @@ export default function Layout() {
 					>
 						<IconButton color="inherit" onClick={toggleMode} size="small">
 							{mode === "dark" ? (
-								<LightModeIcon fontSize="small" />
+								<LightMode fontSize="small" />
 							) : (
-								<DarkModeIcon fontSize="small" />
+								<DarkMode fontSize="small" />
 							)}
 						</IconButton>
 					</Tooltip>

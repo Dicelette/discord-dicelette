@@ -1,10 +1,12 @@
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import Typography from "@mui/material/Typography";
+import {
+	Box,
+	Button,
+	Card,
+	CardContent,
+	MenuItem,
+	Select,
+	Typography,
+} from "@mui/material";
 import { type Locale, useI18n } from "../i18n";
 
 export default function LoginPage() {

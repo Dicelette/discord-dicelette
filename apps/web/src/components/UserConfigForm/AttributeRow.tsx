@@ -1,7 +1,6 @@
-import DeleteIcon from "@mui/icons-material/Delete";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
+import { Delete } from "@mui/icons-material";
+import { Box, IconButton, TextField } from "@mui/material";
+
 import { memo, useState } from "react";
 
 export interface AttributeRowProps {
@@ -60,7 +59,7 @@ const AttributeRow = memo(function AttributeRow({
 				sx={{ flex: 1 }}
 			/>
 			<IconButton size="small" onClick={() => onDelete(name)}>
-				<DeleteIcon fontSize="small" />
+				<Delete fontSize="small" />
 			</IconButton>
 		</Box>
 	);

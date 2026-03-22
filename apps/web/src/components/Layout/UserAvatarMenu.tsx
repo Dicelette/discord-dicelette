@@ -1,10 +1,5 @@
 import LogoutIcon from "@mui/icons-material/Logout";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
+import { Avatar, Box, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
 import { useI18n } from "../../i18n";
 

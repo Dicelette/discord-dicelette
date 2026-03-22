@@ -1,18 +1,18 @@
-import AddIcon from "@mui/icons-material/Add";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+import { Add, ExpandMore, FileDownload, FileUpload } from "@mui/icons-material";
+import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Alert,
+	Box,
+	Button,
+	CircularProgress,
+	Stack,
+	TextField,
+	Tooltip,
+	Typography,
+} from "@mui/material";
+
 import { useI18n } from "../../i18n";
 import SnippetRow from "./SnippetRow";
 import type { SnippetsState } from "./types";
@@ -48,7 +48,7 @@ export default function SnippetsSection({ state }: Props) {
 
 	return (
 		<Accordion defaultExpanded>
-			<AccordionSummary expandIcon={<ExpandMoreIcon />}>
+			<AccordionSummary expandIcon={<ExpandMore />}>
 				<Typography fontWeight={600}>{t("common.snippets").toTitle()}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
@@ -101,7 +101,7 @@ export default function SnippetsSection({ state }: Props) {
 					/>
 					<Button
 						variant="outlined"
-						startIcon={adding ? <CircularProgress size={16} /> : <AddIcon />}
+						startIcon={adding ? <CircularProgress size={16} /> : <Add />}
 						onClick={onAdd}
 						disabled={adding || !newName.trim() || !newValue.trim()}
 					>
@@ -136,7 +136,7 @@ export default function SnippetsSection({ state }: Props) {
 						<span>
 							<Button
 								variant="outlined"
-								startIcon={<FileDownloadIcon />}
+								startIcon={<FileDownload />}
 								onClick={() => exportJson(snippets, "snippets.json")}
 								disabled={Object.keys(snippets).length === 0}
 							>
@@ -154,7 +154,7 @@ export default function SnippetsSection({ state }: Props) {
 					<Tooltip title={t("userConfig.importTooltip")}>
 						<Button
 							variant="outlined"
-							startIcon={<FileUploadIcon />}
+							startIcon={<FileUpload />}
 							onClick={() => importRef.current?.click()}
 						>
 							{t("userConfig.import")}

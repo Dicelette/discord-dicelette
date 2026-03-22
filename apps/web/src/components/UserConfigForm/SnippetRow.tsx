@@ -1,7 +1,5 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
+import { Box, IconButton, TextField } from "@mui/material";
 import { memo, useState } from "react";
 
 export interface SnippetRowProps {

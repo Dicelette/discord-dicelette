@@ -1,9 +1,4 @@
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
+import { Alert, Box, Button, Divider, Paper, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useI18n } from "../../i18n";
@@ -97,7 +92,12 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<Divider sx={{ my: 3 }} />
 
-				<SelfRegisterSection control={control} allowSelfRegister={allowSelfRegister} />
+				<SelfRegisterSection
+					control={control}
+					allowSelfRegister={allowSelfRegister}
+					textChannels={textChannels}
+					noneLabel={noneLabel}
+				/>
 
 				<Divider sx={{ my: 3 }} />
 

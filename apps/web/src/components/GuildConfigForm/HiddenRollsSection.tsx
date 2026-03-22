@@ -1,6 +1,4 @@
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import TextField from "@mui/material/TextField";
+import { FormControlLabel, Switch, TextField } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";

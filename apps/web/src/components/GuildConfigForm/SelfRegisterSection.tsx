@@ -1,17 +1,24 @@
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import TextField from "@mui/material/TextField";
+import { FormControlLabel, Switch } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
+import ChannelSelect from "./ChannelSelect";
 import SectionTitle from "./SectionTitle";
+import type { Channel } from "./types";
 
 interface Props {
 	control: Control<ApiGuildConfig>;
 	allowSelfRegister: ApiGuildConfig["allowSelfRegister"];
+	textChannels: Channel[];
+	noneLabel: string;
 }
 
-export default function SelfRegisterSection({ control, allowSelfRegister }: Props) {
+export default function SelfRegisterSection({
+	control,
+	allowSelfRegister,
+	textChannels,
+	noneLabel,
+}: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -33,17 +40,17 @@ export default function SelfRegisterSection({ control, allowSelfRegister }: Prop
 						/>
 					)}
 				/>
-				{allowSelfRegister && typeof allowSelfRegister !== "boolean" && (
+				{allowSelfRegister && (
 					<Controller
 						name="allowSelfRegister"
 						control={control}
 						render={({ field }) => (
-							<TextField
+							<ChannelSelect
 								label={t("config.fields.moderationChannel")}
-								size="small"
-								value={typeof field.value === "string" ? field.value : ""}
-								onChange={(e) => field.onChange(e.target.value || true)}
-								helperText={t("config.fields.moderationChannelHelp")}
+								value={typeof field.value === "string" ? field.value : undefined}
+								channels={textChannels}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || true)}
 							/>
 						)}
 					/>

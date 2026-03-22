@@ -1,19 +1,20 @@
-import AddIcon from "@mui/icons-material/Add";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SettingsIcon from "@mui/icons-material/Settings";
-import Alert from "@mui/material/Alert";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
-import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+import { Add, Refresh, Settings } from "@mui/icons-material";
+import {
+	Alert,
+	Avatar,
+	Box,
+	Button,
+	Card,
+	CardActionArea,
+	CardContent,
+	Chip,
+	CircularProgress,
+	Divider,
+	Grid,
+	Tooltip,
+	Typography,
+} from "@mui/material";
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "../i18n";
@@ -81,7 +82,7 @@ export default function ServerSelectPage() {
 						<Button
 							size="small"
 							variant="outlined"
-							startIcon={refreshing ? <CircularProgress size={14} /> : <RefreshIcon />}
+							startIcon={refreshing ? <CircularProgress size={14} /> : <Refresh />}
 							onClick={handleRefresh}
 							disabled={refreshing || loading}
 						>
@@ -125,7 +126,7 @@ export default function ServerSelectPage() {
 													<Chip label={t("common.owner")} size="small" sx={{ mt: 0.5 }} />
 												)}
 											</Box>
-											<SettingsIcon sx={{ opacity: 0.4, flexShrink: 0 }} />
+											<Settings sx={{ opacity: 0.4, flexShrink: 0 }} />
 										</CardContent>
 									</CardActionArea>
 								</Card>
@@ -163,7 +164,7 @@ export default function ServerSelectPage() {
 										<Button
 											size="small"
 											variant="outlined"
-											startIcon={<AddIcon />}
+											startIcon={<Add />}
 											onClick={() => handleAddBot(guild)}
 											sx={{ flexShrink: 0 }}
 										>

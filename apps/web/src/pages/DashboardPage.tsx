@@ -1,11 +1,13 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import Typography from "@mui/material/Typography";
+import {
+	Alert,
+	Box,
+	Button,
+	CircularProgress,
+	Tab,
+	Tabs,
+	Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CharactersTab from "../components/CharactersTab";

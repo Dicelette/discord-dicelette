@@ -1,7 +1,4 @@
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
 import { memo } from "react";
 import type { Role } from "./types";
 
@@ -10,11 +7,12 @@ interface RoleSelectProps {
 	value: string | undefined;
 	roles: Role[];
 	noneLabel: string;
+	helperText?: string;
 	onChange: (v: string) => void;
 }
 
 const RoleSelect = memo(
-	({ label, value, roles, noneLabel, onChange }: RoleSelectProps) => (
+	({ label, value, roles, noneLabel, helperText, onChange }: RoleSelectProps) => (
 		<FormControl fullWidth size="small">
 			<InputLabel>{label}</InputLabel>
 			<Select
@@ -31,6 +29,7 @@ const RoleSelect = memo(
 					</MenuItem>
 				))}
 			</Select>
+			{helperText && <FormHelperText>{helperText}</FormHelperText>}
 		</FormControl>
 	)
 );
