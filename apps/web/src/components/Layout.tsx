@@ -1,26 +1,29 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
+import LogoutIcon from "@mui/icons-material/Logout";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useColorScheme } from "@mui/material";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { type Locale, useI18n } from "../i18n";
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-
 export default function Layout() {
 	const { user, logout } = useAuth();
 	const { locale, setLocale, t } = useI18n();
 	const { mode, setMode } = useColorScheme();
 	const toggleMode = () => setMode(mode === "dark" ? "light" : "dark");
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
 	const avatarUrl = user?.avatar
 		? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
@@ -37,7 +40,7 @@ export default function Layout() {
 					<Box className="flex items-center gap-2" sx={{ flexGrow: 1 }}>
 						<img src="/logo.png" alt="Dicelette" style={{ height: 28, width: 28 }} />
 						<Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
-							Dicelette Dashboard
+							{t("login.title")}
 						</Typography>
 					</Box>
 
@@ -85,15 +88,45 @@ export default function Layout() {
 					</Select>
 
 					{user && (
-						<Box className="flex items-center gap-2">
-							<Avatar src={avatarUrl} sx={{ width: 28, height: 28 }} />
-							<Typography variant="body2" sx={{ opacity: 0.8 }}>
-								{user.global_name ?? user.username}
-							</Typography>
-							<Button color="inherit" size="small" onClick={logout} sx={{ opacity: 0.7 }}>
-								{t("common.logout")}
-							</Button>
-						</Box>
+						<>
+							<Box
+								className="flex items-center gap-2"
+								onClick={(e) => setAnchorEl(e.currentTarget)}
+								sx={{
+									cursor: "pointer",
+									px: 1.5,
+									py: 0.5,
+									borderRadius: 2,
+									transition: "background 0.15s",
+									"&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+									"&:active": { backgroundColor: "rgba(255,255,255,0.18)" },
+								}}
+							>
+								<Typography variant="body2">
+									{user.global_name ?? user.username}
+								</Typography>
+								<Avatar src={avatarUrl} sx={{ width: 28, height: 28 }} />
+							</Box>
+							<Menu
+								anchorEl={anchorEl}
+								open={Boolean(anchorEl)}
+								onClose={() => setAnchorEl(null)}
+								transformOrigin={{ horizontal: "right", vertical: "top" }}
+								anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+							>
+								<MenuItem
+									onClick={() => {
+										logout();
+										setAnchorEl(null);
+									}}
+								>
+									<ListItemIcon>
+										<LogoutIcon fontSize="small" />
+									</ListItemIcon>
+									{t("common.logout")}
+								</MenuItem>
+							</Menu>
+						</>
 					)}
 				</Toolbar>
 			</AppBar>

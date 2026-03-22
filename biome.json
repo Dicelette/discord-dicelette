@@ -91,7 +91,7 @@
 					"options": {
 						"conventions": [
 							{
-								"formats": ["CONSTANT_CASE", "camelCase"],
+								"formats": ["CONSTANT_CASE", "camelCase", "PascalCase"],
 								"selector": {
 									"kind": "const",
 									"scope": "global"

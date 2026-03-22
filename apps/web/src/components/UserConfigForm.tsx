@@ -16,7 +16,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useI18n } from "../i18n";
 import type { ApiTemplateResult, ApiUserConfig } from "../lib/api";
 import { userApi } from "../lib/api";
@@ -26,6 +26,29 @@ interface Props {
 	guildId: string;
 	initialConfig: ApiUserConfig["userConfig"];
 }
+
+const DEFAULT_TEMPLATE: ApiTemplateResult = {
+	results: "{{info}} {{result}}",
+	final: "[[{{stats}} {{results}}]](<{{link}}>)",
+	joinResult: "; ",
+	format: {
+		name: "__{{stat}}__:",
+		info: "{{info}} -",
+		dice: "{{dice}}",
+		originalDice: "{{original_dice}}",
+		character: "{{character}}",
+	},
+};
+
+const exportJson = (data: unknown, filename: string) => {
+	const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = filename;
+	a.click();
+	URL.revokeObjectURL(url);
+};
 
 export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const { t } = useI18n();
@@ -39,6 +62,8 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const [savingSnippets, setSavingSnippets] = useState(false);
 	const [snippetSuccess, setSnippetSuccess] = useState(false);
 	const [snippetError, setSnippetError] = useState<string | null>(null);
+	const [addingSnippet, setAddingSnippet] = useState(false);
+	const [snippetAddError, setSnippetAddError] = useState<string | null>(null);
 
 	// --- Attributes state ---
 	const [attributes, setAttributes] = useState<Record<string, number>>(
@@ -49,22 +74,12 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const [savingAttrs, setSavingAttrs] = useState(false);
 	const [attrSuccess, setAttrSuccess] = useState(false);
 	const [attrError, setAttrError] = useState<string | null>(null);
+	const [addingAttr, setAddingAttr] = useState(false);
+	const [attrAddError, setAttrAddError] = useState<string | null>(null);
 
 	// --- Template state ---
-	const defaultTemplate: ApiTemplateResult = {
-		results: "{{info}} {{result}}",
-		final: "[[{{stats}} {{results}}]](<{{link}}>)",
-		joinResult: "; ",
-		format: {
-			name: "__{{stat}}__:",
-			info: "{{info}} -",
-			dice: "{{dice}}",
-			originalDice: "{{original_dice}}",
-			character: "{{character}}",
-		},
-	};
 	const [template, setTemplate] = useState<ApiTemplateResult>(
-		initialConfig?.createLinkTemplate ?? defaultTemplate
+		initialConfig?.createLinkTemplate ?? DEFAULT_TEMPLATE
 	);
 	const [savingTemplate, setSavingTemplate] = useState(false);
 	const [templateSuccess, setTemplateSuccess] = useState(false);
@@ -74,25 +89,8 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const snippetImportRef = useRef<HTMLInputElement>(null);
 	const attrImportRef = useRef<HTMLInputElement>(null);
 
-	// --- Export helpers ---
-	const exportJson = (data: unknown, filename: string) => {
-		const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = filename;
-		a.click();
-		URL.revokeObjectURL(url);
-	};
-
-	// --- Adding state ---
-	const [addingSnippet, setAddingSnippet] = useState(false);
-	const [snippetAddError, setSnippetAddError] = useState<string | null>(null);
-	const [addingAttr, setAddingAttr] = useState(false);
-	const [attrAddError, setAttrAddError] = useState<string | null>(null);
-
 	// --- Snippet handlers ---
-	const addSnippet = async () => {
+	const addSnippet = useCallback(async () => {
 		const name = newSnippetName.trim();
 		const value = newSnippetValue.trim();
 		if (!name || !value) return;
@@ -112,52 +110,54 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setAddingSnippet(false);
 		}
-	};
+	}, [guildId, newSnippetName, newSnippetValue, t]);
 
-	const deleteSnippet = (key: string) => {
+	const deleteSnippet = useCallback((key: string) => {
 		setSnippets((prev) => {
 			const next = { ...prev };
 			delete next[key];
 			return next;
 		});
-	};
+	}, []);
 
-	const importSnippets = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = async () => {
-			try {
-				const parsed = JSON.parse(reader.result as string);
-				if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+	const importSnippets = useCallback(
+		(e: InputEvent & { target: HTMLInputElement }) => {
+			const file = e.target.files?.[0];
+			if (!file) return;
+			const reader = new FileReader();
+			reader.onload = async () => {
+				try {
+					const parsed = JSON.parse(reader.result as string);
+					if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+						setSnippetError(t("userConfig.importError"));
+						return;
+					}
+					const res = await userApi.validateEntries(guildId, "snippets", parsed);
+					const { valid, errors } = res.data;
+					setSnippets((prev) => ({ ...prev, ...(valid as Record<string, string>) }));
+					const errCount = Object.keys(errors).length;
+					const okCount = Object.keys(valid).length;
+					if (errCount > 0) {
+						setSnippetError(
+							t("userConfig.importPartial", { ok: okCount, err: errCount })
+						);
+					} else if (okCount > 0) {
+						setSnippetError(null);
+						setSnippetSuccess(true);
+						setTimeout(() => setSnippetSuccess(false), 3000);
+					}
+				} catch {
 					setSnippetError(t("userConfig.importError"));
-					return;
+				} finally {
+					e.target.value = "";
 				}
-				const res = await userApi.validateEntries(guildId, "snippets", parsed);
-				const { valid, errors } = res.data;
-				setSnippets((prev) => ({
-					...prev,
-					...(valid as Record<string, string>),
-				}));
-				const errCount = Object.keys(errors).length;
-				const okCount = Object.keys(valid).length;
-				if (errCount > 0) {
-					setSnippetError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
-				} else if (okCount > 0) {
-					setSnippetError(null);
-					setSnippetSuccess(true);
-					setTimeout(() => setSnippetSuccess(false), 3000);
-				}
-			} catch {
-				setSnippetError(t("userConfig.importError"));
-			} finally {
-				e.target.value = "";
-			}
-		};
-		reader.readAsText(file);
-	};
+			};
+			reader.readAsText(file);
+		},
+		[guildId, t]
+	);
 
-	const saveSnippets = async () => {
+	const saveSnippets = useCallback(async () => {
 		setSavingSnippets(true);
 		setSnippetError(null);
 		try {
@@ -169,10 +169,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setSavingSnippets(false);
 		}
-	};
+	}, [guildId, snippets, t]);
 
 	// --- Attribute handlers ---
-	const addAttribute = async () => {
+	const addAttribute = useCallback(async () => {
 		const name = newAttrName.trim();
 		const val = Number.parseFloat(newAttrValue);
 		if (!name || Number.isNaN(val)) return;
@@ -196,52 +196,52 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setAddingAttr(false);
 		}
-	};
+	}, [guildId, newAttrName, newAttrValue, t]);
 
-	const deleteAttribute = (key: string) => {
+	const deleteAttribute = useCallback((key: string) => {
 		setAttributes((prev) => {
 			const next = { ...prev };
 			delete next[key];
 			return next;
 		});
-	};
+	}, []);
 
-	const importAttributes = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = async () => {
-			try {
-				const parsed = JSON.parse(reader.result as string);
-				if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+	const importAttributes = useCallback(
+		(e: InputEvent & { target: HTMLInputElement }) => {
+			const file = e.target.files?.[0];
+			if (!file) return;
+			const reader = new FileReader();
+			reader.onload = async () => {
+				try {
+					const parsed = JSON.parse(reader.result as string);
+					if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+						setAttrError(t("userConfig.importError"));
+						return;
+					}
+					const res = await userApi.validateEntries(guildId, "attributes", parsed);
+					const { valid, errors } = res.data;
+					setAttributes((prev) => ({ ...prev, ...(valid as Record<string, number>) }));
+					const errCount = Object.keys(errors).length;
+					const okCount = Object.keys(valid).length;
+					if (errCount > 0) {
+						setAttrError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
+					} else if (okCount > 0) {
+						setAttrError(null);
+						setAttrSuccess(true);
+						setTimeout(() => setAttrSuccess(false), 3000);
+					}
+				} catch {
 					setAttrError(t("userConfig.importError"));
-					return;
+				} finally {
+					e.target.value = "";
 				}
-				const res = await userApi.validateEntries(guildId, "attributes", parsed);
-				const { valid, errors } = res.data;
-				setAttributes((prev) => ({
-					...prev,
-					...(valid as Record<string, number>),
-				}));
-				const errCount = Object.keys(errors).length;
-				const okCount = Object.keys(valid).length;
-				if (errCount > 0) {
-					setAttrError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
-				} else if (okCount > 0) {
-					setAttrError(null);
-					setAttrSuccess(true);
-					setTimeout(() => setAttrSuccess(false), 3000);
-				}
-			} catch {
-				setAttrError(t("userConfig.importError"));
-			} finally {
-				e.target.value = "";
-			}
-		};
-		reader.readAsText(file);
-	};
+			};
+			reader.readAsText(file);
+		},
+		[guildId, t]
+	);
 
-	const saveAttributes = async () => {
+	const saveAttributes = useCallback(async () => {
 		setSavingAttrs(true);
 		setAttrError(null);
 		try {
@@ -253,10 +253,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setSavingAttrs(false);
 		}
-	};
+	}, [guildId, attributes, t]);
 
 	// --- Template handlers ---
-	const saveTemplate = async () => {
+	const saveTemplate = useCallback(async () => {
 		setSavingTemplate(true);
 		setTemplateError(null);
 		try {
@@ -268,9 +268,9 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setSavingTemplate(false);
 		}
-	};
+	}, [guildId, template, t]);
 
-	const resetTemplate = () => setTemplate(defaultTemplate);
+	const resetTemplate = useCallback(() => setTemplate(DEFAULT_TEMPLATE), []);
 
 	return (
 		<Stack spacing={2}>
@@ -406,7 +406,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							type="file"
 							accept=".json,application/json"
 							style={{ display: "none" }}
-							onChange={importSnippets}
+							onChange={importSnippets as never}
 						/>
 						<Tooltip title={t("userConfig.importTooltip")}>
 							<Button
@@ -551,7 +551,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							type="file"
 							accept=".json,application/json"
 							style={{ display: "none" }}
-							onChange={importAttributes}
+							onChange={importAttributes as never}
 						/>
 						<Tooltip title={t("userConfig.importTooltip")}>
 							<Button

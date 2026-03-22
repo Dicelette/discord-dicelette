@@ -12,7 +12,8 @@ import Slider from "@mui/material/Slider";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useI18n } from "../i18n";
 import type { ApiGuildConfig } from "../lib/api";
 import { guildApi } from "../lib/api";
@@ -37,21 +38,91 @@ interface Props {
 }
 
 const DISCORD_LOCALES = [
-	{ value: "en", label: "English" },
+	{ value: "en-US", label: "English" },
 	{ value: "fr", label: "Français" },
 ];
 
+const SectionTitle = memo(({ children }: { children: React.ReactNode }) => (
+	<Typography variant="subtitle1" fontWeight={700} sx={{ mt: 3, mb: 1, opacity: 0.9 }}>
+		{children}
+	</Typography>
+));
+SectionTitle.displayName = "SectionTitle";
+
+interface ChannelSelectProps {
+	label: string;
+	value: string | undefined;
+	channels: Channel[];
+	noneLabel: string;
+	onChange: (v: string) => void;
+}
+
+const ChannelSelect = memo(
+	({ label, value, channels, noneLabel, onChange }: ChannelSelectProps) => (
+		<FormControl fullWidth size="small">
+			<InputLabel>{label}</InputLabel>
+			<Select
+				value={value ?? ""}
+				label={label}
+				onChange={(e) => onChange(e.target.value)}
+			>
+				<MenuItem value="">
+					<em>{noneLabel}</em>
+				</MenuItem>
+				{channels.map((c) => (
+					<MenuItem key={c.id} value={c.id}>
+						# {c.name}
+					</MenuItem>
+				))}
+			</Select>
+		</FormControl>
+	)
+);
+ChannelSelect.displayName = "ChannelSelect";
+
+interface RoleSelectProps {
+	label: string;
+	value: string | undefined;
+	roles: Role[];
+	noneLabel: string;
+	onChange: (v: string) => void;
+}
+
+const RoleSelect = memo(
+	({ label, value, roles, noneLabel, onChange }: RoleSelectProps) => (
+		<FormControl fullWidth size="small">
+			<InputLabel>{label}</InputLabel>
+			<Select
+				value={value ?? ""}
+				label={label}
+				onChange={(e) => onChange(e.target.value)}
+			>
+				<MenuItem value="">
+					<em>{noneLabel}</em>
+				</MenuItem>
+				{roles.map((r) => (
+					<MenuItem key={r.id} value={r.id}>
+						@ {r.name}
+					</MenuItem>
+				))}
+			</Select>
+		</FormControl>
+	)
+);
+RoleSelect.displayName = "RoleSelect";
+
 export default function GuildConfigForm({ config, guildId, onSave, saving }: Props) {
 	const { t } = useI18n();
-	const [local, setLocal] = useState<ApiGuildConfig>(config);
-	const [channels, setChannels] = useState<Channel[]>([]);
-	const [roles, setRoles] = useState<Role[]>([]);
 
-	const isDirty = JSON.stringify(local) !== JSON.stringify(config);
+	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
+		defaultValues: config,
+	});
+
+	const isDirty = formState.isDirty;
 
 	useEffect(() => {
-		setLocal(config);
-	}, [config]);
+		reset(config);
+	}, [config, reset]);
 
 	useEffect(() => {
 		guildApi
@@ -64,6 +135,9 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 			.catch(() => {});
 	}, [guildId]);
 
+	const [channels, setChannels] = useState<Channel[]>([]);
+	const [roles, setRoles] = useState<Role[]>([]);
+
 	useEffect(() => {
 		if (!isDirty) return;
 		const handler = (e: BeforeUnloadEvent) => {
@@ -73,79 +147,25 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 		return () => window.removeEventListener("beforeunload", handler);
 	}, [isDirty]);
 
-	const textChannels = channels.filter((c) => c.type === 0);
+	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
 
-	const set = <K extends keyof ApiGuildConfig>(key: K, value: ApiGuildConfig[K]) => {
-		setLocal((prev) => ({ ...prev, [key]: value }));
-	};
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		onSave(local);
-	};
-
-	const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-		<Typography variant="subtitle1" fontWeight={700} sx={{ mt: 3, mb: 1, opacity: 0.9 }}>
-			{children}
-		</Typography>
+	const sortOrders = useMemo(
+		() => [
+			{ value: "", label: t("config.fields.sortNone") },
+			{ value: "ascending", label: t("config.sort.options.ascending") },
+			{ value: "descending", label: t("config.sort.options.descending") },
+		],
+		[t]
 	);
 
-	const channelSelect = (
-		label: string,
-		value: string | undefined,
-		onChange: (v: string) => void
-	) => (
-		<FormControl fullWidth size="small">
-			<InputLabel>{label}</InputLabel>
-			<Select
-				value={value ?? ""}
-				label={label}
-				onChange={(e) => onChange(e.target.value)}
-			>
-				<MenuItem value="">
-					<em>{t("common.none")}</em>
-				</MenuItem>
-				{textChannels.map((c) => (
-					<MenuItem key={c.id} value={c.id}>
-						# {c.name}
-					</MenuItem>
-				))}
-			</Select>
-		</FormControl>
-	);
+	const noneLabel = t("common.none");
 
-	const roleSelect = (
-		label: string,
-		value: string | undefined,
-		onChange: (v: string) => void
-	) => (
-		<FormControl fullWidth size="small">
-			<InputLabel>{label}</InputLabel>
-			<Select
-				value={value ?? ""}
-				label={label}
-				onChange={(e) => onChange(e.target.value)}
-			>
-				<MenuItem value="">
-					<em>{t("common.none")}</em>
-				</MenuItem>
-				{roles.map((r) => (
-					<MenuItem key={r.id} value={r.id}>
-						@ {r.name}
-					</MenuItem>
-				))}
-			</Select>
-		</FormControl>
-	);
-
-	const sortOrders = [
-		{ value: "", label: t("config.fields.sortNone") },
-		{ value: "ascending", label: t("config.sort.options.ascending") },
-		{ value: "descending", label: t("config.sort.options.descending") },
-	];
+	const hiddenRoll = watch("hiddenRoll");
+	const allowSelfRegister = watch("allowSelfRegister");
+	const stripOOC = watch("stripOOC");
 
 	return (
-		<Box component="form" onSubmit={handleSubmit}>
+		<Box component="form" onSubmit={handleSubmit(onSave)}>
 			{isDirty && (
 				<Alert severity="warning" sx={{ mb: 2 }}>
 					{t("config.unsaved")}
@@ -155,142 +175,210 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 			<Paper sx={{ p: 3, mb: 2 }}>
 				<SectionTitle>{t("config.sections.general")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormControl fullWidth size="small">
-						<InputLabel>{t("config.fields.lang")}</InputLabel>
-						<Select
-							value={local.lang ?? "en-US"}
-							label={t("config.fields.lang")}
-							onChange={(e) => set("lang", e.target.value)}
-						>
-							{DISCORD_LOCALES.map((l) => (
-								<MenuItem key={l.value} value={l.value}>
-									{l.label}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-					<FormControl fullWidth size="small">
-						<InputLabel>{t("config.fields.sortOrder")}</InputLabel>
-						<Select
-							value={local.sortOrder ?? ""}
-							label={t("config.fields.sortOrder")}
-							onChange={(e) => set("sortOrder", e.target.value || undefined)}
-						>
-							{sortOrders.map((s) => (
-								<MenuItem key={s.value} value={s.value}>
-									{s.label}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
+					<Controller
+						name="lang"
+						control={control}
+						render={({ field }) => (
+							<FormControl fullWidth size="small">
+								<InputLabel>{t("config.fields.lang")}</InputLabel>
+								<Select
+									{...field}
+									value={field.value ?? "en-US"}
+									label={t("config.fields.lang")}
+								>
+									{DISCORD_LOCALES.map((l) => (
+										<MenuItem key={l.value} value={l.value}>
+											{l.label}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						)}
+					/>
+					<Controller
+						name="sortOrder"
+						control={control}
+						render={({ field }) => (
+							<FormControl fullWidth size="small">
+								<InputLabel>{t("config.fields.sortOrder")}</InputLabel>
+								<Select
+									{...field}
+									value={field.value ?? ""}
+									label={t("config.fields.sortOrder")}
+									onChange={(e) => field.onChange(e.target.value || undefined)}
+								>
+									{sortOrders.map((s) => (
+										<MenuItem key={s.value} value={s.value}>
+											{s.label}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						)}
+					/>
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
 
 				<SectionTitle>{t("config.sections.channels")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{channelSelect(t("config.fields.logs"), local.logs, (v) =>
-						set("logs", v || undefined)
-					)}
-					{channelSelect(t("config.fields.rollChannel"), local.rollChannel, (v) =>
-						set("rollChannel", v || undefined)
-					)}
-					{channelSelect(t("config.fields.defaultChannel"), local.managerId, (v) =>
-						set("managerId", v || undefined)
-					)}
-					{channelSelect(t("config.fields.privateChannel"), local.privateChannel, (v) =>
-						set("privateChannel", v || undefined)
-					)}
+					<Controller
+						name="logs"
+						control={control}
+						render={({ field }) => (
+							<ChannelSelect
+								label={t("config.fields.logs")}
+								value={field.value}
+								channels={textChannels}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || undefined)}
+							/>
+						)}
+					/>
+					<Controller
+						name="rollChannel"
+						control={control}
+						render={({ field }) => (
+							<ChannelSelect
+								label={t("config.fields.rollChannel")}
+								value={field.value}
+								channels={textChannels}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || undefined)}
+							/>
+						)}
+					/>
+					<Controller
+						name="managerId"
+						control={control}
+						render={({ field }) => (
+							<ChannelSelect
+								label={t("config.fields.defaultChannel")}
+								value={field.value}
+								channels={textChannels}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || undefined)}
+							/>
+						)}
+					/>
+					<Controller
+						name="privateChannel"
+						control={control}
+						render={({ field }) => (
+							<ChannelSelect
+								label={t("config.fields.privateChannel")}
+								value={field.value}
+								channels={textChannels}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || undefined)}
+							/>
+						)}
+					/>
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
 
 				<SectionTitle>{t("config.autoRole")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{roleSelect(t("config.fields.autoRoleStats"), local.autoRole?.stats, (v) =>
-						set("autoRole", { ...local.autoRole, stats: v || undefined })
-					)}
-					{roleSelect(t("config.fields.autoRoleDice"), local.autoRole?.dice, (v) =>
-						set("autoRole", { ...local.autoRole, dice: v || undefined })
-					)}
+					<Controller
+						name="autoRole.stats"
+						control={control}
+						render={({ field }) => (
+							<RoleSelect
+								label={t("config.fields.autoRoleStats")}
+								value={field.value}
+								roles={roles}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || undefined)}
+							/>
+						)}
+					/>
+					<Controller
+						name="autoRole.dice"
+						control={control}
+						render={({ field }) => (
+							<RoleSelect
+								label={t("config.fields.autoRoleDice")}
+								value={field.value}
+								roles={roles}
+								noneLabel={noneLabel}
+								onChange={(v) => field.onChange(v || undefined)}
+							/>
+						)}
+					/>
 				</Box>
 
 				<Divider sx={{ my: 3 }} />
 
 				<SectionTitle>{t("config.sections.diceBehaviour")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.disableThread}
-								onChange={(e) => set("disableThread", e.target.checked || undefined)}
-							/>
-						}
-						label={t("config.fields.disableThread")}
-					/>
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.timestamp}
-								onChange={(e) => set("timestamp", e.target.checked || undefined)}
-							/>
-						}
-						label={t("config.fields.timestamp")}
-					/>
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.context}
-								onChange={(e) => set("context", e.target.checked || undefined)}
-							/>
-						}
-						label={t("config.fields.context")}
-					/>
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.linkToLogs}
-								onChange={(e) => set("linkToLogs", e.target.checked || undefined)}
-							/>
-						}
-						label={t("config.fields.linkToLogs")}
-					/>
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.disableCompare}
-								onChange={(e) => set("disableCompare", e.target.checked || undefined)}
-							/>
-						}
-						label={t("config.fields.disableCompare")}
-					/>
+					{(
+						[
+							["disableThread", "config.fields.disableThread"],
+							["timestamp", "config.fields.timestamp"],
+							["context", "config.fields.context"],
+							["linkToLogs", "config.fields.linkToLogs"],
+							["disableCompare", "config.fields.disableCompare"],
+						] as const
+					).map(([name, labelKey]) => (
+						<Controller
+							key={name}
+							name={name}
+							control={control}
+							render={({ field }) => (
+								<FormControlLabel
+									control={
+										<Switch
+											checked={!!field.value}
+											onChange={(e) => field.onChange(e.target.checked || undefined)}
+										/>
+									}
+									label={t(labelKey)}
+								/>
+							)}
+						/>
+					))}
 				</Box>
 
 				<Box sx={{ mt: 3 }}>
-					<Typography variant="body2" gutterBottom>
-						{t("config.fields.deleteAfter", { val: local.deleteAfter ?? 0 })}
-					</Typography>
-					<Slider
-						value={local.deleteAfter ?? 0}
-						min={0}
-						max={3600}
-						step={30}
-						onChange={(_, v) => set("deleteAfter", (v as number) || undefined)}
-						valueLabelDisplay="auto"
-						sx={{ maxWidth: 400 }}
+					<Controller
+						name="deleteAfter"
+						control={control}
+						render={({ field }) => (
+							<>
+								<Typography variant="body2" gutterBottom>
+									{t("config.fields.deleteAfter", { val: field.value ?? 0 })}
+								</Typography>
+								<Slider
+									value={field.value ?? 0}
+									min={0}
+									max={3600}
+									step={30}
+									onChange={(_, v) => field.onChange((v as number) || undefined)}
+									valueLabelDisplay="auto"
+									sx={{ maxWidth: 400 }}
+								/>
+							</>
+						)}
 					/>
 				</Box>
 
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-					<TextField
-						label={t("config.fields.pity")}
-						type="number"
-						size="small"
-						value={local.pity ?? ""}
-						onChange={(e) =>
-							set("pity", e.target.value ? Number(e.target.value) : undefined)
-						}
-						inputProps={{ min: 0 }}
+					<Controller
+						name="pity"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label={t("config.fields.pity")}
+								type="number"
+								size="small"
+								value={field.value ?? ""}
+								onChange={(e) =>
+									field.onChange(e.target.value ? Number(e.target.value) : undefined)
+								}
+								slotProps={{ htmlInput: { min: 0 } }}
+							/>
+						)}
 					/>
 				</Box>
 
@@ -298,24 +386,34 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<SectionTitle>{t("config.sections.selfRegister")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.allowSelfRegister}
-								onChange={(e) => set("allowSelfRegister", e.target.checked || undefined)}
+					<Controller
+						name="allowSelfRegister"
+						control={control}
+						render={({ field }) => (
+							<FormControlLabel
+								control={
+									<Switch
+										checked={!!field.value}
+										onChange={(e) => field.onChange(e.target.checked || undefined)}
+									/>
+								}
+								label={t("config.fields.allowSelfRegister")}
 							/>
-						}
-						label={t("config.fields.allowSelfRegister")}
+						)}
 					/>
-					{local.allowSelfRegister && typeof local.allowSelfRegister !== "boolean" && (
-						<TextField
-							label={t("config.fields.moderationChannel")}
-							size="small"
-							value={
-								typeof local.allowSelfRegister === "string" ? local.allowSelfRegister : ""
-							}
-							onChange={(e) => set("allowSelfRegister", e.target.value || true)}
-							helperText={t("config.fields.moderationChannelHelp")}
+					{allowSelfRegister && typeof allowSelfRegister !== "boolean" && (
+						<Controller
+							name="allowSelfRegister"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									label={t("config.fields.moderationChannel")}
+									size="small"
+									value={typeof field.value === "string" ? field.value : ""}
+									onChange={(e) => field.onChange(e.target.value || true)}
+									helperText={t("config.fields.moderationChannelHelp")}
+								/>
+							)}
 						/>
 					)}
 				</Box>
@@ -324,32 +422,50 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<SectionTitle>{t("config.sections.hiddenRolls")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.hiddenRoll}
-								onChange={(e) => set("hiddenRoll", e.target.checked || undefined)}
-							/>
-						}
-						label={t("config.fields.hiddenRollEnable")}
-					/>
-					{local.hiddenRoll && (
-						<>
+					<Controller
+						name="hiddenRoll"
+						control={control}
+						render={({ field }) => (
 							<FormControlLabel
 								control={
 									<Switch
-										checked={local.hiddenRoll === true}
-										onChange={(e) => set("hiddenRoll", e.target.checked ? true : "")}
+										checked={!!field.value}
+										onChange={(e) => field.onChange(e.target.checked || undefined)}
 									/>
 								}
-								label={t("config.fields.hiddenRollDm")}
+								label={t("config.fields.hiddenRollEnable")}
 							/>
-							{local.hiddenRoll !== true && (
-								<TextField
-									label={t("config.fields.channelId")}
-									size="small"
-									value={typeof local.hiddenRoll === "string" ? local.hiddenRoll : ""}
-									onChange={(e) => set("hiddenRoll", e.target.value)}
+						)}
+					/>
+					{hiddenRoll && (
+						<>
+							<Controller
+								name="hiddenRoll"
+								control={control}
+								render={({ field }) => (
+									<FormControlLabel
+										control={
+											<Switch
+												checked={field.value === true}
+												onChange={(e) => field.onChange(e.target.checked ? true : "")}
+											/>
+										}
+										label={t("config.fields.hiddenRollDm")}
+									/>
+								)}
+							/>
+							{hiddenRoll !== true && (
+								<Controller
+									name="hiddenRoll"
+									control={control}
+									render={({ field }) => (
+										<TextField
+											label={t("config.fields.channelId")}
+											size="small"
+											value={typeof field.value === "string" ? field.value : ""}
+											onChange={(e) => field.onChange(e.target.value)}
+										/>
+									)}
 								/>
 							)}
 						</>
@@ -360,92 +476,118 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 				<SectionTitle>{t("config.sections.stripOoc")}</SectionTitle>
 				<Box className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormControlLabel
-						control={
-							<Switch
-								checked={!!local.stripOOC}
-								onChange={(e) => set("stripOOC", e.target.checked ? {} : undefined)}
+					<Controller
+						name="stripOOC"
+						control={control}
+						render={({ field }) => (
+							<FormControlLabel
+								control={
+									<Switch
+										checked={field.value !== undefined}
+										onChange={(e) => field.onChange(e.target.checked ? {} : undefined)}
+									/>
+								}
+								label={t("config.fields.stripOocEnable")}
 							/>
-						}
-						label={t("config.fields.stripOocEnable")}
+						)}
 					/>
 				</Box>
-				{local.stripOOC !== undefined && (
+				{stripOOC !== undefined && (
 					<Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-						<TextField
-							label={t("config.fields.stripOocRegex")}
-							size="small"
-							fullWidth
-							value={local.stripOOC.regex ?? ""}
-							onChange={(e) =>
-								set("stripOOC", {
-									...local.stripOOC,
-									regex: e.target.value || undefined,
-								})
-							}
-							helperText={t("config.fields.stripOocRegexHelp")}
+						<Controller
+							name="stripOOC.regex"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									label={t("config.fields.stripOocRegex")}
+									size="small"
+									fullWidth
+									value={field.value ?? ""}
+									onChange={(e) => field.onChange(e.target.value || undefined)}
+									helperText={t("config.fields.stripOocRegexHelp")}
+								/>
+							)}
 						/>
 						<Box>
-							<Typography variant="body2" gutterBottom>
-								{t("config.fields.stripOocDelay", {
-									val: local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0,
-								})}
-							</Typography>
-							<Slider
-								value={local.stripOOC.timer ? local.stripOOC.timer / 1000 : 0}
-								min={0}
-								max={3600}
-								step={30}
-								onChange={(_, v) =>
-									set("stripOOC", {
-										...local.stripOOC,
-										timer: (v as number) ? (v as number) * 1000 : undefined,
-									})
-								}
-								valueLabelDisplay="auto"
-								sx={{ maxWidth: 400 }}
+							<Controller
+								name="stripOOC.timer"
+								control={control}
+								render={({ field }) => (
+									<>
+										<Typography variant="body2" gutterBottom>
+											{t("config.fields.stripOocDelay", {
+												val: field.value ? field.value / 1000 : 0,
+											})}
+										</Typography>
+										<Slider
+											value={field.value ? field.value / 1000 : 0}
+											min={0}
+											max={3600}
+											step={30}
+											onChange={(_, v) =>
+												field.onChange((v as number) ? (v as number) * 1000 : undefined)
+											}
+											valueLabelDisplay="auto"
+											sx={{ maxWidth: 400 }}
+										/>
+									</>
+								)}
 							/>
 						</Box>
-						<FormControl fullWidth size="small">
-							<InputLabel>{t("config.fields.stripOocChannels")}</InputLabel>
-							<Select
-								multiple
-								value={local.stripOOC.categoryId ?? []}
-								label={t("config.fields.stripOocChannels")}
-								onChange={(e) =>
-									set("stripOOC", {
-										...local.stripOOC,
-										categoryId: (e.target.value as string[]).length
-											? (e.target.value as string[])
-											: undefined,
-									})
-								}
-							>
-								{channels.map((c) => (
-									<MenuItem key={c.id} value={c.id}>
-										{c.type === 4 ? "📂" : "#"} {c.name}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
-						{channelSelect(
-							t("config.fields.stripOocForward"),
-							local.stripOOC.forwardId,
-							(v) => set("stripOOC", { ...local.stripOOC, forwardId: v || undefined })
-						)}
-						<FormControlLabel
-							control={
-								<Switch
-									checked={!!local.stripOOC.threadMode}
-									onChange={(e) =>
-										set("stripOOC", {
-											...local.stripOOC,
-											threadMode: e.target.checked || undefined,
-										})
-									}
+						<Controller
+							name="stripOOC.categoryId"
+							control={control}
+							render={({ field }) => (
+								<FormControl fullWidth size="small">
+									<InputLabel>{t("config.fields.stripOocChannels")}</InputLabel>
+									<Select
+										multiple
+										value={field.value ?? []}
+										label={t("config.fields.stripOocChannels")}
+										onChange={(e) =>
+											field.onChange(
+												(e.target.value as string[]).length
+													? (e.target.value as string[])
+													: undefined
+											)
+										}
+									>
+										{channels.map((c) => (
+											<MenuItem key={c.id} value={c.id}>
+												{c.type === 4 ? "📂" : "#"} {c.name}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+							)}
+						/>
+						<Controller
+							name="stripOOC.forwardId"
+							control={control}
+							render={({ field }) => (
+								<ChannelSelect
+									label={t("config.fields.stripOocForward")}
+									value={field.value}
+									channels={textChannels}
+									noneLabel={noneLabel}
+									onChange={(v) => field.onChange(v || undefined)}
 								/>
-							}
-							label={t("config.fields.stripOocThreadMode")}
+							)}
+						/>
+						<Controller
+							name="stripOOC.threadMode"
+							control={control}
+							render={({ field }) => (
+								<FormControlLabel
+									control={
+										<Switch
+											checked={!!field.value}
+											onChange={(e) => field.onChange(e.target.checked || undefined)}
+										/>
+									}
+									label={t("config.fields.stripOocThreadMode")}
+								/>
+							)}
 						/>
 					</Box>
 				)}

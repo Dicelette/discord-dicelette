@@ -1,4 +1,15 @@
 {
+  "characters": {
+    "damage": "Dés de compétence",
+    "loadError": "Impossible de charger les personnages.",
+    "noCharacters": "Aucun personnage enregistré sur ce serveur.",
+    "private": "Fiche privée",
+    "refresh": "Actualiser",
+    "refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
+    "sheetLink": "Voir la fiche",
+    "title": "Mes personnages",
+    "unnamed": "(Sans nom)"
+  },
   "common": {
     "add": "Ajouter",
     "back": "Retour aux serveurs",
@@ -54,17 +65,6 @@
     },
     "unsaved": "Modifications non sauvegardées"
   },
-  "characters": {
-    "damage": "Dés de compétence",
-    "loadError": "Impossible de charger les personnages.",
-    "noCharacters": "Aucun personnage enregistré sur ce serveur.",
-    "private": "Fiche privée",
-    "refresh": "Actualiser",
-    "refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
-    "sheetLink": "Voir la fiche",
-    "title": "Mes personnages",
-    "unnamed": "(Sans nom)"
-  },
   "dashboard": {
     "loadError": "Impossible de charger la configuration.",
     "saveError": "Erreur lors de la sauvegarde.",
@@ -80,7 +80,7 @@
   "login": {
     "button": "Se connecter avec Discord",
     "subtitle": "Connectez-vous avec Discord pour gérer la configuration de votre serveur.",
-    "title": "Dicelette Dashboard"
+    "title": "Dashboard Dicelette"
   },
   "servers": {
     "addBotDesc": "Vous êtes administrateur sur ces serveurs — vous pouvez y ajouter le bot.",
@@ -97,13 +97,13 @@
     "addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
     "addInvalidDice": "Expression de dés « {name} » invalide.",
     "attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
+    "attrValue": "Valeur",
     "export": "Exporter",
     "exportTooltip": "Télécharger en JSON",
     "import": "Importer",
     "importError": "Fichier invalide. Vérifiez le format JSON.",
     "importPartial": "{ok} entrée(s) importée(s), {err} ignorée(s) (formule invalide).",
     "importTooltip": "Importer depuis un fichier JSON (fusionne avec l'existant)",
-    "attrValue": "Valeur",
     "noAttributes": "Aucun attribut défini.",
     "noSnippets": "Aucun raccourci défini.",
     "resetTemplate": "Réinitialiser",

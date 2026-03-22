@@ -75,7 +75,7 @@ export default function CharactersTab({ guildId }: Props) {
 					mb: 3,
 				}}
 			>
-				<Typography variant="h6" fontWeight={600}>
+				<Typography variant="h5" fontWeight={600}>
 					{t("characters.title")}
 				</Typography>
 				<Tooltip title={t("characters.refreshTooltip")}>
@@ -129,7 +129,7 @@ function CharacterCard({ char }: { char: ApiCharacter }) {
 
 				<Box sx={{ flex: 1, minWidth: 0 }}>
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-						<Typography variant="h6" fontWeight={600} noWrap>
+						<Typography variant="h4" fontWeight={600} noWrap>
 							{displayName}
 						</Typography>
 						{char.isPrivate && (
@@ -161,7 +161,7 @@ function CharacterCard({ char }: { char: ApiCharacter }) {
 			{char.stats && char.stats.length > 0 && (
 				<>
 					<Divider sx={{ mb: 1.5 }} />
-					<Typography variant="subtitle2" color="text.secondary" gutterBottom>
+					<Typography variant="h6" color="text.secondary" gutterBottom>
 						{t("common.statistics").toTitle()}
 					</Typography>
 					<Box
@@ -183,7 +183,7 @@ function CharacterCard({ char }: { char: ApiCharacter }) {
 			{char.damage && char.damage.length > 0 && (
 				<>
 					<Divider sx={{ mb: 1.5, mt: char.stats ? 1.5 : 0 }} />
-					<Typography variant="subtitle2" color="text.secondary" gutterBottom>
+					<Typography variant="h6" color="text.secondary" gutterBottom>
 						{t("common.macro").toTitle()}
 					</Typography>
 					<Box
@@ -220,7 +220,7 @@ function StatCell({ name, value }: { name: string; value: string }) {
 			<Typography variant="caption" color="text.secondary" noWrap>
 				{name}
 			</Typography>
-			<Typography variant="body2" fontWeight={600} noWrap>
+			<Typography variant="body2" fontFamily={"var(--code-font-family)"} noWrap>
 				{clean}
 			</Typography>
 		</Box>

@@ -12,7 +12,8 @@
 	"engineStrict": true,
 	"scripts": {
 		"build": "tsc --build && tsc-alias",
-		"postbuild": "tsx packages/localization/docs/build-help.ts --build",
+		"localization:build": "tsx packages/localization/docs/build-help.ts --build",
+		"postbuild": "pnpm localization:build && pnpm dashboard:build",
 		"dev": "tsx watch --clear-screen=false apps/bot/index.ts",
 		"bot:watch": "tsx watch --clear-screen=false apps/bot/index.ts",
 		"dashboard:dev": "pnpm --filter @dicelette/web dev",

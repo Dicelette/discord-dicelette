@@ -9,7 +9,9 @@
       "Bash(powershell.exe -Command \"Move-Item -Path apps/parse_result -Destination packages/parse_result\")",
       "Bash(grep -r \"CharacterData\\\\|messageId\\\\|charName\\\\|isPrivate\\\\|selfRegistration\\\\|allowSelfRegister\" N:/Documents/Github/dicelette/discord-bot/packages/ --include=*.ts -l)",
       "Bash(grep -r \"embed.user\\\\|embed.dice\\\\|embed.add\\\\|common.statistic\\\\|common.statistics\\\\|embed.template\\\\|common.macro\\\\|legacy.dice\" N:/Documents/Github/dicelette/discord-bot/packages/localization --include=*.json -l)",
-      "Bash(wc -l /n/Documents/Github/dicelette/discord-bot/packages/localization/locales/*.json /n/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/*.json)"
+      "Bash(wc -l /n/Documents/Github/dicelette/discord-bot/packages/localization/locales/*.json /n/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/*.json)",
+      "Bash(npx tsc:*)",
+      "Bash(npx biome:*)"
     ]
   }
 }

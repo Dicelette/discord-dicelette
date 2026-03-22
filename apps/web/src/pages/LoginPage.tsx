@@ -27,7 +27,7 @@ export default function LoginPage() {
 					variant="outlined"
 					sx={{
 						fontSize: "0.8rem",
-						fontFamily: '"Iosevka Charon", monospace',
+						fontFamily: "var(--code-font-family)",
 						"& .MuiSelect-select": { py: 0.5, px: 1.5 },
 					}}
 				>
@@ -65,8 +65,6 @@ export default function LoginPage() {
 						onClick={handleLogin}
 						fullWidth
 						sx={{
-							backgroundColor: "var(--discord-color)",
-							"&:hover": { backgroundColor: "var(--discord-color-dark)" },
 							py: 1.5,
 							textTransform: "none",
 							fontSize: "1rem",
