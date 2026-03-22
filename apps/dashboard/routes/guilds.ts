@@ -1,3 +1,4 @@
+import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
 import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
@@ -120,7 +121,7 @@ async function userCanManageGuild(userId: string, guildId: string): Promise<bool
 }
 
 export function createGuildRouter(deps: DashboardDeps) {
-	const { settings, userSettings } = deps;
+	const { settings, userSettings, template } = deps;
 	const router = Router();
 
 	router.get("/:guildId/config", requireAuth, async (req: Request, res: Response) => {
@@ -399,6 +400,139 @@ export function createGuildRouter(deps: DashboardDeps) {
 			const guildId = req.params.guildId as string;
 			const userId = req.session.userId!;
 			charCache.delete(`${guildId}:${userId}`);
+			res.json({ ok: true });
+		}
+	);
+
+	// GET guild statistical template (admin only)
+	router.get("/:guildId/template", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		const canManage = await userCanManageGuild(userId, guildId);
+		if (!canManage) {
+			res.status(403).json({ error: "Insufficient permissions" });
+			return;
+		}
+
+		// Try in-memory cache first
+		const cached = template.get(guildId);
+		if (cached) {
+			res.json(cached);
+			return;
+		}
+
+		// Fall back to fetching the attachment from Discord
+		const config = settings.get(guildId);
+		if (!config?.templateID?.channelId || !config.templateID.messageId) {
+			res.status(404).json({ error: "No template registered" });
+			return;
+		}
+		const botToken = process.env.DISCORD_TOKEN;
+		if (!botToken) {
+			res.status(500).json({ error: "Bot token not configured" });
+			return;
+		}
+		try {
+			const msgRes = await fetch(
+				`${DISCORD_API}/channels/${config.templateID.channelId}/messages/${config.templateID.messageId}`,
+				{ headers: { Authorization: `Bot ${botToken}` } }
+			);
+			if (!msgRes.ok) {
+				res.status(404).json({ error: "Template message not found" });
+				return;
+			}
+			const msg = (await msgRes.json()) as {
+				attachments?: Array<{ filename: string; url: string }>;
+			};
+			const attachment = msg.attachments?.find((a) => a.filename === "template.json");
+			if (!attachment) {
+				res.status(404).json({ error: "Template attachment not found" });
+				return;
+			}
+			const templateData = await fetch(attachment.url).then((r) => r.json());
+			res.json(templateData);
+		} catch {
+			res.status(500).json({ error: "Failed to fetch template" });
+		}
+	});
+
+	// POST import / update guild statistical template (admin only)
+	router.post("/:guildId/template", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		const canManage = await userCanManageGuild(userId, guildId);
+		if (!canManage) {
+			res.status(403).json({ error: "Insufficient permissions" });
+			return;
+		}
+
+		const { template: templateBody } = req.body as { template: unknown };
+		if (!templateBody || typeof templateBody !== "object") {
+			res.status(400).json({ error: "Invalid template" });
+			return;
+		}
+
+		let validated: StatisticalTemplate;
+		try {
+			validated = verifyTemplateValue(templateBody);
+		} catch {
+			res.status(400).json({ error: "Invalid template format" });
+			return;
+		}
+
+		// Update in-memory cache
+		template.set(guildId, validated);
+
+		// Update settings metadata
+		const current = settings.get(guildId);
+		if (current) {
+			const statsName = validated.statistics ? Object.keys(validated.statistics) : [];
+			const excludedStats = validated.statistics
+				? Object.keys(
+						Object.fromEntries(
+							Object.entries(validated.statistics).filter(([, v]) => v.exclude)
+						)
+					)
+				: [];
+			const damageName = validated.damage ? Object.keys(validated.damage) : [];
+			current.templateID = {
+				channelId: current.templateID?.channelId ?? "",
+				messageId: current.templateID?.messageId ?? "",
+				statsName,
+				excludedStats,
+				damageName,
+				valid: true,
+			};
+			settings.set(guildId, current);
+		}
+
+		res.json({ ok: true });
+	});
+
+	// DELETE guild statistical template (admin only)
+	router.delete(
+		"/:guildId/template",
+		requireAuth,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+
+			const canManage = await userCanManageGuild(userId, guildId);
+			if (!canManage) {
+				res.status(403).json({ error: "Insufficient permissions" });
+				return;
+			}
+
+			template.delete(guildId);
+
+			const current = settings.get(guildId);
+			if (current) {
+				current.templateID = undefined as unknown as GuildData["templateID"];
+				settings.set(guildId, current);
+			}
+
 			res.json({ ok: true });
 		}
 	);

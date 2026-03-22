@@ -1,4 +1,7 @@
+import type { StatisticalTemplate } from "@dicelette/core";
 import axios from "axios";
+
+export type { StatisticalTemplate };
 
 export const api = axios.create({
 	baseURL: "/api",
@@ -123,6 +126,13 @@ export const charactersApi = {
 		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters`),
 	refresh: (guildId: string) =>
 		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh`),
+};
+
+export const templateApi = {
+	get: (guildId: string) => api.get<StatisticalTemplate>(`/guilds/${guildId}/template`),
+	import: (guildId: string, template: StatisticalTemplate) =>
+		api.post<{ ok: boolean }>(`/guilds/${guildId}/template`, { template }),
+	delete: (guildId: string) => api.delete<{ ok: boolean }>(`/guilds/${guildId}/template`),
 };
 
 export const userApi = {

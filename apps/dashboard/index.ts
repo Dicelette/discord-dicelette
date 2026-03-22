@@ -1,4 +1,4 @@
-import type { Settings, UserSettings } from "@dicelette/types";
+import type { Settings, TemplateData, UserSettings } from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import cors from "cors";
 import type Enmap from "enmap";
@@ -10,6 +10,7 @@ import { createGuildRouter } from "./routes/guilds.js";
 export interface DashboardDeps {
 	settings: Settings;
 	userSettings: Enmap<UserSettings>;
+	template: TemplateData;
 }
 
 export function startDashboardServer(deps: DashboardDeps): void {

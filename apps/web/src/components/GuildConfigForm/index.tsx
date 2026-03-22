@@ -11,6 +11,7 @@ import GeneralSection from "./GeneralSection";
 import HiddenRollsSection from "./HiddenRollsSection";
 import SelfRegisterSection from "./SelfRegisterSection";
 import StripOOCSection from "./StripOOCSection";
+import TemplateManagerSection from "./TemplateManagerSection";
 import type { Channel, Role } from "./types";
 
 interface Props {
@@ -105,6 +106,10 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 					channels={channels}
 					textChannels={textChannels}
 				/>
+
+				<Divider sx={{ my: 3 }} />
+
+				<TemplateManagerSection guildId={guildId} />
 			</Paper>
 
 			<Box className="flex justify-end gap-3 items-center">

@@ -11,7 +11,10 @@
       "Bash(grep -r \"embed.user\\\\|embed.dice\\\\|embed.add\\\\|common.statistic\\\\|common.statistics\\\\|embed.template\\\\|common.macro\\\\|legacy.dice\" N:/Documents/Github/dicelette/discord-bot/packages/localization --include=*.json -l)",
       "Bash(wc -l /n/Documents/Github/dicelette/discord-bot/packages/localization/locales/*.json /n/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/*.json)",
       "Bash(npx tsc:*)",
-      "Bash(npx biome:*)"
+      "Bash(npx biome:*)",
+      "Bash(grep -r \"verifyTemplateValue\\\\|StatisticalTemplate\" n:/Documents/Github/dicelette/discord-bot --include=*.ts -l)",
+      "Bash(node -e \"const pkg = require\\(''n:/Documents/Github/dicelette/discord-bot/node_modules/@dicelette/core/package.json''\\); console.log\\(pkg.version, pkg.main, pkg.types\\)\")",
+      "Bash(grep -r \"StatisticalTemplate\\\\|createLinkTemplate\" n:/Documents/Github/dicelette/discord-bot/node_modules/@dicelette/core/dist --include=*.d.ts -n)"
     ]
   }
 }

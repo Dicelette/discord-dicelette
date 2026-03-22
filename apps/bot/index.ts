@@ -84,6 +84,7 @@ if (process.env.DASHBOARD_ENABLED === "true") {
 	startDashboardServer({
 		settings: client.settings,
 		userSettings: client.userSettings,
+		template: client.template,
 	});
 }
 
