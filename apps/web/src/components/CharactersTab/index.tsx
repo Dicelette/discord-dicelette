@@ -1,10 +1,12 @@
 import RefreshIcon from "@mui/icons-material/Refresh";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+import {
+	Alert,
+	Box,
+	CircularProgress,
+	IconButton,
+	Tooltip,
+	Typography,
+} from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "../../i18n";
 import type { ApiCharacter } from "../../lib/api";

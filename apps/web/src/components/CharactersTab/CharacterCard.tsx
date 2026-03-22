@@ -1,12 +1,5 @@
-import LockIcon from "@mui/icons-material/Lock";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
-import Divider from "@mui/material/Divider";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
+import { Lock, OpenInNew } from "@mui/icons-material";
+import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
 import { useI18n } from "../../i18n";
 import type { ApiCharacter } from "../../lib/api";
 import "uniformize";
@@ -38,7 +31,7 @@ export default function CharacterCard({ char }: Props) {
 						</Typography>
 						{char.isPrivate && (
 							<Chip
-								icon={<LockIcon />}
+								icon={<Lock />}
 								label={t("characters.private")}
 								size="small"
 								color="default"
@@ -51,7 +44,7 @@ export default function CharacterCard({ char }: Props) {
 					<Button
 						variant="outlined"
 						size="small"
-						endIcon={<OpenInNewIcon />}
+						endIcon={<OpenInNew />}
 						href={char.discordLink}
 						target="_blank"
 						rel="noopener noreferrer"
