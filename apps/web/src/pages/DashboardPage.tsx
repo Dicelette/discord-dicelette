@@ -11,9 +11,9 @@ import {
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CharactersTab from "../components/CharactersTab";
-import type { Channel, Role } from "../components/GuildConfigForm/types";
 import GuildConfigForm from "../components/GuildConfigForm";
 import ModelConfigForm from "../components/GuildConfigForm/ModelConfigForm";
+import type { Channel, Role } from "../components/GuildConfigForm/types";
 import UserConfigForm from "../components/UserConfigForm";
 import { useI18n } from "../i18n";
 import type { ApiGuildConfig, ApiUserConfig } from "../lib/api";
@@ -49,8 +49,14 @@ export default function DashboardPage() {
 				if (admin) {
 					const [configRes] = await Promise.all([
 						guildApi.getConfig(guildId),
-						guildApi.getChannels(guildId).then((r) => setChannels(r.data)).catch(() => {}),
-						guildApi.getRoles(guildId).then((r) => setRoles(r.data)).catch(() => {}),
+						guildApi
+							.getChannels(guildId)
+							.then((r) => setChannels(r.data))
+							.catch(() => {}),
+						guildApi
+							.getRoles(guildId)
+							.then((r) => setRoles(r.data))
+							.catch(() => {}),
 					]);
 					setConfig(configRes.data);
 				}
@@ -137,9 +143,7 @@ export default function DashboardPage() {
 			{tab === "user" && (
 				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
 			)}
-			{tab === "characters" && (
-				<CharactersTab guildId={guildId!} />
-			)}
+			{tab === "characters" && <CharactersTab guildId={guildId!} />}
 		</Box>
 	);
 }

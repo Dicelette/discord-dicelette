@@ -110,7 +110,11 @@ export default function ServerSelectPage() {
 						{botGuilds.map((guild) => (
 							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id}>
 								<Card>
-									<CardActionArea onClick={() => startTransition(() => navigate(`/dashboard/${guild.id}`))}>
+									<CardActionArea
+										onClick={() =>
+											startTransition(() => navigate(`/dashboard/${guild.id}`))
+										}
+									>
 										<CardContent className="flex items-center gap-3 p-4">
 											<Avatar
 												src={getGuildIcon(guild) ?? undefined}

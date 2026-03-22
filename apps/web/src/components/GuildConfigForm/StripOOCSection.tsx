@@ -192,6 +192,7 @@ export default function StripOOCSection({
 									size="small"
 									multiple
 									options={channels}
+									getOptionKey={(c) => c.id}
 									getOptionLabel={(c) => `${c.type === 4 ? "\u{1F4C2}" : "#"} ${c.name}`}
 									value={selected}
 									onChange={(_, newValue) =>

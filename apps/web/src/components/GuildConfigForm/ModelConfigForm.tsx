@@ -19,7 +19,14 @@ interface Props {
 	roles: Role[];
 }
 
-export default function ModelConfigForm({ config, guildId, onSave, saving, channels, roles }: Props) {
+export default function ModelConfigForm({
+	config,
+	guildId,
+	onSave,
+	saving,
+	channels,
+	roles,
+}: Props) {
 	const { t } = useI18n();
 
 	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
