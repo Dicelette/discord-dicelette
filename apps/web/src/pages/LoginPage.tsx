@@ -38,16 +38,16 @@ export default function LoginPage() {
 
 			<Card sx={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
 				<CardContent className="p-8">
-					<Box sx={{ mb: 2 }}>
+					<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1.5, mb: 2 }}>
 						<img
 							src="/logo.png"
 							alt="Dicelette"
-							style={{ height: 72, width: 72, objectFit: "contain" }}
+							style={{ height: 48, width: 48, objectFit: "contain" }}
 						/>
+						<Typography variant="h5" fontWeight={700}>
+							{t("login.title")}
+						</Typography>
 					</Box>
-					<Typography variant="h5" gutterBottom fontWeight={700}>
-						{t("login.title")}
-					</Typography>
 					<Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
 						{t("login.subtitle")}
 					</Typography>

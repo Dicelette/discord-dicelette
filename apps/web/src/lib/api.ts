@@ -96,6 +96,11 @@ export const guildApi = {
 	addBot: (guildId: string) => api.get<{ url: string }>(`/guilds/${guildId}/invite`),
 };
 
+export interface ApiValidationResult {
+	valid: Record<string, string | number>;
+	errors: Record<string, string>;
+}
+
 export const userApi = {
 	getUserConfig: (guildId: string) =>
 		api.get<ApiUserConfig>(`/guilds/${guildId}/user-config`),
@@ -107,4 +112,13 @@ export const userApi = {
 			createLinkTemplate: ApiTemplateResult;
 		}>
 	) => api.patch(`/guilds/${guildId}/user-config`, data),
+	validateEntries: (
+		guildId: string,
+		type: "snippets" | "attributes",
+		entries: Record<string, unknown>
+	) =>
+		api.post<ApiValidationResult>(`/guilds/${guildId}/validate-entries`, {
+			type,
+			entries,
+		}),
 };

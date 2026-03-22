@@ -1,3 +1,4 @@
+import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
 import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
@@ -189,6 +190,42 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&guild_id=${guildId}&scope=bot+applications.commands&permissions=274878024768`;
 		res.json({ url });
 	});
+
+	// Validate snippets or attributes entries (no admin required)
+	router.post(
+		"/:guildId/validate-entries",
+		requireAuth,
+		(req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+			const { type, entries } = req.body as {
+				type: "snippets" | "attributes";
+				entries: Record<string, unknown>;
+			};
+
+			if (!entries || typeof entries !== "object" || Array.isArray(entries)) {
+				res.status(400).json({ error: "Invalid entries format" });
+				return;
+			}
+
+			const userAttrs = userSettings.get(guildId, userId)?.attributes;
+			const valid: Record<string, string | number> = {};
+			const errors: Record<string, string> = {};
+
+			const validate =
+				type === "attributes"
+					? (name: string, value: unknown) => validateAttributeEntry(name, value)
+					: (_name: string, value: unknown) => validateSnippetEntry(value, userAttrs);
+
+			for (const [name, value] of Object.entries(entries)) {
+				const result = validate(name, value);
+				if (result.ok) valid[name] = result.value;
+				else errors[name] = result.error;
+			}
+
+			res.json({ valid, errors });
+		}
+	);
 
 	// Get current user's personal settings for a guild (no admin required)
 	router.get(

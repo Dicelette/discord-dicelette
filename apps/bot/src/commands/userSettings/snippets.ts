@@ -8,6 +8,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	processEntries,
 	registerEntry,
+	validateSnippetEntry,
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
@@ -156,19 +157,9 @@ export async function importSnippets(
 		result: validated,
 		errors,
 		count,
-	} = await processEntries<string>(importedMacros, async (_name, content) => {
-		if (typeof content !== "string") return { error: String(content), ok: false };
-		try {
-			const dice = replaceStatsInDiceFormula(
-				getExpression(content, "0", attributes).dice,
-				attributes
-			);
-			await baseRoll(dice.formula, interaction, client, false, true);
-			return { ok: true, value: content };
-		} catch {
-			return { error: String(content), ok: false };
-		}
-	});
+	} = await processEntries<string>(importedMacros, async (_name, content) =>
+		validateSnippetEntry(content, attributes)
+	);
 
 	for (const [name, value] of Object.entries(validated)) macros[name] = value as string;
 

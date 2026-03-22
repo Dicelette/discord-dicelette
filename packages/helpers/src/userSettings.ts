@@ -1,5 +1,7 @@
 import type { EClient } from "@dicelette/client";
+import { roll } from "@dicelette/core";
 import { t } from "@dicelette/localization";
+import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
 import type { Snippets, Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import * as Djs from "discord.js";
@@ -153,6 +155,36 @@ export async function getContentFile(
 	const response = await fetch(file.url);
 	const fileContent = await response.text();
 	return { fileContent, guildId, overwrite, ul, userId };
+}
+
+export type ValidationResult<T> = { ok: true; value: T } | { ok: false; error: string };
+
+export function validateAttributeEntry(
+	name: string,
+	value: unknown
+): ValidationResult<number> {
+	if (typeof value !== "number" || Number.isNaN(value))
+		return { error: JSON.stringify(value), ok: false };
+	if (name.match(/-/))
+		return { error: "containsHyphen", ok: false };
+	return { ok: true, value };
+}
+
+export function validateSnippetEntry(
+	content: unknown,
+	attributes?: Record<string, number>
+): ValidationResult<string> {
+	if (typeof content !== "string") return { error: String(content), ok: false };
+	try {
+		const substituted = replaceStatsInDiceFormula(
+			getExpression(content, "0", attributes).dice,
+			attributes
+		);
+		roll(substituted.formula);
+		return { ok: true, value: content };
+	} catch {
+		return { error: content, ok: false };
+	}
 }
 
 export async function processEntries<T>(

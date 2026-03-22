@@ -8,6 +8,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	processEntries,
 	registerEntry,
+	validateAttributeEntry,
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
@@ -91,13 +92,9 @@ export async function importattributes(
 		result: validated,
 		errors,
 		count,
-	} = await processEntries<number>(importedStats, async (name, value) => {
-		if (typeof value !== "number" || Number.isNaN(value))
-			return { error: JSON.stringify(value), ok: false };
-		if (name.match(/-/))
-			return { error: ul("userSettings.attributes.import.containsHyphen"), ok: false };
-		return { ok: true, value: value as number };
-	});
+	} = await processEntries<number>(importedStats, async (name, value) =>
+		validateAttributeEntry(name, value)
+	);
 	const key = `${userId}.attributes`;
 	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	if (overwrite) currentStats = {};

@@ -1,117 +1,126 @@
 {
-  "common": {
-    "add": "Add",
-    "back": "Back to servers",
-    "darkTheme": "Dark theme",
-    "documentation": "Documentation",
-    "lightTheme": "Light thème",
-    "loading": "Loading...",
-    "logout": "Logout",
-    "none": "None",
-    "owner": "Owner",
-    "save": "Save",
-    "saving": "Saving..."
-  },
-  "config": {
-    "fields": {
-      "allowSelfRegister": "Allow self-registration",
-      "autoRoleDice": "Auto role (dice)",
-      "autoRoleStats": "Auto role (stats)",
-      "channelId": "Channel ID",
-      "context": "Add context link in logs",
-      "defaultChannel": "Default channel (sheets)",
-      "deleteAfter": "Auto-delete: {val}s",
-      "disableCompare": "Disable success/fail comparison",
-      "disableThread": "Disable result threads",
-      "hiddenRollDm": "Send via DM (otherwise: specific channel)",
-      "hiddenRollEnable": "Enable hidden rolls",
-      "lang": "Language",
-      "linkToLogs": "Link results to logs",
-      "logs": "Logs channel",
-      "moderationChannel": "Moderation channel (optional)",
-      "moderationChannelHelp": "Channel ID for moderating registrations",
-      "pity": "Pity threshold (consecutive critical failures)",
-      "privateChannel": "Private channel",
-      "rollChannel": "Roll results channel",
-      "sortAsc": "Ascending",
-      "sortDesc": "Descending",
-      "sortNone": "None (default)",
-      "sortOrder": "Sort results order",
-      "stripOocChannels": "Monitored channels/categories",
-      "stripOocDelay": "Delay before deletion: {val}s",
-      "stripOocEnable": "Enable OOC stripping",
-      "stripOocForward": "OOC forward channel (optional)",
-      "stripOocRegex": "OOC detection regex",
-      "stripOocRegexHelp": "E.g. \\(\\(.*\\)\\) — wraps out-of-character messages",
-      "stripOocThreadMode": "Thread mode (ignore forward channel)",
-      "timestamp": "Show timestamp in logs"
-    },
-    "sections": {
-      "autoRoles": "Auto roles",
-      "channels": "Channels",
-      "diceBehaviour": "Dice behaviour",
-      "general": "Language & General",
-      "hiddenRolls": "Hidden rolls (GM)",
-      "selfRegister": "Self-registration",
-      "stripOoc": "OOC suppression (out-of-character)"
-    },
-    "unsaved": "You have unsaved changes"
-  },
-  "dashboard": {
-    "loadError": "Could not load configuration.",
-    "saveError": "Error while saving.",
-    "saveSuccess": "Configuration saved!",
-    "tabs": {
-      "admin": "Server config",
-      "user": "Personal config"
-    },
-    "title": "Server configuration",
-    "userOnlyNotice": "You don't have admin permissions on this server. You can still manage your personal settings below."
-  },
-  "login": {
-    "button": "Sign in with Discord",
-    "subtitle": "Sign in with Discord to manage your server configuration.",
-    "title": "Dicelette Dashboard"
-  },
-  "servers": {
-    "addBotDesc": "You are an administrator on these servers — you can add the bot.",
-    "addBotTitle": "Add Dicelette",
-    "botPresent": "Dicelette is present",
-    "loadError": "Could not load servers.",
-    "noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
-    "refresh": "Refresh",
-    "refreshTooltip": "The list is cached for 15 min. Click to force an update.",
-    "subtitle": "Select a server to manage its configuration.",
-    "title": "Your servers"
-  },
-  "userConfig": {
-    "attrName": "Attribute name",
-    "attrValue": "Value",
-    "attributesDesc": "Personal stat values used in dice rolls.",
-    "noAttributes": "No attributes defined yet.",
-    "noSnippets": "No snippets defined yet.",
-    "resetTemplate": "Reset to defaults",
-    "saveError": "Error while saving.",
-    "saveSuccess": "Saved!",
-    "sections": {
-      "attributes": "Personal attributes",
-      "snippets": "Dice snippets",
-      "template": "Roll output template"
-    },
-    "snippetDice": "Dice expression",
-    "snippetName": "Name",
-    "snippetsDesc": "Named dice macros you can use in roll commands.",
-    "templateDesc": "Customize how roll results are formatted when creating links.",
-    "templateFinal": "Final format",
-    "templateFormat": {
-      "character": "Character",
-      "dice": "Dice",
-      "info": "Info",
-      "name": "Stat name",
-      "originalDice": "Original dice"
-    },
-    "templateFormatSection": "Sub-formats:",
-    "templateJoin": "Result separator",
-    "templateResults": "Result line format"
-  }
+	"common": {
+		"add": "Add",
+		"back": "Back to servers",
+		"darkTheme": "Dark theme",
+		"documentation": "Documentation",
+		"lightTheme": "Light thème",
+		"loading": "Loading...",
+		"logout": "Logout",
+		"none": "None",
+		"owner": "Owner",
+		"save": "Save",
+		"saving": "Saving..."
+	},
+	"config": {
+		"fields": {
+			"allowSelfRegister": "Allow self-registration",
+			"autoRoleDice": "Auto role (dice)",
+			"autoRoleStats": "Auto role (stats)",
+			"channelId": "Channel ID",
+			"context": "Add context link in logs",
+			"defaultChannel": "Default channel (sheets)",
+			"deleteAfter": "Auto-delete: {val}s",
+			"disableCompare": "Disable success/fail comparison",
+			"disableThread": "Disable result threads",
+			"hiddenRollDm": "Send via DM (otherwise: specific channel)",
+			"hiddenRollEnable": "Enable hidden rolls",
+			"lang": "Language",
+			"linkToLogs": "Link results to logs",
+			"logs": "Logs channel",
+			"moderationChannel": "Moderation channel (optional)",
+			"moderationChannelHelp": "Channel ID for moderating registrations",
+			"pity": "Pity threshold (consecutive critical failures)",
+			"privateChannel": "Private channel",
+			"rollChannel": "Roll results channel",
+			"sortAsc": "Ascending",
+			"sortDesc": "Descending",
+			"sortNone": "None (default)",
+			"sortOrder": "Sort results order",
+			"stripOocChannels": "Monitored channels/categories",
+			"stripOocDelay": "Delay before deletion: {val}s",
+			"stripOocEnable": "Enable OOC stripping",
+			"stripOocForward": "OOC forward channel (optional)",
+			"stripOocRegex": "OOC detection regex",
+			"stripOocRegexHelp": "E.g. \\(\\(.*\\)\\) — wraps out-of-character messages",
+			"stripOocThreadMode": "Thread mode (ignore forward channel)",
+			"timestamp": "Show timestamp in logs"
+		},
+		"sections": {
+			"autoRoles": "Auto roles",
+			"channels": "Channels",
+			"diceBehaviour": "Dice behaviour",
+			"general": "Language & General",
+			"hiddenRolls": "Hidden rolls (GM)",
+			"selfRegister": "Self-registration",
+			"stripOoc": "OOC suppression"
+		},
+		"unsaved": "You have unsaved changes"
+	},
+	"dashboard": {
+		"loadError": "Could not load configuration.",
+		"saveError": "Error while saving.",
+		"saveSuccess": "Configuration saved!",
+		"tabs": {
+			"admin": "Server config",
+			"user": "Personal config"
+		},
+		"title": "Server configuration",
+		"userOnlyNotice": "You don't have admin permissions on this server. You can still manage your personal settings below."
+	},
+	"login": {
+		"button": "Sign in with Discord",
+		"subtitle": "Sign in with Discord to manage your server configuration.",
+		"title": "Dicelette Dashboard"
+	},
+	"servers": {
+		"addBotDesc": "You are an administrator on these servers — you can add the bot.",
+		"addBotTitle": "Add Dicelette",
+		"botPresent": "Dicelette is present",
+		"loadError": "Could not load servers.",
+		"noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
+		"refresh": "Refresh",
+		"refreshTooltip": "The list is cached for 15 min. Click to force an update.",
+		"subtitle": "Select a server to manage its configuration.",
+		"title": "Your servers"
+	},
+	"userConfig": {
+		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",
+		"addInvalidDice": "Dice expression \"{name}\" is invalid.",
+		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
+		"attrName": "Attribute's name",
+		"attrValue": "Value",
+		"export": "Export",
+		"exportTooltip": "Download as JSON",
+		"import": "Import",
+		"importError": "Invalid file. Please check the JSON format.",
+		"importPartial": "{ok} entry/entries imported, {err} ignored (invalid formula).",
+		"importTooltip": "Import from a JSON file (merges with existing entries)",
+		"attributesDesc": "Register attributes that will be replaced by their values when dice are rolled.",
+		"noAttributes": "No attributes defined yet.",
+		"noSnippets": "No snippets defined yet.",
+		"resetTemplate": "Reset to defaults",
+		"saveError": "Error while saving.",
+		"saveSuccess": "Saved!",
+		"sections": {
+			"attributes": "Attributes",
+			"snippets": "Snippets",
+			"template": "Link's template"
+		},
+		"snippetDice": "Dice expression",
+		"snippetName": "Name",
+		"snippetsDesc": "Named dices you can use in roll commands.",
+		"templateDesc": "Customize how roll results are formatted when creating links.",
+		"templateFinal": "Final format",
+		"templateFormat": {
+			"character": "Character",
+			"dice": "Dice",
+			"info": "Info",
+			"name": "Stat name",
+			"originalDice": "Original dice"
+		},
+		"templateFormatSection": "Sub-formats:",
+		"templateJoin": "Result separator",
+		"templateResults": "Result line format"
+	}
 }

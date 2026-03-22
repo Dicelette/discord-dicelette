@@ -1,6 +1,8 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -12,8 +14,9 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useI18n } from "../i18n";
 import type { ApiTemplateResult, ApiUserConfig } from "../lib/api";
 import { userApi } from "../lib/api";
@@ -66,14 +69,48 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const [templateSuccess, setTemplateSuccess] = useState(false);
 	const [templateError, setTemplateError] = useState<string | null>(null);
 
+	// --- Import file refs ---
+	const snippetImportRef = useRef<HTMLInputElement>(null);
+	const attrImportRef = useRef<HTMLInputElement>(null);
+
+	// --- Export helpers ---
+	const exportJson = (data: unknown, filename: string) => {
+		const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = filename;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
+	// --- Adding state ---
+	const [addingSnippet, setAddingSnippet] = useState(false);
+	const [snippetAddError, setSnippetAddError] = useState<string | null>(null);
+	const [addingAttr, setAddingAttr] = useState(false);
+	const [attrAddError, setAttrAddError] = useState<string | null>(null);
+
 	// --- Snippet handlers ---
-	const addSnippet = () => {
+	const addSnippet = async () => {
 		const name = newSnippetName.trim();
 		const value = newSnippetValue.trim();
 		if (!name || !value) return;
-		setSnippets((prev) => ({ ...prev, [name]: value }));
-		setNewSnippetName("");
-		setNewSnippetValue("");
+		setAddingSnippet(true);
+		setSnippetAddError(null);
+		try {
+			const res = await userApi.validateEntries(guildId, "snippets", { [name]: value });
+			if (res.data.errors[name] !== undefined) {
+				setSnippetAddError(t("userConfig.addInvalidDice", { name }));
+				return;
+			}
+			setSnippets((prev) => ({ ...prev, [name]: value }));
+			setNewSnippetName("");
+			setNewSnippetValue("");
+		} catch {
+			setSnippetAddError(t("userConfig.saveError"));
+		} finally {
+			setAddingSnippet(false);
+		}
 	};
 
 	const deleteSnippet = (key: string) => {
@@ -82,6 +119,47 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			delete next[key];
 			return next;
 		});
+	};
+
+	const importSnippets = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = async () => {
+			try {
+				const parsed = JSON.parse(reader.result as string);
+				if (
+					typeof parsed !== "object" ||
+					parsed === null ||
+					Array.isArray(parsed)
+				) {
+					setSnippetError(t("userConfig.importError"));
+					return;
+				}
+				const res = await userApi.validateEntries(guildId, "snippets", parsed);
+				const { valid, errors } = res.data;
+				setSnippets((prev) => ({
+					...prev,
+					...(valid as Record<string, string>),
+				}));
+				const errCount = Object.keys(errors).length;
+				const okCount = Object.keys(valid).length;
+				if (errCount > 0) {
+					setSnippetError(
+						t("userConfig.importPartial", { ok: okCount, err: errCount })
+					);
+				} else if (okCount > 0) {
+					setSnippetError(null);
+					setSnippetSuccess(true);
+					setTimeout(() => setSnippetSuccess(false), 3000);
+				}
+			} catch {
+				setSnippetError(t("userConfig.importError"));
+			} finally {
+				e.target.value = "";
+			}
+		};
+		reader.readAsText(file);
 	};
 
 	const saveSnippets = async () => {
@@ -99,13 +177,30 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	};
 
 	// --- Attribute handlers ---
-	const addAttribute = () => {
+	const addAttribute = async () => {
 		const name = newAttrName.trim();
 		const val = Number.parseFloat(newAttrValue);
 		if (!name || Number.isNaN(val)) return;
-		setAttributes((prev) => ({ ...prev, [name]: val }));
-		setNewAttrName("");
-		setNewAttrValue("");
+		setAddingAttr(true);
+		setAttrAddError(null);
+		try {
+			const res = await userApi.validateEntries(guildId, "attributes", { [name]: val });
+			if (res.data.errors[name] !== undefined) {
+				const msg =
+					res.data.errors[name] === "containsHyphen"
+						? t("userConfig.attrHyphenError")
+						: t("userConfig.addInvalidAttr", { name });
+				setAttrAddError(msg);
+				return;
+			}
+			setAttributes((prev) => ({ ...prev, [name]: val }));
+			setNewAttrName("");
+			setNewAttrValue("");
+		} catch {
+			setAttrAddError(t("userConfig.saveError"));
+		} finally {
+			setAddingAttr(false);
+		}
 	};
 
 	const deleteAttribute = (key: string) => {
@@ -114,6 +209,47 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			delete next[key];
 			return next;
 		});
+	};
+
+	const importAttributes = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = async () => {
+			try {
+				const parsed = JSON.parse(reader.result as string);
+				if (
+					typeof parsed !== "object" ||
+					parsed === null ||
+					Array.isArray(parsed)
+				) {
+					setAttrError(t("userConfig.importError"));
+					return;
+				}
+				const res = await userApi.validateEntries(guildId, "attributes", parsed);
+				const { valid, errors } = res.data;
+				setAttributes((prev) => ({
+					...prev,
+					...(valid as Record<string, number>),
+				}));
+				const errCount = Object.keys(errors).length;
+				const okCount = Object.keys(valid).length;
+				if (errCount > 0) {
+					setAttrError(
+						t("userConfig.importPartial", { ok: okCount, err: errCount })
+					);
+				} else if (okCount > 0) {
+					setAttrError(null);
+					setAttrSuccess(true);
+					setTimeout(() => setAttrSuccess(false), 3000);
+				}
+			} catch {
+				setAttrError(t("userConfig.importError"));
+			} finally {
+				e.target.value = "";
+			}
+		};
+		reader.readAsText(file);
 	};
 
 	const saveAttributes = async () => {
@@ -202,12 +338,12 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							</Typography>
 						)}
 					</Stack>
-					<Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+					<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 						<TextField
 							size="small"
 							label={t("userConfig.snippetName")}
 							value={newSnippetName}
-							onChange={(e) => setNewSnippetName(e.target.value)}
+							onChange={(e) => { setNewSnippetName(e.target.value); setSnippetAddError(null); }}
 							sx={{ flex: 1 }}
 							inputProps={{ style: { fontFamily: "monospace" } }}
 						/>
@@ -215,7 +351,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							size="small"
 							label={t("userConfig.snippetDice")}
 							value={newSnippetValue}
-							onChange={(e) => setNewSnippetValue(e.target.value)}
+							onChange={(e) => { setNewSnippetValue(e.target.value); setSnippetAddError(null); }}
 							placeholder="2d6+3"
 							sx={{ flex: 2 }}
 							inputProps={{ style: { fontFamily: "monospace" } }}
@@ -223,13 +359,18 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 						/>
 						<Button
 							variant="outlined"
-							startIcon={<AddIcon />}
+							startIcon={addingSnippet ? <CircularProgress size={16} /> : <AddIcon />}
 							onClick={addSnippet}
-							disabled={!newSnippetName.trim() || !newSnippetValue.trim()}
+							disabled={addingSnippet || !newSnippetName.trim() || !newSnippetValue.trim()}
 						>
 							{t("common.add")}
 						</Button>
 					</Box>
+					{snippetAddError && (
+						<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setSnippetAddError(null)}>
+							{snippetAddError}
+						</Alert>
+					)}
 					{snippetError && (
 						<Alert severity="error" sx={{ mb: 1 }} onClose={() => setSnippetError(null)}>
 							{snippetError}
@@ -240,14 +381,44 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							{t("userConfig.saveSuccess")}
 						</Alert>
 					)}
-					<Button
-						variant="contained"
-						onClick={saveSnippets}
-						disabled={savingSnippets}
-						startIcon={savingSnippets ? <CircularProgress size={16} /> : undefined}
-					>
-						{savingSnippets ? t("common.saving") : t("common.save")}
-					</Button>
+					<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+						<Button
+							variant="contained"
+							onClick={saveSnippets}
+							disabled={savingSnippets}
+							startIcon={savingSnippets ? <CircularProgress size={16} /> : undefined}
+						>
+							{savingSnippets ? t("common.saving") : t("common.save")}
+						</Button>
+						<Tooltip title={t("userConfig.exportTooltip")}>
+							<span>
+								<Button
+									variant="outlined"
+									startIcon={<FileDownloadIcon />}
+									onClick={() => exportJson(snippets, "snippets.json")}
+									disabled={Object.keys(snippets).length === 0}
+								>
+									{t("userConfig.export")}
+								</Button>
+							</span>
+						</Tooltip>
+						<input
+							ref={snippetImportRef}
+							type="file"
+							accept=".json,application/json"
+							style={{ display: "none" }}
+							onChange={importSnippets}
+						/>
+						<Tooltip title={t("userConfig.importTooltip")}>
+							<Button
+								variant="outlined"
+								startIcon={<FileUploadIcon />}
+								onClick={() => snippetImportRef.current?.click()}
+							>
+								{t("userConfig.import")}
+							</Button>
+						</Tooltip>
+					</Box>
 				</AccordionDetails>
 			</Accordion>
 
@@ -304,12 +475,12 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							</Typography>
 						)}
 					</Stack>
-					<Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+					<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 						<TextField
 							size="small"
 							label={t("userConfig.attrName")}
 							value={newAttrName}
-							onChange={(e) => setNewAttrName(e.target.value)}
+							onChange={(e) => { setNewAttrName(e.target.value); setAttrAddError(null); }}
 							sx={{ flex: 2 }}
 							inputProps={{ style: { fontFamily: "monospace" } }}
 						/>
@@ -317,20 +488,25 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							size="small"
 							label={t("userConfig.attrValue")}
 							value={newAttrValue}
-							onChange={(e) => setNewAttrValue(e.target.value)}
+							onChange={(e) => { setNewAttrValue(e.target.value); setAttrAddError(null); }}
 							type="number"
 							sx={{ flex: 1 }}
 							onKeyDown={(e) => e.key === "Enter" && addAttribute()}
 						/>
 						<Button
 							variant="outlined"
-							startIcon={<AddIcon />}
+							startIcon={addingAttr ? <CircularProgress size={16} /> : <AddIcon />}
 							onClick={addAttribute}
-							disabled={!newAttrName.trim() || newAttrValue === ""}
+							disabled={addingAttr || !newAttrName.trim() || newAttrValue === ""}
 						>
 							{t("common.add")}
 						</Button>
 					</Box>
+					{attrAddError && (
+						<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setAttrAddError(null)}>
+							{attrAddError}
+						</Alert>
+					)}
 					{attrError && (
 						<Alert severity="error" sx={{ mb: 1 }} onClose={() => setAttrError(null)}>
 							{attrError}
@@ -341,14 +517,44 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 							{t("userConfig.saveSuccess")}
 						</Alert>
 					)}
-					<Button
-						variant="contained"
-						onClick={saveAttributes}
-						disabled={savingAttrs}
-						startIcon={savingAttrs ? <CircularProgress size={16} /> : undefined}
-					>
-						{savingAttrs ? t("common.saving") : t("common.save")}
-					</Button>
+					<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+						<Button
+							variant="contained"
+							onClick={saveAttributes}
+							disabled={savingAttrs}
+							startIcon={savingAttrs ? <CircularProgress size={16} /> : undefined}
+						>
+							{savingAttrs ? t("common.saving") : t("common.save")}
+						</Button>
+						<Tooltip title={t("userConfig.exportTooltip")}>
+							<span>
+								<Button
+									variant="outlined"
+									startIcon={<FileDownloadIcon />}
+									onClick={() => exportJson(attributes, "attributes.json")}
+									disabled={Object.keys(attributes).length === 0}
+								>
+									{t("userConfig.export")}
+								</Button>
+							</span>
+						</Tooltip>
+						<input
+							ref={attrImportRef}
+							type="file"
+							accept=".json,application/json"
+							style={{ display: "none" }}
+							onChange={importAttributes}
+						/>
+						<Tooltip title={t("userConfig.importTooltip")}>
+							<Button
+								variant="outlined"
+								startIcon={<FileUploadIcon />}
+								onClick={() => attrImportRef.current?.click()}
+							>
+								{t("userConfig.import")}
+							</Button>
+						</Tooltip>
+					</Box>
 				</AccordionDetails>
 			</Accordion>
 

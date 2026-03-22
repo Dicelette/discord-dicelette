@@ -44,7 +44,7 @@ export default function Layout() {
 					<Tooltip title={t("common.documentation")}>
 						<IconButton
 							color="inherit"
-							onClick={() => window.open("https://dicelette.app", "_blank")}
+							onClick={() => window.open("https://www.dicelette.app", "_blank")}
 							size="small"
 						>
 							<LibraryBooksIcon fontSize="small" />
