@@ -120,9 +120,6 @@ export default function DashboardPage() {
 					saving={saving}
 				/>
 			)}
-
-			{tab === "characters" && <CharactersTab guildId={guildId!} />}
-
 			{tab === "user" && (
 				<UserConfigForm
 					key={JSON.stringify(userConfigData)}
@@ -130,6 +127,7 @@ export default function DashboardPage() {
 					initialConfig={userConfigData}
 				/>
 			)}
+			{tab === "characters" && <CharactersTab guildId={guildId!} />}
 		</Box>
 	);
 }
