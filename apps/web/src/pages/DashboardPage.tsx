@@ -12,17 +12,20 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CharactersTab from "../components/CharactersTab";
 import GuildConfigForm from "../components/GuildConfigForm";
+import ModelConfigForm from "../components/GuildConfigForm/ModelConfigForm";
 import UserConfigForm from "../components/UserConfigForm";
 import { useI18n } from "../i18n";
 import type { ApiGuildConfig, ApiUserConfig } from "../lib/api";
 import { guildApi, userApi } from "../lib/api";
+
+type ActiveTab = "admin" | "template" | "user" | "characters";
 
 export default function DashboardPage() {
 	const { guildId } = useParams<{ guildId: string }>();
 	const navigate = useNavigate();
 	const { t } = useI18n();
 
-	const [tab, setTab] = useState<"admin" | "user" | "characters">("admin");
+	const [tab, setTab] = useState<ActiveTab>("admin");
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
@@ -100,6 +103,7 @@ export default function DashboardPage() {
 				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} />}
+				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} />}
 				<Tab value="user" label={t("dashboard.tabs.user")} />
 				<Tab value="characters" label={t("dashboard.tabs.characters")} />
 			</Tabs>
@@ -107,6 +111,16 @@ export default function DashboardPage() {
 			{isAdmin && config && (
 				<Box sx={{ display: tab === "admin" ? "block" : "none" }}>
 					<GuildConfigForm
+						config={config}
+						guildId={guildId!}
+						onSave={handleSave}
+						saving={saving}
+					/>
+				</Box>
+			)}
+			{isAdmin && config && (
+				<Box sx={{ display: tab === "template" ? "block" : "none" }}>
+					<ModelConfigForm
 						config={config}
 						guildId={guildId!}
 						onSave={handleSave}

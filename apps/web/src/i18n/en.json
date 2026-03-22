@@ -56,6 +56,7 @@
 			"general": "Language & General",
 			"hiddenRolls": "Hidden rolls (GM)",
 			"selfRegister": "Self-registration",
+			"sheetsChannels": "Sheet channels",
 			"stripOoc": "OOC suppression"
 		},
 		"unsaved": "You have unsaved changes"
@@ -78,6 +79,7 @@
 		"tabs": {
 			"admin": "Server configuration",
 			"characters": "Characters",
+			"template": "Model configuration",
 			"user": "Personal configuration"
 		},
 		"title": "Server configuration",

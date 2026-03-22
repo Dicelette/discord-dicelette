@@ -4,11 +4,12 @@ import { useForm } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
 import { guildApi } from "../../lib/api";
-import ChannelsSection from "./ChannelsSection";
-import DiceBehaviourSection from "./DiceBehaviourSection";
-import GeneralSection from "./GeneralSection";
-import StripOOCSection from "./StripOOCSection";
-import type { Channel } from "./types";
+import AutoRoleSection from "./AutoRoleSection";
+import HiddenRollsSection from "./HiddenRollsSection";
+import SelfRegisterSection from "./SelfRegisterSection";
+import SheetsChannelsSection from "./SheetsChannelsSection";
+import TemplateManagerSection from "./TemplateManagerSection";
+import type { Channel, Role } from "./types";
 
 interface Props {
 	config: ApiGuildConfig;
@@ -17,7 +18,7 @@ interface Props {
 	saving: boolean;
 }
 
-export default function GuildConfigForm({ config, guildId, onSave, saving }: Props) {
+export default function ModelConfigForm({ config, guildId, onSave, saving }: Props) {
 	const { t } = useI18n();
 
 	const { control, handleSubmit, reset, watch, formState } = useForm<ApiGuildConfig>({
@@ -27,6 +28,7 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 	const isDirty = formState.isDirty;
 
 	const [channels, setChannels] = useState<Channel[]>([]);
+	const [roles, setRoles] = useState<Role[]>([]);
 
 	useEffect(() => {
 		reset(config);
@@ -36,6 +38,10 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 		guildApi
 			.getChannels(guildId)
 			.then((r) => setChannels(r.data))
+			.catch(() => {});
+		guildApi
+			.getRoles(guildId)
+			.then((r) => setRoles(r.data))
 			.catch(() => {});
 	}, [guildId]);
 
@@ -50,7 +56,8 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 
 	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
 
-	const stripOOC = watch("stripOOC");
+	const hiddenRoll = watch("hiddenRoll");
+	const allowSelfRegister = watch("allowSelfRegister");
 
 	return (
 		<Stack spacing={2}>
@@ -59,24 +66,26 @@ export default function GuildConfigForm({ config, guildId, onSave, saving }: Pro
 			<Box component="form" onSubmit={handleSubmit(onSave)}>
 				<Stack spacing={2}>
 					<Paper sx={{ p: 3 }}>
-						<GeneralSection control={control} />
+						<TemplateManagerSection guildId={guildId} />
+					</Paper>
+					<Paper sx={{ p: 3 }}>
+						<SheetsChannelsSection control={control} textChannels={textChannels} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<ChannelsSection control={control} textChannels={textChannels} />
+						<AutoRoleSection control={control} roles={roles} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<DiceBehaviourSection control={control} />
-					</Paper>
-
-					<Paper sx={{ p: 3 }}>
-						<StripOOCSection
+						<SelfRegisterSection
 							control={control}
-							stripOOC={stripOOC}
-							channels={channels}
+							allowSelfRegister={allowSelfRegister}
 							textChannels={textChannels}
 						/>
+					</Paper>
+
+					<Paper sx={{ p: 3 }}>
+						<HiddenRollsSection control={control} hiddenRoll={hiddenRoll} />
 					</Paper>
 				</Stack>
 

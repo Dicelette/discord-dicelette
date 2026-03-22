@@ -67,6 +67,7 @@
 			"general": "Langue & Général",
 			"hiddenRolls": "Résultats cachés (MJ)",
 			"selfRegister": "Auto-inscription",
+			"sheetsChannels": "Canaux des fiches",
 			"stripOoc": "Suppression HRP (hors-roleplay)"
 		},
 		"unsaved": "Modifications non sauvegardées"
@@ -78,6 +79,7 @@
 		"tabs": {
 			"admin": "Configuration serveur",
 			"characters": "Personnages",
+			"template": "Configuration du modèle",
 			"user": "Configuration personnelle"
 		},
 		"title": "Configuration du serveur",

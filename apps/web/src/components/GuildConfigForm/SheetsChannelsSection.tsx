@@ -10,19 +10,19 @@ interface Props {
 	textChannels: Channel[];
 }
 
-export default function ChannelsSection({ control, textChannels }: Props) {
+export default function SheetsChannelsSection({ control, textChannels }: Props) {
 	const { t } = useI18n();
 
 	return (
 		<>
-			<SectionTitle>{t("config.sections.channels")}</SectionTitle>
+			<SectionTitle>{t("config.sections.sheetsChannels")}</SectionTitle>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<Controller
-					name="logs"
+					name="managerId"
 					control={control}
 					render={({ field }) => (
 						<ChannelSelect
-							label={t("config.fields.logs")}
+							label={t("config.fields.defaultChannel")}
 							value={field.value}
 							channels={textChannels}
 							onChange={(v) => field.onChange(v || undefined)}
@@ -30,11 +30,11 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 					)}
 				/>
 				<Controller
-					name="rollChannel"
+					name="privateChannel"
 					control={control}
 					render={({ field }) => (
 						<ChannelSelect
-							label={t("config.fields.rollChannel")}
+							label={t("config.fields.privateChannel")}
 							value={field.value}
 							channels={textChannels}
 							onChange={(v) => field.onChange(v || undefined)}
