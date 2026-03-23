@@ -19,4 +19,15 @@ export default defineConfig({
 			},
 		},
 	},
+	build: {
+		rolldownOptions: {
+			output: {
+				manualChunks: {
+					react: ["react", "react-dom", "react-router-dom"],
+					mui: ["@mui/material", "@mui/icons-material", "@emotion/react", "@emotion/styled"],
+					dicelette: ["@dicelette/core"],
+				},
+			},
+		},
+	},
 });
