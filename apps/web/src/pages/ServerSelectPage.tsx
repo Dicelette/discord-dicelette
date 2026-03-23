@@ -61,6 +61,12 @@ export default function ServerSelectPage() {
 	const handleAddBot = async (guild: DiscordGuild) => {
 		const res = await guildApi.addBot(guild.id);
 		window.open(res.data.url, "_blank");
+
+		const onFocus = () => {
+			window.removeEventListener("focus", onFocus);
+			handleRefresh();
+		};
+		window.addEventListener("focus", onFocus);
 	};
 
 	if (loading) {
