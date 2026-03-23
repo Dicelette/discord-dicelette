@@ -91,8 +91,7 @@ function getBotStats(client: EClient, ul: Translation) {
 }
 
 function buttonsLinks(ul: Translation, langToUse: Djs.Locale) {
-	const isProd = process.env.NODE_ENV === "production" ? "prod" : "dev";
-	const emoji = LINKS.icons[isProd];
+	const emoji = LINKS.icons;
 	const buttons = LINKS.buttons;
 	return [
 		new Djs.ButtonBuilder()

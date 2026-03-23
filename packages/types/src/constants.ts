@@ -1,9 +1,11 @@
 /** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
 
 import process from "node:process";
+import dotenv from "dotenv";
 import type { Translation } from "..";
 import type { TemplateResult } from "./database";
 
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 export const MIN_THRESHOLD_MATCH = 0.5;
 
 export const TUTORIAL_IMAGES = [
@@ -31,16 +33,9 @@ export const LINKS = {
 		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=mara-li&labels=enhancement%2Ctriage%2Cfrench&projects=&template=Request_french.yml&title=%5BFR%5D%3A+",
 	},
 	icons: {
-		dev: {
-			discord: "1459934829385875690",
-			github: "1459936027769700621",
-			kofi: "1459935650173292853",
-		},
-		prod: {
-			discord: "1459974851006562396",
-			github: "1459974906312917167",
-			kofi: "1459974972570075441",
-		},
+		discord: process.env.DISCORD ?? "1459934829385875690",
+		github: process.env.GITHUB ?? "1459936027769700621",
+		kofi: process.env.KOFI ?? "1459935650173292853",
 	},
 } as const;
 
@@ -49,12 +44,12 @@ export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
 
 // Regex patterns for dice detection
 
-const MATH = {
+/*const MATH = {
 	dev: "<:math:1394002307431010334>_ _",
 	prod: "<:math:1394002540143710358>_ _",
 } as const;
-
-export const EMOJI_MATH = process.env.NODE_ENV === "production" ? MATH.prod : MATH.dev;
+*/
+export const EMOJI_MATH = `<:math:${process.env.MATH ?? "1394002540143710358"}>_ _`;
 
 export const AND = "&";
 
