@@ -12,37 +12,74 @@ import { createGuildRouter } from "./guilds";
 const SessionStore = MemoryStore(session);
 
 // ---------------------------------------------------------------------------
-// Sliding-window rate limiter for Discord-backed API routes
-// Limits each authenticated user (or IP as fallback) to RATE_MAX requests
-// within a RATE_WINDOW_MS window. Excess requests get a 429.
+// Sliding-window rate limiter factory
+// Creates a per-user (or per-IP as fallback) rate limiter.
 // ---------------------------------------------------------------------------
-const RATE_WINDOW_MS = 60_000; // 1 minute
-const RATE_MAX = 30; // requests per window
+export function makeRateLimit(max: number, windowMs: number) {
+	const buckets = new Map<string, number[]>();
+	return function rateLimit(req: Request, res: Response, next: NextFunction): void {
+		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
+		const now = Date.now();
+		const cutoff = now - windowMs;
+		const hits = (buckets.get(key) ?? []).filter((t) => t > cutoff);
+		if (hits.length >= max) {
+			const retryAfter = Math.ceil((hits[0] - cutoff) / 1000);
+			res.setHeader("Retry-After", String(retryAfter));
+			res.status(429).json({ error: "Too many requests, please slow down." });
+			return;
+		}
+		hits.push(now);
+		buckets.set(key, hits);
+		next();
+	};
+}
 
-const rateBuckets = new Map<string, number[]>();
+// ---------------------------------------------------------------------------
+// Minimal structural interfaces for Discord.js data exposed to routes.
+// These avoid importing discord.js types in the routes package.
+// ---------------------------------------------------------------------------
 
-function slidingWindowRateLimit(req: Request, res: Response, next: NextFunction): void {
-	const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
-	const now = Date.now();
-	const cutoff = now - RATE_WINDOW_MS;
+/** A guild member with computed effective permissions */
+export interface BotMember {
+	/** Returns true if the member's effective permissions include the given bitfield flag */
+	hasPermission: (flag: bigint) => boolean;
+}
 
-	const hits = (rateBuckets.get(key) ?? []).filter((t) => t > cutoff);
-	if (hits.length >= RATE_MAX) {
-		const retryAfter = Math.ceil((hits[0] - cutoff) / 1000);
-		res.setHeader("Retry-After", String(retryAfter));
-		res.status(429).json({ error: "Too many requests, please slow down." });
-		return;
-	}
-	hits.push(now);
-	rateBuckets.set(key, hits);
-	next();
+/** A guild accessible through the bot's Discord.js client cache */
+export interface BotGuild {
+	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
+	fetchMember: (userId: string) => Promise<BotMember | null>;
+	/** All channels in the guild (all types, let the caller filter) */
+	readonly channels: ReadonlyArray<{ id: string; name: string; type: number }>;
+	/** All roles except @everyone */
+	readonly roles: ReadonlyArray<{ id: string; name: string; color: number }>;
+}
+
+/** A Discord message with its embeds and attachments */
+export interface BotMessage {
+	readonly embeds: ReadonlyArray<{
+		title?: string;
+		thumbnail?: { url: string };
+		fields?: ReadonlyArray<{ name: string; value: string }>;
+	}>;
+	readonly attachments: ReadonlyArray<{ filename: string; url: string }>;
+}
+
+/** Channel accessor backed by the Discord.js client cache */
+export interface BotChannels {
+	/** Fetch a message; checks Discord.js message cache first, falls back to API */
+	fetchMessage: (channelId: string, messageId: string) => Promise<BotMessage | null>;
 }
 
 export interface DashboardDeps {
 	settings: Settings;
 	userSettings: Enmap<UserSettings>;
 	template: TemplateData;
-	botGuilds: { has: (id: string) => boolean };
+	botGuilds: {
+		has: (id: string) => boolean;
+		get: (id: string) => BotGuild | undefined;
+	};
+	botChannels: BotChannels;
 }
 
 export function startDashboardServer(deps: DashboardDeps): void {
@@ -97,8 +134,11 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		})
 	);
 
-	app.use("/api/auth", createAuthRouter(deps.botGuilds));
-	app.use("/api/guilds", slidingWindowRateLimit, createGuildRouter(deps));
+	// Auth routes: 10 req/min — protects Discord OAuth calls (guild list, token exchange)
+	// Refresh endpoint has an additional stricter limit defined within createAuthRouter
+	app.use("/api/auth", makeRateLimit(10, 60_000), createAuthRouter(deps.botGuilds));
+	// Guild data routes: 30 req/min — protects Discord.js member fetches and settings writes
+	app.use("/api/guilds", makeRateLimit(30, 60_000), createGuildRouter(deps));
 
 	if (process.env.NODE_ENV === "production") {
 		const distPath = new URL("../../../apps/web/dist", import.meta.url).pathname;

@@ -1,6 +1,33 @@
 import { randomBytes } from "node:crypto";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
+
+// Stricter rate limit specifically for the refresh endpoint (5 req/min per user).
+// The outer auth router already has a 10/min limit from index.ts; this adds
+// an additional guard so spamming refresh can't exhaust Discord OAuth calls
+// even if the general limit is raised in the future.
+function makeRefreshRateLimit() {
+	const buckets = new Map<string, number[]>();
+	const MAX = 5;
+	const WINDOW_MS = 60_000;
+	return function (req: Request, res: Response, next: NextFunction): void {
+		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
+		const now = Date.now();
+		const cutoff = now - WINDOW_MS;
+		const hits = (buckets.get(key) ?? []).filter((t) => t > cutoff);
+		if (hits.length >= MAX) {
+			const retryAfter = Math.ceil((hits[0] - cutoff) / 1000);
+			res.setHeader("Retry-After", String(retryAfter));
+			res.status(429).json({ error: "Too many refresh requests, please slow down." });
+			return;
+		}
+		hits.push(now);
+		buckets.set(key, hits);
+		next();
+	};
+}
+
+const refreshRateLimit = makeRefreshRateLimit();
 
 const DISCORD_API = "https://discord.com/api/v10";
 const OAUTH_SCOPES = "identify guilds";
@@ -148,7 +175,7 @@ export function createAuthRouter(botGuilds: { has: (id: string) => boolean }) {
 		});
 	});
 
-	router.post("/guilds/refresh", (req: Request, res: Response) => {
+	router.post("/guilds/refresh", refreshRateLimit, (req: Request, res: Response) => {
 		if (!req.session.accessToken) {
 			res.status(401).json({ error: "Not authenticated" });
 			return;
