@@ -56,7 +56,7 @@
 		"apps/**/vitest.config.ts",
 		"@testing/**",
 		"apps/localization/docs/**",
-		"web/src/**"
+		"apps/web/**"
 	],
 	"include": ["apps/**/*.ts", "apps/**/*.d.ts", "web/server/**/*.ts", "package.json"],
 	"ts-node": {
