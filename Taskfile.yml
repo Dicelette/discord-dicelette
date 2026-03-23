@@ -31,7 +31,7 @@ tasks:
     desc: build and run beta pm2
     cmds:
       - pnpm run build
-      - pm2 start dist/apps/bot/index.js --name beta-dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"
+      - pm2 start dist/apps/bot/index.js --name beta-dicelette --log-date-format='YYYY-MM-DD HH:mm Z'
   restart-beta:
     desc: restart pm2 beta
     cmds:
