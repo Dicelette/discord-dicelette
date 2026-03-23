@@ -5,9 +5,11 @@ import type Enmap from "enmap";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import session from "express-session";
+import MemoryStore from "memorystore";
 import authRoutes from "./auth";
-import { FileStore } from "./fileStore";
 import { createGuildRouter } from "./guilds";
+
+const SessionStore = MemoryStore(session);
 
 // ---------------------------------------------------------------------------
 // Sliding-window rate limiter for Discord-backed API routes
@@ -79,11 +81,9 @@ export function startDashboardServer(deps: DashboardDeps): void {
 
 	app.use(express.json({ limit: "100kb" }));
 	app.use(cors({ origin: FrontendUrl, credentials: true }));
-	const sessionDir =
-		process.env.SESSION_STORE_DIR ?? new URL("../../sessions", import.meta.url).pathname;
 	app.use(
 		session({
-			store: new FileStore(sessionDir),
+			store: new SessionStore({ checkPeriod: 86_400_000 }), // prune expired entries every 24h
 			secret: sessionSecret ?? "dicelette-dev-secret-change-in-prod",
 			resave: false,
 			saveUninitialized: false,
