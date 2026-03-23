@@ -6,6 +6,7 @@ import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import session from "express-session";
 import authRoutes from "./auth";
+import { FileStore } from "./fileStore";
 import { createGuildRouter } from "./guilds";
 
 // ---------------------------------------------------------------------------
@@ -78,8 +79,11 @@ export function startDashboardServer(deps: DashboardDeps): void {
 
 	app.use(express.json({ limit: "100kb" }));
 	app.use(cors({ origin: FrontendUrl, credentials: true }));
+	const sessionDir =
+		process.env.SESSION_STORE_DIR ?? new URL("../../sessions", import.meta.url).pathname;
 	app.use(
 		session({
+			store: new FileStore(sessionDir),
 			secret: sessionSecret ?? "dicelette-dev-secret-change-in-prod",
 			resave: false,
 			saveUninitialized: false,
