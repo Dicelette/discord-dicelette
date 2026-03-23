@@ -85,6 +85,7 @@ if (process.env.DASHBOARD_ENABLED === "true") {
 		settings: client.settings,
 		userSettings: client.userSettings,
 		template: client.template,
+		botGuilds: client.guilds.cache,
 	});
 }
 

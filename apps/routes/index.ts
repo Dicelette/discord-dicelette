@@ -6,7 +6,7 @@ import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
-import authRoutes from "./auth";
+import { createAuthRouter } from "./auth";
 import { createGuildRouter } from "./guilds";
 
 const SessionStore = MemoryStore(session);
@@ -42,6 +42,7 @@ export interface DashboardDeps {
 	settings: Settings;
 	userSettings: Enmap<UserSettings>;
 	template: TemplateData;
+	botGuilds: { has: (id: string) => boolean };
 }
 
 export function startDashboardServer(deps: DashboardDeps): void {
@@ -96,7 +97,7 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		})
 	);
 
-	app.use("/api/auth", authRoutes);
+	app.use("/api/auth", createAuthRouter(deps.botGuilds));
 	app.use("/api/guilds", slidingWindowRateLimit, createGuildRouter(deps));
 
 	if (process.env.NODE_ENV === "production") {
