@@ -3,7 +3,7 @@ import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers
 import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from ".";
+import type { BotChannels, BotGuild, DashboardDeps } from ".";
 
 // ---------------------------------------------------------------------------
 // Character sheet cache: key = `${guildId}:${userId}`, TTL = 5 min
@@ -13,17 +13,16 @@ const charCache = new Map<string, { data: ApiCharacter[]; ts: number }>();
 
 // ---------------------------------------------------------------------------
 // Permission cache: key = `${userId}:${guildId}`, TTL = 5 min
-// Avoids 2 Discord API calls (members + roles) on every authenticated request
+// Avoids guild.fetchMember() (potentially an API call) on every request.
 // ---------------------------------------------------------------------------
 const PERM_CACHE_TTL = 5 * 60 * 1000;
 const permCache = new Map<string, { result: boolean; expiresAt: number }>();
 
-// ---------------------------------------------------------------------------
-// Guild resource caches (channels, roles): key = guildId, TTL = 5 min
-// ---------------------------------------------------------------------------
-const RESOURCE_CACHE_TTL = 5 * 60 * 1000;
-const channelCache = new Map<string, { data: unknown[]; expiresAt: number }>();
-const roleCache = new Map<string, { data: unknown[]; expiresAt: number }>();
+// Note: channelCache and roleCache have been removed — channels and roles are
+// now read directly from the Discord.js in-memory client cache (zero API calls),
+// so an additional TTL cache layer is unnecessary.
+
+const DISCORD_API = "https://discord.com/api/v10";
 
 interface EmbedField {
 	name: string;
@@ -32,7 +31,7 @@ interface EmbedField {
 interface RawEmbed {
 	title?: string;
 	thumbnail?: { url: string };
-	fields?: EmbedField[];
+	fields?: readonly EmbedField[];
 }
 interface ApiCharacter {
 	charName: string | null;
@@ -66,30 +65,25 @@ function classifyEmbed(embed: RawEmbed): "user" | "stats" | "damage" | null {
 async function fetchCharacterEmbeds(
 	channelId: string,
 	messageId: string,
-	botToken: string
+	botChannels: BotChannels
 ): Promise<{
 	avatar: string | null;
 	stats: EmbedField[] | null;
 	damage: EmbedField[] | null;
 }> {
-	const res = await fetch(`${DISCORD_API}/channels/${channelId}/messages/${messageId}`, {
-		headers: { Authorization: `Bot ${botToken}` },
-	});
-	if (!res.ok) return { avatar: null, stats: null, damage: null };
-	const msg = (await res.json()) as { embeds?: RawEmbed[] };
+	const msg = await botChannels.fetchMessage(channelId, messageId);
+	if (!msg) return { avatar: null, stats: null, damage: null };
 	let avatar: string | null = null;
 	let stats: EmbedField[] | null = null;
 	let damage: EmbedField[] | null = null;
-	for (const embed of msg.embeds ?? []) {
+	for (const embed of msg.embeds) {
 		const kind = classifyEmbed(embed);
 		if (kind === "user" && embed.thumbnail?.url) avatar = embed.thumbnail.url;
-		if (kind === "stats" && embed.fields?.length) stats = embed.fields;
-		if (kind === "damage" && embed.fields?.length) damage = embed.fields;
+		if (kind === "stats" && embed.fields?.length) stats = embed.fields as EmbedField[];
+		if (kind === "damage" && embed.fields?.length) damage = embed.fields as EmbedField[];
 	}
 	return { avatar, stats, damage };
 }
-
-const DISCORD_API = "https://discord.com/api/v10";
 
 /** Discord snowflake: 17-20 digit numeric string */
 const SNOWFLAKE_RE = /^\d{17,20}$/;
@@ -106,51 +100,36 @@ function requireAuth(req: Request, res: Response, next: () => void) {
 	next();
 }
 
-async function userCanManageGuild(userId: string, guildId: string): Promise<boolean> {
+/**
+ * Check if a user can manage a guild using the Discord.js client cache.
+ * Uses member.permissions (computed effective permissions) so no separate
+ * roles API call is needed. Results are cached for 5 minutes to avoid
+ * repeated guild.fetchMember() calls (which may hit the API for uncached members).
+ */
+async function userCanManageGuild(
+	userId: string,
+	guildId: string,
+	botGuilds: DashboardDeps["botGuilds"]
+): Promise<boolean> {
 	const cacheKey = `${userId}:${guildId}`;
 	const cached = permCache.get(cacheKey);
 	if (cached && Date.now() < cached.expiresAt) return cached.result;
 
-	const botToken = process.env.DISCORD_TOKEN;
-	if (!botToken) return false;
+	const guild = botGuilds.get(guildId);
+	if (!guild) {
+		permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+		return false;
+	}
+
 	try {
-		const memberRes = await fetch(`${DISCORD_API}/guilds/${guildId}/members/${userId}`, {
-			headers: { Authorization: `Bot ${botToken}` },
-		});
-		if (!memberRes.ok) {
+		const member = await guild.fetchMember(userId);
+		if (!member) {
 			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
 			return false;
 		}
-		const member = (await memberRes.json()) as { roles: string[] };
-
-		const rolesRes = await fetch(`${DISCORD_API}/guilds/${guildId}/roles`, {
-			headers: { Authorization: `Bot ${botToken}` },
-		});
-		if (!rolesRes.ok) {
-			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-			return false;
-		}
-		const guildRoles = (await rolesRes.json()) as Array<{
-			id: string;
-			permissions: string;
-		}>;
-
 		const ManageGuild = BigInt(0x20);
 		const Administrator = BigInt(0x8);
-
-		let result = false;
-		for (const role of guildRoles) {
-			if (role.id === guildId || member.roles.includes(role.id)) {
-				const perms = BigInt(role.permissions);
-				if (
-					(perms & ManageGuild) !== BigInt(0) ||
-					(perms & Administrator) !== BigInt(0)
-				) {
-					result = true;
-					break;
-				}
-			}
-		}
+		const result = member.hasPermission(ManageGuild) || member.hasPermission(Administrator);
 		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
 		return result;
 	} catch {
@@ -207,7 +186,7 @@ async function userCanManageGuildViaOAuth(
 }
 
 export function createGuildRouter(deps: DashboardDeps) {
-	const { settings, userSettings, template } = deps;
+	const { settings, userSettings, template, botGuilds, botChannels } = deps;
 	const router = Router();
 
 	// Validate guildId format for all /:guildId routes
@@ -229,7 +208,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
@@ -243,7 +222,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
@@ -297,91 +276,41 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
 		}
 
-		const cachedChannels = channelCache.get(guildId);
-		if (cachedChannels && Date.now() < cachedChannels.expiresAt) {
-			res.json(cachedChannels.data);
+		const guild = botGuilds.get(guildId);
+		if (!guild) {
+			res.status(404).json({ error: "Guild not found or bot not present" });
 			return;
 		}
 
-		const botToken = process.env.DISCORD_TOKEN;
-		if (!botToken) {
-			res.status(500).json({ error: "Bot token not configured" });
-			return;
-		}
-		try {
-			const r = await fetch(`${DISCORD_API}/guilds/${guildId}/channels`, {
-				headers: { Authorization: `Bot ${botToken}` },
-			});
-			if (!r.ok) {
-				res.status(r.status).json({ error: "Failed to fetch channels" });
-				return;
-			}
-			const channels = (await r.json()) as Array<{
-				id: string;
-				name: string;
-				type: number;
-			}>;
-			// 0=text, 4=category, 5=announcement, 15=forum
-			const filtered = channels.filter((c) => [0, 4, 5, 15].includes(c.type));
-			channelCache.set(guildId, {
-				data: filtered,
-				expiresAt: Date.now() + RESOURCE_CACHE_TTL,
-			});
-			res.json(filtered);
-		} catch {
-			res.status(500).json({ error: "Failed to fetch channels" });
-		}
+		// 0=text, 4=category, 5=announcement, 15=forum
+		const filtered = guild.channels.filter((c) => [0, 4, 5, 15].includes(c.type));
+		res.json(filtered);
 	});
 
 	router.get("/:guildId/roles", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
 		}
 
-		const cachedRoles = roleCache.get(guildId);
-		if (cachedRoles && Date.now() < cachedRoles.expiresAt) {
-			res.json(cachedRoles.data);
+		const guild = botGuilds.get(guildId);
+		if (!guild) {
+			res.status(404).json({ error: "Guild not found or bot not present" });
 			return;
 		}
 
-		const botToken = process.env.DISCORD_TOKEN;
-		if (!botToken) {
-			res.status(500).json({ error: "Bot token not configured" });
-			return;
-		}
-		try {
-			const r = await fetch(`${DISCORD_API}/guilds/${guildId}/roles`, {
-				headers: { Authorization: `Bot ${botToken}` },
-			});
-			if (!r.ok) {
-				res.status(r.status).json({ error: "Failed to fetch roles" });
-				return;
-			}
-			const allRoles = (await r.json()) as Array<{
-				id: string;
-				name: string;
-				color: number;
-			}>;
-			const filtered = allRoles.filter((role) => role.name !== "@everyone");
-			roleCache.set(guildId, {
-				data: filtered,
-				expiresAt: Date.now() + RESOURCE_CACHE_TTL,
-			});
-			res.json(filtered);
-		} catch {
-			res.status(500).json({ error: "Failed to fetch roles" });
-		}
+		// @everyone is already excluded by the botGuilds adapter
+		res.json(guild.roles);
 	});
 
 	router.get("/:guildId/invite", requireAuth, async (req: Request, res: Response) => {
@@ -457,7 +386,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 			const guildId = req.params.guildId as string;
 			const userId = req.session.userId!;
 
-			const isAdmin = await userCanManageGuild(userId, guildId);
+			const isAdmin = await userCanManageGuild(userId, guildId, botGuilds);
 			const userConfig = userSettings.get(guildId, userId) ?? null;
 
 			res.json({ isAdmin, userConfig });
@@ -525,7 +454,6 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 		const cacheKey = `${guildId}:${userId}`;
-		const botToken = process.env.DISCORD_TOKEN;
 
 		const cached = charCache.get(cacheKey);
 		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
@@ -550,16 +478,14 @@ export function createGuildRouter(deps: DashboardDeps) {
 				let avatar: string | null = null;
 				let stats: EmbedField[] | null = null;
 				let damage: EmbedField[] | null = null;
-				if (botToken) {
-					try {
-						({ avatar, stats, damage } = await fetchCharacterEmbeds(
-							channelId,
-							messageId,
-							botToken
-						));
-					} catch {
-						// silently ignore fetch errors
-					}
+				try {
+					({ avatar, stats, damage } = await fetchCharacterEmbeds(
+						channelId,
+						messageId,
+						botChannels
+					));
+				} catch {
+					// silently ignore fetch errors
 				}
 				return {
 					charName: char.charName ?? null,
@@ -596,7 +522,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
@@ -615,24 +541,17 @@ export function createGuildRouter(deps: DashboardDeps) {
 			res.status(404).json({ error: "No template registered" });
 			return;
 		}
-		const botToken = process.env.DISCORD_TOKEN;
-		if (!botToken) {
-			res.status(500).json({ error: "Bot token not configured" });
-			return;
-		}
+
 		try {
-			const msgRes = await fetch(
-				`${DISCORD_API}/channels/${config.templateID.channelId}/messages/${config.templateID.messageId}`,
-				{ headers: { Authorization: `Bot ${botToken}` } }
+			const msg = await botChannels.fetchMessage(
+				config.templateID.channelId,
+				config.templateID.messageId
 			);
-			if (!msgRes.ok) {
+			if (!msg) {
 				res.status(404).json({ error: "Template message not found" });
 				return;
 			}
-			const msg = (await msgRes.json()) as {
-				attachments?: Array<{ filename: string; url: string }>;
-			};
-			const attachment = msg.attachments?.find((a) => a.filename === "template.json");
+			const attachment = msg.attachments.find((a) => a.filename === "template.json");
 			if (!attachment) {
 				res.status(404).json({ error: "Template attachment not found" });
 				return;
@@ -649,7 +568,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
@@ -706,7 +625,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 			const guildId = req.params.guildId as string;
 			const userId = req.session.userId!;
 
-			const canManage = await userCanManageGuild(userId, guildId);
+			const canManage = await userCanManageGuild(userId, guildId, botGuilds);
 			if (!canManage) {
 				res.status(403).json({ error: "Insufficient permissions" });
 				return;
