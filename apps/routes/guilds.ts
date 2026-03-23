@@ -158,6 +158,54 @@ async function userCanManageGuild(userId: string, guildId: string): Promise<bool
 	}
 }
 
+/**
+ * Check if a user can manage a guild using their OAuth access token.
+ * Used for guilds where the bot is not yet present (e.g. the /invite endpoint),
+ * since the bot token cannot fetch members/roles from guilds it hasn't joined.
+ * The permissions field returned by /users/@me/guilds encodes all effective
+ * permissions for the user in that guild.
+ */
+async function userCanManageGuildViaOAuth(
+	userId: string,
+	guildId: string,
+	accessToken: string
+): Promise<boolean> {
+	const cacheKey = `oauth:${userId}:${guildId}`;
+	const cached = permCache.get(cacheKey);
+	if (cached && Date.now() < cached.expiresAt) return cached.result;
+
+	try {
+		const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+		});
+		if (!res.ok) {
+			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+			return false;
+		}
+		const guilds = (await res.json()) as Array<{
+			id: string;
+			owner: boolean;
+			permissions: string;
+		}>;
+		const guild = guilds.find((g) => g.id === guildId);
+		if (!guild) {
+			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+			return false;
+		}
+		const ManageGuild = BigInt(0x20);
+		const Administrator = BigInt(0x8);
+		const perms = BigInt(guild.permissions);
+		const result =
+			guild.owner ||
+			(perms & ManageGuild) !== BigInt(0) ||
+			(perms & Administrator) !== BigInt(0);
+		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
+		return result;
+	} catch {
+		return false;
+	}
+}
+
 export function createGuildRouter(deps: DashboardDeps) {
 	const { settings, userSettings, template } = deps;
 	const router = Router();
@@ -339,8 +387,11 @@ export function createGuildRouter(deps: DashboardDeps) {
 	router.get("/:guildId/invite", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
+		const accessToken = req.session.accessToken!;
 
-		const canManage = await userCanManageGuild(userId, guildId);
+		// Use the user's OAuth token here: the bot is not yet in this guild so
+		// the bot-token-based userCanManageGuild would always return false.
+		const canManage = await userCanManageGuildViaOAuth(userId, guildId, accessToken);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
