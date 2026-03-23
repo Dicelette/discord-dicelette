@@ -1,9 +1,11 @@
 /** biome-ignore-all lint/style/useNamingConvention: Legacy compatibility */
 
 import process from "node:process";
+import dotenv from "dotenv";
 import type { Translation } from "..";
 import type { TemplateResult } from "./database";
 
+dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 export const MIN_THRESHOLD_MATCH = 0.5;
 
 export const TUTORIAL_IMAGES = [
@@ -32,9 +34,9 @@ export const LINKS = {
 	},
 	icons: {
 		dev: {
-			discord: "1459934829385875690",
-			github: "1459936027769700621",
-			kofi: "1459935650173292853",
+			discord: `${process.env.DISCORD ?? "1485724806870470678"}`,
+			github: `${process.env.GITHUB ?? "1485724832711573706"}`,
+			kofi: `${process.env.KOFI ?? "1485724863485448323"}`,
 		},
 		prod: {
 			discord: "1459974851006562396",
@@ -50,7 +52,7 @@ export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
 // Regex patterns for dice detection
 
 const MATH = {
-	dev: "<:math:1394002307431010334>_ _",
+	dev: `<:math:${process.env.MATH ?? "1485724779813273680"}>_ _`,
 	prod: "<:math:1394002540143710358>_ _",
 } as const;
 
