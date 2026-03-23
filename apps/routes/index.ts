@@ -98,7 +98,7 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	if (process.env.NODE_ENV === "production") {
 		const distPath = new URL("../../../apps/web/dist", import.meta.url).pathname;
 		app.use(express.static(distPath));
-		app.get("*", (_req, res) => {
+		app.get("/{*path}", (_req, res) => {
 			res.sendFile(
 				new URL("../../../apps/web/dist/index.html", import.meta.url).pathname
 			);
