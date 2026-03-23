@@ -144,13 +144,14 @@ router.post("/logout", (req: Request, res: Response) => {
 	});
 });
 
-// Fix 3: only invalidate the current user's own cache, not the shared bot cache
 router.post("/guilds/refresh", (req: Request, res: Response) => {
 	if (!req.session.accessToken) {
 		res.status(401).json({ error: "Not authenticated" });
 		return;
 	}
 	if (req.session.userId) userGuildCache.delete(req.session.userId);
+	// Also invalidate the bot guild cache so newly joined guilds are picked up immediately
+	botGuildCache = null;
 	res.json({ ok: true });
 });
 
