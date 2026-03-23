@@ -22,10 +22,11 @@ export default defineConfig({
 	build: {
 		rolldownOptions: {
 			output: {
-				manualChunks: {
-					react: ["react", "react-dom", "react-router-dom"],
-					mui: ["@mui/material", "@mui/icons-material", "@emotion/react", "@emotion/styled"],
-					dicelette: ["@dicelette/core"],
+				manualChunks: (id) => {
+					if (id.includes("react-dom") || id.includes("react-router") || id.includes("/react/"))
+						return "react";
+					if (id.includes("@mui/") || id.includes("@emotion/")) return "mui";
+					if (id.includes("@dicelette/core")) return "dicelette";
 				},
 			},
 		},
