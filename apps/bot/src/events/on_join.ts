@@ -1,9 +1,11 @@
+import type { EventEmitter } from "node:events";
 import type { EClient } from "@dicelette/client";
 import { logger } from "@dicelette/utils";
 import { GUILD_ONLY_COMMANDS, helpAtInvit } from "commands";
 
-export default (client: EClient): void => {
+export default (client: EClient, guildEvents?: EventEmitter): void => {
 	client.on("guildCreate", async (guild) => {
+		guildEvents?.emit("guildCreate", guild.id);
 		try {
 			client.characters.set(guild.id, {});
 			client.template.set(guild.id, {});

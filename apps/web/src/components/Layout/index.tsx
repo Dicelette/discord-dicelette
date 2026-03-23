@@ -2,6 +2,7 @@ import { DarkMode, LibraryBooks, LightMode } from "@mui/icons-material";
 import {
 	AppBar,
 	Box,
+	Button,
 	IconButton,
 	MenuItem,
 	Select,
@@ -10,7 +11,7 @@ import {
 	Typography,
 	useColorScheme,
 } from "@mui/material";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { type Locale, useI18n } from "../../i18n";
 import UserAvatarMenu from "./UserAvatarMenu";
@@ -33,12 +34,18 @@ export default function Layout() {
 				sx={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
 			>
 				<Toolbar sx={{ gap: 2, backgroundColor: "var(--appbar-bg)" }}>
-					<Box className="flex items-center gap-2" sx={{ flexGrow: 1 }}>
+					<Button
+						component={Link}
+						to="/"
+						color="inherit"
+						sx={{ textTransform: "none", gap: 1, flexGrow: 0 }}
+					>
 						<img src="/logo.png" alt="Dicelette" style={{ height: 28, width: 28 }} />
-						<Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
+						<Typography variant="h6" component="span" sx={{ fontWeight: 700 }}>
 							{t("login.title")}
 						</Typography>
-					</Box>
+					</Button>
+					<Box sx={{ flexGrow: 1 }} />
 
 					<Tooltip title={t("common.documentation")}>
 						<IconButton

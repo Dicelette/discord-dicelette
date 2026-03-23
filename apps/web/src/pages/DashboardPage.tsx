@@ -8,11 +8,15 @@ import {
 	Tabs,
 	Typography,
 } from "@mui/material";
-import { Suspense, lazy, startTransition, useEffect, useState } from "react";
+import { lazy, Suspense, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CharactersTab from "../components/CharactersTab";
 import GuildConfigForm from "../components/GuildConfigForm";
-const ModelConfigForm = lazy(() => import("../components/GuildConfigForm/ModelConfigForm"));
+
+const ModelConfigForm = lazy(
+	() => import("../components/GuildConfigForm/ModelConfigForm")
+);
+
 import type { Channel, Role } from "../components/GuildConfigForm/types";
 import UserConfigForm from "../components/UserConfigForm";
 import { useI18n } from "../i18n";

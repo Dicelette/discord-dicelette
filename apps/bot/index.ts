@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
+import { EventEmitter } from "node:events";
 import process from "node:process";
-import { startDashboardServer } from "@dicelette/dashboard";
 import {
 	humanizeDuration,
 	important,
@@ -14,6 +14,7 @@ import * as event from "event";
 import express from "express";
 import packageJson from "../../package.json" with { type: "json" };
 import "uniformize";
+import { startBotDashboard } from "./src/dashboard";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 setupProcessErrorHandlers();
@@ -35,10 +36,12 @@ export const VERSION = packageJson.version ?? "/";
 export const PRIVATE_ID = (process.env.PRIVATE_ID ?? "453162143668371456")
 	.split(",")
 	.map((id) => id.trim());
+const guildEvents = new EventEmitter();
+
 try {
 	event.ready(client);
 	event.onInteraction(client);
-	event.onJoin(client);
+	event.onJoin(client, guildEvents);
 	event.onMessageSend(client);
 	event.onKick(client);
 	event.onDeleteMessage(client);
@@ -81,11 +84,7 @@ app.listen(process.env.PORT || 3000, () => {
 
 if (process.env.DASHBOARD_ENABLED === "true") {
 	logger.trace("Starting dashboard server...");
-	startDashboardServer({
-		settings: client.settings,
-		userSettings: client.userSettings,
-		template: client.template,
-	});
+	startBotDashboard(client, guildEvents);
 }
 
 client
