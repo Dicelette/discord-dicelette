@@ -58,7 +58,7 @@ function setNestedKey(obj: any, keyPath: string, value: string) {
 function getLocalesPath(): string {
 	if (BUILD_MODE) {
 		const root = findRoot(SOURCE_PATH, "pnpm-workspace.yaml");
-		return path.join(root, "dist/apps/localization/locales");
+		return path.join(root, "dist/packages/localization/locales");
 	}
 	return path.resolve(SOURCE_PATH, "../locales");
 }
