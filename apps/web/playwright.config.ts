@@ -1,13 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
-import os from "node:os";
-import path from "node:path";
 
 // Points to the Chromium binary already cached on the machine.
 // Run `npx playwright install chromium` if you want Playwright to manage its own copy.
-const CHROMIUM_EXECUTABLE = path.join(
-	os.homedir(),
-	".cache/ms-playwright/chromium-1194/chrome-linux/chrome"
-);
 
 export default defineConfig({
 	testDir: "./tests/e2e",
@@ -38,8 +32,6 @@ export default defineConfig({
 			name: "chromium",
 			use: {
 				...devices["Desktop Chrome"],
-				// Use the locally cached Chromium instead of downloading a new one
-				launchOptions: { executablePath: CHROMIUM_EXECUTABLE },
 			},
 		},
 	],

@@ -14,14 +14,16 @@
  *   });
  */
 
-import type { Page } from "@playwright/test";
+import en from "@i18n/en.json" with { type: "json" };
+import fr from "@i18n/fr.json" with { type: "json" };
 import type {
 	ApiCharacter,
 	ApiGuildConfig,
 	ApiUserConfig,
 	DiscordGuild,
 	DiscordUser,
-} from "../../../src/lib/api";
+} from "@lib/api";
+import type { Page } from "@playwright/test";
 
 // ---------------------------------------------------------------------------
 // Données de test réutilisables
@@ -32,6 +34,7 @@ export const MOCK_USER: DiscordUser = {
 	username: "TestUser",
 	discriminator: "0",
 	avatar: null,
+	// biome-ignore lint/style/useNamingConvention: Bruh bruh discord bruh
 	global_name: "Test User",
 };
 
@@ -203,3 +206,10 @@ export async function mockCharacters(
 		route.fulfill({ json: characters })
 	);
 }
+
+// ---- Mock du langage, pas réellement un i18n parce que justement on test pas ça ici, juste la présence de certaines chaînes en fonction de la config de langue. ----
+
+export const languages = {
+	en: en,
+	fr: fr,
+} as const;

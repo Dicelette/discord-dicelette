@@ -33,9 +33,9 @@ export const LINKS = {
 		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=mara-li&labels=enhancement%2Ctriage%2Cfrench&projects=&template=Request_french.yml&title=%5BFR%5D%3A+",
 	},
 	icons: {
-		discord: process.env.DISCORD ?? "1459934829385875690",
-		github: process.env.GITHUB ?? "1459936027769700621",
-		kofi: process.env.KOFI ?? "1459935650173292853",
+		discord: process.env.DISCORD_EMOJI_ID ?? "1459934829385875690",
+		github: process.env.GITHUB_EMOJI_ID ?? "1459936027769700621",
+		kofi: process.env.KOFI_EMOJI_ID ?? "1459935650173292853",
 	},
 } as const;
 
@@ -49,7 +49,7 @@ export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
 	prod: "<:math:1394002540143710358>_ _",
 } as const;
 */
-export const EMOJI_MATH = `<:math:${process.env.MATH ?? "1394002540143710358"}>_ _`;
+export const EMOJI_MATH = `<:math:${process.env.MATH_EMOJI_ID ?? "1394002540143710358"}>_ _`;
 
 export const AND = "&";
 
