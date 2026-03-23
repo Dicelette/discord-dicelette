@@ -8,11 +8,11 @@ import {
 	Tabs,
 	Typography,
 } from "@mui/material";
-import { startTransition, useEffect, useState } from "react";
+import { Suspense, lazy, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CharactersTab from "../components/CharactersTab";
 import GuildConfigForm from "../components/GuildConfigForm";
-import ModelConfigForm from "../components/GuildConfigForm/ModelConfigForm";
+const ModelConfigForm = lazy(() => import("../components/GuildConfigForm/ModelConfigForm"));
 import type { Channel, Role } from "../components/GuildConfigForm/types";
 import UserConfigForm from "../components/UserConfigForm";
 import { useI18n } from "../i18n";
@@ -142,14 +142,16 @@ export default function DashboardPage() {
 			)}
 			{isAdmin && config && mountedTabs.has("template") && (
 				<Box sx={{ display: tab === "template" ? undefined : "none" }}>
-					<ModelConfigForm
-						config={config}
-						guildId={guildId!}
-						onSave={handleSave}
-						saving={saving}
-						channels={channels}
-						roles={roles}
-					/>
+					<Suspense fallback={<CircularProgress />}>
+						<ModelConfigForm
+							config={config}
+							guildId={guildId!}
+							onSave={handleSave}
+							saving={saving}
+							channels={channels}
+							roles={roles}
+						/>
+					</Suspense>
 				</Box>
 			)}
 			{mountedTabs.has("user") && (
