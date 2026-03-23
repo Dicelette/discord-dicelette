@@ -23,7 +23,11 @@ export default defineConfig({
 		rolldownOptions: {
 			output: {
 				manualChunks: (id) => {
-					if (id.includes("react-dom") || id.includes("react-router") || id.includes("/react/"))
+					if (
+						id.includes("react-dom") ||
+						id.includes("react-router") ||
+						id.includes("/react/")
+					)
 						return "react";
 					if (id.includes("@mui/") || id.includes("@emotion/")) return "mui";
 					if (id.includes("@dicelette/core")) return "dicelette";

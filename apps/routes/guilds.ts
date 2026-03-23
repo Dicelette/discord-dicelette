@@ -3,7 +3,7 @@ import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers
 import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import type { BotChannels, BotGuild, DashboardDeps } from ".";
+import type { BotChannels, DashboardDeps } from ".";
 
 // ---------------------------------------------------------------------------
 // Character sheet cache: key = `${guildId}:${userId}`, TTL = 5 min
@@ -129,7 +129,8 @@ async function userCanManageGuild(
 		}
 		const ManageGuild = BigInt(0x20);
 		const Administrator = BigInt(0x8);
-		const result = member.hasPermission(ManageGuild) || member.hasPermission(Administrator);
+		const result =
+			member.hasPermission(ManageGuild) || member.hasPermission(Administrator);
 		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
 		return result;
 	} catch {
