@@ -201,26 +201,37 @@ const userGuildCache = new Map<string, { guilds: DiscordGuild[]; expiresAt: numb
 const USER_GUILD_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 let botGuildCache: { ids: Set<string>; expiresAt: number } | null = null;
+let botGuildCacheFetch: Promise<Set<string>> | null = null;
 const BOT_GUILD_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 async function getBotGuildIds(): Promise<Set<string>> {
 	if (botGuildCache && Date.now() < botGuildCache.expiresAt) {
 		return botGuildCache.ids;
 	}
+	// Deduplicate concurrent requests: if a fetch is already in flight, reuse it
+	if (botGuildCacheFetch) return botGuildCacheFetch;
+
 	const botToken = process.env.DISCORD_TOKEN;
 	if (!botToken) return new Set();
-	try {
-		const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
-			headers: { Authorization: `Bot ${botToken}` },
-		});
-		if (!res.ok) return new Set();
-		const guilds = (await res.json()) as Array<{ id: string }>;
-		const ids = new Set(guilds.map((g) => g.id));
-		botGuildCache = { ids, expiresAt: Date.now() + BOT_GUILD_CACHE_TTL_MS };
-		return ids;
-	} catch {
-		return new Set();
-	}
+
+	botGuildCacheFetch = (async () => {
+		try {
+			const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
+				headers: { Authorization: `Bot ${botToken}` },
+			});
+			if (!res.ok) return new Set<string>();
+			const guilds = (await res.json()) as Array<{ id: string }>;
+			const ids = new Set(guilds.map((g) => g.id));
+			botGuildCache = { ids, expiresAt: Date.now() + BOT_GUILD_CACHE_TTL_MS };
+			return ids;
+		} catch {
+			return new Set<string>();
+		}
+	})().finally(() => {
+		botGuildCacheFetch = null;
+	});
+
+	return botGuildCacheFetch;
 }
 
 export default router;
