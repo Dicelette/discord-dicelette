@@ -135,15 +135,15 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		})
 	);
 
-	// Auth routes: 10 req/min — protects Discord OAuth calls (guild list, token exchange)
+	// Auth routes: 60 req/min per user — protects Discord OAuth calls (guild list, token exchange)
 	// Refresh endpoint has an additional stricter limit defined within createAuthRouter
 	app.use(
 		"/api/auth",
-		makeRateLimit(10, 60_000),
+		makeRateLimit(60, 60_000),
 		createAuthRouter(deps.botGuilds, deps.guildEvents)
 	);
-	// Guild data routes: 30 req/min — protects Discord.js member fetches and settings writes
-	app.use("/api/guilds", makeRateLimit(30, 60_000), createGuildRouter(deps));
+	// Guild data routes: 120 req/min per user — protects Discord.js member fetches and settings writes
+	app.use("/api/guilds", makeRateLimit(120, 60_000), createGuildRouter(deps));
 
 	if (process.env.NODE_ENV === "production") {
 		const distPath = new URL("../../../apps/web/dist", import.meta.url).pathname;
