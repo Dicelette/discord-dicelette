@@ -27,7 +27,9 @@ export default function DashboardPage() {
 	const { t } = useI18n();
 
 	const [tab, setTab] = useState<ActiveTab>("admin");
-	const [mountedTabs, setMountedTabs] = useState<Set<ActiveTab>>(() => new Set(["admin"]));
+	const [mountedTabs, setMountedTabs] = useState<Set<ActiveTab>>(
+		() => new Set(["admin"])
+	);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
@@ -116,7 +118,7 @@ export default function DashboardPage() {
 			<Tabs
 				value={tab}
 				onChange={(_, v: ActiveTab) => {
-					setMountedTabs(prev => prev.has(v) ? prev : new Set([...prev, v]));
+					setMountedTabs((prev) => (prev.has(v) ? prev : new Set([...prev, v])));
 					startTransition(() => setTab(v));
 				}}
 				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
