@@ -103,7 +103,8 @@ export class EClient extends Djs.Client {
 			fs.writeFileSync(this.statusPath, JSON.stringify(this.status), "utf-8");
 		}
 
-		if (process.env.PROD) enmapSettings.dataDir = path.resolve(".\\data_prod");
+		if (process.env.E2E) enmapSettings.dataDir = path.resolve(".\\data_e2e");
+		else if (process.env.PROD) enmapSettings.dataDir = path.resolve(".\\data_prod");
 
 		this.settings = new Enmap(enmapSettings);
 
