@@ -18,8 +18,7 @@ import {
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "../i18n";
-import type { DiscordGuild } from "../lib/api";
-import { authApi, guildApi } from "../lib/api";
+import { authApi, type DiscordGuild, guildApi } from "../lib/api";
 
 export default function ServerSelectPage() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
@@ -45,8 +44,17 @@ export default function ServerSelectPage() {
 			await authApi.refreshGuilds();
 			const res = await authApi.guilds();
 			setGuilds(res.data);
-		} catch {
-			setError(t("servers.loadError"));
+		} catch (err: unknown) {
+			const status =
+				err &&
+				typeof err === "object" &&
+				"response" in err &&
+				err.response &&
+				typeof err.response === "object" &&
+				"status" in err.response
+					? (err.response as { status: number }).status
+					: undefined;
+			setError(status === 429 ? t("servers.rateLimitError") : t("servers.loadError"));
 		} finally {
 			setRefreshing(false);
 		}
@@ -62,11 +70,15 @@ export default function ServerSelectPage() {
 		const res = await guildApi.addBot(guild.id);
 		window.open(res.data.url, "_blank");
 
-		const onFocus = () => {
-			window.removeEventListener("focus", onFocus);
-			handleRefresh();
+		const es = new EventSource("/api/auth/guild-events", { withCredentials: true });
+		es.onmessage = (e: MessageEvent) => {
+			const data = JSON.parse(e.data) as { guildId: string };
+			if (data.guildId === guild.id) {
+				es.close();
+				handleRefresh();
+			}
 		};
-		window.addEventListener("focus", onFocus);
+		es.onerror = () => es.close();
 	};
 
 	if (loading) {

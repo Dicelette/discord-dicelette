@@ -10,7 +10,7 @@ function makeRefreshRateLimit() {
 	const buckets = new Map<string, number[]>();
 	const MAX = 5;
 	const WINDOW_MS = 60_000;
-	return function (req: Request, res: Response, next: NextFunction): void {
+	return (req: Request, res: Response, next: NextFunction): void => {
 		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
 		const now = Date.now();
 		const cutoff = now - WINDOW_MS;
@@ -79,7 +79,10 @@ async function discordFetch(path: string, accessToken: string) {
 const userGuildCache = new Map<string, { guilds: DiscordGuild[]; expiresAt: number }>();
 const USER_GUILD_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-export function createAuthRouter(botGuilds: { has: (id: string) => boolean }) {
+export function createAuthRouter(
+	botGuilds: { has: (id: string) => boolean },
+	guildEvents: import("node:events").EventEmitter
+) {
 	const router = Router();
 
 	// Fix 1: generate a random state and store it in session to prevent OAuth CSRF
@@ -216,7 +219,8 @@ export function createAuthRouter(botGuilds: { has: (id: string) => boolean }) {
 			const filteredGuilds = userGuilds
 				.filter((g) => {
 					const botPresent = botGuilds.has(g.id);
-					const isAdmin = g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
+					const isAdmin =
+						g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
 					return botPresent || isAdmin;
 				})
 				.map((g) => ({ ...g, botPresent: botGuilds.has(g.id) }));
@@ -226,6 +230,36 @@ export function createAuthRouter(botGuilds: { has: (id: string) => boolean }) {
 			console.error("Guilds fetch error:", err);
 			res.status(500).json({ error: "Failed to fetch guilds" });
 		}
+	});
+
+	router.get("/guild-events", (req: Request, res: Response) => {
+		if (!req.session.userId) {
+			res.status(401).end();
+			return;
+		}
+
+		res.setHeader("Content-Type", "text/event-stream");
+		res.setHeader("Cache-Control", "no-cache");
+		res.setHeader("Connection", "keep-alive");
+		res.flushHeaders();
+
+		const onGuildCreate = (guildId: string) => {
+			res.write(`data: ${JSON.stringify({ guildId })}\n\n`);
+		};
+		guildEvents.on("guildCreate", onGuildCreate);
+
+		const timeout = setTimeout(
+			() => {
+				guildEvents.off("guildCreate", onGuildCreate);
+				res.end();
+			},
+			5 * 60 * 1000
+		);
+
+		req.on("close", () => {
+			clearTimeout(timeout);
+			guildEvents.off("guildCreate", onGuildCreate);
+		});
 	});
 
 	return router;

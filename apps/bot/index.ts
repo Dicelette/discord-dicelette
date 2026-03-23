@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/suspicious/noTsIgnore: LET ME ALOOOOOOONE */
+import { EventEmitter } from "node:events";
 import process from "node:process";
 import { startDashboardServer } from "@dicelette/dashboard";
 import {
@@ -81,7 +82,10 @@ app.listen(process.env.PORT || 3000, () => {
 
 if (process.env.DASHBOARD_ENABLED === "true") {
 	logger.trace("Starting dashboard server...");
+	const guildEvents = new EventEmitter();
+	client.on("guildCreate", (guild) => guildEvents.emit("guildCreate", guild.id));
 	startDashboardServer({
+		guildEvents,
 		settings: client.settings,
 		userSettings: client.userSettings,
 		template: client.template,
@@ -96,11 +100,9 @@ if (process.env.DASHBOARD_ENABLED === "true") {
 							// Check in-memory cache first (populated by GuildMembers intent),
 							// fall back to API only if the member isn't cached yet.
 							const m =
-								guild.members.cache.get(userId) ??
-								(await guild.members.fetch(userId));
+								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
 							return {
-								hasPermission: (flag: bigint) =>
-									(m.permissions.bitfield & flag) !== 0n,
+								hasPermission: (flag: bigint) => (m.permissions.bitfield & flag) !== 0n,
 							};
 						} catch {
 							return null;

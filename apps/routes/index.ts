@@ -80,6 +80,7 @@ export interface DashboardDeps {
 		get: (id: string) => BotGuild | undefined;
 	};
 	botChannels: BotChannels;
+	guildEvents: import("node:events").EventEmitter;
 }
 
 export function startDashboardServer(deps: DashboardDeps): void {
@@ -136,7 +137,11 @@ export function startDashboardServer(deps: DashboardDeps): void {
 
 	// Auth routes: 10 req/min — protects Discord OAuth calls (guild list, token exchange)
 	// Refresh endpoint has an additional stricter limit defined within createAuthRouter
-	app.use("/api/auth", makeRateLimit(10, 60_000), createAuthRouter(deps.botGuilds));
+	app.use(
+		"/api/auth",
+		makeRateLimit(10, 60_000),
+		createAuthRouter(deps.botGuilds, deps.guildEvents)
+	);
 	// Guild data routes: 30 req/min — protects Discord.js member fetches and settings writes
 	app.use("/api/guilds", makeRateLimit(30, 60_000), createGuildRouter(deps));
 

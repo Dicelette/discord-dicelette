@@ -95,6 +95,8 @@
 		"addBotTitle": "Ajouter Dicelette",
 		"botPresent": "Dicelette est présent",
 		"loadError": "Impossible de charger les serveurs.",
+		"rateLimitError": "Trop de requêtes. Veuillez patienter avant d'actualiser à nouveau.",
+		"addBotPending": "Bot ajouté ? Cliquez sur Actualiser pour mettre à jour la liste.",
 		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
 		"refresh": "Actualiser",
 		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
