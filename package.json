@@ -30,7 +30,8 @@
 		"prerelease": "tsc --skipLibCheck --noEmit",
 		"release": "commit-and-tag-version",
 		"postrelease": "git push --follow-tags origin main",
-		"test": "vitest run"
+		"test": "vitest run",
+		"test:e2e": "pnpm --filter @dicelette/web test:e2e"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [

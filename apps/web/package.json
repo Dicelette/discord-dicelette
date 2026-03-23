@@ -7,7 +7,10 @@
 		"dev": "vite",
 		"build": "tsc -p tsconfig.json && vite build",
 		"preview": "vite preview",
-		"lint": "biome check --write . --unsafe "
+		"lint": "biome check --write . --unsafe ",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed"
 	},
 	"dependencies": {
 		"@dicelette/types": "workspace:*",
@@ -19,9 +22,11 @@
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-hook-form": "^7.72.0",
-		"react-router-dom": "^7.13.1"
+		"react-router-dom": "^7.13.1",
+		"@dicelette/localization": "workspace:*"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.58.2",
 		"@tailwindcss/postcss": "^4.2.2",
 		"@types/node": "^25.5.0",
 		"@types/react": "^19.2.14",
