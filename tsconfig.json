@@ -37,7 +37,7 @@
 			"locales": ["apps/bot/src/locales.js"],
 			"messages": ["apps/bot/src/messages/index.js"],
 			"utils": ["apps/bot/src/utils/index.js"],
-			"@dicelette/dashboard": ["apps/dashboard/index.js"]
+			"@dicelette/dashboard": ["apps/routes/index.js"]
 		},
 		"removeComments": true,
 		"resolveJsonModule": true,

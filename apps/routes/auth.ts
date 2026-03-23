@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
 import { Router } from "express";
 
@@ -22,6 +23,7 @@ declare module "express-session" {
 		refreshToken?: string;
 		userId?: string;
 		user?: DiscordUser;
+		oauthState?: string;
 	}
 }
 
@@ -49,18 +51,31 @@ async function discordFetch(path: string, accessToken: string) {
 	return res.json();
 }
 
-router.get("/discord", (_req: Request, res: Response) => {
+// Fix 1: generate a random state and store it in session to prevent OAuth CSRF
+router.get("/discord", (req: Request, res: Response) => {
+	const state = randomBytes(16).toString("hex");
+	req.session.oauthState = state;
 	const params = new URLSearchParams({
 		client_id: clientId()!,
 		redirect_uri: redirectUri(),
 		response_type: "code",
 		scope: OAUTH_SCOPES,
+		state,
 	});
 	res.redirect(`https://discord.com/oauth2/authorize?${params}`);
 });
 
 router.get("/callback", async (req: Request, res: Response) => {
-	const { code } = req.query;
+	const { code, state } = req.query;
+
+	// Fix 1 (cont.): validate state before doing anything else
+	if (!state || typeof state !== "string" || state !== req.session.oauthState) {
+		res.status(400).json({ error: "Invalid OAuth state" });
+		return;
+	}
+	// Consume the state immediately so it can't be replayed
+	delete req.session.oauthState;
+
 	if (!code || typeof code !== "string") {
 		res.status(400).json({ error: "Missing code" });
 		return;
@@ -82,7 +97,7 @@ router.get("/callback", async (req: Request, res: Response) => {
 		if (!tokenRes.ok) {
 			const err = await tokenRes.text();
 			console.error("Token exchange failed:", tokenRes.status, err);
-			res.status(500).json({ error: "Token exchange failed", detail: err });
+			res.status(500).json({ error: "Token exchange failed" });
 			return;
 		}
 
@@ -92,6 +107,14 @@ router.get("/callback", async (req: Request, res: Response) => {
 		};
 
 		const user = (await discordFetch("/users/@me", tokens.access_token)) as DiscordUser;
+
+		// Fix 2: regenerate session ID after successful login to prevent session fixation
+		await new Promise<void>((resolve, reject) => {
+			req.session.regenerate((err) => {
+				if (err) reject(err);
+				else resolve();
+			});
+		});
 
 		req.session.accessToken = tokens.access_token;
 		req.session.refreshToken = tokens.refresh_token;
@@ -121,12 +144,12 @@ router.post("/logout", (req: Request, res: Response) => {
 	});
 });
 
+// Fix 3: only invalidate the current user's own cache, not the shared bot cache
 router.post("/guilds/refresh", (req: Request, res: Response) => {
 	if (!req.session.accessToken) {
 		res.status(401).json({ error: "Not authenticated" });
 		return;
 	}
-	botGuildCache = null;
 	if (req.session.userId) userGuildCache.delete(req.session.userId);
 	res.json({ ok: true });
 });

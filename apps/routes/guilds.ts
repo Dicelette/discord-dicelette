@@ -3,13 +3,27 @@ import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers
 import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from "../index.js";
+import type { DashboardDeps } from ".";
 
 // ---------------------------------------------------------------------------
 // Character sheet cache: key = `${guildId}:${userId}`, TTL = 5 min
 // ---------------------------------------------------------------------------
 const CHAR_CACHE_TTL = 5 * 60 * 1000;
 const charCache = new Map<string, { data: ApiCharacter[]; ts: number }>();
+
+// ---------------------------------------------------------------------------
+// Permission cache: key = `${userId}:${guildId}`, TTL = 5 min
+// Avoids 2 Discord API calls (members + roles) on every authenticated request
+// ---------------------------------------------------------------------------
+const PERM_CACHE_TTL = 5 * 60 * 1000;
+const permCache = new Map<string, { result: boolean; expiresAt: number }>();
+
+// ---------------------------------------------------------------------------
+// Guild resource caches (channels, roles): key = guildId, TTL = 5 min
+// ---------------------------------------------------------------------------
+const RESOURCE_CACHE_TTL = 5 * 60 * 1000;
+const channelCache = new Map<string, { data: unknown[]; expiresAt: number }>();
+const roleCache = new Map<string, { data: unknown[]; expiresAt: number }>();
 
 interface EmbedField {
 	name: string;
@@ -77,6 +91,13 @@ async function fetchCharacterEmbeds(
 
 const DISCORD_API = "https://discord.com/api/v10";
 
+/** Discord snowflake: 17-20 digit numeric string */
+const SNOWFLAKE_RE = /^\d{17,20}$/;
+
+function isValidSnowflake(id: string): boolean {
+	return SNOWFLAKE_RE.test(id);
+}
+
 function requireAuth(req: Request, res: Response, next: () => void) {
 	if (!req.session?.userId) {
 		res.status(401).json({ error: "Not authenticated" });
@@ -86,19 +107,29 @@ function requireAuth(req: Request, res: Response, next: () => void) {
 }
 
 async function userCanManageGuild(userId: string, guildId: string): Promise<boolean> {
+	const cacheKey = `${userId}:${guildId}`;
+	const cached = permCache.get(cacheKey);
+	if (cached && Date.now() < cached.expiresAt) return cached.result;
+
 	const botToken = process.env.DISCORD_TOKEN;
 	if (!botToken) return false;
 	try {
 		const memberRes = await fetch(`${DISCORD_API}/guilds/${guildId}/members/${userId}`, {
 			headers: { Authorization: `Bot ${botToken}` },
 		});
-		if (!memberRes.ok) return false;
+		if (!memberRes.ok) {
+			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+			return false;
+		}
 		const member = (await memberRes.json()) as { roles: string[] };
 
 		const rolesRes = await fetch(`${DISCORD_API}/guilds/${guildId}/roles`, {
 			headers: { Authorization: `Bot ${botToken}` },
 		});
-		if (!rolesRes.ok) return false;
+		if (!rolesRes.ok) {
+			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+			return false;
+		}
 		const guildRoles = (await rolesRes.json()) as Array<{
 			id: string;
 			permissions: string;
@@ -107,14 +138,21 @@ async function userCanManageGuild(userId: string, guildId: string): Promise<bool
 		const ManageGuild = BigInt(0x20);
 		const Administrator = BigInt(0x8);
 
+		let result = false;
 		for (const role of guildRoles) {
 			if (role.id === guildId || member.roles.includes(role.id)) {
 				const perms = BigInt(role.permissions);
-				if ((perms & ManageGuild) !== BigInt(0) || (perms & Administrator) !== BigInt(0))
-					return true;
+				if (
+					(perms & ManageGuild) !== BigInt(0) ||
+					(perms & Administrator) !== BigInt(0)
+				) {
+					result = true;
+					break;
+				}
 			}
 		}
-		return false;
+		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
+		return result;
 	} catch {
 		return false;
 	}
@@ -123,6 +161,15 @@ async function userCanManageGuild(userId: string, guildId: string): Promise<bool
 export function createGuildRouter(deps: DashboardDeps) {
 	const { settings, userSettings, template } = deps;
 	const router = Router();
+
+	// Validate guildId format for all /:guildId routes
+	router.param("guildId", (_req, res, next, guildId) => {
+		if (!isValidSnowflake(guildId)) {
+			res.status(400).json({ error: "Invalid guild ID" });
+			return;
+		}
+		next();
+	});
 
 	router.get("/:guildId/config", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
@@ -200,6 +247,20 @@ export function createGuildRouter(deps: DashboardDeps) {
 
 	router.get("/:guildId/channels", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		const canManage = await userCanManageGuild(userId, guildId);
+		if (!canManage) {
+			res.status(403).json({ error: "Insufficient permissions" });
+			return;
+		}
+
+		const cachedChannels = channelCache.get(guildId);
+		if (cachedChannels && Date.now() < cachedChannels.expiresAt) {
+			res.json(cachedChannels.data);
+			return;
+		}
+
 		const botToken = process.env.DISCORD_TOKEN;
 		if (!botToken) {
 			res.status(500).json({ error: "Bot token not configured" });
@@ -219,7 +280,12 @@ export function createGuildRouter(deps: DashboardDeps) {
 				type: number;
 			}>;
 			// 0=text, 4=category, 5=announcement, 15=forum
-			res.json(channels.filter((c) => [0, 4, 5, 15].includes(c.type)));
+			const filtered = channels.filter((c) => [0, 4, 5, 15].includes(c.type));
+			channelCache.set(guildId, {
+				data: filtered,
+				expiresAt: Date.now() + RESOURCE_CACHE_TTL,
+			});
+			res.json(filtered);
 		} catch {
 			res.status(500).json({ error: "Failed to fetch channels" });
 		}
@@ -227,6 +293,20 @@ export function createGuildRouter(deps: DashboardDeps) {
 
 	router.get("/:guildId/roles", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		const canManage = await userCanManageGuild(userId, guildId);
+		if (!canManage) {
+			res.status(403).json({ error: "Insufficient permissions" });
+			return;
+		}
+
+		const cachedRoles = roleCache.get(guildId);
+		if (cachedRoles && Date.now() < cachedRoles.expiresAt) {
+			res.json(cachedRoles.data);
+			return;
+		}
+
 		const botToken = process.env.DISCORD_TOKEN;
 		if (!botToken) {
 			res.status(500).json({ error: "Bot token not configured" });
@@ -245,14 +325,27 @@ export function createGuildRouter(deps: DashboardDeps) {
 				name: string;
 				color: number;
 			}>;
-			res.json(allRoles.filter((r) => r.name !== "@everyone"));
+			const filtered = allRoles.filter((role) => role.name !== "@everyone");
+			roleCache.set(guildId, {
+				data: filtered,
+				expiresAt: Date.now() + RESOURCE_CACHE_TTL,
+			});
+			res.json(filtered);
 		} catch {
 			res.status(500).json({ error: "Failed to fetch roles" });
 		}
 	});
 
-	router.get("/:guildId/invite", requireAuth, (req: Request, res: Response) => {
+	router.get("/:guildId/invite", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		const canManage = await userCanManageGuild(userId, guildId);
+		if (!canManage) {
+			res.status(403).json({ error: "Insufficient permissions" });
+			return;
+		}
+
 		const clientId = process.env.DISCORD_CLIENT_ID ?? process.env.CLIENT_ID;
 		if (!clientId) {
 			res.status(500).json({ error: "CLIENT_ID not configured" });
@@ -273,6 +366,13 @@ export function createGuildRouter(deps: DashboardDeps) {
 				type: "snippets" | "attributes";
 				entries: Record<string, unknown>;
 			};
+
+			if (type !== "snippets" && type !== "attributes") {
+				res
+					.status(400)
+					.json({ error: "Invalid type: must be 'snippets' or 'attributes'" });
+				return;
+			}
 
 			if (!entries || typeof entries !== "object" || Array.isArray(entries)) {
 				res.status(400).json({ error: "Invalid entries format" });
@@ -319,14 +419,50 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const userId = req.session.userId!;
 
 		const { snippets, attributes, createLinkTemplate } = req.body as {
-			snippets?: Record<string, string>;
-			attributes?: Record<string, number>;
+			snippets?: Record<string, unknown>;
+			attributes?: Record<string, unknown>;
 			createLinkTemplate?: unknown;
 		};
 
-		if (snippets !== undefined) userSettings.set(guildId, snippets, `${userId}.snippets`);
-		if (attributes !== undefined)
-			userSettings.set(guildId, attributes, `${userId}.attributes`);
+		if (snippets !== undefined) {
+			if (typeof snippets !== "object" || Array.isArray(snippets)) {
+				res.status(400).json({ error: "Invalid snippets format" });
+				return;
+			}
+			const currentAttrs = userSettings.get(guildId, userId)?.attributes;
+			const errors: Record<string, string> = {};
+			const valid: Record<string, string | number> = {};
+			for (const [name, value] of Object.entries(snippets)) {
+				const result = validateSnippetEntry(value, currentAttrs);
+				if (result.ok) valid[name] = result.value;
+				else errors[name] = result.error;
+			}
+			if (Object.keys(errors).length > 0) {
+				res.status(400).json({ errors });
+				return;
+			}
+			userSettings.set(guildId, valid, `${userId}.snippets`);
+		}
+
+		if (attributes !== undefined) {
+			if (typeof attributes !== "object" || Array.isArray(attributes)) {
+				res.status(400).json({ error: "Invalid attributes format" });
+				return;
+			}
+			const errors: Record<string, string> = {};
+			const valid: Record<string, string | number> = {};
+			for (const [name, value] of Object.entries(attributes)) {
+				const result = validateAttributeEntry(name, value);
+				if (result.ok) valid[name] = result.value;
+				else errors[name] = result.error;
+			}
+			if (Object.keys(errors).length > 0) {
+				res.status(400).json({ errors });
+				return;
+			}
+			userSettings.set(guildId, valid, `${userId}.attributes`);
+		}
+
 		if (createLinkTemplate !== undefined)
 			userSettings.set(guildId, createLinkTemplate, `${userId}.createLinkTemplate`);
 

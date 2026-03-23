@@ -1,4 +1,23 @@
 {
-	"files": [],
-	"references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.server.json" }]
+	"compilerOptions": {
+		"target": "ES2020",
+		"useDefineForClassFields": true,
+		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"moduleDetection": "force",
+		"noEmit": true,
+		"jsx": "react-jsx",
+		"strict": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"paths": {
+			"@dicelette/types": ["../../packages/types/index.ts"],
+			"@dicelette/types/*": ["../../packages/types/src/*"],
+			"@dicelette/localization/*": ["../../packages/localization/*"]
+		}
+	},
+	"include": ["src", "vite.config.ts"]
 }

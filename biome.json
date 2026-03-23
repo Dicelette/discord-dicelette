@@ -119,7 +119,7 @@
 			"includes": ["**/web/src/index.css"],
 			"linter": {
 				"rules": {
-					"suspicious" : {
+					"suspicious": {
 						"noUnknownAtRules": "off"
 					}
 				}
@@ -136,7 +136,7 @@
 			}
 		},
 		{
-			"includes": ["**/dashboard/**", "web/src/lib/api.ts"],
+			"includes": ["**/routes/**", "web/src/lib/api.ts"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -145,7 +145,7 @@
 				}
 			}
 		},
-		
+
 		{
 			"includes": ["**/tests/constant.ts", "!**/node_modules/**", "**/src/regex.ts"],
 			"linter": {
