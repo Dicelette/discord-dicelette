@@ -14,10 +14,11 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"paths": {
-			"@dicelette/types": ["../../packages/types/index.ts"],
-			"@dicelette/types/*": ["../../packages/types/src/*"],
-			"@dicelette/localization/*": ["../../packages/localization/*"]
+			"@lib/*": ["./src/lib/*"],
+			"@components/*": ["./src/components/*"],
+			"@hooks/*": ["./src/hooks/*"],
+			"@i18n/*": ["./src/i18n/*"]
 		}
 	},
-	"include": ["src", "vite.config.ts"]
+	"include": ["src", "vite.config.ts", "tests/**/*"]
 }
