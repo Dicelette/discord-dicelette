@@ -1,4 +1,8 @@
-import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
+import {
+	getEngine,
+	type StatisticalTemplate,
+	verifyTemplateValue,
+} from "@dicelette/core";
 import UploadIcon from "@mui/icons-material/Upload";
 import {
 	Alert,
@@ -73,10 +77,17 @@ export default function ImportTemplateModal({
 			setError(t("template.channelRequired"));
 			return;
 		}
+		let validated: StatisticalTemplate;
 		try {
 			const json = JSON.parse(await file.text());
-			const validated = verifyTemplateValue(json);
-			setSaving(true);
+			const engine = getEngine("browserCrypto");
+			validated = verifyTemplateValue(json, true, engine);
+		} catch {
+			setError(t("template.importError"));
+			return;
+		}
+		setSaving(true);
+		try {
 			await onImport({
 				template: validated,
 				channelId,
@@ -200,7 +211,7 @@ export default function ImportTemplateModal({
 				<Button
 					variant="contained"
 					onClick={handleSubmit}
-					disabled={saving}
+					disabled={saving || !file || !channelId}
 					startIcon={<UploadIcon />}
 				>
 					{saving ? t("common.saving") : t("template.import")}

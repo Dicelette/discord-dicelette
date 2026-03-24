@@ -1,4 +1,8 @@
-import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
+import {
+	getEngine,
+	type StatisticalTemplate,
+	verifyTemplateValue,
+} from "@dicelette/core";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -93,8 +97,6 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 			});
 			setTemplate(data.template);
 			flash(setSuccess, t("template.importSuccess"));
-		} catch {
-			flash(setError, t("template.importError"));
 		} finally {
 			setSaving(false);
 		}
@@ -105,10 +107,11 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		e.target.value = "";
+		setSaving(true);
 		try {
 			const json = JSON.parse(await file.text());
-			const validated = verifyTemplateValue(json);
-			setSaving(true);
+			const engine = getEngine("browserCrypto");
+			const validated = verifyTemplateValue(json, true, engine);
 			await templateApi.import(guildId, { template: validated });
 			setTemplate(validated);
 			flash(setSuccess, t("template.importSuccess"));
