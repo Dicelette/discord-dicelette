@@ -10,7 +10,7 @@ tasks:
   bot:
     desc: Start the bot in watch mode
     cmds:
-      - pnpm tsx watch --clear-screen=false apps/bot/index.ts
+      - pnpm dev
 
   web:
     desc: Start the web dashboard (Vite dev server)
