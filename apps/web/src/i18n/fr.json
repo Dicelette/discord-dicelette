@@ -34,7 +34,7 @@
 			"defaultChannel": "Channel par défaut (fiches)",
 			"deleteAfter": "Suppression automatique : {val}s",
 			"disableCompare": "Désactiver la comparaison succès/échec",
-			"disableThread": "Désactiver les threads de résultats",
+			"disableThread": "Désactiver les fils de résultats",
 			"hiddenRollDm": "Envoyer en MP (sinon : channel spécifique)",
 			"hiddenRollEnable": "Activer les jets cachés",
 			"lang": "Langue",
@@ -58,7 +58,7 @@
 			"stripOocRegexInvalid": "Expression régulière invalide",
 			"stripOocRegexPreview": "Regex générée : {regex}",
 			"stripOocSuffix": "Suffixe",
-			"stripOocThreadMode": "Mode thread (ignore le channel global)",
+			"stripOocThreadMode": "Mode fil (ignore le channel global)",
 			"timestamp": "Afficher l'horodatage dans les logs"
 		},
 		"sections": {
