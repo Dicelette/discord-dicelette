@@ -1,6 +1,6 @@
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
-import type { GuildData } from "@dicelette/types";
+import type { GuildData, UserData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { BotChannels, DashboardDeps } from ".";
@@ -187,7 +187,7 @@ async function userCanManageGuildViaOAuth(
 }
 
 export function createGuildRouter(deps: DashboardDeps) {
-	const { settings, userSettings, template, botGuilds, botChannels } = deps;
+	const { settings, userSettings, template, characters, botGuilds, botChannels } = deps;
 	const router = Router();
 
 	// Validate guildId format for all /:guildId routes
@@ -472,22 +472,41 @@ export function createGuildRouter(deps: DashboardDeps) {
 		const canLink =
 			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
 
-		const characters: ApiCharacter[] = await Promise.all(
+		// Build a lookup map from the in-memory characters DB (same process as the bot).
+		// Keyed by messageId so we can skip the Discord API call when the data is already cached.
+		const memChars: UserData[] = (characters.get(guildId, userId) as UserData[] | undefined) ?? [];
+		const memByMessageId = new Map<string, UserData>(
+			memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
+		);
+
+		const result: ApiCharacter[] = await Promise.all(
 			userChars.map(async (char) => {
 				const [messageId, channelId] = char.messageId;
 				const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+
+				const mem = memByMessageId.get(messageId);
 				let avatar: string | null = null;
 				let stats: EmbedField[] | null = null;
 				let damage: EmbedField[] | null = null;
-				try {
-					({ avatar, stats, damage } = await fetchCharacterEmbeds(
-						channelId,
-						messageId,
-						botChannels
-					));
-				} catch {
-					// silently ignore fetch errors
+
+				if (mem) {
+					// Serve directly from in-memory DB — no Discord API call needed
+					avatar = mem.avatar ?? null;
+					if (mem.stats) stats = Object.entries(mem.stats).map(([name, value]) => ({ name, value: String(value) }));
+					if (mem.damage) damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+				} else {
+					// Fallback: character not yet in memory (e.g. first load after bot restart)
+					try {
+						({ avatar, stats, damage } = await fetchCharacterEmbeds(
+							channelId,
+							messageId,
+							botChannels
+						));
+					} catch {
+						// silently ignore fetch errors
+					}
 				}
+
 				return {
 					charName: char.charName ?? null,
 					messageId,
@@ -502,8 +521,8 @@ export function createGuildRouter(deps: DashboardDeps) {
 			})
 		);
 
-		charCache.set(cacheKey, { data: characters, ts: Date.now() });
-		res.json(characters);
+		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		res.json(result);
 	});
 
 	// Invalidate character cache for the current user (used by refresh button)

@@ -1,4 +1,4 @@
-import type { Settings, TemplateData, UserSettings } from "@dicelette/types";
+import type { Characters, Settings, TemplateData, UserSettings } from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import cors from "cors";
 import type Enmap from "enmap";
@@ -75,6 +75,7 @@ export interface DashboardDeps {
 	settings: Settings;
 	userSettings: Enmap<UserSettings>;
 	template: TemplateData;
+	characters: Characters;
 	botGuilds: {
 		has: (id: string) => boolean;
 		get: (id: string) => BotGuild | undefined;

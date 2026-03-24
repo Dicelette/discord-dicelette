@@ -8,6 +8,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		settings: client.settings,
 		userSettings: client.userSettings,
 		template: client.template,
+		characters: client.characters,
 		botGuilds: {
 			has: (id) => client.guilds.cache.has(id),
 			get: (id) => {
