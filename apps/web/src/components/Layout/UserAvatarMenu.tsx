@@ -28,7 +28,9 @@ export default function UserAvatarMenu({ username, avatarUrl, onLogout }: Props)
 					"&:active": { backgroundColor: "rgba(255,255,255,0.18)" },
 				}}
 			>
-				<Typography variant="body2">{username}</Typography>
+				<Typography variant="body2" sx={{ display: { xs: "none", sm: "block" } }}>
+					{username}
+				</Typography>
 				<Avatar src={avatarUrl} sx={{ width: 28, height: 28 }} />
 			</Box>
 			<Menu
