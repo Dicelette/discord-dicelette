@@ -40,7 +40,7 @@ export default function ModelConfigForm({
 			<Box component="form" onSubmit={handleSubmit(onSave)}>
 				<Stack spacing={2}>
 					<Paper sx={{ p: 3 }}>
-						<TemplateManagerSection guildId={guildId} />
+						<TemplateManagerSection guildId={guildId} channels={channels} />
 					</Paper>
 					<Paper sx={{ p: 3 }}>
 						<SheetsChannelsSection control={control} textChannels={textChannels} />

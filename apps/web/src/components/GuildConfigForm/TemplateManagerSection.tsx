@@ -22,11 +22,20 @@ import {
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../../i18n";
-import { templateApi } from "../../lib/api";
+import { charactersApi, templateApi } from "../../lib/api";
 import { exportJson } from "../UserConfigForm/utils";
+import ImportTemplateModal, {
+	type ImportTemplateData,
+} from "./FormModal/ImportTemplateModal";
 import SectionTitle from "./SectionTitle";
+import type { Channel } from "./types";
 
-export default function TemplateManagerSection({ guildId }: { guildId: string }) {
+interface Props {
+	guildId: string;
+	channels: Channel[];
+}
+
+export default function TemplateManagerSection({ guildId, channels }: Props) {
 	const { t } = useI18n();
 	const fileRef = useRef<HTMLInputElement>(null);
 	const [template, setTemplate] = useState<StatisticalTemplate | null>(null);
@@ -35,6 +44,8 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 	const [success, setSuccess] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [confirmDelete, setConfirmDelete] = useState(false);
+	const [importModalOpen, setImportModalOpen] = useState(false);
+	const [hasCharacters, setHasCharacters] = useState(false);
 
 	const flash = (setter: (v: string | null) => void, msg: string) => {
 		setter(msg);
@@ -43,23 +54,54 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 
 	useEffect(() => {
 		let cancelled = false;
-		templateApi
-			.get(guildId)
-			.then((r) => {
-				if (!cancelled) setTemplate(r.data);
-			})
-			.catch(() => {
-				if (!cancelled) setTemplate(null);
-			})
-			.finally(() => {
-				if (!cancelled) setLoading(false);
-			});
+		Promise.all([
+			templateApi
+				.get(guildId)
+				.then((r) => {
+					if (!cancelled) setTemplate(r.data);
+				})
+				.catch(() => {
+					if (!cancelled) setTemplate(null);
+				}),
+			charactersApi
+				.count(guildId)
+				.then((r) => {
+					if (!cancelled) setHasCharacters(r.data.count > 0);
+				})
+				.catch(() => {}),
+		]).finally(() => {
+			if (!cancelled) setLoading(false);
+		});
 		return () => {
 			cancelled = true;
 		};
 	}, [guildId]);
 
-	const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	// Import depuis le modal (premier enregistrement — avec sélection des canaux)
+	const handleModalImport = async (data: ImportTemplateData) => {
+		setSaving(true);
+		try {
+			if (data.deleteCharacters) {
+				await charactersApi.bulkDelete(guildId);
+				setHasCharacters(false);
+			}
+			await templateApi.import(guildId, {
+				template: data.template,
+				channelId: data.channelId,
+				publicChannelId: data.publicChannelId,
+				privateChannelId: data.privateChannelId,
+			});
+			setTemplate(data.template);
+			flash(setSuccess, t("template.importSuccess"));
+		} catch {
+			flash(setError, t("template.importError"));
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	// Import direct depuis un fichier (mise à jour — template déjà présent)
+	const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		e.target.value = "";
@@ -67,7 +109,7 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 			const json = JSON.parse(await file.text());
 			const validated = verifyTemplateValue(json);
 			setSaving(true);
-			await templateApi.import(guildId, validated);
+			await templateApi.import(guildId, { template: validated });
 			setTemplate(validated);
 			flash(setSuccess, t("template.importSuccess"));
 		} catch {
@@ -107,22 +149,39 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 			)}
 
 			<Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+				{/* Fichier caché pour la mise à jour (template déjà présent) */}
 				<input
 					ref={fileRef}
 					type="file"
 					accept=".json,application/json"
 					style={{ display: "none" }}
-					onChange={handleImport}
+					onChange={handleFileImport}
 				/>
-				<Button
-					variant="outlined"
-					startIcon={<UploadIcon />}
-					onClick={() => fileRef.current?.click()}
-					disabled={saving}
-					size="small"
-				>
-					{t("template.import")}
-				</Button>
+
+				{template === null ? (
+					// Pas de template → ouvre le modal avec sélection des canaux
+					<Button
+						variant="outlined"
+						startIcon={<UploadIcon />}
+						onClick={() => setImportModalOpen(true)}
+						disabled={saving || loading}
+						size="small"
+					>
+						{t("template.import")}
+					</Button>
+				) : (
+					// Template existant → remplacement direct via fichier
+					<Button
+						variant="outlined"
+						startIcon={<UploadIcon />}
+						onClick={() => fileRef.current?.click()}
+						disabled={saving}
+						size="small"
+					>
+						{t("template.import")}
+					</Button>
+				)}
+
 				{template && (
 					<>
 						<Button
@@ -157,6 +216,16 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 				<TemplateView template={template} />
 			)}
 
+			{/* Modal d'import initial */}
+			<ImportTemplateModal
+				open={importModalOpen}
+				onClose={() => setImportModalOpen(false)}
+				onImport={handleModalImport}
+				channels={channels}
+				hasCharacters={hasCharacters}
+			/>
+
+			{/* Confirmation suppression */}
 			<Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
 				<DialogTitle>{t("template.deleteConfirmTitle")}</DialogTitle>
 				<DialogContent>

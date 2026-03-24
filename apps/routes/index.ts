@@ -69,6 +69,8 @@ export interface BotMessage {
 export interface BotChannels {
 	/** Fetch a message; checks Discord.js message cache first, falls back to API */
 	fetchMessage: (channelId: string, messageId: string) => Promise<BotMessage | null>;
+	/** Delete a message; returns true if deleted, false if not found or forbidden */
+	deleteMessage: (channelId: string, messageId: string) => Promise<boolean>;
 }
 
 export interface DashboardDeps {

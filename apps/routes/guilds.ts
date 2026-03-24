@@ -474,7 +474,8 @@ export function createGuildRouter(deps: DashboardDeps) {
 
 		// Build a lookup map from the in-memory characters DB (same process as the bot).
 		// Keyed by messageId so we can skip the Discord API call when the data is already cached.
-		const memChars: UserData[] = (characters.get(guildId, userId) as UserData[] | undefined) ?? [];
+		const memChars: UserData[] =
+			(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
 		const memByMessageId = new Map<string, UserData>(
 			memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
 		);
@@ -492,8 +493,13 @@ export function createGuildRouter(deps: DashboardDeps) {
 				if (mem) {
 					// Serve directly from in-memory DB — no Discord API call needed
 					avatar = mem.avatar ?? null;
-					if (mem.stats) stats = Object.entries(mem.stats).map(([name, value]) => ({ name, value: String(value) }));
-					if (mem.damage) damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+					if (mem.stats)
+						stats = Object.entries(mem.stats).map(([name, value]) => ({
+							name,
+							value: String(value),
+						}));
+					if (mem.damage)
+						damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
 				} else {
 					// Fallback: character not yet in memory (e.g. first load after bot restart)
 					try {
@@ -533,6 +539,66 @@ export function createGuildRouter(deps: DashboardDeps) {
 			const guildId = req.params.guildId as string;
 			const userId = req.session.userId!;
 			charCache.delete(`${guildId}:${userId}`);
+			res.json({ ok: true });
+		}
+	);
+
+	// Count total guild characters across all users (admin only, in-memory)
+	router.get(
+		"/:guildId/characters/count",
+		requireAuth,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+
+			const canManage = await userCanManageGuild(userId, guildId, botGuilds);
+			if (!canManage) {
+				res.status(403).json({ error: "Insufficient permissions" });
+				return;
+			}
+
+			const users = settings.get(guildId)?.user ?? {};
+			const count = Object.values(users).reduce((sum, chars) => sum + chars.length, 0);
+			res.json({ count });
+		}
+	);
+
+	// DELETE all characters in a guild (admin only)
+	router.post(
+		"/:guildId/characters/bulk-delete",
+		requireAuth,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+
+			const canManage = await userCanManageGuild(userId, guildId, botGuilds);
+			if (!canManage) {
+				res.status(403).json({ error: "Insufficient permissions" });
+				return;
+			}
+
+			const guildData = settings.get(guildId);
+			const users = guildData?.user ?? {};
+
+			// Supprime les messages Discord de chaque personnage (erreurs silencieuses)
+			const deletePromises: Promise<boolean>[] = [];
+			for (const userData of Object.values(users)) {
+				for (const char of userData) {
+					const [messageId, channelId] = char.messageId;
+					deletePromises.push(botChannels.deleteMessage(channelId, messageId));
+				}
+			}
+			await Promise.allSettled(deletePromises);
+
+			// Vide les données en mémoire
+			settings.delete(guildId, "user");
+			characters.delete(guildId);
+
+			// Invalide le cache des personnages pour tous les utilisateurs du serveur
+			for (const key of [...charCache.keys()]) {
+				if (key.startsWith(`${guildId}:`)) charCache.delete(key);
+			}
+
 			res.json({ ok: true });
 		}
 	);
@@ -594,7 +660,17 @@ export function createGuildRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const { template: templateBody } = req.body as { template: unknown };
+		const {
+			template: templateBody,
+			channelId,
+			publicChannelId,
+			privateChannelId,
+		} = req.body as {
+			template: unknown;
+			channelId?: string;
+			publicChannelId?: string;
+			privateChannelId?: string;
+		};
 		if (!templateBody || typeof templateBody !== "object") {
 			res.status(400).json({ error: "Invalid template" });
 			return;
@@ -624,13 +700,15 @@ export function createGuildRouter(deps: DashboardDeps) {
 				: [];
 			const damageName = validated.damage ? Object.keys(validated.damage) : [];
 			current.templateID = {
-				channelId: current.templateID?.channelId ?? "",
+				channelId: channelId ?? current.templateID?.channelId ?? "",
 				messageId: current.templateID?.messageId ?? "",
 				statsName,
 				excludedStats,
 				damageName,
 				valid: true,
 			};
+			if (publicChannelId) current.managerId = publicChannelId;
+			if (privateChannelId) current.privateChannel = privateChannelId;
 			settings.set(guildId, current);
 		}
 

@@ -70,6 +70,19 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					return null;
 				}
 			},
+			deleteMessage: async (channelId, messageId) => {
+				const channel = client.channels.cache.get(channelId);
+				if (!channel || !channel.isTextBased()) return false;
+				try {
+					const msg =
+						channel.messages.cache.get(messageId) ??
+						(await channel.messages.fetch(messageId));
+					await msg.delete();
+					return true;
+				} catch {
+					return false;
+				}
+			},
 		},
 	});
 }
