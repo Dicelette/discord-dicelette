@@ -8,7 +8,7 @@ import SelfRegisterSection from "./SelfRegisterSection";
 import SheetsChannelsSection from "./SheetsChannelsSection";
 import TemplateManagerSection from "./TemplateManagerSection";
 import type { Channel, Role } from "./types";
-import { useConfigForm } from "./useConfigForm";
+import { useConfigForm } from "./useConfigForm.ts";
 
 interface Props {
 	config: ApiGuildConfig;

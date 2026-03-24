@@ -28,10 +28,10 @@ import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../../i18n";
 import { charactersApi, templateApi } from "../../lib/api";
 import { exportJson } from "../UserConfigForm/utils";
+import SectionTitle from "./atoms/SectionTitle";
 import ImportTemplateModal, {
 	type ImportTemplateData,
 } from "./FormModal/ImportTemplateModal";
-import SectionTitle from "./SectionTitle";
 import type { Channel } from "./types";
 
 interface Props {

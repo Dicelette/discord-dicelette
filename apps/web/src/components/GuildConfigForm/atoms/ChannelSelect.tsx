@@ -1,6 +1,6 @@
 import { Autocomplete, FormHelperText, TextField } from "@mui/material";
 import { memo } from "react";
-import type { Channel } from "./types";
+import type { Channel } from "../types";
 
 interface ChannelSelectProps {
 	label: string;

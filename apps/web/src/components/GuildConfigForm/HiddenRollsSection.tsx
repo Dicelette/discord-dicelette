@@ -2,7 +2,7 @@ import { FormControlLabel, Switch, TextField } from "@mui/material";
 import { type Control, Controller, useWatch } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
-import SectionTitle from "./SectionTitle";
+import SectionTitle from "./atoms/SectionTitle";
 
 interface Props {
 	control: Control<ApiGuildConfig>;

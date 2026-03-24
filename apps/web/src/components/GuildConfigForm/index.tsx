@@ -1,13 +1,13 @@
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api.ts";
-import ChannelsSection from "./ChannelsSection";
+import ChannelsSection from "./atoms/ChannelsSection.tsx";
 import ConfigFormFooter from "./ConfigFormFooter";
 import DiceBehaviourSection from "./DiceBehaviourSection";
 import GeneralSection from "./GeneralSection";
 import StripOOCSection from "./StripOOCSection";
 import type { Channel } from "./types";
-import { useConfigForm } from "./useConfigForm";
+import { useConfigForm } from "./useConfigForm.ts";
 
 interface Props {
 	config: ApiGuildConfig;

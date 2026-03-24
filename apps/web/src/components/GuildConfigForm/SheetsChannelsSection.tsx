@@ -1,8 +1,8 @@
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
+import SectionTitle from "./atoms/SectionTitle";
 import ChannelSelect from "./ChannelSelect";
-import SectionTitle from "./SectionTitle";
 import type { Channel } from "./types";
 
 interface Props {

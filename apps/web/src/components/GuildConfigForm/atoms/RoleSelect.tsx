@@ -1,6 +1,6 @@
 import { Autocomplete, FormHelperText, TextField } from "@mui/material";
 import { memo } from "react";
-import type { Role } from "./types";
+import type { Role } from "../types";
 
 interface RoleSelectProps {
 	label: string;

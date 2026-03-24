@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api";
-import SectionTitle from "./SectionTitle";
+import SectionTitle from "./atoms/SectionTitle";
 
 const DISCORD_LOCALES = [
 	{ value: "en-US", label: "English" },

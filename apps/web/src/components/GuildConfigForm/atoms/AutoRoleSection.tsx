@@ -1,10 +1,10 @@
 import { Typography } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
-import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api";
+import { useI18n } from "../../../i18n";
+import type { ApiGuildConfig } from "../../../lib/api";
+import type { Role } from "../types";
 import RoleSelect from "./RoleSelect";
 import SectionTitle from "./SectionTitle";
-import type { Role } from "./types";
 
 interface Props {
 	control: Control<ApiGuildConfig>;
