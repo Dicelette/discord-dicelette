@@ -111,6 +111,8 @@
 		"customCritical": "Custom criticals",
 		"damage": "Skill dice",
 		"delete": "Delete",
+		"exportCharacters": "Export characters (CSV)",
+		"exportCharactersError": "Error while exporting characters.",
 		"deleteCharacters": "Delete all server characters",
 		"deleteCharactersHelp": "Permanently deletes all registered characters.",
 		"deleteWarning": "Irreversible action. All characters on the server will be permanently deleted. Consider exporting your data before continuing.",

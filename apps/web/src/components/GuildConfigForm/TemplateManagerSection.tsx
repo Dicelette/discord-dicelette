@@ -119,6 +119,20 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 		}
 	};
 
+	const handleExportCharacters = async () => {
+		try {
+			const res = await charactersApi.exportCsv(guildId);
+			const url = URL.createObjectURL(res.data);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "characters.csv";
+			a.click();
+			URL.revokeObjectURL(url);
+		} catch {
+			flash(setError, t("template.exportCharactersError"));
+		}
+	};
+
 	const handleDelete = async () => {
 		setConfirmDelete(false);
 		setSaving(true);
@@ -192,6 +206,16 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 						>
 							{t("template.export")}
 						</Button>
+						{hasCharacters && (
+							<Button
+								variant="outlined"
+								startIcon={<DownloadIcon />}
+								onClick={handleExportCharacters}
+								size="small"
+							>
+								{t("template.exportCharacters")}
+							</Button>
+						)}
 						<Button
 							variant="outlined"
 							color="error"

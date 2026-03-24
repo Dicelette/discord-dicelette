@@ -111,6 +111,8 @@
 		"customCritical": "Critiques personnalisés",
 		"damage": "Dés de compétence",
 		"delete": "Supprimer",
+		"exportCharacters": "Exporter les personnages (CSV)",
+		"exportCharactersError": "Erreur lors de l'export des personnages.",
 		"deleteCharacters": "Supprimer tous les personnages du serveur",
 		"deleteCharactersHelp": "Supprime définitivement tous les personnages enregistrés.",
 		"deleteWarning": "Action irréversible. Tous les personnages du serveur seront supprimés définitivement. Pensez à exporter vos données avant de continuer.",

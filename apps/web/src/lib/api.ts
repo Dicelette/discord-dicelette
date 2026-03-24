@@ -126,6 +126,8 @@ export const charactersApi = {
 		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters`),
 	count: (guildId: string) =>
 		api.get<{ count: number }>(`/guilds/${guildId}/characters/count`),
+	exportCsv: (guildId: string) =>
+		api.get<Blob>(`/guilds/${guildId}/characters/export`, { responseType: "blob" }),
 	refresh: (guildId: string) =>
 		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh`),
 	bulkDelete: (guildId: string) =>
