@@ -4,6 +4,7 @@ import {
 	Box,
 	CircularProgress,
 	IconButton,
+	Pagination,
 	Tooltip,
 	Typography,
 } from "@mui/material";
@@ -12,6 +13,8 @@ import { useI18n } from "../../i18n";
 import type { ApiCharacter } from "../../lib/api";
 import { charactersApi } from "../../lib/api";
 import CharacterCard from "./CharacterCard";
+
+const PAGE_SIZE = 5;
 
 interface Props {
 	guildId: string;
@@ -23,6 +26,7 @@ export default function CharactersTab({ guildId }: Props) {
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [page, setPage] = useState(1);
 
 	const load = useCallback(
 		async (forceRefresh = false) => {
@@ -38,6 +42,7 @@ export default function CharactersTab({ guildId }: Props) {
 			try {
 				const res = await charactersApi.getCharacters(guildId);
 				setCharacters(res.data);
+				setPage(1);
 			} catch {
 				setError(t("characters.loadError"));
 			} finally {
@@ -59,6 +64,9 @@ export default function CharactersTab({ guildId }: Props) {
 			</Box>
 		);
 	}
+
+	const totalPages = Math.ceil(characters.length / PAGE_SIZE);
+	const pageChars = characters.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
 	return (
 		<Box>
@@ -96,11 +104,25 @@ export default function CharactersTab({ guildId }: Props) {
 			{characters.length === 0 ? (
 				<Typography color="text.secondary">{t("characters.noCharacters")}</Typography>
 			) : (
-				<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-					{characters.map((char) => (
-						<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
-					))}
-				</Box>
+				<>
+					<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+						{pageChars.map((char) => (
+							<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
+						))}
+					</Box>
+
+					{totalPages > 1 && (
+						<Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+							<Pagination
+								count={totalPages}
+								page={page}
+								onChange={(_e, value) => setPage(value)}
+								color="primary"
+								shape="rounded"
+							/>
+						</Box>
+					)}
+				</>
 			)}
 		</Box>
 	);

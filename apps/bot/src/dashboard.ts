@@ -1,6 +1,10 @@
 import type { EventEmitter } from "node:events";
 import { startDashboardServer } from "@dicelette/dashboard";
+import { ln } from "@dicelette/localization";
+import * as Djs from "discord.js";
 import type { EClient } from "./client";
+import { templateEmbed } from "./commands/admin/template";
+import { createDefaultThread } from "./messages";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
 	startDashboardServer({
@@ -8,6 +12,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		settings: client.settings,
 		userSettings: client.userSettings,
 		template: client.template,
+		characters: client.characters,
 		botGuilds: {
 			has: (id) => client.guilds.cache.has(id),
 			get: (id) => {
@@ -65,6 +70,64 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 							url: a.url,
 						})),
 					};
+				} catch {
+					return null;
+				}
+			},
+			deleteMessage: async (channelId, messageId) => {
+				const channel = client.channels.cache.get(channelId);
+				if (!channel || !channel.isTextBased()) return false;
+				try {
+					const msg =
+						channel.messages.cache.get(messageId) ??
+						(await channel.messages.fetch(messageId));
+					await msg.delete();
+					return true;
+				} catch {
+					return false;
+				}
+			},
+			sendTemplate: async (
+				channelId,
+				template,
+				guildId,
+				publicChannelId,
+				_privateChannelId
+			) => {
+				const channel = client.channels.cache.get(channelId);
+				let publicChannel = publicChannelId
+					? client.channels.cache.get(publicChannelId)
+					: undefined;
+				try {
+					const lang = client.settings.get(guildId, "lang");
+					const ul = ln(lang ?? Djs.Locale.EnglishUS);
+					if (channel instanceof Djs.TextChannel && !publicChannel) {
+						publicChannel = await createDefaultThread(
+							channel,
+							client.settings,
+							guildId ? client.guilds.cache.get(guildId) : undefined,
+							false
+						);
+					} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel)
+						return null;
+					if (!publicChannel) return null;
+					const { embeds, components } = templateEmbed(template, ul);
+					const msg = await (channel as Djs.TextChannel).send({
+						components: [components],
+						embeds: embeds,
+						files: [
+							{
+								attachment: Buffer.from(JSON.stringify(template, null, 2), "utf-8"),
+								name: "template.json",
+							},
+						],
+					});
+					try {
+						await msg.pin();
+					} catch {
+						// Missing permissions — non-fatal
+					}
+					return { messageId: msg.id };
 				} catch {
 					return null;
 				}

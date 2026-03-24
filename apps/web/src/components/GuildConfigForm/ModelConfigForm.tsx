@@ -1,14 +1,14 @@
-import { Alert, Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api";
+import type { ApiGuildConfig } from "../../lib/api.ts";
 import AutoRoleSection from "./AutoRoleSection";
+import ConfigFormFooter from "./ConfigFormFooter";
 import HiddenRollsSection from "./HiddenRollsSection";
 import SelfRegisterSection from "./SelfRegisterSection";
 import SheetsChannelsSection from "./SheetsChannelsSection";
 import TemplateManagerSection from "./TemplateManagerSection";
 import type { Channel, Role } from "./types";
+import { useConfigForm } from "./useConfigForm";
 
 interface Props {
 	config: ApiGuildConfig;
@@ -28,27 +28,10 @@ export default function ModelConfigForm({
 	roles,
 }: Props) {
 	const { t } = useI18n();
-
-	const { control, handleSubmit, reset, formState } = useForm<ApiGuildConfig>({
-		defaultValues: config,
-	});
-
-	const isDirty = formState.isDirty;
-
-	useEffect(() => {
-		reset(config);
-	}, [config, reset]);
-
-	useEffect(() => {
-		if (!isDirty) return;
-		const handler = (e: BeforeUnloadEvent) => {
-			e.preventDefault();
-		};
-		window.addEventListener("beforeunload", handler);
-		return () => window.removeEventListener("beforeunload", handler);
-	}, [isDirty]);
-
-	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
+	const { control, handleSubmit, isDirty, textChannels } = useConfigForm(
+		config,
+		channels
+	);
 
 	return (
 		<Stack spacing={2}>
@@ -57,7 +40,7 @@ export default function ModelConfigForm({
 			<Box component="form" onSubmit={handleSubmit(onSave)}>
 				<Stack spacing={2}>
 					<Paper sx={{ p: 3 }}>
-						<TemplateManagerSection guildId={guildId} />
+						<TemplateManagerSection guildId={guildId} channels={channels} />
 					</Paper>
 					<Paper sx={{ p: 3 }}>
 						<SheetsChannelsSection control={control} textChannels={textChannels} />
@@ -76,22 +59,7 @@ export default function ModelConfigForm({
 					</Paper>
 				</Stack>
 
-				<Box className="flex justify-end gap-3 items-center" sx={{ mt: 2 }}>
-					{isDirty && (
-						<Typography variant="body2" color="warning.main">
-							{t("config.unsaved")}
-						</Typography>
-					)}
-					<Button
-						type="submit"
-						variant="contained"
-						size="large"
-						disabled={saving}
-						sx={{ minWidth: 160 }}
-					>
-						{saving ? t("common.saving") : t("common.save")}
-					</Button>
-				</Box>
+				<ConfigFormFooter isDirty={isDirty} saving={saving} />
 			</Box>
 		</Stack>
 	);

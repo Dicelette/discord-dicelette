@@ -1,4 +1,8 @@
-import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
+import {
+	getEngine,
+	type StatisticalTemplate,
+	verifyTemplateValue,
+} from "@dicelette/core";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -22,11 +26,20 @@ import {
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../../i18n";
-import { templateApi } from "../../lib/api";
+import { charactersApi, templateApi } from "../../lib/api";
 import { exportJson } from "../UserConfigForm/utils";
+import ImportTemplateModal, {
+	type ImportTemplateData,
+} from "./FormModal/ImportTemplateModal";
 import SectionTitle from "./SectionTitle";
+import type { Channel } from "./types";
 
-export default function TemplateManagerSection({ guildId }: { guildId: string }) {
+interface Props {
+	guildId: string;
+	channels: Channel[];
+}
+
+export default function TemplateManagerSection({ guildId, channels }: Props) {
 	const { t } = useI18n();
 	const fileRef = useRef<HTMLInputElement>(null);
 	const [template, setTemplate] = useState<StatisticalTemplate | null>(null);
@@ -35,6 +48,8 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 	const [success, setSuccess] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [confirmDelete, setConfirmDelete] = useState(false);
+	const [importModalOpen, setImportModalOpen] = useState(false);
+	const [hasCharacters, setHasCharacters] = useState(false);
 
 	const flash = (setter: (v: string | null) => void, msg: string) => {
 		setter(msg);
@@ -42,28 +57,83 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 	};
 
 	useEffect(() => {
-		templateApi
-			.get(guildId)
-			.then((r) => setTemplate(r.data))
-			.catch(() => setTemplate(null))
-			.finally(() => setLoading(false));
+		const controller = new AbortController();
+		const { signal } = controller;
+		Promise.all([
+			templateApi
+				.get(guildId, { signal })
+				.then((r) => {
+					if (!signal.aborted) setTemplate(r.data);
+				})
+				.catch(() => {
+					if (!signal.aborted) setTemplate(null);
+				}),
+			charactersApi
+				.count(guildId, { signal })
+				.then((r) => {
+					if (!signal.aborted) setHasCharacters(r.data.count > 0);
+				})
+				.catch(() => {}),
+		]).finally(() => {
+			if (!signal.aborted) setLoading(false);
+		});
+		return () => {
+			controller.abort();
+		};
 	}, [guildId]);
 
-	const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	// Import depuis le modal (premier enregistrement — avec sélection des canaux)
+	const handleModalImport = async (data: ImportTemplateData) => {
+		setSaving(true);
+		try {
+			if (data.deleteCharacters) {
+				await charactersApi.bulkDelete(guildId);
+				setHasCharacters(false);
+			}
+			await templateApi.import(guildId, {
+				template: data.template,
+				channelId: data.channelId,
+				publicChannelId: data.publicChannelId,
+				privateChannelId: data.privateChannelId,
+			});
+			setTemplate(data.template);
+			flash(setSuccess, t("template.importSuccess"));
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	// Import direct depuis un fichier (mise à jour — template déjà présent)
+	const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		e.target.value = "";
+		setSaving(true);
 		try {
 			const json = JSON.parse(await file.text());
-			const validated = verifyTemplateValue(json);
-			setSaving(true);
-			await templateApi.import(guildId, validated);
+			const engine = getEngine("browserCrypto");
+			const validated = verifyTemplateValue(json, true, engine);
+			await templateApi.import(guildId, { template: validated });
 			setTemplate(validated);
 			flash(setSuccess, t("template.importSuccess"));
 		} catch {
 			flash(setError, t("template.importError"));
 		} finally {
 			setSaving(false);
+		}
+	};
+
+	const handleExportCharacters = async () => {
+		try {
+			const res = await charactersApi.exportCsv(guildId);
+			const url = URL.createObjectURL(res.data);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "characters.csv";
+			a.click();
+			URL.revokeObjectURL(url);
+		} catch {
+			flash(setError, t("template.exportCharactersError"));
 		}
 	};
 
@@ -83,7 +153,7 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 
 	return (
 		<>
-			<SectionTitle>{t("template.section")}</SectionTitle>
+			<SectionTitle>{t("common.template").toTitle()}</SectionTitle>
 
 			{error && (
 				<Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
@@ -97,22 +167,39 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 			)}
 
 			<Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+				{/* Fichier caché pour la mise à jour (template déjà présent) */}
 				<input
 					ref={fileRef}
 					type="file"
 					accept=".json,application/json"
 					style={{ display: "none" }}
-					onChange={handleImport}
+					onChange={handleFileImport}
 				/>
-				<Button
-					variant="outlined"
-					startIcon={<UploadIcon />}
-					onClick={() => fileRef.current?.click()}
-					disabled={saving}
-					size="small"
-				>
-					{t("template.import")}
-				</Button>
+
+				{template === null ? (
+					// Pas de template → ouvre le modal avec sélection des canaux
+					<Button
+						variant="outlined"
+						startIcon={<UploadIcon />}
+						onClick={() => setImportModalOpen(true)}
+						disabled={saving || loading}
+						size="small"
+					>
+						{t("template.import")}
+					</Button>
+				) : (
+					// Template existant → remplacement direct via fichier
+					<Button
+						variant="outlined"
+						startIcon={<UploadIcon />}
+						onClick={() => fileRef.current?.click()}
+						disabled={saving}
+						size="small"
+					>
+						{t("template.import")}
+					</Button>
+				)}
+
 				{template && (
 					<>
 						<Button
@@ -123,6 +210,16 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 						>
 							{t("template.export")}
 						</Button>
+						{hasCharacters && (
+							<Button
+								variant="outlined"
+								startIcon={<DownloadIcon />}
+								onClick={handleExportCharacters}
+								size="small"
+							>
+								{t("template.exportCharacters")}
+							</Button>
+						)}
 						<Button
 							variant="outlined"
 							color="error"
@@ -147,6 +244,16 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 				<TemplateView template={template} />
 			)}
 
+			{/* Modal d'import initial */}
+			<ImportTemplateModal
+				open={importModalOpen}
+				onClose={() => setImportModalOpen(false)}
+				onImport={handleModalImport}
+				channels={channels}
+				hasCharacters={hasCharacters}
+			/>
+
+			{/* Confirmation suppression */}
 			<Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
 				<DialogTitle>{t("template.deleteConfirmTitle")}</DialogTitle>
 				<DialogContent>
@@ -182,7 +289,7 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 					<Chip label={`${t("template.diceType")}: ${template.diceType}`} size="small" />
 				)}
 				{template.total !== undefined && (
-					<Chip label={`${t("template.total")}: ${template.total}`} size="small" />
+					<Chip label={`${t("common.total")}: ${template.total}`} size="small" />
 				)}
 				{template.forceDistrib && (
 					<Chip
@@ -230,7 +337,7 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("template.name")}</TableCell>
+								<TableCell>{t("common.name")}</TableCell>
 								<TableCell>{t("template.sign")}</TableCell>
 								<TableCell>{t("template.value")}</TableCell>
 								<TableCell>{t("template.onNaturalDice")}</TableCell>
@@ -258,12 +365,12 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 			{template.statistics && Object.keys(template.statistics).length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
-						{t("template.statistics")}
+						{t("common.statistics").toTitle()}
 					</Typography>
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("template.name")}</TableCell>
+								<TableCell>{t("common.name").toTitle()}</TableCell>
 								<TableCell>Min</TableCell>
 								<TableCell>Max</TableCell>
 								<TableCell>{t("template.formula")}</TableCell>
@@ -289,7 +396,7 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 			{template.damage && Object.keys(template.damage).length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
-						{t("template.damage")}
+						{t("common.macro").toTitle()}
 					</Typography>
 					<Table size="small">
 						<TableHead>

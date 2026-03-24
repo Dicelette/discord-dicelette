@@ -124,14 +124,30 @@ export interface ApiCharacter {
 export const charactersApi = {
 	getCharacters: (guildId: string) =>
 		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters`),
+	count: (guildId: string, config?: { signal?: AbortSignal }) =>
+		api.get<{ count: number }>(`/guilds/${guildId}/characters/count`, config),
+	exportCsv: (guildId: string) =>
+		api.get<Blob>(`/guilds/${guildId}/characters/export`, { responseType: "blob" }),
 	refresh: (guildId: string) =>
 		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh`),
+	bulkDelete: (guildId: string) =>
+		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/bulk-delete`),
 };
 
+export interface TemplateImportPayload {
+	template: StatisticalTemplate;
+	channelId?: string;
+	publicChannelId?: string;
+	privateChannelId?: string;
+	updateCharacters?: boolean;
+	deleteCharacters?: boolean;
+}
+
 export const templateApi = {
-	get: (guildId: string) => api.get<StatisticalTemplate>(`/guilds/${guildId}/template`),
-	import: (guildId: string, template: StatisticalTemplate) =>
-		api.post<{ ok: boolean }>(`/guilds/${guildId}/template`, { template }),
+	get: (guildId: string, config?: { signal?: AbortSignal }) =>
+		api.get<StatisticalTemplate>(`/guilds/${guildId}/template`, config),
+	import: (guildId: string, payload: TemplateImportPayload) =>
+		api.post<{ ok: boolean }>(`/guilds/${guildId}/template`, payload),
 	delete: (guildId: string) => api.delete<{ ok: boolean }>(`/guilds/${guildId}/template`),
 };
 

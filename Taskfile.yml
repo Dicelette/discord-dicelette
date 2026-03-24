@@ -10,7 +10,7 @@ tasks:
   bot:
     desc: Start the bot in watch mode
     cmds:
-      - tsx watch --clear-screen=false apps/bot/index.ts
+      - pnpm dev
 
   web:
     desc: Start the web dashboard (Vite dev server)
@@ -20,7 +20,7 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - tsc --build && tsc-alias
+      - pnpm tsc --build && tsc-alias
 
   lint:
     desc: Lint and auto-fix

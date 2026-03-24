@@ -1,20 +1,21 @@
 {
-  "permissions": {
-    "allow": [
-      "Read(//dev/**)",
-      "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/fr.ts\")",
-      "Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/index.tsx\")",
-      "Bash(pnpm run:*)",
-      "Bash(timeout 10 node dist/apps/bot/index.js)",
-      "Bash(powershell.exe -Command \"Move-Item -Path apps/parse_result -Destination packages/parse_result\")",
-      "Bash(grep -r \"CharacterData\\\\|messageId\\\\|charName\\\\|isPrivate\\\\|selfRegistration\\\\|allowSelfRegister\" N:/Documents/Github/dicelette/discord-bot/packages/ --include=*.ts -l)",
-      "Bash(grep -r \"embed.user\\\\|embed.dice\\\\|embed.add\\\\|common.statistic\\\\|common.statistics\\\\|embed.template\\\\|common.macro\\\\|legacy.dice\" N:/Documents/Github/dicelette/discord-bot/packages/localization --include=*.json -l)",
-      "Bash(wc -l /n/Documents/Github/dicelette/discord-bot/packages/localization/locales/*.json /n/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/*.json)",
-      "Bash(npx tsc:*)",
-      "Bash(npx biome:*)",
-      "Bash(grep -r \"verifyTemplateValue\\\\|StatisticalTemplate\" n:/Documents/Github/dicelette/discord-bot --include=*.ts -l)",
-      "Bash(node -e \"const pkg = require\\(''n:/Documents/Github/dicelette/discord-bot/node_modules/@dicelette/core/package.json''\\); console.log\\(pkg.version, pkg.main, pkg.types\\)\")",
-      "Bash(grep -r \"StatisticalTemplate\\\\|createLinkTemplate\" n:/Documents/Github/dicelette/discord-bot/node_modules/@dicelette/core/dist --include=*.d.ts -n)"
-    ]
-  }
+	"permissions": {
+		"allow": [
+			"Read(//dev/**)",
+			"Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/fr.ts\")",
+			"Bash(\"n:/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/index.tsx\")",
+			"Bash(pnpm run:*)",
+			"Bash(timeout 10 node dist/apps/bot/index.js)",
+			"Bash(powershell.exe -Command \"Move-Item -Path apps/parse_result -Destination packages/parse_result\")",
+			"Bash(grep -r \"CharacterData\\\\|messageId\\\\|charName\\\\|isPrivate\\\\|selfRegistration\\\\|allowSelfRegister\" N:/Documents/Github/dicelette/discord-bot/packages/ --include=*.ts -l)",
+			"Bash(grep -r \"embed.user\\\\|embed.dice\\\\|embed.add\\\\|common.statistic\\\\|common.statistics\\\\|embed.template\\\\|common.macro\\\\|legacy.dice\" N:/Documents/Github/dicelette/discord-bot/packages/localization --include=*.json -l)",
+			"Bash(wc -l /n/Documents/Github/dicelette/discord-bot/packages/localization/locales/*.json /n/Documents/Github/dicelette/discord-bot/apps/web/src/i18n/*.json)",
+			"Bash(npx tsc:*)",
+			"Bash(npx biome:*)",
+			"Bash(grep -r \"verifyTemplateValue\\\\|StatisticalTemplate\" n:/Documents/Github/dicelette/discord-bot --include=*.ts -l)",
+			"Bash(node -e \"const pkg = require\\(''n:/Documents/Github/dicelette/discord-bot/node_modules/@dicelette/core/package.json''\\); console.log\\(pkg.version, pkg.main, pkg.types\\)\")",
+			"Bash(grep -r \"StatisticalTemplate\\\\|createLinkTemplate\" n:/Documents/Github/dicelette/discord-bot/node_modules/@dicelette/core/dist --include=*.d.ts -n)",
+			"mcp__ide__getDiagnostics"
+		]
+	}
 }

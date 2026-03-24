@@ -17,11 +17,11 @@ import { searchUserChannel } from "utils";
  */
 export function setDefaultManagerId(
 	guildData: Settings,
-	interaction: Djs.BaseInteraction,
+	guild?: Djs.Guild,
 	channel?: string
 ) {
-	if (!channel || !interaction.guild) return;
-	guildData.set(interaction.guild.id, channel, "managerId");
+	if (!channel || !guild) return;
+	guildData.set(guild.id, channel, "managerId");
 }
 
 /**

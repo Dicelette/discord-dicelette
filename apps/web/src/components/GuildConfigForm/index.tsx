@@ -1,13 +1,13 @@
-import { Alert, Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api";
+import type { ApiGuildConfig } from "../../lib/api.ts";
 import ChannelsSection from "./ChannelsSection";
+import ConfigFormFooter from "./ConfigFormFooter";
 import DiceBehaviourSection from "./DiceBehaviourSection";
 import GeneralSection from "./GeneralSection";
 import StripOOCSection from "./StripOOCSection";
 import type { Channel } from "./types";
+import { useConfigForm } from "./useConfigForm";
 
 interface Props {
 	config: ApiGuildConfig;
@@ -19,27 +19,10 @@ interface Props {
 
 export default function GuildConfigForm({ config, onSave, saving, channels }: Props) {
 	const { t } = useI18n();
-
-	const { control, handleSubmit, reset, formState } = useForm<ApiGuildConfig>({
-		defaultValues: config,
-	});
-
-	const isDirty = formState.isDirty;
-
-	useEffect(() => {
-		reset(config);
-	}, [config, reset]);
-
-	useEffect(() => {
-		if (!isDirty) return;
-		const handler = (e: BeforeUnloadEvent) => {
-			e.preventDefault();
-		};
-		window.addEventListener("beforeunload", handler);
-		return () => window.removeEventListener("beforeunload", handler);
-	}, [isDirty]);
-
-	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
+	const { control, handleSubmit, isDirty, textChannels } = useConfigForm(
+		config,
+		channels
+	);
 
 	return (
 		<Stack spacing={2}>
@@ -68,22 +51,7 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 					</Paper>
 				</Stack>
 
-				<Box className="flex justify-end gap-3 items-center" sx={{ mt: 2 }}>
-					{isDirty && (
-						<Typography variant="body2" color="warning.main">
-							{t("config.unsaved")}
-						</Typography>
-					)}
-					<Button
-						type="submit"
-						variant="contained"
-						size="large"
-						disabled={saving}
-						sx={{ minWidth: 160 }}
-					>
-						{saving ? t("common.saving") : t("common.save")}
-					</Button>
-				</Box>
+				<ConfigFormFooter isDirty={isDirty} saving={saving} />
 			</Box>
 		</Stack>
 	);
