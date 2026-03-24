@@ -2,7 +2,7 @@ import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api.ts";
 import AutoRoleSection from "./AutoRoleSection";
-import ConfigFormFooter from "./ConfigFormFooter";
+import ConfigFormFooter from "./atoms/ConfigFormFooter.tsx";
 import HiddenRollsSection from "./HiddenRollsSection";
 import SelfRegisterSection from "./SelfRegisterSection";
 import SheetsChannelsSection from "./SheetsChannelsSection";

@@ -2,7 +2,7 @@ import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
 import type { ApiGuildConfig } from "../../lib/api.ts";
 import ChannelsSection from "./atoms/ChannelsSection.tsx";
-import ConfigFormFooter from "./ConfigFormFooter";
+import ConfigFormFooter from "./atoms/ConfigFormFooter.tsx";
 import DiceBehaviourSection from "./DiceBehaviourSection";
 import GeneralSection from "./GeneralSection";
 import StripOOCSection from "./StripOOCSection";

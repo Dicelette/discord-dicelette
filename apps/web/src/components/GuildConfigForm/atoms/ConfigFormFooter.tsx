@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import { useI18n } from "../../i18n";
+import { useI18n } from "../../../i18n";
 
 interface Props {
 	isDirty: boolean;
