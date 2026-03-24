@@ -178,7 +178,7 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 					// Pas de template → ouvre le modal avec sélection des canaux
 					<Button
 						variant="outlined"
-						startIcon={<UploadIcon />}
+						startIcon={<DownloadIcon />}
 						onClick={() => setImportModalOpen(true)}
 						disabled={saving || loading}
 						size="small"
@@ -189,7 +189,7 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 					// Template existant → remplacement direct via fichier
 					<Button
 						variant="outlined"
-						startIcon={<UploadIcon />}
+						startIcon={<DownloadIcon />}
 						onClick={() => fileRef.current?.click()}
 						disabled={saving}
 						size="small"
@@ -202,7 +202,7 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 					<>
 						<Button
 							variant="outlined"
-							startIcon={<DownloadIcon />}
+							startIcon={<UploadIcon />}
 							onClick={() => exportJson(template, "template.json")}
 							size="small"
 						>
@@ -211,7 +211,7 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 						{hasCharacters && (
 							<Button
 								variant="outlined"
-								startIcon={<DownloadIcon />}
+								startIcon={<UploadIcon />}
 								onClick={handleExportCharacters}
 								size="small"
 							>

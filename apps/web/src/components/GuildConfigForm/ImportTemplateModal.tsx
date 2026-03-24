@@ -3,7 +3,7 @@ import {
 	type StatisticalTemplate,
 	verifyTemplateValue,
 } from "@dicelette/core";
-import UploadIcon from "@mui/icons-material/Upload";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
 	Alert,
 	Box,
@@ -132,7 +132,7 @@ export default function ImportTemplateModal({
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
 						<Button
 							variant="outlined"
-							startIcon={<UploadIcon />}
+							startIcon={<DownloadIcon />}
 							onClick={() => fileRef.current?.click()}
 							size="small"
 						>
@@ -212,7 +212,7 @@ export default function ImportTemplateModal({
 					variant="contained"
 					onClick={handleSubmit}
 					disabled={saving || !file || !channelId}
-					startIcon={<UploadIcon />}
+					startIcon={<DownloadIcon />}
 				>
 					{saving ? t("common.saving") : t("template.import")}
 				</Button>
