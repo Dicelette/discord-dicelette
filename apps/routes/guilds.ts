@@ -1,6 +1,7 @@
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
 import type { GuildData, UserData } from "@dicelette/types";
+import { Locale } from "discord-api-types/v6";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import Papa from "papaparse";
@@ -780,29 +781,55 @@ export function createGuildRouter(deps: DashboardDeps) {
 		// Update in-memory cache
 		template.set(guildId, validated);
 
-		// Update settings metadata
-		const current = settings.get(guildId);
-		if (current) {
-			const statsName = validated.statistics ? Object.keys(validated.statistics) : [];
-			const excludedStats = validated.statistics
-				? Object.keys(
-						Object.fromEntries(
-							Object.entries(validated.statistics).filter(([, v]) => v.exclude)
-						)
+		const statsName = validated.statistics ? Object.keys(validated.statistics) : [];
+		const excludedStats = validated.statistics
+			? Object.keys(
+					Object.fromEntries(
+						Object.entries(validated.statistics).filter(([, v]) => v.exclude)
 					)
-				: [];
-			const damageName = validated.damage ? Object.keys(validated.damage) : [];
-			current.templateID = {
-				channelId: channelId ?? current.templateID?.channelId ?? "",
-				messageId: current.templateID?.messageId ?? "",
-				statsName,
-				excludedStats,
-				damageName,
-				valid: true,
-			};
+				)
+			: [];
+		const damageName = validated.damage ? Object.keys(validated.damage) : [];
+
+		const current = settings.get(guildId);
+		const effectiveChannelId = channelId ?? current?.templateID?.channelId;
+
+		// Post (or repost) the template message to Discord
+		let newMessageId: string | undefined;
+		if (effectiveChannelId) {
+			// Delete the old message if it exists
+			const oldMessageId = current?.templateID?.messageId;
+			if (oldMessageId && current?.templateID?.channelId) {
+				await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
+			}
+			const sent = await botChannels.sendTemplate(effectiveChannelId, validated, guildId);
+			if (sent) newMessageId = sent.messageId;
+		}
+
+		const templateID = {
+			channelId: effectiveChannelId ?? "",
+			messageId: newMessageId ?? current?.templateID?.messageId ?? "",
+			statsName,
+			excludedStats,
+			damageName,
+			valid: true,
+		};
+
+		if (current) {
+			current.templateID = templateID;
 			if (publicChannelId) current.managerId = publicChannelId;
 			if (privateChannelId) current.privateChannel = privateChannelId;
 			settings.set(guildId, current);
+		} else {
+			// Première import — créer les settings
+			const newData: GuildData = {
+				lang: Locale.EnglishUS,
+				managerId: publicChannelId,
+				templateID,
+				user: {},
+			};
+			if (privateChannelId) newData.privateChannel = privateChannelId;
+			settings.set(guildId, newData);
 		}
 
 		res.json({ ok: true });

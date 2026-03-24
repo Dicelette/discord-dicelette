@@ -1,3 +1,4 @@
+import type { StatisticalTemplate } from "@dicelette/core";
 import type { Characters, Settings, TemplateData, UserSettings } from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import cors from "cors";
@@ -71,6 +72,12 @@ export interface BotChannels {
 	fetchMessage: (channelId: string, messageId: string) => Promise<BotMessage | null>;
 	/** Delete a message; returns true if deleted, false if not found or forbidden */
 	deleteMessage: (channelId: string, messageId: string) => Promise<boolean>;
+	/** Post the template message (embed + template.json attachment + register button) and pin it */
+	sendTemplate: (
+		channelId: string,
+		template: StatisticalTemplate,
+		guildId: string
+	) => Promise<{ messageId: string } | null>;
 }
 
 export interface DashboardDeps {

@@ -1,5 +1,7 @@
 import type { EventEmitter } from "node:events";
 import { startDashboardServer } from "@dicelette/dashboard";
+import { ln } from "@dicelette/localization";
+import * as Djs from "discord.js";
 import type { EClient } from "./client";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
@@ -81,6 +83,39 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					return true;
 				} catch {
 					return false;
+				}
+			},
+			sendTemplate: async (channelId, template, guildId) => {
+				const channel = client.channels.cache.get(channelId);
+				if (!channel || !channel.isTextBased()) return null;
+				try {
+					const lang = client.settings.get(guildId, "lang");
+					const ul = ln(lang ?? Djs.Locale.EnglishUS);
+					const button = new Djs.ButtonBuilder()
+						.setCustomId("register")
+						.setLabel(ul("register.button"))
+						.setStyle(Djs.ButtonStyle.Primary);
+					const row =
+						new Djs.ActionRowBuilder<Djs.MessageActionRowComponentBuilder>().addComponents(
+							button
+						);
+					const msg = await (channel as Djs.TextChannel).send({
+						components: [row],
+						files: [
+							{
+								attachment: Buffer.from(JSON.stringify(template, null, 2), "utf-8"),
+								name: "template.json",
+							},
+						],
+					});
+					try {
+						await msg.pin();
+					} catch {
+						// Missing permissions — non-fatal
+					}
+					return { messageId: msg.id };
+				} catch {
+					return null;
 				}
 			},
 		},

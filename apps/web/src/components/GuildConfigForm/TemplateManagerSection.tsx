@@ -57,27 +57,28 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 	};
 
 	useEffect(() => {
-		let cancelled = false;
+		const controller = new AbortController();
+		const { signal } = controller;
 		Promise.all([
 			templateApi
-				.get(guildId)
+				.get(guildId, { signal })
 				.then((r) => {
-					if (!cancelled) setTemplate(r.data);
+					if (!signal.aborted) setTemplate(r.data);
 				})
 				.catch(() => {
-					if (!cancelled) setTemplate(null);
+					if (!signal.aborted) setTemplate(null);
 				}),
 			charactersApi
-				.count(guildId)
+				.count(guildId, { signal })
 				.then((r) => {
-					if (!cancelled) setHasCharacters(r.data.count > 0);
+					if (!signal.aborted) setHasCharacters(r.data.count > 0);
 				})
 				.catch(() => {}),
 		]).finally(() => {
-			if (!cancelled) setLoading(false);
+			if (!signal.aborted) setLoading(false);
 		});
 		return () => {
-			cancelled = true;
+			controller.abort();
 		};
 	}, [guildId]);
 
@@ -152,7 +153,7 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 
 	return (
 		<>
-			<SectionTitle>{t("template.section")}</SectionTitle>
+			<SectionTitle>{t("common.template").toTitle()}</SectionTitle>
 
 			{error && (
 				<Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
@@ -288,7 +289,7 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 					<Chip label={`${t("template.diceType")}: ${template.diceType}`} size="small" />
 				)}
 				{template.total !== undefined && (
-					<Chip label={`${t("template.total")}: ${template.total}`} size="small" />
+					<Chip label={`${t("common.total")}: ${template.total}`} size="small" />
 				)}
 				{template.forceDistrib && (
 					<Chip
@@ -336,7 +337,7 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("template.name")}</TableCell>
+								<TableCell>{t("common.name")}</TableCell>
 								<TableCell>{t("template.sign")}</TableCell>
 								<TableCell>{t("template.value")}</TableCell>
 								<TableCell>{t("template.onNaturalDice")}</TableCell>
@@ -364,12 +365,12 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 			{template.statistics && Object.keys(template.statistics).length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
-						{t("template.statistics")}
+						{t("common.statistics").toTitle()}
 					</Typography>
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("template.name")}</TableCell>
+								<TableCell>{t("common.name").toTitle()}</TableCell>
 								<TableCell>Min</TableCell>
 								<TableCell>Max</TableCell>
 								<TableCell>{t("template.formula")}</TableCell>
@@ -395,7 +396,7 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 			{template.damage && Object.keys(template.damage).length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
-						{t("template.damage")}
+						{t("common.macro").toTitle()}
 					</Typography>
 					<Table size="small">
 						<TableHead>
