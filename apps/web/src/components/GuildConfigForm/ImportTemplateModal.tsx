@@ -19,9 +19,9 @@ import {
 	Typography,
 } from "@mui/material";
 import { useRef, useState } from "react";
-import { useI18n } from "../../../i18n";
-import ChannelSelect from "../ChannelSelect";
-import type { Channel } from "../types";
+import { useI18n } from "../../i18n";
+import ChannelSelect from "./atoms/ChannelSelect";
+import type { Channel } from "./types";
 
 export interface ImportTemplateData {
 	template: StatisticalTemplate;

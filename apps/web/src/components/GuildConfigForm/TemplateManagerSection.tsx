@@ -29,9 +29,7 @@ import { useI18n } from "../../i18n";
 import { charactersApi, templateApi } from "../../lib/api";
 import { exportJson } from "../UserConfigForm/utils";
 import SectionTitle from "./atoms/SectionTitle";
-import ImportTemplateModal, {
-	type ImportTemplateData,
-} from "./FormModal/ImportTemplateModal";
+import ImportTemplateModal, { type ImportTemplateData } from "./ImportTemplateModal";
 import type { Channel } from "./types";
 
 interface Props {
