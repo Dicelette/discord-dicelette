@@ -14,12 +14,12 @@
  *   });
  */
 
+import type { ApiGuildData } from "@dicelette/types";
 import type { Page } from "@playwright/test";
 import en from "../../../src/i18n/en.json" with { type: "json" };
 import fr from "../../../src/i18n/fr.json" with { type: "json" };
 import type {
 	ApiCharacter,
-	ApiGuildConfig,
 	ApiUserConfig,
 	DiscordGuild,
 	DiscordUser,
@@ -141,7 +141,7 @@ export async function mockInviteUrl(page: Page, guildId: string = MOCK_GUILD_NO_
 export async function mockGuildConfig(
 	page: Page,
 	guildId: string = MOCK_GUILD.id,
-	config: Partial<ApiGuildConfig> = { lang: "en", disableThread: false }
+	config: Partial<ApiGuildData> = { lang: "en", disableThread: false }
 ) {
 	await page.route(`**/api/guilds/${guildId}/config`, (route) =>
 		route.fulfill({ json: config })

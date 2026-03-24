@@ -1,13 +1,13 @@
+import type { ApiGuildData } from "@dicelette/types";
 import { Typography } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../../i18n";
-import type { ApiGuildConfig } from "../../../lib/api";
 import type { Role } from "../types";
 import RoleSelect from "./RoleSelect";
 import SectionTitle from "./SectionTitle";
 
 interface Props {
-	control: Control<ApiGuildConfig>;
+	control: Control<ApiGuildData>;
 	roles: Role[];
 }
 

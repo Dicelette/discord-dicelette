@@ -1,4 +1,5 @@
 import Typography from "@mui/material/Typography";
+import type React from "react";
 import { memo } from "react";
 
 const SectionTitle = memo(({ children }: { children: React.ReactNode }) => (

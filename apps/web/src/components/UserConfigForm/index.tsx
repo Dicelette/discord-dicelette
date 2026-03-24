@@ -4,9 +4,8 @@ import { useI18n } from "../../i18n";
 import type { ApiUserConfig } from "../../lib/api";
 import { userApi } from "../../lib/api";
 import "uniformize";
-import AttributesSection from "./AttributesSection";
+import { AttributesSection, TemplateSection } from "./atoms";
 import SnippetsSection from "./SnippetsSection";
-import TemplateSection from "./TemplateSection";
 import type { AttributesState, SnippetsState, TemplateState } from "./types";
 import { DEFAULT_TEMPLATE } from "./utils";
 

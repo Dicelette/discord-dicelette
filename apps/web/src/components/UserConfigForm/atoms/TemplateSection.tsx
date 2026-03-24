@@ -1,3 +1,4 @@
+import type { TemplateResult } from "@dicelette/types";
 import { ExpandMore } from "@mui/icons-material";
 import {
 	Accordion,
@@ -11,16 +12,11 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
+import { useI18n } from "../../../i18n";
 
-import { useI18n } from "../../i18n";
-import type { ApiTemplateResult } from "../../lib/api";
-import type { TemplateState } from "./types";
+import type { TemplateSectionProps } from "../types.ts";
 
-interface Props {
-	state: TemplateState;
-}
-
-export default function TemplateSection({ state }: Props) {
+export default function TemplateSection({ state }: TemplateSectionProps) {
 	const { t } = useI18n();
 	const {
 		value: template,
@@ -83,7 +79,7 @@ export default function TemplateSection({ state }: Props) {
 								["dice", "{{dice}}"],
 								["originalDice", "{{original_dice}}"],
 								["character", "{{character}}"],
-							] as [keyof ApiTemplateResult["format"], string][]
+							] as [keyof TemplateResult["format"], string][]
 						).map(([field, hint]) => (
 							<TextField
 								key={field}

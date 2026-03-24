@@ -1,3 +1,4 @@
+import type { ApiGuildData } from "@dicelette/types";
 import {
 	Box,
 	FormControlLabel,
@@ -8,8 +9,7 @@ import {
 } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api";
-import SectionTitle from "./atoms/SectionTitle";
+import { SectionTitle } from "./atoms";
 
 const BOOL_FIELDS = [
 	["disableThread", "config.fields.disableThread"],
@@ -20,7 +20,7 @@ const BOOL_FIELDS = [
 ] as const;
 
 interface Props {
-	control: Control<ApiGuildConfig>;
+	control: Control<ApiGuildData>;
 }
 
 export default function DiceBehaviourSection({ control }: Props) {

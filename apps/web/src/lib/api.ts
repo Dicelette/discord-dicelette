@@ -1,9 +1,9 @@
 import type { StatisticalTemplate } from "@dicelette/core";
-import type { ApiGuildData, TemplateResult } from "@dicelette/types";
+import type { ApiGuildData, UserSettingsData } from "@dicelette/types";
 import axios from "axios";
 
 export type { StatisticalTemplate };
-export type { ApiGuildData, TemplateResult };
+export type { ApiGuildData, UserSettingsData };
 
 export const api = axios.create({
 	baseURL: "/api",
@@ -29,19 +29,9 @@ export interface DiscordGuild {
 	botPresent: boolean;
 }
 
-/** @deprecated use ApiGuildData from @dicelette/types */
-export type ApiGuildConfig = ApiGuildData;
-
-/** @deprecated use TemplateResult from @dicelette/types */
-export type ApiTemplateResult = TemplateResult;
-
 export interface ApiUserConfig {
 	isAdmin: boolean;
-	userConfig: {
-		createLinkTemplate?: ApiTemplateResult;
-		snippets?: Record<string, string>;
-		attributes?: Record<string, number>;
-	} | null;
+	userConfig: Partial<UserSettingsData> | null;
 }
 
 export const authApi = {
@@ -52,8 +42,8 @@ export const authApi = {
 };
 
 export const guildApi = {
-	getConfig: (guildId: string) => api.get<ApiGuildConfig>(`/guilds/${guildId}/config`),
-	updateConfig: (guildId: string, data: Partial<ApiGuildConfig>) =>
+	getConfig: (guildId: string) => api.get<ApiGuildData>(`/guilds/${guildId}/config`),
+	updateConfig: (guildId: string, data: Partial<ApiGuildData>) =>
 		api.patch(`/guilds/${guildId}/config`, data),
 	getChannels: (guildId: string) => api.get(`/guilds/${guildId}/channels`),
 	getRoles: (guildId: string) => api.get(`/guilds/${guildId}/roles`),
@@ -115,14 +105,8 @@ export const templateApi = {
 export const userApi = {
 	getUserConfig: (guildId: string) =>
 		api.get<ApiUserConfig>(`/guilds/${guildId}/user-config`),
-	updateUserConfig: (
-		guildId: string,
-		data: Partial<{
-			snippets: Record<string, string>;
-			attributes: Record<string, number>;
-			createLinkTemplate: ApiTemplateResult;
-		}>
-	) => api.patch(`/guilds/${guildId}/user-config`, data),
+	updateUserConfig: (guildId: string, data: Partial<UserSettingsData>) =>
+		api.patch(`/guilds/${guildId}/user-config`, data),
 	validateEntries: (
 		guildId: string,
 		type: "snippets" | "attributes",

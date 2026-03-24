@@ -30,12 +30,7 @@ import { charactersApi, templateApi } from "../../lib/api";
 import { exportJson } from "../UserConfigForm/utils";
 import SectionTitle from "./atoms/SectionTitle";
 import ImportTemplateModal, { type ImportTemplateData } from "./ImportTemplateModal";
-import type { Channel } from "./types";
-
-interface Props {
-	guildId: string;
-	channels: Channel[];
-}
+import type { Props } from "./types";
 
 export default function TemplateManagerSection({ guildId, channels }: Props) {
 	const { t } = useI18n();

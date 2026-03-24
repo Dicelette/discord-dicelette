@@ -1,6 +1,5 @@
+import type { TemplateResult } from "@dicelette/types";
 import type { Dispatch, RefObject, SetStateAction } from "react";
-import type { ApiTemplateResult } from "../../lib/api";
-
 export interface SnippetsState {
 	data: Record<string, string>;
 	newName: string;
@@ -46,12 +45,28 @@ export interface AttributesState {
 }
 
 export interface TemplateState {
-	value: ApiTemplateResult;
-	setValue: Dispatch<SetStateAction<ApiTemplateResult>>;
+	value: TemplateResult;
+	setValue: Dispatch<SetStateAction<TemplateResult>>;
 	saving: boolean;
 	success: boolean;
 	error: string | null;
 	setError: (v: string | null) => void;
 	onSave: () => void;
 	onReset: () => void;
+}
+
+export interface AttributeRowProps {
+	name: string;
+	value: number;
+	onRename: (oldName: string, newName: string) => void;
+	onValueChange: (name: string, value: number) => void;
+	onDelete: (name: string) => void;
+}
+
+export interface AttributeSectionProps {
+	state: AttributesState;
+}
+
+export interface TemplateSectionProps {
+	state: TemplateState;
 }

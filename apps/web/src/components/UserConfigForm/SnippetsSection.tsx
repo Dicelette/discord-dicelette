@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 
 import { useI18n } from "../../i18n";
-import SnippetRow from "./SnippetRow";
+import { SnippetRow } from "./atoms";
 import type { SnippetsState } from "./types";
 import { exportJson } from "./utils";
 

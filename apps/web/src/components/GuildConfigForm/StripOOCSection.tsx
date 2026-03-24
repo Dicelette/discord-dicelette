@@ -1,3 +1,4 @@
+import type { ApiGuildData } from "@dicelette/types";
 import {
 	Autocomplete,
 	Box,
@@ -7,13 +8,10 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-
 import { useState } from "react";
 import { type Control, Controller, useController, useWatch } from "react-hook-form";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api";
-import SectionTitle from "./atoms/SectionTitle";
-import ChannelSelect from "./ChannelSelect";
+import { ChannelSelect, SectionTitle } from "./atoms";
 import type { Channel } from "./types";
 
 function escapeRegex(str: string) {
@@ -26,7 +24,7 @@ function buildRegex(prefix: string, suffix: string): string | undefined {
 }
 
 interface Props {
-	control: Control<ApiGuildConfig>;
+	control: Control<ApiGuildData>;
 	channels: Channel[];
 	textChannels: Channel[];
 }

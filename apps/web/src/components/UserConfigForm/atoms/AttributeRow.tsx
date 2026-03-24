@@ -2,14 +2,7 @@ import { Delete } from "@mui/icons-material";
 import { Box, IconButton, TextField } from "@mui/material";
 
 import { memo, useState } from "react";
-
-export interface AttributeRowProps {
-	name: string;
-	value: number;
-	onRename: (oldName: string, newName: string) => void;
-	onValueChange: (name: string, value: number) => void;
-	onDelete: (name: string) => void;
-}
+import type { AttributeRowProps } from "../types.ts";
 
 const AttributeRow = memo(function AttributeRow({
 	name,

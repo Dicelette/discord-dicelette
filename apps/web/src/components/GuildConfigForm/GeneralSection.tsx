@@ -1,9 +1,9 @@
+import type { ApiGuildData } from "@dicelette/types";
 import { Autocomplete, TextField } from "@mui/material";
 import { useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api";
-import SectionTitle from "./atoms/SectionTitle";
+import { SectionTitle } from "./atoms";
 
 const DISCORD_LOCALES = [
 	{ value: "en-US", label: "English" },
@@ -11,7 +11,7 @@ const DISCORD_LOCALES = [
 ];
 
 interface Props {
-	control: Control<ApiGuildConfig>;
+	control: Control<ApiGuildData>;
 }
 
 export default function GeneralSection({ control }: Props) {

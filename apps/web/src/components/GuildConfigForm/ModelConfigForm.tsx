@@ -1,23 +1,12 @@
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api.ts";
-import AutoRoleSection from "./AutoRoleSection";
-import ConfigFormFooter from "./atoms/ConfigFormFooter.tsx";
+import { AutoRoleSection, ConfigFormFooter } from "./atoms";
 import HiddenRollsSection from "./HiddenRollsSection";
 import SelfRegisterSection from "./SelfRegisterSection";
 import SheetsChannelsSection from "./SheetsChannelsSection";
 import TemplateManagerSection from "./TemplateManagerSection";
-import type { Channel, Role } from "./types";
+import type { ConfigFormProps } from "./types";
 import { useConfigForm } from "./useConfigForm.ts";
-
-interface Props {
-	config: ApiGuildConfig;
-	guildId: string;
-	onSave: (updates: Partial<ApiGuildConfig>) => Promise<void>;
-	saving: boolean;
-	channels: Channel[];
-	roles: Role[];
-}
 
 export default function ModelConfigForm({
 	config,
@@ -26,7 +15,7 @@ export default function ModelConfigForm({
 	saving,
 	channels,
 	roles,
-}: Props) {
+}: ConfigFormProps) {
 	const { t } = useI18n();
 	const { control, handleSubmit, isDirty, textChannels } = useConfigForm(
 		config,

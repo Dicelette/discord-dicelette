@@ -1,6 +1,6 @@
+import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
-import type { ApiGuildConfig } from "../../lib/api.ts";
 import ChannelsSection from "./atoms/ChannelsSection.tsx";
 import ConfigFormFooter from "./atoms/ConfigFormFooter.tsx";
 import DiceBehaviourSection from "./DiceBehaviourSection";
@@ -10,9 +10,9 @@ import type { Channel } from "./types";
 import { useConfigForm } from "./useConfigForm.ts";
 
 interface Props {
-	config: ApiGuildConfig;
+	config: ApiGuildData;
 	guildId: string;
-	onSave: (updates: Partial<ApiGuildConfig>) => Promise<void>;
+	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
 	saving: boolean;
 	channels: Channel[];
 }

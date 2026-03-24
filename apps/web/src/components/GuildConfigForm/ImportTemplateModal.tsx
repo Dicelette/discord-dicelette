@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { useRef, useState } from "react";
 import { useI18n } from "../../i18n";
-import ChannelSelect from "./atoms/ChannelSelect";
+import { ChannelSelect } from "./atoms";
 import type { Channel } from "./types";
 
 export interface ImportTemplateData {

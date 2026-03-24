@@ -1,3 +1,4 @@
+import type { ApiGuildData } from "@dicelette/types";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
 	Alert,
@@ -20,7 +21,7 @@ const ModelConfigForm = lazy(
 import type { Channel, Role } from "../components/GuildConfigForm/types";
 import UserConfigForm from "../components/UserConfigForm";
 import { useI18n } from "../i18n";
-import type { ApiGuildConfig, ApiUserConfig } from "../lib/api";
+import type { ApiUserConfig } from "../lib/api";
 import { guildApi, userApi } from "../lib/api";
 
 type ActiveTab = "admin" | "template" | "user" | "characters";
@@ -35,7 +36,7 @@ export default function DashboardPage() {
 		() => new Set(["admin"])
 	);
 	const [isAdmin, setIsAdmin] = useState(false);
-	const [config, setConfig] = useState<ApiGuildConfig | null>(null);
+	const [config, setConfig] = useState<ApiGuildData | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export default function DashboardPage() {
 			.finally(() => setLoading(false));
 	}, [guildId, t]);
 
-	const handleSave = async (updates: Partial<ApiGuildConfig>) => {
+	const handleSave = async (updates: Partial<ApiGuildData>) => {
 		if (!guildId) return;
 		setSaving(true);
 		setSaveSuccess(false);

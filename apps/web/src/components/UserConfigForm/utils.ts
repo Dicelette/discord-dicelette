@@ -1,6 +1,6 @@
-import type { ApiTemplateResult } from "../../lib/api";
+import type { TemplateResult } from "@dicelette/types";
 
-export const DEFAULT_TEMPLATE: ApiTemplateResult = {
+export const DEFAULT_TEMPLATE: TemplateResult = {
 	results: "{{info}} {{result}}",
 	final: "[[{{stats}} {{results}}]](<{{link}}>)",
 	joinResult: "; ",

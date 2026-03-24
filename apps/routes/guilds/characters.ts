@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import Papa from "papaparse";
 import type { DashboardDeps } from "..";
-import { CHAR_CACHE_TTL, charCache, type ApiCharacter, type EmbedField } from "./types";
+import { type ApiCharacter, CHAR_CACHE_TTL, charCache, type EmbedField } from "./types";
 import { fetchCharacterEmbeds, makeRequireAdmin, requireAuth } from "./utils";
 
 export function createCharactersRouter(deps: DashboardDeps) {
@@ -117,73 +117,78 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	});
 
 	// GET /:guildId/characters/export — export CSV de tous les personnages (admin uniquement)
-	router.get("/export", requireAuth, requireAdmin, async (req: Request, res: Response) => {
-		const guildId = req.params.guildId as string;
+	router.get(
+		"/export",
+		requireAuth,
+		requireAdmin,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
 
-		const guildData = settings.get(guildId);
-		if (!guildData) {
-			res.status(404).json({ error: "Guild not found" });
-			return;
-		}
-
-		const statsName: string[] = guildData.templateID?.statsName ?? [];
-		const hasPrivateChannel = !!guildData.privateChannel;
-		const allUsers = guildData.user ?? {};
-
-		type CsvRow = Record<string, string | number | boolean | undefined>;
-		const rows: CsvRow[] = [];
-
-		for (const [uid, charList] of Object.entries(allUsers)) {
-			const memChars = (characters.get(guildId, uid) as UserData[] | undefined) ?? [];
-			const byName = new Map<string | null | undefined, UserData>(
-				memChars.map((c) => [c.userName ?? null, c])
-			);
-
-			for (const char of charList) {
-				const mem = byName.get(char.charName ?? null) ?? byName.get(null);
-				const row: CsvRow = {
-					user: `'${uid}`,
-					charName: char.charName ?? undefined,
-					avatar: mem?.avatar ?? undefined,
-					channel: mem?.channel ? `'${mem.channel}` : undefined,
-				};
-
-				if (hasPrivateChannel) row.isPrivate = char.isPrivate ?? false;
-
-				for (const name of statsName) {
-					const normalized = name.toLowerCase().replace(/\s+/g, "_");
-					row[name] = mem?.stats?.[normalized] ?? mem?.stats?.[name] ?? undefined;
-				}
-
-				if (mem?.damage && Object.keys(mem.damage).length > 0) {
-					row.dice = `'${Object.entries(mem.damage)
-						.map(([k, v]) => `- ${k}: ${v}`)
-						.join("\n")}`;
-				}
-
-				rows.push(row);
+			const guildData = settings.get(guildId);
+			if (!guildData) {
+				res.status(404).json({ error: "Guild not found" });
+				return;
 			}
+
+			const statsName: string[] = guildData.templateID?.statsName ?? [];
+			const hasPrivateChannel = !!guildData.privateChannel;
+			const allUsers = guildData.user ?? {};
+
+			type CsvRow = Record<string, string | number | boolean | undefined>;
+			const rows: CsvRow[] = [];
+
+			for (const [uid, charList] of Object.entries(allUsers)) {
+				const memChars = (characters.get(guildId, uid) as UserData[] | undefined) ?? [];
+				const byName = new Map<string | null | undefined, UserData>(
+					memChars.map((c) => [c.userName ?? null, c])
+				);
+
+				for (const char of charList) {
+					const mem = byName.get(char.charName ?? null) ?? byName.get(null);
+					const row: CsvRow = {
+						user: `'${uid}`,
+						charName: char.charName ?? undefined,
+						avatar: mem?.avatar ?? undefined,
+						channel: mem?.channel ? `'${mem.channel}` : undefined,
+					};
+
+					if (hasPrivateChannel) row.isPrivate = char.isPrivate ?? false;
+
+					for (const name of statsName) {
+						const normalized = name.toLowerCase().replace(/\s+/g, "_");
+						row[name] = mem?.stats?.[normalized] ?? mem?.stats?.[name] ?? undefined;
+					}
+
+					if (mem?.damage && Object.keys(mem.damage).length > 0) {
+						row.dice = `'${Object.entries(mem.damage)
+							.map(([k, v]) => `- ${k}: ${v}`)
+							.join("\n")}`;
+					}
+
+					rows.push(row);
+				}
+			}
+
+			const columns = ["user", "charName", "avatar", "channel"];
+			if (hasPrivateChannel) columns.push("isPrivate");
+			if (statsName.length > 0) columns.push(...statsName);
+			columns.push("dice");
+
+			const csv = Papa.unparse(rows, {
+				columns,
+				delimiter: ";",
+				header: true,
+				quotes: false,
+				skipEmptyLines: true,
+			});
+
+			// BOM UTF-8 pour Excel
+			const buf = Buffer.from(`\ufeff${csv}`, "utf-8");
+			res.setHeader("Content-Type", "text/csv; charset=utf-8");
+			res.setHeader("Content-Disposition", 'attachment; filename="characters.csv"');
+			res.send(buf);
 		}
-
-		const columns = ["user", "charName", "avatar", "channel"];
-		if (hasPrivateChannel) columns.push("isPrivate");
-		if (statsName.length > 0) columns.push(...statsName);
-		columns.push("dice");
-
-		const csv = Papa.unparse(rows, {
-			columns,
-			delimiter: ";",
-			header: true,
-			quotes: false,
-			skipEmptyLines: true,
-		});
-
-		// BOM UTF-8 pour Excel
-		const buf = Buffer.from(`\ufeff${csv}`, "utf-8");
-		res.setHeader("Content-Type", "text/csv; charset=utf-8");
-		res.setHeader("Content-Disposition", 'attachment; filename="characters.csv"');
-		res.send(buf);
-	});
+	);
 
 	// POST /:guildId/characters/bulk-delete — supprime tous les personnages du serveur (admin uniquement)
 	router.post(

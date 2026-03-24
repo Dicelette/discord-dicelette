@@ -13,16 +13,12 @@ import {
 	Typography,
 } from "@mui/material";
 
-import { useI18n } from "../../i18n";
+import { useI18n } from "../../../i18n";
+import type { AttributeSectionProps } from "../types.ts";
+import { exportJson } from "../utils";
 import AttributeRow from "./AttributeRow";
-import type { AttributesState } from "./types";
-import { exportJson } from "./utils";
 
-interface Props {
-	state: AttributesState;
-}
-
-export default function AttributesSection({ state }: Props) {
+export default function AttributesSection({ state }: AttributeSectionProps) {
 	const { t } = useI18n();
 	const {
 		data: attributes,

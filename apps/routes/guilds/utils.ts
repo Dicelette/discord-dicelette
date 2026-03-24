@@ -6,13 +6,13 @@ import type { Request, Response } from "express";
 import type { BotChannels, DashboardDeps } from "..";
 import {
 	DISCORD_API,
+	type EmbedField,
 	PERM_CACHE_TTL,
+	permCache,
+	type RawEmbed,
 	SNOWFLAKE_RE,
 	STATS_TITLES,
 	USER_EMBED_MARKERS,
-	type EmbedField,
-	type RawEmbed,
-	permCache,
 } from "./types";
 
 // ---------------------------------------------------------------------------

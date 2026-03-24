@@ -9,19 +9,24 @@ export function createChannelsRouter(deps: DashboardDeps) {
 	const requireAdmin = makeRequireAdmin(botGuilds);
 
 	// GET /:guildId/channels
-	router.get("/channels", requireAuth, requireAdmin, async (req: Request, res: Response) => {
-		const guildId = req.params.guildId as string;
+	router.get(
+		"/channels",
+		requireAuth,
+		requireAdmin,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
 
-		const guild = botGuilds.get(guildId);
-		if (!guild) {
-			res.status(404).json({ error: "Guild not found or bot not present" });
-			return;
+			const guild = botGuilds.get(guildId);
+			if (!guild) {
+				res.status(404).json({ error: "Guild not found or bot not present" });
+				return;
+			}
+
+			// 0=text, 4=category, 5=announcement, 15=forum
+			const filtered = guild.channels.filter((c) => [0, 4, 5, 15].includes(c.type));
+			res.json(filtered);
 		}
-
-		// 0=text, 4=category, 5=announcement, 15=forum
-		const filtered = guild.channels.filter((c) => [0, 4, 5, 15].includes(c.type));
-		res.json(filtered);
-	});
+	);
 
 	// GET /:guildId/roles
 	router.get("/roles", requireAuth, requireAdmin, async (req: Request, res: Response) => {
