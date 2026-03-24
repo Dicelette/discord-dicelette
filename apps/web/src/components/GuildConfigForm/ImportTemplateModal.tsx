@@ -14,6 +14,7 @@ import {
 	DialogTitle,
 	Divider,
 	FormControlLabel,
+	Paper,
 	Stack,
 	Switch,
 	Typography,
@@ -110,8 +111,8 @@ export default function ImportTemplateModal({
 			await onImport({
 				template: validated,
 				channelId,
-				publicChannelId: publicChannelId || undefined,
-				privateChannelId: privateChannelId || undefined,
+				publicChannelId,
+				privateChannelId,
 				deleteCharacters,
 			});
 			handleClose();
@@ -136,7 +137,7 @@ export default function ImportTemplateModal({
 		<Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
 			<DialogTitle>{t("template.importModalTitle")}</DialogTitle>
 
-			<DialogContent>
+			<DialogContent sx={{ bgcolor: "background.paper" }}>
 				<Stack spacing={2} sx={{ mt: 1 }}>
 					{error && <Alert severity="error">{error}</Alert>}
 
@@ -148,75 +149,90 @@ export default function ImportTemplateModal({
 						style={{ display: "none" }}
 						onChange={handleFileChange}
 					/>
-					<Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-						<Button
-							variant="outlined"
-							startIcon={<DownloadIcon />}
-							onClick={() => fileRef.current?.click()}
-							size="small"
-						>
-							{t("template.fileLabel")}
-						</Button>
-						<Typography variant="body2" color={file ? "text.primary" : "text.secondary"}>
-							{file ? file.name : t("template.fileNotSelected")}
-						</Typography>
-					</Box>
+					<Paper
+						variant="outlined"
+						sx={{ p: 1.5, bgcolor: "action.hover", borderColor: "divider" }}
+					>
+						<Stack spacing={0.75}>
+							<Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+								{t("template.fileLabel")}
+							</Typography>
+							<Box
+								sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
+							>
+								<Button
+									variant="outlined"
+									startIcon={<DownloadIcon />}
+									onClick={() => fileRef.current?.click()}
+									size="small"
+								>
+									{t("template.fileLabel")}
+								</Button>
+								<Typography
+									variant="body2"
+									color={file ? "text.primary" : "text.secondary"}
+								>
+									{file ? file.name : t("template.fileNotSelected")}
+								</Typography>
+							</Box>
+						</Stack>
+					</Paper>
 
-					<Divider />
+					<Stack spacing={1.5}>
+						{/* Canal de la template (obligatoire) */}
+						<Box>
+							<ChannelSelect
+								label={`${t("template.templateChannel")} *`}
+								value={channelId || undefined}
+								channels={templateChannels}
+								onChange={(value) => {
+									setChannelId(value);
+									setError(null);
+								}}
+							/>
+							<Typography
+								variant="caption"
+								color="text.secondary"
+								sx={{ mt: 0.5, pl: 0.5 }}
+							>
+								{t("template.templateChannelHelp")}
+							</Typography>
+						</Box>
 
-					{/* Canal de la template (obligatoire) */}
-					<Box>
-						<ChannelSelect
-							label={`${t("template.templateChannel")} *`}
-							value={channelId || undefined}
-							channels={templateChannels}
-							onChange={(value) => {
-								setChannelId(value);
-								setError(null);
-							}}
-						/>
-						<Typography
-							variant="caption"
-							color="text.secondary"
-							sx={{ mt: 0.5, pl: 0.5 }}
-						>
-							{t("template.templateChannelHelp")}
-						</Typography>
-					</Box>
+						{/* Canal public (optionnel) */}
+						<Box>
+							<ChannelSelect
+								label={t("config.defaultSheet")}
+								value={publicChannelId || undefined}
+								channels={charChannels}
+								onChange={setPublicChannelId}
+							/>
+							<Typography
+								variant="caption"
+								color="text.secondary"
+								sx={{ mt: 0.5, pl: 0.5 }}
+							>
+								{t("template.publicChannelHelp")}
+							</Typography>
+						</Box>
 
-					{/* Canal public (optionnel) */}
-					<Box>
-						<ChannelSelect
-							label={t("config.defaultSheet")}
-							value={publicChannelId || undefined}
-							channels={charChannels}
-							onChange={setPublicChannelId}
-						/>
-						<Typography
-							variant="caption"
-							color="text.secondary"
-							sx={{ mt: 0.5, pl: 0.5 }}
-						>
-							{t("template.publicChannelHelp")}
-						</Typography>
-					</Box>
-
-					{/* Canal privé (optionnel) */}
-					<Box>
-						<ChannelSelect
-							label={t("config.fields.privateChannel")}
-							value={privateChannelId || undefined}
-							channels={charChannels}
-							onChange={setPrivateChannelId}
-						/>
-						<Typography
-							variant="caption"
-							color="text.secondary"
-							sx={{ mt: 0.5, pl: 0.5 }}
-						>
-							{t("template.privateChannelHelp")}
-						</Typography>
-					</Box>
+						{/* Canal privé (optionnel) */}
+						<Box>
+							<ChannelSelect
+								label={t("config.fields.privateChannel")}
+								value={privateChannelId || undefined}
+								channels={charChannels}
+								onChange={setPrivateChannelId}
+							/>
+							<Typography
+								variant="caption"
+								color="text.secondary"
+								sx={{ mt: 0.5, pl: 0.5 }}
+							>
+								{t("template.privateChannelHelp")}
+							</Typography>
+						</Box>
+					</Stack>
 
 					{/* Suppression des personnages — visible seulement s'il y en a */}
 					{hasCharacters && (
@@ -252,7 +268,7 @@ export default function ImportTemplateModal({
 				</Stack>
 			</DialogContent>
 
-			<DialogActions>
+			<DialogActions sx={{ bgcolor: "background.paper" }}>
 				<Button onClick={handleClose}>{t("common.cancel")}</Button>
 				<Button
 					variant="contained"

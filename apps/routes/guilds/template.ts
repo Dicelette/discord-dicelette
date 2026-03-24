@@ -53,6 +53,9 @@ export function createTemplateRouter(deps: DashboardDeps) {
 	// POST /:guildId/template — importe ou met à jour le template statistique (admin uniquement)
 	router.post("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
+		const body = req.body as Record<string, unknown>;
+		const hasPublicChannelId = Object.hasOwn(body, "publicChannelId");
+		const hasPrivateChannelId = Object.hasOwn(body, "privateChannelId");
 
 		const {
 			template: templateBody,
@@ -93,6 +96,12 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		const current = settings.get(guildId);
 		const effectiveChannelId = channelId ?? current?.templateID?.channelId;
+		const effectivePublicChannelId = hasPublicChannelId
+			? publicChannelId || undefined
+			: current?.managerId;
+		const effectivePrivateChannelId = hasPrivateChannelId
+			? privateChannelId || undefined
+			: current?.privateChannel;
 
 		// Poste (ou reposte) le message template sur Discord
 		let newMessageId: string | undefined;
@@ -105,8 +114,8 @@ export function createTemplateRouter(deps: DashboardDeps) {
 				effectiveChannelId,
 				validated,
 				guildId,
-				publicChannelId,
-				privateChannelId
+				effectivePublicChannelId,
+				effectivePrivateChannelId
 			);
 			if (sent) newMessageId = sent.messageId;
 		}
@@ -122,14 +131,14 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		if (current) {
 			current.templateID = templateID;
-			if (publicChannelId) current.managerId = publicChannelId;
-			if (privateChannelId) current.privateChannel = privateChannelId;
+			if (hasPublicChannelId) current.managerId = publicChannelId || undefined;
+			if (hasPrivateChannelId) current.privateChannel = privateChannelId || undefined;
 			settings.set(guildId, current);
 		} else {
 			// Première importation — création des settings
 			const newData: GuildData = {
 				lang: settings.get(guildId, "lang") ?? Locale.EnglishUS,
-				managerId: publicChannelId,
+				managerId: publicChannelId || undefined,
 				templateID,
 				user: {},
 			};

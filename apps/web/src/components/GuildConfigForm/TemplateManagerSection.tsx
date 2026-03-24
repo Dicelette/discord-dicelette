@@ -53,6 +53,9 @@ export default function TemplateManagerSection({
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [importModalOpen, setImportModalOpen] = useState(false);
 	const [hasCharacters, setHasCharacters] = useState(false);
+	const [templateChannelId, setTemplateChannelId] = useState(defaultTemplateChannelId);
+	const [publicChannelId, setPublicChannelId] = useState(defaultPublicChannelId);
+	const [privateChannelId, setPrivateChannelId] = useState(defaultPrivateChannelId);
 
 	const flash = (setter: (v: string | null) => void, msg: string) => {
 		setter(msg);
@@ -85,6 +88,18 @@ export default function TemplateManagerSection({
 		};
 	}, [guildId]);
 
+	useEffect(() => {
+		setTemplateChannelId(defaultTemplateChannelId);
+	}, [defaultTemplateChannelId]);
+
+	useEffect(() => {
+		setPublicChannelId(defaultPublicChannelId);
+	}, [defaultPublicChannelId]);
+
+	useEffect(() => {
+		setPrivateChannelId(defaultPrivateChannelId);
+	}, [defaultPrivateChannelId]);
+
 	// Import depuis le modal (premier enregistrement — avec sélection des canaux)
 	const handleModalImport = async (data: ImportTemplateData) => {
 		setSaving(true);
@@ -100,6 +115,9 @@ export default function TemplateManagerSection({
 				privateChannelId: data.privateChannelId,
 			});
 			setTemplate(data.template);
+			setTemplateChannelId(data.channelId);
+			setPublicChannelId(data.publicChannelId || undefined);
+			setPrivateChannelId(data.privateChannelId || undefined);
 			flash(setSuccess, t("template.importSuccess"));
 		} finally {
 			setSaving(false);
@@ -232,15 +250,9 @@ export default function TemplateManagerSection({
 			) : (
 				<TemplateView
 					template={template}
-					defaultTemplateChannel={
-						channels.find((c) => c.id === defaultTemplateChannelId)?.name
-					}
-					defaultPrivateChannel={
-						channels.find((c) => c.id === defaultPrivateChannelId)?.name
-					}
-					defaultPublicChannel={
-						channels.find((c) => c.id === defaultPublicChannelId)?.name
-					}
+					defaultTemplateChannel={channels.find((c) => c.id === templateChannelId)?.name}
+					defaultPrivateChannel={channels.find((c) => c.id === privateChannelId)?.name}
+					defaultPublicChannel={channels.find((c) => c.id === publicChannelId)?.name}
 				/>
 			)}
 
@@ -251,9 +263,9 @@ export default function TemplateManagerSection({
 				onImport={handleModalImport}
 				channels={channels}
 				hasCharacters={hasCharacters}
-				defaultTemplateChannelId={defaultTemplateChannelId}
-				defaultPublicChannelId={defaultPublicChannelId}
-				defaultPrivateChannelId={defaultPrivateChannelId}
+				defaultTemplateChannelId={templateChannelId}
+				defaultPublicChannelId={publicChannelId}
+				defaultPrivateChannelId={privateChannelId}
 			/>
 
 			{/* Confirmation suppression */}
