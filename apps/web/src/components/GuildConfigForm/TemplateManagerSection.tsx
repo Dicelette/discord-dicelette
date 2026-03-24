@@ -32,7 +32,17 @@ import SectionTitle from "./atoms/SectionTitle";
 import ImportTemplateModal, { type ImportTemplateData } from "./ImportTemplateModal";
 import type { Props } from "./types";
 
-export default function TemplateManagerSection({ guildId, channels }: Props) {
+export default function TemplateManagerSection({
+	guildId,
+	channels,
+	defaultPublicChannelId,
+	defaultPrivateChannelId,
+	defaultTemplateChannelId,
+}: Props & {
+	defaultPublicChannelId?: string;
+	defaultPrivateChannelId?: string;
+	defaultTemplateChannelId?: string;
+}) {
 	const { t } = useI18n();
 	const fileRef = useRef<HTMLInputElement>(null);
 	const [template, setTemplate] = useState<StatisticalTemplate | null>(null);
@@ -169,29 +179,15 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 					onChange={handleFileImport}
 				/>
 
-				{template === null ? (
-					// Pas de template → ouvre le modal avec sélection des canaux
-					<Button
-						variant="outlined"
-						startIcon={<DownloadIcon />}
-						onClick={() => setImportModalOpen(true)}
-						disabled={saving || loading}
-						size="small"
-					>
-						{t("template.import")}
-					</Button>
-				) : (
-					// Template existant → remplacement direct via fichier
-					<Button
-						variant="outlined"
-						startIcon={<DownloadIcon />}
-						onClick={() => fileRef.current?.click()}
-						disabled={saving}
-						size="small"
-					>
-						{t("template.import")}
-					</Button>
-				)}
+				<Button
+					variant="outlined"
+					startIcon={<DownloadIcon />}
+					onClick={() => setImportModalOpen(true)}
+					disabled={saving || loading}
+					size="small"
+				>
+					{t("template.import")}
+				</Button>
 
 				{template && (
 					<>
@@ -234,7 +230,18 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 					{t("template.none")}
 				</Typography>
 			) : (
-				<TemplateView template={template} />
+				<TemplateView
+					template={template}
+					defaultTemplateChannel={
+						channels.find((c) => c.id === defaultTemplateChannelId)?.name
+					}
+					defaultPrivateChannel={
+						channels.find((c) => c.id === defaultPrivateChannelId)?.name
+					}
+					defaultPublicChannel={
+						channels.find((c) => c.id === defaultPublicChannelId)?.name
+					}
+				/>
 			)}
 
 			{/* Modal d'import initial */}
@@ -244,6 +251,8 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 				onImport={handleModalImport}
 				channels={channels}
 				hasCharacters={hasCharacters}
+				defaultPublicChannelId={defaultPublicChannelId}
+				defaultPrivateChannelId={defaultPrivateChannelId}
 			/>
 
 			{/* Confirmation suppression */}
@@ -263,8 +272,23 @@ export default function TemplateManagerSection({ guildId, channels }: Props) {
 	);
 }
 
-function TemplateView({ template }: { template: StatisticalTemplate }) {
+function TemplateView({
+	template,
+	defaultPublicChannel,
+	defaultPrivateChannel,
+	defaultTemplateChannel,
+}: {
+	template: StatisticalTemplate;
+	defaultPublicChannel?: string;
+	defaultPrivateChannel?: string;
+	defaultTemplateChannel?: string;
+}) {
 	const { t } = useI18n();
+	const channelInfos = [
+		{ label: t("config.fields.defaultChannel"), value: defaultPublicChannel },
+		{ label: t("config.fields.privateChannel"), value: defaultPrivateChannel },
+		{ label: t("template.templateChannel"), value: defaultTemplateChannel },
+	];
 
 	return (
 		<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -409,6 +433,73 @@ function TemplateView({ template }: { template: StatisticalTemplate }) {
 					</Table>
 				</Paper>
 			)}
+			{/* Channel, privée + où est la template, pour référence uniquement, ne peut pas être changé sauf modif de la template par le modal */}
+			<Paper variant="outlined" sx={{ p: 2 }}>
+				<Box
+					sx={{
+						display: "grid",
+						gridTemplateColumns: {
+							xs: "1fr",
+							sm: "repeat(2, minmax(0, 1fr))",
+							md: "repeat(3, minmax(0, 1fr))",
+						},
+						gap: 1,
+					}}
+				>
+					{channelInfos.map(({ label, value }) => {
+						const isMissing = !value;
+						return (
+							<Box
+								key={label}
+								sx={{
+									border: 1,
+									borderColor: "divider",
+									borderRadius: 1,
+									p: 1.25,
+									minHeight: 68,
+								}}
+							>
+								<Typography
+									variant="caption"
+									color="text.secondary"
+									sx={{ display: "block", mb: 0.5, textAlign: "center" }}
+								>
+									{label}
+								</Typography>
+								<Chip
+									size="small"
+									label={value ? `#${value}` : t("common.none")}
+									variant={isMissing ? "outlined" : "filled"}
+									sx={{
+										maxWidth: "100%",
+										display: "flex",
+										mx: "auto",
+										fontWeight: 600,
+										opacity: isMissing ? 0.6 : 1,
+										borderColor: isMissing ? "action.disabledBackground" : undefined,
+										color: isMissing ? "text.secondary" : undefined,
+										bgcolor: isMissing ? "action.hover" : undefined,
+										"& .MuiChip-label": {
+											display: "block",
+											overflow: "hidden",
+											textOverflow: "ellipsis",
+											whiteSpace: "nowrap",
+										},
+										"&:hover": value
+											? {
+													transform: "translateY(-1px)",
+													boxShadow: 1,
+													bgcolor: isMissing ? "action.selected" : "primary.dark",
+												}
+											: {},
+									}}
+									title={value ? `#${value}` : t("common.none")}
+								/>
+							</Box>
+						);
+					})}
+				</Box>
+			</Paper>
 		</Box>
 	);
 }

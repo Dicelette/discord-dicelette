@@ -7,9 +7,14 @@ import type { Channel } from "./types";
 interface Props {
 	control: Control<ApiGuildData>;
 	textChannels: Channel[];
+	disabled?: boolean;
 }
 
-export default function SheetsChannelsSection({ control, textChannels }: Props) {
+export default function SheetsChannelsSection({
+	control,
+	textChannels,
+	disabled,
+}: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -25,6 +30,7 @@ export default function SheetsChannelsSection({ control, textChannels }: Props) 
 							value={field.value}
 							channels={textChannels}
 							onChange={(v) => field.onChange(v || undefined)}
+							disabled={disabled}
 						/>
 					)}
 				/>
@@ -37,6 +43,7 @@ export default function SheetsChannelsSection({ control, textChannels }: Props) 
 							value={field.value}
 							channels={textChannels}
 							onChange={(v) => field.onChange(v || undefined)}
+							disabled={disabled}
 						/>
 					)}
 				/>

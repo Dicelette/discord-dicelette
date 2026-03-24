@@ -7,17 +7,19 @@ interface ChannelSelectProps {
 	value: string | undefined;
 	channels: Channel[];
 	helperText?: string;
+	disabled?: boolean;
 	onChange: (v: string) => void;
 }
 
 const ChannelSelect = memo(
-	({ label, value, channels, helperText, onChange }: ChannelSelectProps) => {
+	({ label, value, channels, helperText, onChange, disabled }: ChannelSelectProps) => {
 		const selected = channels.find((c) => c.id === value) ?? null;
 		return (
 			<>
 				<Autocomplete
 					fullWidth
 					size="small"
+					disabled={disabled}
 					options={channels}
 					getOptionKey={(c) => c.id}
 					getOptionLabel={(c) => `# ${c.name}`}

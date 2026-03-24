@@ -18,7 +18,7 @@ import {
 	Switch,
 	Typography,
 } from "@mui/material";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../../i18n";
 import { ChannelSelect } from "./atoms";
 import type { Channel } from "./types";
@@ -37,6 +37,8 @@ interface Props {
 	onImport: (data: ImportTemplateData) => Promise<void>;
 	channels: Channel[];
 	hasCharacters: boolean;
+	defaultPublicChannelId?: string;
+	defaultPrivateChannelId?: string;
 }
 
 export default function ImportTemplateModal({
@@ -45,17 +47,28 @@ export default function ImportTemplateModal({
 	onImport,
 	channels,
 	hasCharacters,
+	defaultPublicChannelId,
+	defaultPrivateChannelId,
 }: Props) {
 	const { t } = useI18n();
 	const fileRef = useRef<HTMLInputElement>(null);
 
 	const [file, setFile] = useState<File | null>(null);
 	const [channelId, setChannelId] = useState("");
-	const [publicChannelId, setPublicChannelId] = useState("");
-	const [privateChannelId, setPrivateChannelId] = useState("");
+	const [publicChannelId, setPublicChannelId] = useState(defaultPublicChannelId ?? "");
+	const [privateChannelId, setPrivateChannelId] = useState(defaultPrivateChannelId ?? "");
 	const [deleteCharacters, setDeleteCharacters] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
+
+	// Synchronise les valeurs par défaut si la config change
+	useEffect(() => {
+		setPublicChannelId(defaultPublicChannelId ?? "");
+	}, [defaultPublicChannelId]);
+
+	useEffect(() => {
+		setPrivateChannelId(defaultPrivateChannelId ?? "");
+	}, [defaultPrivateChannelId]);
 
 	// Canal template : texte uniquement (type 0)
 	const templateChannels = channels.filter((c) => c.type === 0);
@@ -106,8 +119,8 @@ export default function ImportTemplateModal({
 	const handleClose = () => {
 		setFile(null);
 		setChannelId("");
-		setPublicChannelId("");
-		setPrivateChannelId("");
+		setPublicChannelId(defaultPublicChannelId ?? "");
+		setPrivateChannelId(defaultPrivateChannelId ?? "");
 		setDeleteCharacters(false);
 		setError(null);
 		onClose();
@@ -156,7 +169,7 @@ export default function ImportTemplateModal({
 
 					{/* Canal public (optionnel) */}
 					<ChannelSelect
-						label={t("template.publicChannel")}
+						label={t("config.fields.defaultChannel")}
 						value={publicChannelId || undefined}
 						channels={charChannels}
 						helperText={t("template.publicChannelHelp")}

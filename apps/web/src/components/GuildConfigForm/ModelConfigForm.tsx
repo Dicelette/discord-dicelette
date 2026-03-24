@@ -3,7 +3,6 @@ import { useI18n } from "../../i18n";
 import { AutoRoleSection, ConfigFormFooter } from "./atoms";
 import HiddenRollsSection from "./HiddenRollsSection";
 import SelfRegisterSection from "./SelfRegisterSection";
-import SheetsChannelsSection from "./SheetsChannelsSection";
 import TemplateManagerSection from "./TemplateManagerSection";
 import type { ConfigFormProps } from "./types";
 import { useConfigForm } from "./useConfigForm.ts";
@@ -29,10 +28,12 @@ export default function ModelConfigForm({
 			<Box component="form" onSubmit={handleSubmit(onSave)}>
 				<Stack spacing={2}>
 					<Paper sx={{ p: 3 }}>
-						<TemplateManagerSection guildId={guildId} channels={channels} />
-					</Paper>
-					<Paper sx={{ p: 3 }}>
-						<SheetsChannelsSection control={control} textChannels={textChannels} />
+						<TemplateManagerSection
+							guildId={guildId}
+							channels={channels}
+							defaultPublicChannelId={config.managerId}
+							defaultPrivateChannelId={config.privateChannel}
+						/>
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
