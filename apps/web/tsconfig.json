@@ -12,13 +12,7 @@
 		"jsx": "react-jsx",
 		"strict": true,
 		"skipLibCheck": true,
-		"resolveJsonModule": true,
-		"paths": {
-			"@lib/*": ["./src/lib/*"],
-			"@components/*": ["./src/components/*"],
-			"@hooks/*": ["./src/hooks/*"],
-			"@i18n/*": ["./src/i18n/*"]
-		}
+		"resolveJsonModule": true
 	},
 	"include": ["src", "vite.config.ts", "tests/**/*"]
 }

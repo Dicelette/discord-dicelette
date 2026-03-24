@@ -42,11 +42,21 @@ export default function TemplateManagerSection({ guildId }: { guildId: string })
 	};
 
 	useEffect(() => {
+		let cancelled = false;
 		templateApi
 			.get(guildId)
-			.then((r) => setTemplate(r.data))
-			.catch(() => setTemplate(null))
-			.finally(() => setLoading(false));
+			.then((r) => {
+				if (!cancelled) setTemplate(r.data);
+			})
+			.catch(() => {
+				if (!cancelled) setTemplate(null);
+			})
+			.finally(() => {
+				if (!cancelled) setLoading(false);
+			});
+		return () => {
+			cancelled = true;
+		};
 	}, [guildId]);
 
 	const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {

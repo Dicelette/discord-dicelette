@@ -14,16 +14,16 @@
  *   });
  */
 
-import en from "@i18n/en.json" with { type: "json" };
-import fr from "@i18n/fr.json" with { type: "json" };
+import type { Page } from "@playwright/test";
+import en from "../../../src/i18n/en.json" with { type: "json" };
+import fr from "../../../src/i18n/fr.json" with { type: "json" };
 import type {
 	ApiCharacter,
 	ApiGuildConfig,
 	ApiUserConfig,
 	DiscordGuild,
 	DiscordUser,
-} from "@lib/api";
-import type { Page } from "@playwright/test";
+} from "../../../src/lib/api";
 
 // ---------------------------------------------------------------------------
 // Données de test réutilisables
