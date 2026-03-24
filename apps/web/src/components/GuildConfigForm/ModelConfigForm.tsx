@@ -31,6 +31,7 @@ export default function ModelConfigForm({
 						<TemplateManagerSection
 							guildId={guildId}
 							channels={channels}
+							defaultTemplateChannelId={config.templateID?.channelId}
 							defaultPublicChannelId={config.managerId}
 							defaultPrivateChannelId={config.privateChannel}
 						/>

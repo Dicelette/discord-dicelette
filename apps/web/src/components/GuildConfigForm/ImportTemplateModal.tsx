@@ -37,6 +37,7 @@ interface Props {
 	onImport: (data: ImportTemplateData) => Promise<void>;
 	channels: Channel[];
 	hasCharacters: boolean;
+	defaultTemplateChannelId?: string;
 	defaultPublicChannelId?: string;
 	defaultPrivateChannelId?: string;
 }
@@ -47,6 +48,7 @@ export default function ImportTemplateModal({
 	onImport,
 	channels,
 	hasCharacters,
+	defaultTemplateChannelId,
 	defaultPublicChannelId,
 	defaultPrivateChannelId,
 }: Props) {
@@ -54,7 +56,7 @@ export default function ImportTemplateModal({
 	const fileRef = useRef<HTMLInputElement>(null);
 
 	const [file, setFile] = useState<File | null>(null);
-	const [channelId, setChannelId] = useState("");
+	const [channelId, setChannelId] = useState(defaultTemplateChannelId ?? "");
 	const [publicChannelId, setPublicChannelId] = useState(defaultPublicChannelId ?? "");
 	const [privateChannelId, setPrivateChannelId] = useState(defaultPrivateChannelId ?? "");
 	const [deleteCharacters, setDeleteCharacters] = useState(false);
@@ -62,6 +64,10 @@ export default function ImportTemplateModal({
 	const [saving, setSaving] = useState(false);
 
 	// Synchronise les valeurs par défaut si la config change
+	useEffect(() => {
+		setChannelId(defaultTemplateChannelId ?? "");
+	}, [defaultTemplateChannelId]);
+
 	useEffect(() => {
 		setPublicChannelId(defaultPublicChannelId ?? "");
 	}, [defaultPublicChannelId]);
@@ -118,7 +124,7 @@ export default function ImportTemplateModal({
 
 	const handleClose = () => {
 		setFile(null);
-		setChannelId("");
+		setChannelId(defaultTemplateChannelId ?? "");
 		setPublicChannelId(defaultPublicChannelId ?? "");
 		setPrivateChannelId(defaultPrivateChannelId ?? "");
 		setDeleteCharacters(false);
@@ -159,31 +165,58 @@ export default function ImportTemplateModal({
 					<Divider />
 
 					{/* Canal de la template (obligatoire) */}
-					<ChannelSelect
-						label={`${t("template.templateChannel")} *`}
-						value={channelId || undefined}
-						channels={templateChannels}
-						helperText={t("template.templateChannelHelp")}
-						onChange={setChannelId}
-					/>
+					<Box>
+						<ChannelSelect
+							label={`${t("template.templateChannel")} *`}
+							value={channelId || undefined}
+							channels={templateChannels}
+							onChange={(value) => {
+								setChannelId(value);
+								setError(null);
+							}}
+						/>
+						<Typography
+							variant="caption"
+							color="text.secondary"
+							sx={{ mt: 0.5, pl: 0.5 }}
+						>
+							{t("template.templateChannelHelp")}
+						</Typography>
+					</Box>
 
 					{/* Canal public (optionnel) */}
-					<ChannelSelect
-						label={t("config.defaultSheet")}
-						value={publicChannelId || undefined}
-						channels={charChannels}
-						helperText={t("template.publicChannelHelp")}
-						onChange={setPublicChannelId}
-					/>
+					<Box>
+						<ChannelSelect
+							label={t("config.defaultSheet")}
+							value={publicChannelId || undefined}
+							channels={charChannels}
+							onChange={setPublicChannelId}
+						/>
+						<Typography
+							variant="caption"
+							color="text.secondary"
+							sx={{ mt: 0.5, pl: 0.5 }}
+						>
+							{t("template.publicChannelHelp")}
+						</Typography>
+					</Box>
 
 					{/* Canal privé (optionnel) */}
-					<ChannelSelect
-						label={t("config.fields.privateChannel")}
-						value={privateChannelId || undefined}
-						channels={charChannels}
-						helperText={t("template.privateChannelHelp")}
-						onChange={setPrivateChannelId}
-					/>
+					<Box>
+						<ChannelSelect
+							label={t("config.fields.privateChannel")}
+							value={privateChannelId || undefined}
+							channels={charChannels}
+							onChange={setPrivateChannelId}
+						/>
+						<Typography
+							variant="caption"
+							color="text.secondary"
+							sx={{ mt: 0.5, pl: 0.5 }}
+						>
+							{t("template.privateChannelHelp")}
+						</Typography>
+					</Box>
 
 					{/* Suppression des personnages — visible seulement s'il y en a */}
 					{hasCharacters && (

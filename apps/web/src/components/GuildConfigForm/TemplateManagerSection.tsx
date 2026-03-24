@@ -251,6 +251,7 @@ export default function TemplateManagerSection({
 				onImport={handleModalImport}
 				channels={channels}
 				hasCharacters={hasCharacters}
+				defaultTemplateChannelId={defaultTemplateChannelId}
 				defaultPublicChannelId={defaultPublicChannelId}
 				defaultPrivateChannelId={defaultPrivateChannelId}
 			/>
