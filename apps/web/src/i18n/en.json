@@ -1,4 +1,15 @@
 {
+	"characters": {
+		"damage": "Skill dice",
+		"loadError": "Could not load characters.",
+		"noCharacters": "No characters registered on this server.",
+		"private": "Private sheet",
+		"refresh": "Refresh",
+		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
+		"sheetLink": "View sheet",
+		"title": "My characters",
+		"unnamed": "(Unnamed)"
+	},
 	"common": {
 		"add": "Add",
 		"back": "Back to servers",
@@ -41,13 +52,13 @@
 			"stripOocDelay": "Delay before deletion: {val}s",
 			"stripOocEnable": "Enable OOC stripping",
 			"stripOocForward": "OOC forward channel (optional)",
-			"stripOocPrefix": "OOC prefix",
+			"stripOocPrefix": "Prefix",
 			"stripOocRegex": "OOC detection regex",
 			"stripOocRegexHelp": "E.g. \\(\\(.*\\)\\) — wraps out-of-character messages",
 			"stripOocRegexInvalid": "Invalid regular expression",
 			"stripOocRegexPreview": "Generated regex: {regex}",
-			"stripOocSuffix": "OOC suffix",
-			"stripOocThreadMode": "Thread mode (ignore forward channel)",
+			"stripOocSuffix": "Suffix",
+			"stripOocThreadMode": "Thread mode (ignore global channel)",
 			"timestamp": "Show timestamp in logs"
 		},
 		"sections": {
@@ -60,17 +71,6 @@
 			"stripOoc": "OOC suppression"
 		},
 		"unsaved": "You have unsaved changes"
-	},
-	"characters": {
-		"damage": "Skill dice",
-		"loadError": "Could not load characters.",
-		"noCharacters": "No characters registered on this server.",
-		"private": "Private sheet",
-		"refresh": "Refresh",
-		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
-		"sheetLink": "View sheet",
-		"title": "My characters",
-		"unnamed": "(Unnamed)"
 	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
@@ -92,12 +92,12 @@
 	},
 	"servers": {
 		"addBotDesc": "You are an administrator on these servers — you can add the bot.",
+		"addBotPending": "Bot added? Click Refresh to update the list.",
 		"addBotTitle": "Add Dicelette",
 		"botPresent": "Dicelette is present",
 		"loadError": "Could not load servers.",
-		"rateLimitError": "Too many requests. Please wait before refreshing again.",
-		"addBotPending": "Bot added? Click Refresh to update the list.",
 		"noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
+		"rateLimitError": "Too many requests. Please wait before refreshing again.",
 		"refresh": "Refresh",
 		"refreshTooltip": "The list is cached for 15 min. Click to force an update.",
 		"subtitle": "Select a server to manage its configuration.",
@@ -111,18 +111,18 @@
 		"customCritical": "Custom criticals",
 		"damage": "Skill dice",
 		"delete": "Delete",
-		"exportCharacters": "Export characters (CSV)",
-		"exportCharactersError": "Error while exporting characters.",
 		"deleteCharacters": "Delete all server characters",
 		"deleteCharactersHelp": "Permanently deletes all registered characters.",
-		"deleteWarning": "Irreversible action. All characters on the server will be permanently deleted. Consider exporting your data before continuing.",
 		"deleteConfirmBody": "Are you sure you want to delete this template? Existing characters will not be affected.",
 		"deleteConfirmTitle": "Delete template",
 		"deleteError": "Error while deleting template.",
 		"deleteSuccess": "Template deleted.",
+		"deleteWarning": "Irreversible action. All characters on the server will be permanently deleted. Consider exporting your data before continuing.",
 		"diceType": "Dice type",
 		"excluded": "Excluded",
 		"export": "Export",
+		"exportCharacters": "Export characters (CSV)",
+		"exportCharactersError": "Error while exporting characters.",
 		"fileLabel": "Choose a JSON file",
 		"fileNotSelected": "No file selected",
 		"fileRequired": "Please select a JSON file.",

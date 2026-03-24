@@ -32,7 +32,7 @@ export default function CharacterCard({ char }: Props) {
 						{char.isPrivate && (
 							<Chip
 								icon={<Lock />}
-								label={t("characters.private")}
+								label={t("common.isPrivate")}
 								size="small"
 								color="default"
 							/>

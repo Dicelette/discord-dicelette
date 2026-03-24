@@ -55,7 +55,7 @@ export default function Layout() {
 					</Button>
 					<Box sx={{ flexGrow: 1 }} />
 
-					<Tooltip title={t("common.documentation")}>
+					<Tooltip title={t("info.docs")}>
 						<IconButton
 							color="inherit"
 							onClick={() => window.open("https://www.dicelette.app", "_blank")}

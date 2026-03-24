@@ -108,7 +108,7 @@ export default function TemplateSection({ state }: TemplateSectionProps) {
 						{saving ? t("common.saving") : t("common.save")}
 					</Button>
 					<Button variant="outlined" onClick={onReset}>
-						{t("userConfig.resetTemplate")}
+						{t("userSettings.createLink.reset.description")}
 					</Button>
 				</Box>
 				{error && (

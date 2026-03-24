@@ -169,7 +169,7 @@ export default function ImportTemplateModal({
 
 					{/* Canal public (optionnel) */}
 					<ChannelSelect
-						label={t("config.fields.defaultChannel")}
+						label={t("config.defaultSheet")}
 						value={publicChannelId || undefined}
 						channels={charChannels}
 						helperText={t("template.publicChannelHelp")}
@@ -227,7 +227,7 @@ export default function ImportTemplateModal({
 					disabled={saving || !file || !channelId}
 					startIcon={<DownloadIcon />}
 				>
-					{saving ? t("common.saving") : t("template.import")}
+					{saving ? t("common.saving") : t("import.name").toTitle()}
 				</Button>
 			</DialogActions>
 		</Dialog>

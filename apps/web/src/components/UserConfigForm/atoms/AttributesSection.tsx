@@ -45,7 +45,9 @@ export default function AttributesSection({ state }: AttributeSectionProps) {
 	return (
 		<Accordion defaultExpanded>
 			<AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: "action.hover" }}>
-				<Typography fontWeight={600}>{t("userConfig.sections.attributes")}</Typography>
+				<Typography fontWeight={600}>
+					{t("userSettings.attributes.title").toTitle()}
+				</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
 				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -136,7 +138,7 @@ export default function AttributesSection({ state }: AttributeSectionProps) {
 								onClick={() => exportJson(attributes, "attributes.json")}
 								disabled={Object.keys(attributes).length === 0}
 							>
-								{t("userConfig.export")}
+								{t("export.name").toTitle()}
 							</Button>
 						</span>
 					</Tooltip>
@@ -153,7 +155,7 @@ export default function AttributesSection({ state }: AttributeSectionProps) {
 							startIcon={<FileUpload />}
 							onClick={() => importRef.current?.click()}
 						>
-							{t("userConfig.import")}
+							{t("import.name").toTitle()}
 						</Button>
 					</Tooltip>
 				</Box>

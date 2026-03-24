@@ -15,7 +15,7 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 
 	return (
 		<>
-			<SectionTitle>{t("config.sections.channels")}</SectionTitle>
+			<SectionTitle>{t("config.stripOOC.categories")}</SectionTitle>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<Controller
 					name="logs"

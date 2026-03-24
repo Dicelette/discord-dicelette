@@ -26,7 +26,7 @@ export default function SheetsChannelsSection({
 					control={control}
 					render={({ field }) => (
 						<ChannelSelect
-							label={t("config.fields.defaultChannel")}
+							label={t("config.defaultSheet")}
 							value={field.value}
 							channels={textChannels}
 							onChange={(v) => field.onChange(v || undefined)}

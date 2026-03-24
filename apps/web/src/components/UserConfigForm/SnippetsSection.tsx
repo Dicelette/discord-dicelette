@@ -79,7 +79,7 @@ export default function SnippetsSection({ state }: Props) {
 							color="text.secondary"
 							sx={{ fontStyle: "italic", fontFamily: "var(--code-font-family)" }}
 						>
-							{t("userConfig.noSnippets")}
+							{t("userSettings.snippets.list.empty")}
 						</Typography>
 					)}
 				</Stack>
@@ -147,7 +147,7 @@ export default function SnippetsSection({ state }: Props) {
 								onClick={() => exportJson(snippets, "snippets.json")}
 								disabled={Object.keys(snippets).length === 0}
 							>
-								{t("userConfig.export")}
+								{t("export.name").toTitle()}
 							</Button>
 						</span>
 					</Tooltip>
@@ -164,7 +164,7 @@ export default function SnippetsSection({ state }: Props) {
 							startIcon={<FileUpload />}
 							onClick={() => importRef.current?.click()}
 						>
-							{t("userConfig.import")}
+							{t("import.name").toTitle()}
 						</Button>
 					</Tooltip>
 				</Box>

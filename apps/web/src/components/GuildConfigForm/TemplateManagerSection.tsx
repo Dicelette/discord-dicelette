@@ -186,7 +186,7 @@ export default function TemplateManagerSection({
 					disabled={saving || loading}
 					size="small"
 				>
-					{t("template.import")}
+					{t("import.name").toTitle()}
 				</Button>
 
 				{template && (
@@ -197,7 +197,7 @@ export default function TemplateManagerSection({
 							onClick={() => exportJson(template, "template.json")}
 							size="small"
 						>
-							{t("template.export")}
+							{t("export.name").toTitle()}
 						</Button>
 						{hasCharacters && (
 							<Button
@@ -227,7 +227,7 @@ export default function TemplateManagerSection({
 				<CircularProgress size={24} />
 			) : !template ? (
 				<Typography variant="body2" color="text.secondary">
-					{t("template.none")}
+					{t("config.noTemplate")}
 				</Typography>
 			) : (
 				<TemplateView
@@ -285,7 +285,7 @@ function TemplateView({
 }) {
 	const { t } = useI18n();
 	const channelInfos = [
-		{ label: t("config.fields.defaultChannel"), value: defaultPublicChannel },
+		{ label: t("config.defaultSheet"), value: defaultPublicChannel },
 		{ label: t("config.fields.privateChannel"), value: defaultPrivateChannel },
 		{ label: t("template.templateChannel"), value: defaultTemplateChannel },
 	];
@@ -310,7 +310,7 @@ function TemplateView({
 				)}
 				{template.forceDistrib && (
 					<Chip
-						label={t("template.forceDistrib")}
+						label={t("register.embed.forceDistrib")}
 						size="small"
 						color="secondary"
 						variant="outlined"
@@ -349,14 +349,14 @@ function TemplateView({
 			{template.customCritical && Object.keys(template.customCritical).length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
-						{t("template.customCritical")}
+						{t("config.customCritical")}
 					</Typography>
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("common.name")}</TableCell>
-								<TableCell>{t("template.sign")}</TableCell>
-								<TableCell>{t("template.value")}</TableCell>
+								<TableCell>{t("common.name").toTitle()}</TableCell>
+								<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
+								<TableCell>{t("modals.dice.value")}</TableCell>
 								<TableCell>{t("template.onNaturalDice")}</TableCell>
 								<TableCell>{t("template.affectSkill")}</TableCell>
 							</TableRow>
@@ -388,10 +388,10 @@ function TemplateView({
 						<TableHead>
 							<TableRow>
 								<TableCell>{t("common.name").toTitle()}</TableCell>
-								<TableCell>Min</TableCell>
-								<TableCell>Max</TableCell>
+								<TableCell>{t("graph.min.name").toTitle()}</TableCell>
+								<TableCell>{t("graph.max.name").toTitle()}</TableCell>
 								<TableCell>{t("template.formula")}</TableCell>
-								<TableCell>{t("template.excluded")}</TableCell>
+								<TableCell>{t("register.embed.exclude")}</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -418,7 +418,7 @@ function TemplateView({
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("template.name")}</TableCell>
+								<TableCell>{t("common.name").toTitle()}</TableCell>
 								<TableCell>{t("template.formula")}</TableCell>
 							</TableRow>
 						</TableHead>

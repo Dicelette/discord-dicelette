@@ -49,7 +49,7 @@ export default function StripOOCSection({ control, channels, textChannels }: Pro
 
 	return (
 		<>
-			<SectionTitle>{t("config.sections.stripOoc")}</SectionTitle>
+			<SectionTitle>{t("config.stripOOC.title")}</SectionTitle>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<Controller
 					name="stripOOC"
