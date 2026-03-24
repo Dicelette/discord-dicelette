@@ -481,50 +481,59 @@ export function createGuildRouter(deps: DashboardDeps) {
 		);
 
 		const result: ApiCharacter[] = await Promise.all(
-			userChars.map(async (char) => {
-				const [messageId, channelId] = char.messageId;
-				const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+			userChars
+				.filter((char) => {
+					// Exclude characters that are just template placeholders (not real player registrations)
+					const mem = memByMessageId.get(char.messageId[0]);
+					return !mem?.isFromTemplate;
+				})
+				.map(async (char) => {
+					const [messageId, channelId] = char.messageId;
+					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 
-				const mem = memByMessageId.get(messageId);
-				let avatar: string | null = null;
-				let stats: EmbedField[] | null = null;
-				let damage: EmbedField[] | null = null;
+					const mem = memByMessageId.get(messageId);
+					let avatar: string | null = null;
+					let stats: EmbedField[] | null = null;
+					let damage: EmbedField[] | null = null;
 
-				if (mem) {
-					// Serve directly from in-memory DB — no Discord API call needed
-					avatar = mem.avatar ?? null;
-					if (mem.stats)
-						stats = Object.entries(mem.stats).map(([name, value]) => ({
-							name,
-							value: String(value),
-						}));
-					if (mem.damage)
-						damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
-				} else {
-					// Fallback: character not yet in memory (e.g. first load after bot restart)
-					try {
-						({ avatar, stats, damage } = await fetchCharacterEmbeds(
-							channelId,
-							messageId,
-							botChannels
-						));
-					} catch {
-						// silently ignore fetch errors
+					if (mem) {
+						// Serve directly from in-memory DB — no Discord API call needed
+						avatar = mem.avatar ?? null;
+						if (mem.stats)
+							stats = Object.entries(mem.stats).map(([name, value]) => ({
+								name,
+								value: String(value),
+							}));
+						if (mem.damage)
+							damage = Object.entries(mem.damage).map(([name, value]) => ({
+								name,
+								value,
+							}));
+					} else {
+						// Fallback: character not yet in memory (e.g. first load after bot restart)
+						try {
+							({ avatar, stats, damage } = await fetchCharacterEmbeds(
+								channelId,
+								messageId,
+								botChannels
+							));
+						} catch {
+							// silently ignore fetch errors
+						}
 					}
-				}
 
-				return {
-					charName: char.charName ?? null,
-					messageId,
-					channelId,
-					discordLink,
-					canLink,
-					isPrivate: char.isPrivate ?? false,
-					avatar,
-					stats,
-					damage,
-				};
-			})
+					return {
+						charName: char.charName ?? null,
+						messageId,
+						channelId,
+						discordLink,
+						canLink,
+						isPrivate: char.isPrivate ?? false,
+						avatar,
+						stats,
+						damage,
+					};
+				})
 		);
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
