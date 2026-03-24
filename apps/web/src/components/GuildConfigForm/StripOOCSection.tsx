@@ -58,8 +58,8 @@ export default function StripOOCSection({ control, channels, textChannels }: Pro
 						<FormControlLabel
 							control={
 								<Switch
-									checked={field.value !== undefined}
-									onChange={(e) => field.onChange(e.target.checked ? {} : undefined)}
+									checked={!!field.value}
+									onChange={(e) => field.onChange(e.target.checked ? {} : false)}
 								/>
 							}
 							label={t("config.fields.stripOocEnable")}

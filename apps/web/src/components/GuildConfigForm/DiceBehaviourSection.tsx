@@ -40,7 +40,7 @@ export default function DiceBehaviourSection({ control }: Props) {
 								control={
 									<Switch
 										checked={!!field.value}
-										onChange={(e) => field.onChange(e.target.checked || undefined)}
+										onChange={(e) => field.onChange(e.target.checked || false)}
 									/>
 								}
 								label={t(labelKey)}
