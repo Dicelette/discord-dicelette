@@ -23,7 +23,7 @@ const botErrorOptions: BotErrorOptions = {
 export async function createDefaultThread(
 	parent: Djs.ThreadChannel | Djs.TextChannel,
 	guildData: Settings,
-	interaction: Djs.BaseInteraction,
+	guild?: Djs.Guild,
 	save = true
 ) {
 	if (parent instanceof Djs.ThreadChannel) parent = parent.parent as Djs.TextChannel;
@@ -35,7 +35,7 @@ export async function createDefaultThread(
 			autoArchiveDuration: 10080,
 			name: "📝 • [STATS]",
 		})) as Djs.AnyThreadChannel;
-		if (save) setDefaultManagerId(guildData, interaction, thread.id);
+		if (save) setDefaultManagerId(guildData, guild, thread.id);
 	}
 	return thread;
 }
@@ -180,7 +180,7 @@ export async function repostInThread(
 	} else {
 		// noinspection SuspiciousTypeOfGuard
 		if (!thread && channel instanceof Djs.TextChannel)
-			thread = await createDefaultThread(channel, guildData, interaction);
+			thread = await createDefaultThread(channel, guildData, interaction.guild);
 	}
 	if (!thread) throw new BotError(ul("error.channel.thread"), botErrorOptions);
 

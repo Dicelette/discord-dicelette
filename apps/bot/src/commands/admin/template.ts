@@ -290,7 +290,7 @@ async function registerTemplate(
 		publicChannel = await createDefaultThread(
 			channel,
 			client.settings,
-			interaction,
+			interaction.guild ?? undefined,
 			false
 		);
 	} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
@@ -313,16 +313,16 @@ async function registerTemplate(
 	}
 	const msg = await createEmbed(ul, templateData, channel, interaction);
 	await updateMemory(
-		guildId,
 		client,
 		templateData,
-		interaction,
+		interaction.guild!,
 		{
 			channel: channel.id,
 			privateChannel: privateChannel?.id,
 			publicChannel: publicChannel.id,
 		},
-		msg
+		msg,
+		interaction.locale
 	);
 	await reply(interaction, {
 		content: ul("register.embed.registered"),
@@ -335,25 +335,7 @@ async function registerTemplate(
 	await removeRestriction(guildId, client);
 }
 
-async function userDataUpdate(
-	client: EClient,
-	interaction: Djs.ChatInputCommandInteraction,
-	ul: Translation,
-	templateData: StatisticalTemplate,
-	options: Djs.CommandInteractionOptionResolver
-) {
-	if (options.getBoolean(t("register.options.update.name")))
-		await bulkEditTemplateUser(client, interaction, ul, templateData);
-	else if (options.getBoolean(t("register.options.delete.name")))
-		await bulkDeleteCharacters(client, interaction, ul);
-}
-
-async function createEmbed(
-	ul: Translation,
-	templateData: StatisticalTemplate,
-	channel: Djs.AnyThreadChannel | Djs.TextChannel,
-	interaction: Djs.ChatInputCommandInteraction
-) {
+export function templateEmbed(templateData: StatisticalTemplate, ul: Translation) {
 	const button = new Djs.ButtonBuilder()
 		.setCustomId("register")
 		.setLabel(ul("register.button"))
@@ -436,9 +418,34 @@ async function createEmbed(
 				value: value.trim().length > 0 ? `\`${value}\`` : "_ _",
 			});
 	}
-	const embeds = [embedTemplate, statisticsEmbed, diceEmbed].filter(
-		(embed) => embed !== undefined
-	);
+	return {
+		embeds: [embedTemplate, statisticsEmbed, diceEmbed].filter(
+			(embed) => embed !== undefined
+		),
+		components,
+	};
+}
+
+async function userDataUpdate(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction,
+	ul: Translation,
+	templateData: StatisticalTemplate,
+	options: Djs.CommandInteractionOptionResolver
+) {
+	if (options.getBoolean(t("register.options.update.name")))
+		await bulkEditTemplateUser(client, interaction, ul, templateData);
+	else if (options.getBoolean(t("register.options.delete.name")))
+		await bulkDeleteCharacters(client, interaction, ul);
+}
+
+async function createEmbed(
+	ul: Translation,
+	templateData: StatisticalTemplate,
+	channel: Djs.AnyThreadChannel | Djs.TextChannel,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const { embeds, components } = templateEmbed(templateData, ul);
 	const msg = await channel.send({
 		components: [components],
 		content: "",
@@ -480,22 +487,22 @@ async function createEmbed(
 	return msg;
 }
 
-async function updateMemory(
-	guildId: string,
+export async function updateMemory(
 	client: EClient,
 	templateData: StatisticalTemplate,
-	interaction: Djs.ChatInputCommandInteraction,
+	guild: Djs.Guild,
 	channels: {
 		channel: string;
 		publicChannel: string;
 		privateChannel?: string;
 	},
-	msg: Djs.Message
+	msg: Djs.Message,
+	locale?: Djs.Locale
 ) {
 	const { channel, publicChannel, privateChannel } = channels;
-	client.template.set(guildId, templateData);
+	client.template.set(guild.id, templateData);
 	//save in database file
-	const json = client.settings.get(guildId);
+	const json = client.settings.get(guild.id);
 	const statsName = templateData.statistics
 		? Object.keys(templateData.statistics)
 		: undefined;
@@ -508,7 +515,7 @@ async function updateMemory(
 		: undefined;
 	const damageName = templateData.damage ? Object.keys(templateData.damage) : undefined;
 	if (json) {
-		await deleteOldTemplate(json, interaction);
+		await deleteOldTemplate(json, guild);
 		json.templateID = {
 			channelId: channel,
 			damageName: damageName ?? [],
@@ -520,10 +527,10 @@ async function updateMemory(
 		json.managerId = publicChannel;
 
 		if (privateChannel) json.privateChannel = privateChannel;
-		client.settings.set(guildId, json);
+		client.settings.set(guild.id, json);
 	} else {
 		const newData: GuildData = {
-			lang: interaction.guild?.preferredLocale ?? interaction.locale,
+			lang: guild?.preferredLocale ?? locale,
 			managerId: undefined,
 			templateID: {
 				channelId: channel,
@@ -535,7 +542,7 @@ async function updateMemory(
 			},
 			user: {},
 		};
-		client.settings.set(guildId, newData);
+		client.settings.set(guild.id, newData);
 	}
 }
 
@@ -584,16 +591,16 @@ async function updateTemplateFile(
 	}
 	const msg = await createEmbed(ul, templateData, channel, interaction);
 	await updateMemory(
-		guildId,
 		client,
 		templateData,
-		interaction,
+		interaction.guild!,
 		{
 			channel: channel.id,
 			privateChannel: privateChannelId,
 			publicChannel: publicChannelId,
 		},
-		msg
+		msg,
+		interaction.locale
 	);
 	await userDataUpdate(client, interaction, ul, templateData, options);
 	await reply(interaction, {
@@ -602,13 +609,10 @@ async function updateTemplateFile(
 	await removeRestriction(guildId, client);
 }
 
-async function deleteOldTemplate(
-	json: GuildData,
-	interaction: Djs.ChatInputCommandInteraction
-) {
+async function deleteOldTemplate(json: GuildData, guild: Djs.Guild) {
 	if (json?.templateID?.messageId && json?.templateID?.channelId) {
 		try {
-			const channel = await fetchChannel(interaction.guild!, json.templateID.channelId);
+			const channel = await fetchChannel(guild, json.templateID.channelId);
 			const msg = await (channel as Djs.TextChannel).messages.fetch(
 				json.templateID.messageId
 			);

@@ -101,7 +101,13 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			if (oldMessageId && current?.templateID?.channelId) {
 				await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
 			}
-			const sent = await botChannels.sendTemplate(effectiveChannelId, validated, guildId);
+			const sent = await botChannels.sendTemplate(
+				effectiveChannelId,
+				validated,
+				guildId,
+				publicChannelId,
+				privateChannelId
+			);
 			if (sent) newMessageId = sent.messageId;
 		}
 
@@ -122,7 +128,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		} else {
 			// Première importation — création des settings
 			const newData: GuildData = {
-				lang: Locale.EnglishUS,
+				lang: settings.get(guildId, "lang") ?? Locale.EnglishUS,
 				managerId: publicChannelId,
 				templateID,
 				user: {},

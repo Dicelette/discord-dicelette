@@ -11,6 +11,7 @@
 
 import { expect, test } from "@playwright/test";
 import {
+	languages,
 	MOCK_GUILD,
 	mockAuthMe,
 	mockGuildChannels,
@@ -27,6 +28,8 @@ const DASHBOARD_URL = `/dashboard/${MOCK_GUILD.id}`;
 // ✅ TEST IMPLÉMENTÉ — Exemple de référence
 // ============================================================================
 
+const { fr, en } = languages;
+
 test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 	page,
 }) => {
@@ -41,10 +44,12 @@ test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 	await page.goto(DASHBOARD_URL);
 
 	// 2. Vérifier la présence des 4 onglets (MUI Tab → role="tab")
-	await expect(page.getByRole("tab", { name: "Server configuration" })).toBeVisible();
-	await expect(page.getByRole("tab", { name: "Model configuration" })).toBeVisible();
-	await expect(page.getByRole("tab", { name: "Personal configuration" })).toBeVisible();
-	await expect(page.getByRole("tab", { name: "Characters" })).toBeVisible();
+	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.admin })).toBeVisible();
+	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.template })).toBeVisible();
+	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.user })).toBeVisible();
+	await expect(
+		page.getByRole("tab", { name: fr.dashboard.tabs.characters })
+	).toBeVisible();
 });
 
 // ============================================================================

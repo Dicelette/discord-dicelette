@@ -76,7 +76,9 @@ export interface BotChannels {
 	sendTemplate: (
 		channelId: string,
 		template: StatisticalTemplate,
-		guildId: string
+		guildId: string,
+		publicChannel?: string,
+		privateChannel?: string
 	) => Promise<{ messageId: string } | null>;
 }
 

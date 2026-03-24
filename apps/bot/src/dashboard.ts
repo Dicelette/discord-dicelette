@@ -3,6 +3,8 @@ import { startDashboardServer } from "@dicelette/dashboard";
 import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
+import { templateEmbed } from "./commands/admin/template";
+import { createDefaultThread } from "./messages";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
 	startDashboardServer({
@@ -85,22 +87,34 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					return false;
 				}
 			},
-			sendTemplate: async (channelId, template, guildId) => {
+			sendTemplate: async (
+				channelId,
+				template,
+				guildId,
+				publicChannelId,
+				_privateChannelId
+			) => {
 				const channel = client.channels.cache.get(channelId);
-				if (!channel || !channel.isTextBased()) return null;
+				let publicChannel = publicChannelId
+					? client.channels.cache.get(publicChannelId)
+					: undefined;
 				try {
 					const lang = client.settings.get(guildId, "lang");
 					const ul = ln(lang ?? Djs.Locale.EnglishUS);
-					const button = new Djs.ButtonBuilder()
-						.setCustomId("register")
-						.setLabel(ul("register.button"))
-						.setStyle(Djs.ButtonStyle.Primary);
-					const row =
-						new Djs.ActionRowBuilder<Djs.MessageActionRowComponentBuilder>().addComponents(
-							button
+					if (channel instanceof Djs.TextChannel && !publicChannel) {
+						publicChannel = await createDefaultThread(
+							channel,
+							client.settings,
+							guildId ? client.guilds.cache.get(guildId) : undefined,
+							false
 						);
+					} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel)
+						return null;
+					if (!publicChannel) return null;
+					const { embeds, components } = templateEmbed(template, ul);
 					const msg = await (channel as Djs.TextChannel).send({
-						components: [row],
+						components: [components],
+						embeds: embeds,
 						files: [
 							{
 								attachment: Buffer.from(JSON.stringify(template, null, 2), "utf-8"),
