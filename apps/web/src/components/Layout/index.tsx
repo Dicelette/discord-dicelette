@@ -33,15 +33,23 @@ export default function Layout() {
 				elevation={0}
 				sx={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
 			>
-				<Toolbar sx={{ gap: 2, backgroundColor: "var(--appbar-bg)" }}>
+				<Toolbar sx={{ gap: { xs: 1, sm: 2 }, backgroundColor: "var(--appbar-bg)" }}>
 					<Button
 						component={Link}
 						to="/"
 						color="inherit"
-						sx={{ textTransform: "none", gap: 1, flexGrow: 0 }}
+						sx={{ textTransform: "none", gap: 1, flexGrow: 0, minWidth: 0 }}
 					>
-						<img src="/logo.png" alt="Dicelette" style={{ height: 28, width: 28 }} />
-						<Typography variant="h6" component="span" sx={{ fontWeight: 700 }}>
+						<img
+							src="/logo.png"
+							alt="Dicelette"
+							style={{ height: 28, width: 28, flexShrink: 0 }}
+						/>
+						<Typography
+							variant="h6"
+							component="span"
+							sx={{ fontWeight: 700, display: { xs: "none", sm: "block" } }}
+						>
 							{t("login.title")}
 						</Typography>
 					</Button>
