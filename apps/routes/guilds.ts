@@ -480,7 +480,13 @@ export function createGuildRouter(deps: DashboardDeps) {
 		);
 
 		const result: ApiCharacter[] = await Promise.all(
-			userChars.map(async (char) => {
+			userChars
+				.filter((char) => {
+					// Exclude characters that are just template placeholders (not real player registrations)
+					const mem = memByMessageId.get(char.messageId[0]);
+					return !mem?.isFromTemplate;
+				})
+				.map(async (char) => {
 				const [messageId, channelId] = char.messageId;
 				const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 
