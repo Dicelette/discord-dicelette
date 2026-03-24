@@ -1,7 +1,9 @@
 import type { StatisticalTemplate } from "@dicelette/core";
+import type { ApiGuildData, TemplateResult } from "@dicelette/types";
 import axios from "axios";
 
 export type { StatisticalTemplate };
+export type { ApiGuildData, TemplateResult };
 
 export const api = axios.create({
 	baseURL: "/api",
@@ -27,52 +29,11 @@ export interface DiscordGuild {
 	botPresent: boolean;
 }
 
-export interface ApiGuildConfig {
-	lang?: string;
-	logs?: string;
-	rollChannel?: string;
-	disableThread?: boolean;
-	hiddenRoll?: boolean | string;
-	managerId?: string;
-	deleteAfter?: number;
-	timestamp?: boolean;
-	privateChannel?: string;
-	autoRole?: { dice?: string; stats?: string };
-	context?: boolean;
-	linkToLogs?: boolean;
-	allowSelfRegister?: boolean | string;
-	pity?: number;
-	disableCompare?: boolean;
-	sortOrder?: string;
-	stripOOC?: {
-		regex?: string;
-		forwardId?: string;
-		threadMode?: boolean;
-		timer?: number;
-		categoryId?: string[];
-	};
-	templateID?: {
-		channelId: string;
-		messageId: string;
-		statsName: string[];
-		excludedStats: string[];
-		damageName: string[];
-		valid?: boolean;
-	};
-}
+/** @deprecated use ApiGuildData from @dicelette/types */
+export type ApiGuildConfig = ApiGuildData;
 
-export interface ApiTemplateResult {
-	results: string;
-	final: string;
-	joinResult: string;
-	format: {
-		name: string;
-		info: string;
-		dice: string;
-		originalDice: string;
-		character: string;
-	};
-}
+/** @deprecated use TemplateResult from @dicelette/types */
+export type ApiTemplateResult = TemplateResult;
 
 export interface ApiUserConfig {
 	isAdmin: boolean;
