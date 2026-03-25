@@ -95,10 +95,24 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				publicChannelId,
 				_privateChannelId
 			) => {
-				const channel = client.channels.cache.get(channelId);
+				let channel = client.channels.cache.get(channelId);
+				if (!channel) {
+					try {
+						channel = (await client.channels.fetch(channelId)) ?? undefined;
+					} catch {
+						return null;
+					}
+				}
 				let publicChannel = publicChannelId
-					? client.channels.cache.get(publicChannelId)
+					? (client.channels.cache.get(publicChannelId) ?? undefined)
 					: undefined;
+				if (publicChannelId && !publicChannel) {
+					try {
+						publicChannel = (await client.channels.fetch(publicChannelId)) ?? undefined;
+					} catch {
+						publicChannel = undefined;
+					}
+				}
 				try {
 					const lang = client.settings.get(guildId, "lang");
 					const ul = ln(lang ?? Djs.Locale.EnglishUS);

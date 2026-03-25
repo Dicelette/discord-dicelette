@@ -82,8 +82,6 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		template.set(guildId, validated);
-
 		const statsName = validated.statistics ? Object.keys(validated.statistics) : [];
 		const excludedStats = validated.statistics
 			? Object.keys(
@@ -117,8 +115,14 @@ export function createTemplateRouter(deps: DashboardDeps) {
 				effectivePublicChannelId,
 				effectivePrivateChannelId
 			);
-			if (sent) newMessageId = sent.messageId;
+			if (!sent) {
+				res.status(500).json({ error: "Failed to send template message to Discord channel" });
+				return;
+			}
+			newMessageId = sent.messageId;
 		}
+
+		template.set(guildId, validated);
 
 		const templateID = {
 			channelId: effectiveChannelId ?? "",
