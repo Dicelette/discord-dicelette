@@ -60,7 +60,7 @@ export default function StripOOCSection({ control, channels, textChannels }: Pro
 								<Switch
 									checked={!!(field.value?.timer && field.value.timer > 0)}
 									onChange={(e) =>
-										field.onChange(e.target.checked ? { timer: 180 * 1000 } : undefined)
+										field.onChange(e.target.checked ? { timer: 180 * 1000 } : {})
 									}
 								/>
 							}
