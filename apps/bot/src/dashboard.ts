@@ -37,6 +37,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 							id: c.id,
 							name: c.name,
 							type: c.type as number,
+							parent_id: c.parentId ?? null,
 						}));
 					},
 					get roles() {

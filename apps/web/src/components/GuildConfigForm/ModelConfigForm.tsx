@@ -48,7 +48,7 @@ export default function ModelConfigForm({
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<SelfRegisterSection control={control} textChannels={textChannels} />
+						<SelfRegisterSection control={control} textChannels={textChannels} allChannels={channels} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>

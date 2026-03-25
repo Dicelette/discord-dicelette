@@ -209,6 +209,7 @@ export default function StripOOCSection({ control, channels, textChannels }: Pro
 								label={t("config.fields.stripOocForward")}
 								value={field.value}
 								channels={textChannels}
+								allChannels={channels}
 								onChange={(v) => field.onChange(v || undefined)}
 							/>
 						)}
