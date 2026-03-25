@@ -1,3 +1,4 @@
+import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useI18n } from "../../i18n";
 import { AutoRoleSection, ConfigFormFooter } from "./atoms";
@@ -16,16 +17,21 @@ export default function ModelConfigForm({
 	roles,
 }: ConfigFormProps) {
 	const { t } = useI18n();
-	const { control, handleSubmit, isDirty, textChannels } = useConfigForm(
+	const { control, handleSubmit, isDirty, reset, textChannels } = useConfigForm(
 		config,
 		channels
 	);
+
+	const handleSaveAndReset = async (data: ApiGuildData) => {
+		await onSave(data);
+		reset(data);
+	};
 
 	return (
 		<Stack spacing={2}>
 			{isDirty && <Alert severity="warning">{t("config.unsaved")}</Alert>}
 
-			<Box component="form" onSubmit={handleSubmit(onSave)}>
+			<Box component="form" onSubmit={handleSubmit(handleSaveAndReset)}>
 				<Stack spacing={2}>
 					<Paper sx={{ p: 3 }}>
 						<TemplateManagerSection

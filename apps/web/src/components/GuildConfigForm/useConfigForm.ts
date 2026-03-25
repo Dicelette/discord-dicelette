@@ -34,5 +34,5 @@ export function useConfigForm(config: ApiGuildData, channels: Channel[]) {
 
 	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
 
-	return { control, handleSubmit, isDirty, textChannels };
+	return { control, handleSubmit, isDirty, reset, textChannels };
 }
