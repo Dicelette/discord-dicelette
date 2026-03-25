@@ -1,5 +1,5 @@
 import type { ApiGuildData } from "@dicelette/types";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import type { Channel } from "./types";
 
@@ -25,8 +25,14 @@ export function useConfigForm(config: ApiGuildData, channels: Channel[]) {
 	}, [isDirty]);
 
 	// When disableThread is activated, clear rollChannel (mutually exclusive)
+	// Skip on initial mount to avoid marking the form dirty before any user interaction
+	const isFirstRender = useRef(true);
 	const disableThread = watch("disableThread");
 	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return;
+		}
 		if (disableThread) {
 			setValue("rollChannel", undefined, { shouldDirty: true });
 		}
@@ -34,5 +40,5 @@ export function useConfigForm(config: ApiGuildData, channels: Channel[]) {
 
 	const textChannels = useMemo(() => channels.filter((c) => c.type === 0), [channels]);
 
-	return { control, handleSubmit, isDirty, textChannels };
+	return { control, handleSubmit, isDirty, reset, textChannels };
 }
