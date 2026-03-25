@@ -1,7 +1,7 @@
 name: Update VPS beta
 on:
   push:
-    branch: dashboard
+    branches: dashboard
   workflow_dispatch:
 
 jobs:
@@ -21,4 +21,4 @@ jobs:
                 git stash push --include-untracked --message "Locales temporaires"
                 git pull --rebase
                 pnpm i
-                restart-beta
+                task restart-beta
