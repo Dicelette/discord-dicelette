@@ -59,9 +59,7 @@ test("accéder à '/' sans être connecté redirige vers /login", async ({ page 
 // Indice : Le sélecteur est un <select> MUI contenant les options "FR" et "EN".
 //          Cherche-le avec `page.getByRole("combobox")`.
 //          Vérifie ensuite qu'il est bien visible
-await test("le sélecteur de langue est visible sur la page de login", async ({
-	page,
-}) => {
+test("le sélecteur de langue est visible sur la page de login", async ({ page }) => {
 	await mockAuthNotLoggedIn(page);
 	await page.goto("/login");
 
@@ -80,6 +78,20 @@ await test("le sélecteur de langue est visible sur la page de login", async ({
 	//vérifions qu'on a bien changé de langue, on va utiliser ressource
 	const en = languages.en;
 	await expect(page.getByRole("heading", { name: en.login.title })).toBeVisible();
+});
+
+test("sur mobile, les actions d'entête restent visibles au-dessus de la carte de login", async ({
+	page,
+}) => {
+	await mockAuthNotLoggedIn(page);
+	await page.setViewportSize({ width: 390, height: 844 });
+	await page.goto("/login");
+
+	await expect(page.getByRole("button", { name: /Documentation/i })).toBeVisible();
+	await expect(page.getByRole("combobox")).toBeVisible();
+	await expect(page.getByRole("button", { name: /thème|theme/i })).toBeVisible();
+	await expect(page.getByRole("button", { name: /Discord/ })).toBeVisible();
+	await expect(page.getByRole("heading", { name: /Dicelette/ })).toBeVisible();
 });
 
 // Exercice 3 : Un utilisateur déjà connecté qui accède à /login est redirigé vers "/"
