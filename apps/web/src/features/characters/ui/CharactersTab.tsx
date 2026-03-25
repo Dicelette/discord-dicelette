@@ -9,9 +9,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { charactersApi } from "../../../shared/api/characters.api";
-import type { ApiCharacter } from "../../../shared/api/types";
-import { useI18n } from "../../../shared/i18n";
+import { type ApiCharacter, charactersApi, useI18n } from "../../../shared";
 import CharacterCard from "./CharacterCard";
 
 const PAGE_SIZE = 5;

@@ -7,9 +7,9 @@ import {
 	Select,
 	Typography,
 } from "@mui/material";
-import { type Locale, useI18n } from "../shared/i18n";
+import { type Locale, useI18n } from "../shared";
 
-export default function LoginRoute() {
+export default function Login() {
 	const { locale, setLocale, t } = useI18n();
 
 	const handleLogin = () => {

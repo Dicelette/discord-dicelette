@@ -11,23 +11,20 @@ import {
 } from "@mui/material";
 import { lazy, Suspense, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CharactersTab } from "../features/characters";
-import { GuildConfigForm } from "../features/guild-config";
-import { UserConfigForm } from "../features/user-config";
-import { guildApi } from "../shared/api/guild.api";
-import type { ApiUserConfig } from "../shared/api/types";
-import { userApi } from "../shared/api/user.api";
-import { useI18n } from "../shared/i18n";
+import {
+	type Channel,
+	CharactersTab,
+	GuildConfigForm,
+	type Role,
+	UserConfigForm,
+} from "../features";
+import { type ApiUserConfig, guildApi, useI18n, userApi } from "../shared";
 
-const ModelConfigForm = lazy(
-	() => import("../features/guild-config/ui/sections/ModelConfigForm")
-);
-
-import type { Channel, Role } from "../features/guild-config";
+const ModelConfigForm = lazy(() => import("../features/guild-config/ui/ModelConfigForm"));
 
 type ActiveTab = "admin" | "template" | "user" | "characters";
 
-export default function DashboardRoute() {
+export default function Dashboard() {
 	const { guildId } = useParams<{ guildId: string }>();
 	const navigate = useNavigate();
 	const { t } = useI18n();

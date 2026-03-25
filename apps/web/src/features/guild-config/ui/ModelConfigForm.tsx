@@ -1,19 +1,19 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useConfigForm, useI18n } from "../../../shared";
-import type { Channel } from "../types";
+import type { ConfigFormProps } from "../types.ts";
 import { ConfigFormFooter } from "./atoms";
-import { Channels, DiceBehaviour, General, Results, StripOOC } from "./sections";
+import { HiddenRolls, SelfRegister, TemplateManager } from "./sections";
+import AutoRole from "./sections/AutoRole.tsx";
 
-interface Props {
-	config: ApiGuildData;
-	guildId: string;
-	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
-	saving: boolean;
-	channels: Channel[];
-}
-
-export default function GuildConfigForm({ config, onSave, saving, channels }: Props) {
+export default function ModelConfigForm({
+	config,
+	guildId,
+	onSave,
+	saving,
+	channels,
+	roles,
+}: ConfigFormProps) {
 	const { t } = useI18n();
 	const { control, handleSubmit, isDirty, reset, textChannels } = useConfigForm(
 		config,
@@ -31,12 +31,22 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 
 			<Box component="form" onSubmit={handleSubmit(handleSaveAndReset)}>
 				<Stack spacing={2}>
-					<Paper sx={{ p: 3 }} title={t("config.sections.general")}>
-						<General control={control} />
+					<Paper sx={{ p: 3 }}>
+						<TemplateManager
+							guildId={guildId}
+							channels={channels}
+							defaultTemplateChannelId={config.templateID?.channelId}
+							defaultPublicChannelId={config.managerId}
+							defaultPrivateChannelId={config.privateChannel}
+						/>
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<Channels
+						<AutoRole control={control} roles={roles} />
+					</Paper>
+
+					<Paper sx={{ p: 3 }}>
+						<SelfRegister
 							control={control}
 							textChannels={textChannels}
 							allChannels={channels}
@@ -44,19 +54,7 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<Results
-							control={control}
-							textChannels={textChannels}
-							allChannels={channels}
-						/>
-					</Paper>
-
-					<Paper sx={{ p: 3 }}>
-						<DiceBehaviour control={control} />
-					</Paper>
-
-					<Paper sx={{ p: 3 }}>
-						<StripOOC control={control} channels={channels} textChannels={textChannels} />
+						<HiddenRolls control={control} />
 					</Paper>
 				</Stack>
 

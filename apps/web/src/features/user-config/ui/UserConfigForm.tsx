@@ -1,13 +1,10 @@
 import Stack from "@mui/material/Stack";
 import { useCallback, useRef, useState } from "react";
-import { userApi } from "../../../shared/api/user.api";
-import type { ApiUserConfig } from "../../../shared/api/types";
-import { useI18n } from "../../../shared/i18n";
+import { type ApiUserConfig, useI18n, userApi } from "../../../shared";
 import "uniformize";
-import { AttributesSection, TemplateSection } from "./atoms";
-import SnippetsSection from "./SnippetsSection";
 import type { AttributesState, SnippetsState, TemplateState } from "../types";
 import { DEFAULT_TEMPLATE } from "../utils";
+import { Attributes, Links, Snippets } from "./sections";
 
 interface Props {
 	guildId: string;
@@ -111,7 +108,9 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 					const errCount = Object.keys(errors).length;
 					const okCount = Object.keys(valid).length;
 					if (errCount > 0) {
-						setSnippetError(t("userConfig.importPartial", { ok: okCount, err: errCount }));
+						setSnippetError(
+							t("userConfig.importPartial", { ok: okCount, err: errCount })
+						);
 					} else if (okCount > 0) {
 						setSnippetError(null);
 						setSnippetSuccess(true);
@@ -312,9 +311,9 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 
 	return (
 		<Stack spacing={2}>
-			<SnippetsSection state={snippetsState} />
-			<AttributesSection state={attributesState} />
-			<TemplateSection state={templateState} />
+			<Snippets state={snippetsState} />
+			<Attributes state={attributesState} />
+			<Links state={templateState} />
 		</Stack>
 	);
 }

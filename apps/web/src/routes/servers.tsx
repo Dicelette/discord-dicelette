@@ -16,12 +16,9 @@ import {
 } from "@mui/material";
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../shared/api/auth.api";
-import { guildApi } from "../shared/api/guild.api";
-import type { DiscordGuild } from "../shared/api/types";
-import { useI18n } from "../shared/i18n";
+import { authApi, type DiscordGuild, guildApi, useI18n } from "../shared";
 
-export default function ServersRoute() {
+export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
@@ -146,11 +143,7 @@ export default function ServersRoute() {
 													{guild.name}
 												</Typography>
 												{guild.owner && (
-													<Chip
-														label={t("common.owner")}
-														size="small"
-														sx={{ mt: 0.5 }}
-													/>
+													<Chip label={t("common.owner")} size="small" sx={{ mt: 0.5 }} />
 												)}
 											</Box>
 											<Settings sx={{ opacity: 0.4, flexShrink: 0 }} />
@@ -205,7 +198,9 @@ export default function ServersRoute() {
 				</>
 			)}
 
-			{!loading && guilds.length === 0 && <Alert severity="info">{t("servers.noServers")}</Alert>}
+			{!loading && guilds.length === 0 && (
+				<Alert severity="info">{t("servers.noServers")}</Alert>
+			)}
 		</Box>
 	);
 }
