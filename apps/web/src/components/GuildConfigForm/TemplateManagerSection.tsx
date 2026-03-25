@@ -316,10 +316,18 @@ function TemplateView({
 					/>
 				)}
 				{template.diceType && (
-					<Chip label={`${t("template.diceType")}: ${template.diceType}`} size="small" />
+					<Chip
+						sx={{ fontFamily: "var(--code-font-family)" }}
+						label={`${t("template.diceType")}${t("common.space")}: ${template.diceType}`}
+						size="small"
+					/>
 				)}
 				{template.total !== undefined && (
-					<Chip label={`${t("common.total")}: ${template.total}`} size="small" />
+					<Chip
+						sx={{ fontFamily: "var(--code-font-family)" }}
+						label={`${t("common.total")}${t("common.space")}: ${template.total}`}
+						size="small"
+					/>
 				)}
 				{template.forceDistrib && (
 					<Chip
