@@ -33,3 +33,7 @@ h5,
 h6 {
 	font-family: var(--ifm-heading-font-family);
 }
+
+.template {
+	font-family: var(--code-font-family);
+}

@@ -366,7 +366,7 @@ function TemplateView({
 					</Typography>
 					<Table size="small">
 						<TableHead>
-							<TableRow>
+							<TableRow className="template">
 								<TableCell>{t("common.name").toTitle()}</TableCell>
 								<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
 								<TableCell>{t("modals.dice.value")}</TableCell>
