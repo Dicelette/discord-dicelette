@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Victor+Mono:ital,wght@0,100..700;1,100..700&display=swap");
 
 :root {
 	--ifm-font-family-base: "Atkinson Hyperlegible Next", "Inter", sans-serif;
@@ -6,7 +7,7 @@
 	--bg-default: #f5f5f5;
 	--bg-paper: #ffffff;
 	--appbar-bg: #960ea5;
-	--code-font-family: "Iosevka Charon", monospace;
+	--code-font-family: "Victor Mono", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,4 +37,5 @@ h6 {
 
 code {
 	font-family: var(--code-font-family);
+	font-feature-settings: "calt" 1;
 }

@@ -24,7 +24,25 @@ const theme = createTheme({
 		MuiInputBase: {
 			styleOverrides: {
 				input: {
-					fontFamily: '"Iosevka Charon", monospace',
+					fontFamily: '"Victor Mono", monospace',
+				},
+			},
+		},
+		// biome-ignore lint/style/useNamingConvention: MUI requires PascalCase component keys
+		MuiChip: {
+			styleOverrides: {
+				sizeSmall: ({ theme }) => ({
+					height: 28,
+					fontSize: theme.typography.pxToRem(14),
+				}),
+				labelSmall: {
+					paddingInline: 11,
+				},
+				iconSmall: {
+					fontSize: 19,
+				},
+				deleteIconSmall: {
+					fontSize: 19,
 				},
 			},
 		},

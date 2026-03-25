@@ -3,9 +3,15 @@ import {
 	type StatisticalTemplate,
 	verifyTemplateValue,
 } from "@dicelette/core";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DownloadIcon from "@mui/icons-material/Download";
-import UploadIcon from "@mui/icons-material/Upload";
+import {
+	Casino,
+	CheckCircle,
+	Delete,
+	Download,
+	Functions,
+	SmsFailed,
+	Upload,
+} from "@mui/icons-material";
 import {
 	Alert,
 	Box,
@@ -195,7 +201,7 @@ export default function TemplateManager({
 
 				<Button
 					variant="outlined"
-					startIcon={<DownloadIcon />}
+					startIcon={<Download />}
 					onClick={() => setImportModalOpen(true)}
 					disabled={saving || loading}
 					size="small"
@@ -207,7 +213,7 @@ export default function TemplateManager({
 					<>
 						<Button
 							variant="outlined"
-							startIcon={<UploadIcon />}
+							startIcon={<Upload />}
 							onClick={() => exportJson(template, "template.json")}
 							size="small"
 						>
@@ -216,7 +222,7 @@ export default function TemplateManager({
 						{hasCharacters && (
 							<Button
 								variant="outlined"
-								startIcon={<UploadIcon />}
+								startIcon={<Upload />}
 								onClick={handleExportCharacters}
 								size="small"
 							>
@@ -226,7 +232,7 @@ export default function TemplateManager({
 						<Button
 							variant="outlined"
 							color="error"
-							startIcon={<DeleteIcon />}
+							startIcon={<Delete />}
 							onClick={() => setConfirmDelete(true)}
 							disabled={saving}
 							size="small"
@@ -299,39 +305,6 @@ function TemplateView({
 
 	return (
 		<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-			<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-				{template.charName && (
-					<Chip
-						label={t("template.charName")}
-						size="small"
-						color="primary"
-						variant="outlined"
-					/>
-				)}
-				{template.diceType && (
-					<Chip
-						sx={{ fontFamily: "var(--code-font-family)" }}
-						label={`${t("template.diceType")}${t("common.space")}: ${template.diceType}`}
-						size="small"
-					/>
-				)}
-				{template.total !== undefined && (
-					<Chip
-						sx={{ fontFamily: "var(--code-font-family)" }}
-						label={`${t("common.total")}${t("common.space")}: ${template.total}`}
-						size="small"
-					/>
-				)}
-				{template.forceDistrib && (
-					<Chip
-						label={t("register.embed.forceDistrib")}
-						size="small"
-						color="secondary"
-						variant="outlined"
-					/>
-				)}
-			</Box>
-
 			{template.critical &&
 				(template.critical.success !== undefined ||
 					template.critical.failure !== undefined) && (
@@ -342,14 +315,16 @@ function TemplateView({
 						<Box sx={{ display: "flex", gap: 1 }}>
 							{template.critical.success !== undefined && (
 								<Chip
-									label={`✓ ${template.critical.success}`}
+									icon={<CheckCircle />}
+									label={`${template.critical.success}`}
 									color="success"
 									size="small"
 								/>
 							)}
 							{template.critical.failure !== undefined && (
 								<Chip
-									label={`✗ ${template.critical.failure}`}
+									icon={<SmsFailed />}
+									label={`${template.critical.failure}`}
 									color="error"
 									size="small"
 								/>
@@ -376,11 +351,15 @@ function TemplateView({
 						<TableBody>
 							{Object.entries(template.customCritical).map(([name, crit]) => (
 								<TableRow key={name}>
-									<TableCell>{name}</TableCell>
+									<TableCell>
+										<strong>{name}</strong>
+									</TableCell>
 									<TableCell>
 										<code>{crit.sign}</code>
 									</TableCell>
-									<TableCell>{crit.value}</TableCell>
+									<TableCell>
+										<code>{crit.value}</code>
+									</TableCell>
 									<TableCell>{crit.onNaturalDice ? "✓" : "—"}</TableCell>
 									<TableCell>{crit.affectSkill ? "✓" : "—"}</TableCell>
 								</TableRow>
@@ -451,6 +430,40 @@ function TemplateView({
 					</Table>
 				</Paper>
 			)}
+			<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+				{template.charName && (
+					<Chip
+						label={t("template.charName")}
+						size="small"
+						color="primary"
+						variant="outlined"
+					/>
+				)}
+				{template.diceType && (
+					<Chip
+						icon={<Casino />}
+						sx={{ fontFamily: "var(--code-font-family)" }}
+						label={`${template.diceType}`}
+						size="small"
+					/>
+				)}
+				{template.total !== undefined && (
+					<Chip
+						icon={<Functions />}
+						sx={{ fontFamily: "var(--code-font-family)" }}
+						label={`${template.total}`}
+						size="small"
+					/>
+				)}
+				{template.forceDistrib && (
+					<Chip
+						label={t("register.embed.forceDistrib")}
+						size="small"
+						color="warning"
+						variant="outlined"
+					/>
+				)}
+			</Box>
 			<Paper variant="outlined" sx={{ p: 2 }}>
 				<Box
 					sx={{
