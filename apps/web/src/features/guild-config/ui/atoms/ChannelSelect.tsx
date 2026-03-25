@@ -1,12 +1,13 @@
 import {
 	Autocomplete,
+	createFilterOptions,
 	FormHelperText,
 	ListSubheader,
 	TextField,
-	createFilterOptions,
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import type { Channel } from "../../types";
+import { getChannelParentPath, getChannelPath } from "../../utils";
 
 interface ChannelSelectProps {
 	label: string;
@@ -21,22 +22,35 @@ interface ChannelSelectProps {
 const filter = createFilterOptions<Channel>();
 
 const ChannelSelect = memo(
-	({ label, value, channels, allChannels, helperText, onChange, disabled }: ChannelSelectProps) => {
+	({
+		label,
+		value,
+		channels,
+		allChannels,
+		helperText,
+		onChange,
+		disabled,
+	}: ChannelSelectProps) => {
 		const selected = channels.find((c) => c.id === value) ?? null;
+		const channelSource = allChannels ?? channels;
 
-		const categoryMap = useMemo(() => {
-			const src = allChannels ?? channels;
-			return new Map(src.filter((c) => c.type === 4).map((c) => [c.id, c.name]));
-		}, [allChannels, channels]);
+		const parentPathMap = useMemo(() => {
+			return new Map(
+				channelSource.map((channel) => [
+					channel.id,
+					getChannelParentPath(channel, channelSource),
+				])
+			);
+		}, [channelSource]);
 
 		const sortedChannels = useMemo(() => {
 			return [...channels].sort((a, b) => {
-				const parentA = a.parent_id ? (categoryMap.get(a.parent_id) ?? "") : "\uFFFF";
-				const parentB = b.parent_id ? (categoryMap.get(b.parent_id) ?? "") : "\uFFFF";
+				const parentA = parentPathMap.get(a.id) || "\uFFFF";
+				const parentB = parentPathMap.get(b.id) || "\uFFFF";
 				if (parentA !== parentB) return parentA.localeCompare(parentB);
 				return a.name.localeCompare(b.name);
 			});
-		}, [channels, categoryMap]);
+		}, [channels, parentPathMap]);
 
 		return (
 			<>
@@ -46,11 +60,8 @@ const ChannelSelect = memo(
 					disabled={disabled}
 					options={sortedChannels}
 					getOptionKey={(c) => c.id}
-					getOptionLabel={(c) => {
-						const parent = c.parent_id ? (categoryMap.get(c.parent_id) ?? "") : "";
-						return parent ? `#${parent}/${c.name}` : `# ${c.name}`;
-					}}
-					groupBy={(c) => (c.parent_id ? (categoryMap.get(c.parent_id) ?? "") : "")}
+					getOptionLabel={(c) => getChannelPath(c, channelSource)}
+					groupBy={(c) => parentPathMap.get(c.id) ?? ""}
 					filterOptions={(opts, state) => {
 						const filtered = filter(opts, state);
 						return state.inputValue ? filtered : filtered.slice(0, 10);

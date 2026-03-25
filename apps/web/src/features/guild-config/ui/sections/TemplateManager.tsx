@@ -37,6 +37,7 @@ import { useEffect, useRef, useState } from "react";
 import { charactersApi, templateApi, useI18n } from "../../../../shared";
 import { exportJson } from "../../../user-config/utils";
 import type { Props } from "../../types";
+import { getChannelPathById } from "../../utils";
 import SectionTitle from "../atoms/SectionTitle";
 import ImportTemplateModal, { type ImportTemplateData } from "../ImportTemplateModal";
 
@@ -255,9 +256,9 @@ export default function TemplateManager({
 			) : (
 				<TemplateView
 					template={template}
-					defaultTemplateChannel={channels.find((c) => c.id === templateChannelId)?.name}
-					defaultPrivateChannel={channels.find((c) => c.id === privateChannelId)?.name}
-					defaultPublicChannel={channels.find((c) => c.id === publicChannelId)?.name}
+					defaultTemplateChannel={getChannelPathById(templateChannelId, channels)}
+					defaultPrivateChannel={getChannelPathById(privateChannelId, channels)}
+					defaultPublicChannel={getChannelPathById(publicChannelId, channels)}
 				/>
 			)}
 
@@ -509,7 +510,7 @@ function TemplateView({
 								</Typography>
 								<Chip
 									size="small"
-									label={value ? `#${value}` : t("common.none")}
+									label={value ?? t("common.none")}
 									variant={isMissing ? "outlined" : "filled"}
 									sx={{
 										maxWidth: "100%",
@@ -534,7 +535,7 @@ function TemplateView({
 												}
 											: {},
 									}}
-									title={value ? `#${value}` : t("common.none")}
+									title={value ?? t("common.none")}
 								/>
 							</Box>
 						);
