@@ -29,18 +29,6 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 						/>
 					)}
 				/>
-				<Controller
-					name="rollChannel"
-					control={control}
-					render={({ field }) => (
-						<ChannelSelect
-							label={t("config.fields.rollChannel")}
-							value={field.value}
-							channels={textChannels}
-							onChange={(v) => field.onChange(v || undefined)}
-						/>
-					)}
-				/>
 			</div>
 		</>
 	);

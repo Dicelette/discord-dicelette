@@ -1,21 +1,11 @@
 import type { ApiGuildData } from "@dicelette/types";
-import {
-	Box,
-	FormControlLabel,
-	Slider,
-	Switch,
-	TextField,
-	Typography,
-} from "@mui/material";
+import { FormControlLabel, Switch, TextField } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
 import { useI18n } from "../../i18n";
 import { SectionTitle } from "./atoms";
 
 const BOOL_FIELDS = [
-	["disableThread", "config.fields.disableThread"],
 	["timestamp", "config.fields.timestamp"],
-	["context", "config.fields.context"],
-	["linkToLogs", "config.fields.linkToLogs"],
 	["disableCompare", "config.fields.disableCompare"],
 ] as const;
 
@@ -49,29 +39,6 @@ export default function DiceBehaviourSection({ control }: Props) {
 					/>
 				))}
 			</div>
-
-			<Box sx={{ mt: 3 }}>
-				<Controller
-					name="deleteAfter"
-					control={control}
-					render={({ field }) => (
-						<>
-							<Typography variant="body2" gutterBottom>
-								{t("config.fields.deleteAfter", { val: field.value ?? 0 })}
-							</Typography>
-							<Slider
-								value={field.value ?? 0}
-								min={0}
-								max={3600}
-								step={30}
-								onChange={(_, v) => field.onChange((v as number) || undefined)}
-								valueLabelDisplay="auto"
-								sx={{ maxWidth: 400 }}
-							/>
-						</>
-					)}
-				/>
-			</Box>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 				<Controller

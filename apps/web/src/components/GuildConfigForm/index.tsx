@@ -5,6 +5,7 @@ import ChannelsSection from "./atoms/ChannelsSection.tsx";
 import ConfigFormFooter from "./atoms/ConfigFormFooter.tsx";
 import DiceBehaviourSection from "./DiceBehaviourSection";
 import GeneralSection from "./GeneralSection";
+import ResultsSection from "./ResultsSection";
 import StripOOCSection from "./StripOOCSection";
 import type { Channel } from "./types";
 import { useConfigForm } from "./useConfigForm.ts";
@@ -36,6 +37,10 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 
 					<Paper sx={{ p: 3 }}>
 						<ChannelsSection control={control} textChannels={textChannels} />
+					</Paper>
+
+					<Paper sx={{ p: 3 }}>
+						<ResultsSection control={control} textChannels={textChannels} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
