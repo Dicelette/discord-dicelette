@@ -28,7 +28,7 @@ export function useConfigForm(config: ApiGuildData, channels: Channel[]) {
 	const disableThread = watch("disableThread");
 	useEffect(() => {
 		if (disableThread) {
-			setValue("rollChannel", undefined, { shouldDirty: true });
+			setValue("rollChannel", undefined);
 		}
 	}, [disableThread, setValue]);
 
