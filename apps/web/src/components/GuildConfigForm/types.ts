@@ -5,6 +5,7 @@ export interface Channel {
 	id: string;
 	name: string;
 	type: number;
+	parent_id?: string | null;
 }
 
 export interface Role {

@@ -185,6 +185,7 @@ export default function ImportTemplateModal({
 								label={`${t("template.templateChannel")} *`}
 								value={channelId || undefined}
 								channels={templateChannels}
+								allChannels={channels}
 								onChange={(value) => {
 									setChannelId(value);
 									setError(null);
@@ -205,6 +206,7 @@ export default function ImportTemplateModal({
 								label={t("config.defaultSheet")}
 								value={publicChannelId || undefined}
 								channels={charChannels}
+								allChannels={channels}
 								onChange={setPublicChannelId}
 							/>
 							<Typography
@@ -222,6 +224,7 @@ export default function ImportTemplateModal({
 								label={t("config.fields.privateChannel")}
 								value={privateChannelId || undefined}
 								channels={charChannels}
+								allChannels={channels}
 								onChange={setPrivateChannelId}
 							/>
 							<Typography
