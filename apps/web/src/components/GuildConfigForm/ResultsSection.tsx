@@ -8,9 +8,10 @@ import type { Channel } from "./types";
 interface Props {
 	control: Control<ApiGuildData>;
 	textChannels: Channel[];
+	allChannels?: Channel[];
 }
 
-export default function ResultsSection({ control, textChannels }: Props) {
+export default function ResultsSection({ control, textChannels, allChannels }: Props) {
 	const { t } = useI18n();
 	const disableThread = useWatch({ control, name: "disableThread" });
 
@@ -46,6 +47,7 @@ export default function ResultsSection({ control, textChannels }: Props) {
 							label={t("config.fields.rollChannel")}
 							value={field.value}
 							channels={textChannels}
+							allChannels={allChannels}
 							disabled={!!disableThread}
 							onChange={(v) => field.onChange(v || undefined)}
 						/>

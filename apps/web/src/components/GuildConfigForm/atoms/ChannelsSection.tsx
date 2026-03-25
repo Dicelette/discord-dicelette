@@ -8,9 +8,10 @@ import SectionTitle from "./SectionTitle";
 interface Props {
 	control: Control<ApiGuildData>;
 	textChannels: Channel[];
+	allChannels?: Channel[];
 }
 
-export default function ChannelsSection({ control, textChannels }: Props) {
+export default function ChannelsSection({ control, textChannels, allChannels }: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -25,6 +26,7 @@ export default function ChannelsSection({ control, textChannels }: Props) {
 							label={t("config.fields.logs")}
 							value={field.value}
 							channels={textChannels}
+							allChannels={allChannels}
 							onChange={(v) => field.onChange(v || undefined)}
 						/>
 					)}

@@ -41,11 +41,11 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<ChannelsSection control={control} textChannels={textChannels} />
+						<ChannelsSection control={control} textChannels={textChannels} allChannels={channels} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<ResultsSection control={control} textChannels={textChannels} />
+						<ResultsSection control={control} textChannels={textChannels} allChannels={channels} />
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>

@@ -8,9 +8,10 @@ import type { Channel } from "./types";
 interface Props {
 	control: Control<ApiGuildData>;
 	textChannels: Channel[];
+	allChannels?: Channel[];
 }
 
-export default function SelfRegisterSection({ control, textChannels }: Props) {
+export default function SelfRegisterSection({ control, textChannels, allChannels }: Props) {
 	const allowSelfRegister = useWatch({ control, name: "allowSelfRegister" });
 	const { t } = useI18n();
 
@@ -42,6 +43,7 @@ export default function SelfRegisterSection({ control, textChannels }: Props) {
 								label={t("config.fields.moderationChannel")}
 								value={typeof field.value === "string" ? field.value : undefined}
 								channels={textChannels}
+								allChannels={allChannels}
 								onChange={(v) => field.onChange(v || true)}
 							/>
 						)}
