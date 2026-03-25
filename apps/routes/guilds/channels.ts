@@ -22,8 +22,11 @@ export function createChannelsRouter(deps: DashboardDeps) {
 				return;
 			}
 
-			// 0=text, 4=category, 5=announcement, 15=forum
-			const filtered = guild.channels.filter((c) => [0, 4, 5, 15].includes(c.type));
+			// 0=text, 4=category, 5=announcement, 10=announcement thread,
+			// 11=public thread, 12=private thread, 15=forum
+			const filtered = guild.channels.filter((c) =>
+				[0, 4, 5, 10, 11, 12, 15].includes(c.type)
+			);
 			res.json(filtered);
 		}
 	);
