@@ -5,7 +5,9 @@ import {
 } from "@dicelette/core";
 import {
 	Casino,
+	Check,
 	CheckCircle,
+	Close,
 	Delete,
 	Download,
 	Functions,
@@ -30,6 +32,7 @@ import {
 	TableRow,
 	Typography,
 } from "@mui/material";
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { charactersApi, templateApi, useI18n } from "../../../../shared";
 import { exportJson } from "../../../user-config/utils";
@@ -377,19 +380,27 @@ function TemplateView({
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								<TableCell>{t("common.name").toTitle()}</TableCell>
-								<TableCell>{t("graph.min.name").toTitle()}</TableCell>
-								<TableCell>{t("graph.max.name").toTitle()}</TableCell>
-								<TableCell>{t("template.formula")}</TableCell>
-								<TableCell>{t("register.embed.exclude")}</TableCell>
+								<TableCell>
+									<strong>{t("common.name").toTitle()}</strong>
+								</TableCell>
+								<TableCell>
+									<strong>{t("graph.min.name").toTitle()}</strong>
+								</TableCell>
+								<TableCell>
+									<strong>{t("graph.max.name").toTitle()}</strong>
+								</TableCell>
+								<TableCell>
+									<strong>{t("template.formula")}</strong>
+								</TableCell>
+								<TableCell>
+									<strong>{t("register.embed.exclude")}</strong>
+								</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
 							{Object.entries(template.statistics).map(([name, stat]) => (
 								<TableRow key={name}>
-									<TableCell>
-										<strong>{name}</strong>
-									</TableCell>
+									<TableCell>{name}</TableCell>
 									<TableCell>
 										<code>{stat.min ?? "—"}</code>
 									</TableCell>
@@ -399,7 +410,7 @@ function TemplateView({
 									<TableCell>
 										<code>{stat.combinaison ?? "—"}</code>
 									</TableCell>
-									<TableCell>{stat.exclude ? "✓" : "—"}</TableCell>
+									<TableCell>{stat.exclude ? <Check /> : <Close />}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>
