@@ -366,7 +366,7 @@ function TemplateView({
 					</Typography>
 					<Table size="small">
 						<TableHead>
-							<TableRow className="template">
+							<TableRow>
 								<TableCell>{t("common.name").toTitle()}</TableCell>
 								<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
 								<TableCell>{t("modals.dice.value")}</TableCell>
@@ -410,10 +410,18 @@ function TemplateView({
 						<TableBody>
 							{Object.entries(template.statistics).map(([name, stat]) => (
 								<TableRow key={name}>
-									<TableCell>{name}</TableCell>
-									<TableCell>{stat.min ?? "—"}</TableCell>
-									<TableCell>{stat.max ?? "—"}</TableCell>
-									<TableCell>{stat.combinaison ?? "—"}</TableCell>
+									<TableCell>
+										<strong>{name}</strong>
+									</TableCell>
+									<TableCell>
+										<code>{stat.min ?? "—"}</code>
+									</TableCell>
+									<TableCell>
+										<code>{stat.max ?? "—"}</code>
+									</TableCell>
+									<TableCell>
+										<code>{stat.combinaison ?? "—"}</code>
+									</TableCell>
 									<TableCell>{stat.exclude ? "✓" : "—"}</TableCell>
 								</TableRow>
 							))}
