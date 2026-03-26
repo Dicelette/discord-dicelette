@@ -23,6 +23,13 @@ function buildRegex(prefix: string, suffix: string): string | undefined {
 	return `^${escapeRegex(prefix)}(.*)${escapeRegex(suffix)}$`;
 }
 
+function decomposeSimpleRegex(regex: string) {
+	const format = /^\^(?<prefix>.*)\(\.\*\)(?<suffix>.*)\$$/;
+	const executed = format.exec(regex);
+	if (!executed?.groups) return regex;
+	return { prefix: executed.groups.prefix, suffix: executed.groups.suffix };
+}
+
 interface Props {
 	control: Control<ApiGuildData>;
 	channels: Channel[];
@@ -34,9 +41,21 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 	const stripOOC = useWatch({ control, name: "stripOOC" });
 	const { field: regexField } = useController({ name: "stripOOC.regex", control });
 
-	const [advancedMode, setAdvancedMode] = useState(() => !!stripOOC?.regex);
-	const [prefix, setPrefix] = useState("");
-	const [suffix, setSuffix] = useState("");
+	const [advancedMode, setAdvancedMode] = useState(() => {
+		if (!stripOOC?.regex) return false;
+		const decomposed = decomposeSimpleRegex(stripOOC.regex);
+		return typeof decomposed === "string";
+	});
+	const [prefix, setPrefix] = useState(() => {
+		if (!stripOOC?.regex) return "";
+		const decomposed = decomposeSimpleRegex(stripOOC.regex);
+		return typeof decomposed === "object" ? decomposed.prefix : "";
+	});
+	const [suffix, setSuffix] = useState(() => {
+		if (!stripOOC?.regex) return "";
+		const decomposed = decomposeSimpleRegex(stripOOC.regex);
+		return typeof decomposed === "object" ? decomposed.suffix : "";
+	});
 	const [regexDisplayValue, setRegexDisplayValue] = useState(() => stripOOC?.regex ?? "");
 	const [regexError, setRegexError] = useState<string | null>(null);
 
