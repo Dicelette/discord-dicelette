@@ -97,14 +97,15 @@ export default function Results({ control, textChannels, allChannels }: Props) {
 
 						return (
 							<NumberField
+								size="small"
 								label={t("config.fields.deleteAfter")}
 								value={secondsValue}
 								min={0}
 								max={3600}
-								step={1}
 								disabled={!savingActive}
-								onChange={(seconds) => field.onChange(secondsToMilliseconds(seconds))}
-								sx={{ maxWidth: 400 }}
+								onValueChange={(value) => {
+									field.onChange(secondsToMilliseconds(value));
+								}}
 							/>
 						);
 					}}

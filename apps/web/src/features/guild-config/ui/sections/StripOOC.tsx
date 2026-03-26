@@ -161,7 +161,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 							helperText={regexError ?? t("config.fields.stripOocRegexHelp")}
 						/>
 					)}
-					<Box>
+					<Box sx={{ maxWidth: 400 }}>
 						<Controller
 							name="stripOOC.timer"
 							control={control}
@@ -172,11 +172,13 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 									<NumberField
 										label={t("config.fields.stripOocDelay")}
 										value={secondsValue}
+										size="small"
 										min={0}
 										max={3600}
 										step={30}
-										onChange={(seconds) => field.onChange(secondsToMilliseconds(seconds))}
-										sx={{ maxWidth: 400 }}
+										onValueChange={(seconds) =>
+											field.onChange(secondsToMilliseconds(seconds))
+										}
 									/>
 								);
 							}}

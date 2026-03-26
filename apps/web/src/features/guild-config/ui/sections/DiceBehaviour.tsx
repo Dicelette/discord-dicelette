@@ -1,7 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
-import { FormControlLabel, Switch, TextField } from "@mui/material";
+import { FormControlLabel, Switch } from "@mui/material";
 import { type Control, Controller } from "react-hook-form";
-import { useI18n } from "../../../../shared";
+import { NumberField, useI18n } from "../../../../shared";
 import { SectionTitle } from "../atoms";
 
 const BOOL_FIELDS = [
@@ -45,15 +45,12 @@ export default function DiceBehaviour({ control }: Props) {
 					name="pity"
 					control={control}
 					render={({ field }) => (
-						<TextField
+						<NumberField
 							label={t("config.fields.pity")}
-							type="number"
 							size="small"
-							value={field.value ?? ""}
-							onChange={(e) =>
-								field.onChange(e.target.value ? Number(e.target.value) : undefined)
-							}
-							slotProps={{ htmlInput: { min: 0 } }}
+							value={field.value}
+							min={0}
+							onValueChange={(e) => field.onChange(e ?? undefined)}
 						/>
 					)}
 				/>
