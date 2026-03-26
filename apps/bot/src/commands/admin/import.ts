@@ -230,8 +230,6 @@ async function processCharacter(params: {
 
 		const targetChannel =
 			char.channel ?? (char.private && privateChannel ? privateChannel : defaultChannel);
-
-		console.warn(targetChannel);
 		// Fetch previous stored user data before creating a new message. This prevents a race where
 		// the newly posted message is immediately considered the "old" one and deleted.
 		const previous = (
@@ -348,10 +346,13 @@ export const bulkAdd = {
 			const memberUser = gm?.user as Djs.User | undefined;
 			if (!memberUser) continue;
 
-			for (const char of chars) {
-				asyncJobs.push(
-					limit(() =>
-						processCharacter({
+			// Process all characters for the same user sequentially to avoid race conditions:
+			// concurrent writes for the same userId would overwrite each other in
+			// registerUser/updateMemory (both read the same state before either has written).
+			asyncJobs.push(
+				limit(async () => {
+					for (const char of chars) {
+						await processCharacter({
 							char,
 							client,
 							defaultChannel,
@@ -362,10 +363,10 @@ export const bulkAdd = {
 							privateChannel,
 							shouldDelete: toDelete,
 							ul,
-						})
-					)
-				);
-			}
+						});
+					}
+				})
+			);
 		}
 
 		await Promise.allSettled(asyncJobs);
