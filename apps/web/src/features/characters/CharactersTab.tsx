@@ -13,7 +13,7 @@ import { useI18n } from "@shared";
 import { useCallback, useEffect, useState } from "react";
 import CharacterCard from "./ui/CharacterCard";
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 5;
 
 interface Props {
 	guildId: string;
