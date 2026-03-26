@@ -350,11 +350,11 @@ function TemplateView({
 						<Table size="small" sx={{ minWidth: 620 }}>
 							<TableHead>
 								<TableRow>
-									<TableCell>{t("common.name").toTitle()}</TableCell>
-									<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
-									<TableCell>{t("modals.dice.value")}</TableCell>
-									<TableCell>{t("template.onNaturalDice")}</TableCell>
-									<TableCell>{t("template.affectSkill")}</TableCell>
+									<TableCell align={"center"}>{t("common.name").toTitle()}</TableCell>
+									<TableCell align={"center"}>{t("calc.sign.title").toTitle()}</TableCell>
+									<TableCell align={"center"}>{t("modals.dice.value")}</TableCell>
+									<TableCell align={"center"}>{t("template.onNaturalDice")}</TableCell>
+									<TableCell align={"center"}>{t("template.affectSkill")}</TableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
@@ -390,19 +390,19 @@ function TemplateView({
 						<Table size="small" sx={{ minWidth: 700 }}>
 							<TableHead>
 								<TableRow>
-									<TableCell>
+									<TableCell align={"center"}>
 										<strong>{t("common.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>
+									<TableCell align={"center"}>
 										<strong>{t("graph.min.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>
+									<TableCell align={"center"}>
 										<strong>{t("graph.max.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>
+									<TableCell align={"center"}>
 										<strong>{t("template.formula")}</strong>
 									</TableCell>
-									<TableCell>
+									<TableCell align={"center"}>
 										<strong>{t("register.embed.exclude")}</strong>
 									</TableCell>
 								</TableRow>
@@ -411,18 +411,20 @@ function TemplateView({
 								{Object.entries(template.statistics).map(([name, stat]) => (
 									<TableRow key={name}>
 										<TableCell>{name}</TableCell>
-										<TableCell>
+										<TableCell align={"center"}>
 											<code>{stat.min ?? "—"}</code>
 										</TableCell>
-										<TableCell>
+										<TableCell align={"center"}>
 											<code>{stat.max ?? "—"}</code>
 										</TableCell>
-										<TableCell>
+										<TableCell align={"center"}>
 											<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
 												{stat.combinaison ?? "—"}
 											</code>
 										</TableCell>
-										<TableCell>{stat.exclude ? <Check /> : <Close />}</TableCell>
+										<TableCell align={"center"}>
+											{stat.exclude ? <Check /> : <Close />}
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
