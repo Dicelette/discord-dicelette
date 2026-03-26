@@ -58,7 +58,11 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<HiddenRolls control={control} />
+						<HiddenRolls
+							control={control}
+							textChannels={textChannels}
+							allChannels={channels}
+						/>
 					</Paper>
 				</Stack>
 

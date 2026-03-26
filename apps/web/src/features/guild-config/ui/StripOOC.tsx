@@ -91,7 +91,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 									}
 								/>
 							}
-							label={t("config.fields.stripOocEnable")}
+							label={t("common.enable")}
 						/>
 					)}
 				/>

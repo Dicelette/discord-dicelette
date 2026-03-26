@@ -29,4 +29,6 @@ export interface Props {
 
 export interface HiddenRoleProps {
 	control: Control<ApiGuildData>;
+	textChannels: Channel[];
+	allChannels?: Channel[];
 }

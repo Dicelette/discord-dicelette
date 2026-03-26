@@ -123,6 +123,7 @@
 		"default": "Default",
 		"delete": "delete",
 		"dice": "dice",
+		"enable": "Enable",
 		"ephemeral": "ephemeral",
 		"error": "Error",
 		"expression": "expression",
