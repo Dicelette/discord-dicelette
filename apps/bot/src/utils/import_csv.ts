@@ -139,6 +139,12 @@ async function step(
 	} = {};
 	const ul = ln(lang);
 	const errors: string[] = [];
+	const allMembers = interaction ? await interaction.guild?.members.fetch() : undefined;
+	if (interaction && !allMembers) {
+		const msg = ul("import.errors.no_user");
+		errors.push(msg);
+		return { errors, members };
+	}
 	//get the user id from the guild
 	for (const data of csv) {
 		const user = data.user.toString().replaceAll("'", "").trim();
@@ -151,7 +157,6 @@ async function step(
 
 		//get the user from the guild
 		if (interaction) {
-			const allMembers = await interaction?.guild?.members.fetch();
 			if (!allMembers) {
 				const msg = ul("import.errors.no_user");
 				errors.push(msg);

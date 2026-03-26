@@ -336,16 +336,14 @@ export const bulkAdd = {
 				content: ul("error.channel.defaultChannel"),
 			});
 
-		const guildMembers = await interaction.guild?.members.fetch();
-
 		const toDelete = !!options.getBoolean(t("common.delete"));
 		const limit = pLimit(3); // Keep a low concurrency to respect Discord rate limits
 		const asyncJobs: Promise<unknown>[] = [];
 		const collectedErrors = [...errors];
 
 		for (const [userId, chars] of Object.entries(members)) {
-			// We already parsed the user, so the cache should be up to date
-			const gm = guildMembers!.get(userId);
+			// parseCSV resolves users from guild members and populates cache
+			const gm = interaction.guild?.members.cache.get(userId);
 			const memberUser = gm?.user as Djs.User | undefined;
 			if (!memberUser) continue;
 
