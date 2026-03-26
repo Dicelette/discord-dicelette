@@ -33,6 +33,7 @@ export interface GuildData {
 	managerId?: string;
 	/**
 	 * Disable the auto deletion of the dice result
+	 * Registered in ms
 	 */
 	deleteAfter?: number;
 	/**

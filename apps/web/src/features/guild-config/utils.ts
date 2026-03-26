@@ -41,3 +41,11 @@ export function getChannelPathById(
 	const names = [...getAncestorNames(channel, channelMap), channel.name];
 	return `#${names.join("/")}`;
 }
+
+export function millisecondsToSeconds(value: number | undefined | null) {
+	return Math.round((value ?? 0) / 1000);
+}
+
+export function secondsToMilliseconds(value: number | undefined | null) {
+	return (value ?? 0) * 1000;
+}

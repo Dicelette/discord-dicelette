@@ -13,7 +13,9 @@
 		"test:e2e:headed": "playwright test --headed"
 	},
 	"dependencies": {
+		"@base-ui/react": "^1.3.0",
 		"@dicelette/dashboard-api": "workspace:*",
+		"@dicelette/localization": "workspace:*",
 		"@dicelette/types": "workspace:*",
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.0",
@@ -22,8 +24,7 @@
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-hook-form": "^7.72.0",
-		"react-router-dom": "^7.13.1",
-		"@dicelette/localization": "workspace:*"
+		"react-router-dom": "^7.13.1"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.58.2",

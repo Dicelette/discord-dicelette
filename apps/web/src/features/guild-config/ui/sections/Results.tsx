@@ -1,8 +1,9 @@
 import type { ApiGuildData } from "@dicelette/types";
-import { Box, FormControlLabel, Slider, Switch, Typography } from "@mui/material";
+import { Box, FormControlLabel, Switch } from "@mui/material";
 import { type Control, Controller, useWatch } from "react-hook-form";
-import { useI18n } from "../../../../shared";
+import { NumberField, useI18n } from "../../../../shared";
 import type { Channel } from "../../types";
+import { millisecondsToSeconds, secondsToMilliseconds } from "../../utils";
 import { ChannelSelect, SectionTitle } from "../atoms";
 
 interface Props {
@@ -91,27 +92,24 @@ export default function Results({ control, textChannels, allChannels }: Props) {
 				<Controller
 					name="deleteAfter"
 					control={control}
-					render={({ field }) => (
-						<>
-							<Typography
-								variant="body2"
-								gutterBottom
-								sx={{ color: savingActive ? "inherit" : "text.disabled" }}
-							>
-								{t("config.fields.deleteAfter", { val: field.value ?? 0 })}
-							</Typography>
-							<Slider
-								value={field.value ?? 0}
+					render={({ field }) => {
+						const secondsValue = millisecondsToSeconds(field.value);
+
+						return (
+							<NumberField
+								label={t("config.fields.deleteAfter", {
+									val: secondsValue,
+								})}
+								value={secondsValue}
 								min={0}
 								max={3600}
-								step={30}
+								step={1}
 								disabled={!savingActive}
-								onChange={(_, v) => field.onChange((v as number) || undefined)}
-								valueLabelDisplay="auto"
+								onChange={(seconds) => field.onChange(secondsToMilliseconds(seconds))}
 								sx={{ maxWidth: 400 }}
 							/>
-						</>
-					)}
+						);
+					}}
 				/>
 			</Box>
 		</>

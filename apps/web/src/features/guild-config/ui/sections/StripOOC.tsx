@@ -3,15 +3,15 @@ import {
 	Autocomplete,
 	Box,
 	FormControlLabel,
-	Slider,
 	Switch,
 	TextField,
 	Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { type Control, Controller, useController, useWatch } from "react-hook-form";
-import { useI18n } from "../../../../shared";
+import { NumberField, useI18n } from "../../../../shared";
 import type { Channel } from "../../types";
+import { millisecondsToSeconds, secondsToMilliseconds } from "../../utils";
 import { ChannelSelect, SectionTitle } from "../atoms";
 
 function escapeRegex(str: string) {
@@ -146,26 +146,23 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 						<Controller
 							name="stripOOC.timer"
 							control={control}
-							render={({ field }) => (
-								<>
-									<Typography variant="body2" gutterBottom>
-										{t("config.fields.stripOocDelay", {
-											val: field.value ? field.value / 1000 : 0,
+							render={({ field }) => {
+								const secondsValue = millisecondsToSeconds(field.value);
+
+								return (
+									<NumberField
+										label={t("config.fields.stripOocDelay", {
+											val: secondsValue,
 										})}
-									</Typography>
-									<Slider
-										value={field.value ? field.value / 1000 : 0}
+										value={secondsValue}
 										min={0}
 										max={3600}
 										step={30}
-										onChange={(_, v) =>
-											field.onChange((v as number) ? (v as number) * 1000 : undefined)
-										}
-										valueLabelDisplay="auto"
+										onChange={(seconds) => field.onChange(secondsToMilliseconds(seconds))}
 										sx={{ maxWidth: 400 }}
 									/>
-								</>
-							)}
+								);
+							}}
 						/>
 					</Box>
 					<Controller
