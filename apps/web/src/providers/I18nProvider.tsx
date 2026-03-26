@@ -1,7 +1,7 @@
 import botEn from "@dicelette/localization/locales/en.json";
 import botFr from "@dicelette/localization/locales/fr.json";
+import { en, fr, i18nContext, type Locale } from "@shared";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
-import { en, fr, i18nContext, type Locale } from "../shared/i18n";
 
 const translations: Record<Locale, Record<string, unknown>> = { en, fr };
 const botTranslations: Record<Locale, Record<string, unknown>> = {

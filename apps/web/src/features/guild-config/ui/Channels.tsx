@@ -1,8 +1,6 @@
 import type { ApiGuildData } from "@dicelette/types";
+import { type Channel, ChannelSelect, SectionTitle, useI18n } from "@shared";
 import { type Control, Controller } from "react-hook-form";
-import { useI18n } from "../../../../shared";
-import type { Channel } from "../../types";
-import { ChannelSelect, SectionTitle } from "../atoms";
 
 interface Props {
 	control: Control<ApiGuildData>;

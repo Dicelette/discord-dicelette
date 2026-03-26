@@ -22,7 +22,7 @@ import type {
 } from "@dicelette/dashboard-api";
 import type { ApiGuildData } from "@dicelette/types";
 import type { Page } from "@playwright/test";
-import { en, fr } from "../../../src/shared";
+import { en, fr } from "@shared";
 
 // ---------------------------------------------------------------------------
 // Données de test réutilisables

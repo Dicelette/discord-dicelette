@@ -1,9 +1,8 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Autocomplete, TextField } from "@mui/material";
+import { SectionTitle, useI18n } from "@shared";
 import { useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
-import { useI18n } from "../../../../shared";
-import { SectionTitle } from "../atoms";
 
 const DISCORD_LOCALES = [
 	{ value: "en-US", label: "English" },

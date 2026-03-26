@@ -15,9 +15,9 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
+import { useI18n } from "@shared";
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useI18n } from "../shared";
 
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);

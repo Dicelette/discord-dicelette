@@ -12,7 +12,7 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
-import { useI18n } from "../../../../shared";
+import { useI18n } from "@shared";
 import type { SnippetsState } from "../..";
 import { exportJson } from "../../utils.ts";
 import { SnippetRow } from "../atoms";

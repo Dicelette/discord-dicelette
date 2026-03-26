@@ -9,8 +9,8 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
+import { useI18n } from "@shared";
 import { useCallback, useEffect, useState } from "react";
-import { useI18n } from "../../../shared";
 import CharacterCard from "./CharacterCard";
 
 const PAGE_SIZE = 5;

@@ -12,9 +12,9 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
-import { useI18n } from "../../../../shared";
-import type { AttributeSectionProps } from "../../types";
-import { exportJson } from "../../utils";
+import { useI18n } from "@shared";
+import type { AttributeSectionProps } from "../../types.ts";
+import { exportJson } from "../../utils.ts";
 import { AttributeRow } from "../atoms";
 
 export default function Attributes({ state }: AttributeSectionProps) {

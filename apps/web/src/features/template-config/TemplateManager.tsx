@@ -31,13 +31,11 @@ import {
 	TableRow,
 	Typography,
 } from "@mui/material";
+import { getChannelPathById, type Props, SectionTitle, useI18n } from "@shared";
 import { useEffect, useState } from "react";
-import { useI18n } from "../../../../shared";
-import { exportJson } from "../../../user-config/utils";
-import type { Props } from "../../types";
-import { getChannelPathById } from "../../utils";
-import SectionTitle from "../atoms/SectionTitle";
-import ImportTemplateModal, { type ImportTemplateData } from "../ImportTemplateModal";
+import { exportJson } from "../user-config/utils.ts";
+import { TemplateModal } from "./sections";
+import type { ImportTemplateData } from "./types.ts";
 
 export default function TemplateManager({
 	guildId,
@@ -235,7 +233,7 @@ export default function TemplateManager({
 				/>
 			)}
 
-			<ImportTemplateModal
+			<TemplateModal
 				open={importModalOpen}
 				onClose={() => setImportModalOpen(false)}
 				onImport={handleModalImport}

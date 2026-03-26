@@ -1,7 +1,7 @@
 import { type ApiUserConfig, userApi } from "@dicelette/dashboard-api";
 import Stack from "@mui/material/Stack";
+import { useI18n } from "@shared";
 import { useCallback, useRef, useState } from "react";
-import { useI18n } from "../../../shared";
 import "uniformize";
 import type { AttributesState, SnippetsState, TemplateState } from "../types";
 import { DEFAULT_TEMPLATE } from "../utils";

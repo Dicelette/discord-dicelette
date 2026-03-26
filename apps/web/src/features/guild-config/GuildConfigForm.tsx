@@ -1,16 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
-import { useConfigForm, useI18n } from "../../../shared";
-import type { Channel } from "../types";
-import { ConfigFormFooter } from "./atoms";
-import {
-	Channels,
-	DiceBehaviour,
-	General,
-	HiddenRolls,
-	Results,
-	StripOOC,
-} from "./sections";
+import { type Channel, ConfigFormFooter, useConfigForm, useI18n } from "@shared";
+import { Channels, DiceBehaviour, General, HiddenRolls, Results, StripOOC } from "./ui";
 
 interface Props {
 	config: ApiGuildData;

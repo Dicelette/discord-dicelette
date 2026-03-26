@@ -7,6 +7,14 @@ export interface Channel {
 	type: number;
 	parent_id?: string | null;
 }
+export interface ConfigFormProps {
+	config: ApiGuildData;
+	guildId: string;
+	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
+	saving: boolean;
+	channels: Channel[];
+	roles: Role[];
+}
 
 export interface Role {
 	id: string;
@@ -22,13 +30,3 @@ export interface Props {
 export interface HiddenRoleProps {
 	control: Control<ApiGuildData>;
 }
-
-export interface ConfigFormProps {
-	config: ApiGuildData;
-	guildId: string;
-	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
-	saving: boolean;
-	channels: Channel[];
-	roles: Role[];
-}
-

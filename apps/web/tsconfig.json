@@ -13,7 +13,11 @@
 		"jsx": "react-jsx",
 		"strict": true,
 		"skipLibCheck": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"paths": {
+			"@shared/*": ["./src/shared/src/*"],
+			"@shared": ["./src/shared/index.js"]
+		}
 	},
 	"include": ["src", "vite.config.ts", "tests/**/*", "../../packages/dashboard-api/**/*"]
 }

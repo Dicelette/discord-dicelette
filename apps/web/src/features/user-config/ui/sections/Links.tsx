@@ -12,7 +12,7 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import { useI18n } from "../../../../shared";
+import { useI18n } from "@shared";
 import type { TemplateSectionProps } from "../../types";
 
 export default function Links({ state }: TemplateSectionProps) {

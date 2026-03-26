@@ -1,10 +1,9 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
-import { useConfigForm, useI18n } from "../../../shared";
-import type { ConfigFormProps } from "../types.ts";
-import { ConfigFormFooter } from "./atoms";
-import { SelfRegister, TemplateManager } from "./sections";
-import AutoRole from "./sections/AutoRole.tsx";
+import { ConfigFormFooter, type ConfigFormProps, useConfigForm, useI18n } from "@shared";
+import { AutoRole } from "./atoms";
+import { SelfRegister } from "./sections";
+import TemplateManager from "./TemplateManager.tsx";
 
 export default function ModelConfigForm({
 	config,

@@ -20,19 +20,10 @@ import {
 	Switch,
 	Typography,
 } from "@mui/material";
+import { type Channel, ChannelSelect, useI18n } from "@shared";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useI18n } from "../../../shared";
-import type { Channel } from "../types.ts";
-import { ChannelSelect } from "./atoms";
-
-export interface ImportTemplateData {
-	template: StatisticalTemplate;
-	channelId: string;
-	publicChannelId?: string;
-	privateChannelId?: string;
-	deleteCharacters: boolean;
-}
+import type { ImportTemplateData } from "../types.ts";
 
 interface Props {
 	open: boolean;
@@ -45,7 +36,7 @@ interface Props {
 	defaultPrivateChannelId?: string;
 }
 
-export default function ImportTemplateModal({
+export default function TemplateModal({
 	open,
 	onClose,
 	onImport,

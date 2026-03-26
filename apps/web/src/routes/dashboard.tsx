@@ -10,18 +10,12 @@ import {
 	Tabs,
 	Typography,
 } from "@mui/material";
+import { type Channel, type Role, useI18n } from "@shared";
 import { lazy, Suspense, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-	type Channel,
-	CharactersTab,
-	GuildConfigForm,
-	type Role,
-	UserConfigForm,
-} from "../features";
-import { useI18n } from "../shared";
+import { CharactersTab, GuildConfigForm, UserConfigForm } from "../features";
 
-const ModelConfigForm = lazy(() => import("../features/guild-config/ui/ModelConfigForm"));
+const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
 
 type ActiveTab = "admin" | "template" | "user" | "characters";
 

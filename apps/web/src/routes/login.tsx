@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { DocsButton, LanguageSelect, ThemeToggleButton, useI18n } from "../shared";
+import { DocsButton, LanguageSelect, ThemeToggleButton, useI18n } from "@shared";
 
 export default function Login() {
 	const { t } = useI18n();

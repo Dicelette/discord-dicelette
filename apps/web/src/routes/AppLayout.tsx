@@ -1,13 +1,13 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
-import { Link, Outlet } from "react-router-dom";
-import { useAuth } from "../providers";
 import {
 	DocsButton,
 	LanguageSelect,
 	ThemeToggleButton,
 	UserAvatarMenu,
 	useI18n,
-} from "../shared";
+} from "@shared";
+import { Link, Outlet } from "react-router-dom";
+import { useAuth } from "../providers";
 
 export default function AppLayout() {
 	const { user, logout } = useAuth();

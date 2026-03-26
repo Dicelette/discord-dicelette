@@ -1,8 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { FormControlLabel, Switch } from "@mui/material";
+import { NumberField, SectionTitle, useI18n } from "@shared";
 import { type Control, Controller } from "react-hook-form";
-import { NumberField, useI18n } from "../../../../shared";
-import { SectionTitle } from "../atoms";
 
 const BOOL_FIELDS = [
 	["timestamp", "config.fields.timestamp"],

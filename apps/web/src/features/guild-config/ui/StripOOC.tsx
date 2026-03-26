@@ -7,16 +7,18 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import { useState } from "react";
-import { type Control, Controller, useController, useWatch } from "react-hook-form";
-import { NumberField, useI18n } from "../../../../shared";
-import type { Channel } from "../../types";
 import {
+	type Channel,
+	ChannelSelect,
 	formatDuration,
 	millisecondsToSeconds,
+	NumberField,
+	SectionTitle,
 	secondsToMilliseconds,
-} from "../../utils";
-import { ChannelSelect, SectionTitle } from "../atoms";
+	useI18n,
+} from "@shared";
+import { useState } from "react";
+import { type Control, Controller, useController, useWatch } from "react-hook-form";
 
 function escapeRegex(str: string) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

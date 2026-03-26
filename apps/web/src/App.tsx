@@ -1,7 +1,7 @@
+import { LoadingSpinner } from "@shared";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./providers";
 import { AppLayout, Dashboard, Login, Servers } from "./routes";
-import { LoadingSpinner } from "./shared";
 
 function App() {
 	const { user, loading } = useAuth();

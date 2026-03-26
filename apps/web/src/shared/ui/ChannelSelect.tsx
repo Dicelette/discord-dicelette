@@ -6,8 +6,8 @@ import {
 	TextField,
 } from "@mui/material";
 import { memo, useMemo } from "react";
-import type { Channel } from "../../types";
-import { getChannelParentPath, getChannelPath } from "../../utils";
+import type { Channel } from "../types";
+import { getChannelParentPath, getChannelPath } from "../utils";
 
 interface ChannelSelectProps {
 	label: string;

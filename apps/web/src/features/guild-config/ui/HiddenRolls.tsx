@@ -1,8 +1,6 @@
 import { FormControlLabel, Switch, TextField } from "@mui/material";
+import { type HiddenRoleProps, SectionTitle, useI18n } from "@shared";
 import { Controller, useWatch } from "react-hook-form";
-import { useI18n } from "../../../../shared";
-import type { HiddenRoleProps } from "../../types";
-import { SectionTitle } from "../atoms";
 
 export default function HiddenRolls({ control }: HiddenRoleProps) {
 	const hiddenRoll = useWatch({ control, name: "hiddenRoll" });
@@ -20,7 +18,7 @@ export default function HiddenRolls({ control }: HiddenRoleProps) {
 							control={
 								<Switch
 									checked={!!field.value}
-									onChange={(e) => field.onChange(e.target.checked || undefined)}
+									onChange={(e) => field.onChange(e.target.checked || false)}
 								/>
 							}
 							label={t("config.fields.hiddenRollEnable")}

@@ -2,7 +2,7 @@ import type { ApiCharacter } from "@dicelette/dashboard-api";
 import { Lock, OpenInNew } from "@mui/icons-material";
 import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
 import "uniformize";
-import { useI18n } from "../../../shared";
+import { useI18n } from "@shared";
 import StatCell from "./StatCell";
 
 interface Props {

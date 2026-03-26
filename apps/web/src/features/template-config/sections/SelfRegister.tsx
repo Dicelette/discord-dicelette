@@ -1,9 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { FormControlLabel, Switch } from "@mui/material";
+import { type Channel, ChannelSelect, SectionTitle, useI18n } from "@shared";
 import { type Control, Controller, useWatch } from "react-hook-form";
-import { useI18n } from "../../../../shared";
-import type { Channel } from "../../types";
-import { ChannelSelect, SectionTitle } from "../atoms";
 
 interface Props {
 	control: Control<ApiGuildData>;
