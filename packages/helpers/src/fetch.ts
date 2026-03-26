@@ -12,7 +12,7 @@ export async function fetchChannel(
 	try {
 		// If a channel instance is provided, trust it (must be guild-based for our usage)
 		if (channel) return channel;
-
+		if (typeof channelId === "string" && channelId.trim().length === 0) return null;
 		// Try guild cache first (returns GuildBasedChannel when present)
 		const cached = guild.channels.cache.get(channelId);
 		if (cached) return cached as Djs.GuildBasedChannel;

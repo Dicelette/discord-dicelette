@@ -148,7 +148,11 @@ async function step(
 	//get the user id from the guild
 	for (const data of csv) {
 		const user = data.user.toString().replaceAll("'", "").trim();
-		const channel = data.channel ? data.channel.replaceAll("'", "").trim() : undefined;
+		const cleannedChannel = data.channel
+			? data.channel.replaceAll("'", "").trim()
+			: undefined;
+		const channel =
+			cleannedChannel && cleannedChannel.trim().length > 0 ? cleannedChannel : undefined;
 		const charName = data.charName;
 
 		//get user from the guild
@@ -257,7 +261,6 @@ async function step(
 			},
 			userName: charName,
 		};
-		logger.trace("Adding character", newChar);
 		if (!newChar.private) delete newChar.private;
 		if (!newChar.avatar) delete newChar.avatar;
 		members[userID].push(newChar);

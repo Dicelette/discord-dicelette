@@ -30,7 +30,7 @@ export async function searchUserChannel(
 	try {
 		const channel = await fetchChannel(interaction.guild!, channelId);
 		if (register && channel instanceof Djs.ForumChannel) return;
-		if (!isValidChannel(channel, interaction)) {
+		if (!channel || !isValidChannel(channel, interaction)) {
 			// Avoid using `any`: rely on runtime class to detect forum channels
 			if (register && channel instanceof Djs.ForumChannel) return;
 			if (skipNoFound) return;

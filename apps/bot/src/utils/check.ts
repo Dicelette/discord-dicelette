@@ -126,6 +126,7 @@ export function isValidChannel(
 	channel: Djs.GuildBasedChannel | null | undefined | Djs.TextBasedChannel,
 	_interaction: Djs.CommandInteraction | Djs.BaseInteraction
 ) {
+	if (!channel) return false;
 	return (
 		channel &&
 		!channel.isVoiceBased() &&

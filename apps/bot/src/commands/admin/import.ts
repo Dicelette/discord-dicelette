@@ -231,6 +231,7 @@ async function processCharacter(params: {
 		const targetChannel =
 			char.channel ?? (char.private && privateChannel ? privateChannel : defaultChannel);
 
+		console.warn(targetChannel);
 		// Fetch previous stored user data before creating a new message. This prevents a race where
 		// the newly posted message is immediately considered the "old" one and deleted.
 		const previous = (
@@ -276,7 +277,7 @@ async function processCharacter(params: {
 		logger.warn(
 			`[import] Failed for user ${member.id} (${char?.userName ?? "?"}): ${message}`
 		);
-		errorsRef.push(`${member.username}: ${message}`);
+		errorsRef.push(`- \`${member.username}\`${ul("common.space")}: ${message}`);
 	}
 }
 
