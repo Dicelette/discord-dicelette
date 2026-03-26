@@ -32,7 +32,7 @@ export function useConfigForm(config: ApiGuildData, channels: Channel[]) {
 			return;
 		}
 		if (disableThread) {
-			setValue("rollChannel", undefined, { shouldDirty: true });
+			setValue("rollChannel", undefined);
 		}
 	}, [disableThread, setValue]);
 
