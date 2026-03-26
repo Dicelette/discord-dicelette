@@ -132,7 +132,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		const templateID = {
 			channelId,
-			messageId: newMessageId,
+			messageId: newMessageId!,
 			statsName,
 			excludedStats,
 			damageName,
