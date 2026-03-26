@@ -107,13 +107,13 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		// Poste (ou reposte) le message template sur Discord
 		let newMessageId: string | undefined;
-		if (effectiveChannelId) {
+		if (channelId) {
 			const oldMessageId = current?.templateID?.messageId;
 			if (oldMessageId && current?.templateID?.channelId) {
 				await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
 			}
 			const sent = await botChannels.sendTemplate(
-				effectiveChannelId,
+				channelId,
 				validated,
 				guildId,
 				effectivePublicChannelId,
