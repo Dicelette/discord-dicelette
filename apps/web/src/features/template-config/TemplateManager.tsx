@@ -438,7 +438,9 @@ function TemplateView({
 									.slice((statisticsPage - 1) * rowsPerPage, statisticsPage * rowsPerPage)
 									.map(([name, stat]) => (
 										<TableRow key={name}>
-											<TableCell>{name}</TableCell>
+											<TableCell>
+												<strong>{name}</strong>
+											</TableCell>
 											<TableCell align={"center"}>
 												<code>{stat.min ?? "—"}</code>
 											</TableCell>
@@ -489,9 +491,11 @@ function TemplateView({
 									.slice((damagePage - 1) * rowsPerPage, damagePage * rowsPerPage)
 									.map(([name, formula]) => (
 										<TableRow key={name}>
-											<TableCell>{name}</TableCell>
+											<TableCell>
+												<strong>{name}</strong>
+											</TableCell>
 											<TableCell sx={{ whiteSpace: "normal", wordBreak: "break-word" }}>
-												{formula || "—"}
+												<code>{formula || "—"}</code>
 											</TableCell>
 										</TableRow>
 									))}
