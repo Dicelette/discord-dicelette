@@ -64,13 +64,18 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			privateChannelId,
 		} = req.body as {
 			template: unknown;
-			channelId?: string;
+			channelId: string;
 			publicChannelId?: string;
 			privateChannelId?: string;
 		};
 
 		if (!templateBody || typeof templateBody !== "object") {
 			res.status(400).json({ error: "Invalid template" });
+			return;
+		}
+
+		if (!channelId || typeof channelId !== "string") {
+			res.status(400).json({ error: "channelId is required" });
 			return;
 		}
 
@@ -93,7 +98,6 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		const damageName = validated.damage ? Object.keys(validated.damage) : [];
 
 		const current = settings.get(guildId);
-		const effectiveChannelId = channelId ?? current?.templateID?.channelId;
 		const effectivePublicChannelId = hasPublicChannelId
 			? publicChannelId || undefined
 			: current?.managerId;
@@ -102,31 +106,27 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			: current?.privateChannel;
 
 		// Poste (ou reposte) le message template sur Discord
-		let newMessageId: string | undefined;
-		if (effectiveChannelId) {
-			const oldMessageId = current?.templateID?.messageId;
-			if (oldMessageId && current?.templateID?.channelId) {
-				await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
-			}
-			const sent = await botChannels.sendTemplate(
-				effectiveChannelId,
-				validated,
-				guildId,
-				effectivePublicChannelId,
-				effectivePrivateChannelId
-			);
-			if (!sent) {
-				res.status(500).json({ error: "Failed to send template message to Discord channel" });
-				return;
-			}
-			newMessageId = sent.messageId;
+		const oldMessageId = current?.templateID?.messageId;
+		if (oldMessageId && current?.templateID?.channelId) {
+			await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
+		}
+		const sent = await botChannels.sendTemplate(
+			channelId,
+			validated,
+			guildId,
+			effectivePublicChannelId,
+			effectivePrivateChannelId
+		);
+		if (!sent) {
+			res.status(500).json({ error: "Failed to send template message to Discord channel" });
+			return;
 		}
 
 		template.set(guildId, validated);
 
 		const templateID = {
-			channelId: effectiveChannelId ?? "",
-			messageId: newMessageId ?? current?.templateID?.messageId ?? "",
+			channelId,
+			messageId: sent.messageId,
 			statsName,
 			excludedStats,
 			damageName,
