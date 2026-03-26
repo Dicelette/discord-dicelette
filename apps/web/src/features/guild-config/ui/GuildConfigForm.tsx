@@ -3,7 +3,14 @@ import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useConfigForm, useI18n } from "../../../shared";
 import type { Channel } from "../types";
 import { ConfigFormFooter } from "./atoms";
-import { Channels, DiceBehaviour, General, Results, StripOOC } from "./sections";
+import {
+	Channels,
+	DiceBehaviour,
+	General,
+	HiddenRolls,
+	Results,
+	StripOOC,
+} from "./sections";
 
 interface Props {
 	config: ApiGuildData;
@@ -57,6 +64,10 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 
 					<Paper sx={{ p: 3 }}>
 						<StripOOC control={control} channels={channels} textChannels={textChannels} />
+					</Paper>
+
+					<Paper sx={{ p: 3 }}>
+						<HiddenRolls control={control} />
 					</Paper>
 				</Stack>
 

@@ -16,14 +16,14 @@
 		"cancel": "Cancel",
 		"darkTheme": "Dark theme",
 		"documentation": "Documentation",
+		"here": "here",
 		"lightTheme": "Light theme",
 		"loading": "Loading...",
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Owner",
 		"save": "Save",
-		"saving": "Saving...",
-		"here": "here"
+		"saving": "Saving..."
 	},
 	"config": {
 		"fields": {
@@ -34,6 +34,7 @@
 			"context": "Add context link in logs",
 			"defaultChannel": "Default channel (sheets)",
 			"deleteAfter": "Auto-delete (s)",
+			"deleteAfterHelper": "Deletion after {duration}.",
 			"disableCompare": "Disable success/fail comparison",
 			"disableThread": "Disable result threads",
 			"hiddenRollDm": "Send via DM (otherwise: specific channel)",
@@ -121,6 +122,8 @@
 		"deleteSuccess": "Template deleted.",
 		"deleteWarning": "Irreversible action. All characters on the server will be permanently deleted. Consider exporting your data before continuing.",
 		"diceType": "Dice type",
+		"download": "You can generate a template",
+		"downloadLink": "https://www.dicelette.app/en/docs/sheet/form",
 		"excluded": "Excluded",
 		"export": "Export",
 		"exportCharacters": "Export characters (CSV)",
@@ -146,9 +149,7 @@
 		"templateChannel": "Template channel",
 		"templateChannelHelp": "Channel where the template message will be posted (text only).",
 		"total": "Total",
-		"value": "Value",
-		"download": "You can generate a template",
-		"downloadLink": "https://www.dicelette.app/en/docs/sheet/form"
+		"value": "Value"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",

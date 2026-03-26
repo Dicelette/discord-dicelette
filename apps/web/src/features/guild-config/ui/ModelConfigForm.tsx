@@ -3,7 +3,7 @@ import { Alert, Box, Paper, Stack } from "@mui/material";
 import { useConfigForm, useI18n } from "../../../shared";
 import type { ConfigFormProps } from "../types.ts";
 import { ConfigFormFooter } from "./atoms";
-import { HiddenRolls, SelfRegister, TemplateManager } from "./sections";
+import { SelfRegister, TemplateManager } from "./sections";
 import AutoRole from "./sections/AutoRole.tsx";
 
 export default function ModelConfigForm({
@@ -51,10 +51,6 @@ export default function ModelConfigForm({
 							textChannels={textChannels}
 							allChannels={channels}
 						/>
-					</Paper>
-
-					<Paper sx={{ p: 3 }}>
-						<HiddenRolls control={control} />
 					</Paper>
 				</Stack>
 

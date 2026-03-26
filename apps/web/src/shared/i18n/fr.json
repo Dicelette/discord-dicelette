@@ -16,14 +16,14 @@
 		"cancel": "Annuler",
 		"darkTheme": "Thème sombre",
 		"documentation": "Documentation",
+		"here": "ici",
 		"lightTheme": "Thème clair",
 		"loading": "Chargement...",
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Propriétaire",
 		"save": "Sauvegarder",
-		"saving": "Sauvegarde...",
-		"here": "ici"
+		"saving": "Sauvegarde..."
 	},
 	"config": {
 		"fields": {
@@ -34,6 +34,7 @@
 			"context": "Ajouter un lien de contexte dans les logs",
 			"defaultChannel": "Channel par défaut (fiches)",
 			"deleteAfter": "Suppression automatique (s)",
+			"deleteAfterHelper": "Suppression après {duration}.",
 			"disableCompare": "Désactiver la comparaison succès/échec",
 			"disableThread": "Désactiver les fils de résultats",
 			"hiddenRollDm": "Envoyer en MP (sinon : channel spécifique)",
@@ -121,6 +122,8 @@
 		"deleteSuccess": "Template supprimé.",
 		"deleteWarning": "Action irréversible. Tous les personnages du serveur seront supprimés définitivement. Pensez à exporter vos données avant de continuer.",
 		"diceType": "Dé type",
+		"download": "Vous pouvez générer un modèle",
+		"downloadLink": "https://www.dicelette.app/docs/sheet/form",
 		"excluded": "Exclu",
 		"export": "Exporter",
 		"exportCharacters": "Exporter les personnages (CSV)",
@@ -146,9 +149,7 @@
 		"templateChannel": "Channel du modèle",
 		"templateChannelHelp": "Channel où sera envoyé le message du modèle (texte uniquement).",
 		"total": "Total",
-		"value": "Valeur",
-		"download": "Vous pouvez générer un modèle",
-		"downloadLink": "https://www.dicelette.app/docs/sheet/form"
+		"value": "Valeur"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",

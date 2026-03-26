@@ -13,10 +13,7 @@
 		"jsx": "react-jsx",
 		"strict": true,
 		"skipLibCheck": true,
-		"resolveJsonModule": true,
-		"paths": {
-			"@dicelette/dashboard-api": ["../../packages/dashboard-api/index.ts"]
-		}
+		"resolveJsonModule": true
 	},
 	"include": ["src", "vite.config.ts", "tests/**/*", "../../packages/dashboard-api/**/*"]
 }

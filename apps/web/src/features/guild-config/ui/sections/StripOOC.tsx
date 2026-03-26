@@ -11,7 +11,11 @@ import { useState } from "react";
 import { type Control, Controller, useController, useWatch } from "react-hook-form";
 import { NumberField, useI18n } from "../../../../shared";
 import type { Channel } from "../../types";
-import { millisecondsToSeconds, secondsToMilliseconds } from "../../utils";
+import {
+	formatDuration,
+	millisecondsToSeconds,
+	secondsToMilliseconds,
+} from "../../utils";
 import { ChannelSelect, SectionTitle } from "../atoms";
 
 function escapeRegex(str: string) {
@@ -175,7 +179,9 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 										size="small"
 										min={0}
 										max={3600}
-										step={30}
+										helperText={t("config.fields.deleteAfterHelper", {
+											duration: formatDuration(secondsValue),
+										})}
 										onValueChange={(seconds) =>
 											field.onChange(secondsToMilliseconds(seconds))
 										}

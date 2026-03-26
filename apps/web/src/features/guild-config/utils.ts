@@ -49,3 +49,14 @@ export function millisecondsToSeconds(value: number | undefined | null) {
 export function secondsToMilliseconds(value: number | undefined | null) {
 	return (value ?? 0) * 1000;
 }
+
+export function formatDuration(seconds: number) {
+	if (seconds < 60) return `${seconds}s`;
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	if (minutes < 60)
+		return remainingSeconds ? `${minutes}min ${remainingSeconds}s` : `${minutes}min`;
+	const hours = Math.floor(minutes / 60);
+	const remainingMinutes = minutes % 60;
+	return remainingMinutes ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
+}
