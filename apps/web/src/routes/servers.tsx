@@ -16,7 +16,8 @@ import {
 } from "@mui/material";
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi, type DiscordGuild, guildApi, useI18n } from "../shared";
+import { authApi, type DiscordGuild, guildApi } from "../api";
+import { useI18n } from "../shared";
 
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);

@@ -1,6 +1,7 @@
 import Stack from "@mui/material/Stack";
 import { useCallback, useRef, useState } from "react";
-import { type ApiUserConfig, useI18n, userApi } from "../../../shared";
+import { type ApiUserConfig, userApi } from "../../../api";
+import { useI18n } from "../../../shared";
 import "uniformize";
 import type { AttributesState, SnippetsState, TemplateState } from "../types";
 import { DEFAULT_TEMPLATE } from "../utils";

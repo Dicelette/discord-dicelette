@@ -1,7 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import type { Channel } from "../../features/guild-config";
+import type { Channel } from "../../features";
 
 export function useConfigForm(config: ApiGuildData, channels: Channel[]) {
 	const { control, handleSubmit, reset, formState, watch, setValue } =

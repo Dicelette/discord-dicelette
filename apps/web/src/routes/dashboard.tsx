@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { lazy, Suspense, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { type ApiUserConfig, guildApi, userApi } from "../api";
 import {
 	type Channel,
 	CharactersTab,
@@ -18,7 +19,7 @@ import {
 	type Role,
 	UserConfigForm,
 } from "../features";
-import { type ApiUserConfig, guildApi, useI18n, userApi } from "../shared";
+import { useI18n } from "../shared";
 
 const ModelConfigForm = lazy(() => import("../features/guild-config/ui/ModelConfigForm"));
 

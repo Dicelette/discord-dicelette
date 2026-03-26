@@ -1,6 +1,6 @@
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { authApi, type DiscordUser } from "../shared";
+import { authApi, type DiscordUser } from "../api";
 
 interface AuthContextType {
 	user: DiscordUser | null;
