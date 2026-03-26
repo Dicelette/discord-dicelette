@@ -25,7 +25,7 @@ export default function HiddenRolls({ control }: HiddenRoleProps) {
 						/>
 					)}
 				/>
-				{hiddenRoll && (
+				{(hiddenRoll === true || typeof hiddenRoll === "string") && (
 					<>
 						<Controller
 							name="hiddenRoll"

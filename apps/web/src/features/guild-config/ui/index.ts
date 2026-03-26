@@ -1,4 +1,3 @@
-export { default as SelfRegister } from "../../../template-config/sections/SelfRegister.tsx";
 export { default as Channels } from "./Channels.tsx";
 export { default as DiceBehaviour } from "./DiceBehaviour.tsx";
 export { default as General } from "./General.tsx";

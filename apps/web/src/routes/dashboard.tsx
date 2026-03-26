@@ -119,8 +119,10 @@ export default function Dashboard() {
 					setMountedTabs((prev) => (prev.has(v) ? prev : new Set([...prev, v])));
 					startTransition(() => setTab(v));
 				}}
-				TabIndicatorProps={{
-					sx: { display: { xs: "none", sm: "block" } },
+				slotProps={{
+					indicator: {
+						sx: { display: { xs: "none", sm: "block" } },
+					},
 				}}
 				sx={{
 					mb: 3,
