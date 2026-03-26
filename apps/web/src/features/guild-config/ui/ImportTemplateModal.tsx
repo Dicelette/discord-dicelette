@@ -19,6 +19,7 @@ import {
 	Switch,
 	Typography,
 } from "@mui/material";
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../../../shared";
 import type { Channel } from "../types.ts";
@@ -113,8 +114,9 @@ export default function ImportTemplateModal({
 				deleteCharacters,
 			});
 			handleClose();
-		} catch {
+		} catch (e) {
 			setError(t("template.importError"));
+			console.error(e);
 		} finally {
 			setSaving(false);
 		}

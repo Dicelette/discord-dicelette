@@ -11,7 +11,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 	const router = Router({ mergeParams: true });
 	const requireAdmin = makeRequireAdmin(botGuilds);
 
-	// GET /:guildId/template — récupère le template statistique du serveur (admin uniquement)
+	// GET /guildId/template — récupère le template statistique du serveur (admin uniquement)
 	router.get("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 
@@ -106,29 +106,29 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			: current?.privateChannel;
 
 		// Poste (ou reposte) le message template sur Discord
-		const oldMessageId = current?.templateID?.messageId;
-		if (oldMessageId && current?.templateID?.channelId) {
-			await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
-		}
-		const sent = await botChannels.sendTemplate(
-			channelId,
-			validated,
-			guildId,
-			effectivePublicChannelId,
-			effectivePrivateChannelId
-		);
-		if (!sent) {
-			res.status(500).json({ error: "Failed to send template message to Discord channel" });
-			return;
+		let newMessageId: string | undefined;
+		if (effectiveChannelId) {
+			const oldMessageId = current?.templateID?.messageId;
+			if (oldMessageId && current?.templateID?.channelId) {
+				await botChannels.deleteMessage(current.templateID.channelId, oldMessageId);
+			}
+			const sent = await botChannels.sendTemplate(
+				effectiveChannelId,
+				validated,
+				guildId,
+				effectivePublicChannelId,
+				effectivePrivateChannelId
+			);
+			if (!sent) {
+				res
+					.status(500)
+					.json({ error: "Failed to send template message to Discord channel" });
+				return;
+			}
+			newMessageId = sent.messageId;
 		}
 
 		template.set(guildId, validated);
-
-		// Le canal public peut venir de : la requête > un thread créé auto > l'existant
-		const resolvedPublicChannelId =
-			(hasPublicChannelId ? publicChannelId || undefined : undefined) ??
-			sent.publicChannelId ??
-			current?.managerId;
 
 		const templateID = {
 			channelId,

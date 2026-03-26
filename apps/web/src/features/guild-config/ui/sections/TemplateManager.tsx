@@ -20,10 +20,12 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
+	Pagination,
 	Paper,
 	Table,
 	TableBody,
 	TableCell,
+	TableContainer,
 	TableHead,
 	TableRow,
 	Typography,
@@ -122,6 +124,9 @@ export default function TemplateManager({
 			setPublicChannelId(data.publicChannelId || undefined);
 			setPrivateChannelId(data.privateChannelId || undefined);
 			flash(setSuccess, t("template.importSuccess"));
+		} catch (e) {
+			flash(setError, t("template.importError"));
+			console.error(e);
 		} finally {
 			setSaving(false);
 		}
@@ -269,6 +274,50 @@ function TemplateView({
 	defaultTemplateChannel?: string;
 }) {
 	const { t } = useI18n();
+	const rowsPerPage = 10;
+	const [customCriticalPage, setCustomCriticalPage] = useState(1);
+	const [statisticsPage, setStatisticsPage] = useState(1);
+	const [damagePage, setDamagePage] = useState(1);
+
+	const customCriticalEntries = Object.entries(template.customCritical ?? {});
+	const statisticsEntries = Object.entries(template.statistics ?? {});
+	const damageEntries = Object.entries(template.damage ?? {});
+
+	useEffect(() => {
+		const maxCustomCriticalPage = Math.max(
+			1,
+			Math.ceil(customCriticalEntries.length / rowsPerPage)
+		);
+		const maxStatisticsPage = Math.max(
+			1,
+			Math.ceil(statisticsEntries.length / rowsPerPage)
+		);
+		const maxDamagePage = Math.max(1, Math.ceil(damageEntries.length / rowsPerPage));
+
+		if (customCriticalPage > maxCustomCriticalPage) {
+			setCustomCriticalPage(maxCustomCriticalPage);
+		}
+		if (statisticsPage > maxStatisticsPage) {
+			setStatisticsPage(maxStatisticsPage);
+		}
+		if (damagePage > maxDamagePage) {
+			setDamagePage(maxDamagePage);
+		}
+	}, [
+		customCriticalEntries.length,
+		statisticsEntries.length,
+		damageEntries.length,
+		customCriticalPage,
+		statisticsPage,
+		damagePage,
+	]);
+
+	const tableHeadSx = {
+		"& .MuiTableCell-root": {
+			backgroundColor: "action.selected",
+			fontWeight: 700,
+		},
+	};
 	const channelInfos = [
 		{ label: t("config.defaultSheet"), value: defaultPublicChannel },
 		{ label: t("config.fields.privateChannel"), value: defaultPrivateChannel },
@@ -305,109 +354,162 @@ function TemplateView({
 					</Paper>
 				)}
 
-			{template.customCritical && Object.keys(template.customCritical).length > 0 && (
+			{customCriticalEntries.length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
 						{t("config.customCritical")}
 					</Typography>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell>{t("common.name").toTitle()}</TableCell>
-								<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
-								<TableCell>{t("modals.dice.value")}</TableCell>
-								<TableCell>{t("template.onNaturalDice")}</TableCell>
-								<TableCell>{t("template.affectSkill")}</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{Object.entries(template.customCritical).map(([name, crit]) => (
-								<TableRow key={name}>
-									<TableCell>
-										<strong>{name}</strong>
-									</TableCell>
-									<TableCell>
-										<code>{crit.sign}</code>
-									</TableCell>
-									<TableCell>
-										<code>{crit.value}</code>
-									</TableCell>
-									<TableCell>{crit.onNaturalDice ? "✓" : "—"}</TableCell>
-									<TableCell>{crit.affectSkill ? "✓" : "—"}</TableCell>
+					<TableContainer sx={{ overflowX: "auto" }}>
+						<Table size="small" sx={{ minWidth: 620 }}>
+							<TableHead sx={tableHeadSx}>
+								<TableRow>
+									<TableCell align={"center"}>{t("common.name").toTitle()}</TableCell>
+									<TableCell align={"center"}>{t("calc.sign.title").toTitle()}</TableCell>
+									<TableCell align={"center"}>{t("modals.dice.value")}</TableCell>
+									<TableCell align={"center"}>{t("template.onNaturalDice")}</TableCell>
+									<TableCell align={"center"}>{t("template.affectSkill")}</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHead>
+							<TableBody>
+								{customCriticalEntries
+									.slice(
+										(customCriticalPage - 1) * rowsPerPage,
+										customCriticalPage * rowsPerPage
+									)
+									.map(([name, crit]) => (
+										<TableRow key={name}>
+											<TableCell>
+												<strong>{name}</strong>
+											</TableCell>
+											<TableCell>
+												<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+													{crit.sign}
+												</code>
+											</TableCell>
+											<TableCell>
+												<code>{crit.value}</code>
+											</TableCell>
+											<TableCell>{crit.onNaturalDice ? "✓" : "—"}</TableCell>
+											<TableCell>{crit.affectSkill ? "✓" : "—"}</TableCell>
+										</TableRow>
+									))}
+							</TableBody>
+						</Table>
+					</TableContainer>
+					{customCriticalEntries.length > rowsPerPage && (
+						<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+							<Pagination
+								count={Math.ceil(customCriticalEntries.length / rowsPerPage)}
+								page={customCriticalPage}
+								onChange={(_, page) => setCustomCriticalPage(page)}
+								size="small"
+							/>
+						</Box>
+					)}
 				</Paper>
 			)}
 
-			{template.statistics && Object.keys(template.statistics).length > 0 && (
+			{statisticsEntries.length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
 						{t("common.statistics").toTitle()}
 					</Typography>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell>
-									<strong>{t("common.name").toTitle()}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("graph.min.name").toTitle()}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("graph.max.name").toTitle()}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("template.formula")}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("register.embed.exclude")}</strong>
-								</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{Object.entries(template.statistics).map(([name, stat]) => (
-								<TableRow key={name}>
-									<TableCell>{name}</TableCell>
-									<TableCell>
-										<code>{stat.min ?? "—"}</code>
+					<TableContainer sx={{ overflowX: "auto" }}>
+						<Table size="small" sx={{ minWidth: 700 }}>
+							<TableHead sx={tableHeadSx}>
+								<TableRow>
+									<TableCell align={"center"}>
+										<strong>{t("common.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>
-										<code>{stat.max ?? "—"}</code>
+									<TableCell align={"center"}>
+										<strong>{t("graph.min.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>
-										<code>{stat.combinaison ?? "—"}</code>
+									<TableCell align={"center"}>
+										<strong>{t("graph.max.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>{stat.exclude ? <Check /> : <Close />}</TableCell>
+									<TableCell align={"center"}>
+										<strong>{t("template.formula")}</strong>
+									</TableCell>
+									<TableCell align={"center"}>
+										<strong>{t("register.embed.exclude")}</strong>
+									</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHead>
+							<TableBody>
+								{statisticsEntries
+									.slice((statisticsPage - 1) * rowsPerPage, statisticsPage * rowsPerPage)
+									.map(([name, stat]) => (
+										<TableRow key={name}>
+											<TableCell>{name}</TableCell>
+											<TableCell align={"center"}>
+												<code>{stat.min ?? "—"}</code>
+											</TableCell>
+											<TableCell align={"center"}>
+												<code>{stat.max ?? "—"}</code>
+											</TableCell>
+											<TableCell align={"center"}>
+												<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+													{stat.combinaison ?? "—"}
+												</code>
+											</TableCell>
+											<TableCell align={"center"}>
+												{stat.exclude ? <Check /> : <Close />}
+											</TableCell>
+										</TableRow>
+									))}
+							</TableBody>
+						</Table>
+					</TableContainer>
+					{statisticsEntries.length > rowsPerPage && (
+						<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+							<Pagination
+								count={Math.ceil(statisticsEntries.length / rowsPerPage)}
+								page={statisticsPage}
+								onChange={(_, page) => setStatisticsPage(page)}
+								size="small"
+							/>
+						</Box>
+					)}
 				</Paper>
 			)}
 
-			{template.damage && Object.keys(template.damage).length > 0 && (
+			{damageEntries.length > 0 && (
 				<Paper variant="outlined" sx={{ p: 2 }}>
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
 						{t("common.macro").toTitle()}
 					</Typography>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell>{t("common.name").toTitle()}</TableCell>
-								<TableCell>{t("template.formula")}</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{Object.entries(template.damage).map(([name, formula]) => (
-								<TableRow key={name}>
-									<TableCell>{name}</TableCell>
-									<TableCell>{formula || "—"}</TableCell>
+					<TableContainer sx={{ overflowX: "auto" }}>
+						<Table size="small" sx={{ minWidth: 420 }}>
+							<TableHead sx={tableHeadSx}>
+								<TableRow>
+									<TableCell>{t("common.name").toTitle()}</TableCell>
+									<TableCell>{t("template.formula")}</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHead>
+							<TableBody>
+								{damageEntries
+									.slice((damagePage - 1) * rowsPerPage, damagePage * rowsPerPage)
+									.map(([name, formula]) => (
+										<TableRow key={name}>
+											<TableCell>{name}</TableCell>
+											<TableCell sx={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+												{formula || "—"}
+											</TableCell>
+										</TableRow>
+									))}
+							</TableBody>
+						</Table>
+					</TableContainer>
+					{damageEntries.length > rowsPerPage && (
+						<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+							<Pagination
+								count={Math.ceil(damageEntries.length / rowsPerPage)}
+								page={damagePage}
+								onChange={(_, page) => setDamagePage(page)}
+								size="small"
+							/>
+						</Box>
+					)}
 				</Paper>
 			)}
 			<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>

@@ -26,9 +26,8 @@ export default function AppLayout() {
 			>
 				<Toolbar
 					sx={{
-						gap: { xs: 1, sm: 2 },
-						rowGap: 1,
-						flexWrap: { xs: "wrap", sm: "nowrap" },
+						gap: { xs: 0.5, sm: 2 },
+						flexWrap: "nowrap",
 						backgroundColor: "var(--appbar-bg)",
 					}}
 				>
@@ -57,9 +56,9 @@ export default function AppLayout() {
 							display: "flex",
 							alignItems: "center",
 							justifyContent: "flex-end",
-							gap: 1,
-							flexWrap: "wrap",
-							width: { xs: "100%", sm: "auto" },
+							gap: { xs: 0.5, sm: 1 },
+							flexWrap: "nowrap",
+							width: "auto",
 						}}
 					>
 						<DocsButton />

@@ -103,7 +103,16 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 						return null;
 					}
 				}
-				if (!(channel instanceof Djs.BaseGuildTextChannel)) return null;
+				let publicChannel = publicChannelId
+					? (client.channels.cache.get(publicChannelId) ?? undefined)
+					: undefined;
+				if (publicChannelId && !publicChannel) {
+					try {
+						publicChannel = (await client.channels.fetch(publicChannelId)) ?? undefined;
+					} catch {
+						publicChannel = undefined;
+					}
+				}
 				try {
 					const lang = client.settings.get(guildId, "lang");
 					const ul = ln(lang ?? Djs.Locale.EnglishUS);

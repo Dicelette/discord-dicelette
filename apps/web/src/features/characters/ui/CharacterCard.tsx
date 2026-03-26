@@ -1,7 +1,8 @@
 import { Lock, OpenInNew } from "@mui/icons-material";
 import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
-import { type ApiCharacter, useI18n } from "../../../shared";
+import type { ApiCharacter } from "../../../api";
 import "uniformize";
+import { useI18n } from "../../../shared";
 import StatCell from "./StatCell";
 
 interface Props {

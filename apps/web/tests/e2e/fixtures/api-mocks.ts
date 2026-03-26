@@ -16,14 +16,13 @@
 
 import type { ApiGuildData } from "@dicelette/types";
 import type { Page } from "@playwright/test";
-import {
-	type ApiCharacter,
-	type ApiUserConfig,
-	type DiscordGuild,
-	type DiscordUser,
-	en,
-	fr,
-} from "../../../src/shared";
+import type {
+	ApiCharacter,
+	ApiUserConfig,
+	DiscordGuild,
+	DiscordUser,
+} from "../../../src/api";
+import { en, fr } from "../../../src/shared";
 
 // ---------------------------------------------------------------------------
 // Données de test réutilisables
