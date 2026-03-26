@@ -22,7 +22,8 @@
 		"none": "None",
 		"owner": "Owner",
 		"save": "Save",
-		"saving": "Saving..."
+		"saving": "Saving...",
+		"here": "here"
 	},
 	"config": {
 		"fields": {
@@ -145,7 +146,8 @@
 		"templateChannel": "Template channel",
 		"templateChannelHelp": "Channel where the template message will be posted (text only).",
 		"total": "Total",
-		"value": "Value"
+		"value": "Value",
+		"download": "You can generate a template"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",

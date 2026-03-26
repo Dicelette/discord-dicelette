@@ -22,7 +22,8 @@
 		"none": "Aucun",
 		"owner": "Propriétaire",
 		"save": "Sauvegarder",
-		"saving": "Sauvegarde..."
+		"saving": "Sauvegarde...",
+		"here": "ici"
 	},
 	"config": {
 		"fields": {
@@ -145,7 +146,8 @@
 		"templateChannel": "Channel du modèle",
 		"templateChannelHelp": "Channel où sera envoyé le message du modèle (texte uniquement).",
 		"total": "Total",
-		"value": "Valeur"
+		"value": "Valeur",
+		"download": "Vous pouvez générer un modèle"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",

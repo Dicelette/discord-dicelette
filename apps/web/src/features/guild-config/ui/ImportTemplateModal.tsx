@@ -155,6 +155,10 @@ export default function ImportTemplateModal({
 							<Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
 								{t("template.fileLabel")}
 							</Typography>
+							<Typography variant="caption">
+								{t("template.download")}{" "}
+								<a href="https://www.dicelette.app/docs/sheet/form">{t("common.here")}</a>
+							</Typography>
 							<Box
 								sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
 							>

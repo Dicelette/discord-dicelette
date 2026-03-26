@@ -76,7 +76,7 @@ export default function Snippets({ state }: Props) {
 						<Typography
 							variant="body2"
 							color="text.secondary"
-							sx={{ fontStyle: "italic", fontFamily: "var(--code-font-family)" }}
+							sx={{ fontStyle: "italic" }}
 						>
 							{t("userSettings.snippets.list.empty")}
 						</Typography>

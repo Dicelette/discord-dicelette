@@ -67,7 +67,7 @@ export default function Attributes({ state }: AttributeSectionProps) {
 						<Typography
 							variant="body2"
 							color="text.secondary"
-							sx={{ fontStyle: "italic", fontFamily: "var(--code-font-family)" }}
+							sx={{ fontStyle: "italic" }}
 						>
 							{t("userConfig.noAttributes")}
 						</Typography>
