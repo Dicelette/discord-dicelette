@@ -81,7 +81,6 @@ export default function NumberField({
 			) : null}
 
 			<BaseNumberField.Root
-				id={inputId}
 				name={name}
 				value={value}
 				defaultValue={defaultValue}
@@ -94,37 +93,39 @@ export default function NumberField({
 				required={required}
 				onValueChange={(next) => onChange?.(next)}
 				onValueCommitted={(next) => onValueCommitted?.(next)}
-				render={
-					<OutlinedInput
-						size={size}
-						label={label}
-						error={error}
-						placeholder={placeholder}
-						fullWidth={fullWidth}
-						inputComponent={BaseNumberField.Input as any}
-						endAdornment={
-							<InputAdornment position="end" sx={{ gap: 0.25 }}>
-								<BaseNumberField.Decrement
-									aria-label={decrementAriaLabel}
-									render={
-										<IconButton edge="end" size={iconSize}>
-											<Remove fontSize="inherit" />
-										</IconButton>
-									}
-								/>
-								<BaseNumberField.Increment
-									aria-label={incrementAriaLabel}
-									render={
-										<IconButton edge="end" size={iconSize}>
-											<Add fontSize="inherit" />
-										</IconButton>
-									}
-								/>
-							</InputAdornment>
-						}
-					/>
-				}
-			/>
+				style={{ display: "contents" }}
+			>
+				<OutlinedInput
+					id={inputId}
+					size={size}
+					label={label}
+					error={error}
+					placeholder={placeholder}
+					fullWidth={fullWidth}
+					disabled={disabled}
+					inputComponent={BaseNumberField.Input as any}
+					endAdornment={
+						<InputAdornment position="end" sx={{ gap: 0.25 }}>
+							<BaseNumberField.Decrement
+								aria-label={decrementAriaLabel}
+								render={
+									<IconButton edge="end" size={iconSize}>
+										<Remove fontSize="inherit" />
+									</IconButton>
+								}
+							/>
+							<BaseNumberField.Increment
+								aria-label={incrementAriaLabel}
+								render={
+									<IconButton edge="end" size={iconSize}>
+										<Add fontSize="inherit" />
+									</IconButton>
+								}
+							/>
+						</InputAdornment>
+					}
+				/>
+			</BaseNumberField.Root>
 
 			{helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
 		</FormControl>
