@@ -75,7 +75,7 @@ export default function NumberField({
 			sx={sx}
 		>
 			{label ? (
-				<InputLabel htmlFor={inputId} size={size}>
+				<InputLabel htmlFor={inputId} size={size} shrink>
 					{label}
 				</InputLabel>
 			) : null}

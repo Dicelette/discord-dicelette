@@ -97,9 +97,7 @@ export default function Results({ control, textChannels, allChannels }: Props) {
 
 						return (
 							<NumberField
-								label={t("config.fields.deleteAfter", {
-									val: secondsValue,
-								})}
+								label={t("config.fields.deleteAfter")}
 								value={secondsValue}
 								min={0}
 								max={3600}

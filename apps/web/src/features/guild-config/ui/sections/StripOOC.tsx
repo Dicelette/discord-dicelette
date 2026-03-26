@@ -151,9 +151,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 
 								return (
 									<NumberField
-										label={t("config.fields.stripOocDelay", {
-											val: secondsValue,
-										})}
+										label={t("config.fields.stripOocDelay")}
 										value={secondsValue}
 										min={0}
 										max={3600}
