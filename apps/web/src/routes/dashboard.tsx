@@ -98,7 +98,7 @@ export default function Dashboard() {
 	}
 
 	return (
-		<Box className="max-w-4xl mx-auto p-6">
+		<Box sx={{ maxWidth: "56rem", mx: "auto", px: { xs: 2, sm: 3 }, py: 3 }}>
 			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={{ mb: 3 }}>
 				{t("common.back")}
 			</Button>
@@ -124,12 +124,33 @@ export default function Dashboard() {
 					setMountedTabs((prev) => (prev.has(v) ? prev : new Set([...prev, v])));
 					startTransition(() => setTab(v));
 				}}
-				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
+				TabIndicatorProps={{
+					sx: { display: { xs: "none", sm: "block" } },
+				}}
+				sx={{
+					mb: 3,
+					borderBottom: 1,
+					borderColor: "divider",
+					"& .MuiTabs-flexContainer": {
+						flexWrap: { xs: "wrap", sm: "nowrap" },
+						rowGap: 0.5,
+					},
+					"& .MuiTab-root": {
+						minWidth: { xs: 0, sm: 90 },
+						px: { xs: 1, sm: 2 },
+						flex: { xs: "1 1 auto", sm: "0 0 auto" },
+						borderBottom: { xs: "2px solid transparent", sm: "none" },
+						mb: { xs: "-1px", sm: 0 },
+						"&.Mui-selected": {
+							borderBottomColor: { xs: "primary.main", sm: "transparent" },
+						},
+					},
+				}}
 			>
-				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} />}
-				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} />}
-				<Tab value="user" label={t("dashboard.tabs.user")} />
-				<Tab value="characters" label={t("dashboard.tabs.characters")} />
+				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
+				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
+				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
+				<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 			</Tabs>
 
 			{isAdmin && config && mountedTabs.has("admin") && (

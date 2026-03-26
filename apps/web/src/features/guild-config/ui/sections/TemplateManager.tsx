@@ -28,6 +28,7 @@ import {
 	Table,
 	TableBody,
 	TableCell,
+	TableContainer,
 	TableHead,
 	TableRow,
 	Typography,
@@ -127,6 +128,9 @@ export default function TemplateManager({
 			setPublicChannelId(data.publicChannelId || undefined);
 			setPrivateChannelId(data.privateChannelId || undefined);
 			flash(setSuccess, t("template.importSuccess"));
+		} catch (e) {
+			flash(setError, t("template.importError"));
+			console.error(e);
 		} finally {
 			setSaving(false);
 		}
@@ -342,34 +346,38 @@ function TemplateView({
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
 						{t("config.customCritical")}
 					</Typography>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell>{t("common.name").toTitle()}</TableCell>
-								<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
-								<TableCell>{t("modals.dice.value")}</TableCell>
-								<TableCell>{t("template.onNaturalDice")}</TableCell>
-								<TableCell>{t("template.affectSkill")}</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{Object.entries(template.customCritical).map(([name, crit]) => (
-								<TableRow key={name}>
-									<TableCell>
-										<strong>{name}</strong>
-									</TableCell>
-									<TableCell>
-										<code>{crit.sign}</code>
-									</TableCell>
-									<TableCell>
-										<code>{crit.value}</code>
-									</TableCell>
-									<TableCell>{crit.onNaturalDice ? "✓" : "—"}</TableCell>
-									<TableCell>{crit.affectSkill ? "✓" : "—"}</TableCell>
+					<TableContainer sx={{ overflowX: "auto" }}>
+						<Table size="small" sx={{ minWidth: 620 }}>
+							<TableHead>
+								<TableRow>
+									<TableCell>{t("common.name").toTitle()}</TableCell>
+									<TableCell>{t("calc.sign.title").toTitle()}</TableCell>
+									<TableCell>{t("modals.dice.value")}</TableCell>
+									<TableCell>{t("template.onNaturalDice")}</TableCell>
+									<TableCell>{t("template.affectSkill")}</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHead>
+							<TableBody>
+								{Object.entries(template.customCritical).map(([name, crit]) => (
+									<TableRow key={name}>
+										<TableCell>
+											<strong>{name}</strong>
+										</TableCell>
+										<TableCell>
+											<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+												{crit.sign}
+											</code>
+										</TableCell>
+										<TableCell>
+											<code>{crit.value}</code>
+										</TableCell>
+										<TableCell>{crit.onNaturalDice ? "✓" : "—"}</TableCell>
+										<TableCell>{crit.affectSkill ? "✓" : "—"}</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TableContainer>
 				</Paper>
 			)}
 
@@ -378,44 +386,48 @@ function TemplateView({
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
 						{t("common.statistics").toTitle()}
 					</Typography>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell>
-									<strong>{t("common.name").toTitle()}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("graph.min.name").toTitle()}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("graph.max.name").toTitle()}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("template.formula")}</strong>
-								</TableCell>
-								<TableCell>
-									<strong>{t("register.embed.exclude")}</strong>
-								</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{Object.entries(template.statistics).map(([name, stat]) => (
-								<TableRow key={name}>
-									<TableCell>{name}</TableCell>
+					<TableContainer sx={{ overflowX: "auto" }}>
+						<Table size="small" sx={{ minWidth: 700 }}>
+							<TableHead>
+								<TableRow>
 									<TableCell>
-										<code>{stat.min ?? "—"}</code>
+										<strong>{t("common.name").toTitle()}</strong>
 									</TableCell>
 									<TableCell>
-										<code>{stat.max ?? "—"}</code>
+										<strong>{t("graph.min.name").toTitle()}</strong>
 									</TableCell>
 									<TableCell>
-										<code>{stat.combinaison ?? "—"}</code>
+										<strong>{t("graph.max.name").toTitle()}</strong>
 									</TableCell>
-									<TableCell>{stat.exclude ? <Check /> : <Close />}</TableCell>
+									<TableCell>
+										<strong>{t("template.formula")}</strong>
+									</TableCell>
+									<TableCell>
+										<strong>{t("register.embed.exclude")}</strong>
+									</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHead>
+							<TableBody>
+								{Object.entries(template.statistics).map(([name, stat]) => (
+									<TableRow key={name}>
+										<TableCell>{name}</TableCell>
+										<TableCell>
+											<code>{stat.min ?? "—"}</code>
+										</TableCell>
+										<TableCell>
+											<code>{stat.max ?? "—"}</code>
+										</TableCell>
+										<TableCell>
+											<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+												{stat.combinaison ?? "—"}
+											</code>
+										</TableCell>
+										<TableCell>{stat.exclude ? <Check /> : <Close />}</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TableContainer>
 				</Paper>
 			)}
 
@@ -424,22 +436,26 @@ function TemplateView({
 					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
 						{t("common.macro").toTitle()}
 					</Typography>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell>{t("common.name").toTitle()}</TableCell>
-								<TableCell>{t("template.formula")}</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{Object.entries(template.damage).map(([name, formula]) => (
-								<TableRow key={name}>
-									<TableCell>{name}</TableCell>
-									<TableCell>{formula || "—"}</TableCell>
+					<TableContainer sx={{ overflowX: "auto" }}>
+						<Table size="small" sx={{ minWidth: 420 }}>
+							<TableHead>
+								<TableRow>
+									<TableCell>{t("common.name").toTitle()}</TableCell>
+									<TableCell>{t("template.formula")}</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHead>
+							<TableBody>
+								{Object.entries(template.damage).map(([name, formula]) => (
+									<TableRow key={name}>
+										<TableCell>{name}</TableCell>
+										<TableCell sx={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+											{formula || "—"}
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TableContainer>
 				</Paper>
 			)}
 			<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>

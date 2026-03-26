@@ -11,7 +11,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 	const router = Router({ mergeParams: true });
 	const requireAdmin = makeRequireAdmin(botGuilds);
 
-	// GET /:guildId/template — récupère le template statistique du serveur (admin uniquement)
+	// GET /guildId/template — récupère le template statistique du serveur (admin uniquement)
 	router.get("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 
@@ -116,7 +116,9 @@ export function createTemplateRouter(deps: DashboardDeps) {
 				effectivePrivateChannelId
 			);
 			if (!sent) {
-				res.status(500).json({ error: "Failed to send template message to Discord channel" });
+				res
+					.status(500)
+					.json({ error: "Failed to send template message to Discord channel" });
 				return;
 			}
 			newMessageId = sent.messageId;

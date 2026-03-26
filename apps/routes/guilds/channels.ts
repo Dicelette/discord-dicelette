@@ -3,12 +3,15 @@ import { Router } from "express";
 import type { DashboardDeps } from "..";
 import { makeRequireAdmin, requireAuth, userCanManageGuildViaOAuth } from "./utils";
 
+/*
+GET /guildId/channels
+*/
 export function createChannelsRouter(deps: DashboardDeps) {
 	const { botGuilds } = deps;
 	const router = Router({ mergeParams: true });
 	const requireAdmin = makeRequireAdmin(botGuilds);
 
-	// GET /:guildId/channels
+	// GET /guildId/channels
 	router.get(
 		"/channels",
 		requireAuth,
