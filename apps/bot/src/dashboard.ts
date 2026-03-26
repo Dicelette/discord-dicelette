@@ -4,7 +4,6 @@ import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
 import { templateEmbed } from "./commands/admin/template";
-import { createDefaultThread } from "./messages";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
 	startDashboardServer({
@@ -92,7 +91,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				channelId,
 				template,
 				guildId,
-				publicChannelId,
+				_publicChannelId,
 				_privateChannelId
 			) => {
 				let channel = client.channels.cache.get(channelId);
@@ -103,29 +102,10 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 						return null;
 					}
 				}
-				let publicChannel = publicChannelId
-					? (client.channels.cache.get(publicChannelId) ?? undefined)
-					: undefined;
-				if (publicChannelId && !publicChannel) {
-					try {
-						publicChannel = (await client.channels.fetch(publicChannelId)) ?? undefined;
-					} catch {
-						publicChannel = undefined;
-					}
-				}
+				if (!(channel instanceof Djs.BaseGuildTextChannel)) return null;
 				try {
 					const lang = client.settings.get(guildId, "lang");
 					const ul = ln(lang ?? Djs.Locale.EnglishUS);
-					if (channel instanceof Djs.TextChannel && !publicChannel) {
-						publicChannel = await createDefaultThread(
-							channel,
-							client.settings,
-							guildId ? client.guilds.cache.get(guildId) : undefined,
-							false
-						);
-					} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel)
-						return null;
-					if (!publicChannel) return null;
 					const { embeds, components } = templateEmbed(template, ul);
 					const msg = await (channel as Djs.TextChannel).send({
 						components: [components],
