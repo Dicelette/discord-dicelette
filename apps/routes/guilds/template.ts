@@ -132,7 +132,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		const templateID = {
 			channelId,
-			messageId: sent.messageId,
+			messageId: newMessageId,
 			statsName,
 			excludedStats,
 			damageName,
@@ -141,14 +141,14 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		if (current) {
 			current.templateID = templateID;
-			current.managerId = resolvedPublicChannelId;
+			current.managerId = effectivePublicChannelId;
 			if (hasPrivateChannelId) current.privateChannel = privateChannelId || undefined;
 			settings.set(guildId, current);
 		} else {
 			// Première importation — création des settings
 			const newData: GuildData = {
 				lang: settings.get(guildId, "lang") ?? Locale.EnglishUS,
-				managerId: resolvedPublicChannelId,
+				managerId: effectivePublicChannelId,
 				templateID,
 				user: {},
 			};
