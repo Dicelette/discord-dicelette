@@ -30,9 +30,9 @@ import {
 	TableRow,
 	Typography,
 } from "@mui/material";
-import type React from "react";
 import { useEffect, useState } from "react";
-import { charactersApi, templateApi, useI18n } from "../../../../shared";
+import { charactersApi, templateApi } from "../../../../api";
+import {useI18n} from "../../../../shared"
 import { exportJson } from "../../../user-config/utils";
 import type { Props } from "../../types";
 import { getChannelPathById } from "../../utils";
