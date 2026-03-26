@@ -64,13 +64,18 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			privateChannelId,
 		} = req.body as {
 			template: unknown;
-			channelId?: string;
+			channelId: string;
 			publicChannelId?: string;
 			privateChannelId?: string;
 		};
 
 		if (!templateBody || typeof templateBody !== "object") {
 			res.status(400).json({ error: "Invalid template" });
+			return;
+		}
+
+		if (!channelId || typeof channelId !== "string") {
+			res.status(400).json({ error: "channelId is required" });
 			return;
 		}
 
@@ -93,7 +98,6 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		const damageName = validated.damage ? Object.keys(validated.damage) : [];
 
 		const current = settings.get(guildId);
-		const effectiveChannelId = channelId ?? current?.templateID?.channelId;
 		const effectivePublicChannelId = hasPublicChannelId
 			? publicChannelId || undefined
 			: current?.managerId;
@@ -127,8 +131,8 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		template.set(guildId, validated);
 
 		const templateID = {
-			channelId: effectiveChannelId ?? "",
-			messageId: newMessageId ?? current?.templateID?.messageId ?? "",
+			channelId,
+			messageId: sent.messageId,
 			statsName,
 			excludedStats,
 			damageName,
@@ -137,14 +141,14 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		if (current) {
 			current.templateID = templateID;
-			if (hasPublicChannelId) current.managerId = publicChannelId || undefined;
+			current.managerId = resolvedPublicChannelId;
 			if (hasPrivateChannelId) current.privateChannel = privateChannelId || undefined;
 			settings.set(guildId, current);
 		} else {
 			// Première importation — création des settings
 			const newData: GuildData = {
 				lang: settings.get(guildId, "lang") ?? Locale.EnglishUS,
-				managerId: publicChannelId || undefined,
+				managerId: resolvedPublicChannelId,
 				templateID,
 				user: {},
 			};

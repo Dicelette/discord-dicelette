@@ -116,16 +116,6 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				try {
 					const lang = client.settings.get(guildId, "lang");
 					const ul = ln(lang ?? Djs.Locale.EnglishUS);
-					if (channel instanceof Djs.TextChannel && !publicChannel) {
-						publicChannel = await createDefaultThread(
-							channel,
-							client.settings,
-							guildId ? client.guilds.cache.get(guildId) : undefined,
-							false
-						);
-					} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel)
-						return null;
-					if (!publicChannel) return null;
 					const { embeds, components } = templateEmbed(template, ul);
 					const msg = await (channel as Djs.TextChannel).send({
 						components: [components],
@@ -142,7 +132,23 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					} catch {
 						// Missing permissions — non-fatal
 					}
-					return { messageId: msg.id };
+					// Si pas de canal public fourni et que le canal template supporte les threads,
+					// on crée/récupère le thread par défaut pour y stocker les fiches.
+					let resolvedPublicChannelId: string | undefined = publicChannelId;
+					if (!resolvedPublicChannelId && channel instanceof Djs.TextChannel) {
+						try {
+							const thread = await createDefaultThread(
+								channel,
+								client.settings,
+								client.guilds.cache.get(guildId),
+								false
+							);
+							if (thread) resolvedPublicChannelId = thread.id;
+						} catch {
+							// Non-fatal : le thread sera créé à la prochaine inscription
+						}
+					}
+					return { messageId: msg.id, publicChannelId: resolvedPublicChannelId };
 				} catch {
 					return null;
 				}

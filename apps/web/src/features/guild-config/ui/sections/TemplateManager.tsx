@@ -1,8 +1,4 @@
-import {
-	getEngine,
-	type StatisticalTemplate,
-	verifyTemplateValue,
-} from "@dicelette/core";
+import { type StatisticalTemplate } from "@dicelette/core";
 import {
 	Casino,
 	Check,
@@ -35,9 +31,8 @@ import {
 	Typography,
 } from "@mui/material";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { charactersApi, templateApi } from "../../../../api";
-import { useI18n } from "../../../../shared";
+import { useEffect, useState } from "react";
+import { charactersApi, templateApi, useI18n } from "../../../../shared";
 import { exportJson } from "../../../user-config/utils";
 import type { Props } from "../../types";
 import { getChannelPathById } from "../../utils";
@@ -56,7 +51,6 @@ export default function TemplateManager({
 	defaultTemplateChannelId?: string;
 }) {
 	const { t } = useI18n();
-	const fileRef = useRef<HTMLInputElement>(null);
 	const [template, setTemplate] = useState<StatisticalTemplate | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -138,25 +132,6 @@ export default function TemplateManager({
 		}
 	};
 
-	const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
-		e.target.value = "";
-		setSaving(true);
-		try {
-			const json = JSON.parse(await file.text());
-			const engine = getEngine("browserCrypto");
-			const validated = verifyTemplateValue(json, true, engine);
-			await templateApi.import(guildId, { template: validated });
-			setTemplate(validated);
-			flash(setSuccess, t("template.importSuccess"));
-		} catch {
-			flash(setError, t("template.importError"));
-		} finally {
-			setSaving(false);
-		}
-	};
-
 	const handleExportCharacters = async () => {
 		try {
 			const res = await charactersApi.exportCsv(guildId);
@@ -201,14 +176,6 @@ export default function TemplateManager({
 			)}
 
 			<Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
-				<input
-					ref={fileRef}
-					type="file"
-					accept=".json,application/json"
-					style={{ display: "none" }}
-					onChange={handleFileImport}
-				/>
-
 				<Button
 					variant="outlined"
 					startIcon={<Download />}

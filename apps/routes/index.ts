@@ -72,14 +72,18 @@ export interface BotChannels {
 	fetchMessage: (channelId: string, messageId: string) => Promise<BotMessage | null>;
 	/** Delete a message; returns true if deleted, false if not found or forbidden */
 	deleteMessage: (channelId: string, messageId: string) => Promise<boolean>;
-	/** Post the template message (embed + template.json attachment + register button) and pin it */
+	/**
+	 * Post the template message (embed + template.json attachment + register button) and pin it.
+	 * If publicChannel is not provided and the channel supports threads, a default thread is
+	 * created automatically; its id is returned as publicChannelId.
+	 */
 	sendTemplate: (
 		channelId: string,
 		template: StatisticalTemplate,
 		guildId: string,
 		publicChannel?: string,
 		privateChannel?: string
-	) => Promise<{ messageId: string } | null>;
+	) => Promise<{ messageId: string; publicChannelId?: string } | null>;
 }
 
 export interface DashboardDeps {
