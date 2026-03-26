@@ -124,6 +124,12 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		template.set(guildId, validated);
 
+		// Le canal public peut venir de : la requête > un thread créé auto > l'existant
+		const resolvedPublicChannelId =
+			(hasPublicChannelId ? publicChannelId || undefined : undefined) ??
+			sent.publicChannelId ??
+			current?.managerId;
+
 		const templateID = {
 			channelId,
 			messageId: sent.messageId,
@@ -135,14 +141,14 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		if (current) {
 			current.templateID = templateID;
-			if (hasPublicChannelId) current.managerId = publicChannelId || undefined;
+			current.managerId = resolvedPublicChannelId;
 			if (hasPrivateChannelId) current.privateChannel = privateChannelId || undefined;
 			settings.set(guildId, current);
 		} else {
 			// Première importation — création des settings
 			const newData: GuildData = {
 				lang: settings.get(guildId, "lang") ?? Locale.EnglishUS,
-				managerId: publicChannelId || undefined,
+				managerId: resolvedPublicChannelId,
 				templateID,
 				user: {},
 			};

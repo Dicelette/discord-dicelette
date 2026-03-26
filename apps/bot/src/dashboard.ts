@@ -4,6 +4,7 @@ import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
 import { templateEmbed } from "./commands/admin/template";
+import { createDefaultThread } from "./messages";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
 	startDashboardServer({
@@ -91,7 +92,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				channelId,
 				template,
 				guildId,
-				_publicChannelId,
+				publicChannelId,
 				_privateChannelId
 			) => {
 				let channel = client.channels.cache.get(channelId);
@@ -122,7 +123,23 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					} catch {
 						// Missing permissions — non-fatal
 					}
-					return { messageId: msg.id };
+					// Si pas de canal public fourni et que le canal template supporte les threads,
+					// on crée/récupère le thread par défaut pour y stocker les fiches.
+					let resolvedPublicChannelId: string | undefined = publicChannelId;
+					if (!resolvedPublicChannelId && channel instanceof Djs.TextChannel) {
+						try {
+							const thread = await createDefaultThread(
+								channel,
+								client.settings,
+								client.guilds.cache.get(guildId),
+								false
+							);
+							if (thread) resolvedPublicChannelId = thread.id;
+						} catch {
+							// Non-fatal : le thread sera créé à la prochaine inscription
+						}
+					}
+					return { messageId: msg.id, publicChannelId: resolvedPublicChannelId };
 				} catch {
 					return null;
 				}
