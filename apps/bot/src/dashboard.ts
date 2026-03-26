@@ -1,5 +1,5 @@
 import type { EventEmitter } from "node:events";
-import { startDashboardServer } from "@dicelette/dashboard";
+import { startDashboardServer } from "@dicelette/dashboard-server";
 import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
@@ -55,7 +55,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		botChannels: {
 			fetchMessage: async (channelId, messageId) => {
 				const channel = client.channels.cache.get(channelId);
-				if (!channel || !channel.isTextBased()) return null;
+				if (!channel?.isTextBased()) return null;
 				try {
 					const msg =
 						channel.messages.cache.get(messageId) ??
@@ -77,7 +77,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 			},
 			deleteMessage: async (channelId, messageId) => {
 				const channel = client.channels.cache.get(channelId);
-				if (!channel || !channel.isTextBased()) return false;
+				if (!channel?.isTextBased()) return false;
 				try {
 					const msg =
 						channel.messages.cache.get(messageId) ??

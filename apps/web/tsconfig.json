@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		"target": "ES2020",
 		"useDefineForClassFields": true,
+		"baseUrl": ".",
 		"lib": ["ES2020", "DOM", "DOM.Iterable"],
 		"module": "ESNext",
 		"moduleResolution": "bundler",
@@ -12,7 +13,10 @@
 		"jsx": "react-jsx",
 		"strict": true,
 		"skipLibCheck": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"paths": {
+			"@dicelette/dashboard-api": ["../../packages/dashboard-api/index.ts"]
+		}
 	},
-	"include": ["src", "vite.config.ts", "tests/**/*"]
+	"include": ["src", "vite.config.ts", "tests/**/*", "../../packages/dashboard-api/**/*"]
 }

@@ -37,7 +37,8 @@
 			"locales": ["apps/bot/src/locales.js"],
 			"messages": ["apps/bot/src/messages/index.js"],
 			"utils": ["apps/bot/src/utils/index.js"],
-			"@dicelette/dashboard": ["apps/routes/index.js"]
+			"@dicelette/dashboard-server": ["packages/dashboard-server/index.js"],
+			"@dicelette/dashboard-api": ["packages/dashboard-api/index.js"]
 		},
 		"removeComments": true,
 		"resolveJsonModule": true,
@@ -56,9 +57,17 @@
 		"apps/**/vitest.config.ts",
 		"@testing/**",
 		"apps/localization/docs/**",
+		"packages/localization/docs/**",
 		"apps/web/**"
 	],
-	"include": ["apps/**/*.ts", "apps/**/*.d.ts", "web/server/**/*.ts", "package.json"],
+	"include": [
+		"apps/**/*.ts",
+		"apps/**/*.d.ts",
+		"packages/**/*.ts",
+		"packages/**/*.d.ts",
+		"web/server/**/*.ts",
+		"package.json"
+	],
 	"ts-node": {
 		"esm": true,
 		"experimentalSpecifierResolution": "node",

@@ -1,3 +1,4 @@
+import { type ApiCharacter, charactersApi } from "@dicelette/dashboard-api";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
 	Alert,
@@ -9,7 +10,6 @@ import {
 	Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { type ApiCharacter, charactersApi } from "../../../api";
 import { useI18n } from "../../../shared";
 import CharacterCard from "./CharacterCard";
 

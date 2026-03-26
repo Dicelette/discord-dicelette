@@ -1,3 +1,4 @@
+import { authApi, type DiscordGuild, guildApi } from "@dicelette/dashboard-api";
 import { Add, Refresh, Settings } from "@mui/icons-material";
 import {
 	Alert,
@@ -16,7 +17,6 @@ import {
 } from "@mui/material";
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi, type DiscordGuild, guildApi } from "../api";
 import { useI18n } from "../shared";
 
 export default function Servers() {

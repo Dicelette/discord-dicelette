@@ -38,8 +38,11 @@ export function validateEntries(
 	const errors: Record<string, string> = {};
 	for (const [name, value] of Object.entries(entries)) {
 		const result = validateFn(name, value);
-		if (result.ok) valid[name] = result.value;
-		else errors[name] = result.error;
+		if ("value" in result) {
+			valid[name] = result.value;
+		} else {
+			errors[name] = result.error;
+		}
 	}
 	return { valid, errors };
 }

@@ -25,8 +25,7 @@ export interface ApiUserConfig {
 	userConfig: Partial<UserSettingsData> | null;
 }
 
-export type { StatisticalTemplate };
-export type { ApiGuildData, UserSettingsData };
+export type { ApiGuildData, StatisticalTemplate, UserSettingsData };
 
 export interface ApiValidationResult {
 	valid: Record<string, string | number>;

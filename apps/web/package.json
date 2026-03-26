@@ -13,12 +13,12 @@
 		"test:e2e:headed": "playwright test --headed"
 	},
 	"dependencies": {
+		"@dicelette/dashboard-api": "workspace:*",
 		"@dicelette/types": "workspace:*",
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.0",
 		"@mui/icons-material": "^7.3.9",
 		"@mui/material": "^7.3.9",
-		"axios": "^1.9.0",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-hook-form": "^7.72.0",

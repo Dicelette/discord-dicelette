@@ -1,3 +1,4 @@
+import { type ApiUserConfig, guildApi, userApi } from "@dicelette/dashboard-api";
 import type { ApiGuildData } from "@dicelette/types";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@mui/material";
 import { lazy, Suspense, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { type ApiUserConfig, guildApi, userApi } from "../api";
 import {
 	type Channel,
 	CharactersTab,

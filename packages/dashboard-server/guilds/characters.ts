@@ -1,7 +1,7 @@
-import type { UserData } from "@dicelette/types";
+import type { UserData, UserGuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import Papa from "papaparse";
+import * as Papa from "papaparse";
 import type { DashboardDeps } from "..";
 import { type ApiCharacter, CHAR_CACHE_TTL, charCache, type EmbedField } from "./types";
 import { fetchCharacterEmbeds, makeRequireAdmin, requireAuth } from "./utils";
@@ -111,7 +111,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	// GET /:guildId/characters/count — nombre total de personnages du serveur (admin uniquement)
 	router.get("/count", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const users = settings.get(guildId)?.user ?? {};
+		const users: Record<string, UserGuildData[]> = settings.get(guildId)?.user ?? {};
 		const count = Object.values(users).reduce((sum, chars) => sum + chars.length, 0);
 		res.json({ count });
 	});
@@ -132,7 +132,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 			const statsName: string[] = guildData.templateID?.statsName ?? [];
 			const hasPrivateChannel = !!guildData.privateChannel;
-			const allUsers = guildData.user ?? {};
+			const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
 
 			type CsvRow = Record<string, string | number | boolean | undefined>;
 			const rows: CsvRow[] = [];
@@ -199,7 +199,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			const guildId = req.params.guildId as string;
 
 			const guildData = settings.get(guildId);
-			const users = guildData?.user ?? {};
+			const users: Record<string, UserGuildData[]> = guildData?.user ?? {};
 
 			// Supprime les messages Discord de chaque personnage (erreurs silencieuses)
 			const deletePromises: Promise<boolean>[] = [];

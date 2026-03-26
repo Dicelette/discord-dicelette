@@ -14,14 +14,14 @@
  *   });
  */
 
-import type { ApiGuildData } from "@dicelette/types";
-import type { Page } from "@playwright/test";
 import type {
 	ApiCharacter,
 	ApiUserConfig,
 	DiscordGuild,
 	DiscordUser,
-} from "../../../src/api";
+} from "@dicelette/dashboard-api";
+import type { ApiGuildData } from "@dicelette/types";
+import type { Page } from "@playwright/test";
 import { en, fr } from "../../../src/shared";
 
 // ---------------------------------------------------------------------------

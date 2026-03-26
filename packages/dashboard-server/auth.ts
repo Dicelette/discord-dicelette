@@ -8,14 +8,14 @@ import { Router } from "express";
 // even if the general limit is raised in the future.
 function makeRefreshRateLimit() {
 	const buckets = new Map<string, number[]>();
-	const MAX = 5;
-	const WINDOW_MS = 60_000;
+	const Max = 5;
+	const WindowMs = 60_000;
 	return (req: Request, res: Response, next: NextFunction): void => {
 		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
 		const now = Date.now();
-		const cutoff = now - WINDOW_MS;
+		const cutoff = now - WindowMs;
 		const hits = (buckets.get(key) ?? []).filter((t) => t > cutoff);
-		if (hits.length >= MAX) {
+		if (hits.length >= Max) {
 			const retryAfter = Math.ceil((hits[0] - cutoff) / 1000);
 			res.setHeader("Retry-After", String(retryAfter));
 			res.status(429).json({ error: "Too many refresh requests, please slow down." });

@@ -1,4 +1,5 @@
 import type { StatisticalTemplate } from "@dicelette/core";
+import { charactersApi, templateApi } from "@dicelette/dashboard-api";
 import {
 	Casino,
 	Check,
@@ -31,7 +32,6 @@ import {
 	Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { charactersApi, templateApi } from "../../../../api";
 import { useI18n } from "../../../../shared";
 import { exportJson } from "../../../user-config/utils";
 import type { Props } from "../../types";
