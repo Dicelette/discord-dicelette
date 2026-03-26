@@ -147,7 +147,8 @@
 		"templateChannelHelp": "Channel where the template message will be posted (text only).",
 		"total": "Total",
 		"value": "Value",
-		"download": "You can generate a template"
+		"download": "You can generate a template",
+		"downloadLink": "https://www.dicelette.app/en/docs/sheet/form"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",

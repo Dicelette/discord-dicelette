@@ -147,7 +147,8 @@
 		"templateChannelHelp": "Channel où sera envoyé le message du modèle (texte uniquement).",
 		"total": "Total",
 		"value": "Valeur",
-		"download": "Vous pouvez générer un modèle"
+		"download": "Vous pouvez générer un modèle",
+		"downloadLink": "https://www.dicelette.app/docs/sheet/form"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",

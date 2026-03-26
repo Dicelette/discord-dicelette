@@ -14,6 +14,7 @@ import {
 	DialogTitle,
 	Divider,
 	FormControlLabel,
+	Link,
 	Paper,
 	Stack,
 	Switch,
@@ -157,7 +158,14 @@ export default function ImportTemplateModal({
 							</Typography>
 							<Typography variant="caption">
 								{t("template.download")}{" "}
-								<a href="https://www.dicelette.app/docs/sheet/form">{t("common.here")}</a>
+								<Link
+									color="primary"
+									target="_blank"
+									rel="noopener noreferrer"
+									href={t("template.downloadLink")}
+								>
+									{t("common.here")}
+								</Link>
 							</Typography>
 							<Box
 								sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
