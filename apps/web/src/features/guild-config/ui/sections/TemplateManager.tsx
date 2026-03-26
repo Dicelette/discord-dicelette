@@ -1,4 +1,4 @@
-import { type StatisticalTemplate } from "@dicelette/core";
+import type { StatisticalTemplate } from "@dicelette/core";
 import {
 	Casino,
 	Check,
@@ -32,7 +32,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { charactersApi, templateApi } from "../../../../api";
-import {useI18n} from "../../../../shared"
+import { useI18n } from "../../../../shared";
 import { exportJson } from "../../../user-config/utils";
 import type { Props } from "../../types";
 import { getChannelPathById } from "../../utils";
