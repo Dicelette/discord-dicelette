@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 import { useI18n } from "@shared";
 import { useCallback, useEffect, useState } from "react";
-import CharacterCard from "./CharacterCard";
+import CharacterCard from "./ui/CharacterCard";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 1;
 
 interface Props {
 	guildId: string;

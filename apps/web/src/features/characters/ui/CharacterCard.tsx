@@ -18,7 +18,7 @@ export default function CharacterCard({ char }: Props) {
 			<Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
 				<Avatar
 					src={char.avatar ?? undefined}
-					alt={displayName}
+					alt={displayName.toTitle()}
 					sx={{ width: 56, height: 56 }}
 				>
 					{displayName.charAt(0).toUpperCase()}
@@ -27,7 +27,7 @@ export default function CharacterCard({ char }: Props) {
 				<Box sx={{ flex: 1, minWidth: 0 }}>
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
 						<Typography variant="h4" fontWeight={600} noWrap>
-							{displayName}
+							{displayName.toTitle()}
 						</Typography>
 						{char.isPrivate && (
 							<Chip
