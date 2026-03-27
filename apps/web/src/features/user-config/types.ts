@@ -70,4 +70,5 @@ export interface AttributeSectionProps {
 
 export interface TemplateSectionProps {
 	state: TemplateState;
+	isTemplate?: boolean;
 }

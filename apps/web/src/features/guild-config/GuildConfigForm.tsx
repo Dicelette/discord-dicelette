@@ -1,6 +1,9 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { type Channel, ConfigFormFooter, useConfigForm, useI18n } from "@shared";
+import { useCallback, useEffect, useState } from "react";
+import Links from "../user-config/ui/sections/Links";
+import { DEFAULT_TEMPLATE } from "../user-config/utils";
 import { Channels, DiceBehaviour, General, HiddenRolls, Results, StripOOC } from "./ui";
 
 interface Props {
@@ -18,8 +21,36 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 		channels
 	);
 
+	const [template, setTemplate] = useState(config.createLinkTemplate ?? DEFAULT_TEMPLATE);
+	const [savingTemplate, setSavingTemplate] = useState(false);
+	const [templateSuccess, setTemplateSuccess] = useState(false);
+	const [templateError, setTemplateError] = useState<string | null>(null);
+
+	useEffect(() => {
+		setTemplate(config.createLinkTemplate ?? DEFAULT_TEMPLATE);
+	}, [config.createLinkTemplate]);
+
+	const saveTemplate = useCallback(async () => {
+		setSavingTemplate(true);
+		setTemplateError(null);
+		try {
+			await onSave({ createLinkTemplate: template });
+			setTemplateSuccess(true);
+			setTimeout(() => setTemplateSuccess(false), 3000);
+		} catch {
+			setTemplateError(t("dashboard.saveError"));
+		} finally {
+			setSavingTemplate(false);
+		}
+	}, [onSave, t, template]);
+
+	const resetTemplate = useCallback(() => setTemplate(DEFAULT_TEMPLATE), []);
+
 	const handleSaveAndReset = async (data: ApiGuildData) => {
-		await onSave(data);
+		await onSave({
+			...data,
+			createLinkTemplate: template,
+		});
 		reset(data);
 	};
 
@@ -62,6 +93,22 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 							control={control}
 							textChannels={textChannels}
 							allChannels={channels}
+						/>
+					</Paper>
+
+					<Paper sx={{ p: 0 }}>
+						<Links
+							isTemplate={true}
+							state={{
+								value: template,
+								setValue: setTemplate,
+								saving: savingTemplate,
+								success: templateSuccess,
+								error: templateError,
+								setError: setTemplateError,
+								onSave: saveTemplate,
+								onReset: resetTemplate,
+							}}
 						/>
 					</Paper>
 				</Stack>

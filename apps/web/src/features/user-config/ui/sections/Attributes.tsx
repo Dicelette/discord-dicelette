@@ -13,11 +13,12 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
+import { memo } from "react";
 import type { AttributeSectionProps } from "../../types.ts";
 import { exportJson } from "../../utils.ts";
 import { AttributeRow } from "../atoms";
 
-export default function Attributes({ state }: AttributeSectionProps) {
+function Attributes({ state }: AttributeSectionProps) {
 	const { t } = useI18n();
 	const {
 		data: attributes,
@@ -162,3 +163,6 @@ export default function Attributes({ state }: AttributeSectionProps) {
 		</Accordion>
 	);
 }
+
+export default memo(Attributes);
+

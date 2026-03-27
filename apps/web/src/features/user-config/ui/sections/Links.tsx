@@ -9,13 +9,15 @@ import {
 	Button,
 	CircularProgress,
 	Divider,
+	Link,
 	TextField,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
+import { memo } from "react";
 import type { TemplateSectionProps } from "../../types";
 
-export default function Links({ state }: TemplateSectionProps) {
+function Links({ state, isTemplate }: TemplateSectionProps) {
 	const { t } = useI18n();
 	const {
 		value: template,
@@ -36,6 +38,15 @@ export default function Links({ state }: TemplateSectionProps) {
 			<AccordionDetails>
 				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
 					{t("userConfig.templateDesc")}
+					<br />
+					<Link
+						color="primary"
+						target="_blank"
+						rel="noopener noreferrer"
+						href={t("userConfig.templateLinkDoc")}
+					>
+						{t("userConfig.templateDoc")}
+					</Link>
 				</Typography>
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 					<TextField
@@ -44,7 +55,7 @@ export default function Links({ state }: TemplateSectionProps) {
 						value={template.final}
 						onChange={(e) => setTemplate((p) => ({ ...p, final: e.target.value }))}
 						fullWidth
-						helperText="{{stats}} {{results}} {{link}}"
+						helperText={t("userConfig.templateFinalDesc")}
 					/>
 					<TextField
 						size="small"
@@ -53,7 +64,7 @@ export default function Links({ state }: TemplateSectionProps) {
 						sx={{ fontFamily: "var(--code-font-family)" }}
 						onChange={(e) => setTemplate((p) => ({ ...p, results: e.target.value }))}
 						fullWidth
-						helperText="{{info}} {{result}}"
+						helperText={t("userConfig.templateResultsDesc")}
 					/>
 					<TextField
 						size="small"
@@ -79,7 +90,7 @@ export default function Links({ state }: TemplateSectionProps) {
 								["originalDice", "{{original_dice}}"],
 								["character", "{{character}}"],
 							] as [keyof TemplateResult["format"], string][]
-						).map(([field, hint]) => (
+						).map(([field]) => (
 							<TextField
 								key={field}
 								size="small"
@@ -92,24 +103,25 @@ export default function Links({ state }: TemplateSectionProps) {
 									}))
 								}
 								sx={{ flex: "1 1 200px", fontFamily: "var(--code-font-family)" }}
-								helperText={hint}
 							/>
 						))}
 					</Box>
 				</Box>
-				<Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-					<Button
-						variant="contained"
-						onClick={onSave}
-						disabled={saving}
-						startIcon={saving ? <CircularProgress size={16} /> : undefined}
-					>
-						{saving ? t("common.saving") : t("common.save")}
-					</Button>
-					<Button variant="outlined" onClick={onReset}>
-						{t("userSettings.createLink.reset.description")}
-					</Button>
-				</Box>
+				{!isTemplate && (
+					<Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+						<Button
+							variant="contained"
+							onClick={onSave}
+							disabled={saving}
+							startIcon={saving ? <CircularProgress size={16} /> : undefined}
+						>
+							{saving ? t("common.saving") : t("common.save")}
+						</Button>
+						<Button variant="outlined" onClick={onReset}>
+							{t("userSettings.createLink.reset.description")}
+						</Button>
+					</Box>
+				)}
 				{error && (
 					<Alert severity="error" sx={{ mt: 1 }} onClose={() => setError(null)}>
 						{error}
@@ -124,3 +136,5 @@ export default function Links({ state }: TemplateSectionProps) {
 		</Accordion>
 	);
 }
+
+export default memo(Links);

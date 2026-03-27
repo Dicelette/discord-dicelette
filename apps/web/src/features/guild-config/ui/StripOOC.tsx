@@ -99,7 +99,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 			{!!(stripOOC?.timer && stripOOC.timer > 0) && (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 					<FormControlLabel
-						sx={{ gridColumn: "span 2" }}
+						sx={{ gridColumn: { xs: "span 1", md: "span 2" } }}
 						control={
 							<Switch
 								checked={advancedMode}
@@ -130,7 +130,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 								<Typography
 									variant="caption"
 									color="text.secondary"
-									sx={{ gridColumn: "span 2" }}
+									sx={{ gridColumn: { xs: "span 1", md: "span 2" } }}
 								>
 									{t("config.fields.stripOocRegexPreview", {
 										regex: buildRegex(prefix, suffix) ?? "",
@@ -167,7 +167,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 							helperText={regexError ?? t("config.fields.stripOocRegexHelp")}
 						/>
 					)}
-					<Box sx={{ maxWidth: 400 }}>
+					<Box sx={{ width: "100%", maxWidth: { xs: "100%", md: 400 } }}>
 						<Controller
 							name="stripOOC.timer"
 							control={control}
