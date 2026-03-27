@@ -143,9 +143,11 @@ export default function Servers() {
 												<Typography variant="body1" fontWeight={600} noWrap>
 													{guild.name}
 												</Typography>
-												{guild.owner && (
-													<Chip label={t("common.owner")} size="small" sx={{ mt: 0.5 }} />
-												)}
+												<Chip
+													label={t("common.owner")}
+													size="small"
+													sx={{ mt: 0.5, visibility: guild.owner ? "visible" : "hidden" }}
+												/>
 											</Box>
 											<Settings sx={{ opacity: 0.4, flexShrink: 0 }} />
 										</CardContent>
