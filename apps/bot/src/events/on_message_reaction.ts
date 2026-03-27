@@ -73,7 +73,7 @@ async function sendRollToDM(
 	if (!message) {
 		message = reaction.message;
 	}
-	if (!message || !message.content) return;
+	if (!message?.content) return;
 	if (!user || user.bot) return;
 	await user.send({ content: message.content });
 }
@@ -82,19 +82,18 @@ async function getSavedMessage(
 	reaction: Djs.MessageReaction | Djs.PartialMessageReaction
 ) {
 	const message = reaction.message;
-	if (!message || !message.content) return;
+	if (!message?.content) return;
 	const regexChannel = new RegExp(
 		`-# ↪ https:\\/\\/discord.com\\/channels\\/${reaction.message!.guild!.id}\\/(?<channelID>\\d+)\\/(?<messageID>\\d+)\\/?`,
 		"gi"
 	);
 	const match = regexChannel.exec(message.content);
-	if (!match || !match.groups) return;
+	if (!match?.groups) return;
 	const channelID = match.groups.channelID;
 	const messageID = match.groups.messageID;
 	const channel = await fetchChannel(reaction.message.guild!, channelID);
 	if (
-		!channel ||
-		!channel.isTextBased ||
+		!channel?.isTextBased ||
 		channel instanceof Djs.CategoryChannel ||
 		channel instanceof Djs.MediaChannel ||
 		channel instanceof Djs.ForumChannel

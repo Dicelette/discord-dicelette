@@ -1066,7 +1066,7 @@ export class MacroFeature extends BaseFeature {
 		}
 
 		const channel = await fetchChannel(interaction.guild!, targetChannelId!);
-		if (!channel || !channel.isTextBased())
+		if (!channel?.isTextBased())
 			throw new BotError(this.ul("error.channel.notFound"), botErrorOptionsValidation);
 		const message = await channel.messages.fetch(targetMessageId!);
 		const userEmbed = getEmbeds(message ?? undefined, "user");

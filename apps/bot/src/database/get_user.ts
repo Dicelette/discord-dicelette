@@ -570,7 +570,7 @@ export async function getMacro(
 			await replyEphemeralError(interaction, ul("error.damage.empty"), ul);
 			return;
 		}
-	} else if (!userStatistique || !userStatistique.damage) {
+	} else if (!userStatistique?.damage) {
 		//allow global damage with constructing a new userStatistique with only the damageName and their value
 		//get the damageName from the global template
 		const template = await getTemplateByInteraction(interaction, client);

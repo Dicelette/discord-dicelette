@@ -59,8 +59,7 @@ export default {
 		const botPerms = channel.permissionsFor(botMember, true);
 
 		if (
-			!botPerms ||
-			!botPerms.has([
+			!botPerms?.has([
 				Djs.PermissionFlagsBits.CreatePublicThreads,
 				Djs.PermissionFlagsBits.ViewChannel,
 			])

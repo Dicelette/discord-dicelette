@@ -8,12 +8,12 @@
 		}
 	},
 	"files": {
-		"includes": ["**", "!**/node_modules", "!**/dist"]
+		"includes": ["**", "!!**/node_modules", "!!**/dist"],
+		"ignoreUnknown": true
 	},
 	"formatter": {
 		"enabled": true,
 		"formatWithErrors": false,
-		"includes": ["**", "!**/node_modules/**"],
 		"indentStyle": "tab",
 		"indentWidth": 2,
 		"lineEnding": "lf",
@@ -116,7 +116,7 @@
 		{ "includes": ["**/*.js", "!**/node_modules/**"] },
 		{ "includes": ["**/*.json", "!**/node_modules/**"] },
 		{
-			"includes": ["**/web/src/index.css"],
+			"includes": ["**/web/src/styles.css"],
 			"linter": {
 				"rules": {
 					"suspicious": {
@@ -136,7 +136,11 @@
 			}
 		},
 		{
-			"includes": ["**/routes/**", "web/src/lib/api.ts"],
+			"includes": [
+				"**/routes/**",
+				"packages/dashboard-api/**",
+				"packages/dashboard-server/**"
+			],
 			"linter": {
 				"rules": {
 					"style": {

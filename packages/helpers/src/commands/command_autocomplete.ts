@@ -60,7 +60,7 @@ export function autoCompleteCharacters(
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
 	const guildData = client.settings.get(interaction.guild!.id);
-	if (!guildData || !guildData.templateID) return [];
+	if (!guildData?.templateID) return [];
 	let choices: string[] = [];
 
 	if (focused.name === t("common.statistic")) {

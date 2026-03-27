@@ -469,7 +469,7 @@ export class ResultAsText {
 	}
 
 	private extractCommentsPerSegment(): string[] | undefined {
-		if (!this.resultat?.dice || !this.resultat.dice.includes(";")) return undefined;
+		if (!this.resultat?.dice?.includes(";")) return undefined;
 		const segments = this.resultat.dice.split(";");
 		const comments: string[] = [];
 

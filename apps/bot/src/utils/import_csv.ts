@@ -172,7 +172,7 @@ async function step(
 					member.user.username === user ||
 					member.user.tag === user
 			);
-			if (!guildMember || !guildMember.user) {
+			if (!guildMember?.user) {
 				const msg = ul("import.errors.user_not_found", { user });
 				await reply(interaction, { content: msg });
 				errors.push(msg);

@@ -534,7 +534,7 @@ export class StatsFeature extends BaseFeature {
 
 		const values = interaction.fields.getTextInputValue("allStats");
 		const templateStats = await getTemplateByInteraction(interaction, this.client);
-		if (!templateStats || !templateStats.statistics) return;
+		if (!templateStats?.statistics) return;
 		const valuesAsStats = values.split("\n- ").map((stat) => {
 			const [name, value] = stat.split(/ ?: ?/);
 			return { name: name.replace(/^- /, "").trim().toLowerCase(), value };
@@ -714,7 +714,7 @@ export class StatsFeature extends BaseFeature {
 			if (!channelId || !messageId)
 				throw new BotError(this.ul("error.embed.notFound"), botErrorOptions);
 			const channel = await fetchChannel(interaction.guild!, channelId);
-			if (!channel || !channel.isTextBased())
+			if (!channel?.isTextBased())
 				throw new BotError(this.ul("error.channel.notFound"), botErrorOptions);
 
 			const message = await channel.messages.fetch(messageId);

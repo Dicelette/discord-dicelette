@@ -174,7 +174,7 @@ export function filterStatsInDamage(
 	damages: Record<string, string>,
 	statistics?: string[]
 ) {
-	if (!statistics || !statistics.length) return Object.keys(damages);
+	if (!statistics?.length) return Object.keys(damages);
 	const regex = getStatsRegex(statistics);
 	//remove all damage value that match the regex and return the key
 	return Object.keys(damages).filter((key) => !damages[key].standardize().match(regex));

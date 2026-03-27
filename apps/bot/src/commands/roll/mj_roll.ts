@@ -21,7 +21,7 @@ export const mjRoll = {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
 		const guildData = client.settings.get(interaction.guild!.id);
-		if (!guildData || !guildData.templateID) return;
+		if (!guildData?.templateID) return;
 		let choices: string[] = [];
 		const { user } = extractCommonOptions(options);
 		let allCharFromGuild: {

@@ -147,7 +147,7 @@ export async function getMessageWithKeyPart(
 	const keyParts = parseEmbedKey(embedKey);
 	if (!keyParts) throw new BotError(ul("error.embed.notFound"), botErrorOptions);
 	const channel = await fetchChannel(interaction.guild!, keyParts.channelId);
-	if (!channel || !channel.isTextBased())
+	if (!channel?.isTextBased())
 		throw new BotError(ul("error.channel.notFound"), botErrorOptions);
 	return await channel.messages.fetch(keyParts.messageId);
 }

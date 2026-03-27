@@ -349,7 +349,7 @@ export function isRolling(
 		finalContent = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 
 		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity, sort);
-		if (!diceRoll?.resultat || !diceRoll.resultat.result.length) return undefined;
+		if (!diceRoll?.resultat?.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
 		return {
 			detectRoll: undefined,

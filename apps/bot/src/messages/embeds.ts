@@ -8,7 +8,7 @@ import * as Djs from "discord.js";
 
 export function ensureEmbed(message?: Djs.Message) {
 	const oldEmbeds = message?.embeds[0];
-	if (!oldEmbeds || !oldEmbeds?.fields) throw new NoEmbed();
+	if (!oldEmbeds?.fields) throw new NoEmbed();
 	return oldEmbeds;
 }
 

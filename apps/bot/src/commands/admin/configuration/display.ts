@@ -133,7 +133,7 @@ export async function display(
 		}
 		if (type === "selfRegister") {
 			const selfRegister = selfRegisterAllowance(guildSettings.allowSelfRegister);
-			if (!selfRegister || !selfRegister.allowSelfRegister) return ul("common.no");
+			if (!selfRegister?.allowSelfRegister) return ul("common.no");
 			const res = [
 				`__**${ul("display.allowSelfRegister")}**__ ${selfRegister.allowSelfRegister ? ul("common.yes") : ul("common.no")}`,
 				`__**${ul("display.moderation")}**__ ${selfRegister.moderation ? ul("common.yes") : ul("common.no")}`,

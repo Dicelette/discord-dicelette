@@ -57,7 +57,7 @@ export function extractAndMergeComments(
 
 	// Extract stat markers and clean comment text from all sources
 	for (const part of partsRaw) {
-		if (!part || !part.trim().length) continue;
+		if (!part?.trim().length) continue;
 		const markers = part.match(/%%\[__.*?__]%%/g) ?? [];
 		for (const m of markers) if (!statsMarkers.includes(m)) statsMarkers.push(m);
 		const cleanedPart = stripMeta(part.replace(/%%\[__.*?__]%%/g, "").trim());
