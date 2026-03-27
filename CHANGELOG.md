@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.37.7](https://github.com/Dicelette/discord-dicelette/compare/2.37.6...2.37.7) (2026-03-24)
+
+
+### Bug Fixes
+
+* interpolation ([f3c7068](https://github.com/Dicelette/discord-dicelette/commit/f3c7068fdfb161dc8f5e09dedef5116a88f09420))
+
 ## [2.37.6](https://github.com/Dicelette/discord-dicelette/compare/2.37.5...2.37.6) (2026-03-20)
 
 ## [2.37.5](https://github.com/Dicelette/discord-dicelette/compare/2.37.4...2.37.5) (2026-03-20)
