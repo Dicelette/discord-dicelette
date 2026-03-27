@@ -346,13 +346,10 @@ export const bulkAdd = {
 			const memberUser = gm?.user as Djs.User | undefined;
 			if (!memberUser) continue;
 
-			// Process all characters for the same user sequentially to avoid race conditions:
-			// concurrent writes for the same userId would overwrite each other in
-			// registerUser/updateMemory (both read the same state before either has written).
-			asyncJobs.push(
-				limit(async () => {
-					for (const char of chars) {
-						await processCharacter({
+			for (const char of chars) {
+				asyncJobs.push(
+					limit(() =>
+						processCharacter({
 							char,
 							client,
 							defaultChannel,
@@ -363,10 +360,10 @@ export const bulkAdd = {
 							privateChannel,
 							shouldDelete: toDelete,
 							ul,
-						});
-					}
-				})
-			);
+						})
+					)
+				);
+			}
 		}
 
 		await Promise.allSettled(asyncJobs);
