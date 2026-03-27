@@ -95,7 +95,7 @@
 		"title": "Dashboard Dicelette"
 	},
 	"servers": {
-		"addBotDesc": "Vous êtes administrateur sur ces serveurs — vous pouvez y ajouter le bot.",
+		"addBotDesc": "Vous êtes administrateur sur ces serveurs — Dicelette peut y être ajouté.",
 		"addBotPending": "Bot ajouté ? Cliquez sur Actualiser pour mettre à jour la liste.",
 		"addBotTitle": "Ajouter Dicelette",
 		"botPresent": "Dicelette est présent",
