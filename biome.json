@@ -8,7 +8,21 @@
 		}
 	},
 	"files": {
-		"includes": ["**", "!!**/node_modules", "!!**/dist"],
+		"includes": [
+			"**",
+			"!!**/node_modules",
+			"!!**/dist",
+			"!!**/@testing",
+			"!!**/.husky",
+			"!!**/.vscode",
+			"!!**/.idea",
+			"!!**/.git",
+			"!!**/.cache",
+			"!!**/coverage",
+			"!!**/build",
+			"!!**/.github",
+			"!!**/assets"
+		],
 		"ignoreUnknown": true
 	},
 	"formatter": {
