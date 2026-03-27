@@ -165,8 +165,7 @@ export function validateAttributeEntry(
 ): ValidationResult<number> {
 	if (typeof value !== "number" || Number.isNaN(value))
 		return { error: JSON.stringify(value), ok: false };
-	if (name.match(/-/))
-		return { error: "containsHyphen", ok: false };
+	if (name.match(/-/)) return { error: "containsHyphen", ok: false };
 	return { ok: true, value };
 }
 
