@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.38.0](https://github.com/Dicelette/discord-dicelette/compare/2.37.7...2.38.0) (2026-03-27)
+
+
+### Features
+
+* add web dashboard scaffold with Discord OAuth2 (steps 1 & 2) ([#48](https://github.com/Dicelette/discord-dicelette/issues/48)) ([3c02857](https://github.com/Dicelette/discord-dicelette/commit/3c02857252024bbd7cc67d2b82c3e744281f25f0))
+
 ## [2.37.7](https://github.com/Dicelette/discord-dicelette/compare/2.37.6...2.37.7) (2026-03-24)
 
 
