@@ -217,7 +217,7 @@ function StripOOC({ control, channels, textChannels }: Props) {
 											label={t("config.fields.stripOocChannels")}
 											slotProps={{
 												input: { ...params.InputProps },
-												htmlInput: { ...params.inputProps, readOnly: true },
+												htmlInput: { ...params.inputProps },
 											}}
 										/>
 									)}
