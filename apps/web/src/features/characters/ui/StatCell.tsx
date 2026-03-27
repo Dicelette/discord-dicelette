@@ -69,7 +69,7 @@ export default function StatCell({ name, value }: Props) {
 			</Typography>
 			<Typography
 				variant="body2"
-				sx={{ ...valueSx, mx: "auto", display: "flex", flex: 1, alignItems: "center" }}
+				sx={{ ...valueSx, mx: "auto", alignItems: "center" }}
 				component={"div"}
 				tabIndex={0}
 				fontFamily="var(--code-font-family)"
