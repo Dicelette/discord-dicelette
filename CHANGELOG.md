@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.0.1](https://github.com/Dicelette/discord-dicelette/compare/3.0.0...3.0.1) (2026-03-27)
+
+
+### Bug Fixes
+
+* **dashboard:character:** Some text was cut ([ebd3485](https://github.com/Dicelette/discord-dicelette/commit/ebd3485da9923e6ad2780256460f751daf90ce40))
+* **dashboard:** perf + add template global config ([24776e5](https://github.com/Dicelette/discord-dicelette/commit/24776e5d67958319da2d9cd94c5e6887629bcb06))
+
 ## [3.0.0](https://github.com/Dicelette/discord-dicelette/compare/2.38.0...3.0.0) (2026-03-27)
 
 ## [2.38.0](https://github.com/Dicelette/discord-dicelette/compare/2.37.7...2.38.0) (2026-03-27)
