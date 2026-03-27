@@ -1,7 +1,8 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import { type Channel, ConfigFormFooter, useConfigForm, useI18n } from "@shared";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { TemplateState } from "../user-config/types";
 import Links from "../user-config/ui/sections/Links";
 import { DEFAULT_TEMPLATE } from "../user-config/utils";
 import { Channels, DiceBehaviour, General, HiddenRolls, Results, StripOOC } from "./ui";
@@ -45,6 +46,27 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 	}, [onSave, t, template]);
 
 	const resetTemplate = useCallback(() => setTemplate(DEFAULT_TEMPLATE), []);
+
+	const templateState = useMemo<TemplateState>(
+		() => ({
+			value: template,
+			setValue: setTemplate,
+			saving: savingTemplate,
+			success: templateSuccess,
+			error: templateError,
+			setError: setTemplateError,
+			onSave: saveTemplate,
+			onReset: resetTemplate,
+		}),
+		[
+			template,
+			savingTemplate,
+			templateSuccess,
+			templateError,
+			saveTemplate,
+			resetTemplate,
+		]
+	);
 
 	const handleSaveAndReset = async (data: ApiGuildData) => {
 		await onSave({
@@ -97,19 +119,7 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 					</Paper>
 
 					<Paper sx={{ p: 0 }}>
-						<Links
-							isTemplate={true}
-							state={{
-								value: template,
-								setValue: setTemplate,
-								saving: savingTemplate,
-								success: templateSuccess,
-								error: templateError,
-								setError: setTemplateError,
-								onSave: saveTemplate,
-								onReset: resetTemplate,
-							}}
-						/>
+						<Links isTemplate={true} state={templateState} />
 					</Paper>
 				</Stack>
 

@@ -165,4 +165,3 @@ function Attributes({ state }: AttributeSectionProps) {
 }
 
 export default memo(Attributes);
-

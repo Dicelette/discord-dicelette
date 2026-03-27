@@ -1,6 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { FormControlLabel, Switch } from "@mui/material";
 import { NumberField, SectionTitle, useI18n } from "@shared";
+import { memo } from "react";
 import { type Control, Controller } from "react-hook-form";
 
 const BOOL_FIELDS = [
@@ -12,7 +13,7 @@ interface Props {
 	control: Control<ApiGuildData>;
 }
 
-export default function DiceBehaviour({ control }: Props) {
+function DiceBehaviour({ control }: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -47,7 +48,7 @@ export default function DiceBehaviour({ control }: Props) {
 						<NumberField
 							label={t("config.fields.pity")}
 							size="small"
-							value={field.value}
+							value={field.value ?? null}
 							min={0}
 							onValueChange={(e) => field.onChange(e ?? undefined)}
 						/>
@@ -57,3 +58,5 @@ export default function DiceBehaviour({ control }: Props) {
 		</>
 	);
 }
+
+export default memo(DiceBehaviour);

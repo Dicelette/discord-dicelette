@@ -346,7 +346,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			onSave: saveTemplate,
 			onReset: resetTemplate,
 		}),
-		[template, savingTemplate, templateSuccess, templateError, saveTemplate, resetTemplate]
+		[
+			template,
+			savingTemplate,
+			templateSuccess,
+			templateError,
+			saveTemplate,
+			resetTemplate,
+		]
 	);
 
 	return (

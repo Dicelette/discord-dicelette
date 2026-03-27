@@ -17,7 +17,7 @@ import {
 	secondsToMilliseconds,
 	useI18n,
 } from "@shared";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { type Control, Controller, useController, useWatch } from "react-hook-form";
 
 function escapeRegex(str: string) {
@@ -42,7 +42,7 @@ interface Props {
 	textChannels: Channel[];
 }
 
-export default function StripOOC({ control, channels, textChannels }: Props) {
+function StripOOC({ control, channels, textChannels }: Props) {
 	const { t } = useI18n();
 	const stripOOC = useWatch({ control, name: "stripOOC" });
 	const { field: regexField } = useController({ name: "stripOOC.regex", control });
@@ -258,3 +258,5 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 		</>
 	);
 }
+
+export default memo(StripOOC);

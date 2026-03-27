@@ -1,5 +1,6 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { type Channel, ChannelSelect, SectionTitle, useI18n } from "@shared";
+import { memo } from "react";
 import { type Control, Controller } from "react-hook-form";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 	allChannels?: Channel[];
 }
 
-export default function Channels({ control, textChannels, allChannels }: Props) {
+function Channels({ control, textChannels, allChannels }: Props) {
 	const { t } = useI18n();
 
 	return (
@@ -32,3 +33,5 @@ export default function Channels({ control, textChannels, allChannels }: Props) 
 		</>
 	);
 }
+
+export default memo(Channels);

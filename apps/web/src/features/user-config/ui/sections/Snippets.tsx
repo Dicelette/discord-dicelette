@@ -174,4 +174,3 @@ function Snippets({ state }: Props) {
 }
 
 export default memo(Snippets);
-

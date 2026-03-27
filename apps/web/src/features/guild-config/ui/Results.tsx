@@ -10,6 +10,7 @@ import {
 	secondsToMilliseconds,
 	useI18n,
 } from "@shared";
+import { memo } from "react";
 import { type Control, Controller, useWatch } from "react-hook-form";
 
 interface Props {
@@ -18,7 +19,7 @@ interface Props {
 	allChannels?: Channel[];
 }
 
-export default function Results({ control, textChannels, allChannels }: Props) {
+function Results({ control, textChannels, allChannels }: Props) {
 	const { t } = useI18n();
 	const disableThread = useWatch({ control, name: "disableThread" });
 
@@ -123,3 +124,5 @@ export default function Results({ control, textChannels, allChannels }: Props) {
 		</>
 	);
 }
+
+export default memo(Results);

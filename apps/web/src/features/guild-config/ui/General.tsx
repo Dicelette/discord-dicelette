@@ -1,7 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Autocomplete, TextField } from "@mui/material";
 import { SectionTitle, useI18n } from "@shared";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 
 const DISCORD_LOCALES = [
@@ -13,7 +13,7 @@ interface Props {
 	control: Control<ApiGuildData>;
 }
 
-export default function General({ control }: Props) {
+function General({ control }: Props) {
 	const { t } = useI18n();
 
 	const sortOrders = useMemo(
@@ -89,3 +89,5 @@ export default function General({ control }: Props) {
 		</>
 	);
 }
+
+export default memo(General);
