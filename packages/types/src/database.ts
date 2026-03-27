@@ -33,6 +33,7 @@ export interface GuildData {
 	managerId?: string;
 	/**
 	 * Disable the auto deletion of the dice result
+	 * Registered in ms
 	 */
 	deleteAfter?: number;
 	/**
@@ -238,6 +239,12 @@ export type CustomCriticalRoll = CustomCritical & {
 		rollValue: string;
 	};
 };
+
+/**
+ * API-serialized version of GuildData: identical structure but `lang` is a plain string
+ * (avoids importing discord.js `Locale` enum in non-bot packages).
+ */
+export type ApiGuildData = Omit<GuildData, "lang"> & { lang?: string };
 
 export type Snippets = Record<string, string>;
 

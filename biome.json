@@ -91,7 +91,7 @@
 					"options": {
 						"conventions": [
 							{
-								"formats": ["CONSTANT_CASE", "camelCase"],
+								"formats": ["CONSTANT_CASE", "camelCase", "PascalCase"],
 								"selector": {
 									"kind": "const",
 									"scope": "global"
@@ -116,7 +116,17 @@
 		{ "includes": ["**/*.js", "!**/node_modules/**"] },
 		{ "includes": ["**/*.json", "!**/node_modules/**"] },
 		{
-			"includes": ["**/packages/src/bot/commands/tools/graph.ts", "!**/node_modules/**"],
+			"includes": ["**/web/src/index.css"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noUnknownAtRules": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["**/dicelette/src/bot/commands/tools/graph.ts", "!**/node_modules/**"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -125,6 +135,17 @@
 				}
 			}
 		},
+		{
+			"includes": ["**/routes/**", "web/src/lib/api.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useNamingConvention": "off"
+					}
+				}
+			}
+		},
+
 		{
 			"includes": ["**/tests/constant.ts", "!**/node_modules/**", "**/src/regex.ts"],
 			"linter": {

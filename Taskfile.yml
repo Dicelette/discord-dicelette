@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+  default:
+    desc: Start bot + dashboard in parallel (dev mode)
+    deps: [bot, web]
+
+  bot:
+    desc: Start the bot in watch mode
+    cmds:
+      - pnpm dev
+
+  web:
+    desc: Start the web dashboard (Vite dev server)
+    cmds:
+      - pnpm -C apps/web dev
+
+  build:
+    desc: Build the project
+    cmds:
+      - pnpm tsc --build && tsc-alias
+
+  lint:
+    desc: Lint and auto-fix
+    cmds:
+      - biome check --write ./apps/ --unsafe
+
+  start-beta:
+    desc: build and run beta pm2
+    cmds:
+      - pnpm run build
+      - pm2 start dist/apps/bot/index.js --name beta-dicelette --log-date-format='YYYY-MM-DD HH:mm Z'
+  restart-beta:
+    desc: restart pm2 beta
+    cmds:
+      - pnpm run build
+      - pm2 restart beta-dicelette

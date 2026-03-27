@@ -1,12 +1,12 @@
-import path from "node:path";
+import * as path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
 	test: {
 		alias: {
-			"@dicelette/bot-helpers": path.resolve(
+			"@dicelette/helpers": path.resolve(
 				__dirname,
-				"packages/bot-helpers/index.ts"
+				"packages/helpers/index.ts"
 			),
 			"@dicelette/client": path.resolve(__dirname, "packages/client/index.ts"),
 			"@dicelette/localization": path.resolve(

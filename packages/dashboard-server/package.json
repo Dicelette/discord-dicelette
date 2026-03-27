@@ -1,0 +1,19 @@
+{
+	"name": "@dicelette/dashboard-server",
+	"version": "1.0.0",
+	"type": "module",
+	"exports": {
+		".": "./index.ts"
+	},
+	"dependencies": {
+		"@dicelette/core": "^1.26.0",
+		"@dicelette/types": "workspace:*",
+		"cors": "^2.8.5",
+		"discord-api-types": "^0.37.115",
+		"enmap": "npm:@dicelette/enmap",
+		"express": "^5.1.0",
+		"express-session": "^1.18.1",
+		"memorystore": "^1.6.7",
+		"papaparse": "^5.4.1"
+	}
+}

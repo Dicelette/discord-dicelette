@@ -133,3 +133,7 @@ dist/
 git.zip
 .idea/
 /report/*
+test-results/
+logs/
+playwright-report/
+playwright-report-*
