@@ -125,29 +125,43 @@ export default function Servers() {
 					</Typography>
 					<Grid container spacing={2} sx={{ mb: 4 }}>
 						{botGuilds.map((guild) => (
-							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id}>
-								<Card>
+							<Grid
+								size={{ xs: 12, sm: 6, md: 4 }}
+								key={guild.id}
+								sx={{ display: "flex" }}
+							>
+								<Card sx={{ width: "100%" }}>
 									<CardActionArea
+										sx={{ height: "100%" }}
 										onClick={() =>
 											startTransition(() => navigate(`/dashboard/${guild.id}`))
 										}
 									>
-										<CardContent className="flex items-center gap-3 p-4">
+										<CardContent
+											className="flex items-center gap-3 p-4"
+											sx={{ height: "100%", boxSizing: "border-box" }}
+										>
 											<Avatar
 												src={getGuildIcon(guild) ?? undefined}
 												sx={{ width: 44, height: 44, bgcolor: "primary.main" }}
 											>
 												{guild.name[0]}
 											</Avatar>
-											<Box className="flex-1 min-w-0">
+											<Box
+												className="flex-1 min-w-0"
+												sx={{
+													alignSelf: "stretch",
+													display: "flex",
+													flexDirection: "column",
+													justifyContent: "center",
+												}}
+											>
 												<Typography variant="body1" fontWeight={600} noWrap>
 													{guild.name}
 												</Typography>
-												<Chip
-													label={t("common.owner")}
-													size="small"
-													sx={{ mt: 0.5, visibility: guild.owner ? "visible" : "hidden" }}
-												/>
+												{guild.owner && (
+													<Chip label={t("common.owner")} size="small" sx={{ mt: 0.5 }} />
+												)}
 											</Box>
 											<Settings sx={{ opacity: 0.4, flexShrink: 0 }} />
 										</CardContent>
