@@ -147,51 +147,89 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
 		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
 
-		const result: ApiCharacter[] = [];
+		const result: ApiCharacter[] = await Promise.all(
+			Object.entries(allUsers).flatMap(([userId, userChars]) => {
+				const memChars: UserData[] = allMemChars[userId] ?? [];
+				const memByMessageId = new Map<string, UserData>(
+					memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
+				);
+				const memByUserName = new Map<string, UserData>(
+					memChars
+						.filter((c) => c.userName != null)
+						.map((c) => [c.userName!.toLowerCase(), c])
+				);
+				const memWithoutName = memChars.find((c) => c.userName == null);
 
-		for (const [userId, userChars] of Object.entries(allUsers)) {
-			const memChars: UserData[] = allMemChars[userId] ?? [];
-			const memByMessageId = new Map<string, UserData>(
-				memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
-			);
+				return userChars
+					.filter((char) => {
+						const mem = memByMessageId.get(char.messageId[0]);
+						return !mem?.isFromTemplate;
+					})
+					.map(async (char): Promise<ApiCharacter> => {
+						const [messageId, channelId] = char.messageId;
+						const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 
-			for (const char of userChars) {
-				const mem = memByMessageId.get(char.messageId[0]);
-				if (mem?.isFromTemplate) continue;
+						const mem =
+							memByMessageId.get(messageId) ??
+							memByUserName.get((char.charName ?? "").toLowerCase()) ??
+							(char.charName == null ? memWithoutName : undefined);
 
-				const [messageId, channelId] = char.messageId;
-				const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+						let avatar: string | null = mem?.avatar ?? null;
+						let stats: EmbedField[] | null = null;
+						let damage: EmbedField[] | null = null;
 
-				let avatar: string | null = mem?.avatar ?? null;
-				let stats: EmbedField[] | null = null;
-				let damage: EmbedField[] | null = null;
+						if (mem?.stats)
+							stats = Object.entries(mem.stats).map(([name, value]) => ({
+								name,
+								value: String(value),
+							}));
+						if (mem?.damage)
+							damage = Object.entries(mem.damage).map(([name, value]) => ({
+								name,
+								value,
+							}));
 
-				if (mem?.stats)
-					stats = Object.entries(mem.stats).map(([name, value]) => ({
-						name,
-						value: String(value),
-					}));
-				if (mem?.damage)
-					damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+						if (stats === null || damage === null || avatar === null) {
+							try {
+								const fetched = await fetchCharacterEmbeds(
+									channelId,
+									messageId,
+									botChannels
+								);
+								avatar = avatar ?? fetched.avatar;
+								stats = stats ?? fetched.stats;
+								damage = damage ?? fetched.damage;
+							} catch {
+								// erreurs silencieuses
+							}
+						}
 
-				result.push({
-					charName: char.charName ?? null,
-					messageId,
-					channelId,
-					discordLink,
-					canLink,
-					isPrivate: char.isPrivate ?? false,
-					avatar,
-					stats,
-					damage,
-					userId,
-				});
-			}
-		}
+						return {
+							charName: char.charName ?? null,
+							messageId,
+							channelId,
+							discordLink,
+							canLink,
+							isPrivate: char.isPrivate ?? false,
+							avatar,
+							stats,
+							damage,
+							userId,
+						};
+					});
+			})
+		);
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
 		res.setHeader("Cache-Control", "no-store");
 		res.json(result);
+	});
+
+	// POST /:guildId/characters/refresh-all — invalide le cache serveur (admin uniquement)
+	router.post("/refresh-all", requireAuth, requireAdmin, (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		charCache.delete(`${guildId}:*all*`);
+		res.json({ ok: true });
 	});
 
 	// GET /:guildId/characters/count — nombre total de personnages du serveur (admin uniquement)

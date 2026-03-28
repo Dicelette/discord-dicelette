@@ -6,6 +6,8 @@ export const charactersApi = {
 		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters`),
 	getAllCharacters: (guildId: string) =>
 		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters/all`),
+	refreshAll: (guildId: string) =>
+		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh-all`),
 	count: (guildId: string, config?: { signal?: AbortSignal }) =>
 		api.get<{ count: number }>(`/guilds/${guildId}/characters/count`, config),
 	exportCsv: (guildId: string) =>

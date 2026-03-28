@@ -151,11 +151,11 @@ export default function Dashboard() {
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
-				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
-				<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 				{isAdmin && serverCharCount > 0 && (
 					<Tab value="server-characters" label={t("dashboard.tabs.serverCharacters")} wrapped />
 				)}
+				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
+				<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 			</Tabs>
 
 			{isAdmin && config && mountedTabs.has("admin") && (
