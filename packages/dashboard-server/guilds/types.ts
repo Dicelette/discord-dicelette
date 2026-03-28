@@ -23,6 +23,8 @@ export interface ApiCharacter {
 	avatar: string | null;
 	stats: EmbedField[] | null;
 	damage: EmbedField[] | null;
+	/** Only present in admin server-wide character list */
+	userId?: string;
 }
 
 // ---------------------------------------------------------------------------

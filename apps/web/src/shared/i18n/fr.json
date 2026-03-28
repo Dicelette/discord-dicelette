@@ -1,11 +1,14 @@
 {
 	"characters": {
 		"damage": "Dés de compétence",
+		"filterPlaceholder": "Rechercher par nom…",
 		"loadError": "Impossible de charger les personnages.",
 		"noCharacters": "Aucun personnage enregistré sur ce serveur.",
+		"noResults": "Aucun personnage ne correspond à la recherche.",
 		"private": "Fiche privée",
 		"refresh": "Actualiser",
 		"refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
+		"serverTitle": "Personnages du serveur",
 		"sheetLink": "Voir la fiche",
 		"title": "Mes personnages",
 		"unnamed": "(Sans nom)"
@@ -83,6 +86,7 @@
 		"tabs": {
 			"admin": "Configuration serveur",
 			"characters": "Personnages",
+			"serverCharacters": "Personnages du serveur",
 			"template": "Configuration du modèle",
 			"user": "Configuration personnelle"
 		},

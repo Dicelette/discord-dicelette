@@ -46,6 +46,8 @@ export interface ApiCharacter {
 	avatar: string | null;
 	stats: ApiCharacterField[] | null;
 	damage: ApiCharacterField[] | null;
+	/** Only present in admin server-wide character list */
+	userId?: string;
 }
 
 export interface TemplateImportPayload {

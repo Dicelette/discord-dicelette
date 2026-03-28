@@ -1,4 +1,4 @@
-import type { UserData, UserGuildData } from "@dicelette/types";
+import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import * as Papa from "papaparse";
@@ -122,6 +122,76 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const userId = req.session.userId!;
 		charCache.delete(`${guildId}:${userId}`);
 		res.json({ ok: true });
+	});
+
+	// GET /:guildId/characters/all — toutes les fiches du serveur (admin uniquement)
+	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const cacheKey = `${guildId}:*all*`;
+
+		const cached = charCache.get(cacheKey);
+		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+			res.setHeader("Cache-Control", "no-store");
+			res.json(cached.data);
+			return;
+		}
+
+		const guildData = settings.get(guildId);
+		if (!guildData) {
+			res.status(404).json({ error: "Guild not found" });
+			return;
+		}
+
+		const canLink =
+			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
+		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
+
+		const result: ApiCharacter[] = [];
+
+		for (const [userId, userChars] of Object.entries(allUsers)) {
+			const memChars: UserData[] = allMemChars[userId] ?? [];
+			const memByMessageId = new Map<string, UserData>(
+				memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
+			);
+
+			for (const char of userChars) {
+				const mem = memByMessageId.get(char.messageId[0]);
+				if (mem?.isFromTemplate) continue;
+
+				const [messageId, channelId] = char.messageId;
+				const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+
+				let avatar: string | null = mem?.avatar ?? null;
+				let stats: EmbedField[] | null = null;
+				let damage: EmbedField[] | null = null;
+
+				if (mem?.stats)
+					stats = Object.entries(mem.stats).map(([name, value]) => ({
+						name,
+						value: String(value),
+					}));
+				if (mem?.damage)
+					damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+
+				result.push({
+					charName: char.charName ?? null,
+					messageId,
+					channelId,
+					discordLink,
+					canLink,
+					isPrivate: char.isPrivate ?? false,
+					avatar,
+					stats,
+					damage,
+					userId,
+				});
+			}
+		}
+
+		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		res.setHeader("Cache-Control", "no-store");
+		res.json(result);
 	});
 
 	// GET /:guildId/characters/count — nombre total de personnages du serveur (admin uniquement)
