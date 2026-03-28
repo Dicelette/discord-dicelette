@@ -76,6 +76,10 @@ export default function Dashboard() {
 							.getRoles(guildId)
 							.then((r) => setRoles(r.data))
 							.catch(() => {}),
+						charactersApi
+							.count(guildId)
+							.then((r) => setServerCharCount(r.data.count))
+							.catch(() => {}),
 					]);
 					setConfig(configRes.data);
 				}
