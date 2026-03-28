@@ -2,6 +2,7 @@
 	"characters": {
 		"damage": "Dés de compétence",
 		"filterPlaceholder": "Rechercher par nom…",
+		"serverFilterPlaceholder": "Rechercher par nom ou joueur…",
 		"loadError": "Impossible de charger les personnages.",
 		"noCharacters": "Aucun personnage enregistré sur ce serveur.",
 		"noResults": "Aucun personnage ne correspond à la recherche.",

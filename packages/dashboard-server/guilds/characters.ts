@@ -146,6 +146,17 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
 		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
 		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
+		const guild = botGuilds.get(guildId);
+
+		// Résoudre les pseudos Discord de tous les joueurs en une passe parallèle
+		const uniqueUserIds = Object.keys(allUsers);
+		const nameEntries = await Promise.all(
+			uniqueUserIds.map(async (uid) => {
+				const name = await guild?.fetchMemberName(uid).catch(() => null);
+				return [uid, name ?? null] as const;
+			})
+		);
+		const ownerNames = new Map<string, string | null>(nameEntries);
 
 		const result: ApiCharacter[] = await Promise.all(
 			Object.entries(allUsers).flatMap(([userId, userChars]) => {
@@ -159,6 +170,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						.map((c) => [c.userName!.toLowerCase(), c])
 				);
 				const memWithoutName = memChars.find((c) => c.userName == null);
+				const ownerName = ownerNames.get(userId) ?? undefined;
 
 				return userChars
 					.filter((char) => {
@@ -215,6 +227,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 							stats,
 							damage,
 							userId,
+							ownerName,
 						};
 					});
 			})
