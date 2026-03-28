@@ -11,7 +11,6 @@ const theme = createTheme({
 		fontFamily: '"Atkinson Hyperlegible Next", "Inter", sans-serif',
 	},
 	components: {
-		// biome-ignore lint/style/useNamingConvention: MUI requires PascalCase component keys
 		MuiAccordion: {
 			styleOverrides: {
 				root: ({ theme }) => ({
@@ -20,7 +19,6 @@ const theme = createTheme({
 				}),
 			},
 		},
-		// biome-ignore lint/style/useNamingConvention: MUI requires PascalCase component keys
 		MuiInputBase: {
 			styleOverrides: {
 				input: {
@@ -28,7 +26,6 @@ const theme = createTheme({
 				},
 			},
 		},
-		// biome-ignore lint/style/useNamingConvention: MUI requires PascalCase component keys
 		MuiChip: {
 			styleOverrides: {
 				sizeSmall: ({ theme }) => ({

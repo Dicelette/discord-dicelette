@@ -1,4 +1,4 @@
-import type { UserData, UserGuildData } from "@dicelette/types";
+import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import * as Papa from "papaparse";
@@ -121,6 +121,127 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 		charCache.delete(`${guildId}:${userId}`);
+		res.json({ ok: true });
+	});
+
+	// GET /:guildId/characters/all — toutes les fiches du serveur (admin uniquement)
+	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const cacheKey = `${guildId}:*all*`;
+
+		const cached = charCache.get(cacheKey);
+		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+			res.setHeader("Cache-Control", "no-store");
+			res.json(cached.data);
+			return;
+		}
+
+		const guildData = settings.get(guildId);
+		if (!guildData) {
+			res.status(404).json({ error: "Guild not found" });
+			return;
+		}
+
+		const canLink =
+			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
+		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
+		const guild = botGuilds.get(guildId);
+
+		// Résoudre les pseudos Discord de tous les joueurs en une passe parallèle
+		const uniqueUserIds = Object.keys(allUsers);
+		const nameEntries = await Promise.all(
+			uniqueUserIds.map(async (uid) => {
+				const name = await guild?.fetchMemberName(uid).catch(() => null);
+				return [uid, name ?? null] as const;
+			})
+		);
+		const ownerNames = new Map<string, string | null>(nameEntries);
+
+		const result: ApiCharacter[] = await Promise.all(
+			Object.entries(allUsers).flatMap(([userId, userChars]) => {
+				const memChars: UserData[] = allMemChars[userId] ?? [];
+				const memByMessageId = new Map<string, UserData>(
+					memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
+				);
+				const memByUserName = new Map<string, UserData>(
+					memChars
+						.filter((c) => c.userName != null)
+						.map((c) => [c.userName!.toLowerCase(), c])
+				);
+				const memWithoutName = memChars.find((c) => c.userName == null);
+				const ownerName = ownerNames.get(userId) ?? undefined;
+
+				return userChars
+					.filter((char) => {
+						const mem = memByMessageId.get(char.messageId[0]);
+						return !mem?.isFromTemplate;
+					})
+					.map(async (char): Promise<ApiCharacter> => {
+						const [messageId, channelId] = char.messageId;
+						const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+
+						const mem =
+							memByMessageId.get(messageId) ??
+							memByUserName.get((char.charName ?? "").toLowerCase()) ??
+							(char.charName == null ? memWithoutName : undefined);
+
+						let avatar: string | null = mem?.avatar ?? null;
+						let stats: EmbedField[] | null = null;
+						let damage: EmbedField[] | null = null;
+
+						if (mem?.stats)
+							stats = Object.entries(mem.stats).map(([name, value]) => ({
+								name,
+								value: String(value),
+							}));
+						if (mem?.damage)
+							damage = Object.entries(mem.damage).map(([name, value]) => ({
+								name,
+								value,
+							}));
+
+						if (stats === null || damage === null || avatar === null) {
+							try {
+								const fetched = await fetchCharacterEmbeds(
+									channelId,
+									messageId,
+									botChannels
+								);
+								avatar = avatar ?? fetched.avatar;
+								stats = stats ?? fetched.stats;
+								damage = damage ?? fetched.damage;
+							} catch {
+								// erreurs silencieuses
+							}
+						}
+
+						return {
+							charName: char.charName ?? null,
+							messageId,
+							channelId,
+							discordLink,
+							canLink,
+							isPrivate: char.isPrivate ?? false,
+							avatar,
+							stats,
+							damage,
+							userId,
+							ownerName,
+						};
+					});
+			})
+		);
+
+		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		res.setHeader("Cache-Control", "no-store");
+		res.json(result);
+	});
+
+	// POST /:guildId/characters/refresh-all — invalide le cache serveur (admin uniquement)
+	router.post("/refresh-all", requireAuth, requireAdmin, (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		charCache.delete(`${guildId}:*all*`);
 		res.json({ ok: true });
 	});
 

@@ -32,6 +32,15 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 							return null;
 						}
 					},
+					fetchMemberName: async (userId) => {
+						try {
+							const m =
+								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
+							return m.displayName;
+						} catch {
+							return null;
+						}
+					},
 					get channels() {
 						return [...guild.channels.cache.values()].map((c) => ({
 							id: c.id,

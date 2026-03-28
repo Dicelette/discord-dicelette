@@ -1,4 +1,9 @@
-import { type ApiUserConfig, guildApi, userApi } from "@dicelette/dashboard-api";
+import {
+	type ApiUserConfig,
+	charactersApi,
+	guildApi,
+	userApi,
+} from "@dicelette/dashboard-api";
 import type { ApiGuildData } from "@dicelette/types";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
@@ -13,11 +18,16 @@ import {
 import { type Channel, type Role, useI18n } from "@shared";
 import { lazy, Suspense, startTransition, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CharactersTab, GuildConfigForm, UserConfigForm } from "../features";
+import {
+	CharactersTab,
+	GuildConfigForm,
+	ServerCharactersTab,
+	UserConfigForm,
+} from "../features";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
 
-type ActiveTab = "admin" | "template" | "user" | "characters";
+type ActiveTab = "admin" | "template" | "user" | "characters" | "server-characters";
 
 export default function Dashboard() {
 	const { guildId } = useParams<{ guildId: string }>();
@@ -29,6 +39,7 @@ export default function Dashboard() {
 		() => new Set(["admin"])
 	);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [serverCharCount, setServerCharCount] = useState(0);
 	const [config, setConfig] = useState<ApiGuildData | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
 	const [loading, setLoading] = useState(true);
@@ -59,6 +70,10 @@ export default function Dashboard() {
 						guildApi
 							.getRoles(guildId)
 							.then((r) => setRoles(r.data))
+							.catch(() => {}),
+						charactersApi
+							.count(guildId)
+							.then((r) => setServerCharCount(r.data.count))
 							.catch(() => {}),
 					]);
 					setConfig(configRes.data);
@@ -115,6 +130,8 @@ export default function Dashboard() {
 
 			<Tabs
 				value={tab}
+				variant="scrollable"
+				scrollButtons="auto"
 				onChange={(_, v: ActiveTab) => {
 					setMountedTabs((prev) => (prev.has(v) ? prev : new Set([...prev, v])));
 					startTransition(() => setTab(v));
@@ -146,6 +163,13 @@ export default function Dashboard() {
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
+				{isAdmin && serverCharCount > 0 && (
+					<Tab
+						value="server-characters"
+						label={t("dashboard.tabs.serverCharacters")}
+						wrapped
+					/>
+				)}
 				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
 				<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 			</Tabs>
@@ -183,6 +207,11 @@ export default function Dashboard() {
 			{mountedTabs.has("characters") && (
 				<Box sx={{ display: tab === "characters" ? undefined : "none" }}>
 					<CharactersTab guildId={guildId!} />
+				</Box>
+			)}
+			{isAdmin && mountedTabs.has("server-characters") && (
+				<Box sx={{ display: tab === "server-characters" ? undefined : "none" }}>
+					<ServerCharactersTab guildId={guildId!} />
 				</Box>
 			)}
 		</Box>
