@@ -81,14 +81,17 @@ export function createCharactersRouter(deps: DashboardDeps) {
 								value,
 							}));
 					}
-					if (stats === null && damage === null) {
-						// Fallback : mem absent ou sans stats/damage — récupère depuis les embeds Discord
+					if (stats === null || damage === null || avatar === null) {
+						// Fallback : données manquantes — récupère depuis les embeds Discord
 						try {
-							({ avatar, stats, damage } = await fetchCharacterEmbeds(
+							const fetched = await fetchCharacterEmbeds(
 								channelId,
 								messageId,
 								botChannels
-							));
+							);
+							avatar = avatar ?? fetched.avatar;
+							stats = stats ?? fetched.stats;
+							damage = damage ?? fetched.damage;
 						} catch {
 							// erreurs silencieuses
 						}
