@@ -82,15 +82,27 @@ export default function CharactersTab({ guildId }: Props) {
 			<Box
 				sx={{
 					display: "grid",
-					gridTemplateColumns: characters.length > 0
-						? { xs: "1fr auto", sm: "auto 1fr auto" }
-						: { xs: "1fr auto" },
+					gridTemplateColumns: { xs: "1fr auto", sm: "auto 1fr auto" },
+					gridTemplateAreas:
+						characters.length > 0
+							? {
+									xs: '"title refresh" "search search"',
+									sm: '"title search refresh"',
+								}
+							: {
+									xs: '"title refresh"',
+									sm: '"title . refresh"',
+								},
 					alignItems: "center",
 					gap: 2,
 					mb: 3,
 				}}
 			>
-				<Typography variant="h5" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
+				<Typography
+					variant="h5"
+					fontWeight={600}
+					sx={{ whiteSpace: "nowrap", gridArea: "title" }}
+				>
 					{t("characters.title")}
 				</Typography>
 
@@ -112,12 +124,16 @@ export default function CharactersTab({ guildId }: Props) {
 								),
 							},
 						}}
-						sx={{ width: "100%", display: { xs: "none", sm: "flex" } }}
+						sx={{
+							gridArea: "search",
+							width: { xs: "100%", sm: 320 },
+							justifySelf: { xs: "stretch", sm: "end" },
+						}}
 					/>
 				)}
 
 				<Tooltip title={t("characters.refreshTooltip")}>
-					<span>
+					<Box component="span" sx={{ gridArea: "refresh", justifySelf: "end" }}>
 						<IconButton onClick={() => load(true)} disabled={refreshing} size="small">
 							<RefreshIcon
 								sx={{
@@ -126,31 +142,9 @@ export default function CharactersTab({ guildId }: Props) {
 								}}
 							/>
 						</IconButton>
-					</span>
+					</Box>
 				</Tooltip>
 			</Box>
-
-			{characters.length > 0 && (
-				<TextField
-					size="small"
-					placeholder={t("characters.filterPlaceholder")}
-					value={search}
-					onChange={(e) => {
-						setSearch(e.target.value);
-						setPage(1);
-					}}
-					slotProps={{
-						input: {
-							startAdornment: (
-								<InputAdornment position="start">
-									<SearchIcon fontSize="small" />
-								</InputAdornment>
-							),
-						},
-					}}
-					sx={{ mb: 2, width: "100%", display: { xs: "flex", sm: "none" } }}
-				/>
-			)}
 
 			{error && (
 				<Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>

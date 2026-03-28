@@ -72,9 +72,7 @@ export default function ServerCharactersTab({ guildId }: Props) {
 	const q = search.trim().toLowerCase();
 	const filtered = q
 		? characters.filter(
-				(c) =>
-					(c.charName ?? "").toLowerCase().includes(q) ||
-					(c.ownerName ?? "").toLowerCase().includes(q)
+				(c) => (c.charName ?? "").subText(q) || (c.ownerName ?? "").subText(q)
 			)
 		: characters;
 	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -86,13 +84,21 @@ export default function ServerCharactersTab({ guildId }: Props) {
 			<Box
 				sx={{
 					display: "grid",
-					gridTemplateColumns: { xs: "1fr", sm: "auto 1fr auto" },
+					gridTemplateColumns: { xs: "1fr auto", sm: "auto 1fr auto" },
+					gridTemplateAreas: {
+						xs: '"title refresh" "search search"',
+						sm: '"title search refresh"',
+					},
 					alignItems: "center",
 					gap: 2,
 					mb: 3,
 				}}
 			>
-				<Typography variant="h5" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
+				<Typography
+					variant="h5"
+					fontWeight={600}
+					sx={{ whiteSpace: "nowrap", gridArea: "title" }}
+				>
 					{t("characters.serverTitle")}
 				</Typography>
 
@@ -113,11 +119,15 @@ export default function ServerCharactersTab({ guildId }: Props) {
 							),
 						},
 					}}
-					sx={{ width: "100%" }}
+					sx={{
+						gridArea: "search",
+						width: { xs: "100%", sm: 320 },
+						justifySelf: { xs: "stretch", sm: "end" },
+					}}
 				/>
 
 				<Tooltip title={t("characters.refreshTooltip")}>
-					<span>
+					<Box component="span" sx={{ gridArea: "refresh", justifySelf: "end" }}>
 						<IconButton onClick={() => load(true)} disabled={refreshing} size="small">
 							<RefreshIcon
 								sx={{
@@ -126,7 +136,7 @@ export default function ServerCharactersTab({ guildId }: Props) {
 								}}
 							/>
 						</IconButton>
-					</span>
+					</Box>
 				</Tooltip>
 			</Box>
 
@@ -156,7 +166,7 @@ export default function ServerCharactersTab({ guildId }: Props) {
 										}}
 									>
 										<PersonIcon sx={{ fontSize: 14, color: "text.secondary" }} />
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant="subtitle1" color="text.secondary">
 											{char.ownerName}
 										</Typography>
 									</Box>
