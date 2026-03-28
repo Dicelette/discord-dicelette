@@ -11,6 +11,7 @@ import {
 	type Channel,
 	ChannelSelect,
 	formatDuration,
+	getChannelPathById,
 	millisecondsToSeconds,
 	NumberField,
 	SectionTitle,
@@ -202,9 +203,19 @@ function StripOOC({ control, channels, textChannels }: Props) {
 									fullWidth
 									size="small"
 									multiple
-									options={channels}
+									options={channels.sort((a, b) => {
+										const isUncategorizedA = a.type !== 4 && !a.parent_id;
+										const isUncategorizedB = b.type !== 4 && !b.parent_id;
+										if (isUncategorizedA !== isUncategorizedB)
+											return isUncategorizedA ? -1 : 1;
+										const pathA = getChannelPathById(a.id, channels) ?? a.name;
+										const pathB = getChannelPathById(b.id, channels) ?? b.name;
+										return pathA.localeCompare(pathB);
+									})}
 									getOptionKey={(c) => c.id}
-									getOptionLabel={(c) => `${c.type === 4 ? "\u{1F4C2}" : "#"} ${c.name}`}
+									getOptionLabel={(c) =>
+										`${c.type === 4 ? "\u{1F4C2}" : ""} ${getChannelPathById(c.id, channels)}`
+									}
 									value={selected}
 									onChange={(_, newValue) =>
 										field.onChange(
