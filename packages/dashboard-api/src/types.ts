@@ -48,7 +48,7 @@ export interface ApiCharacter {
 	damage: ApiCharacterField[] | null;
 	/** Only present in admin server-wide character list */
 	userId?: string;
-	/** Discord display name of the owner — only present in admin server-wide character list */
+	/** Discord global profile name of the owner — only present in admin server-wide character list */
 	ownerName?: string;
 }
 

@@ -36,7 +36,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 						try {
 							const m =
 								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
-							return m.displayName;
+							return m.user.globalName ?? m.user.username;
 						} catch {
 							return null;
 						}
