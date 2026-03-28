@@ -19,6 +19,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 		const cached = charCache.get(cacheKey);
 		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+			res.setHeader("Cache-Control", "no-store");
 			res.json(cached.data);
 			return;
 		}
@@ -39,6 +40,13 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const memByMessageId = new Map<string, UserData>(
 			memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
 		);
+		// Fallback : correspondance par userName (insensible à la casse) quand messageId absent
+		const memByUserName = new Map<string, UserData>(
+			memChars
+				.filter((c) => c.userName != null)
+				.map((c) => [c.userName!.toLowerCase(), c])
+		);
+		const memWithoutName = memChars.find((c) => c.userName == null);
 
 		const result: ApiCharacter[] = await Promise.all(
 			userChars
@@ -51,7 +59,10 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					const [messageId, channelId] = char.messageId;
 					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 
-					const mem = memByMessageId.get(messageId);
+					const mem =
+						memByMessageId.get(messageId) ??
+						memByUserName.get((char.charName ?? "").toLowerCase()) ??
+						(char.charName == null ? memWithoutName : undefined);
 					let avatar: string | null = null;
 					let stats: EmbedField[] | null = null;
 					let damage: EmbedField[] | null = null;
@@ -69,8 +80,9 @@ export function createCharactersRouter(deps: DashboardDeps) {
 								name,
 								value,
 							}));
-					} else {
-						// Fallback : personnage absent de la mémoire (ex. premier chargement après restart)
+					}
+					if (stats === null && damage === null) {
+						// Fallback : mem absent ou sans stats/damage — récupère depuis les embeds Discord
 						try {
 							({ avatar, stats, damage } = await fetchCharacterEmbeds(
 								channelId,
@@ -97,6 +109,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		);
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		res.setHeader("Cache-Control", "no-store");
 		res.json(result);
 	});
 
