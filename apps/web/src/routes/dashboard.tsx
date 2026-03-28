@@ -51,13 +51,18 @@ export default function Dashboard() {
 
 	useEffect(() => {
 		if (!guildId) return;
-		userApi
-			.getUserConfig(guildId)
-			.then(async (res) => {
-				const { isAdmin: admin, userConfig } = res.data;
+		Promise.all([
+			userApi.getUserConfig(guildId),
+			charactersApi.count(guildId).catch(() => null),
+		])
+			.then(async ([userConfigRes, countRes]) => {
+				const { isAdmin: admin, userConfig } = userConfigRes.data;
+				const nextServerCharCount = countRes?.data.count ?? 0;
+				const hasServerCharacters = nextServerCharCount > 0;
+				setServerCharCount(nextServerCharCount);
 				setIsAdmin(admin);
 				setUserConfigData(userConfig);
-				const initialTab = admin ? "admin" : "characters";
+				const initialTab = admin ? "admin" : hasServerCharacters ? "characters" : "user";
 				setTab(initialTab);
 				setMountedTabs(new Set([initialTab]));
 				if (admin) {
@@ -70,10 +75,6 @@ export default function Dashboard() {
 						guildApi
 							.getRoles(guildId)
 							.then((r) => setRoles(r.data))
-							.catch(() => {}),
-						charactersApi
-							.count(guildId)
-							.then((r) => setServerCharCount(r.data.count))
 							.catch(() => {}),
 					]);
 					setConfig(configRes.data);
@@ -171,7 +172,9 @@ export default function Dashboard() {
 					/>
 				)}
 				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
-				<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
+				{serverCharCount > 0 && (
+					<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
+				)}
 			</Tabs>
 
 			{isAdmin && config && mountedTabs.has("admin") && (
@@ -204,7 +207,7 @@ export default function Dashboard() {
 					<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
 				</Box>
 			)}
-			{mountedTabs.has("characters") && (
+			{serverCharCount > 0 && mountedTabs.has("characters") && (
 				<Box sx={{ display: tab === "characters" ? undefined : "none" }}>
 					<CharactersTab guildId={guildId!} />
 				</Box>
