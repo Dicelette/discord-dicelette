@@ -85,7 +85,7 @@
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
 			"admin": "Server configuration",
-			"characters": "Characters",
+			"characters": "My characters",
 			"serverCharacters": "Server characters",
 			"template": "Model configuration",
 			"user": "Personal configuration"

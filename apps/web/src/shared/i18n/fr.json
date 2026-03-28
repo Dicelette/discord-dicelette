@@ -85,7 +85,7 @@
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
 			"admin": "Configuration serveur",
-			"characters": "Personnages",
+			"characters": "Mes personnages",
 			"serverCharacters": "Personnages du serveur",
 			"template": "Configuration du modèle",
 			"user": "Configuration personnelle"
