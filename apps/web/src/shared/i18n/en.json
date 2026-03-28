@@ -2,6 +2,7 @@
 	"characters": {
 		"damage": "Skill dice",
 		"filterPlaceholder": "Search by name…",
+		"serverFilterPlaceholder": "Search by name or player…",
 		"loadError": "Could not load characters.",
 		"noCharacters": "No characters registered on this server.",
 		"noResults": "No characters match the search.",
