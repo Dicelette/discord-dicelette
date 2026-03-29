@@ -10,6 +10,8 @@ export const charactersApi = {
 		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh-all`),
 	count: (guildId: string, config?: { signal?: AbortSignal }) =>
 		api.get<{ count: number }>(`/guilds/${guildId}/characters/count`, config),
+	countSelf: (guildId: string, config?: { signal?: AbortSignal }) =>
+		api.get<{ count: number }>(`/guilds/${guildId}/characters/count-self`, config),
 	exportCsv: (guildId: string) =>
 		api.get<Blob>(`/guilds/${guildId}/characters/export`, { responseType: "blob" }),
 	refresh: (guildId: string) =>

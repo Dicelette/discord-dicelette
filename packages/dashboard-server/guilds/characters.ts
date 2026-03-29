@@ -282,6 +282,14 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ count });
 	});
 
+	// GET /:guildId/characters/count-self — nombre de personnages du joueur courant (sans droits admin)
+	router.get("/count-self", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+		const userChars: UserGuildData[] = settings.get(guildId)?.user?.[userId] ?? [];
+		res.json({ count: userChars.length });
+	});
+
 	// GET /:guildId/characters/export — export CSV de tous les personnages (admin uniquement)
 	router.get(
 		"/export",

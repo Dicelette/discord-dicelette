@@ -42,6 +42,7 @@ export default function Dashboard() {
 		() => new Set(["admin"])
 	);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [userCharCount, setUserCharCount] = useState(0);
 	const [serverCharCount, setServerCharCount] = useState(0);
 	const [config, setConfig] = useState<ApiGuildData | null>(null);
 	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
@@ -58,16 +59,16 @@ export default function Dashboard() {
 		if (!guildId) return;
 		Promise.all([
 			userApi.getUserConfig(guildId),
-			charactersApi.count(guildId).catch(() => null),
+			charactersApi.countSelf(guildId).catch(() => null),
 		])
-			.then(async ([userConfigRes, countRes]) => {
+			.then(async ([userConfigRes, userCountRes]) => {
 				const { isAdmin: admin, userConfig } = userConfigRes.data;
-				const nextServerCharCount = countRes?.data.count ?? 0;
-				const hasServerCharacters = nextServerCharCount > 0;
-				setServerCharCount(nextServerCharCount);
+				const nextUserCharCount = userCountRes?.data.count ?? 0;
+				const hasUserCharacters = nextUserCharCount > 0;
+				setUserCharCount(nextUserCharCount);
 				setIsAdmin(admin);
 				setUserConfigData(userConfig);
-				const initialTab = admin ? "admin" : hasServerCharacters ? "characters" : "user";
+				const initialTab = admin ? "admin" : hasUserCharacters ? "characters" : "user";
 				setTab(initialTab);
 				setMountedTabs(new Set([initialTab]));
 				if (admin) {
@@ -222,7 +223,7 @@ export default function Dashboard() {
 					/>
 				)}
 				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
-				{serverCharCount > 0 && (
+				{userCharCount > 0 && (
 					<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 				)}
 			</Tabs>
@@ -257,7 +258,7 @@ export default function Dashboard() {
 					<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
 				</Box>
 			)}
-			{serverCharCount > 0 && mountedTabs.has("characters") && (
+			{userCharCount > 0 && mountedTabs.has("characters") && (
 				<Box sx={{ display: tab === "characters" ? undefined : "none" }}>
 					<CharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
 				</Box>
