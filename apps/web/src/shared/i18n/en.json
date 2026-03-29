@@ -82,6 +82,9 @@
 	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
+		"refreshCharacters": "Refresh characters",
+		"refreshCharactersError": "Could not refresh characters.",
+		"refreshCharactersTooltip": "Refreshes characters data.",
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
 		"tabs": {

@@ -82,6 +82,9 @@
 	},
 	"dashboard": {
 		"loadError": "Impossible de charger la configuration.",
+		"refreshCharacters": "Actualiser les personnages",
+		"refreshCharactersError": "Impossible d'actualiser les personnages.",
+		"refreshCharactersTooltip": "Rafraîchir les données des personnages.",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {

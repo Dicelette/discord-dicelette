@@ -1,64 +1,56 @@
 import { type ApiCharacter, charactersApi } from "@dicelette/dashboard-api";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
 import {
 	Alert,
 	Box,
 	CircularProgress,
-	IconButton,
 	InputAdornment,
 	Pagination,
 	TextField,
-	Tooltip,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CharacterCard from "./ui/CharacterCard";
 
 const PAGE_SIZE = 5;
 
 interface Props {
 	guildId: string;
+	refreshToken?: number;
 }
 
-export default function CharactersTab({ guildId }: Props) {
+export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 	const { t } = useI18n();
+	const lastRefreshToken = useRef(refreshToken);
 	const [characters, setCharacters] = useState<ApiCharacter[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [page, setPage] = useState(1);
 	const [search, setSearch] = useState("");
 
-	const load = useCallback(
-		async (forceRefresh = false) => {
-			setError(null);
-			if (forceRefresh) {
-				setRefreshing(true);
-				try {
-					await charactersApi.refresh(guildId);
-				} catch {
-					// ignore
-				}
-			}
-			try {
-				const res = await charactersApi.getCharacters(guildId);
-				setCharacters(res.data);
-				setPage(1);
-			} catch {
-				setError(t("characters.loadError"));
-			} finally {
-				setLoading(false);
-				setRefreshing(false);
-			}
-		},
-		[guildId, t]
-	);
+	const load = useCallback(async () => {
+		setError(null);
+		try {
+			const res = await charactersApi.getCharacters(guildId);
+			setCharacters(res.data);
+			setPage(1);
+		} catch {
+			setError(t("characters.loadError"));
+		} finally {
+			setLoading(false);
+		}
+	}, [guildId, t]);
 
 	useEffect(() => {
 		load();
 	}, [load]);
+
+	useEffect(() => {
+		if (lastRefreshToken.current === refreshToken) return;
+		lastRefreshToken.current = refreshToken;
+		load();
+	}, [load, refreshToken]);
 
 	if (loading) {
 		return (
@@ -78,20 +70,20 @@ export default function CharactersTab({ guildId }: Props) {
 
 	return (
 		<Box>
-			{/* Header : titre + recherche + refresh sur la même ligne */}
+			{/* Header : titre + recherche */}
 			<Box
 				sx={{
 					display: "grid",
-					gridTemplateColumns: { xs: "1fr auto", sm: "auto 1fr auto" },
+					gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
 					gridTemplateAreas:
 						characters.length > 0
 							? {
-									xs: '"title refresh" "search search"',
-									sm: '"title search refresh"',
+									xs: '"title" "search"',
+									sm: '"title search"',
 								}
 							: {
-									xs: '"title refresh"',
-									sm: '"title . refresh"',
+									xs: '"title"',
+									sm: '"title ."',
 								},
 					alignItems: "center",
 					gap: 2,
@@ -131,19 +123,6 @@ export default function CharactersTab({ guildId }: Props) {
 						}}
 					/>
 				)}
-
-				<Tooltip title={t("characters.refreshTooltip")}>
-					<Box component="span" sx={{ gridArea: "refresh", justifySelf: "end" }}>
-						<IconButton onClick={() => load(true)} disabled={refreshing} size="small">
-							<RefreshIcon
-								sx={{
-									transition: "transform 0.4s",
-									transform: refreshing ? "rotate(360deg)" : "none",
-								}}
-							/>
-						</IconButton>
-					</Box>
-				</Tooltip>
 			</Box>
 
 			{error && (

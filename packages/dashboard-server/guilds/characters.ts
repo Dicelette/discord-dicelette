@@ -4,7 +4,12 @@ import { Router } from "express";
 import * as Papa from "papaparse";
 import type { DashboardDeps } from "..";
 import { type ApiCharacter, CHAR_CACHE_TTL, charCache, type EmbedField } from "./types";
-import { fetchCharacterEmbeds, makeRequireAdmin, requireAuth } from "./utils";
+import {
+	fetchCharacterEmbeds,
+	makeRequireAdmin,
+	requireAuth,
+	userCanRefreshServerCharacters,
+} from "./utils";
 
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
@@ -124,6 +129,25 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ ok: true });
 	});
 
+	// POST /:guildId/characters/refresh-dashboard — refresh joueur, et serveur si MJ/admin
+	router.post("/refresh-dashboard", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		charCache.delete(`${guildId}:${userId}`);
+
+		const canRefreshServer = await userCanRefreshServerCharacters(
+			userId,
+			guildId,
+			botGuilds
+		);
+		if (canRefreshServer) {
+			charCache.delete(`${guildId}:*all*`);
+		}
+
+		res.json({ ok: true, refreshedAll: canRefreshServer });
+	});
+
 	// GET /:guildId/characters/all — toutes les fiches du serveur (admin uniquement)
 	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
@@ -239,11 +263,16 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	});
 
 	// POST /:guildId/characters/refresh-all — invalide le cache serveur (admin uniquement)
-	router.post("/refresh-all", requireAuth, requireAdmin, (req: Request, res: Response) => {
-		const guildId = req.params.guildId as string;
-		charCache.delete(`${guildId}:*all*`);
-		res.json({ ok: true });
-	});
+	router.post(
+		"/refresh-all",
+		requireAuth,
+		requireAdmin,
+		(req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			charCache.delete(`${guildId}:*all*`);
+			res.json({ ok: true });
+		}
+	);
 
 	// GET /:guildId/characters/count — nombre total de personnages du serveur (admin uniquement)
 	router.get("/count", requireAuth, requireAdmin, async (req: Request, res: Response) => {

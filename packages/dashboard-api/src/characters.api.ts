@@ -14,6 +14,10 @@ export const charactersApi = {
 		api.get<Blob>(`/guilds/${guildId}/characters/export`, { responseType: "blob" }),
 	refresh: (guildId: string) =>
 		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/refresh`),
+	refreshDashboard: (guildId: string) =>
+		api.post<{ ok: boolean; refreshedAll: boolean }>(
+			`/guilds/${guildId}/characters/refresh-dashboard`
+		),
 	bulkDelete: (guildId: string) =>
 		api.post<{ ok: boolean }>(`/guilds/${guildId}/characters/bulk-delete`),
 };

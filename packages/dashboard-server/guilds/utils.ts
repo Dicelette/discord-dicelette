@@ -121,6 +121,48 @@ export async function userCanManageGuild(
 }
 
 /**
+ * Vérifie si un utilisateur peut rafraîchir les fiches de tout le serveur.
+ * Autorisé si l'utilisateur a au moins une permission parmi:
+ * - Administrator
+ * - Manage Guild
+ * - Manage Roles
+ */
+export async function userCanRefreshServerCharacters(
+	userId: string,
+	guildId: string,
+	botGuilds: DashboardDeps["botGuilds"]
+): Promise<boolean> {
+	const cacheKey = `refresh:${userId}:${guildId}`;
+	const cached = permCache.get(cacheKey);
+	if (cached && Date.now() < cached.expiresAt) return cached.result;
+
+	const guild = botGuilds.get(guildId);
+	if (!guild) {
+		permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+		return false;
+	}
+
+	try {
+		const member = await guild.fetchMember(userId);
+		if (!member) {
+			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
+			return false;
+		}
+		const Administrator = BigInt(0x8);
+		const ManageGuild = BigInt(0x20);
+		const ManageRoles = BigInt(0x10000000);
+		const result =
+			member.hasPermission(Administrator) ||
+			member.hasPermission(ManageGuild) ||
+			member.hasPermission(ManageRoles);
+		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
+		return result;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Vérifie si un utilisateur peut gérer un serveur via son token OAuth.
  * Utilisé pour les serveurs où le bot n'est pas encore présent (ex. /invite),
  * car le token bot ne peut pas récupérer les membres de serveurs non rejoints.

@@ -50,7 +50,7 @@ export interface BotMember {
 export interface BotGuild {
 	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
 	fetchMember: (userId: string) => Promise<BotMember | null>;
-	/** Fetch the user's Discord profile name (global name > username) */
+	/** Fetch the user's Discord handle (pomelo), formatted as @username */
 	fetchMemberName: (userId: string) => Promise<string | null>;
 	/** All channels in the guild (all types, let the caller filter) */
 	readonly channels: ReadonlyArray<{ id: string; name: string; type: number }>;
