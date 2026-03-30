@@ -11,6 +11,16 @@ import {
 	userCanRefreshServerCharacters,
 } from "./utils";
 
+/**
+ * Détecte une URL Discord CDN dont les paramètres d'expiration ont été supprimés
+ * par cleanAvatarUrl(). Ces URLs sont invalides car Discord requiert les params
+ * ?ex=...&is=...&hm=... pour les fichiers attachés depuis 2023.
+ */
+function isStaleDiscordCdnUrl(url: string | null): boolean {
+	if (!url) return false;
+	return /(cdn|media)\.discordapp\.(net|com)/i.test(url) && !url.includes("?");
+}
+
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
 	const router = Router({ mergeParams: true });
@@ -86,15 +96,16 @@ export function createCharactersRouter(deps: DashboardDeps) {
 								value,
 							}));
 					}
-					if (stats === null || damage === null || avatar === null) {
-						// Fallback : données manquantes — récupère depuis les embeds Discord
+					const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
+					if (stats === null || damage === null || avatar === null || hasStaleAvatar) {
+						// Fallback : données manquantes ou URL CDN expirée — récupère depuis les embeds Discord
 						try {
 							const fetched = await fetchCharacterEmbeds(
 								channelId,
 								messageId,
 								botChannels
 							);
-							avatar = avatar ?? fetched.avatar;
+							if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
 							stats = stats ?? fetched.stats;
 							damage = damage ?? fetched.damage;
 						} catch {
@@ -225,14 +236,15 @@ export function createCharactersRouter(deps: DashboardDeps) {
 								value,
 							}));
 
-						if (stats === null || damage === null || avatar === null) {
+						const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
+						if (stats === null || damage === null || avatar === null || hasStaleAvatar) {
 							try {
 								const fetched = await fetchCharacterEmbeds(
 									channelId,
 									messageId,
 									botChannels
 								);
-								avatar = avatar ?? fetched.avatar;
+								if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
 								stats = stats ?? fetched.stats;
 								damage = damage ?? fetched.damage;
 							} catch {

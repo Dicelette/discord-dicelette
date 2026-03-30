@@ -5,8 +5,14 @@ import {
 	userApi,
 } from "@dicelette/dashboard-api";
 import type { ApiGuildData } from "@dicelette/types";
+import { keyframes } from "@emotion/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RefreshIcon from "@mui/icons-material/Refresh";
+
+const spinAnimation = keyframes`
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+`;
 import {
 	Alert,
 	Box,
@@ -51,6 +57,7 @@ export default function Dashboard() {
 	const [saving, setSaving] = useState(false);
 	const [saveSuccess, setSaveSuccess] = useState(false);
 	const [refreshingCharacters, setRefreshingCharacters] = useState(false);
+	const [refreshSuccess, setRefreshSuccess] = useState(false);
 	const [charactersRefreshToken, setCharactersRefreshToken] = useState(0);
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [roles, setRoles] = useState<Role[]>([]);
@@ -114,9 +121,12 @@ export default function Dashboard() {
 		if (!guildId) return;
 		setRefreshingCharacters(true);
 		setError(null);
+		setRefreshSuccess(false);
 		try {
 			await charactersApi.refreshDashboard(guildId);
 			setCharactersRefreshToken((prev) => prev + 1);
+			setRefreshSuccess(true);
+			setTimeout(() => setRefreshSuccess(false), 3000);
 		} catch {
 			setError(t("dashboard.refreshCharactersError"));
 		} finally {
@@ -160,8 +170,9 @@ export default function Dashboard() {
 						>
 							<RefreshIcon
 								sx={{
-									transition: "transform 0.4s",
-									transform: refreshingCharacters ? "rotate(360deg)" : "none",
+									animation: refreshingCharacters
+										? `${spinAnimation} 0.8s linear infinite`
+										: "none",
 								}}
 							/>
 						</IconButton>
@@ -177,6 +188,11 @@ export default function Dashboard() {
 			{saveSuccess && (
 				<Alert severity="success" sx={{ mb: 3 }}>
 					{t("dashboard.saveSuccess")}
+				</Alert>
+			)}
+			{refreshSuccess && (
+				<Alert severity="success" sx={{ mb: 3 }} onClose={() => setRefreshSuccess(false)}>
+					{t("dashboard.refreshCharactersSuccess")}
 				</Alert>
 			)}
 

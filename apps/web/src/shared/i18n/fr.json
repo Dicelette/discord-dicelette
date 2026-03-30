@@ -84,6 +84,7 @@
 		"loadError": "Impossible de charger la configuration.",
 		"refreshCharacters": "Actualiser les personnages",
 		"refreshCharactersError": "Impossible d'actualiser les personnages.",
+		"refreshCharactersSuccess": "Personnages actualisés !",
 		"refreshCharactersTooltip": "Rafraîchir les données des personnages.",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",

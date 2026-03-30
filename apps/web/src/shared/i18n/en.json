@@ -84,6 +84,7 @@
 		"loadError": "Could not load configuration.",
 		"refreshCharacters": "Refresh characters",
 		"refreshCharactersError": "Could not refresh characters.",
+		"refreshCharactersSuccess": "Characters refreshed!",
 		"refreshCharactersTooltip": "Refreshes characters data.",
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
