@@ -171,7 +171,7 @@ export default function Dashboard() {
 							<RefreshIcon
 								sx={{
 									animation: refreshingCharacters
-										? `${spinAnimation} 0.8s linear infinite`
+										? `${spinAnimation} 1.4s linear infinite`
 										: "none",
 								}}
 							/>
