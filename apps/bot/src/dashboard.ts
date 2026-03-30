@@ -64,7 +64,15 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		},
 		botChannels: {
 			fetchMessage: async (channelId, messageId) => {
-				const channel = client.channels.cache.get(channelId);
+				let channel: Djs.Channel | null | undefined =
+					client.channels.cache.get(channelId);
+				if (!channel) {
+					try {
+						channel = await client.channels.fetch(channelId);
+					} catch {
+						return null;
+					}
+				}
 				if (!channel?.isTextBased()) return null;
 				try {
 					const msg =
@@ -86,7 +94,15 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				}
 			},
 			deleteMessage: async (channelId, messageId) => {
-				const channel = client.channels.cache.get(channelId);
+				let channel: Djs.Channel | null | undefined =
+					client.channels.cache.get(channelId);
+				if (!channel) {
+					try {
+						channel = await client.channels.fetch(channelId);
+					} catch {
+						return false;
+					}
+				}
 				if (!channel?.isTextBased()) return false;
 				try {
 					const msg =
