@@ -1,9 +1,5 @@
-// ---------------------------------------------------------------------------
-// Utilitaires internes pour les routes /guilds
-// ---------------------------------------------------------------------------
-
 import type { Request, Response } from "express";
-import type { BotChannels, DashboardDeps } from "..";
+import type { BotChannels, DashboardDeps } from "./index";
 import {
 	DISCORD_API,
 	type EmbedField,
@@ -15,9 +11,28 @@ import {
 	USER_EMBED_MARKERS,
 } from "./types";
 
-// ---------------------------------------------------------------------------
-// Helpers de validation
-// ---------------------------------------------------------------------------
+/**
+ * Détecte une URL Discord CDN dont les paramètres d'expiration ont été supprimés
+ * par cleanAvatarUrl(). Ces URLs sont invalides car Discord requiert les params
+ * ?ex=...&is=...&hm=... pour les fichiers attachés depuis 2023.
+ */
+export function isStaleDiscordCdnUrl(url: string | null): boolean {
+	if (!url) return false;
+	return /(cdn|media)\.discordapp\.(net|com)/i.test(url) && !url.includes("?");
+}
+
+/** Wraps a promise with a hard timeout; rejects with an Error if not resolved in time. */
+export async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+	let timer: ReturnType<typeof setTimeout>;
+	const timeout = new Promise<never>((_, reject) => {
+		timer = setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms);
+	});
+	try {
+		return await Promise.race([promise, timeout]);
+	} finally {
+		clearTimeout(timer!);
+	}
+}
 
 export function isValidSnowflake(id: string): boolean {
 	return SNOWFLAKE_RE.test(id);
@@ -47,10 +62,6 @@ export function validateEntries(
 	return { valid, errors };
 }
 
-// ---------------------------------------------------------------------------
-// Middlewares
-// ---------------------------------------------------------------------------
-
 export function requireAuth(req: Request, res: Response, next: () => void) {
 	if (!req.session?.userId) {
 		res.status(401).json({ error: "Not authenticated" });
@@ -76,10 +87,6 @@ export function makeRequireAdmin(botGuilds: DashboardDeps["botGuilds"]) {
 		next();
 	};
 }
-
-// ---------------------------------------------------------------------------
-// Vérification des permissions
-// ---------------------------------------------------------------------------
 
 /**
  * Vérifie si un utilisateur peut gérer un serveur via le cache Discord.js du bot.
@@ -207,10 +214,6 @@ export async function userCanManageGuildViaOAuth(
 		return false;
 	}
 }
-
-// ---------------------------------------------------------------------------
-// Helpers embeds Discord
-// ---------------------------------------------------------------------------
 
 export function classifyEmbed(embed: RawEmbed): "user" | "stats" | "damage" | null {
 	const title = (embed.title ?? "").toLowerCase();

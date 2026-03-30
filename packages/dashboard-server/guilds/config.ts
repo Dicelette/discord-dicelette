@@ -2,7 +2,7 @@ import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "..";
-import { makeRequireAdmin, requireAuth } from "./utils";
+import { makeRequireAdmin, requireAuth } from "../utils";
 
 export function createConfigRouter(deps: DashboardDeps) {
 	const { settings, botGuilds } = deps;

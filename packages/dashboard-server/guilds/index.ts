@@ -1,11 +1,11 @@
 import { Router } from "express";
 import type { DashboardDeps } from "..";
+import { isValidSnowflake } from "../utils";
 import { createChannelsRouter } from "./channels";
 import { createCharactersRouter } from "./characters";
 import { createConfigRouter } from "./config";
 import { createTemplateRouter } from "./template";
 import { createUserRouter } from "./user";
-import { isValidSnowflake } from "./utils";
 
 export function createGuildRouter(deps: DashboardDeps) {
 	const router = Router();

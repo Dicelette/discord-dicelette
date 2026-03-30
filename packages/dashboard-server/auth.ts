@@ -2,14 +2,20 @@ import { randomBytes } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
 
-// Stricter rate limit specifically for the refresh endpoint (5 req/min per user).
-// The outer auth router already has a 10/min limit from index.ts; this adds
-// an additional guard so spamming refresh can't exhaust Discord OAuth calls
-// even if the general limit is raised in the future.
+/*
+ * Stricter rate limit specifically for the refresh endpoint (5 req/min per user).
+ * The outer auth router already has a 10/min limit from index.ts; this adds an additional guard so spamming refresh can't exhaust Discord OAuth calls even if the general limit is raised in the future.
+ */
 function makeRefreshRateLimit() {
 	const buckets = new Map<string, number[]>();
 	const Max = 5;
 	const WindowMs = 60_000;
+	setInterval(() => {
+		const cutoff = Date.now() - WindowMs;
+		for (const [key, hits] of buckets) {
+			if (hits.every((t) => t <= cutoff)) buckets.delete(key);
+		}
+	}, WindowMs).unref();
 	return (req: Request, res: Response, next: NextFunction): void => {
 		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
 		const now = Date.now();
@@ -129,8 +135,8 @@ export function createAuthRouter(
 			});
 
 			if (!tokenRes.ok) {
-				const err = await tokenRes.text();
-				console.error("Token exchange failed:", tokenRes.status, err);
+				await tokenRes.text();
+				console.error("[auth] Token exchange failed: HTTP", tokenRes.status);
 				res.status(500).json({ error: "Token exchange failed" });
 				return;
 			}
@@ -158,7 +164,10 @@ export function createAuthRouter(
 			const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:5173";
 			res.redirect(frontendUrl);
 		} catch (err) {
-			console.error("OAuth callback error:", err);
+			console.error(
+				"[auth] OAuth callback error:",
+				err instanceof Error ? err.message : String(err)
+			);
 			res.status(500).json({ error: "Authentication failed" });
 		}
 	});
@@ -227,7 +236,10 @@ export function createAuthRouter(
 
 			res.json(filteredGuilds);
 		} catch (err) {
-			console.error("Guilds fetch error:", err);
+			console.error(
+				"[auth] Guilds fetch error:",
+				err instanceof Error ? err.message : String(err)
+			);
 			res.status(500).json({ error: "Failed to fetch guilds" });
 		}
 	});
