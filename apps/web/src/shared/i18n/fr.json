@@ -109,10 +109,12 @@
 		"addBotTitle": "Ajouter Dicelette",
 		"botPresent": "Dicelette est présent",
 		"loadError": "Impossible de charger les serveurs.",
+		"noSearchResults": "Aucun serveur ne correspond à votre recherche.",
 		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
 		"rateLimitError": "Trop de requêtes. Veuillez patienter avant d'actualiser à nouveau.",
 		"refresh": "Actualiser",
 		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
+		"searchPlaceholder": "Rechercher un serveur...",
 		"subtitle": "Sélectionnez un serveur pour gérer sa configuration.",
 		"title": "Vos serveurs"
 	},

@@ -1,5 +1,5 @@
 import { authApi, type DiscordGuild, guildApi } from "@dicelette/dashboard-api";
-import { Add, Refresh, Settings } from "@mui/icons-material";
+import { Add, Refresh, Search, Settings } from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -12,6 +12,8 @@ import {
 	CircularProgress,
 	Divider,
 	Grid,
+	InputAdornment,
+	TextField,
 	Tooltip,
 	Typography,
 } from "@mui/material";
@@ -21,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
+	const [search, setSearch] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -59,8 +62,21 @@ export default function Servers() {
 		}
 	};
 
-	const botGuilds = guilds.filter((g) => g.botPresent);
-	const adminGuilds = guilds.filter((g) => !g.botPresent);
+	const botGuilds = guilds
+		.filter((g) => g.botPresent)
+		.sort((a, b) => {
+			//on va trier par ordre alphabétique wtf
+			return a.name.localeCompare(b.name);
+		});
+	const adminGuilds = guilds
+		.filter((g) => !g.botPresent)
+		.sort((a, b) => a.name.localeCompare(b.name));
+
+	const normalizedSearch = search.standardize();
+	const matchesSearch = (guild: DiscordGuild) =>
+		normalizedSearch.length === 0 || guild.name.subText(normalizedSearch);
+	const filteredBotGuilds = botGuilds.filter(matchesSearch);
+	const filteredAdminGuilds = adminGuilds.filter(matchesSearch);
 
 	const getGuildIcon = (guild: DiscordGuild) =>
 		guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : null;
@@ -90,27 +106,76 @@ export default function Servers() {
 
 	return (
 		<Box className="max-w-4xl mx-auto p-6">
-			<Box className="flex items-center justify-between" sx={{ mb: 1 }}>
-				<Typography variant="h4" fontWeight={700}>
-					{t("servers.title")}
-				</Typography>
-				<Tooltip title={t("servers.refreshTooltip")}>
-					<span>
-						<Button
-							size="small"
-							variant="outlined"
-							startIcon={refreshing ? <CircularProgress size={14} /> : <Refresh />}
-							onClick={handleRefresh}
-							disabled={refreshing || loading}
-						>
-							{t("servers.refresh")}
-						</Button>
-					</span>
-				</Tooltip>
+			<Box
+				sx={{
+					display: "flex",
+					flexDirection: "column",
+					mb: 4,
+					gap: { xs: 2, md: 0 },
+				}}
+			>
+				<Box
+					sx={{
+						display: "flex",
+						flexDirection: { xs: "column", sm: "row" },
+						justifyContent: "space-between",
+						alignItems: { xs: "stretch", sm: "flex-start" },
+						gap: 2,
+					}}
+				>
+					<Typography variant="h4" fontWeight={700}>
+						{t("servers.title")}
+					</Typography>
+					<Box
+						sx={{ display: "flex", justifyContent: { xs: "flex-start", sm: "flex-end" } }}
+					>
+						<Tooltip title={t("servers.refreshTooltip")}>
+							<span>
+								<Button
+									size="small"
+									variant="outlined"
+									startIcon={refreshing ? <CircularProgress size={14} /> : <Refresh />}
+									onClick={handleRefresh}
+									disabled={refreshing || loading}
+								>
+									{t("servers.refresh")}
+								</Button>
+							</span>
+						</Tooltip>
+					</Box>
+				</Box>
+
+				<Box
+					sx={{
+						display: "flex",
+						flexDirection: { xs: "column", sm: "row" },
+						justifyContent: "space-between",
+						alignItems: { xs: "stretch", sm: "center" },
+						gap: 2,
+					}}
+				>
+					<Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+						{t("servers.subtitle")}
+					</Typography>
+					<TextField
+						fullWidth
+						size="small"
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						placeholder={t("servers.searchPlaceholder")}
+						sx={{ width: { xs: "100%", sm: 320 }, maxWidth: { xs: "100%", sm: 320 } }}
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<Search fontSize="small" />
+									</InputAdornment>
+								),
+							},
+						}}
+					/>
+				</Box>
 			</Box>
-			<Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-				{t("servers.subtitle")}
-			</Typography>
 
 			{error && (
 				<Alert severity="error" sx={{ mb: 3 }}>
@@ -118,13 +183,13 @@ export default function Servers() {
 				</Alert>
 			)}
 
-			{botGuilds.length > 0 && (
+			{filteredBotGuilds.length > 0 && (
 				<>
 					<Typography variant="h6" sx={{ mb: 2, opacity: 0.8 }}>
 						{t("servers.botPresent")}
 					</Typography>
 					<Grid container spacing={2} sx={{ mb: 4 }}>
-						{botGuilds.map((guild) => (
+						{filteredBotGuilds.map((guild) => (
 							<Grid
 								size={{ xs: 12, sm: 6, md: 4 }}
 								key={guild.id}
@@ -173,7 +238,7 @@ export default function Servers() {
 				</>
 			)}
 
-			{adminGuilds.length > 0 && (
+			{filteredAdminGuilds.length > 0 && (
 				<>
 					<Divider sx={{ mb: 3 }} />
 					<Typography variant="h6" sx={{ mb: 1, opacity: 0.8 }}>
@@ -183,7 +248,7 @@ export default function Servers() {
 						{t("servers.addBotDesc")}
 					</Typography>
 					<Grid container spacing={2}>
-						{adminGuilds.map((guild) => (
+						{filteredAdminGuilds.map((guild) => (
 							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id}>
 								<Card sx={{ opacity: 0.7 }}>
 									<CardContent className="flex items-center gap-3 p-4">
@@ -214,6 +279,13 @@ export default function Servers() {
 					</Grid>
 				</>
 			)}
+
+			{guilds.length > 0 &&
+				normalizedSearch.length > 0 &&
+				filteredBotGuilds.length === 0 &&
+				filteredAdminGuilds.length === 0 && (
+					<Alert severity="info">{t("servers.noSearchResults")}</Alert>
+				)}
 
 			{!loading && guilds.length === 0 && (
 				<Alert severity="info">{t("servers.noServers")}</Alert>
