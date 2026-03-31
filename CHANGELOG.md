@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.2.0](https://github.com/Dicelette/discord-dicelette/compare/3.1.1...3.2.0) (2026-03-31)
+
+
+### Features
+
+* **config:** update Vite configuration for optimization and build settings ([d9efc64](https://github.com/Dicelette/discord-dicelette/commit/d9efc646a23612de363fb8a5bf586c7c9091db8b))
+* **dice:** add 'ul' parameter to various functions for improved error handling ([684328d](https://github.com/Dicelette/discord-dicelette/commit/684328da037a74e45023dd74841686474f13b739))
+
 ## [3.1.1](https://github.com/Dicelette/discord-dicelette/compare/3.1.0...3.1.1) (2026-03-31)
 
 
