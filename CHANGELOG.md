@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.4.0](https://github.com/Dicelette/discord-dicelette/compare/3.3.0...3.4.0) (2026-03-31)
+
+
+### Features
+
+* **snippets:** enhance error handling and validation messages for snippets ([85edb0e](https://github.com/Dicelette/discord-dicelette/commit/85edb0eb60cba7d3fcd339dc7e8fd3a9d5317ce9))
+
+
+### Bug Fixes
+
+* **csp:** allow data URI fonts and external HTTPS images ([ea2cbf8](https://github.com/Dicelette/discord-dicelette/commit/ea2cbf8a82c26f0853da168686ac90a3b2236852))
+* should throw error on undefined roll ([9add0bf](https://github.com/Dicelette/discord-dicelette/commit/9add0bf324a921fb0a5fec72ac25a93f10775258))
+
 ## [3.3.0](https://github.com/Dicelette/discord-dicelette/compare/3.2.0...3.3.0) (2026-03-31)
 
 
