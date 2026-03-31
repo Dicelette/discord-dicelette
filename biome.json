@@ -21,7 +21,8 @@
 			"!!**/coverage",
 			"!!**/build",
 			"!!**/.github",
-			"!!**/assets"
+			"!!**/assets",
+			"!!**/playwright-report"
 		],
 		"ignoreUnknown": true
 	},
