@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.5.0](https://github.com/Dicelette/discord-dicelette/compare/3.4.1...3.5.0) (2026-03-31)
+
+
+### Features
+
+* **dashboard:** add role-based dashboard access restrictions ([8aa5672](https://github.com/Dicelette/discord-dicelette/commit/8aa5672d18ae26268f1b1483d721e78bedc12643))
+
+
+### Bug Fixes
+
+* **dashboard:** role removal, admin chip, strict admin restriction ([48017b3](https://github.com/Dicelette/discord-dicelette/commit/48017b312fdd71198c2a89d7ff10f6d19c5a0b34))
+* **dashboard:** show all bot-present guilds in server list ([8d0711b](https://github.com/Dicelette/discord-dicelette/commit/8d0711beee021413bc6904e60e83d79b8df44038))
+
 ## [3.4.1](https://github.com/Dicelette/discord-dicelette/compare/3.4.0...3.4.1) (2026-03-31)
 
 
