@@ -5,7 +5,6 @@ export interface Channel {
 	id: string;
 	name: string;
 	type: number;
-	// biome-ignore lint/style/useNamingConvention: Say that to discord
 	parent_id?: string | null;
 }
 export interface ConfigFormProps {

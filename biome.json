@@ -131,7 +131,11 @@
 		{ "includes": ["**/*.js", "!**/node_modules/**"] },
 		{ "includes": ["**/*.json", "!**/node_modules/**"] },
 		{
-			"includes": ["**/web/src/**/*.{ts,tsx}", "!**/node_modules/**"],
+			"includes": [
+				"**/web/src/**/*.{ts,tsx}",
+				"!**/node_modules/**",
+				"**/*.test.{ts,tsx}"
+			],
 			"linter": {
 				"rules": {
 					"style": {
