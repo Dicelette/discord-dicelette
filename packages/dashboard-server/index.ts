@@ -217,7 +217,7 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	app.use(
 		"/api/auth",
 		makeRateLimit(60, 60_000),
-		createAuthRouter(deps.botGuilds, deps.guildEvents, deps.settings)
+		createAuthRouter(deps.botGuilds, deps.guildEvents)
 	);
 	// Guild data routes: 120 req/min per user — protects Discord.js member fetches and settings writes
 	app.use("/api/guilds", makeRateLimit(120, 60_000), createGuildRouter(deps));

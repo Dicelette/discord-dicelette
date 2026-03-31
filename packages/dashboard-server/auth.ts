@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from "./index";
 
 /*
  * Stricter rate limit specifically for the refresh endpoint (5 req/min per user).
@@ -87,9 +86,8 @@ const userGuildCache = new Map<string, { guilds: DiscordGuild[]; expiresAt: numb
 const USER_GUILD_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function createAuthRouter(
-	botGuilds: DashboardDeps["botGuilds"],
-	guildEvents: import("node:events").EventEmitter,
-	settings: DashboardDeps["settings"]
+	botGuilds: { has: (id: string) => boolean },
+	guildEvents: import("node:events").EventEmitter
 ) {
 	const router = Router();
 
@@ -227,43 +225,18 @@ export function createAuthRouter(
 
 			const ManageGuild = BigInt(0x20);
 
-			// Pre-fetch dashboardAccess roles for guilds where the bot is present
-			// to allow role-based access (checked asynchronously below)
-			const filteredGuilds: Array<DiscordGuild & { botPresent: boolean }> = [];
-
-			for (const g of userGuilds) {
-				const botPresent = botGuilds.has(g.id);
-				const isAdmin =
-					g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
-
-				if (isAdmin || !botPresent) {
-					if (botPresent || isAdmin) {
-						filteredGuilds.push({ ...g, botPresent });
-					}
-					continue;
-				}
-
-				// Bot is present but user doesn't have ManageGuild — check dashboardAccess roles
-				const dashboardAccess = settings.get(g.id, "dashboardAccess") as
-					| string[]
-					| undefined;
-				if (dashboardAccess && dashboardAccess.length > 0) {
-					const guild = botGuilds.get(g.id);
-					if (guild) {
-						try {
-							const member = await guild.fetchMember(userId);
-							if (
-								member &&
-								member.roleIds.some((roleId) => dashboardAccess.includes(roleId))
-							) {
-								filteredGuilds.push({ ...g, botPresent: true });
-							}
-						} catch {
-							// Member fetch failed — skip this guild
-						}
-					}
-				}
-			}
+			// All guilds where the bot is present are shown (users can always
+			// access their personal config). Guilds without the bot are shown
+			// only if the user has ManageGuild (to offer the "add bot" flow).
+			const filteredGuilds = userGuilds
+				.filter((g) => {
+					const botPresent = botGuilds.has(g.id);
+					if (botPresent) return true;
+					const isAdmin =
+						g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
+					return isAdmin;
+				})
+				.map((g) => ({ ...g, botPresent: botGuilds.has(g.id) }));
 
 			res.json(filteredGuilds);
 		} catch (err) {
