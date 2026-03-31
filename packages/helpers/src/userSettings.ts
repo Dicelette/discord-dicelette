@@ -180,7 +180,8 @@ export function validateSnippetEntry(
 			attributes
 		);
 		const formula = substituted.formula.replace(/\s*%%.*%%\s*/g, "").trim();
-		roll(formula);
+		const r = roll(formula);
+		if (!r) return { error: content, ok: false };
 		return { ok: true, value: content };
 	} catch {
 		return { error: content, ok: false };
