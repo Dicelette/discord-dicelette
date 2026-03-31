@@ -65,10 +65,14 @@
 			"stripOocRegexPreview": "Regex générée : {regex}",
 			"stripOocSuffix": "Suffixe",
 			"stripOocThreadMode": "Mode fil (ignore le channel global)",
-			"timestamp": "Afficher l'horodatage dans les logs"
+			"timestamp": "Afficher l'horodatage dans les logs",
+			"dashboardAccess": "Rôles autorisés",
+			"dashboardAccessHelper": "Seuls les utilisateurs possédant l'un de ces rôles pourront accéder au panneau d'administration du dashboard. Les administrateurs ont toujours accès.",
+			"dashboardAccessWarning": "Attention : lorsque cette option est active, les utilisateurs ayant la permission « Gérer le serveur » n'auront plus accès au dashboard par défaut. N'oubliez pas de leur assigner l'un des rôles sélectionnés."
 		},
 		"sections": {
 			"channels": "Canaux",
+			"dashboardAccess": "Restriction d'accès au dashboard",
 			"diceBehaviour": "Comportement des dés",
 			"general": "Langue & Général",
 			"hiddenRolls": "Résultats cachés (MJ)",

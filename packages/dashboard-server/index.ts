@@ -51,6 +51,8 @@ export function makeRateLimit(max: number, windowMs: number) {
 export interface BotMember {
 	/** Returns true if the member's effective permissions include the given bitfield flag */
 	hasPermission: (flag: bigint) => boolean;
+	/** IDs of all roles assigned to this member */
+	readonly roleIds: string[];
 }
 
 /** A guild accessible through the bot's Discord.js client cache */
@@ -215,7 +217,7 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	app.use(
 		"/api/auth",
 		makeRateLimit(60, 60_000),
-		createAuthRouter(deps.botGuilds, deps.guildEvents)
+		createAuthRouter(deps.botGuilds, deps.guildEvents, deps.settings)
 	);
 	// Guild data routes: 120 req/min per user — protects Discord.js member fetches and settings writes
 	app.use("/api/guilds", makeRateLimit(120, 60_000), createGuildRouter(deps));

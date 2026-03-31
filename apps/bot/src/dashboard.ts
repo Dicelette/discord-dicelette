@@ -27,6 +27,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
 							return {
 								hasPermission: (flag: bigint) => (m.permissions.bitfield & flag) !== 0n,
+								roleIds: [...m.roles.cache.keys()],
 							};
 						} catch {
 							return null;

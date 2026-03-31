@@ -97,6 +97,13 @@ export interface GuildData {
 	 * @default undefined
 	 */
 	sortOrder?: SortOrder;
+	/**
+	 * List of role IDs that grant access to the dashboard admin panel.
+	 * When set (non-empty), only users with one of these roles can access admin config.
+	 * ManageGuild permission alone is no longer sufficient; Administrator still works.
+	 * Dashboard-only setting — has no effect on the Discord bot itself.
+	 */
+	dashboardAccess?: string[];
 }
 
 export interface TemplateResult {

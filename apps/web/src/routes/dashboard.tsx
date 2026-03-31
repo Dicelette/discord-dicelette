@@ -253,6 +253,7 @@ export default function Dashboard() {
 						onSave={handleSave}
 						saving={saving}
 						channels={channels}
+						roles={roles}
 					/>
 				</Box>
 			)}

@@ -1,4 +1,5 @@
 export { default as Channels } from "./Channels.tsx";
+export { default as DashboardAccess } from "./DashboardAccess.tsx";
 export { default as DiceBehaviour } from "./DiceBehaviour.tsx";
 export { default as General } from "./General.tsx";
 export { default as HiddenRolls } from "./HiddenRolls.tsx";

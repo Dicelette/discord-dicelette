@@ -9,7 +9,7 @@ import { makeRequireAdmin, requireAuth } from "../utils";
 export function createTemplateRouter(deps: DashboardDeps) {
 	const { settings, template, botChannels, botGuilds } = deps;
 	const router = Router({ mergeParams: true });
-	const requireAdmin = makeRequireAdmin(botGuilds);
+	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
 	// GET /guildId/template — récupère le template statistique du serveur (admin uniquement)
 	router.get("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {

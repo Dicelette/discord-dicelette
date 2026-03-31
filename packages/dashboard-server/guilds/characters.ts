@@ -17,7 +17,7 @@ import {
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
 	const router = Router({ mergeParams: true });
-	const requireAdmin = makeRequireAdmin(botGuilds);
+	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
 	// GET /:guildId/characters — fiches du joueur courant (avec cache)
 	router.get("/", requireAuth, async (req: Request, res: Response) => {

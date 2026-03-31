@@ -7,9 +7,9 @@ import { makeRequireAdmin, requireAuth, userCanManageGuildViaOAuth } from "../ut
 GET /guildId/channels
 */
 export function createChannelsRouter(deps: DashboardDeps) {
-	const { botGuilds } = deps;
+	const { botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
-	const requireAdmin = makeRequireAdmin(botGuilds);
+	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
 	// GET /guildId/channels
 	router.get(

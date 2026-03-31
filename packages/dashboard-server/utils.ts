@@ -1,3 +1,4 @@
+import type { Settings } from "@dicelette/types";
 import type { Request, Response } from "express";
 import type { BotChannels, DashboardDeps } from "./index";
 import {
@@ -72,14 +73,18 @@ export function requireAuth(req: Request, res: Response, next: () => void) {
 
 /**
  * Middleware factory qui vérifie que l'utilisateur courant dispose des droits
- * « Manage Guild » ou « Administrator » via le cache Discord.js bot.
+ * « Manage Guild » ou « Administrator » via le cache Discord.js bot,
+ * ou possède un des rôles listés dans `dashboardAccess` (si configuré).
  * À instancier une fois dans le router et à réutiliser sur les routes admin.
  */
-export function makeRequireAdmin(botGuilds: DashboardDeps["botGuilds"]) {
+export function makeRequireAdmin(
+	botGuilds: DashboardDeps["botGuilds"],
+	settings: Settings
+) {
 	return async (req: Request, res: Response, next: () => void) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
-		const canManage = await userCanManageGuild(userId, guildId, botGuilds);
+		const canManage = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });
 			return;
@@ -90,15 +95,22 @@ export function makeRequireAdmin(botGuilds: DashboardDeps["botGuilds"]) {
 
 /**
  * Vérifie si un utilisateur peut gérer un serveur via le cache Discord.js du bot.
- * Utilise `member.permissions` (permissions effectives calculées) pour éviter
- * un appel séparé à l'API des rôles.
+ *
+ * Quand `dashboardAccess` est configuré (non-vide) dans les settings du serveur,
+ * seuls les utilisateurs possédant l'un de ces rôles (ou la permission Administrator)
+ * ont accès. La permission ManageGuild seule ne suffit plus.
+ *
+ * Sans `dashboardAccess`, le comportement par défaut est conservé :
+ * ManageGuild ou Administrator.
+ *
  * Les résultats sont mis en cache 5 minutes pour limiter les appels à
  * `guild.fetchMember()`.
  */
 export async function userCanManageGuild(
 	userId: string,
 	guildId: string,
-	botGuilds: DashboardDeps["botGuilds"]
+	botGuilds: DashboardDeps["botGuilds"],
+	settings?: Settings
 ): Promise<boolean> {
 	const cacheKey = `${userId}:${guildId}`;
 	const cached = permCache.get(cacheKey);
@@ -116,10 +128,29 @@ export async function userCanManageGuild(
 			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
 			return false;
 		}
-		const ManageGuild = BigInt(0x20);
+
 		const Administrator = BigInt(0x8);
-		const result =
-			member.hasPermission(ManageGuild) || member.hasPermission(Administrator);
+
+		// Administrator always has access regardless of dashboardAccess
+		if (member.hasPermission(Administrator)) {
+			permCache.set(cacheKey, { result: true, expiresAt: Date.now() + PERM_CACHE_TTL });
+			return true;
+		}
+
+		const dashboardAccess = settings?.get(guildId, "dashboardAccess") as
+			| string[]
+			| undefined;
+
+		let result: boolean;
+		if (dashboardAccess && dashboardAccess.length > 0) {
+			// When dashboardAccess is set, only users with one of those roles have access
+			result = member.roleIds.some((roleId) => dashboardAccess.includes(roleId));
+		} else {
+			// Default: ManageGuild grants access
+			const ManageGuild = BigInt(0x20);
+			result = member.hasPermission(ManageGuild);
+		}
+
 		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
 		return result;
 	} catch {

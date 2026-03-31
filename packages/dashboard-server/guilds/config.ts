@@ -2,12 +2,13 @@ import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "..";
+import { permCache } from "../types";
 import { makeRequireAdmin, requireAuth } from "../utils";
 
 export function createConfigRouter(deps: DashboardDeps) {
 	const { settings, botGuilds } = deps;
 	const router = Router({ mergeParams: true });
-	const requireAdmin = makeRequireAdmin(botGuilds);
+	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
 	// GET /:guildId/config
 	router.get("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
@@ -52,9 +53,22 @@ export function createConfigRouter(deps: DashboardDeps) {
 			"sortOrder",
 			"stripOOC",
 			"createLinkTemplate",
+			"dashboardAccess",
 		];
 
 		const updates = req.body as Record<string, unknown>;
+
+		// Validate dashboardAccess: must be an array of strings (role IDs)
+		if ("dashboardAccess" in updates && updates.dashboardAccess != null) {
+			if (
+				!Array.isArray(updates.dashboardAccess) ||
+				!updates.dashboardAccess.every((id: unknown) => typeof id === "string")
+			) {
+				res.status(400).json({ error: "dashboardAccess must be an array of role ID strings" });
+				return;
+			}
+		}
+
 		const merged: GuildData = { ...current };
 
 		for (const key of allowedKeys) {
@@ -68,6 +82,15 @@ export function createConfigRouter(deps: DashboardDeps) {
 		}
 
 		settings.set(guildId, merged);
+
+		// When dashboardAccess changes, invalidate permission cache for this guild
+		// so access checks immediately reflect the new role list
+		if ("dashboardAccess" in updates) {
+			for (const key of permCache.keys()) {
+				if (key.endsWith(`:${guildId}`)) permCache.delete(key);
+			}
+		}
+
 		res.json({ ok: true });
 	});
 

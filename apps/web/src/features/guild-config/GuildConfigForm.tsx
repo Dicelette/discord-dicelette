@@ -1,11 +1,19 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
-import { type Channel, ConfigFormFooter, useConfigForm, useI18n } from "@shared";
+import { type Channel, ConfigFormFooter, type Role, useConfigForm, useI18n } from "@shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TemplateState } from "../user-config/types";
 import Links from "../user-config/ui/sections/Links";
 import { DEFAULT_TEMPLATE } from "../user-config/utils";
-import { Channels, DiceBehaviour, General, HiddenRolls, Results, StripOOC } from "./ui";
+import {
+	Channels,
+	DashboardAccess,
+	DiceBehaviour,
+	General,
+	HiddenRolls,
+	Results,
+	StripOOC,
+} from "./ui";
 
 interface Props {
 	config: ApiGuildData;
@@ -13,9 +21,10 @@ interface Props {
 	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
 	saving: boolean;
 	channels: Channel[];
+	roles: Role[];
 }
 
-export default function GuildConfigForm({ config, onSave, saving, channels }: Props) {
+export default function GuildConfigForm({ config, onSave, saving, channels, roles }: Props) {
 	const { t } = useI18n();
 	const { control, handleSubmit, isDirty, reset, textChannels } = useConfigForm(
 		config,
@@ -116,6 +125,10 @@ export default function GuildConfigForm({ config, onSave, saving, channels }: Pr
 							textChannels={textChannels}
 							allChannels={channels}
 						/>
+					</Paper>
+
+					<Paper sx={{ p: 3 }}>
+						<DashboardAccess control={control} roles={roles} />
 					</Paper>
 
 					<Paper sx={{ p: 0 }}>

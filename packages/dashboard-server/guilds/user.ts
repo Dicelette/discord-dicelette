@@ -5,7 +5,7 @@ import type { DashboardDeps } from "..";
 import { requireAuth, userCanManageGuild, validateEntries } from "../utils";
 
 export function createUserRouter(deps: DashboardDeps) {
-	const { userSettings, botGuilds } = deps;
+	const { userSettings, botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
 
 	// POST /:guildId/validate-entries — validation snippets ou attributs (sans droits admin)
@@ -44,7 +44,7 @@ export function createUserRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 
-		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds);
+		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		const userConfig = userSettings.get(guildId, userId) ?? null;
 
 		res.json({ isAdmin, userConfig });
