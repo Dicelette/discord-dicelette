@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.1.0](https://github.com/Dicelette/discord-dicelette/compare/3.0.1...3.1.0) (2026-03-31)
+
+
+### Features
+
+* **auth:** implement stricter rate limiting and improve error logging ([0dc212f](https://github.com/Dicelette/discord-dicelette/commit/0dc212f545957d90a0f7160e4afc878a46b8f05a))
+* **dashboard:character:** add the refresh bouton directly on the header ([af6ff42](https://github.com/Dicelette/discord-dicelette/commit/af6ff428febaac0bc61fdb34805461f98f36a3d0))
+* **dashboard:** add server characters tab and name search filter ([b616412](https://github.com/Dicelette/discord-dicelette/commit/b6164122d422ce9679a0919f1d6f7899c610c074))
+* **dashboard:** add server characters tab and name search filter for GMs ([ea5a43a](https://github.com/Dicelette/discord-dicelette/commit/ea5a43ac2865b49ef16641d1060e021da65a1480))
+* **dashboard:** show Discord owner name on server characters, grid layout for search ([2e86b56](https://github.com/Dicelette/discord-dicelette/commit/2e86b562b5c833c90eae3d5ea4b717edc975c7c0))
+
+
+### Bug Fixes
+
+* appareance of server list ([0c8c0e3](https://github.com/Dicelette/discord-dicelette/commit/0c8c0e3b324a98ff9da692acff276900a0ec5425))
+* avatar channel ([e6cc395](https://github.com/Dicelette/discord-dicelette/commit/e6cc3956b3505408edeab4a7f3b97325d0fd621c))
+* characters 304 ([90d2948](https://github.com/Dicelette/discord-dicelette/commit/90d29482bd1a905056c21f4975165fd456c854f8))
+* characters doesn't appear on non admin ser ([ab680d1](https://github.com/Dicelette/discord-dicelette/commit/ab680d1ea05eb35fba0767d3714f85052aa0e728))
+* **dashboard:character:** avatar cache, again ([45c494a](https://github.com/Dicelette/discord-dicelette/commit/45c494a33acf7e0407a097f59829028e0071fded))
+* **dashboard:char:** user globalName instead of member name ([6dd41af](https://github.com/Dicelette/discord-dicelette/commit/6dd41af0ada7de795f05e011d88b28ebf7d6976a))
+* **dashboard:** fix server characters tab - stats/avatar, refresh button, tab order ([6c1fe36](https://github.com/Dicelette/discord-dicelette/commit/6c1fe36773d4d34bec150d90fec72650749c694e))
+* **dashboard:** slow down refresh spin animation to 1.4s ([0e3c9b1](https://github.com/Dicelette/discord-dicelette/commit/0e3c9b184831824b2a1fc317421bca009bdf6d5e))
+* **dashboard:** spinning refresh feedback and stale Discord CDN avatar fix ([4c0b418](https://github.com/Dicelette/discord-dicelette/commit/4c0b418beb28f2672071c2397e640c0c0cb9af3e))
+* **dice:** preserve parentheses when replacing stats in formulas & allow combinaison of tree stats without error ([45b57bd](https://github.com/Dicelette/discord-dicelette/commit/45b57bdbf94ef2b684a762c086aaaf853f43443e))
+* do not readonly ([0d3a96c](https://github.com/Dicelette/discord-dicelette/commit/0d3a96c5def8667db58a96f15d340377a794a6ef))
+* same ([3f94da7](https://github.com/Dicelette/discord-dicelette/commit/3f94da73cf0c4f6720593e66df87d9486b9c2e15))
+* should not display character if they are none ([7a2c7d9](https://github.com/Dicelette/discord-dicelette/commit/7a2c7d9198e92fcc19f129c5e24ffeb94e3aa6c9))
+* sort server ([06a99aa](https://github.com/Dicelette/discord-dicelette/commit/06a99aae7a434c814cd68125d6f69c0ea9d461f3))
+
 ## [3.0.1](https://github.com/Dicelette/discord-dicelette/compare/3.0.0...3.0.1) (2026-03-27)
 
 
