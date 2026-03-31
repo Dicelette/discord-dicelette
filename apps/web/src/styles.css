@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-	--ifm-font-family-base: "Atkinson Hyperlegible Next", "Inter", sans-serif;
-	--ifm-heading-font-family: "Karla", sans-serif;
+	--ifm-font-family-base: "Atkinson Hyperlegible Next Variable", "Inter", sans-serif;
+	--ifm-heading-font-family: "Karla Variable", sans-serif;
 	--bg-default: #f5f5f5;
 	--bg-paper: #ffffff;
 	--appbar-bg: #960ea5;
-	--code-font-family: "Victor Mono", monospace;
+	--code-font-family: "Victor Mono Variable", monospace;
 }
 
 @media (prefers-color-scheme: dark) {

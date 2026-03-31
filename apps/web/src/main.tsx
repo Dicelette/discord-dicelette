@@ -1,6 +1,6 @@
-import "@fontsource/atkinson-hyperlegible-next";
-import "@fontsource/iosevka-charon";
-import "@fontsource-variable/victor-mono";
+import "@fontsource-variable/atkinson-hyperlegible-next/wght.css";
+import "@fontsource-variable/victor-mono/wght.css";
+import "@fontsource-variable/karla/wght.css";
 import { CssBaseline, createTheme, ThemeProvider } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -9,9 +9,29 @@ import App from "./App";
 import { AuthProvider, I18nProvider } from "./providers";
 import "./styles.css";
 
+const headingFont = { fontFamily: '"Karla Variable", "Inter", sans-serif' };
+
 const theme = createTheme({
 	typography: {
-		fontFamily: '"Atkinson Hyperlegible Next", "Inter", sans-serif',
+		fontFamily: '"Atkinson Hyperlegible Next Variable", "Inter", sans-serif',
+		h1: {
+			headingFont,
+		},
+		h2: {
+			headingFont,
+		},
+		h3: {
+			headingFont,
+		},
+		h4: {
+			headingFont,
+		},
+		h5: {
+			headingFont,
+		},
+		h6: {
+			headingFont,
+		},
 	},
 	components: {
 		MuiAccordion: {
@@ -25,7 +45,7 @@ const theme = createTheme({
 		MuiInputBase: {
 			styleOverrides: {
 				input: {
-					fontFamily: '"Victor Mono", monospace',
+					fontFamily: '"Victor Mono Variable", monospace',
 				},
 			},
 		},
