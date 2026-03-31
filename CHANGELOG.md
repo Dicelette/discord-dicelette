@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.3.0](https://github.com/Dicelette/discord-dicelette/compare/3.2.0...3.3.0) (2026-03-31)
+
+
+### Bug Fixes
+
+* **dashboard:snippets:** attribute should be passed & allow snippets with it ([c1c6799](https://github.com/Dicelette/discord-dicelette/commit/c1c6799e6f1fde01b8ce0c23704cbe294d9dd06a))
+* **dashboard:** use local font instead of google for privacy & proxy ([1220b46](https://github.com/Dicelette/discord-dicelette/commit/1220b46b199f58cc53a1287ab5bebc1a456f9652))
+
 ## [3.2.0](https://github.com/Dicelette/discord-dicelette/compare/3.1.1...3.2.0) (2026-03-31)
 
 
