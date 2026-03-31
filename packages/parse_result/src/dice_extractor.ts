@@ -491,10 +491,14 @@ export function replaceStatsInDiceFormula(
 					const capitalizedStat = original.capitalize();
 					segmentStats.push(capitalizedStat);
 					statsFounds.push(capitalizedStat);
-					// Escape all regex special characters in the fullMatch (including parentheses)
+					// Preserve surrounding parentheses that the regex may have consumed (e.g. `($s1+$s2)`)
+					const prefix = fullMatch.startsWith("(") ? "(" : "";
+					const suffix = fullMatch.endsWith(")") ? ")" : "";
 					const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-					const regex = getCachedRegex(`${escapedMatch}`, "gu");
-					processedSegment = processedSegment.replace(regex, statValue.toString());
+					processedSegment = processedSegment.replace(
+						new RegExp(escapedMatch, "gu"),
+						`${prefix}${statValue}${suffix}`
+					);
 				}
 			}
 
@@ -534,10 +538,16 @@ export function replaceStatsInDiceFormula(
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
-				// Escape all regex special characters in the fullMatch (including parentheses)
+				// Preserve a dangling paren only when the regex consumed it on one side only.
+				// `($var)` → both parens consumed → drop them (just the value).
+				// `($s1` or `$s2)` → one paren consumed → keep it so `1d($s1+$s2)` → `1d(X+Y)`.
+				const prefix = fullMatch.startsWith("(") && !fullMatch.endsWith(")") ? "(" : "";
+				const suffix = fullMatch.endsWith(")") && !fullMatch.startsWith("(") ? ")" : "";
 				const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-				const regex = getCachedRegex(`${escapedMatch}`, "gu");
-				processedFormula = processedFormula.replace(regex, statValue.toString());
+				processedFormula = processedFormula.replace(
+					new RegExp(escapedMatch, "gu"),
+					`${prefix}${statValue}${suffix}`
+				);
 			}
 		}
 	}
