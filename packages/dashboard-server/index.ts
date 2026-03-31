@@ -147,10 +147,10 @@ export function startDashboardServer(deps: DashboardDeps): void {
 				[
 					"default-src 'self'",
 					"connect-src 'self' https://discord.com",
-					"img-src 'self' data: https://cdn.discordapp.com https://media.discordapp.net",
+					"img-src 'self' data: https:",
 					"script-src 'self'",
 					"style-src 'self' 'unsafe-inline'",
-					"font-src 'self'",
+					"font-src 'self' data:",
 					"frame-ancestors 'none'",
 				].join("; ")
 			);
