@@ -1,8 +1,7 @@
 import type { GuildData } from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from "..";
-import { permCache } from "../types";
+import { type DashboardDeps, permCache } from "../types";
 import { makeRequireAdmin, requireAuth } from "../utils";
 
 export function createConfigRouter(deps: DashboardDeps) {
@@ -66,7 +65,9 @@ export function createConfigRouter(deps: DashboardDeps) {
 				(!Array.isArray(updates.dashboardAccess) ||
 					!updates.dashboardAccess.every((id: unknown) => typeof id === "string"))
 			) {
-				res.status(400).json({ error: "dashboardAccess must be an array of role ID strings" });
+				res
+					.status(400)
+					.json({ error: "dashboardAccess must be an array of role ID strings" });
 				return;
 			}
 

@@ -1,7 +1,7 @@
 import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from "..";
+import type { DashboardDeps } from "../types";
 import { requireAuth, userCanManageGuild, validateEntries } from "../utils";
 
 export function createUserRouter(deps: DashboardDeps) {

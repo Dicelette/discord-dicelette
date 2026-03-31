@@ -1,5 +1,5 @@
 import { Router } from "express";
-import type { DashboardDeps } from "..";
+import type { DashboardDeps } from "../types";
 import { isValidSnowflake } from "../utils";
 import { createChannelsRouter } from "./channels";
 import { createCharactersRouter } from "./characters";

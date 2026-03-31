@@ -3,8 +3,13 @@ import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import * as Papa from "papaparse";
-import type { DashboardDeps } from "..";
-import { type ApiCharacter, CHAR_CACHE_TTL, charCache, type EmbedField } from "../types";
+import {
+	type ApiCharacter,
+	CHAR_CACHE_TTL,
+	charCache,
+	type DashboardDeps,
+	type EmbedField,
+} from "../types";
 import {
 	fetchCharacterEmbeds,
 	isStaleDiscordCdnUrl,

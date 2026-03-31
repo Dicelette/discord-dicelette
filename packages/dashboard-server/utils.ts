@@ -1,7 +1,8 @@
 import type { Settings } from "@dicelette/types";
 import type { Request, Response } from "express";
-import type { BotChannels, DashboardDeps } from "./index";
 import {
+	type BotChannels,
+	type DashboardDeps,
 	DISCORD_API,
 	type EmbedField,
 	PERM_CACHE_TTL,
@@ -275,4 +276,24 @@ export async function fetchCharacterEmbeds(
 		if (kind === "damage" && embed.fields?.length) damage = embed.fields as EmbedField[];
 	}
 	return { avatar, stats, damage };
+}
+
+export function clientId() {
+	return process.env.DISCORD_CLIENT_ID ?? process.env.CLIENT_ID;
+}
+
+export function clientSecret() {
+	return process.env.DISCORD_CLIENT_SECRET ?? process.env.CLIENT_SECRET;
+}
+
+export function redirectUri() {
+	return process.env.DISCORD_REDIRECT_URI ?? "http://localhost:3001/api/auth/callback";
+}
+
+export async function discordFetch(path: string, accessToken: string) {
+	const res = await fetch(`${DISCORD_API}${path}`, {
+		headers: { Authorization: `Bearer ${accessToken}` },
+	});
+	if (!res.ok) throw new Error(`Discord API error: ${res.status}`);
+	return res.json();
 }

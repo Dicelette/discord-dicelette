@@ -1,91 +1,22 @@
 import { randomBytes } from "node:crypto";
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from "./index";
-import { userCanManageGuild } from "./utils";
-
-/*
- * Stricter rate limit specifically for the refresh endpoint (5 req/min per user).
- * The outer auth router already has a 10/min limit from index.ts; this adds an additional guard so spamming refresh can't exhaust Discord OAuth calls even if the general limit is raised in the future.
- */
-function makeRefreshRateLimit() {
-	const buckets = new Map<string, number[]>();
-	const Max = 5;
-	const WindowMs = 60_000;
-	setInterval(() => {
-		const cutoff = Date.now() - WindowMs;
-		for (const [key, hits] of buckets) {
-			if (hits.every((t) => t <= cutoff)) buckets.delete(key);
-		}
-	}, WindowMs).unref();
-	return (req: Request, res: Response, next: NextFunction): void => {
-		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
-		const now = Date.now();
-		const cutoff = now - WindowMs;
-		const hits = (buckets.get(key) ?? []).filter((t) => t > cutoff);
-		if (hits.length >= Max) {
-			const retryAfter = Math.ceil((hits[0] - cutoff) / 1000);
-			res.setHeader("Retry-After", String(retryAfter));
-			res.status(429).json({ error: "Too many refresh requests, please slow down." });
-			return;
-		}
-		hits.push(now);
-		buckets.set(key, hits);
-		next();
-	};
-}
-
-const refreshRateLimit = makeRefreshRateLimit();
-
-const DISCORD_API = "https://discord.com/api/v10";
-const OAUTH_SCOPES = "identify guilds";
-
-function clientId() {
-	return process.env.DISCORD_CLIENT_ID ?? process.env.CLIENT_ID;
-}
-function clientSecret() {
-	return process.env.DISCORD_CLIENT_SECRET ?? process.env.CLIENT_SECRET;
-}
-function redirectUri() {
-	return process.env.DISCORD_REDIRECT_URI ?? "http://localhost:3001/api/auth/callback";
-}
-
-declare module "express-session" {
-	interface SessionData {
-		accessToken?: string;
-		refreshToken?: string;
-		userId?: string;
-		user?: DiscordUser;
-		oauthState?: string;
-	}
-}
-
-interface DiscordUser {
-	id: string;
-	username: string;
-	discriminator: string;
-	avatar: string | null;
-	global_name: string | null;
-}
-
-interface DiscordGuild {
-	id: string;
-	name: string;
-	icon: string | null;
-	owner: boolean;
-	permissions: string;
-}
-
-async function discordFetch(path: string, accessToken: string) {
-	const res = await fetch(`${DISCORD_API}${path}`, {
-		headers: { Authorization: `Bearer ${accessToken}` },
-	});
-	if (!res.ok) throw new Error(`Discord API error: ${res.status}`);
-	return res.json();
-}
-
-const userGuildCache = new Map<string, { guilds: DiscordGuild[]; expiresAt: number }>();
-const USER_GUILD_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+import { refreshRateLimit } from "./rateLimit";
+import {
+	type DashboardDeps,
+	type DiscordGuild,
+	type DiscordUser,
+	OAUTH_SCOPES,
+	USER_GUILD_CACHE_TTL_MS,
+	userGuildCache,
+} from "./types";
+import {
+	clientId,
+	clientSecret,
+	discordFetch,
+	redirectUri,
+	userCanManageGuild,
+} from "./utils";
 
 export function createAuthRouter(
 	botGuilds: DashboardDeps["botGuilds"],

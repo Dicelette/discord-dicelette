@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { Router } from "express";
-import type { DashboardDeps } from "..";
+import type { DashboardDeps } from "../types";
 import { makeRequireAdmin, requireAuth, userCanManageGuildViaOAuth } from "../utils";
 
 /*
