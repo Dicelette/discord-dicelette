@@ -3,11 +3,13 @@ import type { Dispatch, RefObject, SetStateAction } from "react";
 
 export interface SnippetsState {
 	data: Record<string, string>;
+	entryErrors: Record<string, string>;
 	newName: string;
 	newValue: string;
 	adding: boolean;
 	addError: string | null;
 	error: string | null;
+	warning: string | null;
 	success: boolean;
 	saving: boolean;
 	importRef: RefObject<HTMLInputElement | null>;
@@ -15,6 +17,7 @@ export interface SnippetsState {
 	setNewValue: (v: string) => void;
 	setAddError: (v: string | null) => void;
 	setError: (v: string | null) => void;
+	setWarning: (v: string | null) => void;
 	onRename: (oldName: string, newName: string) => void;
 	onValueChange: (name: string, value: string) => void;
 	onDelete: (name: string) => void;

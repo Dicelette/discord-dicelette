@@ -16,7 +16,7 @@ import { useI18n } from "@shared";
 import { memo } from "react";
 import type { SnippetsState } from "../..";
 import { exportJson } from "../../utils.ts";
-import { SnippetRow } from "../atoms";
+import SnippetRow from "../atoms/SnippetRow";
 
 interface Props {
 	state: SnippetsState;
@@ -26,11 +26,13 @@ function Snippets({ state }: Props) {
 	const { t } = useI18n();
 	const {
 		data: snippets,
+		entryErrors,
 		newName,
 		newValue,
 		adding,
 		addError,
 		error,
+		warning,
 		success,
 		saving,
 		importRef,
@@ -38,6 +40,7 @@ function Snippets({ state }: Props) {
 		setNewValue,
 		setAddError,
 		setError,
+		setWarning,
 		onRename,
 		onValueChange,
 		onDelete,
@@ -68,6 +71,7 @@ function Snippets({ state }: Props) {
 							key={name}
 							name={name}
 							value={value}
+							error={entryErrors[name]}
 							onRename={onRename}
 							onValueChange={onValueChange}
 							onDelete={onDelete}
@@ -123,6 +127,11 @@ function Snippets({ state }: Props) {
 				{error && (
 					<Alert severity="error" sx={{ mb: 1 }} onClose={() => setError(null)}>
 						{error}
+					</Alert>
+				)}
+				{warning && (
+					<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setWarning(null)}>
+						{warning}
 					</Alert>
 				)}
 				{success && (

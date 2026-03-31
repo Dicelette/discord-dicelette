@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 export interface SnippetRowProps {
 	name: string;
 	value: string;
+	error?: string;
 	onRename: (oldName: string, newName: string) => void;
 	onValueChange: (name: string, value: string) => void;
 	onDelete: (name: string) => void;
@@ -13,6 +14,7 @@ export interface SnippetRowProps {
 const SnippetRow = memo(function SnippetRow({
 	name,
 	value,
+	error,
 	onRename,
 	onValueChange,
 	onDelete,
@@ -23,7 +25,7 @@ const SnippetRow = memo(function SnippetRow({
 		<Box
 			sx={{
 				display: "flex",
-				alignItems: "center",
+				alignItems: "flex-start",
 				gap: 1,
 				p: 1,
 				borderRadius: 1,
@@ -52,6 +54,8 @@ const SnippetRow = memo(function SnippetRow({
 				onChange={(e) => setLocalValue(e.target.value)}
 				onBlur={() => onValueChange(name, localValue)}
 				placeholder="2d6+3"
+				error={Boolean(error)}
+				helperText={error}
 				sx={{ flex: 2 }}
 				slotProps={{ htmlInput: { style: { fontFamily: "var(--code-font-family)" } } }}
 			/>

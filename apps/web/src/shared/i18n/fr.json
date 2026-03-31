@@ -178,7 +178,10 @@
 		"noSnippets": "Aucun raccourci défini.",
 		"resetTemplate": "Réinitialiser",
 		"saveError": "Erreur lors de la sauvegarde.",
+		"saveNoValidSnippets": "Aucun snippet valide à sauvegarder.",
+		"savePartial": "Sauvegarde partielle : {ok} entrée(s) sauvegardée(s), {err} invalide(s).",
 		"saveSuccess": "Sauvegardé !",
+		"invalidSnippetHelper": "Snippet « {name} » invalide : {value}",
 		"sections": {
 			"attributes": "Attributs personnels",
 			"template": "Template de sortie des jets"

@@ -178,7 +178,10 @@
 		"noSnippets": "No snippets defined yet.",
 		"resetTemplate": "Reset to defaults",
 		"saveError": "Error while saving.",
+		"saveNoValidSnippets": "No valid snippet to save.",
+		"savePartial": "Partial save: {ok} entry/entries saved, {err} invalid.",
 		"saveSuccess": "Saved!",
+		"invalidSnippetHelper": "Invalid snippet \"{name}\": {value}",
 		"sections": {
 			"attributes": "Attributes",
 			"template": "Link's template"

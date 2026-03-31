@@ -221,7 +221,13 @@ export default function Servers() {
 													justifyContent: "center",
 												}}
 											>
-												<Typography variant="body1" fontWeight={600} noWrap>
+												<Typography
+													variant="body1"
+													fontWeight={600}
+													fontSize={"1.1rem"}
+													fontFamily={"var(--ifm-heading-font-family)"}
+													noWrap
+												>
 													{guild.name}
 												</Typography>
 												{guild.owner && (

@@ -23,6 +23,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const [savingSnippets, setSavingSnippets] = useState(false);
 	const [snippetSuccess, setSnippetSuccess] = useState(false);
 	const [snippetError, setSnippetError] = useState<string | null>(null);
+	const [snippetWarning, setSnippetWarning] = useState<string | null>(null);
+	const [snippetEntryErrors, setSnippetEntryErrors] = useState<Record<string, string>>(
+		{}
+	);
 	const [addingSnippet, setAddingSnippet] = useState(false);
 	const [snippetAddError, setSnippetAddError] = useState<string | null>(null);
 
@@ -80,6 +84,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			delete next[key];
 			return next;
 		});
+		setSnippetEntryErrors((prev) => {
+			if (prev[key] === undefined) return prev;
+			const next = { ...prev };
+			delete next[key];
+			return next;
+		});
+		setSnippetWarning(null);
+		setSnippetSuccess(false);
 	}, []);
 
 	const renameSnippet = useCallback((oldName: string, newName: string) => {
@@ -90,10 +102,27 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			entries[idx] = [newName, entries[idx][1]];
 			return Object.fromEntries(entries);
 		});
+		setSnippetEntryErrors((prev) => {
+			if (prev[oldName] === undefined && prev[newName] === undefined) return prev;
+			const next = { ...prev };
+			delete next[oldName];
+			delete next[newName];
+			return next;
+		});
+		setSnippetWarning(null);
+		setSnippetSuccess(false);
 	}, []);
 
 	const updateSnippetValue = useCallback((name: string, value: string) => {
 		setSnippets((prev) => ({ ...prev, [name]: value }));
+		setSnippetEntryErrors((prev) => {
+			if (prev[name] === undefined) return prev;
+			const next = { ...prev };
+			delete next[name];
+			return next;
+		});
+		setSnippetWarning(null);
+		setSnippetSuccess(false);
 	}, []);
 
 	const importSnippets = useCallback(
@@ -141,8 +170,43 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const saveSnippets = useCallback(async () => {
 		setSavingSnippets(true);
 		setSnippetError(null);
+		setSnippetWarning(null);
+		setSnippetSuccess(false);
 		try {
-			await userApi.updateUserConfig(guildId, { snippets });
+			const validation = await userApi.validateEntries(
+				guildId,
+				"snippets",
+				snippets,
+				attributes
+			);
+			const validSnippets = validation.data.valid as Record<string, string>;
+			const rawErrors = validation.data.errors;
+			setSnippetEntryErrors(
+				Object.fromEntries(
+					Object.entries(rawErrors).map(([name, invalidValue]) => [
+						name,
+						t("userConfig.invalidSnippetHelper", {
+							name,
+							value: String(invalidValue),
+						}),
+					])
+				)
+			);
+
+			const okCount = Object.keys(validSnippets).length;
+			const errCount = Object.keys(rawErrors).length;
+			if (okCount === 0 && errCount > 0) {
+				setSnippetError(t("userConfig.saveNoValidSnippets"));
+				return;
+			}
+
+			await userApi.updateUserConfig(guildId, { snippets: validSnippets });
+
+			if (errCount > 0) {
+				setSnippetWarning(t("userConfig.savePartial", { ok: okCount, err: errCount }));
+				return;
+			}
+
 			setSnippetSuccess(true);
 			setTimeout(() => setSnippetSuccess(false), 3000);
 		} catch {
@@ -150,7 +214,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setSavingSnippets(false);
 		}
-	}, [guildId, snippets, t]);
+	}, [guildId, snippets, attributes, t]);
 
 	const addAttribute = useCallback(async () => {
 		const name = newAttrName.trim();
@@ -268,11 +332,13 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const snippetsState = useMemo<SnippetsState>(
 		() => ({
 			data: snippets,
+			entryErrors: snippetEntryErrors,
 			newName: newSnippetName,
 			newValue: newSnippetValue,
 			adding: addingSnippet,
 			addError: snippetAddError,
 			error: snippetError,
+			warning: snippetWarning,
 			success: snippetSuccess,
 			saving: savingSnippets,
 			importRef: snippetImportRef,
@@ -280,6 +346,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			setNewValue: setNewSnippetValue,
 			setAddError: setSnippetAddError,
 			setError: setSnippetError,
+			setWarning: setSnippetWarning,
 			onRename: renameSnippet,
 			onValueChange: updateSnippetValue,
 			onDelete: deleteSnippet,
@@ -289,11 +356,13 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		}),
 		[
 			snippets,
+			snippetEntryErrors,
 			newSnippetName,
 			newSnippetValue,
 			addingSnippet,
 			snippetAddError,
 			snippetError,
+			snippetWarning,
 			snippetSuccess,
 			savingSnippets,
 			renameSnippet,
