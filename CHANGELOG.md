@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.4.1](https://github.com/Dicelette/discord-dicelette/compare/3.4.0...3.4.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* update character and common translations in JSON files ([8f052a9](https://github.com/Dicelette/discord-dicelette/commit/8f052a95f8d1037ef1158ecc5bc40e6f46d10a6a))
+
 ## [3.4.0](https://github.com/Dicelette/discord-dicelette/compare/3.3.0...3.4.0) (2026-03-31)
 
 
