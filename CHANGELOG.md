@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.1.1](https://github.com/Dicelette/discord-dicelette/compare/3.1.0...3.1.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* **dice:** should use attribute even if no character is found ([16e7b1b](https://github.com/Dicelette/discord-dicelette/commit/16e7b1be131706eb3d6071e8c3c7ed6a8d66a0e8))
+
 ## [3.1.0](https://github.com/Dicelette/discord-dicelette/compare/3.0.1...3.1.0) (2026-03-31)
 
 
