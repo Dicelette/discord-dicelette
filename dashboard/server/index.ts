@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { important } from "@dicelette/utils";
 import cors from "cors";
 import type { NextFunction, Request, Response } from "express";
@@ -20,6 +21,16 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	const Port = process.env.DASHBOARD_PORT ?? 3001;
 	const FrontendUrl = process.env.FRONTEND_URL ?? "http://localhost:5173";
 	const isProduction = process.env.NODE_ENV === "production";
+	const frontendHostname = (() => {
+		try {
+			return new URL(FrontendUrl).hostname;
+		} catch {
+			return "";
+		}
+	})();
+	const isLocalhostFrontend =
+		frontendHostname === "localhost" || frontendHostname === "127.0.0.1";
+	const sessionCookieSecure = isProduction && !isLocalhostFrontend;
 
 	const sessionSecret = process.env.SESSION_SECRET;
 	if (!sessionSecret) {
@@ -75,7 +86,8 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			resave: false,
 			saveUninitialized: false,
 			cookie: {
-				secure: isProduction,
+				// Keep secure cookies in real prod, but allow local prod-like tests on http://localhost.
+				secure: sessionCookieSecure,
 				httpOnly: true,
 				sameSite: "lax",
 				maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -129,11 +141,11 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	app.use("/api/guilds", makeRateLimit(120, 60_000), createGuildRouter(deps));
 
 	if (process.env.NODE_ENV === "production") {
-		const distPath = new URL("../../../apps/web/dist", import.meta.url).pathname;
+		const distPath = fileURLToPath(new URL("../../../apps/web/dist", import.meta.url));
 		app.use(express.static(distPath));
 		app.get("/{*path}", (_req, res) => {
 			res.sendFile(
-				new URL("../../../apps/web/dist/index.html", import.meta.url).pathname
+				fileURLToPath(new URL("../../../apps/web/dist/index.html", import.meta.url))
 			);
 		});
 	}
