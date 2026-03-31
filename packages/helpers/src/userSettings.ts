@@ -179,7 +179,8 @@ export function validateSnippetEntry(
 			getExpression(content, "0", attributes).dice,
 			attributes
 		);
-		roll(substituted.formula);
+		const formula = substituted.formula.replace(/\s*%%.*%%\s*/g, "").trim();
+		roll(formula);
 		return { ok: true, value: content };
 	} catch {
 		return { error: content, ok: false };

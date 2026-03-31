@@ -10,10 +10,12 @@ export const userApi = {
 	validateEntries: (
 		guildId: string,
 		type: "snippets" | "attributes",
-		entries: Record<string, unknown>
+		entries: Record<string, unknown>,
+		attributes?: Record<string, number>
 	) =>
 		api.post<ApiValidationResult>(`/guilds/${guildId}/validate-entries`, {
 			type,
 			entries,
+			attributes,
 		}),
 };

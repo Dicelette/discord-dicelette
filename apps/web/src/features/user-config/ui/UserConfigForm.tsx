@@ -54,7 +54,12 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		setAddingSnippet(true);
 		setSnippetAddError(null);
 		try {
-			const res = await userApi.validateEntries(guildId, "snippets", { [name]: value });
+			const res = await userApi.validateEntries(
+				guildId,
+				"snippets",
+				{ [name]: value },
+				attributes
+			);
 			if (res.data.errors[name] !== undefined) {
 				setSnippetAddError(t("userConfig.addInvalidDice", { name }));
 				return;
@@ -67,7 +72,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setAddingSnippet(false);
 		}
-	}, [guildId, newSnippetName, newSnippetValue, t]);
+	}, [guildId, newSnippetName, newSnippetValue, attributes, t]);
 
 	const deleteSnippet = useCallback((key: string) => {
 		setSnippets((prev) => {
@@ -103,7 +108,12 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 						setSnippetError(t("userConfig.importError"));
 						return;
 					}
-					const res = await userApi.validateEntries(guildId, "snippets", parsed);
+					const res = await userApi.validateEntries(
+						guildId,
+						"snippets",
+						parsed,
+						attributes
+					);
 					const { valid, errors } = res.data;
 					setSnippets((prev) => ({ ...prev, ...(valid as Record<string, string>) }));
 					const errCount = Object.keys(errors).length;
@@ -125,7 +135,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			};
 			reader.readAsText(file);
 		},
-		[guildId, t]
+		[guildId, attributes, t]
 	);
 
 	const saveSnippets = useCallback(async () => {

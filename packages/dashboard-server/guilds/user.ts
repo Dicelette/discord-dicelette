@@ -12,9 +12,10 @@ export function createUserRouter(deps: DashboardDeps) {
 	router.post("/validate-entries", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
-		const { type, entries } = req.body as {
+		const { type, entries, attributes } = req.body as {
 			type: "snippets" | "attributes";
 			entries: Record<string, unknown>;
+			attributes?: Record<string, number>;
 		};
 
 		if (type !== "snippets" && type !== "attributes") {
@@ -27,7 +28,8 @@ export function createUserRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const userAttrs = userSettings.get(guildId, userId)?.attributes;
+		const storedAttrs = userSettings.get(guildId, userId)?.attributes;
+		const userAttrs = attributes ?? storedAttrs;
 		const validateFn =
 			type === "attributes"
 				? (name: string, value: unknown) => validateAttributeEntry(name, value)
