@@ -19,7 +19,7 @@ import type {
 	ApiUserConfig,
 	DiscordGuild,
 	DiscordUser,
-} from "@dicelette/dashboard-api";
+} from "@dicelette/api";
 import type { ApiGuildData } from "@dicelette/types";
 import type { Page } from "@playwright/test";
 import { en, fr } from "@shared";

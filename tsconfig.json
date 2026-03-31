@@ -37,8 +37,8 @@
 			"locales": ["apps/bot/src/locales.js"],
 			"messages": ["apps/bot/src/messages/index.js"],
 			"utils": ["apps/bot/src/utils/index.js"],
-			"@dicelette/dashboard-server": ["packages/dashboard-server/index.js"],
-			"@dicelette/dashboard-api": ["packages/dashboard-api/index.js"]
+			"@dicelette/server": ["dashboard/server/index.js"],
+			"@dicelette/api": ["dashboard/api/index.js"]
 		},
 		"removeComments": true,
 		"resolveJsonModule": true,
@@ -66,6 +66,7 @@
 		"packages/**/*.ts",
 		"packages/**/*.d.ts",
 		"web/server/**/*.ts",
+		"dashboard/**/*.ts",
 		"package.json"
 	],
 	"ts-node": {

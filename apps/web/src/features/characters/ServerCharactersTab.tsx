@@ -1,4 +1,4 @@
-import { type ApiCharacter, charactersApi } from "@dicelette/dashboard-api";
+import { type ApiCharacter, charactersApi } from "@dicelette/api";
 import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 import {

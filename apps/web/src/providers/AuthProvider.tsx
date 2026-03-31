@@ -1,4 +1,4 @@
-import { authApi, type DiscordUser } from "@dicelette/dashboard-api";
+import { authApi, type DiscordUser } from "@dicelette/api";
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 

@@ -1,6 +1,6 @@
 import type { EventEmitter } from "node:events";
-import { startDashboardServer } from "@dicelette/dashboard-server";
 import { ln } from "@dicelette/localization";
+import { startDashboardServer } from "@dicelette/server";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
 import { templateEmbed } from "./commands/admin/template";

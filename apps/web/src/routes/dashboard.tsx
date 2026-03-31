@@ -1,9 +1,4 @@
-import {
-	type ApiUserConfig,
-	charactersApi,
-	guildApi,
-	userApi,
-} from "@dicelette/dashboard-api";
+import { type ApiUserConfig, charactersApi, guildApi, userApi } from "@dicelette/api";
 import type { ApiGuildData } from "@dicelette/types";
 import { keyframes } from "@emotion/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -71,8 +66,11 @@ export default function Dashboard() {
 			charactersApi.countSelf(guildId).catch(() => null),
 		])
 			.then(async ([userConfigRes, userCountRes]) => {
-				const { isAdmin: admin, isStrictAdmin: strictAdmin, userConfig } =
-					userConfigRes.data;
+				const {
+					isAdmin: admin,
+					isStrictAdmin: strictAdmin,
+					userConfig,
+				} = userConfigRes.data;
 				const nextUserCharCount = userCountRes?.data.count ?? 0;
 				const hasUserCharacters = nextUserCharCount > 0;
 				setUserCharCount(nextUserCharCount);

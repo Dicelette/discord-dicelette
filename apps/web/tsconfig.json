@@ -19,5 +19,5 @@
 			"@shared": ["./src/shared/index.js"]
 		}
 	},
-	"include": ["src", "vite.config.ts", "tests/**/*", "../../packages/dashboard-api/**/*"]
+	"include": ["src", "vite.config.ts", "tests/**/*", "../../dashboard/api/**/*"]
 }

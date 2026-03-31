@@ -1,4 +1,4 @@
-import { type ApiUserConfig, userApi } from "@dicelette/dashboard-api";
+import { type ApiUserConfig, userApi } from "@dicelette/api";
 import Stack from "@mui/material/Stack";
 import { useI18n } from "@shared";
 import { useCallback, useMemo, useRef, useState } from "react";

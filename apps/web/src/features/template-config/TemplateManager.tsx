@@ -1,5 +1,5 @@
+import { charactersApi, templateApi } from "@dicelette/api";
 import type { StatisticalTemplate } from "@dicelette/core";
-import { charactersApi, templateApi } from "@dicelette/dashboard-api";
 import {
 	Casino,
 	Check,

@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.3.0",
-		"@dicelette/dashboard-api": "workspace:*",
+		"@dicelette/api": "workspace:*",
 		"@dicelette/localization": "workspace:*",
 		"@dicelette/types": "workspace:*",
 		"@emotion/react": "^11.14.0",

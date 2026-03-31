@@ -1,4 +1,4 @@
-import { authApi, type DiscordGuild, guildApi } from "@dicelette/dashboard-api";
+import { authApi, type DiscordGuild, guildApi } from "@dicelette/api";
 import { Add, Refresh, Search, Settings } from "@mui/icons-material";
 import {
 	Alert,

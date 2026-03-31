@@ -5,25 +5,25 @@ export const authApi = {
 	/**
 	 * API: @me
 	 * GET /auth/me
-	 * @Server: /packages/dashboard-server/auth.ts
+	 * @Server: /packages/server/auth.ts
 	 */
 	me: () => api.get<DiscordUser>("/auth/me"),
 	/**
 	 * @Api logout
 	 * POST /auth/logout
-	 * @Server /packages/dashboard-server/auth.ts
+	 * @Server /packages/server/auth.ts
 	 */
 	logout: () => api.post("/auth/logout"),
 	/**
 	 * @Api /auth/guilds
 	 * GET /auth/guilds
-	 * @Server /packages/dashboard-server/auth.ts
+	 * @Server /packages/server/auth.ts
 	 */
 	guilds: () => api.get<DiscordGuild[]>("/auth/guilds"),
 	/**
 	 * API: /auth/guilds/refresh
 	 * POST /auth/guilds/refresh
-	 * @see {@link file://packages/dashboard-server/auth.ts}
+	 * @see {@link file://packages/server/auth.ts}
 	 */
 	refreshGuilds: () => api.post("/auth/guilds/refresh"),
 };

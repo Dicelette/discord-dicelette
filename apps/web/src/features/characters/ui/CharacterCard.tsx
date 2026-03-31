@@ -1,4 +1,4 @@
-import type { ApiCharacter } from "@dicelette/dashboard-api";
+import type { ApiCharacter } from "@dicelette/api";
 import { Lock, OpenInNew } from "@mui/icons-material";
 import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
 import "uniformize";

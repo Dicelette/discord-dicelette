@@ -166,11 +166,7 @@
 			}
 		},
 		{
-			"includes": [
-				"**/routes/**",
-				"packages/dashboard-api/**",
-				"packages/dashboard-server/**"
-			],
+			"includes": ["**/routes/**", "packages/api/**", "packages/server/**"],
 			"linter": {
 				"rules": {
 					"style": {
