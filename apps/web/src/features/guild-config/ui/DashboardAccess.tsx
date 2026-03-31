@@ -7,9 +7,10 @@ import { type Control, Controller, useWatch } from "react-hook-form";
 interface Props {
 	control: Control<ApiGuildData>;
 	roles: Role[];
+	isStrictAdmin: boolean;
 }
 
-function DashboardAccess({ control, roles }: Props) {
+function DashboardAccess({ control, roles, isStrictAdmin }: Props) {
 	const { t } = useI18n();
 	const dashboardAccess = useWatch({ control, name: "dashboardAccess" });
 	const hasRoles = dashboardAccess && dashboardAccess.length > 0;
@@ -34,20 +35,23 @@ function DashboardAccess({ control, roles }: Props) {
 							fullWidth
 							size="small"
 							multiple
+							disabled={!isStrictAdmin}
 							options={roles}
 							getOptionKey={(r) => r.id}
 							getOptionLabel={(r) => `@ ${r.name}`}
 							value={selected}
 							onChange={(_, newValue) =>
-								field.onChange(
-									newValue.length ? newValue.map((r) => r.id) : undefined
-								)
+								field.onChange(newValue.map((r) => r.id))
 							}
 							renderInput={(params) => (
 								<TextField
 									{...params}
 									label={t("config.fields.dashboardAccess")}
-									helperText={t("config.fields.dashboardAccessHelper")}
+									helperText={
+										isStrictAdmin
+											? t("config.fields.dashboardAccessHelper")
+											: t("config.fields.dashboardAccessAdminOnly")
+									}
 									slotProps={{
 										input: { ...params.InputProps },
 										htmlInput: { ...params.inputProps },

@@ -58,14 +58,28 @@ export function createConfigRouter(deps: DashboardDeps) {
 
 		const updates = req.body as Record<string, unknown>;
 
-		// Validate dashboardAccess: must be an array of strings (role IDs)
-		if ("dashboardAccess" in updates && updates.dashboardAccess != null) {
+		// Only strict Administrators can modify dashboardAccess
+		if ("dashboardAccess" in updates) {
+			// Validate format: must be an array of strings (role IDs)
 			if (
-				!Array.isArray(updates.dashboardAccess) ||
-				!updates.dashboardAccess.every((id: unknown) => typeof id === "string")
+				updates.dashboardAccess != null &&
+				(!Array.isArray(updates.dashboardAccess) ||
+					!updates.dashboardAccess.every((id: unknown) => typeof id === "string"))
 			) {
 				res.status(400).json({ error: "dashboardAccess must be an array of role ID strings" });
 				return;
+			}
+
+			const guild = botGuilds.get(guildId);
+			if (guild) {
+				const member = await guild.fetchMember(req.session.userId!);
+				const Administrator = BigInt(0x8);
+				if (!member || !member.hasPermission(Administrator)) {
+					res
+						.status(403)
+						.json({ error: "Only Administrators can modify dashboard access roles" });
+					return;
+				}
 			}
 		}
 
@@ -74,7 +88,11 @@ export function createConfigRouter(deps: DashboardDeps) {
 		for (const key of allowedKeys) {
 			if (!(key in updates)) continue;
 			const value = updates[key];
-			if (value === undefined || value === null) {
+			if (
+				value === undefined ||
+				value === null ||
+				(Array.isArray(value) && value.length === 0)
+			) {
 				delete merged[key];
 			} else {
 				(merged as Record<keyof GuildData, unknown>)[key] = value;

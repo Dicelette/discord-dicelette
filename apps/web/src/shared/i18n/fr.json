@@ -68,7 +68,8 @@
 			"timestamp": "Afficher l'horodatage dans les logs",
 			"dashboardAccess": "Rôles autorisés",
 			"dashboardAccessHelper": "Seuls les utilisateurs possédant l'un de ces rôles pourront accéder au panneau d'administration du dashboard. Les administrateurs ont toujours accès.",
-			"dashboardAccessWarning": "Attention : lorsque cette option est active, les utilisateurs ayant la permission « Gérer le serveur » n'auront plus accès au dashboard par défaut. N'oubliez pas de leur assigner l'un des rôles sélectionnés."
+			"dashboardAccessWarning": "Attention : lorsque cette option est active, les utilisateurs ayant la permission « Gérer le serveur » n'auront plus accès au dashboard par défaut. N'oubliez pas de leur assigner l'un des rôles sélectionnés.",
+			"dashboardAccessAdminOnly": "Seuls les administrateurs du serveur peuvent modifier ce paramètre."
 		},
 		"sections": {
 			"channels": "Canaux",

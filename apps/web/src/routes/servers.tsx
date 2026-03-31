@@ -232,7 +232,7 @@ export default function Servers() {
 												>
 													{guild.name}
 												</Typography>
-												{guild.owner && (
+												{guild.isAdmin && (
 													<Chip label={t("common.owner")} size="small" sx={{ mt: 0.5 }} />
 												)}
 											</Box>

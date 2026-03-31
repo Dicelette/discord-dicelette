@@ -47,7 +47,22 @@ export function createUserRouter(deps: DashboardDeps) {
 		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		const userConfig = userSettings.get(guildId, userId) ?? null;
 
-		res.json({ isAdmin, userConfig });
+		// Check if user has strict Administrator permission (for dashboardAccess editing)
+		let isStrictAdmin = false;
+		const guild = botGuilds.get(guildId);
+		if (guild) {
+			try {
+				const member = await guild.fetchMember(userId);
+				if (member) {
+					const Administrator = BigInt(0x8);
+					isStrictAdmin = member.hasPermission(Administrator);
+				}
+			} catch {
+				// Fetch failed — keep false
+			}
+		}
+
+		res.json({ isAdmin, isStrictAdmin, userConfig });
 	});
 
 	// PATCH /:guildId/user-config — mise à jour des paramètres personnels (sans droits admin)

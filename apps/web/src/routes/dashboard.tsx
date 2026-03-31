@@ -49,6 +49,7 @@ export default function Dashboard() {
 		() => new Set(["admin"])
 	);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [isStrictAdmin, setIsStrictAdmin] = useState(false);
 	const [userCharCount, setUserCharCount] = useState(0);
 	const [serverCharCount, setServerCharCount] = useState(0);
 	const [config, setConfig] = useState<ApiGuildData | null>(null);
@@ -70,11 +71,13 @@ export default function Dashboard() {
 			charactersApi.countSelf(guildId).catch(() => null),
 		])
 			.then(async ([userConfigRes, userCountRes]) => {
-				const { isAdmin: admin, userConfig } = userConfigRes.data;
+				const { isAdmin: admin, isStrictAdmin: strictAdmin, userConfig } =
+					userConfigRes.data;
 				const nextUserCharCount = userCountRes?.data.count ?? 0;
 				const hasUserCharacters = nextUserCharCount > 0;
 				setUserCharCount(nextUserCharCount);
 				setIsAdmin(admin);
+				setIsStrictAdmin(strictAdmin);
 				setUserConfigData(userConfig);
 				const initialTab = admin ? "admin" : hasUserCharacters ? "characters" : "user";
 				setTab(initialTab);
@@ -254,6 +257,7 @@ export default function Dashboard() {
 						saving={saving}
 						channels={channels}
 						roles={roles}
+						isStrictAdmin={isStrictAdmin}
 					/>
 				</Box>
 			)}

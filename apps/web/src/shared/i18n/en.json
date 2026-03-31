@@ -68,7 +68,8 @@
 			"timestamp": "Show timestamp in logs",
 			"dashboardAccess": "Authorized roles",
 			"dashboardAccessHelper": "Only users with one of these roles will be able to access the dashboard admin panel. Administrators always have access.",
-			"dashboardAccessWarning": "Warning: when this option is active, users with the \"Manage Server\" permission will no longer have dashboard access by default. Make sure to assign one of the selected roles to them."
+			"dashboardAccessWarning": "Warning: when this option is active, users with the \"Manage Server\" permission will no longer have dashboard access by default. Make sure to assign one of the selected roles to them.",
+			"dashboardAccessAdminOnly": "Only server Administrators can modify this setting."
 		},
 		"sections": {
 			"channels": "Channels",

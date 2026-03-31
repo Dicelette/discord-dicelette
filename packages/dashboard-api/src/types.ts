@@ -17,10 +17,14 @@ export interface DiscordGuild {
 	permissions: string;
 	/** true = bot is in this guild */
 	botPresent: boolean;
+	/** true = user has admin access to the dashboard for this guild */
+	isAdmin: boolean;
 }
 
 export interface ApiUserConfig {
 	isAdmin: boolean;
+	/** true = user has strict Discord Administrator permission */
+	isStrictAdmin: boolean;
 	userConfig: Partial<UserSettingsData> | null;
 }
 

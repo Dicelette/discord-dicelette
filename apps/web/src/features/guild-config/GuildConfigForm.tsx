@@ -22,9 +22,17 @@ interface Props {
 	saving: boolean;
 	channels: Channel[];
 	roles: Role[];
+	isStrictAdmin: boolean;
 }
 
-export default function GuildConfigForm({ config, onSave, saving, channels, roles }: Props) {
+export default function GuildConfigForm({
+	config,
+	onSave,
+	saving,
+	channels,
+	roles,
+	isStrictAdmin,
+}: Props) {
 	const { t } = useI18n();
 	const { control, handleSubmit, isDirty, reset, textChannels } = useConfigForm(
 		config,
@@ -128,7 +136,7 @@ export default function GuildConfigForm({ config, onSave, saving, channels, role
 					</Paper>
 
 					<Paper sx={{ p: 3 }}>
-						<DashboardAccess control={control} roles={roles} />
+						<DashboardAccess control={control} roles={roles} isStrictAdmin={isStrictAdmin} />
 					</Paper>
 
 					<Paper sx={{ p: 0 }}>

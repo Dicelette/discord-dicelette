@@ -1,6 +1,8 @@
 import { randomBytes } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
+import type { DashboardDeps } from "./index";
+import { userCanManageGuild } from "./utils";
 
 /*
  * Stricter rate limit specifically for the refresh endpoint (5 req/min per user).
@@ -86,8 +88,9 @@ const userGuildCache = new Map<string, { guilds: DiscordGuild[]; expiresAt: numb
 const USER_GUILD_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function createAuthRouter(
-	botGuilds: { has: (id: string) => boolean },
-	guildEvents: import("node:events").EventEmitter
+	botGuilds: DashboardDeps["botGuilds"],
+	guildEvents: import("node:events").EventEmitter,
+	settings: DashboardDeps["settings"]
 ) {
 	const router = Router();
 
@@ -228,15 +231,25 @@ export function createAuthRouter(
 			// All guilds where the bot is present are shown (users can always
 			// access their personal config). Guilds without the bot are shown
 			// only if the user has ManageGuild (to offer the "add bot" flow).
-			const filteredGuilds = userGuilds
-				.filter((g) => {
-					const botPresent = botGuilds.has(g.id);
-					if (botPresent) return true;
-					const isAdmin =
-						g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
-					return isAdmin;
-				})
-				.map((g) => ({ ...g, botPresent: botGuilds.has(g.id) }));
+			const filteredGuilds: Array<
+				DiscordGuild & { botPresent: boolean; isAdmin: boolean }
+			> = [];
+
+			for (const g of userGuilds) {
+				const botPresent = botGuilds.has(g.id);
+				const oauthAdmin =
+					g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
+
+				if (!botPresent && !oauthAdmin) continue;
+
+				let isAdmin = oauthAdmin;
+				// For bot-present guilds, also check dashboardAccess roles
+				if (botPresent) {
+					isAdmin = await userCanManageGuild(userId, g.id, botGuilds, settings);
+				}
+
+				filteredGuilds.push({ ...g, botPresent, isAdmin });
+			}
 
 			res.json(filteredGuilds);
 		} catch (err) {
