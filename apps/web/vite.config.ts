@@ -12,7 +12,18 @@ export default defineConfig({
 			"@shared": path.resolve(__dirname, "./src/shared/index.ts"),
 		},
 	},
+	optimizeDeps: {
+		exclude: ["**/playwright-report/**"],
+	},
 	server: {
+		watch: {
+			ignored: [
+				"**/node_modules/**",
+				"**/dist/**",
+				"**/build/**",
+				"**/playwright-report/**",
+			],
+		},
 		port: 5173,
 		proxy: {
 			"/api": {
@@ -22,6 +33,9 @@ export default defineConfig({
 		},
 	},
 	build: {
+		chunkSizeWarningLimit: 10000,
+		reportCompressedSize: false,
+		minify: "oxc",
 		rolldownOptions: {
 			output: {
 				manualChunks: (id) => {
