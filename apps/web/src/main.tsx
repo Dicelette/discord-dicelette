@@ -1,3 +1,6 @@
+import "@fontsource/atkinson-hyperlegible-next";
+import "@fontsource/iosevka-charon";
+import "@fontsource-variable/victor-mono";
 import { CssBaseline, createTheme, ThemeProvider } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom/client";
