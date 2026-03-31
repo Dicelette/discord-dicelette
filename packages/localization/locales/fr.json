@@ -567,6 +567,7 @@
 			"eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
 			"minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
 			"notFound": "Aucun dé n'a été retrouvé dans la commande !",
+			"stats": "Le dé contient des valeurs inconnues: {{- stats}}. Merci de les vérifier.",
 			"withDice": "Le dé `{{- dice}}` est invalide."
 		},
 		"invalidFormula": "Formule invalide : `{{- formula}}`",
@@ -595,7 +596,7 @@
 		"sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
 		"stats": {
 			"char": "{{- char}} est introuvable.\nVous devez sélectionner l'utilisateur possédant ce personnage pour lancer un dé sur `{{- stat}}`.",
-			"empty": "Cette combination est invalide : aucune statistiques n'existent !",
+			"empty": "Cette combinaison est invalide : aucune des statistiques n'existent !",
 			"excluded": "Cette statistique est exclue : Vous ne pouvez pas faire de jet pour elle.",
 			"notFound": "La statistique `{{- value}}` est introuvable ! Avez vous fait une erreur de frappe ?",
 			"notFound_plural": "Cette commande ne peut pas être utilisé : aucune statistique n'a été enregistrée.",

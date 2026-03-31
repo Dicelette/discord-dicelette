@@ -134,7 +134,8 @@ export async function baseRoll(
 		userData?.stats,
 		true,
 		undefined,
-		ctx?.templateID?.statsName
+		ctx?.templateID?.statsName,
+		ul
 	);
 	const { criticalsFromDice, serverData } = await getCritical(
 		client,

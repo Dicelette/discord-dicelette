@@ -1,7 +1,7 @@
 import { type ApiUserConfig, userApi } from "@dicelette/dashboard-api";
 import Stack from "@mui/material/Stack";
 import { useI18n } from "@shared";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import "uniformize";
 import type { AttributesState, SnippetsState, TemplateState } from "../types";
 import { DEFAULT_TEMPLATE } from "../utils";
@@ -255,60 +255,106 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 
 	const resetTemplate = useCallback(() => setTemplate(DEFAULT_TEMPLATE), []);
 
-	const snippetsState: SnippetsState = {
-		data: snippets,
-		newName: newSnippetName,
-		newValue: newSnippetValue,
-		adding: addingSnippet,
-		addError: snippetAddError,
-		error: snippetError,
-		success: snippetSuccess,
-		saving: savingSnippets,
-		importRef: snippetImportRef,
-		setNewName: setNewSnippetName,
-		setNewValue: setNewSnippetValue,
-		setAddError: setSnippetAddError,
-		setError: setSnippetError,
-		onRename: renameSnippet,
-		onValueChange: updateSnippetValue,
-		onDelete: deleteSnippet,
-		onAdd: addSnippet,
-		onSave: saveSnippets,
-		onImportChange: importSnippets,
-	};
+	const snippetsState = useMemo<SnippetsState>(
+		() => ({
+			data: snippets,
+			newName: newSnippetName,
+			newValue: newSnippetValue,
+			adding: addingSnippet,
+			addError: snippetAddError,
+			error: snippetError,
+			success: snippetSuccess,
+			saving: savingSnippets,
+			importRef: snippetImportRef,
+			setNewName: setNewSnippetName,
+			setNewValue: setNewSnippetValue,
+			setAddError: setSnippetAddError,
+			setError: setSnippetError,
+			onRename: renameSnippet,
+			onValueChange: updateSnippetValue,
+			onDelete: deleteSnippet,
+			onAdd: addSnippet,
+			onSave: saveSnippets,
+			onImportChange: importSnippets,
+		}),
+		[
+			snippets,
+			newSnippetName,
+			newSnippetValue,
+			addingSnippet,
+			snippetAddError,
+			snippetError,
+			snippetSuccess,
+			savingSnippets,
+			renameSnippet,
+			updateSnippetValue,
+			deleteSnippet,
+			addSnippet,
+			saveSnippets,
+			importSnippets,
+		]
+	);
 
-	const attributesState: AttributesState = {
-		data: attributes,
-		newName: newAttrName,
-		newValue: newAttrValue,
-		adding: addingAttr,
-		addError: attrAddError,
-		error: attrError,
-		success: attrSuccess,
-		saving: savingAttrs,
-		importRef: attrImportRef,
-		setNewName: setNewAttrName,
-		setNewValue: setNewAttrValue,
-		setAddError: setAttrAddError,
-		setError: setAttrError,
-		onRename: renameAttribute,
-		onValueChange: updateAttributeValue,
-		onDelete: deleteAttribute,
-		onAdd: addAttribute,
-		onSave: saveAttributes,
-		onImportChange: importAttributes,
-	};
+	const attributesState = useMemo<AttributesState>(
+		() => ({
+			data: attributes,
+			newName: newAttrName,
+			newValue: newAttrValue,
+			adding: addingAttr,
+			addError: attrAddError,
+			error: attrError,
+			success: attrSuccess,
+			saving: savingAttrs,
+			importRef: attrImportRef,
+			setNewName: setNewAttrName,
+			setNewValue: setNewAttrValue,
+			setAddError: setAttrAddError,
+			setError: setAttrError,
+			onRename: renameAttribute,
+			onValueChange: updateAttributeValue,
+			onDelete: deleteAttribute,
+			onAdd: addAttribute,
+			onSave: saveAttributes,
+			onImportChange: importAttributes,
+		}),
+		[
+			attributes,
+			newAttrName,
+			newAttrValue,
+			addingAttr,
+			attrAddError,
+			attrError,
+			attrSuccess,
+			savingAttrs,
+			renameAttribute,
+			updateAttributeValue,
+			deleteAttribute,
+			addAttribute,
+			saveAttributes,
+			importAttributes,
+		]
+	);
 
-	const templateState: TemplateState = {
-		value: template,
-		setValue: setTemplate,
-		saving: savingTemplate,
-		success: templateSuccess,
-		error: templateError,
-		setError: setTemplateError,
-		onSave: saveTemplate,
-		onReset: resetTemplate,
-	};
+	const templateState = useMemo<TemplateState>(
+		() => ({
+			value: template,
+			setValue: setTemplate,
+			saving: savingTemplate,
+			success: templateSuccess,
+			error: templateError,
+			setError: setTemplateError,
+			onSave: saveTemplate,
+			onReset: resetTemplate,
+		}),
+		[
+			template,
+			savingTemplate,
+			templateSuccess,
+			templateError,
+			saveTemplate,
+			resetTemplate,
+		]
+	);
 
 	return (
 		<Stack spacing={2}>

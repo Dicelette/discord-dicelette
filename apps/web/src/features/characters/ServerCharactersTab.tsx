@@ -1,4 +1,5 @@
 import { type ApiCharacter, charactersApi } from "@dicelette/dashboard-api";
+import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 import {
 	Alert,
@@ -20,7 +21,7 @@ interface Props {
 	refreshToken?: number;
 }
 
-export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
+export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props) {
 	const { t } = useI18n();
 	const lastRefreshToken = useRef(refreshToken);
 	const [characters, setCharacters] = useState<ApiCharacter[]>([]);
@@ -32,7 +33,7 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 	const load = useCallback(async () => {
 		setError(null);
 		try {
-			const res = await charactersApi.getCharacters(guildId);
+			const res = await charactersApi.getAllCharacters(guildId);
 			setCharacters(res.data);
 			setPage(1);
 		} catch {
@@ -60,9 +61,10 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 		);
 	}
 
-	const filtered = search.trim()
-		? characters.filter((c) =>
-				(c.charName ?? "").toLowerCase().includes(search.trim().toLowerCase())
+	const q = search.trim().toLowerCase();
+	const filtered = q
+		? characters.filter(
+				(c) => (c.charName ?? "").subText(q) || (c.ownerName ?? "").subText(q)
 			)
 		: characters;
 	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -75,16 +77,10 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 				sx={{
 					display: "grid",
 					gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
-					gridTemplateAreas:
-						characters.length > 0
-							? {
-									xs: '"title" "search"',
-									sm: '"title search"',
-								}
-							: {
-									xs: '"title"',
-									sm: '"title ."',
-								},
+					gridTemplateAreas: {
+						xs: '"title" "search"',
+						sm: '"title search"',
+					},
 					alignItems: "center",
 					gap: 2,
 					mb: 3,
@@ -95,34 +91,32 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 					fontWeight={600}
 					sx={{ whiteSpace: "nowrap", gridArea: "title" }}
 				>
-					{t("characters.title")}
+					{t("characters.serverTitle")}
 				</Typography>
 
-				{characters.length > 0 && (
-					<TextField
-						size="small"
-						placeholder={t("characters.filterPlaceholder")}
-						value={search}
-						onChange={(e) => {
-							setSearch(e.target.value);
-							setPage(1);
-						}}
-						slotProps={{
-							input: {
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon fontSize="small" />
-									</InputAdornment>
-								),
-							},
-						}}
-						sx={{
-							gridArea: "search",
-							width: { xs: "100%", sm: 320 },
-							justifySelf: { xs: "stretch", sm: "end" },
-						}}
-					/>
-				)}
+				<TextField
+					size="small"
+					placeholder={t("characters.serverFilterPlaceholder")}
+					value={search}
+					onChange={(e) => {
+						setSearch(e.target.value);
+						setPage(1);
+					}}
+					slotProps={{
+						input: {
+							startAdornment: (
+								<InputAdornment position="start">
+									<SearchIcon fontSize="small" />
+								</InputAdornment>
+							),
+						},
+					}}
+					sx={{
+						gridArea: "search",
+						width: { xs: "100%", sm: 320 },
+						justifySelf: { xs: "stretch", sm: "end" },
+					}}
+				/>
 			</Box>
 
 			{error && (
@@ -133,13 +127,35 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 
 			{filtered.length === 0 ? (
 				<Typography color="text.secondary">
-					{search.trim() ? t("characters.noResults") : t("characters.noCharacters")}
+					{q ? t("characters.noResults") : t("characters.noCharacters")}
 				</Typography>
 			) : (
 				<>
 					<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 						{pageChars.map((char) => (
-							<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
+							<Box key={`${char.channelId}-${char.messageId}`}>
+								{char.ownerName && (
+									<Box
+										sx={{
+											display: "flex",
+											alignItems: "center",
+											gap: 0.5,
+											mb: 0.5,
+											px: 0.5,
+										}}
+									>
+										<PersonIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+										<Typography
+											variant="subtitle1"
+											color="text.secondary"
+											fontFamily={"var(--code-font-family)"}
+										>
+											{char.ownerName}
+										</Typography>
+									</Box>
+								)}
+								<CharacterCard char={char} />
+							</Box>
 						))}
 					</Box>
 

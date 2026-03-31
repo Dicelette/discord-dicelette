@@ -8,7 +8,22 @@
 		}
 	},
 	"files": {
-		"includes": ["**", "!!**/node_modules", "!!**/dist"],
+		"includes": [
+			"**",
+			"!!**/node_modules",
+			"!!**/dist",
+			"!!**/@testing",
+			"!!**/.husky",
+			"!!**/.vscode",
+			"!!**/.idea",
+			"!!**/.git",
+			"!!**/.cache",
+			"!!**/coverage",
+			"!!**/build",
+			"!!**/.github",
+			"!!**/assets",
+			"!!**/playwright-report"
+		],
 		"ignoreUnknown": true
 	},
 	"formatter": {
@@ -115,6 +130,21 @@
 		{ "includes": ["**/*.ts", "**/*.tsx", "!**/*.js", "!**/node_modules/**"] },
 		{ "includes": ["**/*.js", "!**/node_modules/**"] },
 		{ "includes": ["**/*.json", "!**/node_modules/**"] },
+		{
+			"includes": [
+				"**/web/src/**/*.{ts,tsx}",
+				"!**/node_modules/**",
+				"**/*.test.{ts,tsx}"
+			],
+			"linter": {
+				"rules": {
+					"style": {
+						"useNamingConvention": "off",
+						"useFilenamingConvention": "off"
+					}
+				}
+			}
+		},
 		{
 			"includes": ["**/web/src/styles.css"],
 			"linter": {

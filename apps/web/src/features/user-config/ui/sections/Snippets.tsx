@@ -13,6 +13,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
+import { memo } from "react";
 import type { SnippetsState } from "../..";
 import { exportJson } from "../../utils.ts";
 import { SnippetRow } from "../atoms";
@@ -21,7 +22,7 @@ interface Props {
 	state: SnippetsState;
 }
 
-export default function Snippets({ state }: Props) {
+function Snippets({ state }: Props) {
 	const { t } = useI18n();
 	const {
 		data: snippets,
@@ -171,3 +172,5 @@ export default function Snippets({ state }: Props) {
 		</Accordion>
 	);
 }
+
+export default memo(Snippets);

@@ -23,7 +23,7 @@ export const authApi = {
 	/**
 	 * API: /auth/guilds/refresh
 	 * POST /auth/guilds/refresh
-	 * @Server: /packages/dashboard-server/auth.ts
+	 * @see {@link file://packages/dashboard-server/auth.ts}
 	 */
 	refreshGuilds: () => api.post("/auth/guilds/refresh"),
 };

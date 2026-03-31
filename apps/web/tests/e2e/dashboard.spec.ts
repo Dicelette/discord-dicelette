@@ -14,6 +14,7 @@ import {
 	languages,
 	MOCK_GUILD,
 	mockAuthMe,
+	mockCharactersCount,
 	mockGuildChannels,
 	mockGuildConfig,
 	mockGuildRoles,
@@ -40,6 +41,7 @@ test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 	await mockGuildConfig(page);
 	await mockGuildChannels(page);
 	await mockGuildRoles(page);
+	await mockCharactersCount(page, MOCK_GUILD.id, 1);
 
 	await page.goto(DASHBOARD_URL);
 
@@ -50,6 +52,23 @@ test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 	await expect(
 		page.getByRole("tab", { name: fr.dashboard.tabs.characters })
 	).toBeVisible();
+});
+
+test("l'onglet Mes personnages est masqué quand le serveur n'a aucun personnage", async ({
+	page,
+}) => {
+	await mockAuthMe(page);
+	await mockGuilds(page);
+	await mockUserConfig(page, MOCK_GUILD.id, { isAdmin: false, userConfig: null });
+	await mockCharactersCount(page, MOCK_GUILD.id, 0);
+
+	await page.goto(DASHBOARD_URL);
+
+	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.user })).toBeVisible();
+	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.characters })).toHaveCount(
+		0
+	);
+	await expect(page.getByText(/snippets/i)).toBeVisible();
 });
 
 // ============================================================================

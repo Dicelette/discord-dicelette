@@ -11,9 +11,11 @@ import {
 	type DiceData,
 	type DiceExtractionResult,
 	MIN_THRESHOLD_MATCH,
+	type Translation,
 	type UserData,
 } from "@dicelette/types";
 import {
+	BotError,
 	DICE_COMPILED_PATTERNS,
 	DICE_PATTERNS,
 	getCachedRegex,
@@ -143,6 +145,7 @@ export function applyCommentsToResult(
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
  * @param disableCompare - Encapsulate the roll with `{}`
  * @param sort - Sort the result passed to roll
+ * @param ul
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
 export function processChainedDiceRoll(
@@ -151,7 +154,8 @@ export function processChainedDiceRoll(
 	statsName?: string[],
 	pity?: boolean,
 	disableCompare?: boolean,
-	sort?: SortOrder
+	sort?: SortOrder,
+	ul?: Translation
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -163,7 +167,8 @@ export function processChainedDiceRoll(
 			userData.stats,
 			false,
 			true,
-			statsName
+			statsName,
+			ul
 		);
 		processedContent = res.formula;
 		infoRoll = res.infoRoll;
@@ -218,6 +223,7 @@ export function processChainedDiceRoll(
  * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
  * @param disableCompare - If true, encapsulate the roll in `{}` to disable success/failure comparison
  * @param sort - Optional sort order for the roll results
+ * @param ul
  * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
  */
 export function isRolling(
@@ -226,7 +232,8 @@ export function isRolling(
 	statsName?: string[],
 	pity?: boolean,
 	disableCompare?: boolean,
-	sort?: SortOrder
+	sort?: SortOrder,
+	ul?: Translation
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -292,7 +299,8 @@ export function isRolling(
 			userData.stats,
 			undefined,
 			undefined,
-			statsName
+			statsName,
+			ul
 		);
 	processedContent = res.formula;
 
@@ -326,7 +334,8 @@ export function isRolling(
 			statsName,
 			pity,
 			disableCompare,
-			sort
+			sort,
+			ul
 		);
 		if (diceRoll)
 			return {
@@ -422,6 +431,23 @@ export function getRoll(
 	return rollDice;
 }
 
+function verifyStatMatcherPattern(dice: string, ul?: Translation) {
+	if (REMOVER_PATTERN.STAT_MATCHER.test(dice)) {
+		//find which one is not replaced
+		const matched = dice.matchAll(new RegExp(REMOVER_PATTERN.STAT_MATCHER));
+		const stats = matched
+			? Array.from(matched, (m) => m?.[0])
+					.map((s) => `\`${s}\``)
+					.join(", ")
+			: "unknown";
+		const errorMessage = ul
+			? ul("error.invalidDice.stats", { stats })
+			: `The dice contains unknown statistics: ${stats}. Verify the values before reprocessing.`;
+		throw new BotError(errorMessage);
+	}
+	return dice;
+}
+
 /**
  * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
  * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
@@ -432,9 +458,10 @@ export function replaceStatsInDiceFormula(
 	stats?: Record<string, number>,
 	deleteComments = false,
 	shared = false,
-	statsName?: string[]
+	statsName?: string[],
+	ul?: Translation
 ): { formula: string; infoRoll?: string; statsPerSegment?: string[] } {
-	if (!stats) return { formula: content };
+	if (!stats) return { formula: verifyStatMatcherPattern(content, ul) };
 	//remove secondary opposition
 
 	let comments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
@@ -491,10 +518,14 @@ export function replaceStatsInDiceFormula(
 					const capitalizedStat = original.capitalize();
 					segmentStats.push(capitalizedStat);
 					statsFounds.push(capitalizedStat);
-					// Escape all regex special characters in the fullMatch (including parentheses)
+					// Preserve surrounding parentheses that the regex may have consumed (e.g. `($s1+$s2)`)
+					const prefix = fullMatch.startsWith("(") ? "(" : "";
+					const suffix = fullMatch.endsWith(")") ? ")" : "";
 					const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-					const regex = getCachedRegex(`${escapedMatch}`, "gu");
-					processedSegment = processedSegment.replace(regex, statValue.toString());
+					processedSegment = processedSegment.replace(
+						new RegExp(escapedMatch, "gu"),
+						`${prefix}${statValue}${suffix}`
+					);
 				}
 			}
 
@@ -534,10 +565,16 @@ export function replaceStatsInDiceFormula(
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
-				// Escape all regex special characters in the fullMatch (including parentheses)
+				// Preserve a dangling paren only when the regex consumed it on one side only.
+				// `($var)` → both parens consumed → drop them (just the value).
+				// `($s1` or `$s2)` → one paren consumed → keep it so `1d($s1+$s2)` → `1d(X+Y)`.
+				const prefix = fullMatch.startsWith("(") && !fullMatch.endsWith(")") ? "(" : "";
+				const suffix = fullMatch.endsWith(")") && !fullMatch.startsWith("(") ? ")" : "";
 				const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-				const regex = getCachedRegex(`${escapedMatch}`, "gu");
-				processedFormula = processedFormula.replace(regex, statValue.toString());
+				processedFormula = processedFormula.replace(
+					new RegExp(escapedMatch, "gu"),
+					`${prefix}${statValue}${suffix}`
+				);
 			}
 		}
 	}
@@ -560,13 +597,13 @@ export function replaceStatsInDiceFormula(
 			? `${processedFormula} ${originalComments}`.trim()
 			: processedFormula;
 		return {
-			formula: finalFormula,
+			formula: verifyStatMatcherPattern(finalFormula, ul),
 			infoRoll: uniqueStats?.[0],
 			statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 		};
 	}
 	return {
-		formula: `${processedFormula} ${comments}`,
+		formula: `${verifyStatMatcherPattern(processedFormula, ul)} ${comments}`,
 		infoRoll: uniqueStats?.[0],
 		statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 	};

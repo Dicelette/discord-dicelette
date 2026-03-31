@@ -1,11 +1,15 @@
 {
 	"characters": {
 		"damage": "Dés de compétence",
+		"filterPlaceholder": "Rechercher par nom…",
+		"serverFilterPlaceholder": "Rechercher par nom ou joueur…",
 		"loadError": "Impossible de charger les personnages.",
 		"noCharacters": "Aucun personnage enregistré sur ce serveur.",
+		"noResults": "Aucun personnage ne correspond à la recherche.",
 		"private": "Fiche privée",
 		"refresh": "Actualiser",
 		"refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
+		"serverTitle": "Personnages du serveur",
 		"sheetLink": "Voir la fiche",
 		"title": "Mes personnages",
 		"unnamed": "(Sans nom)"
@@ -78,11 +82,16 @@
 	},
 	"dashboard": {
 		"loadError": "Impossible de charger la configuration.",
+		"refreshCharacters": "Actualiser les personnages",
+		"refreshCharactersError": "Impossible d'actualiser les personnages.",
+		"refreshCharactersSuccess": "Personnages actualisés !",
+		"refreshCharactersTooltip": "Rafraîchir les données des personnages.",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
 			"admin": "Configuration serveur",
-			"characters": "Personnages",
+			"characters": "Mes personnages",
+			"serverCharacters": "Personnages du serveur",
 			"template": "Configuration du modèle",
 			"user": "Configuration personnelle"
 		},
@@ -100,10 +109,12 @@
 		"addBotTitle": "Ajouter Dicelette",
 		"botPresent": "Dicelette est présent",
 		"loadError": "Impossible de charger les serveurs.",
+		"noSearchResults": "Aucun serveur ne correspond à votre recherche.",
 		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
 		"rateLimitError": "Trop de requêtes. Veuillez patienter avant d'actualiser à nouveau.",
 		"refresh": "Actualiser",
 		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
+		"searchPlaceholder": "Rechercher un serveur...",
 		"subtitle": "Sélectionnez un serveur pour gérer sa configuration.",
 		"title": "Vos serveurs"
 	},
@@ -175,7 +186,9 @@
 		"snippetDice": "Expression de dés",
 		"snippetsDesc": "Macros de dés nommées utilisables dans les commandes de jets.",
 		"templateDesc": "Personnalisez le format d'affichage des résultats lors de la création de liens.",
+		"templateDoc": "Vous trouverez la documentation et les modèles de liens ici.",
 		"templateFinal": "Format final",
+		"templateFinalDesc": "Ne peut contenir que les variables de résultats, lien, nom et personnage.",
 		"templateFormat": {
 			"character": "Personnage",
 			"dice": "Dés",
@@ -183,8 +196,11 @@
 			"name": "Nom de la stat",
 			"originalDice": "Dés originaux"
 		},
-		"templateFormatSection": "Sous-formats :",
+		"templateFormatSection": "Sous-formats",
 		"templateJoin": "Séparateur de résultats",
-		"templateResults": "Format d'une ligne de résultat"
+		"templateJoinDesc": "Joins les valeurs du résultat",
+		"templateLinkDoc": "https://www.dicelette.app/docs/config/context_menu",
+		"templateResults": "Format d'une ligne de résultat",
+		"templateResultsDesc": "Liste jointe, composée de dé, info et dé original."
 	}
 }

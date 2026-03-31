@@ -1,10 +1,18 @@
-import type { UserData, UserGuildData } from "@dicelette/types";
+import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
+import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import * as Papa from "papaparse";
 import type { DashboardDeps } from "..";
-import { type ApiCharacter, CHAR_CACHE_TTL, charCache, type EmbedField } from "./types";
-import { fetchCharacterEmbeds, makeRequireAdmin, requireAuth } from "./utils";
+import { type ApiCharacter, CHAR_CACHE_TTL, charCache, type EmbedField } from "../types";
+import {
+	fetchCharacterEmbeds,
+	isStaleDiscordCdnUrl,
+	makeRequireAdmin,
+	requireAuth,
+	userCanRefreshServerCharacters,
+	withTimeout,
+} from "../utils";
 
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
@@ -19,6 +27,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 		const cached = charCache.get(cacheKey);
 		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+			res.setHeader("Cache-Control", "no-store");
 			res.json(cached.data);
 			return;
 		}
@@ -39,64 +48,99 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const memByMessageId = new Map<string, UserData>(
 			memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
 		);
-
-		const result: ApiCharacter[] = await Promise.all(
-			userChars
-				.filter((char) => {
-					// Exclure les personnages issus d'un template (non enregistrés réellement)
-					const mem = memByMessageId.get(char.messageId[0]);
-					return !mem?.isFromTemplate;
-				})
-				.map(async (char) => {
-					const [messageId, channelId] = char.messageId;
-					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-
-					const mem = memByMessageId.get(messageId);
-					let avatar: string | null = null;
-					let stats: EmbedField[] | null = null;
-					let damage: EmbedField[] | null = null;
-
-					if (mem) {
-						// Données directement depuis la mémoire — aucun appel Discord
-						avatar = mem.avatar ?? null;
-						if (mem.stats)
-							stats = Object.entries(mem.stats).map(([name, value]) => ({
-								name,
-								value: String(value),
-							}));
-						if (mem.damage)
-							damage = Object.entries(mem.damage).map(([name, value]) => ({
-								name,
-								value,
-							}));
-					} else {
-						// Fallback : personnage absent de la mémoire (ex. premier chargement après restart)
-						try {
-							({ avatar, stats, damage } = await fetchCharacterEmbeds(
-								channelId,
-								messageId,
-								botChannels
-							));
-						} catch {
-							// erreurs silencieuses
-						}
-					}
-
-					return {
-						charName: char.charName ?? null,
-						messageId,
-						channelId,
-						discordLink,
-						canLink,
-						isPrivate: char.isPrivate ?? false,
-						avatar,
-						stats,
-						damage,
-					};
-				})
+		// Fallback : correspondance par userName (insensible à la casse) quand messageId absent
+		const memByUserName = new Map<string, UserData>(
+			memChars
+				.filter((c) => c.userName != null)
+				.map((c) => [c.userName!.toLowerCase(), c])
 		);
+		const memWithoutName = memChars.find((c) => c.userName == null);
+
+		let result: ApiCharacter[];
+		try {
+			result = await withTimeout(
+				Promise.all(
+					userChars
+						.filter((char) => {
+							// Exclure les personnages issus d'un template (non enregistrés réellement)
+							const mem = memByMessageId.get(char.messageId[0]);
+							return !mem?.isFromTemplate;
+						})
+						.map(async (char) => {
+							const [messageId, channelId] = char.messageId;
+							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+
+							const mem =
+								memByMessageId.get(messageId) ??
+								memByUserName.get((char.charName ?? "").toLowerCase()) ??
+								(char.charName == null ? memWithoutName : undefined);
+							let avatar: string | null = null;
+							let stats: EmbedField[] | null = null;
+							let damage: EmbedField[] | null = null;
+
+							if (mem) {
+								// Données directement depuis la mémoire — aucun appel Discord
+								avatar = mem.avatar ?? null;
+								if (mem.stats)
+									stats = Object.entries(mem.stats).map(([name, value]) => ({
+										name,
+										value: String(value),
+									}));
+								if (mem.damage)
+									damage = Object.entries(mem.damage).map(([name, value]) => ({
+										name,
+										value,
+									}));
+							}
+							const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
+							if (
+								stats === null ||
+								damage === null ||
+								avatar === null ||
+								hasStaleAvatar
+							) {
+								// Fallback : données manquantes ou URL CDN expirée — récupère depuis les embeds Discord
+								try {
+									const fetched = await fetchCharacterEmbeds(
+										channelId,
+										messageId,
+										botChannels
+									);
+									if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
+									stats = stats ?? fetched.stats;
+									damage = damage ?? fetched.damage;
+								} catch (err) {
+									important.warn(
+										`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
+									);
+								}
+							}
+
+							return {
+								charName: char.charName ?? null,
+								messageId,
+								channelId,
+								discordLink,
+								canLink,
+								isPrivate: char.isPrivate ?? false,
+								avatar,
+								stats,
+								damage,
+							};
+						})
+				),
+				15_000
+			);
+		} catch (err) {
+			if (err instanceof Error && err.message.startsWith("Timed out")) {
+				res.status(504).json({ error: "Request timed out" });
+				return;
+			}
+			throw err;
+		}
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		res.setHeader("Cache-Control", "no-store");
 		res.json(result);
 	});
 
@@ -108,12 +152,187 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ ok: true });
 	});
 
+	// POST /:guildId/characters/refresh-dashboard — refresh joueur, et serveur si MJ/admin
+	router.post("/refresh-dashboard", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+
+		charCache.delete(`${guildId}:${userId}`);
+
+		const canRefreshServer = await userCanRefreshServerCharacters(
+			userId,
+			guildId,
+			botGuilds
+		);
+		if (canRefreshServer) {
+			charCache.delete(`${guildId}:*all*`);
+		}
+
+		res.json({ ok: true, refreshedAll: canRefreshServer });
+	});
+
+	// GET /:guildId/characters/all — toutes les fiches du serveur (admin uniquement)
+	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const cacheKey = `${guildId}:*all*`;
+
+		const cached = charCache.get(cacheKey);
+		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+			res.setHeader("Cache-Control", "no-store");
+			res.json(cached.data);
+			return;
+		}
+
+		const guildData = settings.get(guildId);
+		if (!guildData) {
+			res.status(404).json({ error: "Guild not found" });
+			return;
+		}
+
+		const canLink =
+			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
+		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
+		const guild = botGuilds.get(guildId);
+
+		let result: ApiCharacter[];
+		try {
+			result = await withTimeout(
+				(async () => {
+					// Résoudre les pseudos Discord de tous les joueurs en une passe parallèle
+					const uniqueUserIds = Object.keys(allUsers);
+					const nameEntries = await Promise.all(
+						uniqueUserIds.map(async (uid) => {
+							const name = await guild?.fetchMemberName(uid).catch(() => null);
+							return [uid, name ?? null] as const;
+						})
+					);
+					const ownerNames = new Map<string, string | null>(nameEntries);
+
+					return Promise.all(
+						Object.entries(allUsers).flatMap(([userId, userChars]) => {
+							const memChars: UserData[] = allMemChars[userId] ?? [];
+							const memByMessageId = new Map<string, UserData>(
+								memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
+							);
+							const memByUserName = new Map<string, UserData>(
+								memChars
+									.filter((c) => c.userName != null)
+									.map((c) => [c.userName!.toLowerCase(), c])
+							);
+							const memWithoutName = memChars.find((c) => c.userName == null);
+							const ownerName = ownerNames.get(userId) ?? undefined;
+
+							return userChars
+								.filter((char) => {
+									const mem = memByMessageId.get(char.messageId[0]);
+									return !mem?.isFromTemplate;
+								})
+								.map(async (char): Promise<ApiCharacter> => {
+									const [messageId, channelId] = char.messageId;
+									const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+
+									const mem =
+										memByMessageId.get(messageId) ??
+										memByUserName.get((char.charName ?? "").toLowerCase()) ??
+										(char.charName == null ? memWithoutName : undefined);
+
+									let avatar: string | null = mem?.avatar ?? null;
+									let stats: EmbedField[] | null = null;
+									let damage: EmbedField[] | null = null;
+
+									if (mem?.stats)
+										stats = Object.entries(mem.stats).map(([name, value]) => ({
+											name,
+											value: String(value),
+										}));
+									if (mem?.damage)
+										damage = Object.entries(mem.damage).map(([name, value]) => ({
+											name,
+											value,
+										}));
+
+									const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
+									if (
+										stats === null ||
+										damage === null ||
+										avatar === null ||
+										hasStaleAvatar
+									) {
+										try {
+											const fetched = await fetchCharacterEmbeds(
+												channelId,
+												messageId,
+												botChannels
+											);
+											if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
+											stats = stats ?? fetched.stats;
+											damage = damage ?? fetched.damage;
+										} catch (err) {
+											important.warn(
+												`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
+											);
+										}
+									}
+
+									return {
+										charName: char.charName ?? null,
+										messageId,
+										channelId,
+										discordLink,
+										canLink,
+										isPrivate: char.isPrivate ?? false,
+										avatar,
+										stats,
+										damage,
+										userId,
+										ownerName,
+									};
+								});
+						})
+					);
+				})(),
+				30_000
+			);
+		} catch (err) {
+			if (err instanceof Error && err.message.startsWith("Timed out")) {
+				res.status(504).json({ error: "Request timed out" });
+				return;
+			}
+			throw err;
+		}
+
+		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		res.setHeader("Cache-Control", "no-store");
+		res.json(result);
+	});
+
+	// POST /:guildId/characters/refresh-all — invalide le cache serveur (admin uniquement)
+	router.post(
+		"/refresh-all",
+		requireAuth,
+		requireAdmin,
+		(req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			charCache.delete(`${guildId}:*all*`);
+			res.json({ ok: true });
+		}
+	);
+
 	// GET /:guildId/characters/count — nombre total de personnages du serveur (admin uniquement)
 	router.get("/count", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const users: Record<string, UserGuildData[]> = settings.get(guildId)?.user ?? {};
 		const count = Object.values(users).reduce((sum, chars) => sum + chars.length, 0);
 		res.json({ count });
+	});
+
+	// GET /:guildId/characters/count-self — nombre de personnages du joueur courant (sans droits admin)
+	router.get("/count-self", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.session.userId!;
+		const userChars: UserGuildData[] = settings.get(guildId)?.user?.[userId] ?? [];
+		res.json({ count: userChars.length });
 	});
 
 	// GET /:guildId/characters/export — export CSV de tous les personnages (admin uniquement)

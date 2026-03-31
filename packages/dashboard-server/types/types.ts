@@ -2,6 +2,8 @@
 // Types, interfaces et constantes partagées pour les routes /guilds
 // ---------------------------------------------------------------------------
 
+import { CHAR_CACHE_TTL, charCache, permCache } from "./cache";
+
 export interface EmbedField {
 	name: string;
 	value: string;
@@ -23,36 +25,37 @@ export interface ApiCharacter {
 	avatar: string | null;
 	stats: EmbedField[] | null;
 	damage: EmbedField[] | null;
+	/** Only present in admin server-wide character list */
+	userId?: string;
+	/** Discord display name of the owner — only present in admin server-wide character list */
+	ownerName?: string;
 }
 
 // ---------------------------------------------------------------------------
 // Constantes
 // ---------------------------------------------------------------------------
 
-export const DISCORD_API = "https://discord.com/api/v10";
-
-/** Marqueurs identifiant un embed "fiche utilisateur" */
-export const USER_EMBED_MARKERS = [
-	"⌈⌋",
-	"registration",
-	"enregistrement",
-	"registered player",
-	"joueur enregistré",
-];
-
-export const STATS_TITLES = ["statistic", "statistique", "statistics", "statistiques"];
-
-/** Discord snowflake : chaîne numérique de 17 à 20 chiffres */
-export const SNOWFLAKE_RE = /^\d{17,20}$/;
-
 // ---------------------------------------------------------------------------
 // Caches module-level (singleton par processus)
 // ---------------------------------------------------------------------------
 
-/** Cache des fiches personnage : clé = `${guildId}:${userId}`, TTL = 5 min */
-export const CHAR_CACHE_TTL = 5 * 60 * 1000;
-export const charCache = new Map<string, { data: ApiCharacter[]; ts: number }>();
+// ---------------------------------------------------------------------------
+// Cache pruning — prevents unbounded memory growth over time
+// ---------------------------------------------------------------------------
 
-/** Cache des permissions : clé = `${userId}:${guildId}`, TTL = 5 min */
-export const PERM_CACHE_TTL = 5 * 60 * 1000;
-export const permCache = new Map<string, { result: boolean; expiresAt: number }>();
+setInterval(
+	() => {
+		const now = Date.now();
+		for (const [key, entry] of permCache) {
+			if (now >= entry.expiresAt) permCache.delete(key);
+		}
+	},
+	10 * 60 * 1000
+).unref();
+
+setInterval(() => {
+	const now = Date.now();
+	for (const [key, entry] of charCache) {
+		if (now - entry.ts >= CHAR_CACHE_TTL) charCache.delete(key);
+	}
+}, CHAR_CACHE_TTL).unref();

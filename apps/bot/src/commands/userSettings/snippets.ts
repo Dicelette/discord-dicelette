@@ -29,7 +29,11 @@ export async function register(
 	)?.attributes;
 	const dice = replaceStatsInDiceFormula(
 		getExpression(diceValue, "0", attributes).dice,
-		attributes
+		attributes,
+		undefined,
+		undefined,
+		undefined,
+		ul
 	);
 	await baseRoll(dice.formula, interaction, client, false, true);
 	// store using generic helper

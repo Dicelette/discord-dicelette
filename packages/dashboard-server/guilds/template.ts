@@ -4,7 +4,7 @@ import { Locale } from "discord-api-types/v6";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "..";
-import { makeRequireAdmin, requireAuth } from "./utils";
+import { makeRequireAdmin, requireAuth } from "../utils";
 
 export function createTemplateRouter(deps: DashboardDeps) {
 	const { settings, template, botChannels, botGuilds } = deps;

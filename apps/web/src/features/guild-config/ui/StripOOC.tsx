@@ -11,13 +11,14 @@ import {
 	type Channel,
 	ChannelSelect,
 	formatDuration,
+	getChannelPathById,
 	millisecondsToSeconds,
 	NumberField,
 	SectionTitle,
 	secondsToMilliseconds,
 	useI18n,
 } from "@shared";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { type Control, Controller, useController, useWatch } from "react-hook-form";
 
 function escapeRegex(str: string) {
@@ -42,7 +43,7 @@ interface Props {
 	textChannels: Channel[];
 }
 
-export default function StripOOC({ control, channels, textChannels }: Props) {
+function StripOOC({ control, channels, textChannels }: Props) {
 	const { t } = useI18n();
 	const stripOOC = useWatch({ control, name: "stripOOC" });
 	const { field: regexField } = useController({ name: "stripOOC.regex", control });
@@ -99,7 +100,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 			{!!(stripOOC?.timer && stripOOC.timer > 0) && (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 					<FormControlLabel
-						sx={{ gridColumn: "span 2" }}
+						sx={{ gridColumn: { xs: "span 1", md: "span 2" } }}
 						control={
 							<Switch
 								checked={advancedMode}
@@ -130,7 +131,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 								<Typography
 									variant="caption"
 									color="text.secondary"
-									sx={{ gridColumn: "span 2" }}
+									sx={{ gridColumn: { xs: "span 1", md: "span 2" } }}
 								>
 									{t("config.fields.stripOocRegexPreview", {
 										regex: buildRegex(prefix, suffix) ?? "",
@@ -167,7 +168,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 							helperText={regexError ?? t("config.fields.stripOocRegexHelp")}
 						/>
 					)}
-					<Box sx={{ maxWidth: 400 }}>
+					<Box sx={{ width: "100%", maxWidth: { xs: "100%", md: 400 } }}>
 						<Controller
 							name="stripOOC.timer"
 							control={control}
@@ -202,9 +203,19 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 									fullWidth
 									size="small"
 									multiple
-									options={channels}
+									options={channels.sort((a, b) => {
+										const isUncategorizedA = a.type !== 4 && !a.parent_id;
+										const isUncategorizedB = b.type !== 4 && !b.parent_id;
+										if (isUncategorizedA !== isUncategorizedB)
+											return isUncategorizedA ? -1 : 1;
+										const pathA = getChannelPathById(a.id, channels) ?? a.name;
+										const pathB = getChannelPathById(b.id, channels) ?? b.name;
+										return pathA.localeCompare(pathB);
+									})}
 									getOptionKey={(c) => c.id}
-									getOptionLabel={(c) => `${c.type === 4 ? "\u{1F4C2}" : "#"} ${c.name}`}
+									getOptionLabel={(c) =>
+										`${c.type === 4 ? "\u{1F4C2}" : ""} ${getChannelPathById(c.id, channels)}`
+									}
 									value={selected}
 									onChange={(_, newValue) =>
 										field.onChange(
@@ -217,7 +228,7 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 											label={t("config.fields.stripOocChannels")}
 											slotProps={{
 												input: { ...params.InputProps },
-												htmlInput: { ...params.inputProps, readOnly: true },
+												htmlInput: { ...params.inputProps },
 											}}
 										/>
 									)}
@@ -258,3 +269,5 @@ export default function StripOOC({ control, channels, textChannels }: Props) {
 		</>
 	);
 }
+
+export default memo(StripOOC);

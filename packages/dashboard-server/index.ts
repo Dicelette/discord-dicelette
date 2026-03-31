@@ -18,6 +18,13 @@ const SessionStore = MemoryStore(session);
 // ---------------------------------------------------------------------------
 export function makeRateLimit(max: number, windowMs: number) {
 	const buckets = new Map<string, number[]>();
+	// Purge stale keys periodically to prevent unbounded memory growth
+	setInterval(() => {
+		const cutoff = Date.now() - windowMs;
+		for (const [key, hits] of buckets) {
+			if (hits.every((t) => t <= cutoff)) buckets.delete(key);
+		}
+	}, windowMs).unref();
 	return function rateLimit(req: Request, res: Response, next: NextFunction): void {
 		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
 		const now = Date.now();
@@ -50,6 +57,8 @@ export interface BotMember {
 export interface BotGuild {
 	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
 	fetchMember: (userId: string) => Promise<BotMember | null>;
+	/** Fetch the user's Discord handle (pomelo), formatted as @username */
+	fetchMemberName: (userId: string) => Promise<string | null>;
 	/** All channels in the guild (all types, let the caller filter) */
 	readonly channels: ReadonlyArray<{ id: string; name: string; type: number }>;
 	/** All roles except @everyone */
@@ -130,6 +139,21 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			res.setHeader("X-Frame-Options", "DENY");
 			res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 			res.setHeader("X-XSS-Protection", "0");
+			if (isProduction) {
+				res.setHeader("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
+			}
+			res.setHeader(
+				"Content-Security-Policy",
+				[
+					"default-src 'self'",
+					"connect-src 'self' https://discord.com",
+					"img-src 'self' data: https://cdn.discordapp.com https://media.discordapp.net",
+					"script-src 'self'",
+					"style-src 'self' 'unsafe-inline'",
+					"font-src 'self'",
+					"frame-ancestors 'none'",
+				].join("; ")
+			);
 			next();
 		}
 	);
@@ -150,6 +174,41 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			},
 		})
 	);
+
+	// CSRF: reject state-changing requests originating from unexpected origins.
+	// Same-origin requests from the SPA always carry a matching Origin header.
+	// Non-browser clients (monitoring, server-to-server) typically omit Origin and are allowed through.
+	const allowedOrigin = (() => {
+		try {
+			return new URL(FrontendUrl).origin;
+		} catch {
+			return FrontendUrl;
+		}
+	})();
+	app.use((req: Request, res: Response, next: NextFunction): void => {
+		const safeMethods = ["GET", "HEAD", "OPTIONS"];
+		if (safeMethods.includes(req.method)) {
+			next();
+			return;
+		}
+		const origin = req.get("Origin");
+		if (!origin) {
+			next();
+			return;
+		}
+		let requestOrigin: string;
+		try {
+			requestOrigin = new URL(origin).origin;
+		} catch {
+			res.status(403).json({ error: "Forbidden" });
+			return;
+		}
+		if (requestOrigin !== allowedOrigin) {
+			res.status(403).json({ error: "Forbidden" });
+			return;
+		}
+		next();
+	});
 
 	// Auth routes: 60 req/min per user — protects Discord OAuth calls (guild list, token exchange)
 	// Refresh endpoint has an additional stricter limit defined within createAuthRouter

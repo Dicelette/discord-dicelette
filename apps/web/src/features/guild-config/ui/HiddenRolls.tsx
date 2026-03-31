@@ -1,12 +1,9 @@
 import { FormControlLabel, Switch, Typography } from "@mui/material";
 import { ChannelSelect, type HiddenRoleProps, SectionTitle, useI18n } from "@shared";
+import { memo } from "react";
 import { Controller, useWatch } from "react-hook-form";
 
-export default function HiddenRolls({
-	control,
-	textChannels,
-	allChannels,
-}: HiddenRoleProps) {
+function HiddenRolls({ control, textChannels, allChannels }: HiddenRoleProps) {
 	const hiddenRoll = useWatch({ control, name: "hiddenRoll" });
 	const { t } = useI18n();
 
@@ -70,3 +67,5 @@ export default function HiddenRolls({
 		</>
 	);
 }
+
+export default memo(HiddenRolls);

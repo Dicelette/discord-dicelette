@@ -367,5 +367,26 @@ describe("dice_extractor", () => {
 			expect(result.statsPerSegment![1]).toBe("Dex");
 			expect(result.statsPerSegment![2]).toBe("Con");
 		});
+
+		it("should preserve parentheses when replacing stats inside them", () => {
+			const content = "1d($s1+$s2)";
+			const stats = { s1: 5, s2: 10 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.formula).toContain("1d(5+10)");
+		});
+
+		it("should replace 3 stat variables in a single non-shared formula", () => {
+			const content = "1d10+$S1+$S2+$S3";
+			const stats = { S1: 5, S2: 10, S3: 15 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.formula).toContain("1d10+5+10+15");
+			expect(result.formula).toContain("S1");
+			expect(result.formula).toContain("S2");
+			expect(result.formula).toContain("S3");
+		});
 	});
 });

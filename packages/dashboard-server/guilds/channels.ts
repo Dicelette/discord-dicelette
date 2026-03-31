@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "..";
-import { makeRequireAdmin, requireAuth, userCanManageGuildViaOAuth } from "./utils";
+import { makeRequireAdmin, requireAuth, userCanManageGuildViaOAuth } from "../utils";
 
 /*
 GET /guildId/channels

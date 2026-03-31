@@ -1,11 +1,15 @@
 {
 	"characters": {
 		"damage": "Skill dice",
+		"filterPlaceholder": "Search by name…",
+		"serverFilterPlaceholder": "Search by name or player…",
 		"loadError": "Could not load characters.",
 		"noCharacters": "No characters registered on this server.",
+		"noResults": "No characters match the search.",
 		"private": "Private sheet",
 		"refresh": "Refresh",
 		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
+		"serverTitle": "Server characters",
 		"sheetLink": "View sheet",
 		"title": "My characters",
 		"unnamed": "(Unnamed)"
@@ -78,11 +82,16 @@
 	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
+		"refreshCharacters": "Refresh characters",
+		"refreshCharactersError": "Could not refresh characters.",
+		"refreshCharactersSuccess": "Characters refreshed!",
+		"refreshCharactersTooltip": "Refreshes characters data.",
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
 			"admin": "Server configuration",
-			"characters": "Characters",
+			"characters": "My characters",
+			"serverCharacters": "Server characters",
 			"template": "Model configuration",
 			"user": "Personal configuration"
 		},
@@ -100,10 +109,12 @@
 		"addBotTitle": "Add Dicelette",
 		"botPresent": "Dicelette is present",
 		"loadError": "Could not load servers.",
+		"noSearchResults": "No server matches your search.",
 		"noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
 		"rateLimitError": "Too many requests. Please wait before refreshing again.",
 		"refresh": "Refresh",
 		"refreshTooltip": "The list is cached for 15 min. Click to force an update.",
+		"searchPlaceholder": "Search for a server...",
 		"subtitle": "Select a server to manage its configuration.",
 		"title": "Your servers"
 	},
@@ -175,7 +186,9 @@
 		"snippetDice": "Dice expression",
 		"snippetsDesc": "Named dices you can use in roll commands.",
 		"templateDesc": "Customize how roll results are formatted when creating links.",
+		"templateDoc": "You can find the documentation and link templates here.",
 		"templateFinal": "Final format",
+		"templateFinalDesc": "Can only contains values from results, links, name and character.",
 		"templateFormat": {
 			"character": "Character",
 			"dice": "Dice",
@@ -183,8 +196,11 @@
 			"name": "Stat name",
 			"originalDice": "Original dice"
 		},
-		"templateFormatSection": "Sub-formats:",
+		"templateFormatSection": "Sub-formats",
 		"templateJoin": "Result separator",
-		"templateResults": "Result line format"
+		"templateJoinDesc": "Concatenate the values in the result",
+		"templateLinkDoc": "https://www.dicelette.app/en/docs/config/context_menu",
+		"templateResults": "Result line format",
+		"templateResultsDesc": "List joined, composed by dice, info and original dice."
 	}
 }

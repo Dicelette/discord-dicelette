@@ -46,6 +46,10 @@ export interface ApiCharacter {
 	avatar: string | null;
 	stats: ApiCharacterField[] | null;
 	damage: ApiCharacterField[] | null;
+	/** Only present in admin server-wide character list */
+	userId?: string;
+	/** Discord handle (@username) of the owner — only present in admin server-wide character list */
+	ownerName?: string;
 }
 
 export interface TemplateImportPayload {

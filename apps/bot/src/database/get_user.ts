@@ -243,7 +243,13 @@ async function getUserFrom(
 		return char.charName?.subText(charName) || (!charName && char.charName == null);
 	});
 
-	if (!user) return;
+	if (!user) {
+		if (options?.attributes) {
+			const stats = mergeAttribute(client, undefined, guildId, userId);
+			if (stats) return { userData: { stats, template: {} } };
+		}
+		return;
+	}
 
 	const userMessageId: PersonnageIds = {
 		channelId: user.messageId[1],

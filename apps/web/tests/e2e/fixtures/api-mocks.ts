@@ -206,6 +206,20 @@ export async function mockCharacters(
 	);
 }
 
+/**
+ * Simule le nombre total de personnages enregistrés sur un serveur.
+ * Intercepte GET /api/guilds/:guildId/characters/count.
+ */
+export async function mockCharactersCount(
+	page: Page,
+	guildId: string = MOCK_GUILD.id,
+	count = 1
+) {
+	await page.route(`**/api/guilds/${guildId}/characters/count`, (route) =>
+		route.fulfill({ json: { count } })
+	);
+}
+
 // ---- Mock du langage, pas réellement un i18n parce que justement on test pas ça ici, juste la présence de certaines chaînes en fonction de la config de langue. ----
 
 export const languages = {
