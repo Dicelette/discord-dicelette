@@ -78,7 +78,8 @@ export default (client: EClient): void => {
 				statsName,
 				pity,
 				disableCompare,
-				sortOrder
+				sortOrder,
+				ul
 			);
 
 			if (!isRoll || allValuesUndefined(isRoll))
