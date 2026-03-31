@@ -10,9 +10,7 @@ function HiddenRolls({ control, textChannels, allChannels }: HiddenRoleProps) {
 	return (
 		<>
 			<SectionTitle>{t("config.sections.hiddenRolls")}</SectionTitle>
-			<Typography variant={"subtitle1"}>
-				{t("config.sections.hiddenRollsDesc")}
-			</Typography>
+			<Typography variant="subtitle2">{t("config.sections.hiddenRollsDesc")}</Typography>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<Controller
 					name="hiddenRoll"

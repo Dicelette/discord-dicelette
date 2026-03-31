@@ -7,7 +7,7 @@
 	"license": "GNU GPLv3",
 	"keywords": [],
 	"engines": {
-		"node": ">=24"
+		"node": "24.14.0"
 	},
 	"engineStrict": true,
 	"scripts": {
@@ -18,7 +18,7 @@
 		"bot:watch": "tsx watch --clear-screen=false apps/bot/index.ts",
 		"dashboard:build": "pnpm --filter @dicelette/web build",
 		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false apps/bot/index.ts",
-		"lint": "biome check --write ./apps/ ./packages/ --unsafe",
+		"lint": "biome check --write ./apps/ ./packages/ ./dashboard --unsafe",
 		"pm2:delete": "pm2 delete dicelette",
 		"pm2:restart": "pnpm run build && pm2 restart dicelette",
 		"pm2:start": "pnpm run build && pm2 start dist/apps/bot/index.js --name dicelette --log-date-format=\"YYYY-MM-DD HH:mm Z\"",

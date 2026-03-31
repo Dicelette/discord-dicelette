@@ -45,6 +45,7 @@ export const MOCK_GUILD: DiscordGuild = {
 	owner: true,
 	permissions: "2147483647",
 	botPresent: true,
+	isAdmin: true,
 };
 
 /** Serveur Discord où le bot N'est PAS présent (pour tester le bouton "Ajouter") */
@@ -175,13 +176,15 @@ export async function mockGuildRoles(page: Page, guildId: string = MOCK_GUILD.id
  * Simule la configuration personnelle de l'utilisateur sur un serveur.
  * Intercepte GET /api/guilds/:guildId/user-config.
  *
+ * @param page
+ * @param guildId
  * @param data  - `isAdmin: true` → les onglets Admin et Template sont affichés.
  *              - `isAdmin: false` → seuls User et Characters sont affichés.
  */
 export async function mockUserConfig(
 	page: Page,
 	guildId: string = MOCK_GUILD.id,
-	data: ApiUserConfig = { isAdmin: true, userConfig: null }
+	data: ApiUserConfig = { isAdmin: true, userConfig: null, isStrictAdmin: false }
 ) {
 	await page.route(`**/api/guilds/${guildId}/user-config`, (route) =>
 		route.fulfill({ json: data })

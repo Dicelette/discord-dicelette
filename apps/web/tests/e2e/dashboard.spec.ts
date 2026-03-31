@@ -37,7 +37,11 @@ test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 	// 1. Mocker tous les endpoints nécessaires au chargement du dashboard admin
 	await mockAuthMe(page);
 	await mockGuilds(page);
-	await mockUserConfig(page, MOCK_GUILD.id, { isAdmin: true, userConfig: null });
+	await mockUserConfig(page, MOCK_GUILD.id, {
+		isAdmin: true,
+		userConfig: null,
+		isStrictAdmin: false,
+	});
 	await mockGuildConfig(page);
 	await mockGuildChannels(page);
 	await mockGuildRoles(page);
@@ -59,7 +63,11 @@ test("l'onglet Mes personnages est masqué quand le serveur n'a aucun personnage
 }) => {
 	await mockAuthMe(page);
 	await mockGuilds(page);
-	await mockUserConfig(page, MOCK_GUILD.id, { isAdmin: false, userConfig: null });
+	await mockUserConfig(page, MOCK_GUILD.id, {
+		isAdmin: false,
+		userConfig: null,
+		isStrictAdmin: false,
+	});
 	await mockCharactersCount(page, MOCK_GUILD.id, 0);
 
 	await page.goto(DASHBOARD_URL);

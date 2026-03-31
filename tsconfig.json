@@ -58,7 +58,9 @@
 		"@testing/**",
 		"apps/localization/docs/**",
 		"packages/localization/docs/**",
-		"apps/web/**"
+		"apps/web/**",
+		"**/*.spec.ts",
+		"**/tests/**"
 	],
 	"include": [
 		"apps/**/*.ts",

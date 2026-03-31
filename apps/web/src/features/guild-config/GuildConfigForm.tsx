@@ -1,6 +1,12 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
-import { type Channel, ConfigFormFooter, type Role, useConfigForm, useI18n } from "@shared";
+import {
+	type Channel,
+	ConfigFormFooter,
+	type Role,
+	useConfigForm,
+	useI18n,
+} from "@shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TemplateState } from "../user-config/types";
 import Links from "../user-config/ui/sections/Links";
@@ -99,6 +105,13 @@ export default function GuildConfigForm({
 
 			<Box component="form" onSubmit={handleSubmit(handleSaveAndReset)}>
 				<Stack spacing={2}>
+					<Paper sx={{ p: 3 }}>
+						<DashboardAccess
+							control={control}
+							roles={roles}
+							isStrictAdmin={isStrictAdmin}
+						/>
+					</Paper>
 					<Paper sx={{ p: 3 }} title={t("config.sections.general")}>
 						<General control={control} />
 					</Paper>
@@ -133,10 +146,6 @@ export default function GuildConfigForm({
 							textChannels={textChannels}
 							allChannels={channels}
 						/>
-					</Paper>
-
-					<Paper sx={{ p: 3 }}>
-						<DashboardAccess control={control} roles={roles} isStrictAdmin={isStrictAdmin} />
 					</Paper>
 
 					<Paper sx={{ p: 0 }}>
