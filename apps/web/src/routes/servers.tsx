@@ -66,6 +66,9 @@ export default function Servers() {
 		.filter((g) => g.botPresent)
 		.sort((a, b) => {
 			//on va trier par ordre alphabétique wtf
+			//first sort by owner status, then by name
+			if (a.owner && !b.owner) return -1;
+			if (!a.owner && b.owner) return 1;
 			return a.name.localeCompare(b.name);
 		});
 	const adminGuilds = guilds
@@ -226,7 +229,6 @@ export default function Servers() {
 													fontWeight={600}
 													fontSize={"1.1rem"}
 													fontFamily={"var(--ifm-heading-font-family)"}
-													noWrap
 												>
 													{guild.name}
 												</Typography>

@@ -2,13 +2,13 @@
 	"characters": {
 		"damage": "Skill dice",
 		"filterPlaceholder": "Search by name…",
-		"serverFilterPlaceholder": "Search by name or player…",
 		"loadError": "Could not load characters.",
 		"noCharacters": "No characters registered on this server.",
 		"noResults": "No characters match the search.",
 		"private": "Private sheet",
 		"refresh": "Refresh",
 		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
+		"serverFilterPlaceholder": "Search by name or player…",
 		"serverTitle": "Server characters",
 		"sheetLink": "View sheet",
 		"title": "My characters",
@@ -25,7 +25,7 @@
 		"loading": "Loading...",
 		"logout": "Logout",
 		"none": "None",
-		"owner": "Owner",
+		"owner": "Admin",
 		"save": "Save",
 		"saving": "Saving..."
 	},
@@ -174,6 +174,7 @@
 		"importError": "Invalid file. Please check the JSON format.",
 		"importPartial": "{ok} entry/entries imported, {err} ignored (invalid formula).",
 		"importTooltip": "Import from a JSON file (merges with existing entries)",
+		"invalidSnippetHelper": "Invalid snippet \"{name}\": {value}",
 		"noAttributes": "No attributes defined yet.",
 		"noSnippets": "No snippets defined yet.",
 		"resetTemplate": "Reset to defaults",
@@ -181,7 +182,6 @@
 		"saveNoValidSnippets": "No valid snippet to save.",
 		"savePartial": "Partial save: {ok} entry/entries saved, {err} invalid.",
 		"saveSuccess": "Saved!",
-		"invalidSnippetHelper": "Invalid snippet \"{name}\": {value}",
 		"sections": {
 			"attributes": "Attributes",
 			"template": "Link's template"
