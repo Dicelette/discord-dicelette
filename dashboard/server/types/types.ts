@@ -2,9 +2,9 @@
 // Types, interfaces et constantes partagées pour les routes /guilds
 // ---------------------------------------------------------------------------
 
-import type Enmap from "Enmap";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Characters, Settings, TemplateData, UserSettings } from "@dicelette/types";
+import type Enmap from "enmap";
 import { CHAR_CACHE_TTL, charCache, permCache } from "./cache";
 
 export interface EmbedField {
