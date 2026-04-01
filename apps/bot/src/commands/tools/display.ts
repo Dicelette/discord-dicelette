@@ -9,7 +9,7 @@ import {
 } from "@dicelette/helpers";
 import { findln, t } from "@dicelette/localization";
 import { type CharacterData, MIN_THRESHOLD_MATCH } from "@dicelette/types";
-import { sentry } from "@dicelette/utils";
+import { logger, sentry } from "@dicelette/utils";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import {
@@ -61,7 +61,8 @@ export const displayUser = {
 		}
 
 		let userData: CharacterData | undefined = charData?.[user?.id ?? interaction.user.id];
-		if (!userData) userData = await findChara(charData, charName);
+		if (userData && !userData.userId) userData.userId = user?.id ?? interaction.user.id;
+		if (!userData) userData = findChara(charData, charName);
 		if (!userData) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
@@ -70,10 +71,14 @@ export const displayUser = {
 		}
 
 		if (userData.isPrivate) {
+			logger.trace("userData.isPrivate", userData.isPrivate, " sheet of ", user?.id);
 			const allowed = await haveAccess(
 				interaction,
 				userData.messageId[1],
-				user?.id ?? interaction.user.id
+				userData.userId ?? user?.id ?? interaction.user.id
+			);
+			logger.trace(
+				`User ${user?.id ?? interaction.user.id} access to private data: ${allowed}`
 			);
 			if (!allowed)
 				return await reply(interaction, {

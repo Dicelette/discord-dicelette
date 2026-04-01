@@ -459,12 +459,15 @@ export async function getRecordChar(
 	};
 }
 
-export async function findChara(charData: CharDataWithName, charName?: string) {
-	return Object.values(charData).find((data) => {
+export function findChara(charData: CharDataWithName, charName?: string) {
+	const res = Object.entries(charData).find(([id, data]) => {
+		data.userId = id;
 		if (data.charName && charName) return data.charName.subText(charName);
-
 		return data.charName === charName;
 	});
+	//convert to record<string, charData>
+	if (!res) return undefined;
+	return res[1];
 }
 
 export function verifyIfEmbedInDB(

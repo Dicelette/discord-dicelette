@@ -225,6 +225,7 @@ export type CharacterData = {
 	messageId: UserMessageId;
 	damageName?: string[];
 	isPrivate?: boolean;
+	userId?: string;
 };
 
 export type CharDataWithName = Record<string, CharacterData>;
