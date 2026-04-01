@@ -582,8 +582,8 @@ export function replaceStatsInDiceFormula(
 	const uniqueStats = Array.from(new Set(statsFounds.filter((stat) => stat.length > 0)));
 	if (uniqueStats.length > 0) {
 		const statsList = statsName
-			? unNormalizeStatsName(uniqueStats, statsName).join(", ")
-			: uniqueStats.join(", ");
+			? unNormalizeStatsName(uniqueStats, statsName).join(" × ")
+			: uniqueStats.join(" × ");
 		comments = comments
 			? ` %%[__${statsList}__]%% ${comments} `
 			: ` %%[__${statsList}__]%% `;
