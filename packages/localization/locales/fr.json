@@ -921,7 +921,7 @@
 		"noPermission": "Vous n'avez pas les autorisations pour faire cela.",
 		"onlyModerator": "Seulement les modérateurs (ayant les droits sur les rôles) peuvent valider une fiche. Une notification leur a été envoyé pour finir l'enregistrement.",
 		"private": {
-			"description": "Si cette fiche est privée, mettez \"x\".",
+			"description": "Fiche de personnage visible uniquement par son joueur et les personnes autorisées.",
 			"name": "Fiche privée"
 		},
 		"removed": {

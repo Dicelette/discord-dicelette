@@ -921,7 +921,7 @@
 		"noPermission": "You do not have permissions to do this.",
 		"onlyModerator": "Only moderator (with manage role) can validate a sheet. A notification was send to finish the registration.",
 		"private": {
-			"description": "If this record is private, put \"x\".",
+			"description": "Character sheet viewable only by their player and authorized users. ",
 			"name": "Private character sheet"
 		},
 		"removed": {
