@@ -71,7 +71,12 @@ export const displayUser = {
 		}
 
 		if (userData.isPrivate) {
-			logger.trace("userData.isPrivate", userData.isPrivate, " sheet of ", user?.id);
+			logger.trace(
+				"userData.isPrivate",
+				userData.isPrivate,
+				" sheet of ",
+				userData?.userId
+			);
 			const allowed = await haveAccess(
 				interaction,
 				userData.messageId[1],
@@ -82,7 +87,7 @@ export const displayUser = {
 			);
 			if (!allowed)
 				return await reply(interaction, {
-					embeds: [embedError(ul("error.user.notAccess"), ul)],
+					embeds: [embedError(ul("error.private"), ul)],
 				});
 		}
 

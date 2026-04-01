@@ -230,7 +230,8 @@ export const graph = {
 			if (!interaction.guild || !interaction.channel) return;
 			const userId = user?.id ?? interaction.user.id;
 			let userData: CharacterData | undefined = charData[userId];
-			if (!userData) userData = await findChara(charData, charName);
+			if (userData && !userData.userId) userData.userId = userId;
+			if (!userData) userData = findChara(charData, charName);
 
 			if (!userData) {
 				await reply(interaction, {
@@ -253,8 +254,12 @@ export const graph = {
 					embeds: [embedError(ul("error.channel.thread"), ul)],
 				});
 
-			const allowHidden = await haveAccess(interaction, thread.id, userId);
-			if (!allowHidden && charData[userId]?.isPrivate) {
+			const allowHidden = await haveAccess(
+				interaction,
+				thread.id,
+				userData.userId ?? userId
+			);
+			if (!allowHidden && userData.isPrivate) {
 				await reply(interaction, {
 					embeds: [embedError(ul("error.private"), ul)],
 				});
