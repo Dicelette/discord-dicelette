@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.6.0](https://github.com/Dicelette/discord-dicelette/compare/3.5.0...3.6.0) (2026-04-01)
+
+
+### Features
+
+* **bot:character:** checkbox! yipee! ([94a1d30](https://github.com/Dicelette/discord-dicelette/commit/94a1d30fa92cdbc702d1d95991c12548c4f9f949))
+
+
+### Bug Fixes
+
+* **bot:character:** add user_id in character Data to check if the user can have access to it ([6dad042](https://github.com/Dicelette/discord-dicelette/commit/6dad042c900e51505e03c3ed831876bed5d9c3f5))
+
 ## [3.5.0](https://github.com/Dicelette/discord-dicelette/compare/3.4.1...3.5.0) (2026-03-31)
 
 
