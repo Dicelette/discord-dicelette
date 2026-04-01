@@ -72,11 +72,11 @@ export class UserFeature extends BaseFeature {
 		//create a new Label builder component with a text input for the character name
 		const charNameInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("common.charName"))
-			.setTextInputComponent(
-				new Djs.TextInputBuilder()
+			.setTextInputComponent((text) =>
+				text
 					.setCustomId("charName")
 					.setPlaceholder(this.ul("modals.charName.description"))
-					.setRequired(this.template.charName || false)
+					.setRequired(this.template?.charName || false)
 					.setValue("")
 					.setStyle(Djs.TextInputStyle.Short)
 			);
@@ -84,8 +84,8 @@ export class UserFeature extends BaseFeature {
 		//we will use the new LabelBuilder component to create a label with a user select for the user!
 		const userIdInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("common.user"))
-			.setUserSelectMenuComponent(
-				new Djs.UserSelectMenuBuilder()
+			.setUserSelectMenuComponent((user) =>
+				user
 					.setCustomId("userID")
 					.setPlaceholder(this.ul("modals.user.description"))
 					.setRequired(true)
@@ -97,19 +97,16 @@ export class UserFeature extends BaseFeature {
 		const avatarInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("modals.avatar.name"))
 			.setDescription(this.ul("modals.avatar.file.description"))
-			.setFileUploadComponent(
-				new Djs.FileUploadBuilder()
-					.setCustomId("avatarFile")
-					.setRequired(false)
-					.setMaxValues(1)
+			.setFileUploadComponent((file) =>
+				file.setCustomId("avatarFile").setRequired(false).setMaxValues(1)
 			);
 
 		//we will use the new LabelBuilder component to create a label with a channel select for the channel!
 		const channelIdInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("modals.channel.name"))
 			.setDescription(this.ul("modals.channel.description"))
-			.setChannelSelectMenuComponent(
-				new Djs.ChannelSelectMenuBuilder()
+			.setChannelSelectMenuComponent((channel) =>
+				channel
 					.setCustomId("channelId")
 					.setRequired(false)
 					.setMaxValues(1)
@@ -130,13 +127,16 @@ export class UserFeature extends BaseFeature {
 			const privateInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 				.setLabel(this.ul("modals.private.name"))
 				.setDescription(this.ul("modals.private.description"))
+				/*
 				.setTextInputComponent(
 					new Djs.TextInputBuilder()
 						.setCustomId("private")
 						.setRequired(false)
 						.setValue("")
 						.setStyle(Djs.TextInputStyle.Short)
-				);
+				);*/
+				/*checkbox!yipee*/
+				.setCheckboxComponent((checkbox) => checkbox.setCustomId("private"));
 			components.push(privateInput);
 		}
 
@@ -252,7 +252,7 @@ export class UserFeature extends BaseFeature {
 
 		const isPrivate =
 			this.client.settings.get(interaction.guild!.id, "privateChannel") && moderator // Allow private channel only if the user is a moderator
-				? interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
+				? interaction.fields.getCheckbox("private") //interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
 				: false;
 		const avatar = interaction.fields.getUploadedFiles("avatarFile")?.first();
 		const files = [];
