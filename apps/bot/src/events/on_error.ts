@@ -62,30 +62,38 @@ export async function interactionError(
 	ul: Translation,
 	langToUse?: Djs.Locale
 ) {
-	console.error(e);
-	if (!e.name.includes("Invalid_Dice_Type")) sentry.error(e);
-	if (
-		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
-		(interaction.replied || interaction.deferred)
-	)
-		return;
+	const isUnknownInteractionError = e instanceof Djs.DiscordAPIError && e.code === 10062;
+	if (!e.name.includes("Invalid_Dice_Type") && !isUnknownInteractionError) {
+		sentry.error(e);
+		console.error(e);
+	}
 	if (!interaction.guild) return;
-	const msgError = lError(e as Error, interaction, langToUse);
-	if (msgError.length === 0) return;
-	const cause = (e as Error).cause ? ((e as Error).cause as string) : undefined;
-	const embed = embedError(msgError, ul, cause);
-	if (interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand())
-		await reply(interaction, {
-			embeds: [embed],
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-
 	if (client.settings.has(interaction.guild.id)) {
 		const db = client.settings.get(interaction.guild.id, "logs");
 		if (!db) return;
 		const logs = (await fetchChannel(interaction.guild!, db)) as Djs.GuildBasedChannel;
 		if (logs instanceof Djs.TextChannel) {
 			await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
+		}
+	}
+
+	if (
+		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
+		(interaction.replied || interaction.deferred)
+	)
+		return;
+	const msgError = lError(e as Error, interaction, langToUse);
+	if (msgError.length === 0) return;
+	const cause = (e as Error).cause ? ((e as Error).cause as string) : undefined;
+	const embed = embedError(msgError, ul, cause);
+	if (interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) {
+		try {
+			await reply(interaction, {
+				embeds: [embed],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+		} catch {
+			return;
 		}
 	}
 }
