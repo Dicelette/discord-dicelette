@@ -12,8 +12,8 @@ export default (client: EClient): void => {
 					"## ❌ Le bot a été déconnecté du serveur Discord.\n\n" +
 					"Veuillez vérifier l'état du bot et le redémarrer si nécessaire.",
 			});
+			await sendErrorToWebhook(`Shard disconnected: ${event.toString()}`);
 		}
-		await sendErrorToWebhook(`Shard disconnected: ${event.toString()}`);
 		console.error(`Shard ${shardId} disconnected:`, event);
 		sentry.error(`Shard ${shardId} disconnected`, { event, shardId });
 		process.exit(1); // Optionally exit the process to restart the bot by pm2
@@ -21,11 +21,12 @@ export default (client: EClient): void => {
 };
 
 export async function sendErrorToWebhook(error: unknown) {
+	if (!process.env.OWNER_ID) return;
 	if (error instanceof Error && MATCH_API_ERROR.test(error.stack || error.message))
 		return;
 	const ownerId = process.env.OWNER_ID;
 	const webhookUrl = process.env.WEBHOOK_URL;
-	if (!ownerId || !webhookUrl) {
+	if (!webhookUrl) {
 		console.error("Owner ID or Webhook URL is not set in environment variables.");
 		sentry.error("Owner ID or Webhook URL is not set in environment variables.");
 		return;
