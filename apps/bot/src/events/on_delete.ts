@@ -105,7 +105,7 @@ export const onDeleteMessage = (client: EClient): void => {
 							logger.info(`Deleted character ${value.charName} for user ${user}`);
 							values.splice(index, 1);
 							//delete in characters database
-							deleteUserInChar(client.characters, user, guildID, value.charName);
+							deleteUserInChar(client.characters, user, guildID, value.charName, client.characterCacheTimestamps);
 						}
 					}
 					if (values.length === 0) delete dbUser[user];

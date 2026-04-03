@@ -21,7 +21,8 @@ export async function updateMemory(
 	guildId: string,
 	userID: string,
 	_ul: Translation,
-	data: Partial<{ userData: UserData; message: Djs.Message; embeds: Djs.EmbedBuilder[] }>
+	data: Partial<{ userData: UserData; message: Djs.Message; embeds: Djs.EmbedBuilder[] }>,
+	timestamps?: Map<string, number>
 ) {
 	let { userData, message, embeds } = data;
 	if (!userData) {
@@ -47,6 +48,7 @@ export async function updateMemory(
 		} else userChar.push(userData);
 		characters.set(guildId, userChar, userID);
 	} else characters.set(guildId, [userData], userID);
+	timestamps?.set(`${guildId}:${userID}`, Date.now());
 	return userData;
 }
 
@@ -54,12 +56,15 @@ export function deleteUserInChar(
 	characters: Characters,
 	userId: string,
 	guildId: string,
-	charName?: string | null
+	charName?: string | null,
+	timestamps?: Map<string, number>
 ) {
 	const userData = characters.get(guildId, userId);
 	if (userData) {
 		const filter = userData.filter((char) => !char.userName?.subText(charName, true));
-		if (filter.length === 0) characters.delete(guildId, userId);
-		else characters.set(guildId, filter, userId);
+		if (filter.length === 0) {
+			characters.delete(guildId, userId);
+			timestamps?.delete(`${guildId}:${userId}`);
+		} else characters.set(guildId, filter, userId);
 	}
 }

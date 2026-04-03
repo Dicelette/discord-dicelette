@@ -126,6 +126,7 @@ export default (client: EClient): void => {
 				"&permissions=8&scope=bot%20applications.commands"
 		);
 		cleanData(client);
+		startCacheCleanup(client);
 		if (process.env.NODE_ENV === "development") client.template = dev(client.template);
 	});
 };
@@ -217,7 +218,38 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 			Boolean
 		) as UserData[];
 		characters.set(guild.id, allCharacters, userId);
+		client.characterCacheTimestamps.set(`${guild.id}:${userId}`, Date.now());
 	});
 
 	await Promise.all(userPromises);
+}
+
+/**
+ * Periodically evicts character cache entries that haven't been refreshed within `maxAge` ms.
+ * Evicted entries are re-fetched from Discord on next access, so data is never lost.
+ *
+ * @param client - The bot client holding the caches.
+ * @param maxAge - Maximum age of a cache entry in ms before eviction (default: 24 h).
+ * @param interval - How often to run the cleanup in ms (default: 1 h).
+ */
+function startCacheCleanup(
+	client: EClient,
+	maxAge = 24 * 60 * 60 * 1000,
+	interval = 60 * 60 * 1000
+) {
+	setInterval(() => {
+		const now = Date.now();
+		let count = 0;
+		for (const [key, ts] of client.characterCacheTimestamps) {
+			if (now - ts > maxAge) {
+				const sep = key.indexOf(":");
+				const guildId = key.slice(0, sep);
+				const userId = key.slice(sep + 1);
+				client.characters.delete(guildId, userId);
+				client.characterCacheTimestamps.delete(key);
+				count++;
+			}
+		}
+		if (count > 0) logger.info(`Cache cleanup: evicted ${count} stale character entries`);
+	}, interval);
 }

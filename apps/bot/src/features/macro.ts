@@ -486,7 +486,7 @@ export class MacroFeature extends BaseFeature {
 			await registerUser(userRegister, interaction, db, false);
 			await updateMemory(this.client.characters, interaction.guild.id, userID, ul, {
 				embeds: allEmbeds,
-			});
+			}, this.client.characterCacheTimestamps);
 		} else {
 			const isModerator = interaction.guild?.members.cache
 				.get(interaction.user.id)
@@ -824,7 +824,7 @@ export class MacroFeature extends BaseFeature {
 
 		await updateMemory(this.client.characters, interaction.guild!.id, userID, this.ul, {
 			embeds,
-		});
+		}, this.client.characterCacheTimestamps);
 		const userRegister: UserRegistration = {
 			charName: userName,
 			damage,
