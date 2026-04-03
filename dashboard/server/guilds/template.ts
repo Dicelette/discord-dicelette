@@ -25,7 +25,8 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		// Fallback : récupération de la pièce jointe depuis Discord
 		const config = settings.get(guildId);
 		if (!config?.templateID?.channelId || !config.templateID.messageId) {
-			res.status(404).json({ error: "No template registered" });
+			// Comportement attendu : aucun template enregistré sur ce serveur
+			res.json(null);
 			return;
 		}
 
