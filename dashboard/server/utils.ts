@@ -13,6 +13,21 @@ import {
 	USER_EMBED_MARKERS,
 } from "./types";
 
+const ADMINISTRATOR = BigInt(0x8);
+const MANAGE_GUILD = BigInt(0x20);
+const MANAGE_ROLES = BigInt(0x10000000);
+
+function getCached(key: string): boolean | null {
+	const cached = permCache.get(key);
+	if (cached && Date.now() < cached.expiresAt) return cached.result;
+	return null;
+}
+
+function setCached(key: string, result: boolean): boolean {
+	permCache.set(key, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
+	return result;
+}
+
 /**
  * Détecte une URL Discord CDN dont les paramètres d'expiration ont été supprimés
  * par cleanAvatarUrl(). Ces URLs sont invalides car Discord requiert les params
@@ -114,29 +129,18 @@ export async function userCanManageGuild(
 	settings?: Settings
 ): Promise<boolean> {
 	const cacheKey = `${userId}:${guildId}`;
-	const cached = permCache.get(cacheKey);
-	if (cached && Date.now() < cached.expiresAt) return cached.result;
+	const hit = getCached(cacheKey);
+	if (hit !== null) return hit;
 
 	const guild = botGuilds.get(guildId);
-	if (!guild) {
-		permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-		return false;
-	}
+	if (!guild) return setCached(cacheKey, false);
 
 	try {
 		const member = await guild.fetchMember(userId);
-		if (!member) {
-			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-			return false;
-		}
-
-		const Administrator = BigInt(0x8);
+		if (!member) return setCached(cacheKey, false);
 
 		// Administrator always has access regardless of dashboardAccess
-		if (member.hasPermission(Administrator)) {
-			permCache.set(cacheKey, { result: true, expiresAt: Date.now() + PERM_CACHE_TTL });
-			return true;
-		}
+		if (member.hasPermission(ADMINISTRATOR)) return setCached(cacheKey, true);
 
 		const dashboardAccess = settings?.get(guildId, "dashboardAccess") as
 			| string[]
@@ -148,12 +152,10 @@ export async function userCanManageGuild(
 			result = member.roleIds.some((roleId) => dashboardAccess.includes(roleId));
 		} else {
 			// Default: ManageGuild grants access
-			const ManageGuild = BigInt(0x20);
-			result = member.hasPermission(ManageGuild);
+			result = member.hasPermission(MANAGE_GUILD);
 		}
 
-		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
-		return result;
+		return setCached(cacheKey, result);
 	} catch {
 		return false;
 	}
@@ -172,30 +174,20 @@ export async function userCanRefreshServerCharacters(
 	botGuilds: DashboardDeps["botGuilds"]
 ): Promise<boolean> {
 	const cacheKey = `refresh:${userId}:${guildId}`;
-	const cached = permCache.get(cacheKey);
-	if (cached && Date.now() < cached.expiresAt) return cached.result;
+	const hit = getCached(cacheKey);
+	if (hit !== null) return hit;
 
 	const guild = botGuilds.get(guildId);
-	if (!guild) {
-		permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-		return false;
-	}
+	if (!guild) return setCached(cacheKey, false);
 
 	try {
 		const member = await guild.fetchMember(userId);
-		if (!member) {
-			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-			return false;
-		}
-		const Administrator = BigInt(0x8);
-		const ManageGuild = BigInt(0x20);
-		const ManageRoles = BigInt(0x10000000);
+		if (!member) return setCached(cacheKey, false);
 		const result =
-			member.hasPermission(Administrator) ||
-			member.hasPermission(ManageGuild) ||
-			member.hasPermission(ManageRoles);
-		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
-		return result;
+			member.hasPermission(ADMINISTRATOR) ||
+			member.hasPermission(MANAGE_GUILD) ||
+			member.hasPermission(MANAGE_ROLES);
+		return setCached(cacheKey, result);
 	} catch {
 		return false;
 	}
@@ -212,36 +204,27 @@ export async function userCanManageGuildViaOAuth(
 	accessToken: string
 ): Promise<boolean> {
 	const cacheKey = `oauth:${userId}:${guildId}`;
-	const cached = permCache.get(cacheKey);
-	if (cached && Date.now() < cached.expiresAt) return cached.result;
+	const hit = getCached(cacheKey);
+	if (hit !== null) return hit;
 
 	try {
 		const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
 			headers: { Authorization: `Bearer ${accessToken}` },
 		});
-		if (!res.ok) {
-			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-			return false;
-		}
+		if (!res.ok) return setCached(cacheKey, false);
 		const guilds = (await res.json()) as Array<{
 			id: string;
 			owner: boolean;
 			permissions: string;
 		}>;
 		const guild = guilds.find((g) => g.id === guildId);
-		if (!guild) {
-			permCache.set(cacheKey, { result: false, expiresAt: Date.now() + PERM_CACHE_TTL });
-			return false;
-		}
-		const ManageGuild = BigInt(0x20);
-		const Administrator = BigInt(0x8);
+		if (!guild) return setCached(cacheKey, false);
 		const perms = BigInt(guild.permissions);
 		const result =
 			guild.owner ||
-			(perms & ManageGuild) !== BigInt(0) ||
-			(perms & Administrator) !== BigInt(0);
-		permCache.set(cacheKey, { result, expiresAt: Date.now() + PERM_CACHE_TTL });
-		return result;
+			(perms & MANAGE_GUILD) !== BigInt(0) ||
+			(perms & ADMINISTRATOR) !== BigInt(0);
+		return setCached(cacheKey, result);
 	} catch {
 		return false;
 	}
