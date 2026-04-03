@@ -320,7 +320,7 @@ async function getUserFrom(
 		if (!userData) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 		await updateMemory(characters, guildId, userId, ul, {
 			userData,
-		});
+		}, client.characterCacheTimestamps);
 		if (options.fetchMessage) userData.messageId = targetMessage.id;
 
 		if (options?.attributes)
@@ -716,7 +716,7 @@ export async function getStatistics(
 		userStatistique.template = template;
 		await updateMemory(client.characters, interaction.guild!.id, targetUserId, ul, {
 			userData: userStatistique,
-		});
+		}, client.characterCacheTimestamps);
 	}
 
 	if (!userStatistique) {
