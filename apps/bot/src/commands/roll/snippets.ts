@@ -33,7 +33,8 @@ export default {
 		const { ul } = getLangAndConfig(client, interaction);
 		const userId = interaction.user.id;
 		const guildId = interaction.guild!.id;
-		const macroName = interaction.options.getString(t("common.name"), true).standardize();
+		const optMacro = interaction.options.getString(t("common.name"), true);
+		const macroName = optMacro.standardize();
 		const userSettings = client.userSettings.get(guildId, userId);
 		const snippets = userSettings?.snippets ?? {};
 		const attributes = userSettings?.attributes;
@@ -53,7 +54,7 @@ export default {
 			if (bestMatch) dice = snippets[bestMatch];
 		}
 		if (!dice) {
-			const text = ul("userSettings.snippets.delete.notFound", { name: macroName });
+			const text = ul("userSettings.snippets.delete.notFound", { name: optMacro });
 			await interaction.reply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 			return;
 		}
