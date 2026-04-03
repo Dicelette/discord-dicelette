@@ -27,9 +27,7 @@ function DashboardAccess({ control, roles, isStrictAdmin }: Props) {
 				name="dashboardAccess"
 				control={control}
 				render={({ field }) => {
-					const selected = roles.filter((r) =>
-						(field.value ?? []).includes(r.id)
-					);
+					const selected = roles.filter((r) => (field.value ?? []).includes(r.id));
 					return (
 						<Autocomplete
 							fullWidth
@@ -40,9 +38,7 @@ function DashboardAccess({ control, roles, isStrictAdmin }: Props) {
 							getOptionKey={(r) => r.id}
 							getOptionLabel={(r) => `@ ${r.name}`}
 							value={selected}
-							onChange={(_, newValue) =>
-								field.onChange(newValue.map((r) => r.id))
-							}
+							onChange={(_, newValue) => field.onChange(newValue.map((r) => r.id))}
 							renderInput={(params) => (
 								<TextField
 									{...params}
