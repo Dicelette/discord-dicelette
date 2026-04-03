@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.7.0](https://github.com/Dicelette/discord-dicelette/compare/3.6.2...3.7.0) (2026-04-03)
+
+
+### Bug Fixes
+
+* snippet validation rejects valid dice with comments ([2cf7627](https://github.com/Dicelette/discord-dicelette/commit/2cf7627432ae7340cb14a2a1929b74ba55c793b7))
+
 ## [3.6.2](https://github.com/Dicelette/discord-dicelette/compare/3.6.1...3.6.2) (2026-04-02)
 
 ## [3.6.1](https://github.com/Dicelette/discord-dicelette/compare/3.6.0...3.6.1) (2026-04-01)
