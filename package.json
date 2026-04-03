@@ -47,7 +47,7 @@
 		"cors": "^2.8.5",
 		"dedent": "^1.7.2",
 		"discord-api-types": "^0.38.43",
-		"discord.js": "14.26.0",
+		"discord.js": "14.26.2",
 		"dotenv": "^17.3.1",
 		"enmap": "npm:@dicelette/enmap",
 		"express": "^5.1.0",
