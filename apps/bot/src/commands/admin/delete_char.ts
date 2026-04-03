@@ -350,7 +350,8 @@ async function deleteUserByLocation(
 		client.characters,
 		user?.id ?? interaction.user.id,
 		interaction.guild!.id,
-		charName
+		charName,
+		client.characterCacheTimestamps
 	);
 	if (!userChannel) {
 		return await deleteNoUserMessage(interaction, client, ul, guildData, user, charName);

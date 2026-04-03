@@ -63,6 +63,14 @@ export class EClient extends Djs.Client {
 	public trivialCacheTimeouts: Map<string, NodeJS.Timeout> = new Map();
 
 	/**
+	 * Timestamps tracking when each user's character data was last cached.
+	 * Used for periodic TTL-based cache cleanup.
+	 * @key `${guildId}:${userId}`
+	 * @value Unix timestamp (ms) of last cache write
+	 */
+	public characterCacheTimestamps: Map<string, number> = new Map();
+
+	/**
 	 * Key the last status when the bot restarts
 	 */
 	public status: BotStatus = {
