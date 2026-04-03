@@ -3,6 +3,7 @@ import type { ApiGuildData } from "@dicelette/types";
 import { keyframes } from "@emotion/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import type { ReactNode } from "react";
 
 const spinAnimation = keyframes`
 	from { transform: rotate(0deg); }
@@ -33,6 +34,21 @@ import {
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
 
 type ActiveTab = "admin" | "template" | "user" | "characters" | "server-characters";
+
+function TabPanel({
+	value,
+	current,
+	mounted,
+	children,
+}: {
+	value: ActiveTab;
+	current: ActiveTab;
+	mounted: Set<ActiveTab>;
+	children: ReactNode;
+}) {
+	if (!mounted.has(value)) return null;
+	return <Box sx={{ display: current === value ? undefined : "none" }}>{children}</Box>;
+}
 
 export default function Dashboard() {
 	const { guildId } = useParams<{ guildId: string }>();
@@ -246,8 +262,8 @@ export default function Dashboard() {
 				)}
 			</Tabs>
 
-			{isAdmin && config && mountedTabs.has("admin") && (
-				<Box sx={{ display: tab === "admin" ? undefined : "none" }}>
+			{isAdmin && config && (
+				<TabPanel value="admin" current={tab} mounted={mountedTabs}>
 					<GuildConfigForm
 						config={config}
 						guildId={guildId!}
@@ -257,10 +273,10 @@ export default function Dashboard() {
 						roles={roles}
 						isStrictAdmin={isStrictAdmin}
 					/>
-				</Box>
+				</TabPanel>
 			)}
-			{isAdmin && config && mountedTabs.has("template") && (
-				<Box sx={{ display: tab === "template" ? undefined : "none" }}>
+			{isAdmin && config && (
+				<TabPanel value="template" current={tab} mounted={mountedTabs}>
 					<Suspense fallback={<CircularProgress />}>
 						<ModelConfigForm
 							config={config}
@@ -271,22 +287,20 @@ export default function Dashboard() {
 							roles={roles}
 						/>
 					</Suspense>
-				</Box>
+				</TabPanel>
 			)}
-			{mountedTabs.has("user") && (
-				<Box sx={{ display: tab === "user" ? undefined : "none" }}>
-					<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
-				</Box>
-			)}
-			{userCharCount > 0 && mountedTabs.has("characters") && (
-				<Box sx={{ display: tab === "characters" ? undefined : "none" }}>
+			<TabPanel value="user" current={tab} mounted={mountedTabs}>
+				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
+			</TabPanel>
+			{userCharCount > 0 && (
+				<TabPanel value="characters" current={tab} mounted={mountedTabs}>
 					<CharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
-				</Box>
+				</TabPanel>
 			)}
-			{isAdmin && mountedTabs.has("server-characters") && (
-				<Box sx={{ display: tab === "server-characters" ? undefined : "none" }}>
+			{isAdmin && (
+				<TabPanel value="server-characters" current={tab} mounted={mountedTabs}>
 					<ServerCharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
-				</Box>
+				</TabPanel>
 			)}
 		</Box>
 	);

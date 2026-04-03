@@ -1,17 +1,8 @@
-import { type ApiCharacter, charactersApi } from "@dicelette/api";
-import SearchIcon from "@mui/icons-material/Search";
-import {
-	Alert,
-	Box,
-	CircularProgress,
-	InputAdornment,
-	Pagination,
-	TextField,
-	Typography,
-} from "@mui/material";
+import { charactersApi } from "@dicelette/api";
 import { useI18n } from "@shared";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCharactersList } from "./hooks/useCharactersList";
 import CharacterCard from "./ui/CharacterCard";
+import CharacterListLayout from "./ui/CharacterListLayout";
 
 const PAGE_SIZE = 5;
 
@@ -22,140 +13,34 @@ interface Props {
 
 export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 	const { t } = useI18n();
-	const lastRefreshToken = useRef(refreshToken);
-	const [characters, setCharacters] = useState<ApiCharacter[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [page, setPage] = useState(1);
-	const [search, setSearch] = useState("");
+	const { characters, loading, error, setError, page, setPage, search, handleSearchChange } =
+		useCharactersList(guildId, charactersApi.getCharacters, refreshToken, t("characters.loadError"));
 
-	const load = useCallback(async () => {
-		setError(null);
-		try {
-			const res = await charactersApi.getCharacters(guildId);
-			setCharacters(res.data);
-			setPage(1);
-		} catch {
-			setError(t("characters.loadError"));
-		} finally {
-			setLoading(false);
-		}
-	}, [guildId, t]);
-
-	useEffect(() => {
-		load();
-	}, [load]);
-
-	useEffect(() => {
-		if (lastRefreshToken.current === refreshToken) return;
-		lastRefreshToken.current = refreshToken;
-		load();
-	}, [load, refreshToken]);
-
-	if (loading) {
-		return (
-			<Box sx={{ display: "flex", justifyContent: "center", p: 6 }}>
-				<CircularProgress />
-			</Box>
-		);
-	}
-
-	const filtered = search.trim()
-		? characters.filter((c) =>
-				(c.charName ?? "").toLowerCase().includes(search.trim().toLowerCase())
-			)
+	const q = search.trim().toLowerCase();
+	const filtered = q
+		? characters.filter((c) => (c.charName ?? "").toLowerCase().includes(q))
 		: characters;
 	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 	const pageChars = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
 	return (
-		<Box>
-			{/* Header : titre + recherche */}
-			<Box
-				sx={{
-					display: "grid",
-					gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
-					gridTemplateAreas:
-						characters.length > 0
-							? {
-									xs: '"title" "search"',
-									sm: '"title search"',
-								}
-							: {
-									xs: '"title"',
-									sm: '"title ."',
-								},
-					alignItems: "center",
-					gap: 2,
-					mb: 3,
-				}}
-			>
-				<Typography
-					variant="h5"
-					fontWeight={600}
-					sx={{ whiteSpace: "nowrap", gridArea: "title" }}
-				>
-					{t("characters.title")}
-				</Typography>
-
-				{characters.length > 0 && (
-					<TextField
-						size="small"
-						placeholder={t("characters.filterPlaceholder")}
-						value={search}
-						onChange={(e) => {
-							setSearch(e.target.value);
-							setPage(1);
-						}}
-						slotProps={{
-							input: {
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon fontSize="small" />
-									</InputAdornment>
-								),
-							},
-						}}
-						sx={{
-							gridArea: "search",
-							width: { xs: "100%", sm: 320 },
-							justifySelf: { xs: "stretch", sm: "end" },
-						}}
-					/>
-				)}
-			</Box>
-
-			{error && (
-				<Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
-					{error}
-				</Alert>
+		<CharacterListLayout
+			title={t("characters.title")}
+			searchPlaceholder={t("characters.filterPlaceholder")}
+			showSearch={characters.length > 0}
+			loading={loading}
+			error={error}
+			onCloseError={() => setError(null)}
+			search={search}
+			onSearchChange={handleSearchChange}
+			page={page}
+			onPageChange={setPage}
+			pageChars={pageChars}
+			totalPages={totalPages}
+			emptyText={search.trim() ? t("characters.noResults") : t("characters.noCharacters")}
+			renderCard={(char) => (
+				<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
 			)}
-
-			{filtered.length === 0 ? (
-				<Typography color="text.secondary">
-					{search.trim() ? t("characters.noResults") : t("characters.noCharacters")}
-				</Typography>
-			) : (
-				<>
-					<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-						{pageChars.map((char) => (
-							<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
-						))}
-					</Box>
-
-					{totalPages > 1 && (
-						<Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-							<Pagination
-								count={totalPages}
-								page={page}
-								onChange={(_e, value) => setPage(value)}
-								color="primary"
-								shape="rounded"
-							/>
-						</Box>
-					)}
-				</>
-			)}
-		</Box>
+		/>
 	);
 }

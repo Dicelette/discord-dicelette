@@ -5,6 +5,7 @@ import { Router } from "express";
 import * as Papa from "papaparse";
 import {
 	type ApiCharacter,
+	type BotChannels,
 	CHAR_CACHE_TTL,
 	charCache,
 	type DashboardDeps,
@@ -18,6 +19,62 @@ import {
 	userCanRefreshServerCharacters,
 	withTimeout,
 } from "../utils";
+
+function isAllowSelfRegister(guildData: { allowSelfRegister?: boolean | string }): boolean {
+	return guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+}
+
+function buildMemMaps(memChars: UserData[]) {
+	const memByMessageId = new Map<string, UserData>(
+		memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
+	);
+	const memByUserName = new Map<string, UserData>(
+		memChars
+			.filter((c) => c.userName != null)
+			.map((c) => [c.userName!.toLowerCase(), c])
+	);
+	const memWithoutName = memChars.find((c) => c.userName == null);
+	return { memByMessageId, memByUserName, memWithoutName };
+}
+
+async function resolveCharacterData(
+	charName: string | null | undefined,
+	messageId: string,
+	channelId: string,
+	memMaps: ReturnType<typeof buildMemMaps>,
+	botChannels: BotChannels
+): Promise<{ avatar: string | null; stats: EmbedField[] | null; damage: EmbedField[] | null }> {
+	const { memByMessageId, memByUserName, memWithoutName } = memMaps;
+	const mem =
+		memByMessageId.get(messageId) ??
+		memByUserName.get((charName ?? "").toLowerCase()) ??
+		(charName == null ? memWithoutName : undefined);
+
+	let avatar: string | null = mem?.avatar ?? null;
+	let stats: EmbedField[] | null = null;
+	let damage: EmbedField[] | null = null;
+
+	if (mem?.stats)
+		stats = Object.entries(mem.stats).map(([name, value]) => ({ name, value: String(value) }));
+	if (mem?.damage)
+		damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+
+	const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
+	if (stats === null || damage === null || avatar === null || hasStaleAvatar) {
+		try {
+			const fetched = await fetchCharacterEmbeds(channelId, messageId, botChannels);
+			if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
+			stats = stats ?? fetched.stats;
+			damage = damage ?? fetched.damage;
+		} catch (err) {
+			important.warn(
+				`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
+			);
+		}
+	}
+
+	return { avatar, stats, damage };
+}
 
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
@@ -44,22 +101,12 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 
 		const userChars = guildData.user?.[userId] ?? [];
-		const canLink =
-			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+		const canLink = isAllowSelfRegister(guildData);
 
 		// Lookup dans le cache en mémoire du bot (même processus) — évite les appels Discord
 		const memChars: UserData[] =
 			(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
-		const memByMessageId = new Map<string, UserData>(
-			memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
-		);
-		// Fallback : correspondance par userName (insensible à la casse) quand messageId absent
-		const memByUserName = new Map<string, UserData>(
-			memChars
-				.filter((c) => c.userName != null)
-				.map((c) => [c.userName!.toLowerCase(), c])
-		);
-		const memWithoutName = memChars.find((c) => c.userName == null);
+		const memMaps = buildMemMaps(memChars);
 
 		let result: ApiCharacter[];
 		try {
@@ -68,59 +115,19 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					userChars
 						.filter((char) => {
 							// Exclure les personnages issus d'un template (non enregistrés réellement)
-							const mem = memByMessageId.get(char.messageId[0]);
+							const mem = memMaps.memByMessageId.get(char.messageId[0]);
 							return !mem?.isFromTemplate;
 						})
 						.map(async (char) => {
 							const [messageId, channelId] = char.messageId;
 							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-
-							const mem =
-								memByMessageId.get(messageId) ??
-								memByUserName.get((char.charName ?? "").toLowerCase()) ??
-								(char.charName == null ? memWithoutName : undefined);
-							let avatar: string | null = null;
-							let stats: EmbedField[] | null = null;
-							let damage: EmbedField[] | null = null;
-
-							if (mem) {
-								// Données directement depuis la mémoire — aucun appel Discord
-								avatar = mem.avatar ?? null;
-								if (mem.stats)
-									stats = Object.entries(mem.stats).map(([name, value]) => ({
-										name,
-										value: String(value),
-									}));
-								if (mem.damage)
-									damage = Object.entries(mem.damage).map(([name, value]) => ({
-										name,
-										value,
-									}));
-							}
-							const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
-							if (
-								stats === null ||
-								damage === null ||
-								avatar === null ||
-								hasStaleAvatar
-							) {
-								// Fallback : données manquantes ou URL CDN expirée — récupère depuis les embeds Discord
-								try {
-									const fetched = await fetchCharacterEmbeds(
-										channelId,
-										messageId,
-										botChannels
-									);
-									if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
-									stats = stats ?? fetched.stats;
-									damage = damage ?? fetched.damage;
-								} catch (err) {
-									important.warn(
-										`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
-									);
-								}
-							}
-
+							const { avatar, stats, damage } = await resolveCharacterData(
+								char.charName,
+								messageId,
+								channelId,
+								memMaps,
+								botChannels
+							);
 							return {
 								charName: char.charName ?? null,
 								messageId,
@@ -194,8 +201,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const canLink =
-			guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
+		const canLink = isAllowSelfRegister(guildData);
 		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
 		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
 		const guild = botGuilds.get(guildId);
@@ -217,69 +223,24 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					return Promise.all(
 						Object.entries(allUsers).flatMap(([userId, userChars]) => {
 							const memChars: UserData[] = allMemChars[userId] ?? [];
-							const memByMessageId = new Map<string, UserData>(
-								memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
-							);
-							const memByUserName = new Map<string, UserData>(
-								memChars
-									.filter((c) => c.userName != null)
-									.map((c) => [c.userName!.toLowerCase(), c])
-							);
-							const memWithoutName = memChars.find((c) => c.userName == null);
+							const memMaps = buildMemMaps(memChars);
 							const ownerName = ownerNames.get(userId) ?? undefined;
 
 							return userChars
 								.filter((char) => {
-									const mem = memByMessageId.get(char.messageId[0]);
+									const mem = memMaps.memByMessageId.get(char.messageId[0]);
 									return !mem?.isFromTemplate;
 								})
 								.map(async (char): Promise<ApiCharacter> => {
 									const [messageId, channelId] = char.messageId;
 									const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-
-									const mem =
-										memByMessageId.get(messageId) ??
-										memByUserName.get((char.charName ?? "").toLowerCase()) ??
-										(char.charName == null ? memWithoutName : undefined);
-
-									let avatar: string | null = mem?.avatar ?? null;
-									let stats: EmbedField[] | null = null;
-									let damage: EmbedField[] | null = null;
-
-									if (mem?.stats)
-										stats = Object.entries(mem.stats).map(([name, value]) => ({
-											name,
-											value: String(value),
-										}));
-									if (mem?.damage)
-										damage = Object.entries(mem.damage).map(([name, value]) => ({
-											name,
-											value,
-										}));
-
-									const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
-									if (
-										stats === null ||
-										damage === null ||
-										avatar === null ||
-										hasStaleAvatar
-									) {
-										try {
-											const fetched = await fetchCharacterEmbeds(
-												channelId,
-												messageId,
-												botChannels
-											);
-											if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
-											stats = stats ?? fetched.stats;
-											damage = damage ?? fetched.damage;
-										} catch (err) {
-											important.warn(
-												`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
-											);
-										}
-									}
-
+									const { avatar, stats, damage } = await resolveCharacterData(
+										char.charName,
+										messageId,
+										channelId,
+										memMaps,
+										botChannels
+									);
 									return {
 										charName: char.charName ?? null,
 										messageId,

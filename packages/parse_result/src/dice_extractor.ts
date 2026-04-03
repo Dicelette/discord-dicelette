@@ -580,8 +580,9 @@ export function replaceStatsInDiceFormula(
 	}
 
 	const uniqueStats = Array.from(new Set(statsFounds.filter((stat) => stat.length > 0)));
+	let statsList: string | undefined;
 	if (uniqueStats.length > 0) {
-		const statsList = statsName
+		statsList = statsName
 			? unNormalizeStatsName(uniqueStats, statsName).join(" × ")
 			: uniqueStats.join(" × ");
 		comments = comments
@@ -598,13 +599,13 @@ export function replaceStatsInDiceFormula(
 			: processedFormula;
 		return {
 			formula: verifyStatMatcherPattern(finalFormula, ul),
-			infoRoll: uniqueStats?.[0],
+			infoRoll: statsList,
 			statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 		};
 	}
 	return {
 		formula: `${verifyStatMatcherPattern(processedFormula, ul)} ${comments}`,
-		infoRoll: uniqueStats?.[0],
+		infoRoll: statsList,
 		statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 	};
 }

@@ -75,7 +75,7 @@ export function createConfigRouter(deps: DashboardDeps) {
 			if (guild) {
 				const member = await guild.fetchMember(req.session.userId!);
 				const Administrator = BigInt(0x8);
-				if (!member || !member.hasPermission(Administrator)) {
+				if (!member?.hasPermission(Administrator)) {
 					res
 						.status(403)
 						.json({ error: "Only Administrators can modify dashboard access roles" });
