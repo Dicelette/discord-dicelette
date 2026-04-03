@@ -59,9 +59,18 @@ const SnippetRow = memo(function SnippetRow({
 				sx={{ flex: 2 }}
 				slotProps={{ htmlInput: { style: { fontFamily: "var(--code-font-family)" } } }}
 			/>
-			<IconButton size="small" onClick={() => onDelete(name)}>
-				<DeleteIcon fontSize="small" />
-			</IconButton>
+			<Box
+				sx={{
+					display: "flex",
+					alignSelf: "stretch",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<IconButton size="small" onClick={() => onDelete(name)}>
+					<DeleteIcon fontSize="small" />
+				</IconButton>
+			</Box>
 		</Box>
 	);
 });
