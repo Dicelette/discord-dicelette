@@ -1,5 +1,5 @@
 import { authApi, type DiscordGuild, guildApi } from "@dicelette/api";
-import { Add, Refresh, Search, Settings } from "@mui/icons-material";
+import { Add, AdminPanelSettings, Refresh, Search } from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -8,7 +8,6 @@ import {
 	Card,
 	CardActionArea,
 	CardContent,
-	Chip,
 	CircularProgress,
 	Divider,
 	Grid,
@@ -232,11 +231,10 @@ export default function Servers() {
 												>
 													{guild.name}
 												</Typography>
-												{guild.isAdmin && (
-													<Chip label={t("common.owner")} size="small" sx={{ mt: 0.5 }} />
-												)}
 											</Box>
-											<Settings sx={{ opacity: 0.4, flexShrink: 0 }} />
+											{guild.isAdmin && (
+												<AdminPanelSettings sx={{ opacity: 0.4, flexShrink: 0 }} />
+											)}
 										</CardContent>
 									</CardActionArea>
 								</Card>
