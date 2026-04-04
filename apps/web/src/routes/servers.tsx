@@ -1,5 +1,5 @@
 import { authApi, type DiscordGuild, guildApi } from "@dicelette/api";
-import { Add, AdminPanelSettings, Refresh, Search } from "@mui/icons-material";
+import { Add, Refresh, Search } from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -12,6 +12,7 @@ import {
 	Divider,
 	Grid,
 	InputAdornment,
+	SvgIcon,
 	TextField,
 	Tooltip,
 	Typography,
@@ -233,7 +234,23 @@ export default function Servers() {
 												</Typography>
 											</Box>
 											{guild.isAdmin && (
-												<AdminPanelSettings sx={{ opacity: 0.4, flexShrink: 0 }} />
+												<SvgIcon>
+													{/** biome-ignore lint/a11y/noSvgWithoutTitle: wtf */}
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width={24}
+														height={24}
+														viewBox="0 0 24 24"
+														opacity={0.4}
+													>
+														<path
+															fill="currentColor"
+															d="M5.827 19v-1h12.346v1zm-.058-2.884L4.321 8.475q-.05.02-.112.022q-.063.003-.113.003q-.471 0-.783-.32T3 7.404q0-.473.313-.804q.312-.33.784-.33t.803.33q.33.331.33.804q0 .104-.008.193t-.059.176l3.202 1.285l2.971-4.045q-.217-.142-.344-.376q-.127-.233-.127-.503q0-.472.331-.803q.33-.331.803-.331q.472 0 .804.33t.332.8q0 .284-.127.512q-.127.23-.344.371l2.97 4.045l3.203-1.285q-.027-.08-.047-.175q-.02-.096-.02-.194q0-.473.312-.804q.312-.33.784-.33t.803.33q.331.331.331.804q0 .454-.332.775t-.806.321q-.038 0-.086-.012t-.104-.013l-1.441 7.64zm.854-1h10.754l1.227-6.137l-3.317 1.323L12 5.804l-3.286 4.498l-3.318-1.323zm5.377 0"
+															strokeWidth={0.5}
+															stroke="currentColor"
+														/>
+													</svg>
+												</SvgIcon>
 											)}
 										</CardContent>
 									</CardActionArea>
