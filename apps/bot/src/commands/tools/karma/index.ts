@@ -139,6 +139,7 @@ const getCount = {
 				break;
 			case t("luckMeter.graph.title"):
 				await chart(interaction, client, ul);
+				break;
 		}
 	},
 };
