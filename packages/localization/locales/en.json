@@ -828,7 +828,7 @@
 		"error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
 		"graph": {
 			"description": "Build a graphical image based on the leaderboard",
-			"title": "graph"
+			"title": "chart"
 		},
 		"leaderboard": {
 			"noData": "No data available for this server yet!",

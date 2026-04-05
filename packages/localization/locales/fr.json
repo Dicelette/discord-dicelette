@@ -828,7 +828,7 @@
 		"error": "Les dés ne connaissent pas encore {{- user}}. Ses résultats ne peuvent donc pas être affichés !",
 		"graph": {
 			"description": "Créer un graphique basée sur le leaderboard",
-			"title": "graph"
+			"title": "chart"
 		},
 		"leaderboard": {
 			"noData": "Il n'y a pas encore de données pour ce serveur !",

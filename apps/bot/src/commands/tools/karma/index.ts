@@ -8,7 +8,7 @@ import type { Translation } from "@dicelette/types";
 import { t } from "i18next";
 import { embedError } from "messages";
 import { bilan } from "./bilan";
-import { graph } from "./graph";
+import { chart } from "./chart";
 import { leaderboard } from "./leaderboard";
 import { server } from "./server";
 
@@ -138,7 +138,7 @@ const getCount = {
 				await resetCount(interaction, client, ul);
 				break;
 			case t("luckMeter.graph.title"):
-				await graph(interaction, client, ul);
+				await chart(interaction, client, ul);
 		}
 	},
 };

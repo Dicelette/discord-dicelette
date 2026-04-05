@@ -267,7 +267,7 @@ async function buildLeaderBoardChart(
  * @param client
  * @param ul
  */
-export async function graph(
+export async function chart(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
 	ul: Translation
