@@ -48,8 +48,9 @@ export default (client: EClient): void => {
 		try {
 			if (isDev) {
 				await client.application?.commands.set(GLOBAL_CMD.map((x) => x.data.toJSON()));
+				logger.info("Loaded commands in DEV env");
 			} else await client.application?.commands.set(serializedCommands);
-			logger.info(`Global commands updated (${serializedCommands.length})`);
+			important.info(`Global commands updated (${serializedCommands.length})`);
 		} catch (err) {
 			logger.fatal("Failed to update global commands:", err);
 		}
