@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.8.0](https://github.com/Dicelette/discord-dicelette/compare/3.7.0...3.8.0) (2026-04-05)
+
+
+### Features
+
+* **stats:** add leaderboard, graph, and user bilan functionalities with new types and utility functions ([c421594](https://github.com/Dicelette/discord-dicelette/commit/c421594b3fc4c90ede86dfd2460d2082a3f4bfb2))
+
 ## [3.7.0](https://github.com/Dicelette/discord-dicelette/compare/3.6.2...3.7.0) (2026-04-03)
 
 
