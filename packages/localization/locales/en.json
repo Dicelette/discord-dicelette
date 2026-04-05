@@ -826,6 +826,10 @@
 		"description": "Get the number of success, failures (and critical ones) of an user.",
 		"ephemeral": "Send the reply in an ephemeral message",
 		"error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
+		"graph": {
+			"description": "Build a graphical image based on the leaderboard",
+			"title": "graph"
+		},
 		"leaderboard": {
 			"noData": "No data available for this server yet!",
 			"option": {

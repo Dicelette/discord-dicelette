@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome support this kind of configuration, we need to ignore the naming rules */
 import "uniformize";
+import path from "node:path";
 import { getEngine, standardizeDice } from "@dicelette/core";
 import { logger } from "@sentry/node";
 import { Random } from "random-js";
@@ -105,4 +106,8 @@ export function allValueUndefOrEmptyString(obj: unknown): boolean {
 			(typeof value === "string" && value.trim() === "") ||
 			(typeof value === "object" && allValueUndefOrEmptyString(value))
 	);
+}
+
+export function fontPath(fontName: string) {
+	return path.resolve(`assets/fonts/${fontName}.ttf`).replace("dist/", "");
 }

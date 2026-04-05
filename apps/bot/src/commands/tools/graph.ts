@@ -1,9 +1,12 @@
-import path from "node:path";
 import type { EClient } from "@dicelette/client";
-import { charUserOptions, haveAccess } from "@dicelette/helpers";
+import {
+	charUserOptions,
+	getInteractionContext as getLangAndConfig,
+	haveAccess,
+} from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import type { CharacterData, PersonnageIds, UserData } from "@dicelette/types";
-import { filterChoices, logger, sentry } from "@dicelette/utils";
+import { filterChoices, fontPath, logger, sentry } from "@dicelette/utils";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import {
 	findChara,
@@ -17,7 +20,6 @@ import parse from "parse-color";
 import { searchUserChannel } from "utils";
 import "@dicelette/discord_ext";
 import type { Statistic, StatisticalTemplate } from "@dicelette/core";
-import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 
 async function chart(
 	userData: UserData,
@@ -117,10 +119,6 @@ async function chart(
 		options,
 		type: "radar",
 	});
-}
-
-function fontPath(fontName: string) {
-	return path.resolve(`assets/fonts/${fontName}.ttf`).replace("dist/", "");
 }
 
 export const graph = {
