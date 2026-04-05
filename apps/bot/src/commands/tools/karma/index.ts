@@ -104,8 +104,8 @@ const getCount = {
 		)
 		.addSubcommand((subcommand) =>
 			subcommand
-				.setNames("luckMeter.graph.title")
-				.setDescriptions("luckMeter.graph.description")
+				.setNames("luckMeter.chart.title")
+				.setDescriptions("luckMeter.chart.description")
 				.addBooleanOption((option) =>
 					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
 				)
@@ -137,7 +137,7 @@ const getCount = {
 			case t("luckMeter.reset.title"):
 				await resetCount(interaction, client, ul);
 				break;
-			case t("luckMeter.graph.title"):
+			case t("luckMeter.chart.title"):
 				await chart(interaction, client, ul);
 				break;
 		}

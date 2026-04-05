@@ -806,6 +806,10 @@
 		"validationWaiting": "The sheet of <@{{- user}}> wait for validation ({{- url}}).{{- role}}"
 	},
 	"luckMeter": {
+		"chart": {
+			"description": "Build a graphical image based on the leaderboard",
+			"title": "chart"
+		},
 		"count": {
 			"consecutive": {
 				"failure": "Current failure streak",
@@ -826,10 +830,6 @@
 		"description": "Get the number of success, failures (and critical ones) of an user.",
 		"ephemeral": "Send the reply in an ephemeral message",
 		"error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
-		"graph": {
-			"description": "Build a graphical image based on the leaderboard",
-			"title": "chart"
-		},
 		"leaderboard": {
 			"noData": "No data available for this server yet!",
 			"option": {
