@@ -52,12 +52,10 @@ async function buildLeaderBoardChart(
 
 	const top10Display = top10.map(({ member }, i) => {
 		const displayName = member.user.globalName ?? member.user.username;
-		const safeName =
-			displayName.length > 16 ? `${displayName.slice(0, 13)}...` : displayName;
 		const avatarUrl =
 			member.displayAvatarURL({ extension: "png", forceStatic: true, size: 64 }) ?? null;
 
-		return { avatarUrl, label: `${i + 1}. ${safeName}` };
+		return { avatarUrl, label: `${i + 1}. ${displayName}` };
 	});
 
 	const labels = top10Display.map((item) => item.label);
@@ -111,7 +109,7 @@ async function buildLeaderBoardChart(
 		animation: false,
 		maintainAspectRatio: false,
 		layout: {
-			padding: { top: 24, right: 24, bottom: 110, left: 12 },
+			padding: { top: 24, right: 24, bottom: 154, left: 12 },
 		},
 		plugins: {
 			legend: {
@@ -165,23 +163,53 @@ async function buildLeaderBoardChart(
 			const xScale = chart.scales.x;
 			if (!xScale) return;
 
-			const radius = 16;
-			const labelsY = chart.chartArea.bottom + 38;
 			const { ctx } = chart;
+			const isDense = top10.length >= 9;
+			const radius = isDense ? 14 : 16;
+			const fontSize = isDense ? 24 : 30;
+			const rowOffset = isDense ? 34 : 0;
+			const baseLabelsY = chart.chartArea.bottom + 36;
+			const slotWidth =
+				top10.length > 1
+					? Math.abs(xScale.getPixelForValue(1) - xScale.getPixelForValue(0))
+					: chart.chartArea.right - chart.chartArea.left;
+
+			const truncateToWidth = (text: string, maxWidth: number) => {
+				if (ctx.measureText(text).width <= maxWidth) return text;
+				const ellipsis = "...";
+				let trimmed = text;
+				while (
+					trimmed.length > 0 &&
+					ctx.measureText(`${trimmed}${ellipsis}`).width > maxWidth
+				) {
+					trimmed = trimmed.slice(0, -1);
+				}
+				return trimmed ? `${trimmed}${ellipsis}` : ellipsis;
+			};
+
 			for (let i = 0; i < top10.length; i++) {
-				const label = labels[i] ?? "";
+				const rawLabel = labels[i] ?? "";
 				const xCenter = xScale.getPixelForValue(i);
 				const avatar = avatarImages[i];
+				const labelY = baseLabelsY + (i % 2) * rowOffset;
 
 				ctx.save();
-				ctx.font = "700 30px Ubuntu";
+				ctx.font = `700 ${fontSize}px Ubuntu`;
 				ctx.textAlign = "left";
 				ctx.textBaseline = "middle";
 				ctx.fillStyle = "#d1d5db";
 
+				const avatarWidth = avatar ? radius * 2 + 10 : 0;
+				const maxLabelWidth = Math.max(34, slotWidth - avatarWidth - 8);
+				const label = truncateToWidth(rawLabel, maxLabelWidth);
 				const textWidth = ctx.measureText(label).width;
-				const avatarX = xCenter - textWidth / 2 - radius * 2 - 10;
-				const avatarY = labelsY - radius;
+				const totalWidth = textWidth + avatarWidth;
+
+				let avatarX = xCenter - totalWidth / 2;
+				const minX = chart.chartArea.left + 2;
+				const maxX = chart.chartArea.right - totalWidth - 2;
+				avatarX = Math.min(maxX, Math.max(minX, avatarX));
+				const avatarY = labelY - radius;
 
 				if (avatar) {
 					ctx.beginPath();
@@ -196,13 +224,14 @@ async function buildLeaderBoardChart(
 					ctx.drawImage(avatar, avatarX, avatarY, radius * 2, radius * 2);
 					ctx.restore();
 					ctx.save();
-					ctx.font = "700 30px Ubuntu";
+					ctx.font = `700 ${fontSize}px Ubuntu`;
 					ctx.textAlign = "left";
 					ctx.textBaseline = "middle";
 					ctx.fillStyle = "#d1d5db";
 				}
 
-				ctx.fillText(label, avatarX + radius * 2 + 10, labelsY);
+				const textX = avatar ? avatarX + radius * 2 + 10 : avatarX;
+				ctx.fillText(label, textX, labelY);
 				ctx.restore();
 			}
 		},
