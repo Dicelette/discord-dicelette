@@ -523,9 +523,16 @@ export class StatsFeature extends BaseFeature {
 			user: Djs.userMention(interaction.user.id),
 		});
 		await sendLogs(`${logMessage}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
-		await updateMemory(characters, interaction.guild!.id, userID, this.ul, {
-			embeds: list,
-		}, this.client.characterCacheTimestamps);
+		await updateMemory(
+			characters,
+			interaction.guild!.id,
+			userID,
+			this.ul,
+			{
+				embeds: list,
+			},
+			this.client.characterCacheTimestamps
+		);
 	}
 
 	private async getFieldsToAppend(statsEmbeds: Djs.EmbedBuilder) {

@@ -20,7 +20,9 @@ import {
 	withTimeout,
 } from "../utils";
 
-function isAllowSelfRegister(guildData: { allowSelfRegister?: boolean | string }): boolean {
+function isAllowSelfRegister(guildData: {
+	allowSelfRegister?: boolean | string;
+}): boolean {
 	return guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
 }
 
@@ -29,9 +31,7 @@ function buildMemMaps(memChars: UserData[]) {
 		memChars.filter((c) => c.messageId).map((c) => [c.messageId!, c])
 	);
 	const memByUserName = new Map<string, UserData>(
-		memChars
-			.filter((c) => c.userName != null)
-			.map((c) => [c.userName!.toLowerCase(), c])
+		memChars.filter((c) => c.userName != null).map((c) => [c.userName!.toLowerCase(), c])
 	);
 	const memWithoutName = memChars.find((c) => c.userName == null);
 	return { memByMessageId, memByUserName, memWithoutName };
@@ -43,7 +43,11 @@ async function resolveCharacterData(
 	channelId: string,
 	memMaps: ReturnType<typeof buildMemMaps>,
 	botChannels: BotChannels
-): Promise<{ avatar: string | null; stats: EmbedField[] | null; damage: EmbedField[] | null }> {
+): Promise<{
+	avatar: string | null;
+	stats: EmbedField[] | null;
+	damage: EmbedField[] | null;
+}> {
 	const { memByMessageId, memByUserName, memWithoutName } = memMaps;
 	const mem =
 		memByMessageId.get(messageId) ??
@@ -55,7 +59,10 @@ async function resolveCharacterData(
 	let damage: EmbedField[] | null = null;
 
 	if (mem?.stats)
-		stats = Object.entries(mem.stats).map(([name, value]) => ({ name, value: String(value) }));
+		stats = Object.entries(mem.stats).map(([name, value]) => ({
+			name,
+			value: String(value),
+		}));
 	if (mem?.damage)
 		damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
 

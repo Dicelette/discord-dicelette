@@ -49,17 +49,7 @@ export default (client: EClient): void => {
 			if (isDev) {
 				await client.application?.commands.set(GLOBAL_CMD.map((x) => x.data.toJSON()));
 				logger.info("Loaded commands in DEV env");
-			} else {
-				const karmaCmd = serializedCommands.find((c) => c.name === "karma");
-				important.info(
-					`karma subcommands in payload: ${JSON.stringify(karmaCmd?.options?.map((o) => o.name))}`
-				);
-				const result = await client.application?.commands.set(serializedCommands);
-				const registeredKarma = result?.find((c) => c.name === "karma");
-				important.info(
-					`karma subcommands registered by Discord: ${JSON.stringify(registeredKarma?.options?.map((o) => o.name))}`
-				);
-			}
+			} else await client.application?.commands.set(serializedCommands);
 			important.info(`Global commands updated (${serializedCommands.length})`);
 		} catch (err) {
 			logger.fatal("Failed to update global commands:", err);

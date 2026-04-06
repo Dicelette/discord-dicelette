@@ -42,5 +42,14 @@ export function useCharactersList(
 		setPage(1);
 	};
 
-	return { characters, loading, error, setError, page, setPage, search, handleSearchChange };
+	return {
+		characters,
+		loading,
+		error,
+		setError,
+		page,
+		setPage,
+		search,
+		handleSearchChange,
+	};
 }

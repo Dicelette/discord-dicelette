@@ -318,9 +318,16 @@ async function getUserFrom(
 			options.cleanUrl
 		);
 		if (!userData) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
-		await updateMemory(characters, guildId, userId, ul, {
-			userData,
-		}, client.characterCacheTimestamps);
+		await updateMemory(
+			characters,
+			guildId,
+			userId,
+			ul,
+			{
+				userData,
+			},
+			client.characterCacheTimestamps
+		);
 		if (options.fetchMessage) userData.messageId = targetMessage.id;
 
 		if (options?.attributes)
@@ -714,9 +721,16 @@ export async function getStatistics(
 	if (userStatistique && template && !equal(userStatistique.template, template)) {
 		logger.trace("Updating user template to match guild template settings.");
 		userStatistique.template = template;
-		await updateMemory(client.characters, interaction.guild!.id, targetUserId, ul, {
-			userData: userStatistique,
-		}, client.characterCacheTimestamps);
+		await updateMemory(
+			client.characters,
+			interaction.guild!.id,
+			targetUserId,
+			ul,
+			{
+				userData: userStatistique,
+			},
+			client.characterCacheTimestamps
+		);
 	}
 
 	if (!userStatistique) {

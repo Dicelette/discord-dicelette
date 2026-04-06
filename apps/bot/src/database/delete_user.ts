@@ -45,7 +45,13 @@ export function deleteByMessageIds(
 				if (characters.get(guild.id, user)) characters.delete(guild.id, user);
 			} else {
 				db.set(guild.id, userChars, `user.${user}`);
-				deleteUserInChar(characters, user, guild.id, undefined, client.characterCacheTimestamps);
+				deleteUserInChar(
+					characters,
+					user,
+					guild.id,
+					undefined,
+					client.characterCacheTimestamps
+				);
 			}
 			logger.trace(`Deleted ${messageId} for user ${user}`);
 		}
@@ -107,6 +113,12 @@ function cleanUserDB(
 			characters.delete(thread.guild.id, user);
 		} else guildDB.set(thread.guild.id, filterChar, `user.${user}`);
 		if (charDeleted)
-			deleteUserInChar(characters, user, thread.guild.id, charDeleted?.charName, client.characterCacheTimestamps);
+			deleteUserInChar(
+				characters,
+				user,
+				thread.guild.id,
+				charDeleted?.charName,
+				client.characterCacheTimestamps
+			);
 	}
 }

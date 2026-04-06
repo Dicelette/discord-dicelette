@@ -15,8 +15,21 @@ interface Props {
 
 export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props) {
 	const { t } = useI18n();
-	const { characters, loading, error, setError, page, setPage, search, handleSearchChange } =
-		useCharactersList(guildId, charactersApi.getAllCharacters, refreshToken, t("characters.loadError"));
+	const {
+		characters,
+		loading,
+		error,
+		setError,
+		page,
+		setPage,
+		search,
+		handleSearchChange,
+	} = useCharactersList(
+		guildId,
+		charactersApi.getAllCharacters,
+		refreshToken,
+		t("characters.loadError")
+	);
 
 	const q = search.trim().toLowerCase();
 	const filtered = q

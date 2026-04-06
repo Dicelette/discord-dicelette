@@ -127,9 +127,16 @@ export class RenameFeature extends BaseFeature {
 		if (!guildData) return;
 		//update the characters database
 		//remove the old chara
-		await updateMemory(this.client.characters, interaction.guild!.id, userId, this.ul, {
-			userData: charData,
-		}, this.client.characterCacheTimestamps);
+		await updateMemory(
+			this.client.characters,
+			interaction.guild!.id,
+			userId,
+			this.ul,
+			{
+				userData: charData,
+			},
+			this.client.characterCacheTimestamps
+		);
 
 		await rename(
 			newName,

@@ -76,9 +76,16 @@ export async function bulkEditTemplateUser(
 					userMessages
 				);
 				await userMessages.edit({ embeds: listEmbed.list, files: listEmbed.files });
-				await updateMemory(client.characters, interaction.guild!.id, userID, ul, {
-					embeds: listEmbed.list,
-				}, client.characterCacheTimestamps);
+				await updateMemory(
+					client.characters,
+					interaction.guild!.id,
+					userID,
+					ul,
+					{
+						embeds: listEmbed.list,
+					},
+					client.characterCacheTimestamps
+				);
 			} catch (e) {
 				logger.warn(e);
 				//pass
