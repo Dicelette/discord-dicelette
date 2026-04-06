@@ -644,7 +644,7 @@
 	"graph": {
 		"attributes": {
 			"description": "Générer un graphique basée sur les attributs à la place des statistiques.",
-			"options": "Attributs a afficher (separes par une virgule, ex: volonte, resistance physique)"
+			"options": "Attributs à afficher (séparés par une virgule, ex: volonté, résistance physique)"
 		},
 		"bg": {
 			"description": "Couleur du fond du graphique. Par défaut: #0e47b2",
