@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.9.0](https://github.com/Dicelette/discord-dicelette/compare/3.8.0...3.9.0) (2026-04-06)
+
+
+### Features
+
+* add chart generation and attribute selection functionality ([ce3b04b](https://github.com/Dicelette/discord-dicelette/commit/ce3b04bc356cdbd661ef1f5f4925a9dd235df9e9))
+
+
+### Bug Fixes
+
+* correct French translations for graph attribute options ([d5651b2](https://github.com/Dicelette/discord-dicelette/commit/d5651b2da4e9d886fed404b86dd64e7a14738dca))
+* ensure chart function is called for luckMeter.graph.title case ([2aab076](https://github.com/Dicelette/discord-dicelette/commit/2aab0763b12001dd023e512edc024b07a8eca1a6))
+
 ## [3.8.0](https://github.com/Dicelette/discord-dicelette/compare/3.7.0...3.8.0) (2026-04-05)
 
 
