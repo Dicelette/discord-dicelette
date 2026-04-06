@@ -642,6 +642,10 @@
 		}
 	},
 	"graph": {
+		"attributes": {
+			"description": "Generate a graph based on the attributes instead of statistics.",
+			"options": "Attributes to display (comma separated, e.g. willpower, physical resistance)"
+		},
 		"bg": {
 			"description": "Background color of the chart. By default: #0e47b2",
 			"name": "background"

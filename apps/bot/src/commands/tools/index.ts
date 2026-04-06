@@ -11,6 +11,8 @@ export * from "./choose";
 export * from "./display";
 export * from "./edit";
 export * from "./graph";
+export { chart, convertHexToRGBA, generateColor, imagePersonalized } from "./graph/draw";
+export { getMax, getMin } from "./graph/utils";
 export * from "./help";
 export { createHelpMessageDB, helpAtInvit } from "./help/createHelpMessage";
 export * from "./info";
