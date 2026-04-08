@@ -21,8 +21,14 @@ import {
 	rollCustomCriticalsFromDice,
 	type Server,
 	skillCustomCritical,
+	verifyStatMatcherPattern,
 } from "@dicelette/parse_result";
-import type { RollOptions, Translation, UserData } from "@dicelette/types";
+import type {
+	RollOptions,
+	Translation,
+	UserData,
+	UserSettingsData,
+} from "@dicelette/types";
 import {
 	capitalizeBetweenPunct,
 	DICE_COMPILED_PATTERNS,
@@ -70,13 +76,16 @@ export async function rollWithInteraction(
 	};
 	let pity = false;
 	let sort: SortOrder | undefined;
+	let userSettings: UserSettingsData | undefined;
 	if (interaction.guild) {
 		const pityNb = client.criticalCount.get(interaction.guild.id, data.userId!)
 			?.consecutive?.failure;
 		const pityThreshold = client.settings.get(interaction.guild.id, "pity");
 		pity = triggerPity(pityThreshold, pityNb);
 		sort = client.settings.get(interaction.guild.id, "sortOrder");
+		userSettings = client.userSettings.get(interaction.guild.id, data.userId!);
 	}
+	dice = verifyStatMatcherPattern(dice, ul, userSettings?.ignoreNotfound);
 	const result = getRoll(dice, pity, sort);
 	if (!result) {
 		await reply(interaction, {
@@ -176,7 +185,14 @@ export async function rollMacro(
 	}
 
 	const dollarValue = convertNameToValue(atq, userStatistique.stats);
-	const expr = getExpression(dice, expression, userStatistique.stats, dollarValue?.total);
+	const expr = getExpression(
+		dice,
+		expression,
+		userStatistique.stats,
+		dollarValue?.total,
+		undefined,
+		client.userSettings.get(interaction.guildId!, interaction.user.id)?.ignoreNotfound
+	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
 	//dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
@@ -292,7 +308,7 @@ export async function rollStatistique(
 			optionChar,
 			statistic
 		);
-		if (!res) return;
+		if (!res) throw new Error("No result found for getRightValue in rollStatistique");
 		statistic = res.statistic;
 		standardizedStatistic = res.standardizedStatistic;
 		userStat = res.userStat;
@@ -314,7 +330,8 @@ export async function rollStatistique(
 		expression,
 		userStatistique.stats,
 		userStatStr,
-		ctx?.templateID?.statsName
+		ctx?.templateID?.statsName,
+		client.userSettings.get(interaction.guildId!, interaction.user.id)?.ignoreNotfound
 	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;

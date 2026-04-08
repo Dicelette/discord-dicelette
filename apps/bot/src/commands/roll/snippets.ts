@@ -63,7 +63,15 @@ export default {
 			charOptions = dice.match(CHARACTER_DETECTION)![1];
 			dice = dice.replace(CHARACTER_DETECTION, "").trim();
 		}
-		const expr = getExpression(dice, expressionOpt);
+
+		const expr = getExpression(
+			dice,
+			expressionOpt,
+			attributes,
+			undefined,
+			undefined,
+			userSettings?.ignoreNotfound
+		);
 		dice = expr.dice;
 		const expressionStr = expr.expressionStr;
 

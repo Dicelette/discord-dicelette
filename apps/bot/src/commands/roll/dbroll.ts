@@ -25,7 +25,8 @@ export const dbRoll = {
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { userStatistique, options, ul, optionChar } =
 			(await getStatistics(interaction, client)) ?? {};
-		if (!userStatistique || !options || !ul) return;
+		if (!userStatistique || !options || !ul)
+			throw new Error("No userStatistique, options or ul found for dbRoll command");
 		return await rollStatistique(
 			interaction,
 			client,

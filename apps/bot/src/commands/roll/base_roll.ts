@@ -135,7 +135,10 @@ export async function baseRoll(
 		true,
 		undefined,
 		ctx?.templateID?.statsName,
-		ul
+		ul,
+		interaction.guild
+			? client.userSettings.get(interaction.guild.id, user.id)?.ignoreNotfound
+			: undefined
 	);
 	const { criticalsFromDice, serverData } = await getCritical(
 		client,

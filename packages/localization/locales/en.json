@@ -1099,6 +1099,13 @@
 				"description": "Display all registered attributes.",
 				"empty": "There is no saved data."
 			},
+			"replaceUnknown": {
+				"description": "Replace unknown attributes by a specific value. Remove the value to disable.",
+				"options": "Value used to replace the unknow value.",
+				"reset": "The value was removed. Now, unknown attributes will raise an error.",
+				"set": "`{{- value}}` will replace all unknown attribute in the dice.",
+				"title": "replace_unknown"
+			},
 			"title": "attributes"
 		},
 		"createLink": {

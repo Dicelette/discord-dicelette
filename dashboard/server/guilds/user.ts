@@ -28,12 +28,15 @@ export function createUserRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const storedAttrs = userSettings.get(guildId, userId)?.attributes;
+		const user = userSettings.get(guildId, userId);
+		const storedAttrs = user?.attributes;
+		const replaceUnknown = user?.ignoreNotfound;
 		const userAttrs = attributes ?? storedAttrs;
 		const validateFn =
 			type === "attributes"
 				? (name: string, value: unknown) => validateAttributeEntry(name, value)
-				: (_name: string, value: unknown) => validateSnippetEntry(value, userAttrs);
+				: (_name: string, value: unknown) =>
+						validateSnippetEntry(value, userAttrs, replaceUnknown);
 
 		const { valid, errors } = validateEntries(entries, validateFn);
 		res.json({ valid, errors });
@@ -81,9 +84,11 @@ export function createUserRouter(deps: DashboardDeps) {
 				res.status(400).json({ error: "Invalid snippets format" });
 				return;
 			}
-			const currentAttrs = userSettings.get(guildId, userId)?.attributes;
+			const user = userSettings.get(guildId, userId);
+			const currentAttrs = user?.attributes;
+			const replaceUnknown = user?.ignoreNotfound;
 			const { valid, errors } = validateEntries(snippets, (_name, value) =>
-				validateSnippetEntry(value, currentAttrs)
+				validateSnippetEntry(value, currentAttrs, replaceUnknown)
 			);
 			if (Object.keys(errors).length > 0) {
 				res.status(400).json({ errors });

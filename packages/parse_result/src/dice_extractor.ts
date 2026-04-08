@@ -155,7 +155,8 @@ export function processChainedDiceRoll(
 	pity?: boolean,
 	disableCompare?: boolean,
 	sort?: SortOrder,
-	ul?: Translation
+	ul?: Translation,
+	replaceUnknown?: string
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
 	// Process stats replacement if userData is available
 	let processedContent = content;
@@ -168,7 +169,8 @@ export function processChainedDiceRoll(
 			false,
 			true,
 			statsName,
-			ul
+			ul,
+			replaceUnknown
 		);
 		processedContent = res.formula;
 		infoRoll = res.infoRoll;
@@ -233,7 +235,8 @@ export function isRolling(
 	pity?: boolean,
 	disableCompare?: boolean,
 	sort?: SortOrder,
-	ul?: Translation
+	ul?: Translation,
+	replaceUnknown?: string
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
@@ -300,7 +303,8 @@ export function isRolling(
 			undefined,
 			undefined,
 			statsName,
-			ul
+			ul,
+			replaceUnknown
 		);
 	processedContent = res.formula;
 
@@ -335,7 +339,8 @@ export function isRolling(
 			pity,
 			disableCompare,
 			sort,
-			ul
+			ul,
+			replaceUnknown
 		);
 		if (diceRoll)
 			return {
@@ -431,8 +436,23 @@ export function getRoll(
 	return rollDice;
 }
 
-function verifyStatMatcherPattern(dice: string, ul?: Translation) {
+export function replaceUnknown(dice: string, replacer: string) {
+	return dice
+		.replaceAll(REMOVER_PATTERN.STAT_MATCHER, replacer)
+		.replaceAll("+0", "")
+		.replaceAll("-0", "");
+}
+
+export function verifyStatMatcherPattern(
+	dice: string,
+	ul?: Translation,
+	replaceUnknow?: string
+) {
 	if (REMOVER_PATTERN.STAT_MATCHER.test(dice)) {
+		if (replaceUnknow)
+			//remove ALL unknow value
+			return replaceUnknown(dice, replaceUnknow);
+
 		//find which one is not replaced
 		const matched = dice.matchAll(new RegExp(REMOVER_PATTERN.STAT_MATCHER));
 		const stats = matched
@@ -445,7 +465,7 @@ function verifyStatMatcherPattern(dice: string, ul?: Translation) {
 			: `The dice contains unknown statistics: ${stats}. Verify the values before reprocessing.`;
 		throw new BotError(errorMessage);
 	}
-	return dice;
+	return dice.replaceAll("+0", "").replaceAll("-0", "");
 }
 
 /**
@@ -459,9 +479,10 @@ export function replaceStatsInDiceFormula(
 	deleteComments = false,
 	shared = false,
 	statsName?: string[],
-	ul?: Translation
+	ul?: Translation,
+	replaceUnknow?: string
 ): { formula: string; infoRoll?: string; statsPerSegment?: string[] } {
-	if (!stats) return { formula: verifyStatMatcherPattern(content, ul) };
+	if (!stats) return { formula: verifyStatMatcherPattern(content, ul, replaceUnknow) };
 	//remove secondary opposition
 
 	let comments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
@@ -549,7 +570,8 @@ export function replaceStatsInDiceFormula(
 	} else {
 		// Non-shared roll: process as before
 		const variableMatches = [...processedFormula.matchAll(REMOVER_PATTERN.STAT_MATCHER)];
-		if (!variableMatches.length) return { formula: content };
+		if (!variableMatches.length)
+			return { formula: verifyStatMatcherPattern(content, ul, replaceUnknow) };
 
 		for (const match of variableMatches) {
 			const fullMatch = match[0];
@@ -598,13 +620,13 @@ export function replaceStatsInDiceFormula(
 			? `${processedFormula} ${originalComments}`.trim()
 			: processedFormula;
 		return {
-			formula: verifyStatMatcherPattern(finalFormula, ul),
+			formula: verifyStatMatcherPattern(finalFormula, ul, replaceUnknow),
 			infoRoll: statsList,
 			statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 		};
 	}
 	return {
-		formula: `${verifyStatMatcherPattern(processedFormula, ul)} ${comments}`,
+		formula: `${verifyStatMatcherPattern(processedFormula, ul, replaceUnknow)} ${comments}`,
 		infoRoll: statsList,
 		statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 	};

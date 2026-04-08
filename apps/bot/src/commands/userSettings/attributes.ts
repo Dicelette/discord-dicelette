@@ -55,7 +55,7 @@ export async function exportStats(
 	});
 }
 
-export async function importattributes(
+export async function importAttributes(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction
 ) {
@@ -128,4 +128,36 @@ export async function register(
 			value: `**${value}**`,
 		})
 	);
+}
+
+export async function setUnknowReplace(
+	client: EClient,
+	interaction: Djs.ChatInputCommandInteraction
+) {
+	const { ul } = getLangAndConfig(client, interaction);
+	const value = interaction.options.getString(
+		t("userSettings.attributes.create.value.title"),
+		false
+	);
+	if (!value) {
+		client.userSettings.delete(
+			interaction.guild!.id,
+			`${interaction.user.id}.ignoreNotfound`
+		);
+		await reply(interaction, {
+			content: ul(ul("userSettings.attributes.replaceUnknown.reset")),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
+	client.userSettings.set(
+		interaction.guild!.id,
+		value,
+		`${interaction.user.id}.ignoreNotfound`
+	);
+	await reply(interaction, {
+		content: ul(ul("userSettings.attributes.replaceUnknown.set"), { value }),
+		flags: Djs.MessageFlags.Ephemeral,
+	});
+	return;
 }

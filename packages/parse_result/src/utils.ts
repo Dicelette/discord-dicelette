@@ -7,7 +7,7 @@ import { DICE_COMPILED_PATTERNS, logger, REMOVER_PATTERN } from "@dicelette/util
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
-import { findStatInDiceFormula, getRoll } from "./dice_extractor";
+import { findStatInDiceFormula, getRoll, replaceUnknown } from "./dice_extractor";
 
 /**
  * Get or create cached regex for stats filtering
@@ -33,7 +33,8 @@ export function timestamp(time?: boolean) {
 export function convertExpression(
 	dice: string,
 	statistics?: Record<string, number>,
-	dollarValue?: string
+	dollarValue?: string,
+	unknownReplacer?: string
 ): string {
 	if (isNumber(dice)) {
 		const res = Number.parseInt(dice, 10);
@@ -42,6 +43,7 @@ export function convertExpression(
 		return "";
 	}
 	dice = generateStatsDice(dice, statistics, MIN_THRESHOLD_MATCH, dollarValue);
+	if (unknownReplacer) dice = replaceUnknown(dice, unknownReplacer);
 	try {
 		const evaluated = evaluate(dice);
 		if (typeof evaluated === "number")
@@ -147,9 +149,10 @@ export function getExpression(
 	expression: string,
 	stats?: Record<string, number>,
 	total?: string,
-	statsName?: string[]
+	statsName?: string[],
+	replaceUnknown?: string
 ) {
-	let expressionStr = convertExpression(expression, stats, total);
+	let expressionStr = convertExpression(expression, stats, total, replaceUnknown);
 	let isExp = false;
 	dice = dice.replace(
 		DICE_COMPILED_PATTERNS.DICE_EXPRESSION,

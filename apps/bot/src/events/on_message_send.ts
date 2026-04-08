@@ -79,7 +79,8 @@ export default (client: EClient): void => {
 				pity,
 				disableCompare,
 				sortOrder,
-				ul
+				ul,
+				client.userSettings.get(message.guild.id, message.author.id)?.ignoreNotfound
 			);
 
 			if (!isRoll || allValuesUndefined(isRoll))

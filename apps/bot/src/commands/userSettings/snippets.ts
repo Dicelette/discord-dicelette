@@ -23,17 +23,26 @@ export async function register(
 	const { ul } = getLangAndConfig(client, interaction);
 	const macroName = interaction.options.getString(t("common.name"), true);
 	const diceValue = interaction.options.getString(t("common.dice"), true);
-	const attributes = client.userSettings.get(
+	const userSettings = client.userSettings.get(
 		interaction.guild!.id,
 		interaction.user.id
-	)?.attributes;
+	);
+	const attributes = userSettings?.attributes;
 	const dice = replaceStatsInDiceFormula(
-		getExpression(diceValue, "0", attributes).dice,
+		getExpression(
+			diceValue,
+			"0",
+			attributes,
+			undefined,
+			undefined,
+			userSettings?.ignoreNotfound
+		).dice,
 		attributes,
 		undefined,
 		undefined,
 		undefined,
-		ul
+		ul,
+		client.userSettings.get(interaction.guild!.id, interaction.user.id)?.ignoreNotfound
 	);
 	await baseRoll(dice.formula, interaction, client, false, true);
 	// store using generic helper
@@ -152,17 +161,19 @@ export async function importSnippets(
 	const key = `${userId}.snippets`;
 	let macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
 	if (overwrite) macros = {};
-	const attributes = client.userSettings.get(
+	const userSettings = client.userSettings.get(
 		interaction.guild!.id,
 		interaction.user.id
-	)?.attributes;
+	);
+	const attributes = userSettings?.attributes;
+	const replaceUnknown = userSettings?.ignoreNotfound;
 	// validate and merge the imported macros
 	const {
 		result: validated,
 		errors,
 		count,
 	} = await processEntries<string>(importedMacros, async (_name, content) =>
-		validateSnippetEntry(content, attributes)
+		validateSnippetEntry(content, attributes, replaceUnknown)
 	);
 
 	for (const [name, value] of Object.entries(validated)) macros[name] = value as string;

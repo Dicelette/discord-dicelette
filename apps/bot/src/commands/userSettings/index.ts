@@ -142,6 +142,17 @@ export const userSettings = {
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
+						.setNames("userSettings.attributes.replaceUnknown.title")
+						.setDescriptions("userSettings.attributes.replaceUnknown.description")
+						.addStringOption((option) =>
+							option
+								.setNames("userSettings.attributes.create.value.title")
+								.setDescriptions("userSettings.attributes.replaceUnknown.options")
+								.setRequired(false)
+						)
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
 						.setNames("userSettings.snippets.list.title")
 						.setDescriptions("userSettings.attributes.list.description")
 				)
@@ -200,7 +211,9 @@ export const userSettings = {
 				case t("export.name"):
 					return await attributes.exportStats(client, interaction);
 				case t("import.name"):
-					return await attributes.importattributes(client, interaction);
+					return await attributes.importAttributes(client, interaction);
+				case t("userSettings.attributes.replaceUnknown.title"):
+					return await attributes.setUnknowReplace(client, interaction);
 			}
 		}
 	},

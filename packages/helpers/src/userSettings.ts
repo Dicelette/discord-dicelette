@@ -171,13 +171,19 @@ export function validateAttributeEntry(
 
 export function validateSnippetEntry(
 	content: unknown,
-	attributes?: Record<string, number>
+	attributes?: Record<string, number>,
+	replaceUnknow?: string
 ): ValidationResult<string> {
 	if (typeof content !== "string") return { error: String(content), ok: false };
 	try {
 		const substituted = replaceStatsInDiceFormula(
 			getExpression(content, "0", attributes).dice,
-			attributes
+			attributes,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			replaceUnknow
 		);
 		const formula = substituted.formula
 			.replace(/\s*%%.*%%\s*/g, "")
