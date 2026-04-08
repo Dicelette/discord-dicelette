@@ -322,8 +322,6 @@ export async function rollStatistique(
 		});
 		return;
 	}
-	//if (threshold)
-	//	threshold = generateStatsDice(threshold, userStatistique.stats, userStat?.toString());
 	const userStatStr = userStat?.toString();
 	const expr = getExpression(
 		dice,

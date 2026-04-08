@@ -2,7 +2,7 @@ import type { EClient } from "@dicelette/client";
 import { generateStatsDice, isNumber } from "@dicelette/core";
 import { autoCompleteCharacters, calcOptions } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
-import { getRoll, timestamp } from "@dicelette/parse_result";
+import { getRoll, replaceUnknown, timestamp } from "@dicelette/parse_result";
 import {
 	EMOJI_MATH,
 	MIN_THRESHOLD_MATCH,
@@ -161,6 +161,9 @@ export async function calculate(
 	const sortResult = interaction.guild
 		? client.settings.get(interaction.guildId!, "sortOrder")
 		: undefined;
+	const userSettings = interaction.guild
+		? client.userSettings.get(interaction.guild.id, interaction.user.id)
+		: undefined;
 
 	let statInfo:
 		| {
@@ -213,10 +216,7 @@ export async function calculate(
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
 		if (interaction.guild) {
-			const expansion = client.userSettings.get(
-				interaction.guild.id,
-				interaction.user.id
-			)?.attributes;
+			const expansion = userSettings?.attributes;
 			if (expansion) formula = generateStatsDice(formula, expansion, MIN_THRESHOLD_MATCH);
 		}
 		const isRoll = getRoll(formula, undefined, sortResult);
@@ -226,6 +226,8 @@ export async function calculate(
 			needFormat = false;
 		}
 	}
+	const replacer = userSettings?.ignoreNotfound;
+	if (replacer) totalFormula = replaceUnknown(totalFormula, replacer);
 	const comments = options.getString(t("common.comments")) ?? undefined;
 	try {
 		const result = evaluate(totalFormula);
