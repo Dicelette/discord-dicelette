@@ -1110,7 +1110,7 @@
 				"placeholder": "Valeur par défaut lorsqu'un attribut est inconnu :",
 				"reset": "La valeur de replacement a été supprimée. Maintenant, les attributs inconnus lèveront une erreur.",
 				"set": "La valeur `{{- value}}` remplacera tous les attributs inconnus dans le dé.",
-				"title": "replacer_inconnu"
+				"title": "remplacer_inconnu"
 			},
 			"title": "attributs"
 		},
