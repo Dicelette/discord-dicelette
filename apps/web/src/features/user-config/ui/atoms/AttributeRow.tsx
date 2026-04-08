@@ -1,5 +1,5 @@
 import { Delete } from "@mui/icons-material";
-import { Box, IconButton, TextField } from "@mui/material";
+import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import { memo, useEffect, useState } from "react";
 import type { AttributeRowProps } from "../../types";
 
@@ -12,6 +12,7 @@ const boxSx = {
 	bgcolor: "background.paper",
 	border: "1px solid",
 	borderColor: "divider",
+	scrollBarWidth: "none",
 } as const;
 
 const keyframesShake = {
@@ -29,6 +30,11 @@ const nameFieldShakeSx = { ...nameFieldSx, animation: "shake 0.4s ease" } as con
 const valueFieldSx = { flex: 1 } as const;
 const nameInputProps = {
 	htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } },
+} as const;
+
+const errorTooltipSlotProps = {
+	tooltip: { sx: { bgcolor: "error.main" } },
+	arrow: { sx: { color: "error.main" } },
 } as const;
 
 const AttributeRow = memo(function AttributeRow({
@@ -53,27 +59,34 @@ const AttributeRow = memo(function AttributeRow({
 
 	return (
 		<Box sx={boxSx}>
-			<TextField
-				size="small"
-				value={localName}
-				onChange={(e) => {
-					setLocalName(e.target.value);
-					setNameError(null);
-				}}
-				onBlur={() => {
-					if (localName !== name) {
-						const err = onRename(name, localName);
-						if (err) {
-							setLocalName(name);
-							setNameError(err);
+			<Tooltip
+				open={Boolean(nameError)}
+				title={nameError ?? ""}
+				arrow
+				placement="top"
+				slotProps={errorTooltipSlotProps}
+			>
+				<TextField
+					size="small"
+					value={localName}
+					onChange={(e) => {
+						setLocalName(e.target.value);
+						setNameError(null);
+					}}
+					onBlur={() => {
+						if (localName !== name) {
+							const err = onRename(name, localName);
+							if (err) {
+								setLocalName(name);
+								setNameError(err);
+							}
 						}
-					}
-				}}
-				error={Boolean(nameError)}
-				helperText={nameError ?? undefined}
-				sx={nameShaking ? nameFieldShakeSx : nameFieldSx}
-				slotProps={nameInputProps}
-			/>
+					}}
+					error={Boolean(nameError)}
+					sx={nameShaking ? nameFieldShakeSx : nameFieldSx}
+					slotProps={nameInputProps}
+				/>
+			</Tooltip>
 			<TextField
 				size="small"
 				value={localValue}

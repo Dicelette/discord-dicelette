@@ -7,39 +7,64 @@ import {
 	Box,
 	Button,
 	CircularProgress,
-	Stack,
 	TextField,
 	Tooltip,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { List, type RowComponentProps, useListRef } from "react-window";
 import type { AttributeSectionProps } from "../../types.ts";
 import { exportJson } from "../../utils.ts";
 import { AttributeRow } from "../atoms";
+import {
+	accordionSummarySx,
+	actionsBoxSx,
+	addRowBoxSx,
+	alertMbSx,
+	alertShakeSx,
+	codeInputSlotProps,
+	descriptionSx,
+	emptyTextSx,
+	ITEM_SIZE,
+	inputHiddenStyle,
+	listBoxSx,
+	MAX_LIST_HEIGHT,
+} from "./styles.ts";
 
-const accordionSummarySx = { bgcolor: "action.hover" } as const;
-const stackSx = { mb: 2 } as const;
-const emptyTextSx = { fontStyle: "italic" } as const;
-const addRowBoxSx = { display: "flex", gap: 1, mb: 1 } as const;
-const newNameFieldSx = { flex: 2, fontFamily: "var(--code-font-family)" } as const;
+const newNameFieldSx = { flex: 2 } as const;
 const newValueFieldSx = { flex: 1 } as const;
-const alertMbSx = { mb: 1 } as const;
-const alertShakeSx = {
-	mb: 1,
-	"@keyframes shake": {
-		"0%, 100%": { transform: "translateX(0)" },
-		"20%": { transform: "translateX(-5px)" },
-		"40%": { transform: "translateX(5px)" },
-		"60%": { transform: "translateX(-3px)" },
-		"80%": { transform: "translateX(3px)" },
-	},
-	animation: "shake 0.4s ease",
-} as const;
-const actionsBoxSx = { display: "flex", gap: 1, flexWrap: "wrap" } as const;
 const replaceUnknownFieldSx = { mb: 2, fontFamily: "var(--code-font-family)" } as const;
-const descriptionSx = { mb: 2 } as const;
-const inputHiddenStyle = { display: "none" } as const;
+
+interface AttributeItemData {
+	entries: [string, number][];
+	onRename: (oldName: string, newName: string) => string | null;
+	onValueChange: (name: string, value: number) => void;
+	onDelete: (name: string) => void;
+}
+
+function AttributeItem({
+	index,
+	style,
+	entries,
+	onRename,
+	onValueChange,
+	onDelete,
+}: RowComponentProps<AttributeItemData>) {
+	const [name, value] = entries[index];
+	return (
+		<div style={style}>
+			<AttributeRow
+				key={name}
+				name={name}
+				value={value}
+				onRename={onRename}
+				onValueChange={onValueChange}
+				onDelete={onDelete}
+			/>
+		</div>
+	);
+}
 
 function Attributes({ state }: AttributeSectionProps) {
 	const { t } = useI18n();
@@ -74,6 +99,30 @@ function Attributes({ state }: AttributeSectionProps) {
 		onSave,
 		onImportChange,
 	} = state;
+
+	const entries = useMemo(
+		() => Object.entries(attributes) as [string, number][],
+		[attributes]
+	);
+	const itemData = useMemo<AttributeItemData>(
+		() => ({ entries, onRename, onValueChange, onDelete }),
+		[entries, onRename, onValueChange, onDelete]
+	);
+
+	const listStyle = {
+		height: Math.min(entries.length * ITEM_SIZE, MAX_LIST_HEIGHT),
+		width: "100%" as const,
+		scrollbarWidth: "thin" as const,
+		scrollbarColor: "rgba(255, 255, 255, 0.2) transparent",
+	};
+	const listRef = useListRef(null);
+	const prevCountRef = useRef(entries.length);
+	useEffect(() => {
+		if (entries.length > prevCountRef.current) {
+			listRef.current?.scrollToRow({ index: entries.length - 1, align: "end" });
+		}
+		prevCountRef.current = entries.length;
+	}, [entries.length, listRef]);
 
 	return (
 		<Accordion defaultExpanded>
@@ -110,23 +159,22 @@ function Attributes({ state }: AttributeSectionProps) {
 				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
 					{t("userSettings.attributes.description")}
 				</Typography>
-				<Stack spacing={1} sx={stackSx}>
-					{Object.entries(attributes).map(([name, value]) => (
-						<AttributeRow
-							key={name}
-							name={name}
-							value={value}
-							onRename={onRename}
-							onValueChange={onValueChange}
-							onDelete={onDelete}
+				{entries.length === 0 ? (
+					<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
+						{t("userConfig.noAttributes")}
+					</Typography>
+				) : (
+					<Box sx={listBoxSx}>
+						<List
+							listRef={listRef}
+							rowCount={entries.length}
+							rowHeight={ITEM_SIZE}
+							rowProps={itemData}
+							rowComponent={AttributeItem}
+							style={listStyle}
 						/>
-					))}
-					{Object.keys(attributes).length === 0 && (
-						<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
-							{t("userConfig.noAttributes")}
-						</Typography>
-					)}
-				</Stack>
+					</Box>
+				)}
 				<Box sx={addRowBoxSx}>
 					<TextField
 						size="small"
@@ -137,6 +185,7 @@ function Attributes({ state }: AttributeSectionProps) {
 							setAddError(null);
 						}}
 						sx={newNameFieldSx}
+						slotProps={codeInputSlotProps}
 					/>
 					<TextField
 						size="small"

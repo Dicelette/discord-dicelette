@@ -1,5 +1,5 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Box, IconButton, TextField } from "@mui/material";
+import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import { memo, useEffect, useState } from "react";
 
 export interface SnippetRowProps {
@@ -13,7 +13,7 @@ export interface SnippetRowProps {
 
 const boxSx = {
 	display: "flex",
-	alignItems: "flex-start",
+	alignItems: "center",
 	gap: 1,
 	p: 1,
 	borderRadius: 1,
@@ -38,6 +38,11 @@ const valueFieldSx = { flex: 2, ...keyframesShake } as const;
 const valueFieldShakeSx = { ...valueFieldSx, animation: "shake 0.4s ease" } as const;
 const nameInputProps = {
 	htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } },
+} as const;
+
+const errorTooltipSlotProps = {
+	tooltip: { sx: { bgcolor: "error.main" } },
+	arrow: { sx: { color: "error.main" } },
 } as const;
 const valueInputProps = {
 	htmlInput: { style: { fontFamily: "var(--code-font-family)" } },
@@ -80,27 +85,34 @@ const SnippetRow = memo(function SnippetRow({
 	}, [error]);
 	return (
 		<Box sx={boxSx}>
-			<TextField
-				size="small"
-				value={localName}
-				onChange={(e) => {
-					setLocalName(e.target.value);
-					setNameError(null);
-				}}
-				onBlur={() => {
-					if (localName !== name) {
-						const err = onRename(name, localName);
-						if (err) {
-							setLocalName(name);
-							setNameError(err);
+			<Tooltip
+				open={Boolean(nameError)}
+				title={nameError ?? ""}
+				arrow
+				placement="top"
+				slotProps={errorTooltipSlotProps}
+			>
+				<TextField
+					size="small"
+					value={localName}
+					onChange={(e) => {
+						setLocalName(e.target.value);
+						setNameError(null);
+					}}
+					onBlur={() => {
+						if (localName !== name) {
+							const err = onRename(name, localName);
+							if (err) {
+								setLocalName(name);
+								setNameError(err);
+							}
 						}
-					}
-				}}
-				error={Boolean(nameError)}
-				helperText={nameError ?? undefined}
-				sx={nameShaking ? nameFieldShakeSx : nameFieldSx}
-				slotProps={nameInputProps}
-			/>
+					}}
+					error={Boolean(nameError)}
+					sx={nameShaking ? nameFieldShakeSx : nameFieldSx}
+					slotProps={nameInputProps}
+				/>
+			</Tooltip>
 			<TextField
 				size="small"
 				value={localValue}
@@ -108,7 +120,6 @@ const SnippetRow = memo(function SnippetRow({
 				onBlur={() => onValueChange(name, localValue)}
 				placeholder="2d6+3"
 				error={Boolean(error)}
-				helperText={error}
 				sx={valueShaking ? valueFieldShakeSx : valueFieldSx}
 				slotProps={valueInputProps}
 			/>

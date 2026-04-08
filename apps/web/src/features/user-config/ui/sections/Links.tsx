@@ -16,6 +16,7 @@ import {
 import { useI18n } from "@shared";
 import { type ChangeEvent, type ComponentProps, memo, useCallback, useMemo } from "react";
 import type { TemplateSectionProps } from "../../types";
+import { accordionSummarySx, descriptionSx } from "./styles.ts";
 
 type FormatFieldKey = keyof TemplateResult["format"];
 
@@ -32,8 +33,6 @@ const FORMAT_FIELD_SX = {
 	flex: "1 1 200px",
 	fontFamily: "var(--code-font-family)",
 } as const;
-const accordionSummarySx = { bgcolor: "action.hover" } as const;
-const descriptionSx = { mb: 2 } as const;
 const columnBoxSx = { display: "flex", flexDirection: "column", gap: 2 } as const;
 const wrapBoxSx = { display: "flex", flexWrap: "wrap", gap: 2 } as const;
 const actionsBoxSx = { display: "flex", gap: 1, mt: 2 } as const;

@@ -1,0 +1,25 @@
+export const ITEM_SIZE = 65;
+export const MAX_LIST_HEIGHT = 5 * ITEM_SIZE;
+
+export const accordionSummarySx = { bgcolor: "action.hover" } as const;
+export const listBoxSx = { mb: 2 } as const;
+export const emptyTextSx = { fontStyle: "italic" } as const;
+export const addRowBoxSx = { display: "flex", gap: 1, mb: 1 } as const;
+export const alertMbSx = { mb: 1 } as const;
+export const alertShakeSx = {
+	mb: 1,
+	"@keyframes shake": {
+		"0%, 100%": { transform: "translateX(0)" },
+		"20%": { transform: "translateX(-5px)" },
+		"40%": { transform: "translateX(5px)" },
+		"60%": { transform: "translateX(-3px)" },
+		"80%": { transform: "translateX(3px)" },
+	},
+	animation: "shake 0.4s ease",
+} as const;
+export const actionsBoxSx = { display: "flex", gap: 1, flexWrap: "wrap" } as const;
+export const descriptionSx = { mb: 2 } as const;
+export const inputHiddenStyle = { display: "none" } as const;
+export const codeInputSlotProps = {
+	htmlInput: { style: { fontFamily: "var(--code-font-family)" } },
+} as const;
