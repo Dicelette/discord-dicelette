@@ -308,6 +308,10 @@ export async function registerEntry<T>(
 	const guildId = interaction.guild!.id;
 	const store: Record<string, unknown> =
 		client.userSettings.get(guildId, userId)?.[type] ?? {};
+	if (store[name.standardize()]) {
+		//already in it, we should delete it before to add the new one, to avoid keeping the old one if the user change only the case for example
+		delete store[name.standardize()];
+	}
 	store[name] = value as unknown;
 	const key = `${userId}.${type}`;
 	client.userSettings.set(guildId, store, key);

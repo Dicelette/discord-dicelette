@@ -1,4 +1,4 @@
-import type { ApiGuildData } from "@dicelette/types";
+import type { ApiGuildData, TemplateResult } from "@dicelette/types";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import {
 	type Channel,
@@ -7,10 +7,9 @@ import {
 	useConfigForm,
 	useI18n,
 } from "@shared";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { TemplateState } from "../user-config/types";
+import { useCallback } from "react";
+import { useTemplateState } from "../user-config/hooks";
 import Links from "../user-config/ui/sections/Links";
-import { DEFAULT_TEMPLATE } from "../user-config/utils";
 import {
 	Channels,
 	DashboardAccess,
@@ -45,56 +44,20 @@ export default function GuildConfigForm({
 		channels
 	);
 
-	const [template, setTemplate] = useState(config.createLinkTemplate ?? DEFAULT_TEMPLATE);
-	const [savingTemplate, setSavingTemplate] = useState(false);
-	const [templateSuccess, setTemplateSuccess] = useState(false);
-	const [templateError, setTemplateError] = useState<string | null>(null);
-
-	useEffect(() => {
-		setTemplate(config.createLinkTemplate ?? DEFAULT_TEMPLATE);
-	}, [config.createLinkTemplate]);
-
-	const saveTemplate = useCallback(async () => {
-		setSavingTemplate(true);
-		setTemplateError(null);
-		try {
-			await onSave({ createLinkTemplate: template });
-			setTemplateSuccess(true);
-			setTimeout(() => setTemplateSuccess(false), 3000);
-		} catch {
-			setTemplateError(t("dashboard.saveError"));
-		} finally {
-			setSavingTemplate(false);
-		}
-	}, [onSave, t, template]);
-
-	const resetTemplate = useCallback(() => setTemplate(DEFAULT_TEMPLATE), []);
-
-	const templateState = useMemo<TemplateState>(
-		() => ({
-			value: template,
-			setValue: setTemplate,
-			saving: savingTemplate,
-			success: templateSuccess,
-			error: templateError,
-			setError: setTemplateError,
-			onSave: saveTemplate,
-			onReset: resetTemplate,
-		}),
-		[
-			template,
-			savingTemplate,
-			templateSuccess,
-			templateError,
-			saveTemplate,
-			resetTemplate,
-		]
+	const saveFn = useCallback(
+		(template: TemplateResult) => onSave({ createLinkTemplate: template }),
+		[onSave]
 	);
+
+	const templateState = useTemplateState(config.createLinkTemplate, saveFn, {
+		externalValue: config.createLinkTemplate,
+		errorKey: "dashboard.saveError",
+	});
 
 	const handleSaveAndReset = async (data: ApiGuildData) => {
 		await onSave({
 			...data,
-			createLinkTemplate: template,
+			createLinkTemplate: templateState.value,
 		});
 		reset(data);
 	};

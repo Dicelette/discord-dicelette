@@ -1,5 +1,3 @@
-import { type ApiUserConfig, charactersApi, guildApi, userApi } from "@dicelette/api";
-import type { ApiGuildData } from "@dicelette/types";
 import { keyframes } from "@emotion/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -21,8 +19,8 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
-import { type Channel, type Role, useI18n } from "@shared";
-import { lazy, Suspense, startTransition, useEffect, useState } from "react";
+import { useI18n } from "@shared";
+import { lazy, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
 	CharactersTab,
@@ -30,10 +28,9 @@ import {
 	ServerCharactersTab,
 	UserConfigForm,
 } from "../features";
+import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
-
-type ActiveTab = "admin" | "template" | "user" | "characters" | "server-characters";
 
 function TabPanel({
 	value,
@@ -55,102 +52,30 @@ export default function Dashboard() {
 	const navigate = useNavigate();
 	const { t } = useI18n();
 
-	const [tab, setTab] = useState<ActiveTab>("admin");
-	const [mountedTabs, setMountedTabs] = useState<Set<ActiveTab>>(
-		() => new Set(["admin"])
-	);
-	const [isAdmin, setIsAdmin] = useState(false);
-	const [isStrictAdmin, setIsStrictAdmin] = useState(false);
-	const [userCharCount, setUserCharCount] = useState(0);
-	const [serverCharCount, setServerCharCount] = useState(0);
-	const [config, setConfig] = useState<ApiGuildData | null>(null);
-	const [userConfigData, setUserConfigData] = useState<ApiUserConfig["userConfig"]>(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [saving, setSaving] = useState(false);
-	const [saveSuccess, setSaveSuccess] = useState(false);
-	const [refreshingCharacters, setRefreshingCharacters] = useState(false);
-	const [refreshSuccess, setRefreshSuccess] = useState(false);
-	const [charactersRefreshToken, setCharactersRefreshToken] = useState(0);
-	const [channels, setChannels] = useState<Channel[]>([]);
-	const [roles, setRoles] = useState<Role[]>([]);
-
-	useEffect(() => {
-		if (!guildId) return;
-		Promise.all([
-			userApi.getUserConfig(guildId),
-			charactersApi.countSelf(guildId).catch(() => null),
-		])
-			.then(async ([userConfigRes, userCountRes]) => {
-				const {
-					isAdmin: admin,
-					isStrictAdmin: strictAdmin,
-					userConfig,
-				} = userConfigRes.data;
-				const nextUserCharCount = userCountRes?.data.count ?? 0;
-				const hasUserCharacters = nextUserCharCount > 0;
-				setUserCharCount(nextUserCharCount);
-				setIsAdmin(admin);
-				setIsStrictAdmin(strictAdmin);
-				setUserConfigData(userConfig);
-				const initialTab = admin ? "admin" : hasUserCharacters ? "characters" : "user";
-				setTab(initialTab);
-				setMountedTabs(new Set([initialTab]));
-				if (admin) {
-					const [configRes] = await Promise.all([
-						guildApi.getConfig(guildId),
-						guildApi
-							.getChannels(guildId)
-							.then((r) => setChannels(r.data))
-							.catch(() => {}),
-						guildApi
-							.getRoles(guildId)
-							.then((r) => setRoles(r.data))
-							.catch(() => {}),
-						charactersApi
-							.count(guildId)
-							.then((r) => setServerCharCount(r.data.count))
-							.catch(() => {}),
-					]);
-					setConfig(configRes.data);
-				}
-			})
-			.catch(() => setError(t("dashboard.loadError")))
-			.finally(() => setLoading(false));
-	}, [guildId, t]);
-
-	const handleSave = async (updates: Partial<ApiGuildData>) => {
-		if (!guildId) return;
-		setSaving(true);
-		setSaveSuccess(false);
-		try {
-			await guildApi.updateConfig(guildId, updates);
-			setConfig((prev) => (prev ? { ...prev, ...updates } : prev));
-			setSaveSuccess(true);
-			setTimeout(() => setSaveSuccess(false), 3000);
-		} catch {
-			setError(t("dashboard.saveError"));
-		} finally {
-			setSaving(false);
-		}
-	};
-
-	const handleCharactersRefresh = async () => {
-		if (!guildId) return;
-		setRefreshingCharacters(true);
-		setError(null);
-		setRefreshSuccess(false);
-		try {
-			await charactersApi.refreshDashboard(guildId);
-			setCharactersRefreshToken((prev) => prev + 1);
-			setRefreshSuccess(true);
-			setTimeout(() => setRefreshSuccess(false), 3000);
-		} catch {
-			setError(t("dashboard.refreshCharactersError"));
-		} finally {
-			setRefreshingCharacters(false);
-		}
-	};
+	const {
+		tab,
+		mountedTabs,
+		isAdmin,
+		isStrictAdmin,
+		userCharCount,
+		serverCharCount,
+		config,
+		userConfigData,
+		loading,
+		error,
+		setError,
+		saving,
+		saveSuccess,
+		refreshingCharacters,
+		refreshSuccess,
+		setRefreshSuccess,
+		charactersRefreshToken,
+		channels,
+		roles,
+		handleSave,
+		handleCharactersRefresh,
+		handleTabChange,
+	} = useDashboard(guildId);
 
 	if (loading) {
 		return (
@@ -218,10 +143,7 @@ export default function Dashboard() {
 				value={tab}
 				variant="scrollable"
 				scrollButtons="auto"
-				onChange={(_, v: ActiveTab) => {
-					setMountedTabs((prev) => (prev.has(v) ? prev : new Set([...prev, v])));
-					startTransition(() => setTab(v));
-				}}
+				onChange={handleTabChange}
 				slotProps={{
 					indicator: {
 						sx: { display: { xs: "none", sm: "block" } },

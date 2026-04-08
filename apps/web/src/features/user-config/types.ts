@@ -18,7 +18,7 @@ export interface SnippetsState {
 	setAddError: (v: string | null) => void;
 	setError: (v: string | null) => void;
 	setWarning: (v: string | null) => void;
-	onRename: (oldName: string, newName: string) => void;
+	onRename: (oldName: string, newName: string) => string | null;
 	onValueChange: (name: string, value: string) => void;
 	onDelete: (name: string) => void;
 	onAdd: () => void;
@@ -42,7 +42,7 @@ export interface AttributesState {
 	setNewValue: (v: string) => void;
 	setAddError: (v: string | null) => void;
 	setError: (v: string | null) => void;
-	onRename: (oldName: string, newName: string) => void;
+	onRename: (oldName: string, newName: string) => string | null;
 	onValueChange: (name: string, value: number) => void;
 	onDelete: (name: string) => void;
 	onAdd: () => void;
@@ -64,7 +64,7 @@ export interface TemplateState {
 export interface AttributeRowProps {
 	name: string;
 	value: number;
-	onRename: (oldName: string, newName: string) => void;
+	onRename: (oldName: string, newName: string) => string | null;
 	onValueChange: (name: string, value: number) => void;
 	onDelete: (name: string) => void;
 }

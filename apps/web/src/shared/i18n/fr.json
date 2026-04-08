@@ -170,6 +170,7 @@
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
+		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"addInvalidDice": "Expression de dés « {name} » invalide.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
 		"attrValue": "Valeur",

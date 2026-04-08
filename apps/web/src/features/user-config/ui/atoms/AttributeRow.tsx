@@ -12,6 +12,7 @@ const AttributeRow = memo(function AttributeRow({
 }: AttributeRowProps) {
 	const [localName, setLocalName] = useState(name);
 	const [localValue, setLocalValue] = useState(String(value));
+	const [nameError, setNameError] = useState<string | null>(null);
 	return (
 		<Box
 			sx={{
@@ -28,10 +29,21 @@ const AttributeRow = memo(function AttributeRow({
 			<TextField
 				size="small"
 				value={localName}
-				onChange={(e) => setLocalName(e.target.value)}
-				onBlur={() => {
-					if (localName !== name) onRename(name, localName);
+				onChange={(e) => {
+					setLocalName(e.target.value);
+					setNameError(null);
 				}}
+				onBlur={() => {
+					if (localName !== name) {
+						const err = onRename(name, localName);
+						if (err) {
+							setLocalName(name);
+							setNameError(err);
+						}
+					}
+				}}
+				error={Boolean(nameError)}
+				helperText={nameError ?? undefined}
 				sx={{ flex: 2 }}
 				slotProps={{
 					htmlInput: {

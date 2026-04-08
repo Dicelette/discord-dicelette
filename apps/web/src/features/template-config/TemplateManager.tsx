@@ -1,4 +1,3 @@
-import { charactersApi, templateApi } from "@dicelette/api";
 import type { StatisticalTemplate } from "@dicelette/core";
 import {
 	Casino,
@@ -34,8 +33,8 @@ import {
 import { getChannelPathById, type Props, SectionTitle, useI18n } from "@shared";
 import { useEffect, useState } from "react";
 import { exportJson } from "../user-config/utils.ts";
+import { useTemplateManager } from "./hooks";
 import { TemplateModal } from "./sections";
-import type { ImportTemplateData } from "./types.ts";
 
 export default function TemplateManager({
 	guildId,
@@ -49,126 +48,48 @@ export default function TemplateManager({
 	defaultTemplateChannelId?: string;
 }) {
 	const { t } = useI18n();
-	const [template, setTemplate] = useState<StatisticalTemplate | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(null);
-	const [saving, setSaving] = useState(false);
-	const [confirmDelete, setConfirmDelete] = useState(false);
-	const [importModalOpen, setImportModalOpen] = useState(false);
-	const [hasCharacters, setHasCharacters] = useState(false);
-	const [templateChannelId, setTemplateChannelId] = useState(defaultTemplateChannelId);
-	const [publicChannelId, setPublicChannelId] = useState(defaultPublicChannelId);
-	const [privateChannelId, setPrivateChannelId] = useState(defaultPrivateChannelId);
-
-	const flash = (setter: (v: string | null) => void, msg: string) => {
-		setter(msg);
-		setTimeout(() => setter(null), 3000);
-	};
-
-	useEffect(() => {
-		const controller = new AbortController();
-		const { signal } = controller;
-		Promise.all([
-			templateApi
-				.get(guildId, { signal })
-				.then((r) => {
-					if (!signal.aborted) setTemplate(r.data);
-				})
-				.catch(() => {
-					if (!signal.aborted) setTemplate(null);
-				}),
-			charactersApi
-				.count(guildId, { signal })
-				.then((r) => {
-					if (!signal.aborted) setHasCharacters(r.data.count > 0);
-				})
-				.catch(() => {}),
-		]).finally(() => {
-			if (!signal.aborted) setLoading(false);
-		});
-		return () => {
-			controller.abort();
-		};
-	}, [guildId]);
-
-	useEffect(() => {
-		setTemplateChannelId(defaultTemplateChannelId);
-	}, [defaultTemplateChannelId]);
-
-	useEffect(() => {
-		setPublicChannelId(defaultPublicChannelId);
-	}, [defaultPublicChannelId]);
-
-	useEffect(() => {
-		setPrivateChannelId(defaultPrivateChannelId);
-	}, [defaultPrivateChannelId]);
-
-	const handleModalImport = async (data: ImportTemplateData) => {
-		setSaving(true);
-		try {
-			if (data.deleteCharacters) {
-				await charactersApi.bulkDelete(guildId);
-				setHasCharacters(false);
-			}
-			await templateApi.import(guildId, {
-				template: data.template,
-				channelId: data.channelId,
-				publicChannelId: data.publicChannelId,
-				privateChannelId: data.privateChannelId,
-			});
-			setTemplate(data.template);
-			setTemplateChannelId(data.channelId);
-			setPublicChannelId(data.publicChannelId || undefined);
-			setPrivateChannelId(data.privateChannelId || undefined);
-			flash(setSuccess, t("template.importSuccess"));
-		} catch (e) {
-			flash(setError, t("template.importError"));
-			console.error(e);
-		} finally {
-			setSaving(false);
-		}
-	};
-
-	const handleExportCharacters = async () => {
-		try {
-			const res = await charactersApi.exportCsv(guildId);
-			const url = URL.createObjectURL(res.data);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = "characters.csv";
-			a.click();
-			URL.revokeObjectURL(url);
-		} catch {
-			flash(setError, t("template.exportCharactersError"));
-		}
-	};
-
-	const handleDelete = async () => {
-		setConfirmDelete(false);
-		setSaving(true);
-		try {
-			await templateApi.delete(guildId);
-			setTemplate(null);
-			flash(setSuccess, t("template.deleteSuccess"));
-		} catch {
-			flash(setError, t("template.deleteError"));
-		} finally {
-			setSaving(false);
-		}
-	};
+	const {
+		template,
+		loading,
+		error,
+		success,
+		saving,
+		confirmDelete,
+		importModalOpen,
+		hasCharacters,
+		templateChannelId,
+		publicChannelId,
+		privateChannelId,
+		dispatch,
+		handleModalImport,
+		handleExportCharacters,
+		handleDelete,
+	} = useTemplateManager(
+		guildId,
+		defaultTemplateChannelId,
+		defaultPublicChannelId,
+		defaultPrivateChannelId
+	);
 
 	return (
 		<>
 			<SectionTitle>{t("common.template").toTitle()}</SectionTitle>
 
 			{error && (
-				<Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+				<Alert
+					severity="error"
+					sx={{ mb: 2 }}
+					onClose={() => dispatch({ type: "set_error", value: null })}
+				>
 					{error}
 				</Alert>
 			)}
 			{success && (
-				<Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess(null)}>
+				<Alert
+					severity="success"
+					sx={{ mb: 2 }}
+					onClose={() => dispatch({ type: "set_success", value: null })}
+				>
 					{success}
 				</Alert>
 			)}
@@ -177,7 +98,7 @@ export default function TemplateManager({
 				<Button
 					variant="outlined"
 					startIcon={<Download />}
-					onClick={() => setImportModalOpen(true)}
+					onClick={() => dispatch({ type: "import_modal", value: true })}
 					disabled={saving || loading}
 					size="small"
 				>
@@ -208,7 +129,7 @@ export default function TemplateManager({
 							variant="outlined"
 							color="error"
 							startIcon={<Delete />}
-							onClick={() => setConfirmDelete(true)}
+							onClick={() => dispatch({ type: "confirm_delete", value: true })}
 							disabled={saving}
 							size="small"
 						>
@@ -235,7 +156,7 @@ export default function TemplateManager({
 
 			<TemplateModal
 				open={importModalOpen}
-				onClose={() => setImportModalOpen(false)}
+				onClose={() => dispatch({ type: "import_modal", value: false })}
 				onImport={handleModalImport}
 				channels={channels}
 				hasCharacters={hasCharacters}
@@ -244,13 +165,18 @@ export default function TemplateManager({
 				defaultPrivateChannelId={privateChannelId}
 			/>
 
-			<Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+			<Dialog
+				open={confirmDelete}
+				onClose={() => dispatch({ type: "confirm_delete", value: false })}
+			>
 				<DialogTitle>{t("template.deleteConfirmTitle")}</DialogTitle>
 				<DialogContent>
 					<Typography>{t("template.deleteConfirmBody")}</Typography>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setConfirmDelete(false)}>{t("common.cancel")}</Button>
+					<Button onClick={() => dispatch({ type: "confirm_delete", value: false })}>
+						{t("common.cancel")}
+					</Button>
 					<Button color="error" variant="contained" onClick={handleDelete}>
 						{t("template.delete")}
 					</Button>

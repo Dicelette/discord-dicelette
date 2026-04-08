@@ -6,7 +6,7 @@ export interface SnippetRowProps {
 	name: string;
 	value: string;
 	error?: string;
-	onRename: (oldName: string, newName: string) => void;
+	onRename: (oldName: string, newName: string) => string | null;
 	onValueChange: (name: string, value: string) => void;
 	onDelete: (name: string) => void;
 }
@@ -21,6 +21,7 @@ const SnippetRow = memo(function SnippetRow({
 }: SnippetRowProps) {
 	const [localName, setLocalName] = useState(name);
 	const [localValue, setLocalValue] = useState(value);
+	const [nameError, setNameError] = useState<string | null>(null);
 	return (
 		<Box
 			sx={{
@@ -37,10 +38,21 @@ const SnippetRow = memo(function SnippetRow({
 			<TextField
 				size="small"
 				value={localName}
-				onChange={(e) => setLocalName(e.target.value)}
-				onBlur={() => {
-					if (localName !== name) onRename(name, localName);
+				onChange={(e) => {
+					setLocalName(e.target.value);
+					setNameError(null);
 				}}
+				onBlur={() => {
+					if (localName !== name) {
+						const err = onRename(name, localName);
+						if (err) {
+							setLocalName(name);
+							setNameError(err);
+						}
+					}
+				}}
+				error={Boolean(nameError)}
+				helperText={nameError ?? undefined}
 				sx={{ flex: 1 }}
 				slotProps={{
 					htmlInput: {
