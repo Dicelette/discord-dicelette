@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.10.0](https://github.com/Dicelette/discord-dicelette/compare/3.9.0...3.10.0) (2026-04-08)
+
+
+### Features
+
+* add ignoreNotfound option to user settings and update related functionality ([496d0d9](https://github.com/Dicelette/discord-dicelette/commit/496d0d99f7ff9fc1bd72a3529f7f84ff80902593))
+* add replaceUnknown option to user settings and update related functionality ([7699eed](https://github.com/Dicelette/discord-dicelette/commit/7699eed23fbb1be0c0c99e941bc38805c2b58fa7))
+
 ## [3.9.0](https://github.com/Dicelette/discord-dicelette/compare/3.8.0...3.9.0) (2026-04-06)
 
 
