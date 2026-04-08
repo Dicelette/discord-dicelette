@@ -22,6 +22,7 @@ function Attributes({ state }: AttributeSectionProps) {
 	const { t } = useI18n();
 	const {
 		data: attributes,
+		replaceUnknown,
 		newName,
 		newValue,
 		adding,
@@ -30,6 +31,7 @@ function Attributes({ state }: AttributeSectionProps) {
 		success,
 		saving,
 		importRef,
+		setReplaceUnknown,
 		setNewName,
 		setNewValue,
 		setAddError,
@@ -50,6 +52,30 @@ function Attributes({ state }: AttributeSectionProps) {
 				</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
+				<Box paddingTop={"1rem"}>
+					<TextField
+						fullWidth
+						size="small"
+						label={t("userConfig.replaceUnknown.title")}
+						helperText={t("userConfig.replaceUnknown.description")}
+						value={replaceUnknown}
+						onChange={(e) => {
+							setReplaceUnknown(e.target.value);
+							setError(null);
+						}}
+						onKeyDown={(e) => e.key === "Enter" && onSave()}
+						sx={{ mb: 2, fontFamily: "var(--code-font-family)" }}
+					/>
+				</Box>
+				<Typography
+					variant="h6"
+					fontSize={"1rem"}
+					borderTop={"1px solid rgba(255, 255, 255, 0.12)"}
+					paddingTop={"12px"}
+					gutterBottom
+				>
+					{t("userConfig.sections.attributes")}
+				</Typography>
 				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
 					{t("userSettings.attributes.description")}
 				</Typography>
@@ -106,6 +132,7 @@ function Attributes({ state }: AttributeSectionProps) {
 						{t("common.add")}
 					</Button>
 				</Box>
+
 				{addError && (
 					<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setAddError(null)}>
 						{addError}

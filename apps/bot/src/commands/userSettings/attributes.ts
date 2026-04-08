@@ -21,7 +21,9 @@ export async function display(
 	const { ul } = getLangAndConfig(client, interaction);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
-	const userStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
+	const userSettings = client.userSettings.get(guildId, userId);
+	const userStats = userSettings?.attributes ?? {};
+	const defaultValue = userSettings?.ignoreNotfound;
 	const entries = Object.entries(userStats);
 	if (entries.length === 0) {
 		await reply(interaction, {
@@ -30,7 +32,10 @@ export async function display(
 		});
 		return;
 	}
-	await chunkMessage(entries, ul, interaction);
+	let appendText: undefined | string;
+	if (defaultValue)
+		appendText = `\n__**${ul("userSettings.attributes.replaceUnknown.placeholder")}**__ \`${defaultValue}\``;
+	await chunkMessage(entries, ul, interaction, appendText);
 }
 
 export async function exportStats(

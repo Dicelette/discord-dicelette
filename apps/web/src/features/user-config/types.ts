@@ -28,6 +28,7 @@ export interface SnippetsState {
 
 export interface AttributesState {
 	data: Record<string, number>;
+	replaceUnknown: string;
 	newName: string;
 	newValue: string;
 	adding: boolean;
@@ -36,6 +37,7 @@ export interface AttributesState {
 	success: boolean;
 	saving: boolean;
 	importRef: RefObject<HTMLInputElement | null>;
+	setReplaceUnknown: (v: string) => void;
 	setNewName: (v: string) => void;
 	setNewValue: (v: string) => void;
 	setAddError: (v: string | null) => void;

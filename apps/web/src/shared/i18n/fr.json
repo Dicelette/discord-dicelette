@@ -36,6 +36,10 @@
 			"autoRoleStats": "Rôle auto (statistiques)",
 			"channelId": "Channel de réception",
 			"context": "Ajouter un lien de contexte dans les logs",
+			"dashboardAccess": "Rôles autorisés",
+			"dashboardAccessAdminOnly": "Seuls les administrateurs du serveur peuvent modifier ce paramètre.",
+			"dashboardAccessHelper": "Seuls les utilisateurs possédant l'un de ces rôles pourront accéder au panneau d'administration du dashboard. Les administrateurs ont toujours accès.",
+			"dashboardAccessWarning": "Attention : lorsque cette option est active, les utilisateurs ayant la permission « Gérer le serveur » n'auront plus accès au dashboard par défaut. N'oubliez pas de leur assigner l'un des rôles sélectionnés.",
 			"defaultChannel": "Channel par défaut (fiches)",
 			"deleteAfter": "Suppression automatique (s)",
 			"deleteAfterHelper": "Suppression après {duration}.",
@@ -65,11 +69,7 @@
 			"stripOocRegexPreview": "Regex générée : {regex}",
 			"stripOocSuffix": "Suffixe",
 			"stripOocThreadMode": "Mode fil (ignore le channel global)",
-			"timestamp": "Afficher l'horodatage dans les logs",
-			"dashboardAccess": "Rôles autorisés",
-			"dashboardAccessHelper": "Seuls les utilisateurs possédant l'un de ces rôles pourront accéder au panneau d'administration du dashboard. Les administrateurs ont toujours accès.",
-			"dashboardAccessWarning": "Attention : lorsque cette option est active, les utilisateurs ayant la permission « Gérer le serveur » n'auront plus accès au dashboard par défaut. N'oubliez pas de leur assigner l'un des rôles sélectionnés.",
-			"dashboardAccessAdminOnly": "Seuls les administrateurs du serveur peuvent modifier ce paramètre."
+			"timestamp": "Afficher l'horodatage dans les logs"
 		},
 		"sections": {
 			"channels": "Canaux",
@@ -182,6 +182,9 @@
 		"invalidSnippetHelper": "Snippet « {name} » invalide : {value}",
 		"noAttributes": "Aucun attribut défini.",
 		"noSnippets": "Aucun raccourci défini.",
+		"replaceUnknown": {
+			"description": "Permet de remplacer tous les attributs inconnus par une valeur. Laissez vide pour désactiver."
+		},
 		"resetTemplate": "Réinitialiser",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveNoValidSnippets": "Aucun snippet valide à sauvegarder.",

@@ -1064,6 +1064,11 @@
 		"description": "Mettre à jour le modèle avec un nouveau fichier sans modifier les autres options",
 		"name": "modifier"
 	},
+	"userConfig": {
+		"replaceUnknown": {
+			"title": "Remplacer les valeurs inconnues"
+		}
+	},
 	"userSettings": {
 		"attributes": {
 			"create": {
@@ -1100,8 +1105,9 @@
 				"empty": "Il n'y a pas de données sauvegardées."
 			},
 			"replaceUnknown": {
-				"description": "Replacer les attributs inconnus par une valeur spécifique. Supprimer la valeur pour désactiver.",
+				"description": "Remplacer les attributs inconnus par une valeur spécifique. Supprimer la valeur pour désactiver.",
 				"options": "Valeur à utiliser pour replacer la valeur inconnue.",
+				"placeholder": "Valeur par défaut lorsqu'un attribut est inconnu :",
 				"reset": "La valeur de replacement a été supprimée. Maintenant, les attributs inconnus lèveront une erreur.",
 				"set": "La valeur `{{- value}}` remplacera tous les attributs inconnus dans le dé.",
 				"title": "replacer_inconnu"

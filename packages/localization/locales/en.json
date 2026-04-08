@@ -1064,6 +1064,11 @@
 		"description": "Update the template without editing the others options",
 		"name": "update"
 	},
+	"userConfig": {
+		"replaceUnknown": {
+			"title": "Replace unknown value"
+		}
+	},
 	"userSettings": {
 		"attributes": {
 			"create": {
@@ -1102,6 +1107,7 @@
 			"replaceUnknown": {
 				"description": "Replace unknown attributes by a specific value. Remove the value to disable.",
 				"options": "Value used to replace the unknow value.",
+				"placeholder": "Replace value when attribute is unknown:",
 				"reset": "The value was removed. Now, unknown attributes will raise an error.",
 				"set": "`{{- value}}` will replace all unknown attribute in the dice.",
 				"title": "replace_unknown"

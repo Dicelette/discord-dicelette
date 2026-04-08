@@ -9,12 +9,14 @@ import * as Djs from "discord.js";
 export async function chunkMessage(
 	entries: [string, string | number][],
 	ul: Translation,
-	interaction: Djs.ChatInputCommandInteraction
+	interaction: Djs.ChatInputCommandInteraction,
+	appendText?: string
 ) {
 	const lines = entries.map(
 		([name, content]) =>
 			`- **${name.toTitle()}**${ul("common.space")}: \`${content.toString().replaceAll("`", "\\`")}\``
 	);
+	if (appendText) lines.push(appendText);
 	const lineLinked = lines.join("\n");
 	if (lineLinked.length <= 2000) {
 		//send as normal message

@@ -33,6 +33,9 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const [attributes, setAttributes] = useState<Record<string, number>>(
 		initialConfig?.attributes ?? {}
 	);
+	const [replaceUnknown, setReplaceUnknown] = useState(
+		initialConfig?.ignoreNotfound ?? ""
+	);
 	const [newAttrName, setNewAttrName] = useState("");
 	const [newAttrValue, setNewAttrValue] = useState("");
 	const [savingAttrs, setSavingAttrs] = useState(false);
@@ -40,6 +43,8 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const [attrError, setAttrError] = useState<string | null>(null);
 	const [addingAttr, setAddingAttr] = useState(false);
 	const [attrAddError, setAttrAddError] = useState<string | null>(null);
+	const normalizedReplaceUnknown = replaceUnknown.trim();
+	const replaceUnknownForValidation = normalizedReplaceUnknown || undefined;
 
 	const [template, setTemplate] = useState(
 		initialConfig?.createLinkTemplate ?? DEFAULT_TEMPLATE
@@ -62,7 +67,8 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 				guildId,
 				"snippets",
 				{ [name]: value },
-				attributes
+				attributes,
+				replaceUnknownForValidation
 			);
 			if (res.data.errors[name] !== undefined) {
 				setSnippetAddError(t("userConfig.addInvalidDice", { name }));
@@ -76,7 +82,14 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setAddingSnippet(false);
 		}
-	}, [guildId, newSnippetName, newSnippetValue, attributes, t]);
+	}, [
+		guildId,
+		newSnippetName,
+		newSnippetValue,
+		attributes,
+		replaceUnknownForValidation,
+		t,
+	]);
 
 	const deleteSnippet = useCallback((key: string) => {
 		setSnippets((prev) => {
@@ -141,7 +154,8 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 						guildId,
 						"snippets",
 						parsed,
-						attributes
+						attributes,
+						replaceUnknownForValidation
 					);
 					const { valid, errors } = res.data;
 					setSnippets((prev) => ({ ...prev, ...(valid as Record<string, string>) }));
@@ -164,7 +178,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			};
 			reader.readAsText(file);
 		},
-		[guildId, attributes, t]
+		[guildId, attributes, replaceUnknownForValidation, t]
 	);
 
 	const saveSnippets = useCallback(async () => {
@@ -177,7 +191,8 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 				guildId,
 				"snippets",
 				snippets,
-				attributes
+				attributes,
+				replaceUnknownForValidation
 			);
 			const validSnippets = validation.data.valid as Record<string, string>;
 			const rawErrors = validation.data.errors;
@@ -214,7 +229,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setSavingSnippets(false);
 		}
-	}, [guildId, snippets, attributes, t]);
+	}, [guildId, snippets, attributes, replaceUnknownForValidation, t]);
 
 	const addAttribute = useCallback(async () => {
 		const name = newAttrName.trim();
@@ -303,7 +318,10 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		setSavingAttrs(true);
 		setAttrError(null);
 		try {
-			await userApi.updateUserConfig(guildId, { attributes });
+			await userApi.updateUserConfig(guildId, {
+				attributes,
+				ignoreNotfound: normalizedReplaceUnknown,
+			});
 			setAttrSuccess(true);
 			setTimeout(() => setAttrSuccess(false), 3000);
 		} catch {
@@ -311,7 +329,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		} finally {
 			setSavingAttrs(false);
 		}
-	}, [guildId, attributes, t]);
+	}, [guildId, attributes, normalizedReplaceUnknown, t]);
 
 	const saveTemplate = useCallback(async () => {
 		setSavingTemplate(true);
@@ -377,6 +395,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 	const attributesState = useMemo<AttributesState>(
 		() => ({
 			data: attributes,
+			replaceUnknown,
 			newName: newAttrName,
 			newValue: newAttrValue,
 			adding: addingAttr,
@@ -385,6 +404,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 			success: attrSuccess,
 			saving: savingAttrs,
 			importRef: attrImportRef,
+			setReplaceUnknown,
 			setNewName: setNewAttrName,
 			setNewValue: setNewAttrValue,
 			setAddError: setAttrAddError,
@@ -398,6 +418,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 		}),
 		[
 			attributes,
+			replaceUnknown,
 			newAttrName,
 			newAttrValue,
 			addingAttr,
