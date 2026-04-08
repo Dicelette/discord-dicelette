@@ -13,10 +13,36 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import type { SnippetsState } from "../..";
 import { exportJson } from "../../utils.ts";
 import SnippetRow from "../atoms/SnippetRow";
+
+const accordionSummarySx = {
+	bgcolor: "action.hover",
+	borderTopLeftRadius: "4px",
+	borderTopRightRadius: "4px",
+} as const;
+const stackSx = { mb: 2 } as const;
+const emptyTextSx = { fontStyle: "italic" } as const;
+const addRowBoxSx = { display: "flex", gap: 1, mb: 1 } as const;
+const newNameFieldSx = { flex: 1, fontFamily: "var(--code-font-family)" } as const;
+const newValueFieldSx = { flex: 2, fontFamily: "var(--code-font-family)" } as const;
+const alertMbSx = { mb: 1 } as const;
+const alertShakeSx = {
+	mb: 1,
+	"@keyframes shake": {
+		"0%, 100%": { transform: "translateX(0)" },
+		"20%": { transform: "translateX(-5px)" },
+		"40%": { transform: "translateX(5px)" },
+		"60%": { transform: "translateX(-3px)" },
+		"80%": { transform: "translateX(3px)" },
+	},
+	animation: "shake 0.4s ease",
+} as const;
+const actionsBoxSx = { display: "flex", gap: 1, flexWrap: "wrap" } as const;
+const descriptionSx = { mb: 2 } as const;
+const inputHiddenStyle = { display: "none" } as const;
 
 interface Props {
 	state: SnippetsState;
@@ -24,6 +50,14 @@ interface Props {
 
 function Snippets({ state }: Props) {
 	const { t } = useI18n();
+	const [addErrorShaking, setAddErrorShaking] = useState(false);
+	useEffect(() => {
+		if (state.addError) {
+			setAddErrorShaking(true);
+			const timer = setTimeout(() => setAddErrorShaking(false), 400);
+			return () => clearTimeout(timer);
+		}
+	}, [state.addError]);
 	const {
 		data: snippets,
 		entryErrors,
@@ -51,21 +85,14 @@ function Snippets({ state }: Props) {
 
 	return (
 		<Accordion defaultExpanded>
-			<AccordionSummary
-				expandIcon={<ExpandMore />}
-				sx={{
-					bgcolor: "action.hover",
-					borderTopLeftRadius: "4px",
-					borderTopRightRadius: "4px",
-				}}
-			>
+			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
 				<Typography fontWeight={600}>{t("common.snippets").toTitle()}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
-				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
 					{t("userConfig.snippetsDesc")}
 				</Typography>
-				<Stack spacing={1} sx={{ mb: 2 }}>
+				<Stack spacing={1} sx={stackSx}>
 					{Object.entries(snippets).map(([name, value]) => (
 						<SnippetRow
 							key={name}
@@ -78,16 +105,12 @@ function Snippets({ state }: Props) {
 						/>
 					))}
 					{Object.keys(snippets).length === 0 && (
-						<Typography
-							variant="body2"
-							color="text.secondary"
-							sx={{ fontStyle: "italic" }}
-						>
+						<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
 							{t("userSettings.snippets.list.empty")}
 						</Typography>
 					)}
 				</Stack>
-				<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+				<Box sx={addRowBoxSx}>
 					<TextField
 						size="small"
 						label={t("common.name").toTitle()}
@@ -96,7 +119,7 @@ function Snippets({ state }: Props) {
 							setNewName(e.target.value);
 							setAddError(null);
 						}}
-						sx={{ flex: 1, fontFamily: "var(--code-font-family)" }}
+						sx={newNameFieldSx}
 					/>
 					<TextField
 						size="small"
@@ -107,7 +130,7 @@ function Snippets({ state }: Props) {
 							setAddError(null);
 						}}
 						placeholder="2d6+3"
-						sx={{ flex: 2, fontFamily: "var(--code-font-family)" }}
+						sx={newValueFieldSx}
 						onKeyDown={(e) => e.key === "Enter" && onAdd()}
 					/>
 					<Button
@@ -120,26 +143,30 @@ function Snippets({ state }: Props) {
 					</Button>
 				</Box>
 				{addError && (
-					<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setAddError(null)}>
+					<Alert
+						severity="warning"
+						sx={addErrorShaking ? alertShakeSx : alertMbSx}
+						onClose={() => setAddError(null)}
+					>
 						{addError}
 					</Alert>
 				)}
 				{error && (
-					<Alert severity="error" sx={{ mb: 1 }} onClose={() => setError(null)}>
+					<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
 						{error}
 					</Alert>
 				)}
 				{warning && (
-					<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setWarning(null)}>
+					<Alert severity="warning" sx={alertMbSx} onClose={() => setWarning(null)}>
 						{warning}
 					</Alert>
 				)}
 				{success && (
-					<Alert severity="success" sx={{ mb: 1 }}>
+					<Alert severity="success" sx={alertMbSx}>
 						{t("userConfig.saveSuccess")}
 					</Alert>
 				)}
-				<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+				<Box sx={actionsBoxSx}>
 					<Button
 						variant="contained"
 						onClick={onSave}
@@ -164,7 +191,7 @@ function Snippets({ state }: Props) {
 						ref={importRef}
 						type="file"
 						accept=".json,application/json"
-						style={{ display: "none" }}
+						style={inputHiddenStyle}
 						onChange={onImportChange as never}
 					/>
 					<Tooltip title={t("userConfig.importTooltip")}>

@@ -13,13 +13,44 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import type { AttributeSectionProps } from "../../types.ts";
 import { exportJson } from "../../utils.ts";
 import { AttributeRow } from "../atoms";
 
+const accordionSummarySx = { bgcolor: "action.hover" } as const;
+const stackSx = { mb: 2 } as const;
+const emptyTextSx = { fontStyle: "italic" } as const;
+const addRowBoxSx = { display: "flex", gap: 1, mb: 1 } as const;
+const newNameFieldSx = { flex: 2, fontFamily: "var(--code-font-family)" } as const;
+const newValueFieldSx = { flex: 1 } as const;
+const alertMbSx = { mb: 1 } as const;
+const alertShakeSx = {
+	mb: 1,
+	"@keyframes shake": {
+		"0%, 100%": { transform: "translateX(0)" },
+		"20%": { transform: "translateX(-5px)" },
+		"40%": { transform: "translateX(5px)" },
+		"60%": { transform: "translateX(-3px)" },
+		"80%": { transform: "translateX(3px)" },
+	},
+	animation: "shake 0.4s ease",
+} as const;
+const actionsBoxSx = { display: "flex", gap: 1, flexWrap: "wrap" } as const;
+const replaceUnknownFieldSx = { mb: 2, fontFamily: "var(--code-font-family)" } as const;
+const descriptionSx = { mb: 2 } as const;
+const inputHiddenStyle = { display: "none" } as const;
+
 function Attributes({ state }: AttributeSectionProps) {
 	const { t } = useI18n();
+	const [addErrorShaking, setAddErrorShaking] = useState(false);
+	useEffect(() => {
+		if (state.addError) {
+			setAddErrorShaking(true);
+			const timer = setTimeout(() => setAddErrorShaking(false), 400);
+			return () => clearTimeout(timer);
+		}
+	}, [state.addError]);
 	const {
 		data: attributes,
 		replaceUnknown,
@@ -46,7 +77,7 @@ function Attributes({ state }: AttributeSectionProps) {
 
 	return (
 		<Accordion defaultExpanded>
-			<AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: "action.hover" }}>
+			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
 				<Typography fontWeight={600}>
 					{t("userSettings.attributes.title").toTitle()}
 				</Typography>
@@ -64,7 +95,7 @@ function Attributes({ state }: AttributeSectionProps) {
 							setError(null);
 						}}
 						onKeyDown={(e) => e.key === "Enter" && onSave()}
-						sx={{ mb: 2, fontFamily: "var(--code-font-family)" }}
+						sx={replaceUnknownFieldSx}
 					/>
 				</Box>
 				<Typography
@@ -76,10 +107,10 @@ function Attributes({ state }: AttributeSectionProps) {
 				>
 					{t("userConfig.sections.attributes")}
 				</Typography>
-				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
 					{t("userSettings.attributes.description")}
 				</Typography>
-				<Stack spacing={1} sx={{ mb: 2 }}>
+				<Stack spacing={1} sx={stackSx}>
 					{Object.entries(attributes).map(([name, value]) => (
 						<AttributeRow
 							key={name}
@@ -91,16 +122,12 @@ function Attributes({ state }: AttributeSectionProps) {
 						/>
 					))}
 					{Object.keys(attributes).length === 0 && (
-						<Typography
-							variant="body2"
-							color="text.secondary"
-							sx={{ fontStyle: "italic" }}
-						>
+						<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
 							{t("userConfig.noAttributes")}
 						</Typography>
 					)}
 				</Stack>
-				<Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+				<Box sx={addRowBoxSx}>
 					<TextField
 						size="small"
 						label={t("common.name").toTitle()}
@@ -109,7 +136,7 @@ function Attributes({ state }: AttributeSectionProps) {
 							setNewName(e.target.value);
 							setAddError(null);
 						}}
-						sx={{ flex: 2, fontFamily: "var(--code-font-family)" }}
+						sx={newNameFieldSx}
 					/>
 					<TextField
 						size="small"
@@ -120,7 +147,7 @@ function Attributes({ state }: AttributeSectionProps) {
 							setAddError(null);
 						}}
 						type="number"
-						sx={{ flex: 1 }}
+						sx={newValueFieldSx}
 						onKeyDown={(e) => e.key === "Enter" && onAdd()}
 					/>
 					<Button
@@ -134,21 +161,25 @@ function Attributes({ state }: AttributeSectionProps) {
 				</Box>
 
 				{addError && (
-					<Alert severity="warning" sx={{ mb: 1 }} onClose={() => setAddError(null)}>
+					<Alert
+						severity="warning"
+						sx={addErrorShaking ? alertShakeSx : alertMbSx}
+						onClose={() => setAddError(null)}
+					>
 						{addError}
 					</Alert>
 				)}
 				{error && (
-					<Alert severity="error" sx={{ mb: 1 }} onClose={() => setError(null)}>
+					<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
 						{error}
 					</Alert>
 				)}
 				{success && (
-					<Alert severity="success" sx={{ mb: 1 }}>
+					<Alert severity="success" sx={alertMbSx}>
 						{t("userConfig.saveSuccess")}
 					</Alert>
 				)}
-				<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+				<Box sx={actionsBoxSx}>
 					<Button
 						variant="contained"
 						onClick={onSave}
@@ -173,7 +204,7 @@ function Attributes({ state }: AttributeSectionProps) {
 						ref={importRef}
 						type="file"
 						accept=".json,application/json"
-						style={{ display: "none" }}
+						style={inputHiddenStyle}
 						onChange={onImportChange as never}
 					/>
 					<Tooltip title={t("userConfig.importTooltip")}>

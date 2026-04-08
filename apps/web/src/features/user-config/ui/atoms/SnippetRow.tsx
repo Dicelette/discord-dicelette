@@ -1,6 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, IconButton, TextField } from "@mui/material";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 export interface SnippetRowProps {
 	name: string;
@@ -10,6 +10,44 @@ export interface SnippetRowProps {
 	onValueChange: (name: string, value: string) => void;
 	onDelete: (name: string) => void;
 }
+
+const boxSx = {
+	display: "flex",
+	alignItems: "flex-start",
+	gap: 1,
+	p: 1,
+	borderRadius: 1,
+	bgcolor: "background.paper",
+	border: "1px solid",
+	borderColor: "divider",
+} as const;
+
+const keyframesShake = {
+	"@keyframes shake": {
+		"0%, 100%": { transform: "translateX(0)" },
+		"20%": { transform: "translateX(-5px)" },
+		"40%": { transform: "translateX(5px)" },
+		"60%": { transform: "translateX(-3px)" },
+		"80%": { transform: "translateX(3px)" },
+	},
+} as const;
+
+const nameFieldSx = { flex: 1, ...keyframesShake } as const;
+const nameFieldShakeSx = { ...nameFieldSx, animation: "shake 0.4s ease" } as const;
+const valueFieldSx = { flex: 2, ...keyframesShake } as const;
+const valueFieldShakeSx = { ...valueFieldSx, animation: "shake 0.4s ease" } as const;
+const nameInputProps = {
+	htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } },
+} as const;
+const valueInputProps = {
+	htmlInput: { style: { fontFamily: "var(--code-font-family)" } },
+} as const;
+const deleteButtonBoxSx = {
+	display: "flex",
+	alignSelf: "stretch",
+	alignItems: "center",
+	justifyContent: "center",
+} as const;
 
 const SnippetRow = memo(function SnippetRow({
 	name,
@@ -22,19 +60,26 @@ const SnippetRow = memo(function SnippetRow({
 	const [localName, setLocalName] = useState(name);
 	const [localValue, setLocalValue] = useState(value);
 	const [nameError, setNameError] = useState<string | null>(null);
+	const [nameShaking, setNameShaking] = useState(false);
+	const [valueShaking, setValueShaking] = useState(false);
+
+	useEffect(() => {
+		if (nameError) {
+			setNameShaking(true);
+			const timer = setTimeout(() => setNameShaking(false), 400);
+			return () => clearTimeout(timer);
+		}
+	}, [nameError]);
+
+	useEffect(() => {
+		if (error) {
+			setValueShaking(true);
+			const timer = setTimeout(() => setValueShaking(false), 400);
+			return () => clearTimeout(timer);
+		}
+	}, [error]);
 	return (
-		<Box
-			sx={{
-				display: "flex",
-				alignItems: "flex-start",
-				gap: 1,
-				p: 1,
-				borderRadius: 1,
-				bgcolor: "background.paper",
-				border: "1px solid",
-				borderColor: "divider",
-			}}
-		>
+		<Box sx={boxSx}>
 			<TextField
 				size="small"
 				value={localName}
@@ -53,12 +98,8 @@ const SnippetRow = memo(function SnippetRow({
 				}}
 				error={Boolean(nameError)}
 				helperText={nameError ?? undefined}
-				sx={{ flex: 1 }}
-				slotProps={{
-					htmlInput: {
-						style: { fontFamily: "var(--code-font-family)", fontWeight: 600 },
-					},
-				}}
+				sx={nameShaking ? nameFieldShakeSx : nameFieldSx}
+				slotProps={nameInputProps}
 			/>
 			<TextField
 				size="small"
@@ -68,17 +109,10 @@ const SnippetRow = memo(function SnippetRow({
 				placeholder="2d6+3"
 				error={Boolean(error)}
 				helperText={error}
-				sx={{ flex: 2 }}
-				slotProps={{ htmlInput: { style: { fontFamily: "var(--code-font-family)" } } }}
+				sx={valueShaking ? valueFieldShakeSx : valueFieldSx}
+				slotProps={valueInputProps}
 			/>
-			<Box
-				sx={{
-					display: "flex",
-					alignSelf: "stretch",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
+			<Box sx={deleteButtonBoxSx}>
 				<IconButton size="small" onClick={() => onDelete(name)}>
 					<DeleteIcon fontSize="small" />
 				</IconButton>

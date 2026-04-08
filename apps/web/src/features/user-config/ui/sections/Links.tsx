@@ -32,6 +32,12 @@ const FORMAT_FIELD_SX = {
 	flex: "1 1 200px",
 	fontFamily: "var(--code-font-family)",
 } as const;
+const accordionSummarySx = { bgcolor: "action.hover" } as const;
+const descriptionSx = { mb: 2 } as const;
+const columnBoxSx = { display: "flex", flexDirection: "column", gap: 2 } as const;
+const wrapBoxSx = { display: "flex", flexWrap: "wrap", gap: 2 } as const;
+const actionsBoxSx = { display: "flex", gap: 1, mt: 2 } as const;
+const alertMtSx = { mt: 1 } as const;
 
 interface TemplateInputProps {
 	label: string;
@@ -116,11 +122,11 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 
 	return (
 		<Accordion>
-			<AccordionSummary expandIcon={<ExpandMore />} sx={{ bgcolor: "action.hover" }}>
+			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
 				<Typography fontWeight={600}>{t("userConfig.sections.template")}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
-				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
 					{t("userConfig.templateDesc")}
 					<br />
 					<Link
@@ -132,7 +138,7 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 						{t("userConfig.templateDoc")}
 					</Link>
 				</Typography>
-				<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+				<Box sx={columnBoxSx}>
 					<TemplateInput
 						label={t("userConfig.templateFinal")}
 						value={template.final}
@@ -158,7 +164,7 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 					<Typography variant="body2" color="text.secondary" sx={CODE_FONT_SX}>
 						{t("userConfig.templateFormatSection")}
 					</Typography>
-					<Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+					<Box sx={wrapBoxSx}>
 						{FORMAT_FIELDS.map((field) => (
 							<TemplateInput
 								key={field}
@@ -171,7 +177,7 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 					</Box>
 				</Box>
 				{!isTemplate && (
-					<Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+					<Box sx={actionsBoxSx}>
 						<Button
 							variant="contained"
 							onClick={onSave}
@@ -186,12 +192,12 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 					</Box>
 				)}
 				{error && (
-					<Alert severity="error" sx={{ mt: 1 }} onClose={closeError}>
+					<Alert severity="error" sx={alertMtSx} onClose={closeError}>
 						{error}
 					</Alert>
 				)}
 				{success && (
-					<Alert severity="success" sx={{ mt: 1 }}>
+					<Alert severity="success" sx={alertMtSx}>
 						{t("userConfig.saveSuccess")}
 					</Alert>
 				)}

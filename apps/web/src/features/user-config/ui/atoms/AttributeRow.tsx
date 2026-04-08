@@ -1,7 +1,35 @@
 import { Delete } from "@mui/icons-material";
 import { Box, IconButton, TextField } from "@mui/material";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import type { AttributeRowProps } from "../../types";
+
+const boxSx = {
+	display: "flex",
+	alignItems: "center",
+	gap: 1,
+	p: 1,
+	borderRadius: 1,
+	bgcolor: "background.paper",
+	border: "1px solid",
+	borderColor: "divider",
+} as const;
+
+const keyframesShake = {
+	"@keyframes shake": {
+		"0%, 100%": { transform: "translateX(0)" },
+		"20%": { transform: "translateX(-5px)" },
+		"40%": { transform: "translateX(5px)" },
+		"60%": { transform: "translateX(-3px)" },
+		"80%": { transform: "translateX(3px)" },
+	},
+} as const;
+
+const nameFieldSx = { flex: 2, ...keyframesShake } as const;
+const nameFieldShakeSx = { ...nameFieldSx, animation: "shake 0.4s ease" } as const;
+const valueFieldSx = { flex: 1 } as const;
+const nameInputProps = {
+	htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } },
+} as const;
 
 const AttributeRow = memo(function AttributeRow({
 	name,
@@ -13,19 +41,18 @@ const AttributeRow = memo(function AttributeRow({
 	const [localName, setLocalName] = useState(name);
 	const [localValue, setLocalValue] = useState(String(value));
 	const [nameError, setNameError] = useState<string | null>(null);
+	const [nameShaking, setNameShaking] = useState(false);
+
+	useEffect(() => {
+		if (nameError) {
+			setNameShaking(true);
+			const timer = setTimeout(() => setNameShaking(false), 400);
+			return () => clearTimeout(timer);
+		}
+	}, [nameError]);
+
 	return (
-		<Box
-			sx={{
-				display: "flex",
-				alignItems: "center",
-				gap: 1,
-				p: 1,
-				borderRadius: 1,
-				bgcolor: "background.paper",
-				border: "1px solid",
-				borderColor: "divider",
-			}}
-		>
+		<Box sx={boxSx}>
 			<TextField
 				size="small"
 				value={localName}
@@ -44,12 +71,8 @@ const AttributeRow = memo(function AttributeRow({
 				}}
 				error={Boolean(nameError)}
 				helperText={nameError ?? undefined}
-				sx={{ flex: 2 }}
-				slotProps={{
-					htmlInput: {
-						style: { fontFamily: "var(--code-font-family)", fontWeight: 600 },
-					},
-				}}
+				sx={nameShaking ? nameFieldShakeSx : nameFieldSx}
+				slotProps={nameInputProps}
 			/>
 			<TextField
 				size="small"
@@ -60,7 +83,7 @@ const AttributeRow = memo(function AttributeRow({
 					const val = Number.parseFloat(localValue);
 					if (!Number.isNaN(val)) onValueChange(name, val);
 				}}
-				sx={{ flex: 1 }}
+				sx={valueFieldSx}
 			/>
 			<IconButton size="small" onClick={() => onDelete(name)}>
 				<Delete fontSize="small" />
