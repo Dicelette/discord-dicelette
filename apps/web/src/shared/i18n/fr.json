@@ -26,6 +26,7 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
+		"discard": "Annuler les modifications",
 		"save": "Sauvegarder",
 		"saving": "Sauvegarde..."
 	},

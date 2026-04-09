@@ -7,14 +7,7 @@ import {
 	Functions,
 	SmsFailed,
 } from "@mui/icons-material";
-import {
-	Box,
-	Chip,
-	Paper,
-	TableCell,
-	TableRow,
-	Typography,
-} from "@mui/material";
+import { Box, Chip, Paper, TableCell, TableRow, Typography } from "@mui/material";
 import { useI18n } from "@shared";
 import { useEffect, useState } from "react";
 import { PaginatedTable } from "../atoms";
@@ -182,7 +175,9 @@ export default function TemplateView({
 										{stat.combinaison ?? "—"}
 									</code>
 								</TableCell>
-								<TableCell align="center">{stat.exclude ? <Check /> : <Close />}</TableCell>
+								<TableCell align="center">
+									{stat.exclude ? <Check /> : <Close />}
+								</TableCell>
 							</TableRow>
 						)}
 					/>

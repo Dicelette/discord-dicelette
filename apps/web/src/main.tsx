@@ -12,6 +12,9 @@ import "./styles.css";
 const headingFont = { fontFamily: '"Karla Variable", "Inter", sans-serif' };
 
 const theme = createTheme({
+	cssVariables: {
+		colorSchemeSelector: "data",
+	},
 	typography: {
 		fontFamily: '"Atkinson Hyperlegible Next Variable", "Inter", sans-serif',
 		h1: {

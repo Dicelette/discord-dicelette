@@ -26,6 +26,7 @@
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
+		"discard": "Reset Changes",
 		"save": "Save",
 		"saving": "Saving..."
 	},

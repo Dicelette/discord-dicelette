@@ -1,5 +1,5 @@
 import type { ApiGuildData, TemplateResult } from "@dicelette/types";
-import { Alert, Box, Paper, Stack } from "@mui/material";
+import { Box, Paper, Stack } from "@mui/material";
 import {
 	type Channel,
 	ConfigFormFooter,
@@ -64,8 +64,6 @@ export default function GuildConfigForm({
 
 	return (
 		<Stack spacing={2}>
-			{isDirty && <Alert severity="warning">{t("config.unsaved")}</Alert>}
-
 			<Box component="form" onSubmit={handleSubmit(handleSaveAndReset)}>
 				<Stack spacing={2}>
 					<Paper sx={{ p: 3 }}>
@@ -116,7 +114,7 @@ export default function GuildConfigForm({
 					</Paper>
 				</Stack>
 
-				<ConfigFormFooter isDirty={isDirty} saving={saving} />
+				<ConfigFormFooter isDirty={isDirty} saving={saving} onReset={() => reset()} />
 			</Box>
 		</Stack>
 	);
