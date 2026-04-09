@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.10.5](https://github.com/Dicelette/discord-dicelette/compare/3.10.4...3.10.5) (2026-04-09)
+
+
+### Bug Fixes
+
+* **styles:** update confirm colors for better visibility ([3a9f123](https://github.com/Dicelette/discord-dicelette/commit/3a9f12324d065af06bbbc1905fe046da35d164e7))
+
 ## [3.10.4](https://github.com/Dicelette/discord-dicelette/compare/3.10.3...3.10.4) (2026-04-08)
 
 ## [3.10.3](https://github.com/Dicelette/discord-dicelette/compare/3.10.2...3.10.3) (2026-04-08)
