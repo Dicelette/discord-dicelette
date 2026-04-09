@@ -7,8 +7,8 @@
 	--bg-paper: #ffffff;
 	--appbar-bg: #960ea5;
 	--code-font-family: "Victor Mono Variable", monospace;
-	--confirm-bgcolor: var(--color-sky-800);
-	--confirm-color: var(--color-sky-50);
+	--confirm-bgcolor: var(--color-amber-500);
+	--confirm-color: var(--color-amber-950);
 	--return-color: var(--color-red-50);
 	--return-bgcolor: var(--color-red-700);
 	--return-bgcolor-hover: var(--color-red-600);
@@ -17,8 +17,8 @@
 [data-dark] {
 	--bg-default: var(--color-zinc-900);
 	--bg-paper: var(--color-zinc-800);
-	--confirm-bgcolor: var(--color-sky-800);
-	--confirm-color: var(--color-sky-50);
+	--confirm-bgcolor: var(--color-amber-500);
+	--confirm-color: var(--color-amber-950);
 	--return-color: var(--color-red-50);
 	--return-bgcolor: var(--color-red-700);
 	--return-bgcolor-hover: var(--color-red-600);
@@ -44,5 +44,5 @@ h6 {
 
 code {
 	font-family: var(--code-font-family);
-	font-feature-settings: "calt" 1;
+	font-feature-settings: "calt"1;
 }
