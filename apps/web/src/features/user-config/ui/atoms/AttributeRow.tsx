@@ -1,6 +1,7 @@
 import { Delete } from "@mui/icons-material";
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
+import { useShake } from "../../hooks";
 import type { AttributeRowProps } from "../../types";
 
 const boxSx = {
@@ -47,15 +48,7 @@ const AttributeRow = memo(function AttributeRow({
 	const [localName, setLocalName] = useState(name);
 	const [localValue, setLocalValue] = useState(String(value));
 	const [nameError, setNameError] = useState<string | null>(null);
-	const [nameShaking, setNameShaking] = useState(false);
-
-	useEffect(() => {
-		if (nameError) {
-			setNameShaking(true);
-			const timer = setTimeout(() => setNameShaking(false), 400);
-			return () => clearTimeout(timer);
-		}
-	}, [nameError]);
+	const nameShaking = useShake(nameError);
 
 	return (
 		<Box sx={boxSx}>
@@ -69,6 +62,7 @@ const AttributeRow = memo(function AttributeRow({
 				<TextField
 					size="small"
 					value={localName}
+					onClick={() => setNameError(null)}
 					onChange={(e) => {
 						setLocalName(e.target.value);
 						setNameError(null);

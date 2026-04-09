@@ -12,9 +12,10 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { List, type RowComponentProps, useListRef } from "react-window";
 import type { SnippetsState } from "../..";
+import { useShake } from "../../hooks";
 import { exportJson } from "../../utils.ts";
 import SnippetRow from "../atoms/SnippetRow";
 import {
@@ -78,14 +79,7 @@ interface Props {
 
 function Snippets({ state }: Props) {
 	const { t } = useI18n();
-	const [addErrorShaking, setAddErrorShaking] = useState(false);
-	useEffect(() => {
-		if (state.addError) {
-			setAddErrorShaking(true);
-			const timer = setTimeout(() => setAddErrorShaking(false), 400);
-			return () => clearTimeout(timer);
-		}
-	}, [state.addError]);
+	const addErrorShaking = useShake(state.addError);
 	const {
 		data: snippets,
 		entryErrors,

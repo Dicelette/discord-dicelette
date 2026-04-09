@@ -1,6 +1,7 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
+import { useShake } from "../../hooks";
 
 export interface SnippetRowProps {
 	name: string;
@@ -65,24 +66,8 @@ const SnippetRow = memo(function SnippetRow({
 	const [localName, setLocalName] = useState(name);
 	const [localValue, setLocalValue] = useState(value);
 	const [nameError, setNameError] = useState<string | null>(null);
-	const [nameShaking, setNameShaking] = useState(false);
-	const [valueShaking, setValueShaking] = useState(false);
-
-	useEffect(() => {
-		if (nameError) {
-			setNameShaking(true);
-			const timer = setTimeout(() => setNameShaking(false), 400);
-			return () => clearTimeout(timer);
-		}
-	}, [nameError]);
-
-	useEffect(() => {
-		if (error) {
-			setValueShaking(true);
-			const timer = setTimeout(() => setValueShaking(false), 400);
-			return () => clearTimeout(timer);
-		}
-	}, [error]);
+	const nameShaking = useShake(nameError);
+	const valueShaking = useShake(error);
 	return (
 		<Box sx={boxSx}>
 			<Tooltip
@@ -95,6 +80,7 @@ const SnippetRow = memo(function SnippetRow({
 				<TextField
 					size="small"
 					value={localName}
+					onClick={() => setNameError(null)}
 					onChange={(e) => {
 						setLocalName(e.target.value);
 						setNameError(null);
