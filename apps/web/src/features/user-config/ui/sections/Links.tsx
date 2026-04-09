@@ -1,9 +1,5 @@
 import type { TemplateResult } from "@dicelette/types";
-import { ExpandMore } from "@mui/icons-material";
 import {
-	Accordion,
-	AccordionDetails,
-	AccordionSummary,
 	Alert,
 	Box,
 	Button,
@@ -16,7 +12,8 @@ import {
 import { useI18n } from "@shared";
 import { type ChangeEvent, type ComponentProps, memo, useCallback, useMemo } from "react";
 import type { TemplateSectionProps } from "../../types";
-import { accordionSummarySx, descriptionSx } from "./styles.ts";
+import { FormAccordion } from "../atoms";
+import { descriptionSx } from "./styles.ts";
 
 type FormatFieldKey = keyof TemplateResult["format"];
 
@@ -120,12 +117,8 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 	const closeError = useCallback(() => setError(null), [setError]);
 
 	return (
-		<Accordion>
-			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
-				<Typography fontWeight={600}>{t("userConfig.sections.template")}</Typography>
-			</AccordionSummary>
-			<AccordionDetails>
-				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
+		<FormAccordion title={t("userConfig.sections.template")}>
+			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
 					{t("userConfig.templateDesc")}
 					<br />
 					<Link
@@ -200,8 +193,7 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 						{t("userConfig.saveSuccess")}
 					</Alert>
 				)}
-			</AccordionDetails>
-		</Accordion>
+		</FormAccordion>
 	);
 }
 

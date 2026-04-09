@@ -2,6 +2,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import { memo, useState } from "react";
 import { useShake } from "../../hooks";
+import { SHAKE_KEYFRAMES } from "./styles";
 
 export interface SnippetRowProps {
 	name: string;
@@ -23,19 +24,9 @@ const boxSx = {
 	borderColor: "divider",
 } as const;
 
-const keyframesShake = {
-	"@keyframes shake": {
-		"0%, 100%": { transform: "translateX(0)" },
-		"20%": { transform: "translateX(-5px)" },
-		"40%": { transform: "translateX(5px)" },
-		"60%": { transform: "translateX(-3px)" },
-		"80%": { transform: "translateX(3px)" },
-	},
-} as const;
-
-const nameFieldSx = { flex: 1, ...keyframesShake } as const;
+const nameFieldSx = { flex: 1, ...SHAKE_KEYFRAMES } as const;
 const nameFieldShakeSx = { ...nameFieldSx, animation: "shake 0.4s ease" } as const;
-const valueFieldSx = { flex: 2, ...keyframesShake } as const;
+const valueFieldSx = { flex: 2, ...SHAKE_KEYFRAMES } as const;
 const valueFieldShakeSx = { ...valueFieldSx, animation: "shake 0.4s ease" } as const;
 const nameInputProps = {
 	htmlInput: { style: { fontFamily: "var(--code-font-family)", fontWeight: 600 } },

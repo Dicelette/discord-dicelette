@@ -1,6 +1,6 @@
 import { userApi } from "@dicelette/api";
 import { useI18n } from "@shared";
-import { useCallback, useMemo, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import type { AttributesState } from "../types";
 
 export interface AttributesStateWithExtras extends AttributesState {
@@ -105,6 +105,12 @@ export function useAttributesState(
 		addError: null,
 	});
 
+	useEffect(() => {
+		if (!state.success) return;
+		const id = setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
+		return () => clearTimeout(id);
+	}, [state.success]);
+
 	const normalizedReplaceUnknown = state.replaceUnknown.trim();
 	const replaceUnknownForValidation = normalizedReplaceUnknown || undefined;
 
@@ -184,7 +190,6 @@ export function useAttributesState(
 					} else if (okCount > 0) {
 						dispatch({ type: "set_error", value: null });
 						dispatch({ type: "set_success", value: true });
-						setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
 					}
 				} catch {
 					dispatch({ type: "set_error", value: t("userConfig.importError") });
@@ -206,7 +211,6 @@ export function useAttributesState(
 				ignoreNotfound: normalizedReplaceUnknown,
 			});
 			dispatch({ type: "set_success", value: true });
-			setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
 		} catch {
 			dispatch({ type: "set_error", value: t("userConfig.saveError") });
 		} finally {
@@ -259,28 +263,9 @@ export function useAttributesState(
 			onSave,
 			onImportChange,
 		}),
-		[
-			state.data,
-			state.replaceUnknown,
-			state.newName,
-			state.newValue,
-			state.adding,
-			state.addError,
-			state.error,
-			state.success,
-			state.saving,
-			setReplaceUnknown,
-			setNewName,
-			setNewValue,
-			setAddError,
-			setError,
-			onRename,
-			onValueChange,
-			onDelete,
-			onAdd,
-			onSave,
-			onImportChange,
-		]
+		// Stable setters (empty-dep useCallback) omitted — they never change.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[state, onRename, onAdd, onSave, onImportChange]
 	);
 
 	return { ...attributesState, normalizedReplaceUnknown, replaceUnknownForValidation };

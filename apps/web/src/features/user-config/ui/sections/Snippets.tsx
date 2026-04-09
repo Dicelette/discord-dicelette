@@ -1,8 +1,5 @@
-import { Add, ExpandMore, FileDownload, FileUpload } from "@mui/icons-material";
+import { Add, FileDownload, FileUpload } from "@mui/icons-material";
 import {
-	Accordion,
-	AccordionDetails,
-	AccordionSummary,
 	Alert,
 	Box,
 	Button,
@@ -17,7 +14,7 @@ import { List, type RowComponentProps, useListRef } from "react-window";
 import type { SnippetsState } from "../..";
 import { useShake } from "../../hooks";
 import { exportJson } from "../../utils.ts";
-import SnippetRow from "../atoms/SnippetRow";
+import { FormAccordion, SnippetRow } from "../atoms";
 import {
 	actionsBoxSx,
 	addRowBoxSx,
@@ -31,12 +28,6 @@ import {
 	listBoxSx,
 	MAX_LIST_HEIGHT,
 } from "./styles.ts";
-
-const accordionSummarySx = {
-	bgcolor: "action.hover",
-	borderTopLeftRadius: "4px",
-	borderTopRightRadius: "4px",
-} as const;
 const newNameFieldSx = { flex: 1 } as const;
 const newValueFieldSx = { flex: 2 } as const;
 
@@ -127,15 +118,11 @@ function Snippets({ state }: Props) {
 			listRef.current?.scrollToRow({ index: entries.length - 1, align: "end" });
 		}
 		prevCountRef.current = entries.length;
-	}, [entries.length, listRef]);
+	}, [entries.length]); // listRef is a ref and never changes — excluded intentionally
 
 	return (
-		<Accordion defaultExpanded>
-			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
-				<Typography fontWeight={600}>{t("common.snippets").toTitle()}</Typography>
-			</AccordionSummary>
-			<AccordionDetails>
-				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
+		<FormAccordion title={t("common.snippets").toTitle()} defaultExpanded>
+			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
 					{t("userConfig.snippetsDesc")}
 				</Typography>
 				{entries.length === 0 ? (
@@ -250,8 +237,7 @@ function Snippets({ state }: Props) {
 						</Button>
 					</Tooltip>
 				</Box>
-			</AccordionDetails>
-		</Accordion>
+		</FormAccordion>
 	);
 }
 

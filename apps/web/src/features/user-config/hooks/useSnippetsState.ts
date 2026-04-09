@@ -1,6 +1,6 @@
 import { userApi } from "@dicelette/api";
 import { useI18n } from "@shared";
-import { useCallback, useMemo, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import type { SnippetsState } from "../types";
 
 interface State {
@@ -134,6 +134,12 @@ export function useSnippetsState(
 		addError: null,
 	});
 
+	useEffect(() => {
+		if (!state.success) return;
+		const id = setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
+		return () => clearTimeout(id);
+	}, [state.success]);
+
 	const onAdd = useCallback(async () => {
 		const name = state.newName.trim();
 		const value = state.newValue.trim();
@@ -229,7 +235,6 @@ export function useSnippetsState(
 					} else if (okCount > 0) {
 						dispatch({ type: "set_error", value: null });
 						dispatch({ type: "set_success", value: true });
-						setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
 					}
 				} catch {
 					dispatch({ type: "set_error", value: t("userConfig.importError") });
@@ -288,7 +293,6 @@ export function useSnippetsState(
 			}
 
 			dispatch({ type: "set_success", value: true });
-			setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
 		} catch {
 			dispatch({ type: "set_error", value: t("userConfig.saveError") });
 		} finally {
@@ -342,28 +346,8 @@ export function useSnippetsState(
 			onSave,
 			onImportChange,
 		}),
-		[
-			state.data,
-			state.entryErrors,
-			state.newName,
-			state.newValue,
-			state.adding,
-			state.addError,
-			state.error,
-			state.warning,
-			state.success,
-			state.saving,
-			setNewName,
-			setNewValue,
-			setAddError,
-			setError,
-			setWarning,
-			onRename,
-			onValueChange,
-			onDelete,
-			onAdd,
-			onSave,
-			onImportChange,
-		]
+		// Stable setters (empty-dep useCallback) omitted — they never change.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[state, onRename, onAdd, onSave, onImportChange]
 	);
 }

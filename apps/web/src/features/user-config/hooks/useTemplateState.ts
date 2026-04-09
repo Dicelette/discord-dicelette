@@ -71,6 +71,12 @@ export function useTemplateState(
 		}
 	}, [externalValue]);
 
+	useEffect(() => {
+		if (!state.success) return;
+		const id = setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
+		return () => clearTimeout(id);
+	}, [state.success]);
+
 	const setValue = useCallback<Dispatch<SetStateAction<TemplateResult>>>((v) => {
 		if (typeof v === "function") {
 			dispatch({ type: "update_value", updater: v });
@@ -89,7 +95,6 @@ export function useTemplateState(
 		try {
 			await saveFn(state.template);
 			dispatch({ type: "set_success", value: true });
-			setTimeout(() => dispatch({ type: "set_success", value: false }), 3000);
 		} catch {
 			dispatch({ type: "set_error", value: t(errorKey) });
 		} finally {

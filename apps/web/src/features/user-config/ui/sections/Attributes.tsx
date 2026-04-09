@@ -1,8 +1,5 @@
-import { Add, ExpandMore, FileDownload, FileUpload } from "@mui/icons-material";
+import { Add, FileDownload, FileUpload } from "@mui/icons-material";
 import {
-	Accordion,
-	AccordionDetails,
-	AccordionSummary,
 	Alert,
 	Box,
 	Button,
@@ -16,9 +13,8 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { List, type RowComponentProps, useListRef } from "react-window";
 import type { AttributeSectionProps } from "../../types.ts";
 import { exportJson } from "../../utils.ts";
-import { AttributeRow } from "../atoms";
+import { AttributeRow, FormAccordion } from "../atoms";
 import {
-	accordionSummarySx,
 	actionsBoxSx,
 	addRowBoxSx,
 	alertMbSx,
@@ -122,17 +118,11 @@ function Attributes({ state }: AttributeSectionProps) {
 			listRef.current?.scrollToRow({ index: entries.length - 1, align: "end" });
 		}
 		prevCountRef.current = entries.length;
-	}, [entries.length, listRef]);
+	}, [entries.length]); // listRef is a ref and never changes — excluded intentionally
 
 	return (
-		<Accordion defaultExpanded>
-			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
-				<Typography fontWeight={600}>
-					{t("userSettings.attributes.title").toTitle()}
-				</Typography>
-			</AccordionSummary>
-			<AccordionDetails>
-				<Box paddingTop={"1rem"}>
+		<FormAccordion title={t("userSettings.attributes.title").toTitle()} defaultExpanded>
+			<Box paddingTop={"1rem"}>
 					<TextField
 						fullWidth
 						size="small"
@@ -265,9 +255,8 @@ function Attributes({ state }: AttributeSectionProps) {
 							{t("import.name").toTitle()}
 						</Button>
 					</Tooltip>
-				</Box>
-			</AccordionDetails>
-		</Accordion>
+			</Box>
+		</FormAccordion>
 	);
 }
 

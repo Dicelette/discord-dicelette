@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"cd /d N:\\\\Documents\\\\Github\\\\dicelette\\\\discord-bot && node_modules\\\\.bin\\\\tsc -p apps\\\\web\\\\tsconfig.json --noEmit 2>&1\")",
+      "Bash(powershell -Command \"Set-Location 'N:\\\\Documents\\\\Github\\\\dicelette\\\\discord-bot'; node node_modules/.bin/tsc -p apps/web/tsconfig.json --noEmit 2>&1 | Select-Object -First 40\")"
+    ]
+  }
+}

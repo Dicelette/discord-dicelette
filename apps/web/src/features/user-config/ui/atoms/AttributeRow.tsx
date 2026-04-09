@@ -3,6 +3,7 @@ import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import { memo, useState } from "react";
 import { useShake } from "../../hooks";
 import type { AttributeRowProps } from "../../types";
+import { SHAKE_KEYFRAMES } from "./styles";
 
 const boxSx = {
 	display: "flex",
@@ -16,17 +17,7 @@ const boxSx = {
 	scrollBarWidth: "none",
 } as const;
 
-const keyframesShake = {
-	"@keyframes shake": {
-		"0%, 100%": { transform: "translateX(0)" },
-		"20%": { transform: "translateX(-5px)" },
-		"40%": { transform: "translateX(5px)" },
-		"60%": { transform: "translateX(-3px)" },
-		"80%": { transform: "translateX(3px)" },
-	},
-} as const;
-
-const nameFieldSx = { flex: 2, ...keyframesShake } as const;
+const nameFieldSx = { flex: 2, ...SHAKE_KEYFRAMES } as const;
 const nameFieldShakeSx = { ...nameFieldSx, animation: "shake 0.4s ease" } as const;
 const valueFieldSx = { flex: 1 } as const;
 const nameInputProps = {

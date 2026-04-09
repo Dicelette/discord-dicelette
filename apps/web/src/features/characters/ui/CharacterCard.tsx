@@ -3,13 +3,14 @@ import { Lock, OpenInNew } from "@mui/icons-material";
 import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
 import "uniformize";
 import { useI18n } from "@shared";
+import { memo } from "react";
 import StatCell from "./StatCell";
 
 interface Props {
 	char: ApiCharacter;
 }
 
-export default function CharacterCard({ char }: Props) {
+function CharacterCard({ char }: Props) {
 	const { t } = useI18n();
 	const displayName = char.charName ?? t("characters.unnamed");
 
@@ -97,3 +98,5 @@ export default function CharacterCard({ char }: Props) {
 		</Paper>
 	);
 }
+
+export default memo(CharacterCard);

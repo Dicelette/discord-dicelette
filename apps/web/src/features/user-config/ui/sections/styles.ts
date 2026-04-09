@@ -1,3 +1,5 @@
+import { SHAKE_KEYFRAMES } from "../atoms/styles";
+
 export const ITEM_SIZE = 65;
 export const MAX_LIST_HEIGHT = 5 * ITEM_SIZE;
 
@@ -8,13 +10,7 @@ export const addRowBoxSx = { display: "flex", gap: 1, mb: 1 } as const;
 export const alertMbSx = { mb: 1 } as const;
 export const alertShakeSx = {
 	mb: 1,
-	"@keyframes shake": {
-		"0%, 100%": { transform: "translateX(0)" },
-		"20%": { transform: "translateX(-5px)" },
-		"40%": { transform: "translateX(5px)" },
-		"60%": { transform: "translateX(-3px)" },
-		"80%": { transform: "translateX(3px)" },
-	},
+	...SHAKE_KEYFRAMES,
 	animation: "shake 0.4s ease",
 } as const;
 export const actionsBoxSx = { display: "flex", gap: 1, flexWrap: "wrap" } as const;
