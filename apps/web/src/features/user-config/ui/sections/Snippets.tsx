@@ -28,6 +28,7 @@ import {
 	listBoxSx,
 	MAX_LIST_HEIGHT,
 } from "./styles.ts";
+
 const newNameFieldSx = { flex: 1 } as const;
 const newValueFieldSx = { flex: 2 } as const;
 
@@ -118,125 +119,125 @@ function Snippets({ state }: Props) {
 			listRef.current?.scrollToRow({ index: entries.length - 1, align: "end" });
 		}
 		prevCountRef.current = entries.length;
-	}, [entries.length]); // listRef is a ref and never changes — excluded intentionally
+	}, [entries.length, listRef.current?.scrollToRow]); // listRef is a ref and never changes — excluded intentionally
 
 	return (
 		<FormAccordion title={t("common.snippets").toTitle()} defaultExpanded>
 			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
-					{t("userConfig.snippetsDesc")}
+				{t("userConfig.snippetsDesc")}
+			</Typography>
+			{entries.length === 0 ? (
+				<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
+					{t("userSettings.snippets.list.empty")}
 				</Typography>
-				{entries.length === 0 ? (
-					<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
-						{t("userSettings.snippets.list.empty")}
-					</Typography>
-				) : (
-					<Box sx={listBoxSx}>
-						<List
-							listRef={listRef}
-							rowCount={entries.length}
-							rowHeight={ITEM_SIZE}
-							rowProps={itemData}
-							rowComponent={SnippetItem}
-							style={listStyle}
-						/>
-					</Box>
-				)}
-				<Box sx={addRowBoxSx}>
-					<TextField
-						size="small"
-						label={t("common.name").toTitle()}
-						value={newName}
-						onChange={(e) => {
-							setNewName(e.target.value);
-							setAddError(null);
-						}}
-						sx={newNameFieldSx}
-						slotProps={codeInputSlotProps}
+			) : (
+				<Box sx={listBoxSx}>
+					<List
+						listRef={listRef}
+						rowCount={entries.length}
+						rowHeight={ITEM_SIZE}
+						rowProps={itemData}
+						rowComponent={SnippetItem}
+						style={listStyle}
 					/>
-					<TextField
-						size="small"
-						label={t("common.dice").toTitle()}
-						value={newValue}
-						onChange={(e) => {
-							setNewValue(e.target.value);
-							setAddError(null);
-						}}
-						placeholder="2d6+3"
-						sx={newValueFieldSx}
-						slotProps={codeInputSlotProps}
-						onKeyDown={(e) => e.key === "Enter" && onAdd()}
-					/>
-					<Button
-						variant="outlined"
-						startIcon={adding ? <CircularProgress size={16} /> : <Add />}
-						onClick={onAdd}
-						disabled={adding || !newName.trim() || !newValue.trim()}
-					>
-						{t("common.add")}
-					</Button>
 				</Box>
-				{addError && (
-					<Alert
-						severity="warning"
-						sx={addErrorShaking ? alertShakeSx : alertMbSx}
-						onClose={() => setAddError(null)}
-					>
-						{addError}
-					</Alert>
-				)}
-				{error && (
-					<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
-						{error}
-					</Alert>
-				)}
-				{warning && (
-					<Alert severity="warning" sx={alertMbSx} onClose={() => setWarning(null)}>
-						{warning}
-					</Alert>
-				)}
-				{success && (
-					<Alert severity="success" sx={alertMbSx}>
-						{t("userConfig.saveSuccess")}
-					</Alert>
-				)}
-				<Box sx={actionsBoxSx}>
-					<Button
-						variant="contained"
-						onClick={onSave}
-						disabled={saving}
-						startIcon={saving ? <CircularProgress size={16} /> : undefined}
-					>
-						{saving ? t("common.saving") : t("common.save")}
-					</Button>
-					<Tooltip title={t("userConfig.exportTooltip")}>
-						<span>
-							<Button
-								variant="outlined"
-								startIcon={<FileDownload />}
-								onClick={() => exportJson(snippets, "snippets.json")}
-								disabled={Object.keys(snippets).length === 0}
-							>
-								{t("export.name").toTitle()}
-							</Button>
-						</span>
-					</Tooltip>
-					<input
-						ref={importRef}
-						type="file"
-						accept=".json,application/json"
-						style={inputHiddenStyle}
-						onChange={onImportChange as never}
-					/>
-					<Tooltip title={t("userConfig.importTooltip")}>
+			)}
+			<Box sx={addRowBoxSx}>
+				<TextField
+					size="small"
+					label={t("common.name").toTitle()}
+					value={newName}
+					onChange={(e) => {
+						setNewName(e.target.value);
+						setAddError(null);
+					}}
+					sx={newNameFieldSx}
+					slotProps={codeInputSlotProps}
+				/>
+				<TextField
+					size="small"
+					label={t("common.dice").toTitle()}
+					value={newValue}
+					onChange={(e) => {
+						setNewValue(e.target.value);
+						setAddError(null);
+					}}
+					placeholder="2d6+3"
+					sx={newValueFieldSx}
+					slotProps={codeInputSlotProps}
+					onKeyDown={(e) => e.key === "Enter" && onAdd()}
+				/>
+				<Button
+					variant="outlined"
+					startIcon={adding ? <CircularProgress size={16} /> : <Add />}
+					onClick={onAdd}
+					disabled={adding || !newName.trim() || !newValue.trim()}
+				>
+					{t("common.add")}
+				</Button>
+			</Box>
+			{addError && (
+				<Alert
+					severity="warning"
+					sx={addErrorShaking ? alertShakeSx : alertMbSx}
+					onClose={() => setAddError(null)}
+				>
+					{addError}
+				</Alert>
+			)}
+			{error && (
+				<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
+					{error}
+				</Alert>
+			)}
+			{warning && (
+				<Alert severity="warning" sx={alertMbSx} onClose={() => setWarning(null)}>
+					{warning}
+				</Alert>
+			)}
+			{success && (
+				<Alert severity="success" sx={alertMbSx}>
+					{t("userConfig.saveSuccess")}
+				</Alert>
+			)}
+			<Box sx={actionsBoxSx}>
+				<Button
+					variant="contained"
+					onClick={onSave}
+					disabled={saving}
+					startIcon={saving ? <CircularProgress size={16} /> : undefined}
+				>
+					{saving ? t("common.saving") : t("common.save")}
+				</Button>
+				<Tooltip title={t("userConfig.exportTooltip")}>
+					<span>
 						<Button
 							variant="outlined"
-							startIcon={<FileUpload />}
-							onClick={() => importRef.current?.click()}
+							startIcon={<FileDownload />}
+							onClick={() => exportJson(snippets, "snippets.json")}
+							disabled={Object.keys(snippets).length === 0}
 						>
-							{t("import.name").toTitle()}
+							{t("export.name").toTitle()}
 						</Button>
-					</Tooltip>
-				</Box>
+					</span>
+				</Tooltip>
+				<input
+					ref={importRef}
+					type="file"
+					accept=".json,application/json"
+					style={inputHiddenStyle}
+					onChange={onImportChange as never}
+				/>
+				<Tooltip title={t("userConfig.importTooltip")}>
+					<Button
+						variant="outlined"
+						startIcon={<FileUpload />}
+						onClick={() => importRef.current?.click()}
+					>
+						{t("import.name").toTitle()}
+					</Button>
+				</Tooltip>
+			</Box>
 		</FormAccordion>
 	);
 }

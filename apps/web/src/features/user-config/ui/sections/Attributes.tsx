@@ -118,143 +118,143 @@ function Attributes({ state }: AttributeSectionProps) {
 			listRef.current?.scrollToRow({ index: entries.length - 1, align: "end" });
 		}
 		prevCountRef.current = entries.length;
-	}, [entries.length]); // listRef is a ref and never changes — excluded intentionally
+	}, [entries.length, listRef.current?.scrollToRow]); // listRef is a ref and never changes — excluded intentionally
 
 	return (
 		<FormAccordion title={t("userSettings.attributes.title").toTitle()} defaultExpanded>
 			<Box paddingTop={"1rem"}>
-					<TextField
-						fullWidth
-						size="small"
-						label={t("userConfig.replaceUnknown.title")}
-						helperText={t("userConfig.replaceUnknown.description")}
-						value={replaceUnknown}
-						onChange={(e) => {
-							setReplaceUnknown(e.target.value);
-							setError(null);
-						}}
-						onKeyDown={(e) => e.key === "Enter" && onSave()}
-						sx={replaceUnknownFieldSx}
+				<TextField
+					fullWidth
+					size="small"
+					label={t("userConfig.replaceUnknown.title")}
+					helperText={t("userConfig.replaceUnknown.description")}
+					value={replaceUnknown}
+					onChange={(e) => {
+						setReplaceUnknown(e.target.value);
+						setError(null);
+					}}
+					onKeyDown={(e) => e.key === "Enter" && onSave()}
+					sx={replaceUnknownFieldSx}
+				/>
+			</Box>
+			<Typography
+				variant="h6"
+				fontSize={"1rem"}
+				borderTop={"1px solid rgba(255, 255, 255, 0.12)"}
+				paddingTop={"12px"}
+				gutterBottom
+			>
+				{t("userConfig.sections.attributes")}
+			</Typography>
+			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
+				{t("userSettings.attributes.description")}
+			</Typography>
+			{entries.length === 0 ? (
+				<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
+					{t("userConfig.noAttributes")}
+				</Typography>
+			) : (
+				<Box sx={listBoxSx}>
+					<List
+						listRef={listRef}
+						rowCount={entries.length}
+						rowHeight={ITEM_SIZE}
+						rowProps={itemData}
+						rowComponent={AttributeItem}
+						style={listStyle}
 					/>
 				</Box>
-				<Typography
-					variant="h6"
-					fontSize={"1rem"}
-					borderTop={"1px solid rgba(255, 255, 255, 0.12)"}
-					paddingTop={"12px"}
-					gutterBottom
+			)}
+			<Box sx={addRowBoxSx}>
+				<TextField
+					size="small"
+					label={t("common.name").toTitle()}
+					value={newName}
+					onChange={(e) => {
+						setNewName(e.target.value);
+						setAddError(null);
+					}}
+					sx={newNameFieldSx}
+					slotProps={codeInputSlotProps}
+				/>
+				<TextField
+					size="small"
+					label={t("userSettings.attributes.create.value.title").toTitle()}
+					value={newValue}
+					onChange={(e) => {
+						setNewValue(e.target.value);
+						setAddError(null);
+					}}
+					type="number"
+					sx={newValueFieldSx}
+					onKeyDown={(e) => e.key === "Enter" && onAdd()}
+				/>
+				<Button
+					variant="outlined"
+					startIcon={adding ? <CircularProgress size={16} /> : <Add />}
+					onClick={onAdd}
+					disabled={adding || !newName.trim() || newValue === ""}
 				>
-					{t("userConfig.sections.attributes")}
-				</Typography>
-				<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
-					{t("userSettings.attributes.description")}
-				</Typography>
-				{entries.length === 0 ? (
-					<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
-						{t("userConfig.noAttributes")}
-					</Typography>
-				) : (
-					<Box sx={listBoxSx}>
-						<List
-							listRef={listRef}
-							rowCount={entries.length}
-							rowHeight={ITEM_SIZE}
-							rowProps={itemData}
-							rowComponent={AttributeItem}
-							style={listStyle}
-						/>
-					</Box>
-				)}
-				<Box sx={addRowBoxSx}>
-					<TextField
-						size="small"
-						label={t("common.name").toTitle()}
-						value={newName}
-						onChange={(e) => {
-							setNewName(e.target.value);
-							setAddError(null);
-						}}
-						sx={newNameFieldSx}
-						slotProps={codeInputSlotProps}
-					/>
-					<TextField
-						size="small"
-						label={t("userSettings.attributes.create.value.title").toTitle()}
-						value={newValue}
-						onChange={(e) => {
-							setNewValue(e.target.value);
-							setAddError(null);
-						}}
-						type="number"
-						sx={newValueFieldSx}
-						onKeyDown={(e) => e.key === "Enter" && onAdd()}
-					/>
-					<Button
-						variant="outlined"
-						startIcon={adding ? <CircularProgress size={16} /> : <Add />}
-						onClick={onAdd}
-						disabled={adding || !newName.trim() || newValue === ""}
-					>
-						{t("common.add")}
-					</Button>
-				</Box>
+					{t("common.add")}
+				</Button>
+			</Box>
 
-				{addError && (
-					<Alert
-						severity="warning"
-						sx={addErrorShaking ? alertShakeSx : alertMbSx}
-						onClose={() => setAddError(null)}
-					>
-						{addError}
-					</Alert>
-				)}
-				{error && (
-					<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
-						{error}
-					</Alert>
-				)}
-				{success && (
-					<Alert severity="success" sx={alertMbSx}>
-						{t("userConfig.saveSuccess")}
-					</Alert>
-				)}
-				<Box sx={actionsBoxSx}>
-					<Button
-						variant="contained"
-						onClick={onSave}
-						disabled={saving}
-						startIcon={saving ? <CircularProgress size={16} /> : undefined}
-					>
-						{saving ? t("common.saving") : t("common.save")}
-					</Button>
-					<Tooltip title={t("userConfig.exportTooltip")}>
-						<span>
-							<Button
-								variant="outlined"
-								startIcon={<FileDownload />}
-								onClick={() => exportJson(attributes, "attributes.json")}
-								disabled={Object.keys(attributes).length === 0}
-							>
-								{t("export.name").toTitle()}
-							</Button>
-						</span>
-					</Tooltip>
-					<input
-						ref={importRef}
-						type="file"
-						accept=".json,application/json"
-						style={inputHiddenStyle}
-						onChange={onImportChange as never}
-					/>
-					<Tooltip title={t("userConfig.importTooltip")}>
+			{addError && (
+				<Alert
+					severity="warning"
+					sx={addErrorShaking ? alertShakeSx : alertMbSx}
+					onClose={() => setAddError(null)}
+				>
+					{addError}
+				</Alert>
+			)}
+			{error && (
+				<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
+					{error}
+				</Alert>
+			)}
+			{success && (
+				<Alert severity="success" sx={alertMbSx}>
+					{t("userConfig.saveSuccess")}
+				</Alert>
+			)}
+			<Box sx={actionsBoxSx}>
+				<Button
+					variant="contained"
+					onClick={onSave}
+					disabled={saving}
+					startIcon={saving ? <CircularProgress size={16} /> : undefined}
+				>
+					{saving ? t("common.saving") : t("common.save")}
+				</Button>
+				<Tooltip title={t("userConfig.exportTooltip")}>
+					<span>
 						<Button
 							variant="outlined"
-							startIcon={<FileUpload />}
-							onClick={() => importRef.current?.click()}
+							startIcon={<FileDownload />}
+							onClick={() => exportJson(attributes, "attributes.json")}
+							disabled={Object.keys(attributes).length === 0}
 						>
-							{t("import.name").toTitle()}
+							{t("export.name").toTitle()}
 						</Button>
-					</Tooltip>
+					</span>
+				</Tooltip>
+				<input
+					ref={importRef}
+					type="file"
+					accept=".json,application/json"
+					style={inputHiddenStyle}
+					onChange={onImportChange as never}
+				/>
+				<Tooltip title={t("userConfig.importTooltip")}>
+					<Button
+						variant="outlined"
+						startIcon={<FileUpload />}
+						onClick={() => importRef.current?.click()}
+					>
+						{t("import.name").toTitle()}
+					</Button>
+				</Tooltip>
 			</Box>
 		</FormAccordion>
 	);

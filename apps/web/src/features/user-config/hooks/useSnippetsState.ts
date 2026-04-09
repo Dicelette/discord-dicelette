@@ -348,6 +348,19 @@ export function useSnippetsState(
 		}),
 		// Stable setters (empty-dep useCallback) omitted — they never change.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[state, onRename, onAdd, onSave, onImportChange]
+		[
+			state,
+			onRename,
+			onAdd,
+			onSave,
+			onImportChange,
+			setWarning,
+			setNewName,
+			onValueChange,
+			setNewValue,
+			setError,
+			setAddError,
+			onDelete,
+		]
 	);
 }

@@ -119,80 +119,80 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 	return (
 		<FormAccordion title={t("userConfig.sections.template")}>
 			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
-					{t("userConfig.templateDesc")}
-					<br />
-					<Link
-						color="primary"
-						target="_blank"
-						rel="noopener noreferrer"
-						href={t("userConfig.templateLinkDoc")}
-					>
-						{t("userConfig.templateDoc")}
-					</Link>
+				{t("userConfig.templateDesc")}
+				<br />
+				<Link
+					color="primary"
+					target="_blank"
+					rel="noopener noreferrer"
+					href={t("userConfig.templateLinkDoc")}
+				>
+					{t("userConfig.templateDoc")}
+				</Link>
+			</Typography>
+			<Box sx={columnBoxSx}>
+				<TemplateInput
+					label={t("userConfig.templateFinal")}
+					value={template.final}
+					onChange={updateFinal}
+					fullWidth
+					helperText={t("userConfig.templateFinalDesc")}
+				/>
+				<TemplateInput
+					label={t("userConfig.templateResults")}
+					value={template.results}
+					sx={CODE_FONT_SX}
+					onChange={updateResults}
+					fullWidth
+					helperText={t("userConfig.templateResultsDesc")}
+				/>
+				<TemplateInput
+					label={t("userConfig.templateJoin")}
+					value={template.joinResult}
+					onChange={updateJoinResult}
+					sx={JOIN_FIELD_SX}
+				/>
+				<Divider />
+				<Typography variant="body2" color="text.secondary" sx={CODE_FONT_SX}>
+					{t("userConfig.templateFormatSection")}
 				</Typography>
-				<Box sx={columnBoxSx}>
-					<TemplateInput
-						label={t("userConfig.templateFinal")}
-						value={template.final}
-						onChange={updateFinal}
-						fullWidth
-						helperText={t("userConfig.templateFinalDesc")}
-					/>
-					<TemplateInput
-						label={t("userConfig.templateResults")}
-						value={template.results}
-						sx={CODE_FONT_SX}
-						onChange={updateResults}
-						fullWidth
-						helperText={t("userConfig.templateResultsDesc")}
-					/>
-					<TemplateInput
-						label={t("userConfig.templateJoin")}
-						value={template.joinResult}
-						onChange={updateJoinResult}
-						sx={JOIN_FIELD_SX}
-					/>
-					<Divider />
-					<Typography variant="body2" color="text.secondary" sx={CODE_FONT_SX}>
-						{t("userConfig.templateFormatSection")}
-					</Typography>
-					<Box sx={wrapBoxSx}>
-						{FORMAT_FIELDS.map((field) => (
-							<TemplateInput
-								key={field}
-								label={t(`userConfig.templateFormat.${field}`)}
-								value={template.format[field]}
-								onChange={formatHandlers[field]}
-								sx={FORMAT_FIELD_SX}
-							/>
-						))}
-					</Box>
+				<Box sx={wrapBoxSx}>
+					{FORMAT_FIELDS.map((field) => (
+						<TemplateInput
+							key={field}
+							label={t(`userConfig.templateFormat.${field}`)}
+							value={template.format[field]}
+							onChange={formatHandlers[field]}
+							sx={FORMAT_FIELD_SX}
+						/>
+					))}
 				</Box>
-				{!isTemplate && (
-					<Box sx={actionsBoxSx}>
-						<Button
-							variant="contained"
-							onClick={onSave}
-							disabled={saving}
-							startIcon={saving ? <CircularProgress size={16} /> : undefined}
-						>
-							{saving ? t("common.saving") : t("common.save")}
-						</Button>
-						<Button variant="outlined" onClick={onReset}>
-							{t("userSettings.createLink.reset.description")}
-						</Button>
-					</Box>
-				)}
-				{error && (
-					<Alert severity="error" sx={alertMtSx} onClose={closeError}>
-						{error}
-					</Alert>
-				)}
-				{success && (
-					<Alert severity="success" sx={alertMtSx}>
-						{t("userConfig.saveSuccess")}
-					</Alert>
-				)}
+			</Box>
+			{!isTemplate && (
+				<Box sx={actionsBoxSx}>
+					<Button
+						variant="contained"
+						onClick={onSave}
+						disabled={saving}
+						startIcon={saving ? <CircularProgress size={16} /> : undefined}
+					>
+						{saving ? t("common.saving") : t("common.save")}
+					</Button>
+					<Button variant="outlined" onClick={onReset}>
+						{t("userSettings.createLink.reset.description")}
+					</Button>
+				</Box>
+			)}
+			{error && (
+				<Alert severity="error" sx={alertMtSx} onClose={closeError}>
+					{error}
+				</Alert>
+			)}
+			{success && (
+				<Alert severity="success" sx={alertMtSx}>
+					{t("userConfig.saveSuccess")}
+				</Alert>
+			)}
 		</FormAccordion>
 	);
 }

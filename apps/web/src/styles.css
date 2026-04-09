@@ -24,8 +24,6 @@
 	--return-bgcolor-hover: var(--color-red-600);
 }
 
-
-
 * {
 	box-sizing: border-box;
 }
@@ -46,5 +44,5 @@ h6 {
 
 code {
 	font-family: var(--code-font-family);
-	font-feature-settings: "calt"1;
+	font-feature-settings: "calt" 1;
 }

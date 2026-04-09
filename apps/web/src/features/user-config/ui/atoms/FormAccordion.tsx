@@ -10,7 +10,11 @@ interface Props {
 	children: ReactNode;
 }
 
-export default function FormAccordion({ title, defaultExpanded = false, children }: Props) {
+export default function FormAccordion({
+	title,
+	defaultExpanded = false,
+	children,
+}: Props) {
 	return (
 		<Accordion defaultExpanded={defaultExpanded}>
 			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>

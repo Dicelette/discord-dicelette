@@ -265,7 +265,20 @@ export function useAttributesState(
 		}),
 		// Stable setters (empty-dep useCallback) omitted — they never change.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[state, onRename, onAdd, onSave, onImportChange]
+		[
+			state,
+			onRename,
+			onAdd,
+			onSave,
+			onImportChange,
+			setReplaceUnknown,
+			setNewName,
+			onValueChange,
+			setNewValue,
+			setError,
+			setAddError,
+			onDelete,
+		]
 	);
 
 	return { ...attributesState, normalizedReplaceUnknown, replaceUnknownForValidation };

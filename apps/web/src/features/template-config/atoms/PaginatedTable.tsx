@@ -1,4 +1,11 @@
-import { Box, Pagination, Table, TableBody, TableContainer, TableHead } from "@mui/material";
+import {
+	Box,
+	Pagination,
+	Table,
+	TableBody,
+	TableContainer,
+	TableHead,
+} from "@mui/material";
 import type { ReactNode } from "react";
 
 const TABLE_HEAD_SX = {
@@ -34,7 +41,9 @@ export default function PaginatedTable<T>({
 			<TableContainer sx={{ overflowX: "auto" }}>
 				<Table size="small" sx={{ minWidth }}>
 					<TableHead sx={TABLE_HEAD_SX}>{head}</TableHead>
-					<TableBody>{pageEntries.map(([key, value]) => renderRow(key, value))}</TableBody>
+					<TableBody>
+						{pageEntries.map(([key, value]) => renderRow(key, value))}
+					</TableBody>
 				</Table>
 			</TableContainer>
 			{entries.length > rowsPerPage && (

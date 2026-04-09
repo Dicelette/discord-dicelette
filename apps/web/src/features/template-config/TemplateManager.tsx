@@ -1,8 +1,4 @@
-import {
-	Delete,
-	Download,
-	Upload,
-} from "@mui/icons-material";
+import { Delete, Download, Upload } from "@mui/icons-material";
 import {
 	Alert,
 	Box,
@@ -18,7 +14,6 @@ import { getChannelPathById, type Props, SectionTitle, useI18n } from "@shared";
 import { exportJson } from "../user-config/utils.ts";
 import { useTemplateManager } from "./hooks";
 import { TemplateModal, TemplateView } from "./sections";
-
 
 export default function TemplateManager({
 	guildId,
