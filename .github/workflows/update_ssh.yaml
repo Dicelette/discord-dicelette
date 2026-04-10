@@ -1,8 +1,8 @@
 name: Update VPS
 on:
   push:
-    tags:
-      - "*"
+    tags-ignore:
+      - "@dicelette/web@*"
   workflow_dispatch:
 
 jobs:
