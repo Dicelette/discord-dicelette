@@ -25,6 +25,13 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import type { ImportTemplateData } from "../types.ts";
 
+const dialogBgSx = { bgcolor: "background.paper" } as const;
+const stackMtSx = { mt: 1 } as const;
+const filePaperSx = { p: 1.5, bgcolor: "action.hover", borderColor: "divider" } as const;
+const subtitleBoldSx = { fontWeight: 700 } as const;
+const fileRowSx = { display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" } as const;
+const captionIndentSx = { mt: 0.5, pl: 0.5 } as const;
+
 interface Props {
 	open: boolean;
 	onClose: () => void;
@@ -128,8 +135,8 @@ export default function TemplateModal({
 		<Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
 			<DialogTitle>{t("template.importModalTitle")}</DialogTitle>
 
-			<DialogContent sx={{ bgcolor: "background.paper" }}>
-				<Stack spacing={2} sx={{ mt: 1 }}>
+			<DialogContent sx={dialogBgSx}>
+				<Stack spacing={2} sx={stackMtSx}>
 					{error && <Alert severity="error">{error}</Alert>}
 
 					<input
@@ -139,12 +146,9 @@ export default function TemplateModal({
 						style={{ display: "none" }}
 						onChange={handleFileChange}
 					/>
-					<Paper
-						variant="outlined"
-						sx={{ p: 1.5, bgcolor: "action.hover", borderColor: "divider" }}
-					>
+					<Paper variant="outlined" sx={filePaperSx}>
 						<Stack spacing={0.75}>
-							<Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+							<Typography variant="subtitle2" sx={subtitleBoldSx}>
 								{t("template.fileLabel")}
 							</Typography>
 							<Typography variant="caption">
@@ -158,9 +162,7 @@ export default function TemplateModal({
 									{t("common.here")}
 								</Link>
 							</Typography>
-							<Box
-								sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
-							>
+							<Box sx={fileRowSx}>
 								<Button
 									variant="outlined"
 									startIcon={<DownloadIcon />}
@@ -194,7 +196,7 @@ export default function TemplateModal({
 							<Typography
 								variant="caption"
 								color="text.secondary"
-								sx={{ mt: 0.5, pl: 0.5 }}
+								sx={captionIndentSx}
 							>
 								{t("template.templateChannelHelp")}
 							</Typography>
@@ -211,7 +213,7 @@ export default function TemplateModal({
 							<Typography
 								variant="caption"
 								color="text.secondary"
-								sx={{ mt: 0.5, pl: 0.5 }}
+								sx={captionIndentSx}
 							>
 								{t("template.publicChannelHelp")}
 							</Typography>
@@ -228,7 +230,7 @@ export default function TemplateModal({
 							<Typography
 								variant="caption"
 								color="text.secondary"
-								sx={{ mt: 0.5, pl: 0.5 }}
+								sx={captionIndentSx}
 							>
 								{t("template.privateChannelHelp")}
 							</Typography>
@@ -266,7 +268,7 @@ export default function TemplateModal({
 				</Stack>
 			</DialogContent>
 
-			<DialogActions sx={{ bgcolor: "background.paper" }}>
+			<DialogActions sx={dialogBgSx}>
 				<Button onClick={handleClose}>{t("common.cancel")}</Button>
 				<Button
 					variant="contained"

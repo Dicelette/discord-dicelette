@@ -20,6 +20,9 @@ import {
 	StripOOC,
 } from "./ui";
 
+const paperSx = { p: 3 } as const;
+const linksPaperSx = { p: 0 } as const;
+
 interface Props {
 	config: ApiGuildData;
 	guildId: string;
@@ -66,7 +69,7 @@ export default function GuildConfigForm({
 		<Stack spacing={2}>
 			<Box component="form" onSubmit={handleSubmit(handleSaveAndReset)}>
 				<Stack spacing={2}>
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<DashboardAccess
 							control={control}
 							roles={roles}
@@ -77,7 +80,7 @@ export default function GuildConfigForm({
 						<General control={control} />
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<Channels
 							control={control}
 							textChannels={textChannels}
@@ -85,7 +88,7 @@ export default function GuildConfigForm({
 						/>
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<Results
 							control={control}
 							textChannels={textChannels}
@@ -93,15 +96,15 @@ export default function GuildConfigForm({
 						/>
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<DiceBehaviour control={control} />
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<StripOOC control={control} channels={channels} textChannels={textChannels} />
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<HiddenRolls
 							control={control}
 							textChannels={textChannels}
@@ -109,7 +112,7 @@ export default function GuildConfigForm({
 						/>
 					</Paper>
 
-					<Paper sx={{ p: 0 }}>
+					<Paper sx={linksPaperSx}>
 						<Links isTemplate={true} state={templateState} />
 					</Paper>
 				</Stack>

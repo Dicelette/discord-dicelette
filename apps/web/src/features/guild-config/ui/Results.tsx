@@ -13,6 +13,8 @@ import {
 import { memo } from "react";
 import { type Control, Controller, useWatch } from "react-hook-form";
 
+const deleteBoxSx = { mt: 3 } as const;
+
 interface Props {
 	control: Control<ApiGuildData>;
 	textChannels: Channel[];
@@ -95,7 +97,7 @@ function Results({ control, textChannels, allChannels }: Props) {
 				/>
 			</div>
 
-			<Box sx={{ mt: 3 }}>
+			<Box sx={deleteBoxSx}>
 				<Controller
 					name="deleteAfter"
 					control={control}

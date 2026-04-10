@@ -6,6 +6,15 @@ import { useCharactersList } from "./hooks/useCharactersList";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
 
+const ownerLabelBoxSx = {
+	display: "flex",
+	alignItems: "center",
+	gap: 0.5,
+	mb: 0.5,
+	px: 0.5,
+} as const;
+const ownerIconSx = { fontSize: 14, color: "text.secondary" } as const;
+
 const PAGE_SIZE = 5;
 
 interface Props {
@@ -58,16 +67,8 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 			renderCard={(char) => (
 				<Box key={`${char.channelId}-${char.messageId}`}>
 					{char.ownerName && (
-						<Box
-							sx={{
-								display: "flex",
-								alignItems: "center",
-								gap: 0.5,
-								mb: 0.5,
-								px: 0.5,
-							}}
-						>
-							<PersonIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+						<Box sx={ownerLabelBoxSx}>
+							<PersonIcon sx={ownerIconSx} />
 							<Typography
 								variant="subtitle1"
 								color="text.secondary"

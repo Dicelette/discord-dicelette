@@ -12,6 +12,43 @@ import { useI18n } from "@shared";
 import { useEffect, useState } from "react";
 import { PaginatedTable } from "../atoms";
 
+const viewContainerSx = { display: "flex", flexDirection: "column", gap: 2 } as const;
+const sectionPaperSx = { p: 2 } as const;
+const sectionTitleSx = { mb: 1 } as const;
+const criticalChipsSx = { display: "flex", gap: 1 } as const;
+const wordBreakCellSx = { whiteSpace: "normal", wordBreak: "break-word" } as const;
+const chipsContainerSx = { display: "flex", gap: 1, flexWrap: "wrap" } as const;
+const codeFontSx = { fontFamily: "var(--code-font-family)" } as const;
+const channelGridSx = {
+	display: "grid",
+	gridTemplateColumns: {
+		xs: "1fr",
+		sm: "repeat(2, minmax(0, 1fr))",
+		md: "repeat(3, minmax(0, 1fr))",
+	},
+	gap: 1,
+} as const;
+const channelItemSx = {
+	border: 1,
+	borderColor: "divider",
+	borderRadius: 1,
+	p: 1.25,
+	minHeight: 68,
+} as const;
+const channelLabelSx = { display: "block", mb: 0.5, textAlign: "center" } as const;
+const channelChipBaseSx = {
+	maxWidth: "100%",
+	display: "flex",
+	mx: "auto",
+	fontWeight: 600,
+	"& .MuiChip-label": {
+		display: "block",
+		overflow: "hidden",
+		textOverflow: "ellipsis",
+		whiteSpace: "nowrap",
+	},
+} as const;
+
 const ROWS_PER_PAGE = 10;
 
 interface Props {
@@ -59,15 +96,15 @@ export default function TemplateView({
 	];
 
 	return (
-		<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+		<Box sx={viewContainerSx}>
 			{template.critical &&
 				(template.critical.success !== undefined ||
 					template.critical.failure !== undefined) && (
-					<Paper variant="outlined" sx={{ p: 2 }}>
-						<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
+					<Paper variant="outlined" sx={sectionPaperSx}>
+						<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
 							{t("template.critical")}
 						</Typography>
-						<Box sx={{ display: "flex", gap: 1 }}>
+						<Box sx={criticalChipsSx}>
 							{template.critical.success !== undefined && (
 								<Chip
 									icon={<CheckCircle />}
@@ -89,8 +126,8 @@ export default function TemplateView({
 				)}
 
 			{customCriticalEntries.length > 0 && (
-				<Paper variant="outlined" sx={{ p: 2 }}>
-					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
+				<Paper variant="outlined" sx={sectionPaperSx}>
+					<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
 						{t("config.customCritical")}
 					</Typography>
 					<PaginatedTable
@@ -113,8 +150,8 @@ export default function TemplateView({
 								<TableCell>
 									<strong>{name}</strong>
 								</TableCell>
-								<TableCell>
-									<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+								<TableCell sx={wordBreakCellSx}>
+									<code>
 										{crit.sign}
 									</code>
 								</TableCell>
@@ -130,8 +167,8 @@ export default function TemplateView({
 			)}
 
 			{statisticsEntries.length > 0 && (
-				<Paper variant="outlined" sx={{ p: 2 }}>
-					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
+				<Paper variant="outlined" sx={sectionPaperSx}>
+					<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
 						{t("common.statistics").toTitle()}
 					</Typography>
 					<PaginatedTable
@@ -170,8 +207,8 @@ export default function TemplateView({
 								<TableCell align="center">
 									<code>{stat.max ?? "—"}</code>
 								</TableCell>
-								<TableCell align="center">
-									<code style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+								<TableCell align="center" sx={wordBreakCellSx}>
+									<code>
 										{stat.combinaison ?? "—"}
 									</code>
 								</TableCell>
@@ -185,8 +222,8 @@ export default function TemplateView({
 			)}
 
 			{damageEntries.length > 0 && (
-				<Paper variant="outlined" sx={{ p: 2 }}>
-					<Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>
+				<Paper variant="outlined" sx={sectionPaperSx}>
+					<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
 						{t("common.macro").toTitle()}
 					</Typography>
 					<PaginatedTable
@@ -206,7 +243,7 @@ export default function TemplateView({
 								<TableCell>
 									<strong>{name}</strong>
 								</TableCell>
-								<TableCell sx={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+								<TableCell sx={wordBreakCellSx}>
 									<code>{formula || "—"}</code>
 								</TableCell>
 							</TableRow>
@@ -215,7 +252,7 @@ export default function TemplateView({
 				</Paper>
 			)}
 
-			<Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+			<Box sx={chipsContainerSx}>
 				{template.charName && (
 					<Chip
 						label={t("template.charName")}
@@ -227,7 +264,7 @@ export default function TemplateView({
 				{template.diceType && (
 					<Chip
 						icon={<Casino />}
-						sx={{ fontFamily: "var(--code-font-family)" }}
+						sx={codeFontSx}
 						label={`${template.diceType}`}
 						size="small"
 					/>
@@ -235,7 +272,7 @@ export default function TemplateView({
 				{template.total !== undefined && (
 					<Chip
 						icon={<Functions />}
-						sx={{ fontFamily: "var(--code-font-family)" }}
+						sx={codeFontSx}
 						label={`${template.total}`}
 						size="small"
 					/>
@@ -250,35 +287,16 @@ export default function TemplateView({
 				)}
 			</Box>
 
-			<Paper variant="outlined" sx={{ p: 2 }}>
-				<Box
-					sx={{
-						display: "grid",
-						gridTemplateColumns: {
-							xs: "1fr",
-							sm: "repeat(2, minmax(0, 1fr))",
-							md: "repeat(3, minmax(0, 1fr))",
-						},
-						gap: 1,
-					}}
-				>
+			<Paper variant="outlined" sx={sectionPaperSx}>
+				<Box sx={channelGridSx}>
 					{channelInfos.map(({ label, value }) => {
 						const isMissing = !value;
 						return (
-							<Box
-								key={label}
-								sx={{
-									border: 1,
-									borderColor: "divider",
-									borderRadius: 1,
-									p: 1.25,
-									minHeight: 68,
-								}}
-							>
+							<Box key={label} sx={channelItemSx}>
 								<Typography
 									variant="caption"
 									color="text.secondary"
-									sx={{ display: "block", mb: 0.5, textAlign: "center" }}
+									sx={channelLabelSx}
 								>
 									{label}
 								</Typography>
@@ -286,29 +304,22 @@ export default function TemplateView({
 									size="small"
 									label={value ?? t("common.none")}
 									variant={isMissing ? "outlined" : "filled"}
-									sx={{
-										maxWidth: "100%",
-										display: "flex",
-										mx: "auto",
-										fontWeight: 600,
-										opacity: isMissing ? 0.6 : 1,
-										borderColor: isMissing ? "action.disabledBackground" : undefined,
-										color: isMissing ? "text.secondary" : undefined,
-										bgcolor: isMissing ? "action.hover" : undefined,
-										"& .MuiChip-label": {
-											display: "block",
-											overflow: "hidden",
-											textOverflow: "ellipsis",
-											whiteSpace: "nowrap",
+									sx={[
+										channelChipBaseSx,
+										{
+											opacity: isMissing ? 0.6 : 1,
+											borderColor: isMissing ? "action.disabledBackground" : undefined,
+											color: isMissing ? "text.secondary" : undefined,
+											bgcolor: isMissing ? "action.hover" : undefined,
+											"&:hover": value
+												? {
+														transform: "translateY(-1px)",
+														boxShadow: 1,
+														bgcolor: isMissing ? "action.selected" : "primary.dark",
+													}
+												: {},
 										},
-										"&:hover": value
-											? {
-													transform: "translateY(-1px)",
-													boxShadow: 1,
-													bgcolor: isMissing ? "action.selected" : "primary.dark",
-												}
-											: {},
-									}}
+									]}
 									title={value ?? t("common.none")}
 								/>
 							</Box>

@@ -3,6 +3,19 @@ import { Avatar, Box, ListItemIcon, Menu, MenuItem, Typography } from "@mui/mate
 import { useState } from "react";
 import { useI18n } from "../i18n";
 
+const avatarBoxSx = {
+	cursor: "pointer",
+	px: 1.5,
+	py: 0.5,
+	borderRadius: 2,
+	transition: "background 0.15s",
+	"&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+	"&:active": { backgroundColor: "rgba(255,255,255,0.18)" },
+} as const;
+
+const usernameTypographySx = { display: { xs: "none", sm: "block" } } as const;
+const avatarSizeSx = { width: 28, height: 28 } as const;
+
 interface Props {
 	username: string;
 	avatarUrl: string;
@@ -18,20 +31,12 @@ export default function UserAvatarMenu({ username, avatarUrl, onLogout }: Props)
 			<Box
 				className="flex items-center gap-2"
 				onClick={(e) => setAnchorEl(e.currentTarget)}
-				sx={{
-					cursor: "pointer",
-					px: 1.5,
-					py: 0.5,
-					borderRadius: 2,
-					transition: "background 0.15s",
-					"&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
-					"&:active": { backgroundColor: "rgba(255,255,255,0.18)" },
-				}}
+				sx={avatarBoxSx}
 			>
-				<Typography variant="body2" sx={{ display: { xs: "none", sm: "block" } }}>
+				<Typography variant="body2" sx={usernameTypographySx}>
 					{username}
 				</Typography>
-				<Avatar src={avatarUrl} sx={{ width: 28, height: 28 }} />
+				<Avatar src={avatarUrl} sx={avatarSizeSx} />
 			</Box>
 			<Menu
 				anchorEl={anchorEl}

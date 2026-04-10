@@ -4,6 +4,8 @@ import { type Role, SectionTitle, useI18n } from "@shared";
 import { memo } from "react";
 import { type Control, Controller, useWatch } from "react-hook-form";
 
+const alertMbSx = { mb: 2 } as const;
+
 interface Props {
 	control: Control<ApiGuildData>;
 	roles: Role[];
@@ -19,7 +21,7 @@ function DashboardAccess({ control, roles, isStrictAdmin }: Props) {
 		<>
 			<SectionTitle>{t("config.sections.dashboardAccess")}</SectionTitle>
 			{hasRoles && (
-				<Alert severity="warning" sx={{ mb: 2 }}>
+				<Alert severity="warning" sx={alertMbSx}>
 					{t("config.fields.dashboardAccessWarning")}
 				</Alert>
 			)}

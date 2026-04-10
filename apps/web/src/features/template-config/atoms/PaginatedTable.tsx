@@ -15,6 +15,9 @@ const TABLE_HEAD_SX = {
 	},
 } as const;
 
+const tableContainerSx = { overflowX: "auto" } as const;
+const paginationBoxSx = { display: "flex", justifyContent: "flex-end", mt: 1 } as const;
+
 interface Props<T> {
 	entries: [string, T][];
 	page: number;
@@ -38,7 +41,7 @@ export default function PaginatedTable<T>({
 
 	return (
 		<>
-			<TableContainer sx={{ overflowX: "auto" }}>
+			<TableContainer sx={tableContainerSx}>
 				<Table size="small" sx={{ minWidth }}>
 					<TableHead sx={TABLE_HEAD_SX}>{head}</TableHead>
 					<TableBody>
@@ -47,7 +50,7 @@ export default function PaginatedTable<T>({
 				</Table>
 			</TableContainer>
 			{entries.length > rowsPerPage && (
-				<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+				<Box sx={paginationBoxSx}>
 					<Pagination
 						count={Math.ceil(entries.length / rowsPerPage)}
 						page={page}

@@ -1,5 +1,16 @@
 import { Box, Typography } from "@mui/material";
 
+const cellBoxSx = {
+	bgcolor: "action.hover",
+	borderRadius: 1,
+	px: 1.5,
+	py: 0.75,
+	display: "flex",
+	flexDirection: "column",
+	width: "100%",
+	minWidth: 0,
+} as const;
+
 interface Props {
 	name: string;
 	value: string;
@@ -52,18 +63,7 @@ export default function StatCell({ name, value }: Props) {
 	};
 
 	return (
-		<Box
-			sx={{
-				bgcolor: "action.hover",
-				borderRadius: 1,
-				px: 1.5,
-				py: 0.75,
-				display: "flex",
-				flexDirection: "column",
-				width: "100%",
-				minWidth: 0,
-			}}
-		>
+		<Box sx={cellBoxSx}>
 			<Typography variant="caption" color="text.secondary" component={"div"}>
 				{name}
 			</Typography>

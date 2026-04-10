@@ -6,6 +6,25 @@ import { useI18n } from "@shared";
 import { memo } from "react";
 import StatCell from "./StatCell";
 
+const cardPaperSx = { p: 3 } as const;
+const headerBoxSx = { display: "flex", alignItems: "center", gap: 2, mb: 2 } as const;
+const avatarSx = { width: 56, height: 56 } as const;
+const nameSectionSx = { flex: 1, minWidth: 0 } as const;
+const nameRowSx = { display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" } as const;
+const dividerSx = { mb: 1.5 } as const;
+const dividerWithStatsSx = { mb: 1.5, mt: 1.5 } as const;
+const statsGridSx = {
+	display: "grid",
+	gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+	gap: 1,
+	mb: 1,
+} as const;
+const damageGridSx = {
+	display: "grid",
+	gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+	gap: 1,
+} as const;
+
 interface Props {
 	char: ApiCharacter;
 }
@@ -15,18 +34,18 @@ function CharacterCard({ char }: Props) {
 	const displayName = char.charName ?? t("characters.unnamed");
 
 	return (
-		<Paper variant="outlined" sx={{ p: 3 }}>
-			<Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+		<Paper variant="outlined" sx={cardPaperSx}>
+			<Box sx={headerBoxSx}>
 				<Avatar
 					src={char.avatar ?? undefined}
 					alt={displayName.toTitle()}
-					sx={{ width: 56, height: 56 }}
+					sx={avatarSx}
 				>
 					{displayName.charAt(0).toUpperCase()}
 				</Avatar>
 
-				<Box sx={{ flex: 1, minWidth: 0 }}>
-					<Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+				<Box sx={nameSectionSx}>
+					<Box sx={nameRowSx}>
 						<Typography variant="h4" fontWeight={600} noWrap>
 							{displayName.toTitle()}
 						</Typography>
@@ -57,18 +76,11 @@ function CharacterCard({ char }: Props) {
 
 			{char.stats && char.stats.length > 0 && (
 				<>
-					<Divider sx={{ mb: 1.5 }} />
+					<Divider sx={dividerSx} />
 					<Typography variant="h6" color="text.secondary" gutterBottom>
 						{t("common.statistics").toTitle()}
 					</Typography>
-					<Box
-						sx={{
-							display: "grid",
-							gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-							gap: 1,
-							mb: 1,
-						}}
-					>
+					<Box sx={statsGridSx}>
 						{char.stats.map((field) => (
 							<StatCell key={field.name} name={field.name} value={field.value} />
 						))}
@@ -78,17 +90,11 @@ function CharacterCard({ char }: Props) {
 
 			{char.damage && char.damage.length > 0 && (
 				<>
-					<Divider sx={{ mb: 1.5, mt: char.stats ? 1.5 : 0 }} />
+					<Divider sx={char.stats ? dividerWithStatsSx : dividerSx} />
 					<Typography variant="h6" color="text.secondary" gutterBottom>
 						{t("common.macro").toTitle()}
 					</Typography>
-					<Box
-						sx={{
-							display: "grid",
-							gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-							gap: 1,
-						}}
-					>
+					<Box sx={damageGridSx}>
 						{char.damage.map((field) => (
 							<StatCell key={field.name} name={field.name} value={field.value} />
 						))}

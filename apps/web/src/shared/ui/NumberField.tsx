@@ -10,6 +10,25 @@ import {
 } from "@mui/material";
 import * as React from "react";
 
+const inputAdornmentSx = {
+	flexDirection: "column",
+	maxHeight: "unset",
+	alignSelf: "stretch",
+	borderLeft: "1px solid",
+	borderColor: "divider",
+	ml: 0,
+	"& button": {
+		py: 0,
+		flex: 1,
+		borderRadius: 0.5,
+	},
+} as const;
+
+const arrowUpSx = { transform: "translateY(2px)" } as const;
+const arrowDownSx = { transform: "translateY(-2px)" } as const;
+const outlinedInputSx = { pr: 0 } as const;
+const formHelperTextSx = { ml: 0, "&:empty": { mt: 0 } } as const;
+
 /**
  * This component is a placeholder for FormControl to correctly set the shrink label state on SSR.
  */
@@ -70,26 +89,14 @@ export default function NumberField({
 						endAdornment={
 							<InputAdornment
 								position="end"
-								sx={{
-									flexDirection: "column",
-									maxHeight: "unset",
-									alignSelf: "stretch",
-									borderLeft: "1px solid",
-									borderColor: "divider",
-									ml: 0,
-									"& button": {
-										py: 0,
-										flex: 1,
-										borderRadius: 0.5,
-									},
-								}}
+								sx={inputAdornmentSx}
 							>
 								<BaseNumberField.Increment
 									render={<IconButton size={size} aria-label="Increase" />}
 								>
 									<KeyboardArrowUp
 										fontSize={size}
-										sx={{ transform: "translateY(2px)" }}
+										sx={arrowUpSx}
 									/>
 								</BaseNumberField.Increment>
 
@@ -98,16 +105,16 @@ export default function NumberField({
 								>
 									<KeyboardArrowDown
 										fontSize={size}
-										sx={{ transform: "translateY(-2px)" }}
+										sx={arrowDownSx}
 									/>
 								</BaseNumberField.Decrement>
 							</InputAdornment>
 						}
-						sx={{ pr: 0 }}
+						sx={outlinedInputSx}
 					/>
 				)}
 			/>
-			<FormHelperText sx={{ ml: 0, "&:empty": { mt: 0 } }}>
+			<FormHelperText sx={formHelperTextSx}>
 				{other.helperText}
 			</FormHelperText>
 		</BaseNumberField.Root>

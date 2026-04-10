@@ -32,6 +32,47 @@ import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
 
+const tabHiddenSx = { display: "none" } as const;
+const tabVisibleSx = {} as const;
+const pageContainerSx = {
+	maxWidth: "56rem",
+	mx: "auto",
+	px: { xs: 2, sm: 3 },
+	py: 3,
+} as const;
+const backButtonSx = { mb: 3 } as const;
+const dashboardHeaderSx = {
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "space-between",
+	gap: 2,
+	mb: 1,
+} as const;
+const dashboardTitleSx = { mb: 0 } as const;
+const spinSx = { animation: `${spinAnimation} 1.4s linear infinite` } as const;
+const noSpinSx = { animation: "none" } as const;
+const alertSx = { mb: 3 } as const;
+const tabsSx = {
+	mb: 3,
+	borderBottom: 1,
+	borderColor: "divider",
+	"& .MuiTabs-flexContainer": {
+		flexWrap: { xs: "wrap", sm: "nowrap" },
+		rowGap: 0.5,
+	},
+	"& .MuiTab-root": {
+		minWidth: { xs: 0, sm: 90 },
+		px: { xs: 1, sm: 2 },
+		flex: { xs: "1 1 auto", sm: "0 0 auto" },
+		borderBottom: { xs: "2px solid transparent", sm: "none" },
+		mb: { xs: "-1px", sm: 0 },
+		"&.Mui-selected": {
+			borderBottomColor: { xs: "primary.main", sm: "transparent" },
+		},
+	},
+} as const;
+const tabIndicatorSx = { display: { xs: "none", sm: "block" } } as const;
+
 function TabPanel({
 	value,
 	current,
@@ -44,7 +85,7 @@ function TabPanel({
 	children: ReactNode;
 }) {
 	if (!mounted.has(value)) return null;
-	return <Box sx={{ display: current === value ? undefined : "none" }}>{children}</Box>;
+	return <Box sx={current === value ? tabVisibleSx : tabHiddenSx}>{children}</Box>;
 }
 
 export default function Dashboard() {
@@ -86,21 +127,13 @@ export default function Dashboard() {
 	}
 
 	return (
-		<Box sx={{ maxWidth: "56rem", mx: "auto", px: { xs: 2, sm: 3 }, py: 3 }}>
-			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={{ mb: 3 }}>
+		<Box sx={pageContainerSx}>
+			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={backButtonSx}>
 				{t("common.back")}
 			</Button>
 
-			<Box
-				sx={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "space-between",
-					gap: 2,
-					mb: 1,
-				}}
-			>
-				<Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 0 }}>
+			<Box sx={dashboardHeaderSx}>
+				<Typography variant="h4" gutterBottom fontWeight={700} sx={dashboardTitleSx}>
 					{t("dashboard.title")}
 				</Typography>
 				<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
@@ -112,11 +145,7 @@ export default function Dashboard() {
 							aria-label={t("dashboard.refreshCharacters")}
 						>
 							<RefreshIcon
-								sx={{
-									animation: refreshingCharacters
-										? `${spinAnimation} 1.4s linear infinite`
-										: "none",
-								}}
+								sx={refreshingCharacters ? spinSx : noSpinSx}
 							/>
 						</IconButton>
 					</Box>
@@ -124,17 +153,17 @@ export default function Dashboard() {
 			</Box>
 
 			{error && (
-				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+				<Alert severity="error" sx={alertSx} onClose={() => setError(null)}>
 					{error}
 				</Alert>
 			)}
 			{saveSuccess && (
-				<Alert severity="success" sx={{ mb: 3 }}>
+				<Alert severity="success" sx={alertSx}>
 					{t("dashboard.saveSuccess")}
 				</Alert>
 			)}
 			{refreshSuccess && (
-				<Alert severity="success" sx={{ mb: 3 }} onClose={() => setRefreshSuccess(false)}>
+				<Alert severity="success" sx={alertSx} onClose={() => setRefreshSuccess(false)}>
 					{t("dashboard.refreshCharactersSuccess")}
 				</Alert>
 			)}
@@ -146,28 +175,10 @@ export default function Dashboard() {
 				onChange={handleTabChange}
 				slotProps={{
 					indicator: {
-						sx: { display: { xs: "none", sm: "block" } },
+						sx: tabIndicatorSx,
 					},
 				}}
-				sx={{
-					mb: 3,
-					borderBottom: 1,
-					borderColor: "divider",
-					"& .MuiTabs-flexContainer": {
-						flexWrap: { xs: "wrap", sm: "nowrap" },
-						rowGap: 0.5,
-					},
-					"& .MuiTab-root": {
-						minWidth: { xs: 0, sm: 90 },
-						px: { xs: 1, sm: 2 },
-						flex: { xs: "1 1 auto", sm: "0 0 auto" },
-						borderBottom: { xs: "2px solid transparent", sm: "none" },
-						mb: { xs: "-1px", sm: 0 },
-						"&.Mui-selected": {
-							borderBottomColor: { xs: "primary.main", sm: "transparent" },
-						},
-					},
-				}}
+				sx={tabsSx}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}

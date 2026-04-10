@@ -5,6 +5,8 @@ import { AutoRole } from "./atoms";
 import { SelfRegister } from "./sections";
 import TemplateManager from "./TemplateManager.tsx";
 
+const paperSx = { p: 3 } as const;
+
 export default function ModelConfigForm({
 	config,
 	guildId,
@@ -27,7 +29,7 @@ export default function ModelConfigForm({
 		<Stack spacing={2}>
 			<Box component="form" onSubmit={handleSubmit(handleSaveAndReset)}>
 				<Stack spacing={2}>
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<TemplateManager
 							guildId={guildId}
 							channels={channels}
@@ -37,11 +39,11 @@ export default function ModelConfigForm({
 						/>
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<AutoRole control={control} roles={roles} />
 					</Paper>
 
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={paperSx}>
 						<SelfRegister
 							control={control}
 							textChannels={textChannels}

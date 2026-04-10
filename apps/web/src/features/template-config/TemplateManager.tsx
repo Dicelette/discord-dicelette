@@ -15,6 +15,9 @@ import { exportJson } from "../user-config/utils.ts";
 import { useTemplateManager } from "./hooks";
 import { TemplateModal, TemplateView } from "./sections";
 
+const alertMbSx = { mb: 2 } as const;
+const actionsBoxSx = { display: "flex", gap: 1, mb: 2, flexWrap: "wrap" } as const;
+
 export default function TemplateManager({
 	guildId,
 	channels,
@@ -57,7 +60,7 @@ export default function TemplateManager({
 			{error && (
 				<Alert
 					severity="error"
-					sx={{ mb: 2 }}
+					sx={alertMbSx}
 					onClose={() => dispatch({ type: "set_error", value: null })}
 				>
 					{error}
@@ -66,14 +69,14 @@ export default function TemplateManager({
 			{success && (
 				<Alert
 					severity="success"
-					sx={{ mb: 2 }}
+					sx={alertMbSx}
 					onClose={() => dispatch({ type: "set_success", value: null })}
 				>
 					{success}
 				</Alert>
 			)}
 
-			<Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+			<Box sx={actionsBoxSx}>
 				<Button
 					variant="outlined"
 					startIcon={<Download />}

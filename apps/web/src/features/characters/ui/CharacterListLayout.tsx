@@ -11,6 +11,33 @@ import {
 } from "@mui/material";
 import type { ReactNode } from "react";
 
+const loadingBoxSx = { display: "flex", justifyContent: "center", p: 6 } as const;
+const headerGridWithSearchSx = {
+	display: "grid",
+	gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
+	gridTemplateAreas: { xs: '"title" "search"', sm: '"title search"' },
+	alignItems: "center",
+	gap: 2,
+	mb: 3,
+} as const;
+const headerGridNoSearchSx = {
+	display: "grid",
+	gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
+	gridTemplateAreas: { xs: '"title"', sm: '"title ."' },
+	alignItems: "center",
+	gap: 2,
+	mb: 3,
+} as const;
+const titleTypographySx = { whiteSpace: "nowrap", gridArea: "title" } as const;
+const searchFieldSx = {
+	gridArea: "search",
+	width: { xs: "100%", sm: 320 },
+	justifySelf: { xs: "stretch", sm: "end" },
+} as const;
+const alertSx = { mb: 2 } as const;
+const listBoxSx = { display: "flex", flexDirection: "column", gap: 3 } as const;
+const paginationBoxSx = { display: "flex", justifyContent: "center", mt: 3 } as const;
+
 interface Props {
 	title: string;
 	searchPlaceholder: string;
@@ -46,7 +73,7 @@ export default function CharacterListLayout({
 }: Props) {
 	if (loading) {
 		return (
-			<Box sx={{ display: "flex", justifyContent: "center", p: 6 }}>
+			<Box sx={loadingBoxSx}>
 				<CircularProgress />
 			</Box>
 		);
@@ -54,22 +81,11 @@ export default function CharacterListLayout({
 
 	return (
 		<Box>
-			<Box
-				sx={{
-					display: "grid",
-					gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
-					gridTemplateAreas: showSearch
-						? { xs: '"title" "search"', sm: '"title search"' }
-						: { xs: '"title"', sm: '"title ."' },
-					alignItems: "center",
-					gap: 2,
-					mb: 3,
-				}}
-			>
+			<Box sx={showSearch ? headerGridWithSearchSx : headerGridNoSearchSx}>
 				<Typography
 					variant="h5"
 					fontWeight={600}
-					sx={{ whiteSpace: "nowrap", gridArea: "title" }}
+					sx={titleTypographySx}
 				>
 					{title}
 				</Typography>
@@ -89,17 +105,13 @@ export default function CharacterListLayout({
 								),
 							},
 						}}
-						sx={{
-							gridArea: "search",
-							width: { xs: "100%", sm: 320 },
-							justifySelf: { xs: "stretch", sm: "end" },
-						}}
+						sx={searchFieldSx}
 					/>
 				)}
 			</Box>
 
 			{error && (
-				<Alert severity="error" sx={{ mb: 2 }} onClose={onCloseError}>
+				<Alert severity="error" sx={alertSx} onClose={onCloseError}>
 					{error}
 				</Alert>
 			)}
@@ -108,12 +120,12 @@ export default function CharacterListLayout({
 				<Typography color="text.secondary">{emptyText}</Typography>
 			) : (
 				<>
-					<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+					<Box sx={listBoxSx}>
 						{pageChars.map((char) => renderCard(char))}
 					</Box>
 
 					{totalPages > 1 && (
-						<Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+						<Box sx={paginationBoxSx}>
 							<Pagination
 								count={totalPages}
 								page={page}

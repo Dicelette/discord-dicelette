@@ -21,6 +21,56 @@ import { useI18n } from "@shared";
 import { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const pageHeaderSx = {
+	display: "flex",
+	flexDirection: "column",
+	mb: 4,
+	gap: { xs: 2, md: 0 },
+} as const;
+const titleRowSx = {
+	display: "flex",
+	flexDirection: { xs: "column", sm: "row" },
+	justifyContent: "space-between",
+	alignItems: { xs: "stretch", sm: "flex-start" },
+	gap: 2,
+} as const;
+const refreshBoxSx = {
+	display: "flex",
+	justifyContent: { xs: "flex-start", sm: "flex-end" },
+} as const;
+const subtitleRowSx = {
+	display: "flex",
+	flexDirection: { xs: "column", sm: "row" },
+	justifyContent: "space-between",
+	alignItems: { xs: "stretch", sm: "center" },
+	gap: 2,
+} as const;
+const subtitleTextSx = { flex: 1 } as const;
+const searchFieldSx = {
+	width: { xs: "100%", sm: 320 },
+	maxWidth: { xs: "100%", sm: 320 },
+} as const;
+const alertSx = { mb: 3 } as const;
+const botSectionTitleSx = { mb: 2, opacity: 0.8 } as const;
+const botGridSx = { mb: 4 } as const;
+const gridItemSx = { display: "flex" } as const;
+const fullWidthCardSx = { width: "100%" } as const;
+const fullHeightActionSx = { height: "100%" } as const;
+const cardContentSx = { height: "100%", boxSizing: "border-box" } as const;
+const botGuildAvatarSx = { width: 44, height: 44, bgcolor: "primary.main" } as const;
+const guildNameBoxSx = {
+	alignSelf: "stretch",
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "center",
+} as const;
+const dividerSx = { mb: 3 } as const;
+const adminSectionTitleSx = { mb: 1, opacity: 0.8 } as const;
+const adminSubtitleSx = { mb: 2 } as const;
+const adminGuildAvatarSx = { width: 44, height: 44, bgcolor: "secondary.dark" } as const;
+const adminGuildCardSx = { opacity: 0.7 } as const;
+const addButtonSx = { flexShrink: 0 } as const;
+
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
 	const [search, setSearch] = useState("");
@@ -109,29 +159,12 @@ export default function Servers() {
 
 	return (
 		<Box className="max-w-4xl mx-auto p-6">
-			<Box
-				sx={{
-					display: "flex",
-					flexDirection: "column",
-					mb: 4,
-					gap: { xs: 2, md: 0 },
-				}}
-			>
-				<Box
-					sx={{
-						display: "flex",
-						flexDirection: { xs: "column", sm: "row" },
-						justifyContent: "space-between",
-						alignItems: { xs: "stretch", sm: "flex-start" },
-						gap: 2,
-					}}
-				>
+			<Box sx={pageHeaderSx}>
+				<Box sx={titleRowSx}>
 					<Typography variant="h4" fontWeight={700}>
 						{t("servers.title")}
 					</Typography>
-					<Box
-						sx={{ display: "flex", justifyContent: { xs: "flex-start", sm: "flex-end" } }}
-					>
+					<Box sx={refreshBoxSx}>
 						<Tooltip title={t("servers.refreshTooltip")}>
 							<span>
 								<Button
@@ -148,16 +181,8 @@ export default function Servers() {
 					</Box>
 				</Box>
 
-				<Box
-					sx={{
-						display: "flex",
-						flexDirection: { xs: "column", sm: "row" },
-						justifyContent: "space-between",
-						alignItems: { xs: "stretch", sm: "center" },
-						gap: 2,
-					}}
-				>
-					<Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+				<Box sx={subtitleRowSx}>
+					<Typography variant="body2" color="text.secondary" sx={subtitleTextSx}>
 						{t("servers.subtitle")}
 					</Typography>
 					<TextField
@@ -166,7 +191,7 @@ export default function Servers() {
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
 						placeholder={t("servers.searchPlaceholder")}
-						sx={{ width: { xs: "100%", sm: 320 }, maxWidth: { xs: "100%", sm: 320 } }}
+						sx={searchFieldSx}
 						slotProps={{
 							input: {
 								startAdornment: (
@@ -181,48 +206,43 @@ export default function Servers() {
 			</Box>
 
 			{error && (
-				<Alert severity="error" sx={{ mb: 3 }}>
+				<Alert severity="error" sx={alertSx}>
 					{error}
 				</Alert>
 			)}
 
 			{filteredBotGuilds.length > 0 && (
 				<>
-					<Typography variant="h6" sx={{ mb: 2, opacity: 0.8 }}>
+					<Typography variant="h6" sx={botSectionTitleSx}>
 						{t("servers.botPresent")}
 					</Typography>
-					<Grid container spacing={2} sx={{ mb: 4 }}>
+					<Grid container spacing={2} sx={botGridSx}>
 						{filteredBotGuilds.map((guild) => (
 							<Grid
 								size={{ xs: 12, sm: 6, md: 4 }}
 								key={guild.id}
-								sx={{ display: "flex" }}
+								sx={gridItemSx}
 							>
-								<Card sx={{ width: "100%" }}>
+								<Card sx={fullWidthCardSx}>
 									<CardActionArea
-										sx={{ height: "100%" }}
+										sx={fullHeightActionSx}
 										onClick={() =>
 											startTransition(() => navigate(`/dashboard/${guild.id}`))
 										}
 									>
 										<CardContent
 											className="flex items-center gap-3 p-4"
-											sx={{ height: "100%", boxSizing: "border-box" }}
+											sx={cardContentSx}
 										>
 											<Avatar
 												src={getGuildIcon(guild) ?? undefined}
-												sx={{ width: 44, height: 44, bgcolor: "primary.main" }}
+												sx={botGuildAvatarSx}
 											>
 												{guild.name[0]}
 											</Avatar>
 											<Box
 												className="flex-1 min-w-0"
-												sx={{
-													alignSelf: "stretch",
-													display: "flex",
-													flexDirection: "column",
-													justifyContent: "center",
-												}}
+												sx={guildNameBoxSx}
 											>
 												<Typography
 													variant="body1"
@@ -263,21 +283,21 @@ export default function Servers() {
 
 			{filteredAdminGuilds.length > 0 && (
 				<>
-					<Divider sx={{ mb: 3 }} />
-					<Typography variant="h6" sx={{ mb: 1, opacity: 0.8 }}>
+					<Divider sx={dividerSx} />
+					<Typography variant="h6" sx={adminSectionTitleSx}>
 						{t("servers.addBotTitle")}
 					</Typography>
-					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+					<Typography variant="body2" color="text.secondary" sx={adminSubtitleSx}>
 						{t("servers.addBotDesc")}
 					</Typography>
 					<Grid container spacing={2}>
 						{filteredAdminGuilds.map((guild) => (
 							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id}>
-								<Card sx={{ opacity: 0.7 }}>
+								<Card sx={adminGuildCardSx}>
 									<CardContent className="flex items-center gap-3 p-4">
 										<Avatar
 											src={getGuildIcon(guild) ?? undefined}
-											sx={{ width: 44, height: 44, bgcolor: "secondary.dark" }}
+											sx={adminGuildAvatarSx}
 										>
 											{guild.name[0]}
 										</Avatar>
@@ -291,7 +311,7 @@ export default function Servers() {
 											variant="outlined"
 											startIcon={<Add />}
 											onClick={() => handleAddBot(guild)}
-											sx={{ flexShrink: 0 }}
+											sx={addButtonSx}
 										>
 											{t("common.add")}
 										</Button>
