@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.2.1](https://github.com/Dicelette/discord-dicelette/compare/@dicelette/web@0.2.0...@dicelette/web@0.2.1) (2026-04-10)
+
+
+### Features
+
+* **ui:** enhance ConfigFormFooter with Snackbar notifications for save and discard actions ([febbaf1](https://github.com/Dicelette/discord-dicelette/commit/febbaf13ae249fc631b64b33224b8b22d84de957))
+
 ## 0.2.0 (2026-04-10)
 
 
