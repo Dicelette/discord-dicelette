@@ -1,11 +1,11 @@
-name: Update VPS beta
+name: Update Dashboard
 on:
   push:
-    branches: dashboard
+    tags: ["@dicelette/web@*"]
   workflow_dispatch:
-
+  
 jobs:
-    update_beta:
+    dashboard_release:
         runs-on: ubuntu-latest
         steps:
         - name: Connect to vps
@@ -16,9 +16,10 @@ jobs:
             port: ${{secrets.PORT}}
             key: ${{ secrets.SSH_KEY }}
             script: |
-                cd dicelette-beta/
+                cd dicelette/
                 fnm use lts
                 git stash push --include-untracked --message "Locales temporaires"
                 git pull --rebase
                 pnpm i
-                task restart-beta
+                pnpm dashboard:build
+                pm2 restart dicelette

@@ -1,5 +1,7 @@
 import { keyframes } from "@emotion/react";
-import { Button, Paper, Slide, Typography } from "@mui/material";
+import RotateLeftIcon from "@mui/icons-material/RotateLeft";
+import SaveIcon from "@mui/icons-material/Save";
+import { Button, IconButton, Paper, Slide, Tooltip, Typography } from "@mui/material";
 import { useI18n } from "../i18n";
 
 interface Props {
@@ -61,6 +63,21 @@ const saveButtonSx = {
 	"&.Mui-disabled": { bgcolor: "success.light", color: "grey.400" },
 } as const;
 
+const resetIconButtonSx = {
+	color: "var(--return-color)",
+	bgcolor: "var(--return-bgcolor)",
+	borderRadius: 1,
+	"&:hover": { bgcolor: "var(--return-bgcolor-hover)" },
+} as const;
+
+const saveIconButtonSx = {
+	bgcolor: "success.dark",
+	color: "#fff",
+	borderRadius: 1,
+	"&:hover": { bgcolor: "success.main" },
+	"&.Mui-disabled": { bgcolor: "success.light", color: "grey.400" },
+} as const;
+
 export default function ConfigFormFooter({ isDirty, saving, onReset }: Props) {
 	const { t } = useI18n();
 	return (
@@ -70,22 +87,46 @@ export default function ConfigFormFooter({ isDirty, saving, onReset }: Props) {
 					{t("config.unsaved")}
 				</Typography>
 				{onReset && (
-					<Button
-						variant="outlined"
-						size="medium"
-						type="button"
-						onClick={onReset}
-						sx={resetButtonSx}
-					>
-						{t("common.discard")}
-					</Button>
+					<>
+						<Tooltip title={t("common.discard")}>
+							<IconButton
+								size="medium"
+								type="button"
+								onClick={onReset}
+								sx={{ ...resetIconButtonSx, display: { xs: "inline-flex", md: "none" } }}
+							>
+								<RotateLeftIcon />
+							</IconButton>
+						</Tooltip>
+						<Button
+							variant="outlined"
+							size="medium"
+							type="button"
+							onClick={onReset}
+							sx={{ ...resetButtonSx, display: { xs: "none", md: "inline-flex" } }}
+						>
+							{t("common.discard")}
+						</Button>
+					</>
 				)}
+				<Tooltip title={saving ? t("common.saving") : t("common.save")}>
+					<span style={{ display: "contents" }}>
+						<IconButton
+							type="submit"
+							size="medium"
+							disabled={saving}
+							sx={{ ...saveIconButtonSx, display: { xs: "inline-flex", md: "none" } }}
+						>
+							<SaveIcon />
+						</IconButton>
+					</span>
+				</Tooltip>
 				<Button
 					type="submit"
 					variant="contained"
 					size="medium"
 					disabled={saving}
-					sx={saveButtonSx}
+					sx={{ ...saveButtonSx, display: { xs: "none", md: "inline-flex" } }}
 				>
 					{saving ? t("common.saving") : t("common.save")}
 				</Button>
