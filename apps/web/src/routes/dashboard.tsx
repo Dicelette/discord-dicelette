@@ -72,6 +72,17 @@ const tabsSx = {
 	},
 } as const;
 const tabIndicatorSx = { display: { xs: "none", sm: "block" } } as const;
+const tabsUnsavedSx = {
+	"& .MuiTab-root:not(.Mui-selected)": {
+		opacity: 0.4,
+		transition: "opacity 0.2s ease",
+		"& .MuiTouchRipple-root": { display: "none" },
+	},
+	"& .MuiTabScrollButton-root": {
+		pointerEvents: "none",
+		opacity: 0.2,
+	},
+} as const;
 
 function TabPanel({
 	value,
@@ -113,6 +124,8 @@ export default function Dashboard() {
 		charactersRefreshToken,
 		channels,
 		roles,
+		hasUnsavedChanges,
+		setHasUnsavedChanges,
 		handleSave,
 		handleCharactersRefresh,
 		handleTabChange,
@@ -128,7 +141,11 @@ export default function Dashboard() {
 
 	return (
 		<Box sx={pageContainerSx}>
-			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={backButtonSx}>
+			<Button
+				startIcon={<ArrowBackIcon />}
+				onClick={() => navigate("/")}
+				sx={backButtonSx}
+			>
 				{t("common.back")}
 			</Button>
 
@@ -144,9 +161,7 @@ export default function Dashboard() {
 							size="small"
 							aria-label={t("dashboard.refreshCharacters")}
 						>
-							<RefreshIcon
-								sx={refreshingCharacters ? spinSx : noSpinSx}
-							/>
+							<RefreshIcon sx={refreshingCharacters ? spinSx : noSpinSx} />
 						</IconButton>
 					</Box>
 				</Tooltip>
@@ -155,11 +170,6 @@ export default function Dashboard() {
 			{error && (
 				<Alert severity="error" sx={alertSx} onClose={() => setError(null)}>
 					{error}
-				</Alert>
-			)}
-			{saveSuccess && (
-				<Alert severity="success" sx={alertSx}>
-					{t("dashboard.saveSuccess")}
 				</Alert>
 			)}
 			{refreshSuccess && (
@@ -178,7 +188,7 @@ export default function Dashboard() {
 						sx: tabIndicatorSx,
 					},
 				}}
-				sx={tabsSx}
+				sx={[tabsSx, hasUnsavedChanges && tabsUnsavedSx]}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
@@ -202,6 +212,8 @@ export default function Dashboard() {
 						guildId={guildId!}
 						onSave={handleSave}
 						saving={saving}
+						saveSuccess={saveSuccess}
+						onDirtyChange={setHasUnsavedChanges}
 						channels={channels}
 						roles={roles}
 						isStrictAdmin={isStrictAdmin}
@@ -216,6 +228,8 @@ export default function Dashboard() {
 							guildId={guildId!}
 							onSave={handleSave}
 							saving={saving}
+							saveSuccess={saveSuccess}
+							onDirtyChange={setHasUnsavedChanges}
 							channels={channels}
 							roles={roles}
 						/>

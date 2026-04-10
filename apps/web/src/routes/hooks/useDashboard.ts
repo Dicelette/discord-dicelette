@@ -28,6 +28,7 @@ interface State {
 	charactersRefreshToken: number;
 	channels: Channel[];
 	roles: Role[];
+	hasUnsavedChanges: boolean;
 }
 
 type Action =
@@ -52,7 +53,8 @@ type Action =
 	| { type: "increment_refresh_token" }
 	| { type: "update_config"; updates: Partial<ApiGuildData> }
 	| { type: "mount_tab"; tab: ActiveTab }
-	| { type: "set_tab"; tab: ActiveTab };
+	| { type: "set_tab"; tab: ActiveTab }
+	| { type: "set_dirty"; value: boolean };
 
 function reducer(state: State, action: Action): State {
 	switch (action.type) {
@@ -99,6 +101,8 @@ function reducer(state: State, action: Action): State {
 				: { ...state, mountedTabs: new Set([...state.mountedTabs, action.tab]) };
 		case "set_tab":
 			return { ...state, tab: action.tab };
+		case "set_dirty":
+			return { ...state, hasUnsavedChanges: action.value };
 	}
 }
 
@@ -128,6 +132,7 @@ export function useDashboard(guildId: string | undefined) {
 		charactersRefreshToken: 0,
 		channels: [],
 		roles: [],
+		hasUnsavedChanges: false,
 	});
 
 	useEffect(() => {
@@ -218,9 +223,17 @@ export function useDashboard(guildId: string | undefined) {
 		}
 	}, [guildId, t]);
 
-	const handleTabChange = useCallback((_: unknown, v: ActiveTab) => {
-		dispatch({ type: "mount_tab", tab: v });
-		startTransition(() => dispatch({ type: "set_tab", tab: v }));
+	const handleTabChange = useCallback(
+		(_: unknown, v: ActiveTab) => {
+			if (state.hasUnsavedChanges) return;
+			dispatch({ type: "mount_tab", tab: v });
+			startTransition(() => dispatch({ type: "set_tab", tab: v }));
+		},
+		[state.hasUnsavedChanges]
+	);
+
+	const setHasUnsavedChanges = useCallback((value: boolean) => {
+		dispatch({ type: "set_dirty", value });
 	}, []);
 
 	const setError = useCallback((value: string | null) => {
@@ -235,6 +248,7 @@ export function useDashboard(guildId: string | undefined) {
 		...state,
 		setError,
 		setRefreshSuccess,
+		setHasUnsavedChanges,
 		handleSave,
 		handleCharactersRefresh,
 		handleTabChange,

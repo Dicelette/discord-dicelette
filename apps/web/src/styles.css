@@ -11,17 +11,23 @@
 	--confirm-color: var(--color-amber-950);
 	--return-color: var(--color-red-50);
 	--return-bgcolor: var(--color-red-700);
-	--return-bgcolor-hover: var(--color-red-600);
+	--return-bgcolor-hover: var(--color-red-800);
+	--save-bgcolor: var(--color-emerald-700);
+	--save-bgcolor-hover: var(--color-emerald-800);
+	--save-color: var(--color-emerald-50);
 }
 
 [data-dark] {
 	--bg-default: var(--color-zinc-900);
 	--bg-paper: var(--color-zinc-800);
-	--confirm-bgcolor: var(--color-amber-500);
-	--confirm-color: var(--color-amber-950);
+	--confirm-bgcolor: var(--color-slate-600);
+	--confirm-color: var(--color-zinc-200);
 	--return-color: var(--color-red-50);
 	--return-bgcolor: var(--color-red-700);
-	--return-bgcolor-hover: var(--color-red-600);
+	--return-bgcolor-hover: var(--color-red-800);
+	--save-bgcolor: var(--color-emerald-700);
+	--save-bgcolor-hover: var(--color-emerald-800);
+	--save-color: var(--color-emerald-50);
 }
 
 * {
@@ -44,5 +50,5 @@ h6 {
 
 code {
 	font-family: var(--code-font-family);
-	font-feature-settings: "calt"1;
+	font-feature-settings: "calt" 1;
 }

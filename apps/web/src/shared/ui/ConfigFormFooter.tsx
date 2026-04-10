@@ -1,50 +1,70 @@
 import { keyframes } from "@emotion/react";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import SaveIcon from "@mui/icons-material/Save";
-import { Button, IconButton, Paper, Slide, Typography } from "@mui/material";
+import { Alert, Box, Button, Fade, Paper, Snackbar, Typography } from "@mui/material";
+import TrapFocus from "@mui/material/Unstable_TrapFocus";
+import { useEffect, useState } from "react";
 import { useI18n } from "../i18n";
 
 interface Props {
 	isDirty: boolean;
 	saving: boolean;
 	onReset?: () => void;
+	saveSuccess?: boolean;
 }
 
 const shake = keyframes`
-  0%, 100% { transform: translateX(0); }
-  20%       { transform: translateX(-7px); }
-  40%       { transform: translateX(7px); }
-  60%       { transform: translateX(-4px); }
-  80%       { transform: translateX(4px); }
+  0%, 100% { transform: translateX(-50%); }
+  20%       { transform: translateX(calc(-50% - 5px)); }
+  40%       { transform: translateX(calc(-50% + 5px)); }
+  60%       { transform: translateX(calc(-50% - 3px)); }
+  80%       { transform: translateX(calc(-50% + 3px)); }
 `;
 
 const paperSx = {
 	position: "fixed",
-	top: 0,
-	left: 0,
-	right: 0,
-	zIndex: 1300,
-	py: 2,
-	px: 3,
-	borderRadius: 0,
+	bottom: 16,
+	left: "50%",
+	transform: "translateX(-50%)",
+	width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
+	maxWidth: "58rem",
+	zIndex: "appBar",
+	borderRadius: 2,
+	py: 1,
+	px: { xs: 1.5, md: 3 },
 	display: "flex",
+	flexDirection: "row",
 	alignItems: "center",
-	justifyContent: "center",
-	gap: 2,
+	justifyContent: "flex-start",
+	gap: 1,
 	bgcolor: "var(--confirm-bgcolor)",
 	color: "var(--confirm-color)",
-	animation: `${shake} 0.45s ease`,
+	animation: `${shake} 0.35s ease`,
 } as const;
 
 const typographySx = {
 	flexGrow: 1,
+	flexShrink: 1,
 	textAlign: "center",
+	overflow: "hidden",
+	textOverflow: "ellipsis",
+	whiteSpace: "nowrap",
 	color: "var(--confirm-color)",
 	fontFamily: "var(--ifm-heading-font-family)",
 	fontSize: { xs: "1rem", sm: "1.15rem" },
 } as const;
 
+const buttonBoxSx = {
+	ml: "auto",
+	display: "flex",
+	alignItems: "center",
+	gap: 1,
+} as const;
+
 const resetButtonSx = {
+	minWidth: { xs: 0, md: "auto" },
+	px: { xs: 1, md: 2 },
+	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	fontFamily: "var(--ifm-font-family-base)",
 	color: "var(--return-color)",
 	bgcolor: "var(--return-bgcolor)",
@@ -56,83 +76,127 @@ const resetButtonSx = {
 } as const;
 
 const saveButtonSx = {
-	bgcolor: "success.dark",
-	color: "#fff",
+	minWidth: { xs: 0, md: "auto" },
+	px: { xs: 1, md: 2 },
+	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
+	bgcolor: "var(--save-bgcolor)",
+	color: "var(--save-color)",
 	fontWeight: "bold",
-	"&:hover": { bgcolor: "success.main" },
-	"&.Mui-disabled": { bgcolor: "success.light", color: "grey.400" },
-	display: { xs: "none", md: "inline-flex" },
-} as const;
-
-const resetIconButtonSx = {
-	color: "var(--return-color)",
-	bgcolor: "var(--return-bgcolor)",
-	borderRadius: 1,
-	display: { xs: "inline-flex", md: "none" },
-	"&:hover": { bgcolor: "var(--return-bgcolor-hover)" },
-} as const;
-
-const saveIconButtonSx = {
-	bgcolor: "success.dark",
-	color: "#fff",
-	borderRadius: 1,
-	display: { xs: "inline-flex", md: "none" },
-	"&:hover": { bgcolor: "success.main" },
+	"&:hover": { bgcolor: "var(--save-bgcolor-hover)" },
 	"&.Mui-disabled": { bgcolor: "success.light", color: "grey.400" },
 } as const;
 
-export default function ConfigFormFooter({ isDirty, saving, onReset }: Props) {
+const labelSx = { display: { xs: "none", md: "inline-block" } } as const;
+
+export default function ConfigFormFooter({
+	isDirty,
+	saving,
+	onReset,
+	saveSuccess,
+}: Props) {
 	const { t } = useI18n();
-	return (
-		<Slide direction="down" in={isDirty} mountOnEnter unmountOnExit>
-			<Paper elevation={8} sx={paperSx}>
-				<Typography variant="h6" fontWeight="medium" sx={typographySx}>
-					{t("config.unsaved")}
-				</Typography>
-				{onReset && (
-					<>
-						<IconButton
-							size="medium"
-							type="button"
-							onClick={onReset}
-							aria-label={t("common.discard")}
-							sx={resetIconButtonSx}
-						>
-							<RotateLeftIcon />
-						</IconButton>
-						<Button
-							variant="outlined"
-							size="medium"
-							type="button"
-							onClick={onReset}
-							sx={{ ...resetButtonSx, display: { xs: "none", md: "inline-flex" } }}
-						>
-							{t("common.discard")}
-						</Button>
-					</>
-				)}
+	const [saveOpen, setSaveOpen] = useState(false);
+	const [discardOpen, setDiscardOpen] = useState(false);
 
-				<span style={{ display: "contents" }}>
-					<IconButton
-						type="submit"
-						size="medium"
-						disabled={saving}
-						aria-label={saving ? t("common.saving") : t("common.save")}
-						sx={saveIconButtonSx}
+	useEffect(() => {
+		if (saveSuccess) setSaveOpen(true);
+	}, [saveSuccess]);
+
+	const handleReset = () => {
+		onReset?.();
+		setDiscardOpen(true);
+	};
+
+	const snackbarAnchor = { vertical: "top", horizontal: "right" } as const;
+
+	return (
+		<>
+			<TrapFocus open={isDirty} disableAutoFocus disableEnforceFocus>
+				<Fade in={isDirty} mountOnEnter unmountOnExit>
+					<Paper
+						elevation={8}
+						sx={paperSx}
+						role="dialog"
+						aria-modal="false"
+						aria-label={t("config.unsaved")}
+						tabIndex={-1}
 					>
-						<SaveIcon />
-					</IconButton>
-				</span>
-				<Button
-					type="submit"
-					variant="contained"
-					size="medium"
-					disabled={saving}
-					sx={saveButtonSx}
-				>
-					{saving ? t("common.saving") : t("common.save")}
-				</Button>
-			</Paper>
-		</Slide>
+						<Typography variant="h6" fontWeight="medium" sx={typographySx}>
+							{t("config.unsaved")}
+						</Typography>
+
+						<Box sx={buttonBoxSx}>
+							{onReset && (
+								<Button
+									variant="outlined"
+									size="small"
+									type="button"
+									onClick={handleReset}
+									startIcon={<RotateLeftIcon />}
+									sx={resetButtonSx}
+								>
+									<Box component="span" sx={labelSx}>
+										{t("common.discard")}
+									</Box>
+								</Button>
+							)}
+
+							<Button
+								type="submit"
+								variant="contained"
+								size="small"
+								disabled={saving}
+								startIcon={<SaveIcon />}
+								sx={saveButtonSx}
+							>
+								<Box component="span" sx={labelSx}>
+									{saving ? t("common.saving") : t("common.save")}
+								</Box>
+							</Button>
+						</Box>
+					</Paper>
+				</Fade>
+			</TrapFocus>
+
+			<Fade in={isDirty}>
+				<Box
+					aria-hidden="true"
+					sx={{
+						position: "fixed",
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: 16,
+						bgcolor: "background.default",
+						zIndex: (theme) => theme.zIndex.appBar - 1,
+						pointerEvents: "none",
+					}}
+				/>
+			</Fade>
+
+			{isDirty && <Box sx={{ height: 72 }} aria-hidden="true" />}
+
+			<Snackbar
+				open={saveOpen}
+				autoHideDuration={3000}
+				onClose={() => setSaveOpen(false)}
+				anchorOrigin={snackbarAnchor}
+			>
+				<Alert severity="success" onClose={() => setSaveOpen(false)}>
+					{t("dashboard.saveSuccess")}
+				</Alert>
+			</Snackbar>
+
+			<Snackbar
+				open={discardOpen}
+				autoHideDuration={3000}
+				onClose={() => setDiscardOpen(false)}
+				anchorOrigin={snackbarAnchor}
+			>
+				<Alert severity="warning" onClose={() => setDiscardOpen(false)}>
+					{t("common.discardSuccess")}
+				</Alert>
+			</Snackbar>
+		</>
 	);
 }

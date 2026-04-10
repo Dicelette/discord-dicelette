@@ -12,6 +12,8 @@ export interface ConfigFormProps {
 	guildId: string;
 	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
 	saving: boolean;
+	saveSuccess?: boolean;
+	onDirtyChange?: (isDirty: boolean) => void;
 	channels: Channel[];
 	roles: Role[];
 }

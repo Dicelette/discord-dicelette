@@ -26,7 +26,8 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
-		"discard": "Annuler les modifications",
+		"discard": "Annuler",
+		"discardSuccess": "Modifications annulées.",
 		"save": "Sauvegarder",
 		"saving": "Sauvegarde..."
 	},
@@ -194,7 +195,7 @@
 		"saveSuccess": "Sauvegardé !",
 		"sections": {
 			"attributes": "Attributs personnels",
-			"template": "Template de sortie des jets"
+			"template": "Modèle du lien vers les résultats"
 		},
 		"snippetDice": "Expression de dés",
 		"snippetsDesc": "Macros de dés nommées utilisables dans les commandes de jets.",

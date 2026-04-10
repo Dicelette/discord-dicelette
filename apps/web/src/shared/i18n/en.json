@@ -26,7 +26,8 @@
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
-		"discard": "Reset Changes",
+		"discard": "Reset",
+		"discardSuccess": "Changes discarded.",
 		"save": "Save",
 		"saving": "Saving..."
 	},
@@ -194,7 +195,7 @@
 		"saveSuccess": "Saved!",
 		"sections": {
 			"attributes": "Attributes",
-			"template": "Link's template"
+			"template": "Result link's template"
 		},
 		"snippetDice": "Dice expression",
 		"snippetsDesc": "Named dices you can use in roll commands.",

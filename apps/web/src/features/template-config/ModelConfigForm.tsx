@@ -1,6 +1,7 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Box, Paper, Stack } from "@mui/material";
 import { ConfigFormFooter, type ConfigFormProps, useConfigForm } from "@shared";
+import { useEffect } from "react";
 import { AutoRole } from "./atoms";
 import { SelfRegister } from "./sections";
 import TemplateManager from "./TemplateManager.tsx";
@@ -12,6 +13,8 @@ export default function ModelConfigForm({
 	guildId,
 	onSave,
 	saving,
+	saveSuccess,
+	onDirtyChange,
 	channels,
 	roles,
 }: ConfigFormProps) {
@@ -19,6 +22,10 @@ export default function ModelConfigForm({
 		config,
 		channels
 	);
+
+	useEffect(() => {
+		onDirtyChange?.(isDirty);
+	}, [isDirty, onDirtyChange]);
 
 	const handleSaveAndReset = async (data: ApiGuildData) => {
 		await onSave(data);
@@ -52,7 +59,12 @@ export default function ModelConfigForm({
 					</Paper>
 				</Stack>
 
-				<ConfigFormFooter isDirty={isDirty} saving={saving} onReset={() => reset()} />
+				<ConfigFormFooter
+					isDirty={isDirty}
+					saving={saving}
+					onReset={() => reset()}
+					saveSuccess={saveSuccess}
+				/>
 			</Box>
 		</Stack>
 	);

@@ -7,7 +7,7 @@ import {
 	useConfigForm,
 	useI18n,
 } from "@shared";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useTemplateState } from "../user-config/hooks";
 import Links from "../user-config/ui/sections/Links";
 import {
@@ -28,6 +28,8 @@ interface Props {
 	guildId: string;
 	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
 	saving: boolean;
+	saveSuccess?: boolean;
+	onDirtyChange?: (isDirty: boolean) => void;
 	channels: Channel[];
 	roles: Role[];
 	isStrictAdmin: boolean;
@@ -37,6 +39,8 @@ export default function GuildConfigForm({
 	config,
 	onSave,
 	saving,
+	saveSuccess,
+	onDirtyChange,
 	channels,
 	roles,
 	isStrictAdmin,
@@ -46,6 +50,10 @@ export default function GuildConfigForm({
 		config,
 		channels
 	);
+
+	useEffect(() => {
+		onDirtyChange?.(isDirty);
+	}, [isDirty, onDirtyChange]);
 
 	const saveFn = useCallback(
 		(template: TemplateResult) => onSave({ createLinkTemplate: template }),
@@ -117,7 +125,12 @@ export default function GuildConfigForm({
 					</Paper>
 				</Stack>
 
-				<ConfigFormFooter isDirty={isDirty} saving={saving} onReset={() => reset()} />
+				<ConfigFormFooter
+					isDirty={isDirty}
+					saving={saving}
+					onReset={() => reset()}
+					saveSuccess={saveSuccess}
+				/>
 			</Box>
 		</Stack>
 	);
