@@ -3,6 +3,7 @@
 ## Resources:
 - Find the *bot* on [GitHub](<https://github.com/Dicelette/discord-dicelette/>)
 - Access the [Documentation](<https://dicelette.github.io/en>) for detailed usage instructions.
+- Find the [Dashboard](<https://dashboard.dicelette.app/>) to manage your server's configuration and settings.
 
 ## Usage:
 ### Commands:

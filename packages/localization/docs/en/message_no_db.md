@@ -1,6 +1,6 @@
 The bot has different administration commands that allow you to personalize your experience.
 
-You will find [here](<https://dicelette.github.io/en/docs/config>) detailed explanations of the commands shown here:
+You can change the bot's settings directly from the [Dashboard](<https://dashboard.dicelette.app/>) or by using the commands below:
 - </config display general:{{- display}}>: Display the server configuration
 - </config logs:{{- logs}}>: Records a channel to display errors and modifications made to records.
 - </config result_channel:{{- result}}>: Allows you to define a channel or enable/disable the automatic thread creation to receive the results of all dice rolls from the server.
@@ -8,3 +8,5 @@ You will find [here](<https://dicelette.github.io/en/docs/config>) detailed expl
 - </config timestamp:{{-timestamp}}> : Display (or not) the timestamp in the dice roll logs.
 - </config self_register:{{- self_register}}> : Allow users to register themselves to the bot, when a template is set, and with the option to restrict validation to moderators only and prevent users from creating in channels other than the default one.
 - </config change_language:{{- language}}> : Allows you to change the bot's language. The default language depends on the server's language, but is English if the server's language is not supported or not set. 
+
+You can find [here](<https://www.dicelette.app/en/docs/config>) detailed explanations about the configuration.

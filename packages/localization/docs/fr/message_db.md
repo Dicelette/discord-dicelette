@@ -6,6 +6,8 @@ Ces commandes permettent l'attribution automatique de rôles lors de la validati
 - **</config auto_role statistics:{{- stat}}>** : Ajoute un rôle lors de la validation des statistiques.
 - **</config auto_role dice:{{- dice}}>** : Ajoute un rôle lors de l'enregistrement d'un dé. 
 
+-# Ces rôles peuvent également être attribués directement depuis le [Dashboard](<https://dashboard.dicelette.app/>).
+
 Cela permet l'utilisation des commandes </dbroll:{{- dbroll}}>, </macro:{{- macro}}> et </calc:{{- calc}}> si elles sont restreintes aux utilisateurs ayant ces rôles.
 
 # Lancers de dés « maître de jeu »

@@ -32,7 +32,7 @@ export const info = {
 			.setAuthor({
 				name: ul("info.author"),
 			})
-			.setThumbnail("https://dicelette.github.io/img/dicelette.png")
+			.setThumbnail("https://www.dicelette.app/img/dicelette.png")
 			.setTimestamp();
 		return await interaction.reply({
 			components: [new Djs.ActionRowBuilder<Djs.ButtonBuilder>().addComponents(buttons)],
@@ -114,5 +114,10 @@ function buttonsLinks(ul: Translation, langToUse: Djs.Locale) {
 			.setStyle(Djs.ButtonStyle.Link)
 			.setEmoji("📖")
 			.setURL(langToUse === "fr" ? LINKS.fr.docs : LINKS.en.docs),
+		new Djs.ButtonBuilder()
+			.setLabel(ul("info.dashboard"))
+			.setStyle(Djs.ButtonStyle.Link)
+			.setEmoji("📊")
+			.setURL("https://dashboard.dicelette.app/"),
 	];
 }

@@ -691,6 +691,9 @@
 				"name": "version"
 			}
 		},
+		"dashboard": {
+			"link": "You can also configure **everything** from the [dashboard]({{- link}})."
+		},
 		"description": "Display help",
 		"diceNotation": "# Dice Notation Guide\r\n- **Basic Dice Rolls**: Perform standard dice rolls using the format `XdY`, where `X` is the number of dice and `Y` is the number of sides. Example: `2d6` rolls two 6-sided dice.\r\n- **[Dice Groups](<https://dice-roller.github.io/documentation/guide/notation/group-rolls.html>)**: Group multiple dice rolls together for complex scenarios. Example: `(1d6, 2d8)`.\r\n- **[Modifiers](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)**: Apply mathematical operations to dice rolls, such as adding or subtracting values. Example: `1d20+5`.\r\n- **[Comments](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)**: Add descriptions to your rolls for clarity. Example: `1d6 // Attack damage`.\r\n- **[Math](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)**: Perform advanced calculations using dice rolls. Example: `(1d6+2)*3`.\r\n- **[Bulk Rolls](<https://dicelette.github.io/en/docs/introduction/expression#bulk-rolls>)**: Roll multiple dice simultaneously using the format `[number of dice]#[dice]`. Example: `2#d6` rolls two 6-sided dice.\r\n- **[Shared Rolls](<https://dicelette.github.io/en/docs/introduction/expression#shared-unique-rolls-reusing-results>)**: Reuse the result of a previous roll in subsequent calculations. Example: `1d6;&+10`.\r\n- **[Critical by Die](<https://dicelette.github.io/en/docs/introduction/expression#critical-successes-and-failures>)**: Specify critical conditions for dice rolls. Example: `1d20{cs:>=10}>=20` means the roll is a critical success if the result is greater than or equal to 10.",
 		"docs": {
@@ -771,7 +774,7 @@
 		"count": "Number of servers",
 		"description": "Display generic information on the bot",
 		"docs": "Documentation",
-		"kofi": "\nKofi",
+		"kofi": "Kofi",
 		"latency": "Latency",
 		"presentation": "Dicelette is a bot written in Typescript and open-source dedicated to dice rolls:\n- Complex expression support,\n- Automatic results organization and logging,\n- Creation of snippets\n- Character template creation\n- Advanced customization: auto-role, HRP deletion, etc.",
 		"title": "info",

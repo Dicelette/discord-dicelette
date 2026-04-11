@@ -27,7 +27,7 @@ export async function helpAtInvit(guild: Djs.Guild): Promise<void> {
 	const lang = guild.preferredLocale;
 	const ul = ln(lang);
 	const docLinkExt = lang === "fr" ? "" : "en/";
-	const docLink = `https://dicelette.github.io/${docLinkExt}`;
+	const docLink = `https://wwww.dicelette.app/${docLinkExt}`;
 	//get system channel
 	let systemChannel = guild.systemChannel ?? "dm";
 	if (
@@ -47,7 +47,7 @@ export async function helpAtInvit(guild: Djs.Guild): Promise<void> {
 	if (!ids) return;
 	const msg = dedent(`
 	${ul("help.invit.serv", { serv: guild.name })}
-	
+	${ul(ul("help.dashboard.link"), { link: "https://dashboard.dicelette.app/" })}
 	${ul("help.invit.change_language", { id: commandId, lang })}
 	
 	${ul("help.invit.copy", { id: commandId })}

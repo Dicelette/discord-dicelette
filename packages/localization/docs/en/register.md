@@ -6,7 +6,7 @@ The bot allows you to configure a server model, enabling the creation and manage
 
 ### Getting Started:
 1. **Configure the Model**: Follow the detailed instructions available [here](<https://dicelette.github.io/en/docs/sheet/model>) to set up your server model.
-2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}>. 
+2. **Save Character Sheets**: Once the model is configured, you can save character sheets directly on your server using </register:{{-register}}> or through the [Dashboard](<https://dashboard.dicelette.app/>).
 
 ### Commands Overview:
 After setting up the model, you can use the following commands to interact with character sheets:

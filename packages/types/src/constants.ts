@@ -24,12 +24,12 @@ export const LINKS = {
 	},
 	en: {
 		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=mara-li&labels=bug%2Ctriage%2Cenglish&projects=&template=bug_english.yml&title=%5BBug%5D%3A+",
-		docs: "https://dicelette.github.io/en/",
+		docs: "https://www.dicelette.app/en/",
 		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=mara-li&labels=enhancement%2Ctriage%2Cenglish&projects=&template=request_english.yml&title=%5BFR%5D%3A+",
 	},
 	fr: {
 		bug: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=mara-li&labels=bug%2Ctriage%2Cfrench&projects=&template=bug_french.yml&title=%5BBug%5D%3A+",
-		docs: "https://dicelette.github.io/",
+		docs: "https://www.dicelette.app",
 		fr: "https://github.com/Dicelette/discord-dicelette/issues/new?assignees=mara-li&labels=enhancement%2Ctriage%2Cfrench&projects=&template=Request_french.yml&title=%5BFR%5D%3A+",
 	},
 	icons: {

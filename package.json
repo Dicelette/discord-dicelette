@@ -17,6 +17,7 @@
 		"dev": "tsx watch --clear-screen=false apps/bot/index.ts",
 		"bot:watch": "tsx watch --clear-screen=false apps/bot/index.ts",
 		"dashboard:release": "pnpm --filter @dicelette/web release",
+		"postdashboard:release": "pnpm postrelease",
 		"dashboard:build": "pnpm --filter @dicelette/web build",
 		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false apps/bot/index.ts",
 		"lint": "biome check --write ./apps/ ./packages/ ./dashboard --unsafe",
