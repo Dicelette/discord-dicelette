@@ -53,6 +53,13 @@ const paperSx: SxProps = {
 	animation: `${shake} 0.35s ease`,
 } as const;
 
+const typoFontSize: SxProps = { fontSize: { xs: "0.9rem", sm: "1.15rem" } } as const;
+
+const iconSx: SxProps = {
+	...typoFontSize,
+	verticalAlign: "-0.2rem",
+};
+
 const typographySx: SxProps = {
 	flexGrow: 1,
 	flexShrink: 1,
@@ -62,7 +69,7 @@ const typographySx: SxProps = {
 	whiteSpace: "nowrap",
 	color: "var(--confirm-color)",
 	fontFamily: "var(--ifm-heading-font-family)",
-	fontSize: { xs: "0.9rem", sm: "1.15rem" },
+	...typoFontSize,
 } as const;
 
 const buttonBoxSx: SxProps = {
@@ -72,15 +79,19 @@ const buttonBoxSx: SxProps = {
 	gap: 1,
 } as const;
 
-const resetButtonSx: SxProps = {
+const buttonCommonSx: SxProps = {
 	minWidth: { xs: 0, md: "auto" },
 	px: { xs: 1.5, md: 1 },
 	py: { xs: 1, md: 0.5 },
-	fontSize: { xs: "0.9rem", md: "0.9rem" },
+	fontSize: "0.9rem",
 	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	fontFamily: "var(--ifm-font-family-base)",
-	color: "var(--return-color)",
-	bgcolor: "none",
+} as const;
+
+const resetButtonSx: SxProps = {
+	...buttonCommonSx,
+	color: { xs: "var(--return-color-hover)", sm: "var(--return-color)" },
+	bgcolor: { xs: "var(--return-bgcolor)", sm: "transparent" },
 	borderColor: "none",
 	border: "none",
 	textDecoration: "underline",
@@ -92,12 +103,7 @@ const resetButtonSx: SxProps = {
 } as const;
 
 const saveButtonSx: SxProps = {
-	minWidth: { xs: 0, md: "auto" },
-	px: { xs: 1.5, md: 1 },
-	py: { xs: 1, md: 0.5 },
-	textTransform: "none",
-	fontSize: { xs: "0.9rem", md: "0.9rem" },
-	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
+	...buttonCommonSx,
 	bgcolor: "var(--save-bgcolor)",
 	color: "var(--save-color)",
 	fontWeight: "bold",
@@ -151,7 +157,7 @@ export default function ConfigFormFooter({
 						tabIndex={-1}
 					>
 						<Typography variant="h6" fontWeight="medium" sx={typographySx}>
-							<WarningAmber sx={{ xs: "0.9rem", sm: "1.15rem" }} /> {t("config.unsaved")}
+							<WarningAmber sx={iconSx} /> {t("config.unsaved")}
 						</Typography>
 
 						<Box sx={buttonBoxSx}>
