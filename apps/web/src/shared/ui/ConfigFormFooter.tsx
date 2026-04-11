@@ -1,7 +1,17 @@
 import { keyframes } from "@emotion/react";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import SaveIcon from "@mui/icons-material/Save";
-import { Alert, Box, Button, Fade, Paper, Snackbar, Typography } from "@mui/material";
+import {
+	Alert,
+	Box,
+	Button,
+	Fade,
+	Paper,
+	Snackbar,
+	type SxProps,
+	type Theme,
+	Typography,
+} from "@mui/material";
 import TrapFocus from "@mui/material/Unstable_TrapFocus";
 import { useEffect, useState } from "react";
 import { useI18n } from "../i18n";
@@ -21,7 +31,7 @@ const shake = keyframes`
   80%       { transform: translateX(calc(-50% + 3px)); }
 `;
 
-const paperSx = {
+const paperSx: SxProps = {
 	position: "fixed",
 	bottom: "calc(16px + env(safe-area-inset-bottom))",
 	left: "50%",
@@ -42,7 +52,7 @@ const paperSx = {
 	animation: `${shake} 0.35s ease`,
 } as const;
 
-const typographySx = {
+const typographySx: SxProps = {
 	flexGrow: 1,
 	flexShrink: 1,
 	textAlign: "center",
@@ -54,14 +64,14 @@ const typographySx = {
 	fontSize: { xs: "0.9rem", sm: "1.15rem" },
 } as const;
 
-const buttonBoxSx = {
+const buttonBoxSx: SxProps = {
 	ml: "auto",
 	display: "flex",
 	alignItems: "center",
 	gap: 1,
 } as const;
 
-const resetButtonSx = {
+const resetButtonSx: SxProps = {
 	minWidth: { xs: 0, md: "auto" },
 	px: { xs: 1.5, md: 1 },
 	py: { xs: 1, md: 0.5 },
@@ -77,7 +87,7 @@ const resetButtonSx = {
 	},
 } as const;
 
-const saveButtonSx = {
+const saveButtonSx: SxProps = {
 	minWidth: { xs: 0, md: "auto" },
 	px: { xs: 1.5, md: 1 },
 	py: { xs: 1, md: 0.5 },
@@ -88,6 +98,17 @@ const saveButtonSx = {
 	fontWeight: "bold",
 	"&:hover": { bgcolor: "var(--save-bgcolor-hover)" },
 	"&.Mui-disabled": { bgcolor: "success.light", color: "grey.400" },
+} as const;
+
+const fadeBoxSx: SxProps<Theme> = {
+	position: "fixed",
+	bottom: 0,
+	left: 0,
+	right: 0,
+	height: "calc(16px + env(safe-area-inset-bottom))",
+	bgcolor: "background.default",
+	zIndex: (theme) => theme.zIndex.appBar - 1,
+	pointerEvents: "none",
 } as const;
 
 const labelSx = { display: { xs: "none", md: "inline-block" } } as const;
@@ -163,19 +184,7 @@ export default function ConfigFormFooter({
 			</TrapFocus>
 
 			<Fade in={isDirty}>
-				<Box
-					aria-hidden="true"
-					sx={{
-						position: "fixed",
-						bottom: 0,
-						left: 0,
-						right: 0,
-						height: "calc(16px + env(safe-area-inset-bottom))",
-						bgcolor: "background.default",
-						zIndex: (theme) => theme.zIndex.appBar - 1,
-						pointerEvents: "none",
-					}}
-				/>
+				<Box aria-hidden="true" sx={fadeBoxSx} />
 			</Fade>
 
 			{isDirty && <Box sx={{ height: 72 }} aria-hidden="true" />}
