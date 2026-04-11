@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.10.6](https://github.com/Dicelette/discord-dicelette/compare/3.10.5...3.10.6) (2026-04-11)
+
+
+### Features
+
+* **docs:** add links to Dashboard for server configuration and settings management ([aa9457a](https://github.com/Dicelette/discord-dicelette/commit/aa9457a7b15028ac909083d24914030b6b85fc46))
+* **scripts:** add dashboard release script for improved deployment ([14bf01d](https://github.com/Dicelette/discord-dicelette/commit/14bf01dd1a2e117002c6411bed22f7ac2e092a76))
+* **ui:** enhance ConfigFormFooter with Snackbar notifications for save and discard actions ([febbaf1](https://github.com/Dicelette/discord-dicelette/commit/febbaf13ae249fc631b64b33224b8b22d84de957))
+
+
+### Bug Fixes
+
+* **ui:** enhance ConfigFormFooter with icon buttons for better UX ([454df89](https://github.com/Dicelette/discord-dicelette/commit/454df89fc68ab20f049cb2cce32eba81f41dc486))
+
 ## [3.10.5](https://github.com/Dicelette/discord-dicelette/compare/3.10.4...3.10.5) (2026-04-09)
 
 
