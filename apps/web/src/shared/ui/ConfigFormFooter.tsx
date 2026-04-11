@@ -23,7 +23,7 @@ const shake = keyframes`
 
 const paperSx = {
 	position: "fixed",
-	bottom: 16,
+	bottom: "calc(16px + env(safe-area-inset-bottom))",
 	left: "50%",
 	transform: "translateX(-50%)",
 	width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
@@ -170,7 +170,7 @@ export default function ConfigFormFooter({
 						bottom: 0,
 						left: 0,
 						right: 0,
-						height: 16,
+						height: "calc(16px + env(safe-area-inset-bottom))",
 						bgcolor: "background.default",
 						zIndex: (theme) => theme.zIndex.appBar - 1,
 						pointerEvents: "none",

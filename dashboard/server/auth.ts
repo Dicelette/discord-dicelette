@@ -14,6 +14,7 @@ import {
 	clientId,
 	clientSecret,
 	discordFetch,
+	getfrontEndUrl,
 	redirectUri,
 	userCanManageGuild,
 } from "./utils";
@@ -95,8 +96,7 @@ export function createAuthRouter(
 			req.session.userId = user.id;
 			req.session.user = user;
 
-			const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:5173";
-			res.redirect(frontendUrl);
+			res.redirect(getfrontEndUrl());
 		} catch (err) {
 			console.error(
 				"[auth] OAuth callback error:",

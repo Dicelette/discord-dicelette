@@ -16,6 +16,7 @@ export default defineConfig({
 		exclude: ["**/playwright-report/**"],
 	},
 	server: {
+		host: true, // expose sur 0.0.0.0 → accessible via l'IP locale du PC
 		watch: {
 			ignored: [
 				"**/node_modules/**",
@@ -29,6 +30,7 @@ export default defineConfig({
 			"/api": {
 				target: "http://localhost:3001",
 				changeOrigin: true,
+				xfwd: true, // transmet X-Forwarded-Host → permet de rediriger vers l'IP réelle
 			},
 		},
 	},

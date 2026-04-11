@@ -280,3 +280,7 @@ export async function discordFetch(path: string, accessToken: string) {
 	if (!res.ok) throw new Error(`Discord API error: ${res.status}`);
 	return res.json();
 }
+
+export function getfrontEndUrl() {
+	return process.env.FRONTEND_URL ?? "http://localhost:5173";
+}
