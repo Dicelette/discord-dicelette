@@ -30,7 +30,7 @@ const paperSx = {
 	maxWidth: "58rem",
 	zIndex: "appBar",
 	borderRadius: 2,
-	py: 1,
+	py: { xs: 1.5, md: 1 },
 	px: { xs: 1.5, md: 3 },
 	display: "flex",
 	flexDirection: "row",
@@ -51,7 +51,7 @@ const typographySx = {
 	whiteSpace: "nowrap",
 	color: "var(--confirm-color)",
 	fontFamily: "var(--ifm-heading-font-family)",
-	fontSize: { xs: "1rem", sm: "1.15rem" },
+	fontSize: { xs: "0.9rem", sm: "1.15rem" },
 } as const;
 
 const buttonBoxSx = {
@@ -63,7 +63,9 @@ const buttonBoxSx = {
 
 const resetButtonSx = {
 	minWidth: { xs: 0, md: "auto" },
-	px: { xs: 1, md: 2 },
+	px: { xs: 1.5, md: 1 },
+	py: { xs: 1, md: 0.5 },
+	fontSize: { xs: "0.9rem", md: "0.8rem" },
 	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	fontFamily: "var(--ifm-font-family-base)",
 	color: "var(--return-color)",
@@ -77,7 +79,9 @@ const resetButtonSx = {
 
 const saveButtonSx = {
 	minWidth: { xs: 0, md: "auto" },
-	px: { xs: 1, md: 2 },
+	px: { xs: 1.5, md: 1 },
+	py: { xs: 1, md: 0.5 },
+	fontSize: { xs: "0.9rem", md: "0.8rem" },
 	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	bgcolor: "var(--save-bgcolor)",
 	color: "var(--save-color)",
