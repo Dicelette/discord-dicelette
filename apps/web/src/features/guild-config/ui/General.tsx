@@ -1,3 +1,4 @@
+import { SortOrder } from "@dicelette/core";
 import type { ApiGuildData } from "@dicelette/types";
 import { Autocomplete, TextField } from "@mui/material";
 import { SectionTitle, useI18n } from "@shared";
@@ -9,6 +10,12 @@ const DISCORD_LOCALES = [
 	{ value: "fr", label: "Français" },
 ];
 
+const SORT_ORDERS: { value: NonNullable<ApiGuildData["sortOrder"]>; labelKey: string }[] =
+	[
+		{ value: SortOrder.Ascending, labelKey: "config.sort.options.ascending" },
+		{ value: SortOrder.Descending, labelKey: "config.sort.options.descending" },
+	];
+
 interface Props {
 	control: Control<ApiGuildData>;
 }
@@ -17,10 +24,7 @@ function General({ control }: Props) {
 	const { t } = useI18n();
 
 	const sortOrders = useMemo(
-		() => [
-			{ value: "ascending", label: t("config.sort.options.ascending") },
-			{ value: "descending", label: t("config.sort.options.descending") },
-		],
+		() => SORT_ORDERS.map((order) => ({ value: order.value, label: t(order.labelKey) })),
 		[t]
 	);
 
@@ -70,7 +74,9 @@ function General({ control }: Props) {
 								options={sortOrders}
 								getOptionLabel={(s) => s.label}
 								value={selected}
-								onChange={(_, newValue) => field.onChange(newValue?.value ?? undefined)}
+								onChange={(_, newValue) =>
+									field.onChange(newValue?.value ?? SortOrder.None)
+								}
 								renderInput={(params) => (
 									<TextField
 										{...params}
