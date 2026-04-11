@@ -9,11 +9,16 @@
 	--code-font-family: "Victor Mono Variable", monospace;
 	--confirm-bgcolor: var(--color-amber-500);
 	--confirm-color: var(--color-amber-950);
-	--return-color: var(--color-red-50);
-	--return-bgcolor: var(--color-red-700);
-	--return-color-hover: var(--color-red-50);
+	--return-color: var(--color-rose-50);
+	--return-bgcolor: var(--color-rose-600);
+	--return-color-hover: var(--color-rose-50);
 
-	--return-bgcolor-hover: var(--color-red-800);
+	--return-bgcolor-hover: var(--color-rose-700);
+	--reset-link-color: #1f2937;
+	--reset-link-color-hover: #111827;
+	--reset-link-bg: transparent;
+	--reset-link-bg-hover: rgba(17, 24, 39, 0.12);
+	--reset-link-focus-ring: #111827;
 	--save-bgcolor: var(--color-emerald-700);
 	--save-bgcolor-hover: var(--color-emerald-800);
 	--save-color: var(--color-emerald-50);
@@ -22,13 +27,18 @@
 [data-dark] {
 	--bg-default: var(--color-zinc-900);
 	--bg-paper: var(--color-zinc-800);
-	--confirm-bgcolor: var(--color-slate-600);
+	--confirm-bgcolor: var(--color-slate-800);
 	--confirm-color: var(--color-zinc-200);
-	--return-color: var(--color-red-50);
-	--return-color-hover: var(--color-red-50);
-	--return-color-mobile: var(--color-red-50);
-	--return-bgcolor: var(--color-red-700);
-	--return-bgcolor-hover: var(--color-red-800);
+	--return-color: var(--color-rose-50);
+	--return-color-hover: var(--color-rose-50);
+	--return-color-mobile: var(--color-rose-50);
+	--return-bgcolor: var(--color-rose-600);
+	--return-bgcolor-hover: var(--color-rose-700);
+	--reset-link-color: #bfdbfe;
+	--reset-link-color-hover: #dbeafe;
+	--reset-link-bg: transparent;
+	--reset-link-bg-hover: rgba(191, 219, 254, 0.16);
+	--reset-link-focus-ring: #93c5fd;
 	--save-bgcolor: var(--color-emerald-700);
 	--save-bgcolor-hover: var(--color-emerald-800);
 	--save-color: var(--color-emerald-50);

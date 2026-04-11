@@ -65,8 +65,6 @@ const typographySx: SxProps = {
 	flexShrink: 1,
 	textAlign: "center",
 	overflow: "hidden",
-	textOverflow: "ellipsis",
-	whiteSpace: "nowrap",
 	color: "var(--confirm-color)",
 	fontFamily: "var(--ifm-heading-font-family)",
 	...typoFontSize,
@@ -86,19 +84,31 @@ const buttonCommonSx: SxProps = {
 	fontSize: "0.9rem",
 	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	fontFamily: "var(--ifm-font-family-base)",
+	textTransform: "none",
 } as const;
 
 const resetButtonSx: SxProps = {
 	...buttonCommonSx,
-	color: { xs: "var(--return-color-hover)", sm: "var(--return-color)" },
-	bgcolor: { xs: "var(--return-bgcolor)", sm: "transparent" },
-	borderColor: "none",
+	color: "var(--reset-link-color)",
+	bgcolor: "var(--reset-link-bg)",
 	border: "none",
 	textDecoration: "underline",
-	textTransform: "none",
+	textUnderlineOffset: "2px",
+	fontWeight: 500,
+	paddingRight: { xs: 1, md: "revert" },
+	"& .MuiButton-startIcon": {
+		mr: { xs: 0.5, md: 1 },
+		"& > *:nth-of-type(1)": {
+			fontSize: { xs: "1.5rem", md: "1.1rem" },
+		},
+	},
 	"&:hover": {
-		bgcolor: "var(--return-bgcolor-hover)",
-		color: "var(--return-color-hover)",
+		bgcolor: "var(--reset-link-bg-hover)",
+		color: "var(--reset-link-color-hover)",
+	},
+	"&:focus-visible": {
+		outline: "2px solid var(--reset-link-focus-ring)",
+		outlineOffset: 2,
 	},
 } as const;
 
@@ -163,8 +173,8 @@ export default function ConfigFormFooter({
 						<Box sx={buttonBoxSx}>
 							{onReset && (
 								<Button
-									size="small"
-									type="button"
+									size="medium"
+									type="reset"
 									onClick={handleReset}
 									startIcon={<RotateLeftIcon />}
 									sx={resetButtonSx}
