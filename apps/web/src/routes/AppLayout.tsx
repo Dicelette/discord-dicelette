@@ -44,28 +44,15 @@ export default function AppLayout() {
 
 	return (
 		<Box className="min-h-screen flex flex-col">
-			<AppBar
-				position="static"
-				elevation={0}
-				sx={appBarSx}
-			>
+			<AppBar position="static" elevation={0} sx={appBarSx}>
 				<Toolbar sx={toolbarSx}>
-					<Button
-						component={Link}
-						to="/"
-						color="inherit"
-						sx={logoButtonSx}
-					>
+					<Button component={Link} to="/" color="inherit" sx={logoButtonSx}>
 						<img
 							src="/logo.png"
 							alt="Dicelette"
 							style={{ height: 28, width: 28, flexShrink: 0 }}
 						/>
-						<Typography
-							variant="h6"
-							component="span"
-							sx={appTitleSx}
-						>
+						<Typography variant="h6" component="span" sx={appTitleSx}>
 							{t("login.title")}
 						</Typography>
 					</Button>

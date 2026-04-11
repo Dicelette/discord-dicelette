@@ -41,10 +41,7 @@ export default function Login() {
 				</Box>
 			</Box>
 
-			<Box
-				className="flex-1 flex items-center justify-center"
-				sx={mainBoxSx}
-			>
+			<Box className="flex-1 flex items-center justify-center" sx={mainBoxSx}>
 				<Card sx={loginCardSx}>
 					<CardContent className="p-8">
 						<Box sx={logoBoxSx}>

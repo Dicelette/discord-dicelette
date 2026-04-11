@@ -15,11 +15,7 @@ const sectionTitleSx = {
 } as const;
 
 const SectionTitle = memo(({ children }: { children: React.ReactNode }) => (
-	<Typography
-		variant="subtitle1"
-		fontWeight={600}
-		sx={sectionTitleSx}
-	>
+	<Typography variant="subtitle1" fontWeight={600} sx={sectionTitleSx}>
 		{children}
 	</Typography>
 ));

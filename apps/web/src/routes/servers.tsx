@@ -218,11 +218,7 @@ export default function Servers() {
 					</Typography>
 					<Grid container spacing={2} sx={botGridSx}>
 						{filteredBotGuilds.map((guild) => (
-							<Grid
-								size={{ xs: 12, sm: 6, md: 4 }}
-								key={guild.id}
-								sx={gridItemSx}
-							>
+							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id} sx={gridItemSx}>
 								<Card sx={fullWidthCardSx}>
 									<CardActionArea
 										sx={fullHeightActionSx}
@@ -240,10 +236,7 @@ export default function Servers() {
 											>
 												{guild.name[0]}
 											</Avatar>
-											<Box
-												className="flex-1 min-w-0"
-												sx={guildNameBoxSx}
-											>
+											<Box className="flex-1 min-w-0" sx={guildNameBoxSx}>
 												<Typography
 													variant="body1"
 													fontWeight={600}

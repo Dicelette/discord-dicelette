@@ -151,9 +151,7 @@ export default function TemplateView({
 									<strong>{name}</strong>
 								</TableCell>
 								<TableCell sx={wordBreakCellSx}>
-									<code>
-										{crit.sign}
-									</code>
+									<code>{crit.sign}</code>
 								</TableCell>
 								<TableCell>
 									<code>{crit.value}</code>
@@ -208,9 +206,7 @@ export default function TemplateView({
 									<code>{stat.max ?? "—"}</code>
 								</TableCell>
 								<TableCell align="center" sx={wordBreakCellSx}>
-									<code>
-										{stat.combinaison ?? "—"}
-									</code>
+									<code>{stat.combinaison ?? "—"}</code>
 								</TableCell>
 								<TableCell align="center">
 									{stat.exclude ? <Check /> : <Close />}
@@ -293,11 +289,7 @@ export default function TemplateView({
 						const isMissing = !value;
 						return (
 							<Box key={label} sx={channelItemSx}>
-								<Typography
-									variant="caption"
-									color="text.secondary"
-									sx={channelLabelSx}
-								>
+								<Typography variant="caption" color="text.secondary" sx={channelLabelSx}>
 									{label}
 								</Typography>
 								<Chip

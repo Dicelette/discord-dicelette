@@ -87,26 +87,17 @@ export default function NumberField({
 							input: props,
 						}}
 						endAdornment={
-							<InputAdornment
-								position="end"
-								sx={inputAdornmentSx}
-							>
+							<InputAdornment position="end" sx={inputAdornmentSx}>
 								<BaseNumberField.Increment
 									render={<IconButton size={size} aria-label="Increase" />}
 								>
-									<KeyboardArrowUp
-										fontSize={size}
-										sx={arrowUpSx}
-									/>
+									<KeyboardArrowUp fontSize={size} sx={arrowUpSx} />
 								</BaseNumberField.Increment>
 
 								<BaseNumberField.Decrement
 									render={<IconButton size={size} aria-label="Decrease" />}
 								>
-									<KeyboardArrowDown
-										fontSize={size}
-										sx={arrowDownSx}
-									/>
+									<KeyboardArrowDown fontSize={size} sx={arrowDownSx} />
 								</BaseNumberField.Decrement>
 							</InputAdornment>
 						}
@@ -114,9 +105,7 @@ export default function NumberField({
 					/>
 				)}
 			/>
-			<FormHelperText sx={formHelperTextSx}>
-				{other.helperText}
-			</FormHelperText>
+			<FormHelperText sx={formHelperTextSx}>{other.helperText}</FormHelperText>
 		</BaseNumberField.Root>
 	);
 }

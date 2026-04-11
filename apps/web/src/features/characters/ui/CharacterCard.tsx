@@ -10,7 +10,12 @@ const cardPaperSx = { p: 3 } as const;
 const headerBoxSx = { display: "flex", alignItems: "center", gap: 2, mb: 2 } as const;
 const avatarSx = { width: 56, height: 56 } as const;
 const nameSectionSx = { flex: 1, minWidth: 0 } as const;
-const nameRowSx = { display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" } as const;
+const nameRowSx = {
+	display: "flex",
+	alignItems: "center",
+	gap: 1,
+	flexWrap: "wrap",
+} as const;
 const dividerSx = { mb: 1.5 } as const;
 const dividerWithStatsSx = { mb: 1.5, mt: 1.5 } as const;
 const statsGridSx = {
@@ -36,11 +41,7 @@ function CharacterCard({ char }: Props) {
 	return (
 		<Paper variant="outlined" sx={cardPaperSx}>
 			<Box sx={headerBoxSx}>
-				<Avatar
-					src={char.avatar ?? undefined}
-					alt={displayName.toTitle()}
-					sx={avatarSx}
-				>
+				<Avatar src={char.avatar ?? undefined} alt={displayName.toTitle()} sx={avatarSx}>
 					{displayName.charAt(0).toUpperCase()}
 				</Avatar>
 

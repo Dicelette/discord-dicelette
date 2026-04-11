@@ -82,11 +82,7 @@ export default function CharacterListLayout({
 	return (
 		<Box>
 			<Box sx={showSearch ? headerGridWithSearchSx : headerGridNoSearchSx}>
-				<Typography
-					variant="h5"
-					fontWeight={600}
-					sx={titleTypographySx}
-				>
+				<Typography variant="h5" fontWeight={600} sx={titleTypographySx}>
 					{title}
 				</Typography>
 
@@ -120,9 +116,7 @@ export default function CharacterListLayout({
 				<Typography color="text.secondary">{emptyText}</Typography>
 			) : (
 				<>
-					<Box sx={listBoxSx}>
-						{pageChars.map((char) => renderCard(char))}
-					</Box>
+					<Box sx={listBoxSx}>{pageChars.map((char) => renderCard(char))}</Box>
 
 					{totalPages > 1 && (
 						<Box sx={paginationBoxSx}>

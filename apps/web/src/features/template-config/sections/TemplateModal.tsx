@@ -29,7 +29,12 @@ const dialogBgSx = { bgcolor: "background.paper" } as const;
 const stackMtSx = { mt: 1 } as const;
 const filePaperSx = { p: 1.5, bgcolor: "action.hover", borderColor: "divider" } as const;
 const subtitleBoldSx = { fontWeight: 700 } as const;
-const fileRowSx = { display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" } as const;
+const fileRowSx = {
+	display: "flex",
+	alignItems: "center",
+	gap: 1,
+	flexWrap: "wrap",
+} as const;
 const captionIndentSx = { mt: 0.5, pl: 0.5 } as const;
 
 interface Props {
@@ -193,11 +198,7 @@ export default function TemplateModal({
 									setError(null);
 								}}
 							/>
-							<Typography
-								variant="caption"
-								color="text.secondary"
-								sx={captionIndentSx}
-							>
+							<Typography variant="caption" color="text.secondary" sx={captionIndentSx}>
 								{t("template.templateChannelHelp")}
 							</Typography>
 						</Box>
@@ -210,11 +211,7 @@ export default function TemplateModal({
 								allChannels={channels}
 								onChange={setPublicChannelId}
 							/>
-							<Typography
-								variant="caption"
-								color="text.secondary"
-								sx={captionIndentSx}
-							>
+							<Typography variant="caption" color="text.secondary" sx={captionIndentSx}>
 								{t("template.publicChannelHelp")}
 							</Typography>
 						</Box>
@@ -227,11 +224,7 @@ export default function TemplateModal({
 								allChannels={channels}
 								onChange={setPrivateChannelId}
 							/>
-							<Typography
-								variant="caption"
-								color="text.secondary"
-								sx={captionIndentSx}
-							>
+							<Typography variant="caption" color="text.secondary" sx={captionIndentSx}>
 								{t("template.privateChannelHelp")}
 							</Typography>
 						</Box>
