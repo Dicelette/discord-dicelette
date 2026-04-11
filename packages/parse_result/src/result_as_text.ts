@@ -507,10 +507,12 @@ export class ResultAsText {
 		this.resultat!.comment = this.removeIgnore(this.resultat!.comment);
 
 		const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
+		const sanitizedComment = this.resultat!.comment?.replaceAll(/(\\\*|\*\/|\/\*)/g, "")
+			.replace(/^#\s*/u, "")
+			.replaceAll("×", "*")
+			.trim();
 		return this.resultat!.comment
-			? `${info}*${this.resultat!.comment.replaceAll(/(\\\*|#|\*\/|\/\*)/g, "")
-					.replaceAll("×", "*")
-					.trim()}*\n `
+			? `${info}*${sanitizedComment}*\n `
 			: interaction || hasStatsPerSegment
 				? `${info ? `${info}\n` : "\n"}`
 				: `${info ? `${info}\n` : ""}_ _`;

@@ -174,6 +174,20 @@ describe("shared roll with statsPerSegment", () => {
 });
 
 describe("interaction formatting with infoRoll", () => {
+	it("should preserve # in channel mentions inside comments", () => {
+		const result: Resultat = {
+			comment: "coucou <#1226300738599256165>",
+			dice: "1d20",
+			result: "1d20: [10] = 10",
+			total: 10,
+		};
+
+		const res = new ResultAsText(result, DATA);
+		const text = res.defaultMessage();
+
+		expect(text).toContain("*coucou <#1226300738599256165>*");
+	});
+
 	it("should have newline after infoRoll when used as interaction without comment", () => {
 		const result: Resultat = {
 			dice: "1d45",
