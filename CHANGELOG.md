@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.10.7](https://github.com/Dicelette/discord-dicelette/compare/3.10.6...3.10.7) (2026-04-11)
+
+
+### Features
+
+* **ui:** enhance ConfigFormFooter with warning icon and style updates for better visibility ([0d32312](https://github.com/Dicelette/discord-dicelette/commit/0d32312d8a66aa4bf4583c01f5148a55bbd449b0))
+
+
+### Bug Fixes
+
+* **db:** old version of the dashboard can lead to a wrong version for ascending/descending, so it will be fixed in ready (will be removed in future version) ([0f4697d](https://github.com/Dicelette/discord-dicelette/commit/0f4697d55b379aacbd05c125028eeb849411d91c))
+* **result:** sanitize comments to preserve channel mentions and improve formatting ([6f86133](https://github.com/Dicelette/discord-dicelette/commit/6f86133136c0a4efe3bdb2d51b0e5d2e67ea54e0))
+
 ## [3.10.6](https://github.com/Dicelette/discord-dicelette/compare/3.10.5...3.10.6) (2026-04-11)
 
 
