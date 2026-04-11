@@ -11,6 +11,8 @@
 	--confirm-color: var(--color-amber-950);
 	--return-color: var(--color-red-50);
 	--return-bgcolor: var(--color-red-700);
+	--return-color-hover: var(--color-red-50);
+
 	--return-bgcolor-hover: var(--color-red-800);
 	--save-bgcolor: var(--color-emerald-700);
 	--save-bgcolor-hover: var(--color-emerald-800);
@@ -22,7 +24,8 @@
 	--bg-paper: var(--color-zinc-800);
 	--confirm-bgcolor: var(--color-slate-600);
 	--confirm-color: var(--color-zinc-200);
-	--return-color: var(--color-red-50);
+	--return-color: var(--color-neutral-950);
+	--return-color-hover: var(--color-red-50);
 	--return-bgcolor: var(--color-red-700);
 	--return-bgcolor-hover: var(--color-red-800);
 	--save-bgcolor: var(--color-emerald-700);
