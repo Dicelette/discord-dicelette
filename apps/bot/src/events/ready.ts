@@ -3,6 +3,7 @@
 
 import process from "node:process";
 import type { EClient } from "@dicelette/client";
+import { SortOrder } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
 import { dev, important, logger } from "@dicelette/utils";
@@ -141,6 +142,7 @@ export default (client: EClient): void => {
  * @param guild - The Discord guild whose user data will be migrated.
  */
 function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
+	fixSortOrder(db, guild);
 	if (db.get(guild.id, "converted")) return;
 	const users = db.get(guild.id, "user");
 	if (!users) {
@@ -253,4 +255,15 @@ function startCacheCleanup(
 		}
 		if (count > 0) logger.info(`Cache cleanup: evicted ${count} stale character entries`);
 	}, interval);
+}
+
+function fixSortOrder(db: Settings, guild: Djs.Guild) {
+	const sortOrder = db.get(guild.id, "sortOrder");
+	if (!sortOrder) return;
+	console.log("sortOrder", sortOrder);
+	if (sortOrder.toString().toLowerCase() === "ascending") {
+		db.set(guild.id, SortOrder.Ascending, "sortOrder");
+	} else if (sortOrder.toString().toLowerCase() === "descending") {
+		db.set(guild.id, SortOrder.Descending, "sortOrder");
+	}
 }
