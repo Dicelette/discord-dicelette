@@ -1,4 +1,5 @@
 import { keyframes } from "@emotion/react";
+import { WarningAmber } from "@mui/icons-material";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import SaveIcon from "@mui/icons-material/Save";
 import {
@@ -75,15 +76,18 @@ const resetButtonSx: SxProps = {
 	minWidth: { xs: 0, md: "auto" },
 	px: { xs: 1.5, md: 1 },
 	py: { xs: 1, md: 0.5 },
-	fontSize: { xs: "0.9rem", md: "0.8rem" },
+	fontSize: { xs: "0.9rem", md: "0.9rem" },
 	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	fontFamily: "var(--ifm-font-family-base)",
 	color: "var(--return-color)",
-	bgcolor: "var(--return-bgcolor)",
-	borderColor: "var(--return-bgcolor)",
+	bgcolor: "none",
+	borderColor: "none",
+	border: "none",
+	textDecoration: "underline",
+	textTransform: "none",
 	"&:hover": {
 		bgcolor: "var(--return-bgcolor-hover)",
-		borderColor: "var(--return-bgcolor-hover)",
+		color: "var(--return-color-hover)",
 	},
 } as const;
 
@@ -91,7 +95,8 @@ const saveButtonSx: SxProps = {
 	minWidth: { xs: 0, md: "auto" },
 	px: { xs: 1.5, md: 1 },
 	py: { xs: 1, md: 0.5 },
-	fontSize: { xs: "0.9rem", md: "0.8rem" },
+	textTransform: "none",
+	fontSize: { xs: "0.9rem", md: "0.9rem" },
 	"& .MuiButton-startIcon": { mr: { xs: 0, md: 1 } },
 	bgcolor: "var(--save-bgcolor)",
 	color: "var(--save-color)",
@@ -105,8 +110,7 @@ const fadeBoxSx: SxProps<Theme> = {
 	bottom: 0,
 	left: 0,
 	right: 0,
-	height: "calc(16px + env(safe-area-inset-bottom))",
-	bgcolor: "background.default",
+	bgcolor: "transparent",
 	zIndex: (theme) => theme.zIndex.appBar - 1,
 	pointerEvents: "none",
 } as const;
@@ -147,13 +151,12 @@ export default function ConfigFormFooter({
 						tabIndex={-1}
 					>
 						<Typography variant="h6" fontWeight="medium" sx={typographySx}>
-							{t("config.unsaved")}
+							<WarningAmber sx={{ xs: "0.9rem", sm: "1.15rem" }} /> {t("config.unsaved")}
 						</Typography>
 
 						<Box sx={buttonBoxSx}>
 							{onReset && (
 								<Button
-									variant="outlined"
 									size="small"
 									type="button"
 									onClick={handleReset}

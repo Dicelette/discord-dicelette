@@ -19,6 +19,8 @@
 		"back": "Back to servers",
 		"cancel": "Cancel",
 		"darkTheme": "Dark theme",
+		"discard": "Reset",
+		"discardSuccess": "Changes discarded.",
 		"documentation": "Documentation",
 		"here": "here",
 		"lightTheme": "Light theme",
@@ -26,8 +28,6 @@
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
-		"discard": "Reset",
-		"discardSuccess": "Changes discarded.",
 		"save": "Save",
 		"saving": "Saving..."
 	},
@@ -85,7 +85,7 @@
 			"sheetsChannels": "Sheet channels",
 			"stripOoc": "OOC suppression"
 		},
-		"unsaved": "You have unsaved changes"
+		"unsaved": "Warning: there are unsaved changes!"
 	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
@@ -172,8 +172,8 @@
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",
-		"alreadyExists": "Name \"{name}\" already exists.",
 		"addInvalidDice": "Dice expression \"{name}\" is invalid.",
+		"alreadyExists": "Name \"{name}\" already exists.",
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
 		"attrValue": "Value",
 		"export": "Export",

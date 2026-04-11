@@ -19,6 +19,8 @@
 		"back": "Retour aux serveurs",
 		"cancel": "Annuler",
 		"darkTheme": "Thème sombre",
+		"discard": "Réinitialiser",
+		"discardSuccess": "Modifications annulées.",
 		"documentation": "Documentation",
 		"here": "ici",
 		"lightTheme": "Thème clair",
@@ -26,8 +28,6 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
-		"discard": "Annuler",
-		"discardSuccess": "Modifications annulées.",
 		"save": "Sauvegarder",
 		"saving": "Sauvegarde..."
 	},
@@ -85,7 +85,7 @@
 			"sheetsChannels": "Canaux des fiches",
 			"stripOoc": "Suppression HRP (hors-roleplay)"
 		},
-		"unsaved": "Modifications non sauvegardées"
+		"unsaved": "Attention, il reste des modification non enregistrées !"
 	},
 	"dashboard": {
 		"loadError": "Impossible de charger la configuration.",
@@ -172,8 +172,8 @@
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
-		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"addInvalidDice": "Expression de dés « {name} » invalide.",
+		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
 		"attrValue": "Valeur",
 		"export": "Exporter",
