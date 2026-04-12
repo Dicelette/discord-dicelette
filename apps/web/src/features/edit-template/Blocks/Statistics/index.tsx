@@ -1,5 +1,6 @@
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { Box } from "@mui/material";
+import { useI18n } from "@shared";
 import { FieldArray, type FormikHelpers } from "formik";
 import { memo, useCallback, useEffect, useId, useMemo, useRef } from "react";
 import { Section } from "../../Atoms";
@@ -23,6 +24,7 @@ const createStatisticId = (): string => {
 };
 
 const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
+	const { t } = useI18n();
 	const droppableId = useId();
 	const lastLengthRef = useRef(0);
 	const tbodyScrollRef = useRef<HTMLElement | null>(null);
@@ -77,7 +79,7 @@ const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
 						<Section
 							type="stats"
 							length={values.statistics.length}
-							label="Statistiques"
+							label={t("template.statistics")}
 							onAdd={() =>
 								push({
 									id: createStatisticId(),

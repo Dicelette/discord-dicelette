@@ -1,4 +1,5 @@
 import { Box, Stack, Tooltip } from "@mui/material";
+import { useI18n } from "@shared";
 import type { FC } from "react";
 import { useId } from "react";
 import { CheckBox, Section, Textfield } from "../Atoms";
@@ -14,32 +15,21 @@ const CHECKBOX_GRID_SX = {
 const TOTAL_SX = { width: { xs: "100%", sm: 150 }, mb: 0 } as const;
 
 const General: FC = () => {
+	const { t } = useI18n();
 	const totalId = useId();
 	const isCharNameId = useId();
-	const isPrivateId = useId();
 	const forceDistribId = useId();
 
 	return (
-		<Section label="Général">
+		<Section label={t("template.general")}>
 			<Box sx={CHECKBOX_GRID_SX}>
-				<label htmlFor={isCharNameId}>Rendre obligatoire le nom du personnage</label>
+				<label htmlFor={isCharNameId}>{t("template.charName")}</label>
 				<CheckBox
 					label={""}
 					name="isCharNameRequired"
 					id={isCharNameId}
 					className="ml-0!"
 				/>
-
-				<Tooltip
-					title="Utilisée uniquement dans le CSV d'importation de fiche"
-					arrow
-					placement="right"
-				>
-					<label htmlFor={isPrivateId} className="cursor-help">
-						Fiches privées
-					</label>
-				</Tooltip>
-				<CheckBox label={""} name="isPrivate" id={isPrivateId} className="ml-0!" />
 			</Box>
 
 			<Stack
@@ -49,21 +39,17 @@ const General: FC = () => {
 				sx={{ my: 1 }}
 			>
 				<Textfield
-					label="Total"
+					label={t("template.total")}
 					name="total"
 					id={totalId}
 					type="number"
 					slotProps={{ htmlInput: { min: 0 } }}
 					sx={TOTAL_SX}
 				/>
-				<Tooltip
-					title="Renvoie une erreur si la somme des statistiques est inférieure au total défini"
-					arrow
-					placement="right"
-				>
+				<Tooltip title={t("template.forceDistribHelp")} arrow placement="right">
 					<span>
 						<CheckBox
-							label="Forcer la distribution des points"
+							label={t("template.forceDistrib")}
 							labelPlacement="end"
 							name="forceDistrib"
 							id={forceDistribId}
@@ -73,7 +59,7 @@ const General: FC = () => {
 				</Tooltip>
 			</Stack>
 
-			<Textfield label="Dé principal" name="diceType" />
+			<Textfield label={t("template.diceType")} name="diceType" />
 		</Section>
 	);
 };

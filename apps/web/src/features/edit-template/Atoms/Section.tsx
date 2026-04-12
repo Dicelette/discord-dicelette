@@ -1,25 +1,30 @@
 import { Box, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 
 import { AddButton } from ".";
 
 type SectionProps = {
 	length?: number;
 	type?: "macro" | "stats" | "critical";
-	children: React.ReactNode;
+	children: ReactNode;
 	label: string;
 	onAdd?: () => void;
 	titleSx?: SxProps<Theme>;
 };
 
+const sxProps: SxProps<Theme> = {
+	mb: 1,
+	display: "flex",
+	alignItems: "center",
+	gap: 1,
+	padding: 0,
+	margin: 0,
+};
+
 const Section: FC<SectionProps> = ({ length, type, children, label, onAdd, titleSx }) => (
 	<Box component="section" sx={{ display: "flex", flexDirection: "column", mb: 2 }}>
-		<Typography
-			variant="h6"
-			fontWeight="bold"
-			sx={{ mb: 1, display: "flex", alignItems: "center", gap: 1, ...titleSx }}
-		>
+		<Typography variant="h6" fontWeight="bold" sx={{ ...sxProps, ...titleSx }}>
 			{label}
 			{onAdd && <AddButton len={length} type={type} onClick={onAdd} />}
 		</Typography>

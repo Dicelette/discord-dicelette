@@ -18,22 +18,22 @@ const theme = createTheme({
 	typography: {
 		fontFamily: '"Atkinson Hyperlegible Next Variable", "Inter", sans-serif',
 		h1: {
-			headingFont,
+			...headingFont,
 		},
 		h2: {
-			headingFont,
+			...headingFont,
 		},
 		h3: {
-			headingFont,
+			...headingFont,
 		},
 		h4: {
-			headingFont,
+			...headingFont,
 		},
 		h5: {
-			headingFont,
+			...headingFont,
 		},
 		h6: {
-			headingFont,
+			...headingFont,
 		},
 	},
 	components: {

@@ -15,22 +15,22 @@ export type Custom = DataForm["customCritical"][number];
 const SIGN_OPTIONS = [">", ">=", "<", "<=", "==", "!="] as const;
 
 const CODE_INPUT_SX = {
-	width: { xs: "100%", xl: 200 },
+	width: { xs: "100%", md: 200 },
 	mb: 0,
 	"& .MuiInputBase-input": { fontFamily: "var(--code-font-family)" },
 } as const;
 
 const ROW_SX = {
 	display: "flex",
-	flexDirection: { xs: "column", xl: "row" },
-	alignItems: { xl: "center" },
-	width: { xl: "100%" },
+	flexDirection: { xs: "column", md: "row" },
+	alignItems: { md: "center" },
+	width: { md: "100%" },
 } as const;
 
-const CELL_SX = { p: 1, width: { xs: "100%", xl: "auto" } } as const;
+const CELL_SX = { p: 1, width: { xs: "100%", md: "auto" } } as const;
 const BTN_CELL_SX = {
-	p: { xs: 1, xl: "2px" },
-	width: { xs: "100%", xl: "auto" },
+	p: { xs: 1, md: "2px" },
+	width: { xs: "100%", md: "auto" },
 } as const;
 
 type CustomCriticalRowProps = {

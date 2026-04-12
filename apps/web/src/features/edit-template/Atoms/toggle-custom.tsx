@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react";
 import ToggleButton from "@mui/material/ToggleButton";
 import { useI18n } from "@shared";
-import { useCompact } from "./CompactContext";
 
 type ToggleOpt = "naturalDice" | "affectSkill" | "excludedStat";
 
@@ -54,26 +53,32 @@ export default function StandaloneToggleButton({
 	opt,
 }: StandaloneToggleButtonProps) {
 	const { t } = useI18n();
-	const isNarrow = useCompact();
 	const cfg = OPT_CONFIG[opt];
 	const title = t(cfg.titleKey);
 
-	return isNarrow ? (
-		<ToggleButton
-			value={cfg.value}
-			size="small"
-			selected={selected}
-			onChange={onChange}
-			color={cfg.color}
-			aria-label={title}
-			title={title}
-			sx={{ p: 1, width: "100%", justifyContent: "flex-start", gap: 1 }}
-		>
-			<Icon icon={cfg.icon.selected} height="20" />
-			{title}
-		</ToggleButton>
-	) : (
-		<Tooltip cfg={cfg} title={title} selected={selected} onChange={onChange} />
+	return (
+		<>
+			<ToggleButton
+				value={cfg.value}
+				size="small"
+				selected={selected}
+				onChange={onChange}
+				color={cfg.color}
+				aria-label={title}
+				title={title}
+				sx={{
+					p: 1,
+					width: "100%",
+					justifyContent: "flex-start",
+					gap: 1,
+					display: { xs: "flex", md: "none" },
+				}}
+			>
+				<Icon icon={cfg.icon.selected} height="20" />
+				{title}
+			</ToggleButton>
+			<Tooltip cfg={cfg} title={title} selected={selected} onChange={onChange} />
+		</>
 	);
 }
 
@@ -114,6 +119,7 @@ function Tooltip({
 					bgcolor: `${color}.dark`,
 					opacity: 1,
 				},
+				display: { xs: "none", md: "inline-flex" },
 			}}
 		>
 			<Icon icon={selected ? cfg.icon.selected : cfg.icon.unselected} height="28" />

@@ -1,5 +1,6 @@
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { Box } from "@mui/material";
+import { useI18n } from "@shared";
 import { FieldArray, type FormikHelpers } from "formik";
 import { memo, useCallback, useEffect, useId, useMemo, useRef } from "react";
 import { Section } from "../../Atoms";
@@ -23,6 +24,7 @@ const createMacroId = (): string => {
 };
 
 const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
+	const { t } = useI18n();
 	const droppableId = useId();
 	const lastLengthRef = useRef(0);
 	const tbodyScrollRef = useRef<HTMLElement | null>(null);
@@ -75,8 +77,7 @@ const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
 						<Section
 							length={values.damages.length}
 							type="macro"
-							label="Macros"
-							titleSx={{ py: 0.5, mb: 0.75 }}
+							label={t("template.damage")}
 							onAdd={() => push({ id: createMacroId(), name: "", value: "" })}
 						>
 							{""}
