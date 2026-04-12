@@ -2,6 +2,7 @@ import { TextField, type TextFieldProps } from "@mui/material";
 import { FastField, type FieldProps } from "formik";
 import type { FC, HTMLInputTypeAttribute } from "react";
 import { useEffect, useRef, useState } from "react";
+import { BASE_TEXTFIELD_SX, mergeSx } from "../styles";
 
 type TextfieldProps = TextFieldProps & {
 	autoFocus?: boolean;
@@ -51,7 +52,7 @@ const DebouncedTextfield = ({
 			onChange={props.onChange ?? handleChange}
 			onBlur={field.onBlur}
 			autoFocus={props.autoFocus}
-			sx={{ width: { xs: "100%", xl: 400 }, mb: 2, ...props.sx }}
+			sx={mergeSx(BASE_TEXTFIELD_SX, props.sx)}
 			error={!!meta.error || (props.error ?? false)}
 			size="small"
 			name={field.name}

@@ -3,6 +3,7 @@ import { useI18n } from "@shared";
 import { useId } from "react";
 import { Section, Textfield } from "../../Atoms";
 import type { CriticalValues } from "../../interfaces";
+import { INLINE_BLOCK_SPAN_SX } from "../styles";
 import { criticalErrorMessage, errorClass } from "./errors";
 
 type CriticalValueProps = {
@@ -22,7 +23,7 @@ export default ({ critical }: CriticalValueProps) => {
 	return (
 		<Section label={t("template.critical")}>
 			<Tooltip title={successMsg} arrow placement="right">
-				<Box component="span" sx={{ display: "inline-block" }}>
+				<Box component="span" sx={INLINE_BLOCK_SPAN_SX}>
 					<Textfield
 						label={t("template.success")}
 						name="critical.success"
@@ -35,7 +36,7 @@ export default ({ critical }: CriticalValueProps) => {
 				</Box>
 			</Tooltip>
 			<Tooltip title={failureMsg} arrow placement="right">
-				<Box component="span" sx={{ display: "inline-block" }}>
+				<Box component="span" sx={INLINE_BLOCK_SPAN_SX}>
 					<Textfield
 						label={t("template.failure")}
 						name="critical.failure"

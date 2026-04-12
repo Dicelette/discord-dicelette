@@ -5,22 +5,13 @@ import { FieldArray, type FormikHelpers } from "formik";
 import { memo, useCallback, useEffect, useId, useMemo, useRef } from "react";
 import { Section } from "../../Atoms";
 import type { DataForm } from "../../interfaces";
-import { SCROLLABLE_TBODY_SX } from "../styles";
+import { createFormItemId } from "../../utils";
+import { SCROLLABLE_TBODY_SX, TABLE_SX } from "../styles";
 import RenderRow from "./RenderRow";
 
 type StatisticsProps = {
 	values: DataForm;
 	setFieldValue: FormikHelpers<DataForm>["setFieldValue"];
-};
-
-type CryptoLike = { randomUUID?: () => string };
-
-const createStatisticId = (): string => {
-	const browserCrypto = (globalThis as { crypto?: CryptoLike }).crypto;
-	return (
-		browserCrypto?.randomUUID?.() ??
-		`stat-${Date.now()}-${Math.random().toString(16).slice(2)}`
-	);
 };
 
 const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
@@ -82,7 +73,7 @@ const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
 							label={t("template.statistics")}
 							onAdd={() =>
 								push({
-									id: createStatisticId(),
+									id: createFormItemId("stat"),
 									name: "",
 									min: "",
 									max: "",
@@ -93,7 +84,7 @@ const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
 						>
 							{""}
 						</Section>
-						<Box component="table" sx={{ width: "100%" }}>
+						<Box component="table" sx={TABLE_SX}>
 							<DragDropContext onDragEnd={onDragEnd}>
 								<Droppable droppableId={`droppable-${droppableId}`}>
 									{(provided) => (

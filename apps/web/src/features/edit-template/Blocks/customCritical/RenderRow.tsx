@@ -1,6 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Autocomplete, Box, TextField, Tooltip } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import { useI18n } from "@shared";
 import { memo, type ReactElement, useCallback, useMemo } from "react";
 import { Tablefield } from "../../Atoms";
@@ -8,6 +7,8 @@ import CopyButton from "../../Atoms/button/copyButton";
 import RemoveButton from "../../Atoms/button/removeButton";
 import StandaloneToggleButton from "../../Atoms/toggle-custom";
 import type { DataForm } from "../../interfaces";
+import { createFormItemId } from "../../utils";
+import { BTN_CELL_SX, CELL_SX, DUPLICATE_ROW_SX, ROW_SX } from "../styles";
 import { customCriticalErrorMessage } from "./errors";
 
 export type Custom = DataForm["customCritical"][number];
@@ -18,19 +19,6 @@ const CODE_INPUT_SX = {
 	width: { xs: "100%", md: 200 },
 	mb: 0,
 	"& .MuiInputBase-input": { fontFamily: "var(--code-font-family)" },
-} as const;
-
-const ROW_SX = {
-	display: "flex",
-	flexDirection: { xs: "column", md: "row" },
-	alignItems: { md: "center" },
-	width: { md: "100%" },
-} as const;
-
-const CELL_SX = { p: 1, width: { xs: "100%", md: "auto" } } as const;
-const BTN_CELL_SX = {
-	p: { xs: 1, md: "2px" },
-	width: { xs: "100%", md: "auto" },
 } as const;
 
 type CustomCriticalRowProps = {
@@ -112,9 +100,7 @@ const CustomCriticalRow = ({
 	const handleCopy = useCallback(
 		() =>
 			push({
-				id: (
-					globalThis as { crypto?: { randomUUID?: () => string } }
-				).crypto?.randomUUID?.(),
+				id: createFormItemId("cc"),
 				selection: custom.selection,
 				name: custom.name,
 				formula: custom.formula,
@@ -151,12 +137,7 @@ const CustomCriticalRow = ({
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
-					sx={{
-						...ROW_SX,
-						...(normalizedDuplicate && {
-							bgcolor: (t) => alpha(t.palette.error.main, 0.08),
-						}),
-					}}
+					sx={[ROW_SX, normalizedDuplicate && DUPLICATE_ROW_SX]}
 				>
 					<Box component="td" sx={BTN_CELL_SX}>
 						<CopyButton maxLen={22} length={normalizedLength} onClick={handleCopy} />

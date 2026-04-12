@@ -1,26 +1,17 @@
 import { DeleteOutline } from "@mui/icons-material";
-import {
-	Box,
-	Button,
-	IconButton,
-	type SxProps,
-	type Theme,
-	Tooltip,
-} from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
 import type { FC } from "react";
+import {
+	DESKTOP_ACTION_WRAPPER_SX,
+	MOBILE_ACTION_BUTTON_SX,
+	TRANSPARENT_ICON_BUTTON_SX,
+} from "../styles";
 
 type RemoveButtonProps = {
 	onClick: () => void;
 };
 
-const buttonSx: SxProps<Theme> = { width: "100%", justifyContent: "flex-start" };
-const iconButtonSx: SxProps<Theme> = {
-	p: 0,
-	borderRadius: 0,
-	bgcolor: "transparent",
-	"&:hover": { bgcolor: "transparent", opacity: 0.8 },
-};
 const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 	const { t } = useI18n();
 	const removeFieldLabel = t("template.removeField");
@@ -34,11 +25,11 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 				size="small"
 				aria-label={removeFieldLabel}
 				startIcon={<DeleteOutline fontSize="small" />}
-				sx={{ ...buttonSx, display: { xs: "flex", md: "none" } }}
+				sx={MOBILE_ACTION_BUTTON_SX}
 			>
 				{t("template.delete")}
 			</Button>
-			<Box sx={{ display: { xs: "none", md: "inline-flex" } }}>
+			<Box sx={DESKTOP_ACTION_WRAPPER_SX}>
 				<Tooltip title={removeFieldLabel} arrow>
 					<IconButton
 						onClick={onClick}
@@ -46,7 +37,7 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 						color="error"
 						aria-label={removeFieldLabel}
 						disableRipple
-						sx={iconButtonSx}
+						sx={TRANSPARENT_ICON_BUTTON_SX}
 					>
 						<DeleteOutline />
 					</IconButton>

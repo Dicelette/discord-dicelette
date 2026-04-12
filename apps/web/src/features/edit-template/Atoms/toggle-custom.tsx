@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import ToggleButton from "@mui/material/ToggleButton";
 import { useI18n } from "@shared";
+import { getDesktopToggleSx, MOBILE_TOGGLE_SX } from "./styles";
 
 type ToggleOpt = "naturalDice" | "affectSkill" | "excludedStat";
 
@@ -66,13 +67,7 @@ export default function StandaloneToggleButton({
 				color={cfg.color}
 				aria-label={title}
 				title={title}
-				sx={{
-					p: 1,
-					width: "100%",
-					justifyContent: "flex-start",
-					gap: 1,
-					display: { xs: "flex", md: "none" },
-				}}
+				sx={MOBILE_TOGGLE_SX}
 			>
 				<Icon icon={cfg.icon.selected} height="20" />
 				{title}
@@ -103,24 +98,7 @@ function Tooltip({
 			selected={selected}
 			aria-label={title}
 			title={title}
-			sx={{
-				p: "3px",
-				border: "none",
-				borderRadius: 1,
-				// Icon always shows the semantic color; full opacity when active
-				color: selected ? "common.white" : `${color}.main`,
-				bgcolor: selected ? `${color}.main` : "transparent",
-				"&:hover": {
-					bgcolor: `${color}.main`,
-					color: "common.white",
-					opacity: 0.85,
-				},
-				"&.Mui-selected:hover": {
-					bgcolor: `${color}.dark`,
-					opacity: 1,
-				},
-				display: { xs: "none", md: "inline-flex" },
-			}}
+			sx={getDesktopToggleSx(color, selected)}
 		>
 			<Icon icon={selected ? cfg.icon.selected : cfg.icon.unselected} height="28" />
 		</ToggleButton>

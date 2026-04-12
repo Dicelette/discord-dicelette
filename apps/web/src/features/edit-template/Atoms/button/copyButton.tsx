@@ -1,27 +1,17 @@
 import { ContentCopy } from "@mui/icons-material";
-import {
-	Box,
-	Button,
-	IconButton,
-	type SxProps,
-	type Theme,
-	Tooltip,
-} from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
 import type { FC } from "react";
+import {
+	DESKTOP_ACTION_WRAPPER_SX,
+	MOBILE_ACTION_BUTTON_SX,
+	TRANSPARENT_ICON_BUTTON_SX,
+} from "../styles";
 
 type CopyButtonProps = {
 	onClick: () => void;
 	maxLen?: number;
 	length?: number;
-};
-
-const buttonSx: SxProps<Theme> = { width: "100%", justifyContent: "flex-start" };
-const iconButtonSx: SxProps<Theme> = {
-	p: 0,
-	borderRadius: 0,
-	bgcolor: "transparent",
-	"&:hover": { bgcolor: "transparent", opacity: 0.8 },
 };
 
 const CopyButton: FC<CopyButtonProps> = ({ onClick, maxLen, length }) => {
@@ -39,11 +29,11 @@ const CopyButton: FC<CopyButtonProps> = ({ onClick, maxLen, length }) => {
 				disabled={disabled}
 				aria-label={copyFieldLabel}
 				startIcon={<ContentCopy fontSize="small" />}
-				sx={{ ...buttonSx, display: { xs: "flex", md: "none" } }}
+				sx={MOBILE_ACTION_BUTTON_SX}
 			>
 				{t("template.duplicate")}
 			</Button>
-			<Box sx={{ display: { xs: "none", md: "inline-flex" } }}>
+			<Box sx={DESKTOP_ACTION_WRAPPER_SX}>
 				<Tooltip title={copyFieldLabel} arrow>
 					<span>
 						<IconButton
@@ -53,7 +43,7 @@ const CopyButton: FC<CopyButtonProps> = ({ onClick, maxLen, length }) => {
 							disabled={disabled}
 							aria-label={copyFieldLabel}
 							disableRipple
-							sx={iconButtonSx}
+							sx={TRANSPARENT_ICON_BUTTON_SX}
 						>
 							<ContentCopy fontSize="small" />
 						</IconButton>

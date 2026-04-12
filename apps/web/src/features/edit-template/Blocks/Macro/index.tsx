@@ -5,22 +5,13 @@ import { FieldArray, type FormikHelpers } from "formik";
 import { memo, useCallback, useEffect, useId, useMemo, useRef } from "react";
 import { Section } from "../../Atoms";
 import type { DataForm } from "../../interfaces";
-import { SCROLLABLE_TBODY_SX } from "../styles";
+import { createFormItemId } from "../../utils";
+import { SCROLLABLE_TBODY_SX, TABLE_SX } from "../styles";
 import RenderRow from "./RenderRow";
 
 type MacroProps = {
 	values: DataForm;
 	setFieldValue: FormikHelpers<DataForm>["setFieldValue"];
-};
-
-type CryptoLike = { randomUUID?: () => string };
-
-const createMacroId = (): string => {
-	const browserCrypto = (globalThis as { crypto?: CryptoLike }).crypto;
-	return (
-		browserCrypto?.randomUUID?.() ??
-		`macro-${Date.now()}-${Math.random().toString(16).slice(2)}`
-	);
 };
 
 const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
@@ -78,11 +69,11 @@ const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
 							length={values.damages.length}
 							type="macro"
 							label={t("template.damage")}
-							onAdd={() => push({ id: createMacroId(), name: "", value: "" })}
+							onAdd={() => push({ id: createFormItemId("macro"), name: "", value: "" })}
 						>
 							{""}
 						</Section>
-						<Box component="table" sx={{ width: "100%" }}>
+						<Box component="table" sx={TABLE_SX}>
 							<DragDropContext onDragEnd={onDragEnd}>
 								<Droppable droppableId={`droppable-${droppableId}`}>
 									{(provided) => (

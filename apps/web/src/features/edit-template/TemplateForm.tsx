@@ -19,19 +19,9 @@ import Macro from "./Blocks/Macro";
 import Statistics from "./Blocks/Statistics";
 import { errorCode } from "./errorsTranslation";
 import type { DataForm } from "./interfaces";
-import { isNumber } from "./utils";
+import { createFormItemId, isNumber } from "./utils";
 
 const engine = getEngine("browserCrypto");
-
-type CryptoLike = { randomUUID?: () => string };
-
-const createFormItemId = (prefix: string): string => {
-	const browserCrypto = (globalThis as { crypto?: CryptoLike }).crypto;
-	return (
-		browserCrypto?.randomUUID?.() ??
-		`${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
-	);
-};
 
 export const INITIAL_VALUES: DataForm = {
 	isCharNameRequired: false,

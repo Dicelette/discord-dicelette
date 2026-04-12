@@ -3,6 +3,7 @@ import type { SxProps, Theme } from "@mui/material/styles";
 import type { FC, ReactNode } from "react";
 
 import { AddButton } from ".";
+import { mergeSx, SECTION_ROOT_SX, SECTION_TITLE_SX } from "./styles";
 
 type SectionProps = {
 	length?: number;
@@ -13,18 +14,9 @@ type SectionProps = {
 	titleSx?: SxProps<Theme>;
 };
 
-const sxProps: SxProps<Theme> = {
-	mb: 1,
-	display: "flex",
-	alignItems: "center",
-	gap: 1,
-	padding: 0,
-	margin: 0,
-};
-
 const Section: FC<SectionProps> = ({ length, type, children, label, onAdd, titleSx }) => (
-	<Box component="section" sx={{ display: "flex", flexDirection: "column", mb: 2 }}>
-		<Typography variant="h6" fontWeight="bold" sx={{ ...sxProps, ...titleSx }}>
+	<Box component="section" sx={SECTION_ROOT_SX}>
+		<Typography variant="h6" fontWeight="bold" sx={mergeSx(SECTION_TITLE_SX, titleSx)}>
 			{label}
 			{onAdd && <AddButton len={length} type={type} onClick={onAdd} />}
 		</Typography>

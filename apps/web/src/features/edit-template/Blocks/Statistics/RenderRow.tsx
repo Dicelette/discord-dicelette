@@ -1,6 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Box, Tooltip } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import { useI18n } from "@shared";
 import { memo, type ReactElement, useCallback, useMemo } from "react";
 import { Tablefield } from "../../Atoms";
@@ -8,6 +7,14 @@ import CopyButton from "../../Atoms/button/copyButton";
 import RemoveButton from "../../Atoms/button/removeButton";
 import StandaloneToggleButton from "../../Atoms/toggle-custom";
 import type { StatisticFields } from "../../interfaces";
+import { createFormItemId } from "../../utils";
+import {
+	BTN_CELL_SX,
+	CELL_SX,
+	DUPLICATE_ROW_SX,
+	NUMBER_TABLE_FIELD_SX,
+	ROW_SX,
+} from "../styles";
 import {
 	maximalErrorClass,
 	maximalErrorMessage,
@@ -16,19 +23,6 @@ import {
 	nameErrorClass,
 	nameErrorMessage,
 } from "./errors";
-
-const ROW_SX = {
-	display: "flex",
-	flexDirection: { xs: "column", md: "row" },
-	alignItems: { md: "center" },
-	width: { md: "100%" },
-} as const;
-
-const CELL_SX = { p: 1, width: { xs: "100%", md: "auto" } } as const;
-const BTN_CELL_SX = {
-	p: { xs: 1, md: "2px" },
-	width: { xs: "100%", md: "auto" },
-} as const;
 
 const EMPTY_STAT: StatisticFields = { name: "", min: "", max: "", combinaison: "" };
 
@@ -94,16 +88,10 @@ const StatisticsRow = ({
 	const handleCopy = useCallback(
 		() =>
 			push({
-				id: (
-					globalThis as { crypto?: { randomUUID?: () => string } }
-				).crypto?.randomUUID?.(),
-				name: "",
-				max,
-				min,
-				combinaison,
-				excluded,
+				...stat,
+				id: createFormItemId("stat"),
 			}),
-		[push, max, min, combinaison, excluded]
+		[push, stat]
 	);
 	const handleRemove = useCallback(() => remove(statIndex), [remove, statIndex]);
 	const handleToggleExcluded = useCallback(
@@ -123,12 +111,7 @@ const StatisticsRow = ({
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
-					sx={{
-						...ROW_SX,
-						...(normalizedDuplicate && {
-							bgcolor: (t) => alpha(t.palette.error.main, 0.08),
-						}),
-					}}
+					sx={[ROW_SX, normalizedDuplicate && DUPLICATE_ROW_SX]}
 				>
 					<Box component="td" sx={BTN_CELL_SX}>
 						<CopyButton length={normalizedLength} maxLen={25} onClick={handleCopy} />
@@ -155,7 +138,7 @@ const StatisticsRow = ({
 									name={`statistics[${statIndex}].min`}
 									label={t("template.min")}
 									className={minErrClass}
-									sx={{ width: { xs: "100%", xl: 100 } }}
+									sx={NUMBER_TABLE_FIELD_SX}
 									id={`Min-${statIndex}`}
 									disabled={!!combinaison}
 									error={!!minMsg}
@@ -173,7 +156,7 @@ const StatisticsRow = ({
 									label={t("template.max")}
 									id={`Max-${statIndex}`}
 									className={maxErrClass}
-									sx={{ width: { xs: "100%", xl: 100 } }}
+									sx={NUMBER_TABLE_FIELD_SX}
 									disabled={!!combinaison}
 									error={!!maxMsg}
 								/>

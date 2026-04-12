@@ -13,6 +13,7 @@ const CHECKBOX_GRID_SX = {
 } as const;
 
 const TOTAL_SX = { width: { xs: "100%", sm: 150 }, mb: 0 } as const;
+const GENERAL_STACK_SX = { my: 1 } as const;
 
 const General: FC = () => {
 	const { t } = useI18n();
@@ -36,7 +37,7 @@ const General: FC = () => {
 				direction={{ xs: "column", sm: "row" }}
 				spacing={2}
 				alignItems={{ sm: "flex-start" }}
-				sx={{ my: 1 }}
+				sx={GENERAL_STACK_SX}
 			>
 				<Textfield
 					label={t("template.total")}
