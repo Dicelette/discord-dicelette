@@ -28,6 +28,7 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
+		"edit": "Modifier",
 		"save": "Sauvegarder",
 		"saving": "Sauvegarde..."
 	},
@@ -154,6 +155,8 @@
 		"formula": "Formule",
 		"import": "Importer",
 		"importError": "Fichier invalide. Vérifiez le format JSON.",
+		"createModalTitle": "Créer un modèle",
+		"editModalTitle": "Modifier le modèle",
 		"importModalTitle": "Importer un modèle",
 		"importSuccess": "Modèle importé avec succès !",
 		"name": "Nom",

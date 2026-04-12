@@ -12,6 +12,7 @@ interface State {
 	saving: boolean;
 	confirmDelete: boolean;
 	importModalOpen: boolean;
+	editModalOpen: boolean;
 	hasCharacters: boolean;
 	templateChannelId: string | undefined;
 	publicChannelId: string | undefined;
@@ -25,6 +26,7 @@ type Action =
 	| { type: "set_success"; value: string | null }
 	| { type: "confirm_delete"; value: boolean }
 	| { type: "import_modal"; value: boolean }
+	| { type: "edit_modal"; value: boolean }
 	| { type: "bulk_deleted" }
 	| {
 			type: "imported";
@@ -59,6 +61,8 @@ function reducer(state: State, action: Action): State {
 			return { ...state, confirmDelete: action.value };
 		case "import_modal":
 			return { ...state, importModalOpen: action.value };
+		case "edit_modal":
+			return { ...state, editModalOpen: action.value };
 		case "bulk_deleted":
 			return { ...state, hasCharacters: false };
 		case "imported":
@@ -96,6 +100,7 @@ export function useTemplateManager(
 		saving: false,
 		confirmDelete: false,
 		importModalOpen: false,
+		editModalOpen: false,
 		hasCharacters: false,
 		templateChannelId: defaultTemplateChannelId,
 		publicChannelId: defaultPublicChannelId,
@@ -107,7 +112,7 @@ export function useTemplateManager(
 		setTimeout(() => dispatch({ type: kind, value: null }), 3000);
 	}, []);
 
-	// Initial data load — wait for BOTH promises before marking loading: false
+	// Initial data load
 	useEffect(() => {
 		const controller = new AbortController();
 		const { signal } = controller;

@@ -1,4 +1,4 @@
-import { Delete, Download, Upload } from "@mui/icons-material";
+import { Delete, Download, Edit, Upload } from "@mui/icons-material";
 import {
 	Alert,
 	Box,
@@ -13,7 +13,7 @@ import {
 import { getChannelPathById, type Props, SectionTitle, useI18n } from "@shared";
 import { exportJson } from "../user-config/utils.ts";
 import { useTemplateManager } from "./hooks";
-import { TemplateModal, TemplateView } from "./sections";
+import { EditTemplateModal, TemplateModal, TemplateView } from "./sections";
 
 const alertMbSx = { mb: 2 } as const;
 const actionsBoxSx = { display: "flex", gap: 1, mb: 2, flexWrap: "wrap" } as const;
@@ -38,6 +38,7 @@ export default function TemplateManager({
 		saving,
 		confirmDelete,
 		importModalOpen,
+		editModalOpen,
 		hasCharacters,
 		templateChannelId,
 		publicChannelId,
@@ -85,6 +86,16 @@ export default function TemplateManager({
 					size="small"
 				>
 					{t("import.name").toTitle()}
+				</Button>
+
+				<Button
+					variant="outlined"
+					startIcon={<Edit />}
+					onClick={() => dispatch({ type: "edit_modal", value: true })}
+					disabled={saving || loading}
+					size="small"
+				>
+					{t("common.edit").toTitle()}
 				</Button>
 
 				{template && (
@@ -136,12 +147,26 @@ export default function TemplateManager({
 				/>
 			)}
 
+			{/* Import from JSON file modal */}
 			<TemplateModal
 				open={importModalOpen}
 				onClose={() => dispatch({ type: "import_modal", value: false })}
 				onImport={handleModalImport}
 				channels={channels}
 				hasCharacters={hasCharacters}
+				defaultTemplateChannelId={templateChannelId}
+				defaultPublicChannelId={publicChannelId}
+				defaultPrivateChannelId={privateChannelId}
+			/>
+
+			{/* Edit / create template via form modal */}
+			<EditTemplateModal
+				open={editModalOpen}
+				onClose={() => dispatch({ type: "edit_modal", value: false })}
+				onSave={handleModalImport}
+				channels={channels}
+				hasCharacters={hasCharacters}
+				existingTemplate={template ?? undefined}
 				defaultTemplateChannelId={templateChannelId}
 				defaultPublicChannelId={publicChannelId}
 				defaultPrivateChannelId={privateChannelId}

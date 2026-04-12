@@ -28,6 +28,7 @@
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
+		"edit": "Edit",
 		"save": "Save",
 		"saving": "Saving..."
 	},
@@ -154,6 +155,8 @@
 		"formula": "Formula",
 		"import": "Import",
 		"importError": "Invalid file. Please check the JSON format.",
+		"createModalTitle": "Create a template",
+		"editModalTitle": "Edit template",
 		"importModalTitle": "Import a template",
 		"importSuccess": "Template imported successfully!",
 		"name": "Name",
