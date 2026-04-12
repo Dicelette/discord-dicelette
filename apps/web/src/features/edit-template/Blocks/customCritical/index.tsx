@@ -78,6 +78,7 @@ const CustomCriticalBlock = ({ values, setFieldValue }: CustomCriticalProps) => 
 							length={values.customCritical.length}
 							type="critical"
 							label={t("template.customCritical")}
+							titleSx={{ py: 0.5, mb: 0.75 }}
 							onAdd={() =>
 								push({
 									id: createCustomCriticalId(),

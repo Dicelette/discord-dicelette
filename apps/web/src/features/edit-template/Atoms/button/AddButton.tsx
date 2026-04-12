@@ -1,6 +1,5 @@
 import { AddCircleOutline } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import type { FC } from "react";
 
 type AddButtonProps = {
@@ -24,13 +23,13 @@ const AddButton: FC<AddButtonProps> = ({ len, type, onClick }) => {
 					size="small"
 					color="success"
 					disabled={isDisabled}
-					sx={(theme) => ({
-						border: `1px solid ${theme.palette.success.main}`,
-						bgcolor: alpha(theme.palette.success.main, 0.12),
-						"&:hover": {
-							bgcolor: alpha(theme.palette.success.main, 0.2),
-						},
-					})}
+					disableRipple
+					sx={{
+						p: 0,
+						borderRadius: 0,
+						bgcolor: "transparent",
+						"&:hover": { bgcolor: "transparent", opacity: 0.8 },
+					}}
 				>
 					<AddCircleOutline fontSize="small" />
 				</IconButton>

@@ -1,6 +1,5 @@
 import { DeleteOutline } from "@mui/icons-material";
 import { Button, IconButton, Tooltip } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import type { FC } from "react";
 import { useCompact } from "../CompactContext";
 
@@ -30,13 +29,13 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 				size="small"
 				color="error"
 				aria-label="Supprimer ce champ"
-				sx={(theme) => ({
-					border: `1px solid ${theme.palette.error.main}`,
-					bgcolor: alpha(theme.palette.error.main, 0.12),
-					"&:hover": {
-						bgcolor: alpha(theme.palette.error.main, 0.2),
-					},
-				})}
+				disableRipple
+				sx={{
+					p: 0,
+					borderRadius: 0,
+					bgcolor: "transparent",
+					"&:hover": { bgcolor: "transparent", opacity: 0.8 },
+				}}
 			>
 				<DeleteOutline />
 			</IconButton>

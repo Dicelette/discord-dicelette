@@ -1,6 +1,5 @@
 import { ContentCopy } from "@mui/icons-material";
 import { Button, IconButton, Tooltip } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import type { FC } from "react";
 import { useCompact } from "../CompactContext";
 
@@ -36,13 +35,13 @@ const CopyButton: FC<CopyButtonProps> = ({ onClick, maxLen, length }) => {
 					color="info"
 					disabled={disabled}
 					aria-label="Dupliquer ce champ"
-					sx={(theme) => ({
-						border: `1px solid ${theme.palette.info.main}`,
-						bgcolor: alpha(theme.palette.info.main, 0.12),
-						"&:hover": {
-							bgcolor: alpha(theme.palette.info.main, 0.2),
-						},
-					})}
+					disableRipple
+					sx={{
+						p: 0,
+						borderRadius: 0,
+						bgcolor: "transparent",
+						"&:hover": { bgcolor: "transparent", opacity: 0.8 },
+					}}
 				>
 					<ContentCopy fontSize="small" />
 				</IconButton>

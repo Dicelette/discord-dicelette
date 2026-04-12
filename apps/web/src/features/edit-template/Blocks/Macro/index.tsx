@@ -76,6 +76,7 @@ const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
 							length={values.damages.length}
 							type="macro"
 							label="Macros"
+							titleSx={{ py: 0.5, mb: 0.75 }}
 							onAdd={() => push({ id: createMacroId(), name: "", value: "" })}
 						>
 							{""}
