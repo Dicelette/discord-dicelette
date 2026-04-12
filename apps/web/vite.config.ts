@@ -16,7 +16,6 @@ export default defineConfig({
 		exclude: ["**/playwright-report/**"],
 	},
 	server: {
-		host: true, // expose sur 0.0.0.0 → accessible via l'IP locale du PC
 		watch: {
 			ignored: [
 				"**/node_modules/**",

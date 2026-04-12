@@ -1,6 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Box, Tooltip } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import { useI18n } from "@shared";
 import { memo, type ReactElement, useCallback, useMemo } from "react";
 import { Tablefield } from "../../Atoms";
 import CopyButton from "../../Atoms/button/copyButton";
@@ -46,6 +47,7 @@ const StatisticsRow = ({
 	statistics,
 	setFieldValue,
 }: StatisticsRowProps): ReactElement => {
+	const { t } = useI18n();
 	const stat = statistics[statIndex];
 	const { max, min, combinaison, excluded, name } = stat;
 
@@ -61,12 +63,22 @@ const StatisticsRow = ({
 		[stat.min, stat.max, stat.combinaison, stat]
 	);
 
-	const nameMsg = useMemo(
+	const nameMsgKey = useMemo(
 		() => nameErrorMessage(statIndex, duplicateIndices, name),
 		[statIndex, duplicateIndices, name]
 	);
-	const minMsg = useMemo(() => minimalErrorMessage(statIndex, stat), [statIndex, stat]);
-	const maxMsg = useMemo(() => maximalErrorMessage(statIndex, stat), [statIndex, stat]);
+	const minMsgKey = useMemo(
+		() => minimalErrorMessage(statIndex, stat),
+		[statIndex, stat]
+	);
+	const maxMsgKey = useMemo(
+		() => maximalErrorMessage(statIndex, stat),
+		[statIndex, stat]
+	);
+
+	const nameMsg = nameMsgKey ? t(nameMsgKey) : "";
+	const minMsg = minMsgKey ? t(minMsgKey) : "";
+	const maxMsg = maxMsgKey ? t(maxMsgKey) : "";
 
 	const handleCopy = useCallback(
 		() => push({ name: "", max, min, combinaison, excluded }),
@@ -103,10 +115,10 @@ const StatisticsRow = ({
 						<CopyButton length={statistics.length} maxLen={25} onClick={handleCopy} />
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={nameMsg || ""} arrow placement="top">
+						<Tooltip title={nameMsg} arrow placement="top">
 							<span>
 								<Tablefield
-									label="Nom"
+									label={t("template.name")}
 									name={`statistics[${statIndex}].name`}
 									id={`Stats-Nom-${statIndex}`}
 									className={nameErrClass}
@@ -116,13 +128,13 @@ const StatisticsRow = ({
 						</Tooltip>
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={minMsg || ""} arrow placement="top">
+						<Tooltip title={minMsg} arrow placement="top">
 							<span>
 								<Tablefield
 									type="number"
 									slotProps={{ htmlInput: { min: 0 } }}
 									name={`statistics[${statIndex}].min`}
-									label="Min"
+									label={t("template.min")}
 									className={minErrClass}
 									sx={{ width: { xs: "100%", xl: 100 } }}
 									id={`Min-${statIndex}`}
@@ -133,13 +145,13 @@ const StatisticsRow = ({
 						</Tooltip>
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={maxMsg || ""} arrow placement="top">
+						<Tooltip title={maxMsg} arrow placement="top">
 							<span>
 								<Tablefield
 									type="number"
 									slotProps={{ htmlInput: { min: 0 } }}
 									name={`statistics[${statIndex}].max`}
-									label="Max"
+									label={t("template.max")}
 									id={`Max-${statIndex}`}
 									className={maxErrClass}
 									sx={{ width: { xs: "100%", xl: 100 } }}
@@ -151,7 +163,7 @@ const StatisticsRow = ({
 					</Box>
 					<Box component="td" sx={CELL_SX}>
 						<Tablefield
-							label="Combinaison"
+							label={t("template.combination")}
 							name={`statistics[${statIndex}].combinaison`}
 							disabled={!!(min || max)}
 						/>

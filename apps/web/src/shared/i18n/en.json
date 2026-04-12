@@ -171,7 +171,35 @@
 		"templateChannel": "Template channel",
 		"templateChannelHelp": "Channel where the template message will be posted (text only).",
 		"total": "Total",
-		"value": "Value"
+		"value": "Value",
+		"min": "Min",
+		"max": "Max",
+		"combination": "Combination",
+		"success": "Success",
+		"failure": "Failure",
+		"errors": {
+			"validation": "Template validation error",
+			"shared": {
+				"duplicateName": "This name is already used",
+				"emptyName": "Name cannot be empty",
+				"emptyValue": "Value cannot be empty"
+			},
+			"critical": {
+				"sameValues": "Both values cannot be identical",
+				"negative": "Value cannot be lower than 0"
+			},
+			"statistics": {
+				"minGreaterThanMax": "Minimum value cannot be greater than maximum value",
+				"minNegative": "Minimum value cannot be negative",
+				"minNotNumber": "Minimum value must be a number",
+				"maxLowerThanMin": "Maximum value cannot be lower than minimum value",
+				"maxNegative": "Maximum value cannot be negative",
+				"maxNotNumber": "Maximum value must be a number"
+			},
+			"customCritical": {
+				"emptyText": "Text cannot be empty"
+			}
+		}
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",

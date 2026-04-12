@@ -171,7 +171,35 @@
 		"templateChannel": "Channel du modèle",
 		"templateChannelHelp": "Channel où sera envoyé le message du modèle (texte uniquement).",
 		"total": "Total",
-		"value": "Valeur"
+		"value": "Valeur",
+		"min": "Min",
+		"max": "Max",
+		"combination": "Combinaison",
+		"success": "Succès",
+		"failure": "Échec",
+		"errors": {
+			"validation": "Erreur de validation du modèle",
+			"shared": {
+				"duplicateName": "Ce nom est déjà utilisé",
+				"emptyName": "Le nom ne peut pas être vide",
+				"emptyValue": "La valeur ne peut pas être vide"
+			},
+			"critical": {
+				"sameValues": "Les deux valeurs ne peuvent être identiques",
+				"negative": "La valeur ne peut pas être inférieure à 0"
+			},
+			"statistics": {
+				"minGreaterThanMax": "La valeur minimale ne peut pas être supérieure à la valeur maximale",
+				"minNegative": "La valeur minimale ne peut pas être négative",
+				"minNotNumber": "La valeur minimale doit être un nombre",
+				"maxLowerThanMin": "La valeur maximale ne peut pas être inférieure à la valeur minimale",
+				"maxNegative": "La valeur maximale ne peut pas être négative",
+				"maxNotNumber": "La valeur maximale doit être un nombre"
+			},
+			"customCritical": {
+				"emptyText": "Le texte ne peut pas être vide"
+			}
+		}
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",

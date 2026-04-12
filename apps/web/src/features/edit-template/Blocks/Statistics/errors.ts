@@ -1,20 +1,30 @@
 import type { StatisticFields } from "../../interfaces";
 import { isNumber, under } from "../../utils";
 
+type StatisticsErrorKey =
+	| "template.errors.statistics.minGreaterThanMax"
+	| "template.errors.statistics.minNegative"
+	| "template.errors.statistics.minNotNumber"
+	| "template.errors.statistics.maxLowerThanMin"
+	| "template.errors.statistics.maxNegative"
+	| "template.errors.statistics.maxNotNumber"
+	| "template.errors.shared.emptyName"
+	| "template.errors.shared.duplicateName";
+
 export function minimalErrorMessage(
 	_index: number,
 	statistics: StatisticFields
-): string | null {
+): StatisticsErrorKey | null {
 	const { min, max } = statistics;
 	if (!min) return null;
 	if (min && max && min > max) {
-		return "La valeur minimale ne peut pas être supérieure à la valeur maximale";
+		return "template.errors.statistics.minGreaterThanMax";
 	}
 	if (under(min, 0)) {
-		return "La valeur minimale ne peut pas être négative";
+		return "template.errors.statistics.minNegative";
 	}
 	if (!isNumber(min)) {
-		return "La valeur minimale doit être un nombre";
+		return "template.errors.statistics.minNotNumber";
 	}
 	return null;
 }
@@ -22,17 +32,17 @@ export function minimalErrorMessage(
 export function maximalErrorMessage(
 	_index: number,
 	statistic: StatisticFields
-): string | null {
+): StatisticsErrorKey | null {
 	const { min, max } = statistic;
 	if (!max) return null;
 	if (min && max && min > max) {
-		return "La valeur maximale ne peut pas être inférieure à la valeur minimale";
+		return "template.errors.statistics.maxLowerThanMin";
 	}
 	if (under(max, 0)) {
-		return "La valeur maximale ne peut pas être négative";
+		return "template.errors.statistics.maxNegative";
 	}
 	if (!isNumber(max)) {
-		return "La valeur maximale doit être un nombre";
+		return "template.errors.statistics.maxNotNumber";
 	}
 	return null;
 }
@@ -59,9 +69,9 @@ export function nameErrorMessage(
 	index: number,
 	duplicateIndices: number[],
 	name: string
-): string | null {
-	if (name.length === 0) return "Le nom ne peut pas être vide";
-	if (duplicateIndices.includes(index)) return "Ce nom est déjà utilisé";
+): StatisticsErrorKey | null {
+	if (name.length === 0) return "template.errors.shared.emptyName";
+	if (duplicateIndices.includes(index)) return "template.errors.shared.duplicateName";
 	return null;
 }
 

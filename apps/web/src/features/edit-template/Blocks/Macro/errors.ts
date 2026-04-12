@@ -1,16 +1,21 @@
 import type { MacroValues } from "../../interfaces";
 
+type MacroErrorKey =
+	| "template.errors.shared.duplicateName"
+	| "template.errors.shared.emptyName"
+	| "template.errors.shared.emptyValue";
+
 export function macroErrorMessage(
 	index: number,
 	duplicateIndices: number[],
 	dice: MacroValues
-): string | null {
-	if (duplicateIndices.includes(index)) return "Ce nom est déjà utilisé";
-	if (dice.name.length === 0) return "Le nom ne peut pas être vide";
+): MacroErrorKey | null {
+	if (duplicateIndices.includes(index)) return "template.errors.shared.duplicateName";
+	if (dice.name.length === 0) return "template.errors.shared.emptyName";
 	return null;
 }
 
-export function macroValueErrorMessage(dice: MacroValues): string | null {
-	if (dice.name.length === 0) return "La valeur ne peut pas être vide";
+export function macroValueErrorMessage(dice: MacroValues): MacroErrorKey | null {
+	if (dice.name.length === 0) return "template.errors.shared.emptyValue";
 	return null;
 }

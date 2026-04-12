@@ -1,6 +1,9 @@
 import type { Custom } from "./RenderRow";
 
 type TextualCriticalField = "selection" | "name" | "formula" | "text";
+type CustomCriticalErrorKey =
+	| "template.errors.shared.duplicateName"
+	| "template.errors.customCritical.emptyText";
 
 export function customCriticalErrorMessage({
 	index,
@@ -12,12 +15,12 @@ export function customCriticalErrorMessage({
 	idName: TextualCriticalField;
 	duplicateIndices: number[];
 	customCritical: Custom;
-}): string | null {
+}): CustomCriticalErrorKey | null {
 	if (duplicateIndices.includes(index) && idName !== "selection") {
-		return "Ce nom est déjà utilisé";
+		return "template.errors.shared.duplicateName";
 	}
 	if (customCritical[idName].length === 0) {
-		return "Le texte ne peut pas être vide";
+		return "template.errors.customCritical.emptyText";
 	}
 	return null;
 }

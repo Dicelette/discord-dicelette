@@ -7,6 +7,7 @@ import {
 	verifyTemplateValue,
 } from "@dicelette/core";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { useI18n } from "@shared";
 import { Form, Formik, type FormikHelpers } from "formik";
 import type { FC } from "react";
 import { useCallback, useMemo } from "react";
@@ -164,6 +165,7 @@ const TemplateForm: FC<TemplateFormProps> = ({
 	onError,
 	formId,
 }) => {
+	const { t } = useI18n();
 	// Single media-query call: all button children read this via CompactContext.
 	const theme = useTheme();
 	const isNarrow = useMediaQuery(theme.breakpoints.down("xl"));
@@ -180,12 +182,12 @@ const TemplateForm: FC<TemplateFormProps> = ({
 			try {
 				await onSave(dataFormToTemplate(values));
 			} catch (error) {
-				onError(errorCode(error));
+				onError(errorCode(error, t));
 			} finally {
 				setSubmitting(false);
 			}
 		},
-		[onSave, onError]
+		[onSave, onError, t]
 	);
 
 	return (

@@ -1,6 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Box, Tooltip } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import { useI18n } from "@shared";
 import { memo, type ReactElement, useCallback, useMemo } from "react";
 import { Tablefield } from "../../Atoms";
 import CopyButton from "../../Atoms/button/copyButton";
@@ -36,14 +37,18 @@ const DiceRow = ({
 	push,
 	remove,
 }: DiceRowProps): ReactElement => {
+	const { t } = useI18n();
 	const dice = macro[index];
 	const { name, value } = dice;
 
-	const nameMsg = useMemo(
+	const nameMsgKey = useMemo(
 		() => macroErrorMessage(index, duplicateIndices, dice),
 		[index, duplicateIndices, dice]
 	);
-	const valueMsg = useMemo(() => macroValueErrorMessage(dice), [dice]);
+	const valueMsgKey = useMemo(() => macroValueErrorMessage(dice), [dice]);
+
+	const nameMsg = nameMsgKey ? t(nameMsgKey) : "";
+	const valueMsg = valueMsgKey ? t(valueMsgKey) : "";
 
 	const handleCopy = useCallback(() => push({ name, value }), [push, name, value]);
 	const handleRemove = useCallback(() => remove(index), [remove, index]);
@@ -73,11 +78,11 @@ const DiceRow = ({
 						<CopyButton maxLen={25} length={macro.length} onClick={handleCopy} />
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={nameMsg || ""} arrow placement="top">
+						<Tooltip title={nameMsg} arrow placement="top">
 							<span>
 								<Tablefield
 									name={`damages[${index}].name`}
-									label="Nom"
+									label={t("template.name")}
 									id={`Dice-Nom-${index}`}
 									error={!!nameMsg}
 								/>
@@ -85,11 +90,11 @@ const DiceRow = ({
 						</Tooltip>
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={valueMsg || ""} arrow placement="top">
+						<Tooltip title={valueMsg} arrow placement="top">
 							<span>
 								<Tablefield
 									name={`damages[${index}].value`}
-									label="Valeur"
+									label={t("template.value")}
 									id={`Value-${index}`}
 									error={!!valueMsg}
 								/>

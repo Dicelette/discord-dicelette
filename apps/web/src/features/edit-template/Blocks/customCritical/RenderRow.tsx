@@ -1,6 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Autocomplete, Box, TextField, Tooltip } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import { useI18n } from "@shared";
 import { memo, type ReactElement, useCallback, useMemo } from "react";
 import { Tablefield } from "../../Atoms";
 import CopyButton from "../../Atoms/button/copyButton";
@@ -49,10 +50,11 @@ const CustomCriticalRow = ({
 	customCritical,
 	setFieldValue,
 }: CustomCriticalRowProps): ReactElement => {
+	const { t } = useI18n();
 	const custom = customCritical[index];
 	const { onNaturalDice, affectSkill, selection } = custom;
 
-	const selectionMsg = useMemo(
+	const selectionMsgKey = useMemo(
 		() =>
 			customCriticalErrorMessage({
 				index,
@@ -62,7 +64,7 @@ const CustomCriticalRow = ({
 			}),
 		[index, duplicateIndices, custom]
 	);
-	const nameMsg = useMemo(
+	const nameMsgKey = useMemo(
 		() =>
 			customCriticalErrorMessage({
 				index,
@@ -72,7 +74,7 @@ const CustomCriticalRow = ({
 			}),
 		[index, duplicateIndices, custom]
 	);
-	const formulaMsg = useMemo(
+	const formulaMsgKey = useMemo(
 		() =>
 			customCriticalErrorMessage({
 				index,
@@ -82,6 +84,10 @@ const CustomCriticalRow = ({
 			}),
 		[index, duplicateIndices, custom]
 	);
+
+	const selectionMsg = selectionMsgKey ? t(selectionMsgKey) : "";
+	const nameMsg = nameMsgKey ? t(nameMsgKey) : "";
+	const formulaMsg = formulaMsgKey ? t(formulaMsgKey) : "";
 
 	const handleCopy = useCallback(
 		() =>
@@ -135,7 +141,7 @@ const CustomCriticalRow = ({
 						<CopyButton maxLen={22} length={customCritical.length} onClick={handleCopy} />
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={selectionMsg || ""} arrow placement="top">
+						<Tooltip title={selectionMsg} arrow placement="top">
 							<span>
 								<Autocomplete
 									size="small"
@@ -148,7 +154,7 @@ const CustomCriticalRow = ({
 									renderInput={(params) => (
 										<TextField
 											{...params}
-											label="Signe"
+											label={t("template.sign")}
 											variant="outlined"
 											sx={CODE_INPUT_SX}
 											error={!!selectionMsg}
@@ -159,11 +165,11 @@ const CustomCriticalRow = ({
 						</Tooltip>
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={nameMsg || ""} arrow placement="top">
+						<Tooltip title={nameMsg} arrow placement="top">
 							<span>
 								<Tablefield
 									name={`customCritical[${index}].name`}
-									label="Nom"
+									label={t("template.name")}
 									variant="outlined"
 									id={`Critical-name-${index}`}
 									error={!!nameMsg}
@@ -172,11 +178,11 @@ const CustomCriticalRow = ({
 						</Tooltip>
 					</Box>
 					<Box component="td" sx={CELL_SX}>
-						<Tooltip title={formulaMsg || ""} arrow placement="top">
+						<Tooltip title={formulaMsg} arrow placement="top">
 							<span>
 								<Tablefield
 									name={`customCritical[${index}].formula`}
-									label="Formule"
+									label={t("template.formula")}
 									variant="outlined"
 									id={`Critical-formula-${index}`}
 									error={!!formulaMsg}

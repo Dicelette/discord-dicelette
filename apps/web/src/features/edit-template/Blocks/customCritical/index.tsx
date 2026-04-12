@@ -1,5 +1,6 @@
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { Box } from "@mui/material";
+import { useI18n } from "@shared";
 import { FieldArray, type FormikHelpers } from "formik";
 import { memo, useCallback, useEffect, useId, useMemo, useRef } from "react";
 import { Section } from "../../Atoms";
@@ -23,6 +24,7 @@ const createCustomCriticalId = (): string => {
 };
 
 const CustomCriticalBlock = ({ values, setFieldValue }: CustomCriticalProps) => {
+	const { t } = useI18n();
 	const droppableId = useId();
 	const lastLengthRef = useRef(0);
 	const tbodyScrollRef = useRef<HTMLElement | null>(null);
@@ -72,7 +74,7 @@ const CustomCriticalBlock = ({ values, setFieldValue }: CustomCriticalProps) => 
 						<Section
 							length={values.customCritical.length}
 							type="critical"
-							label="Critiques Personnalisés"
+							label={t("template.customCritical")}
 							onAdd={() =>
 								push({
 									id: createCustomCriticalId(),

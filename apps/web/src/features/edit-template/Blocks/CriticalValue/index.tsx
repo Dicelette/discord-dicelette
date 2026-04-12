@@ -1,4 +1,5 @@
 import { Box, Tooltip } from "@mui/material";
+import { useI18n } from "@shared";
 import { useId } from "react";
 import { Section, Textfield } from "../../Atoms";
 import type { CriticalValues } from "../../interfaces";
@@ -9,18 +10,21 @@ type CriticalValueProps = {
 };
 
 export default ({ critical }: CriticalValueProps) => {
+	const { t } = useI18n();
 	const baseId = useId();
 	const tooltipBase = `critical-${baseId}`;
 
-	const successMsg = criticalErrorMessage(critical, "success");
-	const failureMsg = criticalErrorMessage(critical, "failure");
+	const successMsgKey = criticalErrorMessage(critical, "success");
+	const failureMsgKey = criticalErrorMessage(critical, "failure");
+	const successMsg = successMsgKey ? t(successMsgKey) : "";
+	const failureMsg = failureMsgKey ? t(failureMsgKey) : "";
 
 	return (
-		<Section label="Critique">
-			<Tooltip title={successMsg || ""} arrow placement="right">
+		<Section label={t("template.critical")}>
+			<Tooltip title={successMsg} arrow placement="right">
 				<Box component="span" sx={{ display: "inline-block" }}>
 					<Textfield
-						label="Succès"
+						label={t("template.success")}
 						name="critical.success"
 						type="number"
 						id={`${tooltipBase}-success`}
@@ -30,10 +34,10 @@ export default ({ critical }: CriticalValueProps) => {
 					/>
 				</Box>
 			</Tooltip>
-			<Tooltip title={failureMsg || ""} arrow placement="right">
+			<Tooltip title={failureMsg} arrow placement="right">
 				<Box component="span" sx={{ display: "inline-block" }}>
 					<Textfield
-						label="Échec"
+						label={t("template.failure")}
 						name="critical.failure"
 						type="number"
 						id={`${tooltipBase}-failure`}

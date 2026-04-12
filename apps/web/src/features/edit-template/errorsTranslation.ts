@@ -1,5 +1,5 @@
-export function errorCode(error: unknown): string {
+export function errorCode(error: unknown, t: (key: string) => string): string {
 	if (error instanceof Error) return error.message;
 	if (typeof error === "string") return error;
-	return "Erreur de validation du modèle";
+	return t("template.errors.validation");
 }

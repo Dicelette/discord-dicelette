@@ -1,11 +1,12 @@
 import { Icon } from "@iconify/react";
 import ToggleButton from "@mui/material/ToggleButton";
+import { useI18n } from "@shared";
 import { useCompact } from "./CompactContext";
 
 type ToggleOpt = "naturalDice" | "affectSkill" | "excludedStat";
 
 type OptConfig = {
-	title: string;
+	titleKey: string;
 	value: string;
 	color: "info" | "warning" | "success" | "secondary" | "primary";
 	icon: { selected: string; unselected: string };
@@ -13,7 +14,7 @@ type OptConfig = {
 
 const OPT_CONFIG: Record<ToggleOpt, OptConfig> = {
 	naturalDice: {
-		title: "Affecter uniquement les dés naturels",
+		titleKey: "template.onNaturalDice",
 		value: "onNaturalDice",
 		color: "warning",
 		icon: {
@@ -22,7 +23,7 @@ const OPT_CONFIG: Record<ToggleOpt, OptConfig> = {
 		},
 	},
 	excludedStat: {
-		title: "Exclure de la sélection des dés de statistiques",
+		titleKey: "template.excluded",
 		value: "excludedStat",
 		color: "info",
 		icon: {
@@ -31,7 +32,7 @@ const OPT_CONFIG: Record<ToggleOpt, OptConfig> = {
 		},
 	},
 	affectSkill: {
-		title: "Utilisable sur les macros",
+		titleKey: "template.affectSkill",
 		value: "affectSkill",
 		color: "secondary",
 		icon: {
@@ -52,8 +53,10 @@ export default function StandaloneToggleButton({
 	onChange,
 	opt,
 }: StandaloneToggleButtonProps) {
+	const { t } = useI18n();
 	const isNarrow = useCompact();
 	const cfg = OPT_CONFIG[opt];
+	const title = t(cfg.titleKey);
 
 	return isNarrow ? (
 		<ToggleButton
@@ -62,25 +65,27 @@ export default function StandaloneToggleButton({
 			selected={selected}
 			onChange={onChange}
 			color={cfg.color}
-			aria-label={cfg.title}
-			title={cfg.title}
+			aria-label={title}
+			title={title}
 			sx={{ p: 1, width: "100%", justifyContent: "flex-start", gap: 1 }}
 		>
 			<Icon icon={cfg.icon.selected} height="20" />
-			{cfg.title}
+			{title}
 		</ToggleButton>
 	) : (
-		<Tooltip cfg={cfg} selected={selected} onChange={onChange} />
+		<Tooltip cfg={cfg} title={title} selected={selected} onChange={onChange} />
 	);
 }
 
 // Separate component so the tooltip title is stable (no inline object creation)
 function Tooltip({
 	cfg,
+	title,
 	selected,
 	onChange,
 }: {
 	cfg: OptConfig;
+	title: string;
 	selected: boolean;
 	onChange: () => void;
 }) {
@@ -91,8 +96,8 @@ function Tooltip({
 			size="small"
 			onChange={onChange}
 			selected={selected}
-			aria-label={cfg.title}
-			title={cfg.title}
+			aria-label={title}
+			title={title}
 			sx={{
 				p: "3px",
 				border: "none",
