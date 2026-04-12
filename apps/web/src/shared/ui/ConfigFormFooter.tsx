@@ -37,7 +37,7 @@ const paperSx: SxProps = {
 	bottom: "calc(16px + env(safe-area-inset-bottom))",
 	left: "50%",
 	transform: "translateX(-50%)",
-	width: { xs: "calc(100% - 32px)", sm: "calc(100% - 48px)" },
+	width: { xs: "calc(100% - 40px)", sm: "calc(100% - 48px)" },
 	maxWidth: "58rem",
 	zIndex: "appBar",
 	borderRadius: 2,
