@@ -30,25 +30,36 @@ const BTN_CELL_SX = {
 	width: { xs: "100%", xl: "auto" },
 } as const;
 
+const EMPTY_STAT: StatisticFields = { name: "", min: "", max: "", combinaison: "" };
+
 type StatisticsRowProps = {
 	statIndex: number;
-	duplicateIndices: number[];
+	item?: StatisticFields;
+	isDuplicate?: boolean;
+	length?: number;
+	duplicateIndices?: number[];
+	statistics?: StatisticFields[];
 	push: (value: StatisticFields) => void;
 	remove: (index: number) => void;
-	statistics: StatisticFields[];
 	setFieldValue: (field: string, value: unknown) => unknown;
 };
 
 const StatisticsRow = ({
 	statIndex,
+	item,
+	isDuplicate,
+	length,
 	duplicateIndices,
+	statistics,
 	push,
 	remove,
-	statistics,
 	setFieldValue,
 }: StatisticsRowProps): ReactElement => {
 	const { t } = useI18n();
-	const stat = statistics[statIndex];
+	const stat = item ?? statistics?.[statIndex] ?? EMPTY_STAT;
+	const normalizedLength = length ?? statistics?.length ?? 0;
+	const normalizedDuplicate =
+		isDuplicate ?? (duplicateIndices ? duplicateIndices.includes(statIndex) : false);
 	const { max, min, combinaison, excluded, name } = stat;
 
 	const nameErrClass = useMemo(() => nameErrorClass(name), [name]);
@@ -64,8 +75,8 @@ const StatisticsRow = ({
 	);
 
 	const nameMsgKey = useMemo(
-		() => nameErrorMessage(statIndex, duplicateIndices, name),
-		[statIndex, duplicateIndices, name]
+		() => nameErrorMessage(statIndex, normalizedDuplicate ? [statIndex] : [], name),
+		[statIndex, normalizedDuplicate, name]
 	);
 	const minMsgKey = useMemo(
 		() => minimalErrorMessage(statIndex, stat),
@@ -81,7 +92,17 @@ const StatisticsRow = ({
 	const maxMsg = maxMsgKey ? t(maxMsgKey) : "";
 
 	const handleCopy = useCallback(
-		() => push({ name: "", max, min, combinaison, excluded }),
+		() =>
+			push({
+				id: (
+					globalThis as { crypto?: { randomUUID?: () => string } }
+				).crypto?.randomUUID?.(),
+				name: "",
+				max,
+				min,
+				combinaison,
+				excluded,
+			}),
 		[push, max, min, combinaison, excluded]
 	);
 	const handleRemove = useCallback(() => remove(statIndex), [remove, statIndex]);
@@ -89,8 +110,6 @@ const StatisticsRow = ({
 		() => setFieldValue(`statistics[${statIndex}].excluded`, !excluded),
 		[setFieldValue, statIndex, excluded]
 	);
-
-	const isDuplicate = duplicateIndices.includes(statIndex);
 
 	return (
 		<Draggable
@@ -106,13 +125,13 @@ const StatisticsRow = ({
 					{...provided.dragHandleProps}
 					sx={{
 						...ROW_SX,
-						...(isDuplicate && {
+						...(normalizedDuplicate && {
 							bgcolor: (t) => alpha(t.palette.error.main, 0.08),
 						}),
 					}}
 				>
 					<Box component="td" sx={BTN_CELL_SX}>
-						<CopyButton length={statistics.length} maxLen={25} onClick={handleCopy} />
+						<CopyButton length={normalizedLength} maxLen={25} onClick={handleCopy} />
 					</Box>
 					<Box component="td" sx={CELL_SX}>
 						<Tooltip title={nameMsg} arrow placement="top">

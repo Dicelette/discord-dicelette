@@ -66,12 +66,20 @@ export function maximalErrorClass(statistic: StatisticFields): string {
 }
 
 export function nameErrorMessage(
-	index: number,
-	duplicateIndices: number[],
-	name: string
+	indexOrIsDuplicate: number | boolean,
+	duplicateIndicesOrName: number[] | string,
+	nameArg?: string
 ): StatisticsErrorKey | null {
+	const isDuplicate =
+		typeof indexOrIsDuplicate === "boolean"
+			? indexOrIsDuplicate
+			: Array.isArray(duplicateIndicesOrName)
+				? duplicateIndicesOrName.includes(indexOrIsDuplicate)
+				: false;
+	const name =
+		typeof duplicateIndicesOrName === "string" ? duplicateIndicesOrName : (nameArg ?? "");
 	if (name.length === 0) return "template.errors.shared.emptyName";
-	if (duplicateIndices.includes(index)) return "template.errors.shared.duplicateName";
+	if (isDuplicate) return "template.errors.shared.duplicateName";
 	return null;
 }
 

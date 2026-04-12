@@ -29,31 +29,33 @@ const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
 
 	useEffect(() => {
 		if (values.statistics.length > lastLengthRef.current) {
-			values.statistics.forEach((s) => {
-				if (!s.id) s.id = createStatisticId();
-			});
 			tbodyScrollRef.current?.scrollTo({
 				top: tbodyScrollRef.current.scrollHeight,
 				behavior: "smooth",
 			});
-			lastLengthRef.current = values.statistics.length;
 		}
+		lastLengthRef.current = values.statistics.length;
 	}, [values.statistics]);
 
-	const duplicateIndices = useMemo(() => {
+	const duplicateIndexSet = useMemo(() => {
 		const nameToFirstIndex = new Map<string, number>();
-		const dups: number[] = [];
+		const dups = new Set<number>();
 		values.statistics.forEach((stat, idx: number) => {
 			if (!stat.name) return;
 			const existing = nameToFirstIndex.get(stat.name);
 			if (existing !== undefined) {
-				dups.push(existing, idx);
+				dups.add(existing);
+				dups.add(idx);
 			} else {
 				nameToFirstIndex.set(stat.name, idx);
 			}
 		});
-		return Array.from(new Set(dups));
+		return dups;
 	}, [values.statistics]);
+	const duplicateIndices = useMemo(
+		() => Array.from(duplicateIndexSet),
+		[duplicateIndexSet]
+	);
 
 	const onDragEnd = useCallback(
 		(result: DropResult) => {
@@ -106,6 +108,9 @@ const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
 												<RenderRow
 													key={item.id || statIndex}
 													statIndex={statIndex}
+													item={item}
+													isDuplicate={duplicateIndexSet.has(statIndex)}
+													length={values.statistics.length}
 													duplicateIndices={duplicateIndices}
 													push={push}
 													remove={remove}

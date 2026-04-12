@@ -1,4 +1,4 @@
-import type { Custom } from "./RenderRow";
+import type { DataForm } from "../../interfaces";
 
 type TextualCriticalField = "selection" | "name" | "formula" | "text";
 type CustomCriticalErrorKey =
@@ -9,14 +9,19 @@ export function customCriticalErrorMessage({
 	index,
 	idName,
 	duplicateIndices,
+	isDuplicate,
 	customCritical,
 }: {
-	index: number;
+	index?: number;
 	idName: TextualCriticalField;
-	duplicateIndices: number[];
-	customCritical: Custom;
+	duplicateIndices?: number[];
+	isDuplicate?: boolean;
+	customCritical: DataForm["customCritical"][number];
 }): CustomCriticalErrorKey | null {
-	if (duplicateIndices.includes(index) && idName !== "selection") {
+	const duplicate =
+		isDuplicate ??
+		(index !== undefined && duplicateIndices ? duplicateIndices.includes(index) : false);
+	if (duplicate && idName !== "selection") {
 		return "template.errors.shared.duplicateName";
 	}
 	if (customCritical[idName].length === 0) {

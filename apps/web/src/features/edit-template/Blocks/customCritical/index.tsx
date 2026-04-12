@@ -31,28 +31,31 @@ const CustomCriticalBlock = ({ values, setFieldValue }: CustomCriticalProps) => 
 
 	useEffect(() => {
 		if (values.customCritical.length > lastLengthRef.current) {
-			values.customCritical.forEach((c) => {
-				if (!c.id) c.id = createCustomCriticalId();
-			});
 			tbodyScrollRef.current?.scrollTo({
 				top: tbodyScrollRef.current.scrollHeight,
 				behavior: "smooth",
 			});
-			lastLengthRef.current = values.customCritical.length;
 		}
+		lastLengthRef.current = values.customCritical.length;
 	}, [values.customCritical]);
 
 	const duplicateIndices = useMemo(() => {
 		const map = new Map<string, number>();
-		const d: number[] = [];
+		const d = new Set<number>();
 		values.customCritical.forEach((c, i: number) => {
 			if (!c.name) return;
 			const first = map.get(c.name);
-			if (first !== undefined) d.push(first, i);
-			else map.set(c.name, i);
+			if (first !== undefined) {
+				d.add(first);
+				d.add(i);
+			} else map.set(c.name, i);
 		});
-		return Array.from(new Set(d));
+		return d;
 	}, [values.customCritical]);
+	const duplicateIndicesArray = useMemo(
+		() => Array.from(duplicateIndices),
+		[duplicateIndices]
+	);
 
 	const onDragEnd = useCallback(
 		(result: DropResult) => {
@@ -106,7 +109,10 @@ const CustomCriticalBlock = ({ values, setFieldValue }: CustomCriticalProps) => 
 												<RenderRow
 													key={item.id || index}
 													index={index}
-													duplicateIndices={duplicateIndices}
+													item={item}
+													isDuplicate={duplicateIndices.has(index)}
+													length={values.customCritical.length}
+													duplicateIndices={duplicateIndicesArray}
 													push={push}
 													remove={remove}
 													customCritical={values.customCritical}

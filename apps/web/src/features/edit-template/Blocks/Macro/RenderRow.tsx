@@ -22,38 +22,57 @@ const BTN_CELL_SX = {
 	width: { xs: "100%", xl: "auto" },
 } as const;
 
+const EMPTY_MACRO: MacroValues = { name: "", value: "" };
+
 type DiceRowProps = {
-	duplicateIndices: number[];
+	item?: MacroValues;
+	isDuplicate?: boolean;
 	index: number;
-	macro: MacroValues[];
+	length?: number;
+	duplicateIndices?: number[];
+	macro?: MacroValues[];
 	push: (value: MacroValues) => void;
 	remove: (index: number) => void;
 };
 
 const DiceRow = ({
-	duplicateIndices,
+	item,
+	isDuplicate,
 	index,
+	length,
+	duplicateIndices,
 	macro,
 	push,
 	remove,
 }: DiceRowProps): ReactElement => {
 	const { t } = useI18n();
-	const dice = macro[index];
+	const dice = item ?? macro?.[index] ?? EMPTY_MACRO;
+	const normalizedLength = length ?? macro?.length ?? 0;
+	const normalizedDuplicate =
+		isDuplicate ?? (duplicateIndices ? duplicateIndices.includes(index) : false);
 	const { name, value } = dice;
 
 	const nameMsgKey = useMemo(
-		() => macroErrorMessage(index, duplicateIndices, dice),
-		[index, duplicateIndices, dice]
+		() => macroErrorMessage(index, normalizedDuplicate ? [index] : [], dice),
+		[index, normalizedDuplicate, dice]
 	);
 	const valueMsgKey = useMemo(() => macroValueErrorMessage(dice), [dice]);
 
 	const nameMsg = nameMsgKey ? t(nameMsgKey) : "";
 	const valueMsg = valueMsgKey ? t(valueMsgKey) : "";
 
-	const handleCopy = useCallback(() => push({ name, value }), [push, name, value]);
+	const handleCopy = useCallback(
+		() =>
+			push({
+				id: (
+					globalThis as { crypto?: { randomUUID?: () => string } }
+				).crypto?.randomUUID?.(),
+				name,
+				value,
+			}),
+		[push, name, value]
+	);
 	const handleRemove = useCallback(() => remove(index), [remove, index]);
-
-	const isDuplicate = duplicateIndices.includes(index);
 
 	return (
 		<Draggable
@@ -69,13 +88,13 @@ const DiceRow = ({
 					{...provided.dragHandleProps}
 					sx={{
 						...ROW_SX,
-						...(isDuplicate && {
+						...(normalizedDuplicate && {
 							bgcolor: (t) => alpha(t.palette.error.main, 0.08),
 						}),
 					}}
 				>
 					<Box component="td" sx={BTN_CELL_SX}>
-						<CopyButton maxLen={25} length={macro.length} onClick={handleCopy} />
+						<CopyButton maxLen={25} length={normalizedLength} onClick={handleCopy} />
 					</Box>
 					<Box component="td" sx={CELL_SX}>
 						<Tooltip title={nameMsg} arrow placement="top">

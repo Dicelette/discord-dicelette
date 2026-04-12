@@ -23,6 +23,16 @@ import { isNumber } from "./utils";
 
 const engine = getEngine("browserCrypto");
 
+type CryptoLike = { randomUUID?: () => string };
+
+const createFormItemId = (prefix: string): string => {
+	const browserCrypto = (globalThis as { crypto?: CryptoLike }).crypto;
+	return (
+		browserCrypto?.randomUUID?.() ??
+		`${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
+	);
+};
+
 export const INITIAL_VALUES: DataForm = {
 	isCharNameRequired: false,
 	isPrivate: false,
@@ -104,6 +114,7 @@ export function mapSchemaToFormValues(
 ): DataForm {
 	const statisticsArray = schema.statistics
 		? Object.entries(schema.statistics).map(([name, value]) => ({
+				id: createFormItemId("stat"),
 				name,
 				combinaison: value.combinaison,
 				min: value.min?.toString(),
@@ -114,6 +125,7 @@ export function mapSchemaToFormValues(
 
 	const damagesArray = schema.damage
 		? Object.entries(schema.damage).map(([name, value]) => ({
+				id: createFormItemId("macro"),
 				name,
 				value,
 			}))
@@ -121,6 +133,7 @@ export function mapSchemaToFormValues(
 
 	const customCriticalArray = schema.customCritical
 		? Object.entries(schema.customCritical).map(([name, value]) => ({
+				id: createFormItemId("cc"),
 				name,
 				selection: value.sign as CustomCriticalType["sign"],
 				formula: value.value,

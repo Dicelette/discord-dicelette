@@ -29,28 +29,31 @@ const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
 
 	useEffect(() => {
 		if (values.damages.length > lastLengthRef.current) {
-			values.damages.forEach((d) => {
-				if (!d.id) d.id = createMacroId();
-			});
 			tbodyScrollRef.current?.scrollTo({
 				top: tbodyScrollRef.current.scrollHeight,
 				behavior: "smooth",
 			});
-			lastLengthRef.current = values.damages.length;
 		}
+		lastLengthRef.current = values.damages.length;
 	}, [values.damages]);
 
 	const duplicateInMacros = useMemo(() => {
 		const map = new Map<string, number>();
-		const dups: number[] = [];
+		const dups = new Set<number>();
 		values.damages.forEach((d, i: number) => {
 			if (!d.name) return;
 			const first = map.get(d.name);
-			if (first !== undefined) dups.push(first, i);
-			else map.set(d.name, i);
+			if (first !== undefined) {
+				dups.add(first);
+				dups.add(i);
+			} else map.set(d.name, i);
 		});
-		return Array.from(new Set(dups));
+		return dups;
 	}, [values.damages]);
+	const duplicateIndices = useMemo(
+		() => Array.from(duplicateInMacros),
+		[duplicateInMacros]
+	);
 
 	const onDragEnd = useCallback(
 		(result: DropResult) => {
@@ -93,8 +96,11 @@ const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
 											{values.damages.map((item, index: number) => (
 												<RenderRow
 													key={item.id || index}
-													duplicateIndices={duplicateInMacros}
+													item={item}
+													isDuplicate={duplicateInMacros.has(index)}
 													index={index}
+													length={values.damages.length}
+													duplicateIndices={duplicateIndices}
 													macro={values.damages}
 													push={push}
 													remove={remove}

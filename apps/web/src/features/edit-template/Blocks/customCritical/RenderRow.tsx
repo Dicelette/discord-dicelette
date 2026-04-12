@@ -35,23 +35,40 @@ const BTN_CELL_SX = {
 
 type CustomCriticalRowProps = {
 	index: number;
-	duplicateIndices: number[];
+	item?: Custom;
+	isDuplicate?: boolean;
+	length?: number;
+	duplicateIndices?: number[];
+	customCritical?: Custom[];
 	push: (value: Custom) => void;
 	remove: (index: number) => void;
 	setFieldValue: (field: string, value: unknown) => unknown;
-	customCritical: Custom[];
 };
 
 const CustomCriticalRow = ({
 	index,
+	item,
+	isDuplicate,
+	length,
 	duplicateIndices,
+	customCritical,
 	push,
 	remove,
-	customCritical,
 	setFieldValue,
 }: CustomCriticalRowProps): ReactElement => {
 	const { t } = useI18n();
-	const custom = customCritical[index];
+	const custom = item ??
+		customCritical?.[index] ?? {
+			selection: ">=",
+			name: "",
+			formula: "",
+			text: "",
+			onNaturalDice: false,
+			affectSkill: false,
+		};
+	const normalizedDuplicate =
+		isDuplicate ?? (duplicateIndices ? duplicateIndices.includes(index) : false);
+	const normalizedLength = length ?? customCritical?.length ?? 0;
 	const { onNaturalDice, affectSkill, selection } = custom;
 
 	const selectionMsgKey = useMemo(
@@ -59,30 +76,33 @@ const CustomCriticalRow = ({
 			customCriticalErrorMessage({
 				index,
 				idName: "selection",
+				isDuplicate: normalizedDuplicate,
 				duplicateIndices,
 				customCritical: custom,
 			}),
-		[index, duplicateIndices, custom]
+		[index, normalizedDuplicate, duplicateIndices, custom]
 	);
 	const nameMsgKey = useMemo(
 		() =>
 			customCriticalErrorMessage({
 				index,
 				idName: "name",
+				isDuplicate: normalizedDuplicate,
 				duplicateIndices,
 				customCritical: custom,
 			}),
-		[index, duplicateIndices, custom]
+		[index, normalizedDuplicate, duplicateIndices, custom]
 	);
 	const formulaMsgKey = useMemo(
 		() =>
 			customCriticalErrorMessage({
 				index,
 				idName: "formula",
+				isDuplicate: normalizedDuplicate,
 				duplicateIndices,
 				customCritical: custom,
 			}),
-		[index, duplicateIndices, custom]
+		[index, normalizedDuplicate, duplicateIndices, custom]
 	);
 
 	const selectionMsg = selectionMsgKey ? t(selectionMsgKey) : "";
@@ -92,6 +112,9 @@ const CustomCriticalRow = ({
 	const handleCopy = useCallback(
 		() =>
 			push({
+				id: (
+					globalThis as { crypto?: { randomUUID?: () => string } }
+				).crypto?.randomUUID?.(),
 				selection: custom.selection,
 				name: custom.name,
 				formula: custom.formula,
@@ -116,8 +139,6 @@ const CustomCriticalRow = ({
 		[setFieldValue, index, affectSkill]
 	);
 
-	const isDuplicate = duplicateIndices.includes(index);
-
 	return (
 		<Draggable
 			key={custom.id || index}
@@ -132,13 +153,13 @@ const CustomCriticalRow = ({
 					{...provided.dragHandleProps}
 					sx={{
 						...ROW_SX,
-						...(isDuplicate && {
+						...(normalizedDuplicate && {
 							bgcolor: (t) => alpha(t.palette.error.main, 0.08),
 						}),
 					}}
 				>
 					<Box component="td" sx={BTN_CELL_SX}>
-						<CopyButton maxLen={22} length={customCritical.length} onClick={handleCopy} />
+						<CopyButton maxLen={22} length={normalizedLength} onClick={handleCopy} />
 					</Box>
 					<Box component="td" sx={CELL_SX}>
 						<Tooltip title={selectionMsg} arrow placement="top">
