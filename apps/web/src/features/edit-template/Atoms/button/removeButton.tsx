@@ -1,5 +1,6 @@
 import { DeleteOutline } from "@mui/icons-material";
 import { Button, IconButton, Tooltip } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import type { FC } from "react";
 import { useCompact } from "../CompactContext";
 
@@ -13,7 +14,7 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 	return isNarrow ? (
 		<Button
 			onClick={onClick}
-			variant="outlined"
+			variant="contained"
 			color="error"
 			size="small"
 			aria-label="Supprimer ce champ"
@@ -29,6 +30,13 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 				size="small"
 				color="error"
 				aria-label="Supprimer ce champ"
+				sx={(theme) => ({
+					border: `1px solid ${theme.palette.error.main}`,
+					bgcolor: alpha(theme.palette.error.main, 0.12),
+					"&:hover": {
+						bgcolor: alpha(theme.palette.error.main, 0.2),
+					},
+				})}
 			>
 				<DeleteOutline />
 			</IconButton>
