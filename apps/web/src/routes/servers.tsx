@@ -71,6 +71,9 @@ const adminGuildAvatarSx = { width: 44, height: 44, bgcolor: "secondary.dark" } 
 const adminGuildCardSx = { opacity: 0.7 } as const;
 const addButtonSx = { flexShrink: 0 } as const;
 
+const GUILDS_CACHE_TTL = 5 * 60 * 1000;
+let guildsClientCache: { guilds: DiscordGuild[]; expiresAt: number } | null = null;
+
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
 	const [search, setSearch] = useState("");
@@ -81,10 +84,21 @@ export default function Servers() {
 	const { t } = useI18n();
 
 	useEffect(() => {
+		if (guildsClientCache && Date.now() < guildsClientCache.expiresAt) {
+			setGuilds(guildsClientCache.guilds);
+			setLoading(false);
+			return;
+		}
 		setLoading(true);
 		authApi
 			.guilds()
-			.then((res) => setGuilds(res.data))
+			.then((res) => {
+				guildsClientCache = {
+					guilds: res.data,
+					expiresAt: Date.now() + GUILDS_CACHE_TTL,
+				};
+				setGuilds(res.data);
+			})
 			.catch(() => setError(t("servers.loadError")))
 			.finally(() => setLoading(false));
 	}, [t]);
@@ -92,9 +106,11 @@ export default function Servers() {
 	const handleRefresh = async () => {
 		setRefreshing(true);
 		setError(null);
+		guildsClientCache = null;
 		try {
 			await authApi.refreshGuilds();
 			const res = await authApi.guilds();
+			guildsClientCache = { guilds: res.data, expiresAt: Date.now() + GUILDS_CACHE_TTL };
 			setGuilds(res.data);
 		} catch (err: unknown) {
 			const status =
