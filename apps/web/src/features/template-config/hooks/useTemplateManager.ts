@@ -4,6 +4,17 @@ import { useI18n } from "@shared";
 import { useCallback, useEffect, useReducer } from "react";
 import type { ImportTemplateData } from "../types";
 
+const TEMPLATE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface TemplateCache {
+	template: StatisticalTemplate | null;
+	hasCharacters: boolean;
+	expiresAt: number;
+}
+
+// Keyed by guildId so switching between guilds doesn't serve stale data.
+const templateClientCache = new Map<string, TemplateCache>();
+
 interface State {
 	template: StatisticalTemplate | null;
 	loading: boolean;
@@ -114,6 +125,12 @@ export function useTemplateManager(
 
 	// Initial data load
 	useEffect(() => {
+		const cached = templateClientCache.get(guildId);
+		if (cached && Date.now() < cached.expiresAt) {
+			dispatch({ type: "loaded", template: cached.template, hasCharacters: cached.hasCharacters });
+			return;
+		}
+
 		const controller = new AbortController();
 		const { signal } = controller;
 
@@ -134,7 +151,10 @@ export function useTemplateManager(
 				})
 				.catch(() => {}),
 		]).finally(() => {
-			if (!signal.aborted) dispatch({ type: "loaded", template, hasCharacters });
+			if (!signal.aborted) {
+				templateClientCache.set(guildId, { template, hasCharacters, expiresAt: Date.now() + TEMPLATE_CACHE_TTL });
+				dispatch({ type: "loaded", template, hasCharacters });
+			}
 		});
 
 		return () => controller.abort();
@@ -172,9 +192,15 @@ export function useTemplateManager(
 		async (data: ImportTemplateData) => {
 			dispatch({ type: "saving", value: true });
 			try {
+				// Sequential order is intentional: characters must be deleted before
+				// importing the new template so the server never sees characters
+				// validated against a schema that no longer exists.
 				if (data.deleteCharacters) {
 					await charactersApi.bulkDelete(guildId);
 					dispatch({ type: "bulk_deleted" });
+					// Patch cache: template is still valid, only hasCharacters changed.
+					const existing = templateClientCache.get(guildId);
+					if (existing) templateClientCache.set(guildId, { ...existing, hasCharacters: false });
 				}
 				await templateApi.import(guildId, {
 					template: data.template,
@@ -182,6 +208,7 @@ export function useTemplateManager(
 					publicChannelId: data.publicChannelId,
 					privateChannelId: data.privateChannelId,
 				});
+				templateClientCache.delete(guildId);
 				dispatch({
 					type: "imported",
 					template: data.template,
@@ -219,6 +246,7 @@ export function useTemplateManager(
 		dispatch({ type: "saving", value: true });
 		try {
 			await templateApi.delete(guildId);
+			templateClientCache.delete(guildId);
 			dispatch({ type: "deleted" });
 			flash("set_success", t("template.deleteSuccess"));
 		} catch {

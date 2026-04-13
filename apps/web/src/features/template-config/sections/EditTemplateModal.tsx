@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { type Channel, ChannelSelect, useI18n } from "@shared";
 import {
+	startTransition,
 	useCallback,
 	useEffect,
 	useId,
@@ -131,10 +132,10 @@ export default function EditTemplateModal({
 			setFormReady(false);
 			return;
 		}
-		// Two rAF frames: first lets the Dialog start its CSS transition,
-		// second renders the form once the browser has painted the skeleton.
+		// One rAF lets the Dialog start its CSS transition, then startTransition
+		// marks the form mount as non-urgent so React can yield to the animation.
 		rafRef.current = requestAnimationFrame(() => {
-			rafRef.current = requestAnimationFrame(() => setFormReady(true));
+			startTransition(() => setFormReady(true));
 		});
 		return () => cancelAnimationFrame(rafRef.current);
 	}, [open]);
