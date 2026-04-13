@@ -4,7 +4,6 @@ import { alpha } from "@mui/material/styles";
 export const ITEM_SIZE = 65;
 
 /** Show ~5 rows then scroll, identical to user-config list behaviour. */
-export const MAX_LIST_HEIGHT = 5 * ITEM_SIZE;
 
 export const TABLE_SX = { width: "100%" } as const;
 
@@ -40,7 +39,6 @@ export const SCROLLABLE_TBODY_SX = {
 	},
 	// Bounded scroll area only on wide screens.
 	// On narrow screens rows stack vertically and are too tall to cap.
-	maxHeight: { xl: MAX_LIST_HEIGHT },
 	overflowY: { xl: "auto" as const },
 	scrollbarWidth: "thin" as const,
 	scrollbarColor: "rgba(255, 255, 255, 0.2) transparent",
