@@ -22,13 +22,13 @@
 		"discard": "Reset",
 		"discardSuccess": "Changes discarded.",
 		"documentation": "Documentation",
+		"edit": "Edit",
 		"here": "here",
 		"lightTheme": "Light theme",
 		"loading": "Loading...",
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
-		"edit": "Edit",
 		"save": "Save",
 		"saving": "Saving..."
 	},
@@ -127,16 +127,17 @@
 		"title": "Your servers"
 	},
 	"template": {
-		"general": "General",
+		"add": {
+			"label": "New",
+			"max": "You reached the maximum value allowed ({{- maxLen}})."
+		},
 		"affectSkill": "Affects skills",
-		"addMacro": "Add a macro",
-		"addStatistic": "Add a statistic",
 		"channelRequired": "Please select a channel.",
 		"charName": "Character name required",
+		"combination": "Combination",
+		"createModalTitle": "Create a template",
 		"critical": "Criticals",
 		"customCritical": "Custom criticals",
-		"duplicate": "Duplicate",
-		"duplicateField": "Duplicate this field",
 		"damage": "Skill dice",
 		"delete": "Delete",
 		"deleteCharacters": "Delete all server characters",
@@ -149,25 +150,53 @@
 		"diceType": "Dice type",
 		"download": "You can generate a template",
 		"downloadLink": "https://www.dicelette.app/en/docs/sheet/form",
+		"duplicate": "Duplicate",
+		"duplicateField": "Duplicate this field",
+		"editModalTitle": "Edit template",
+		"errors": {
+			"critical": {
+				"negative": "Value cannot be lower than 0",
+				"sameValues": "Both values cannot be identical"
+			},
+			"customCritical": {
+				"emptyText": "Text cannot be empty"
+			},
+			"shared": {
+				"duplicateName": "This name is already used",
+				"emptyName": "Name cannot be empty",
+				"emptyValue": "Value cannot be empty"
+			},
+			"statistics": {
+				"maxLowerThanMin": "Maximum value cannot be lower than minimum value",
+				"maxNegative": "Maximum value cannot be negative",
+				"maxNotNumber": "Maximum value must be a number",
+				"minGreaterThanMax": "Minimum value cannot be greater than maximum value",
+				"minNegative": "Minimum value cannot be negative",
+				"minNotNumber": "Minimum value must be a number"
+			},
+			"validation": "Template validation error"
+		},
 		"excluded": "Excluded",
 		"export": "Export",
 		"exportCharacters": "Export characters (CSV)",
 		"exportCharactersError": "Error while exporting characters.",
+		"failure": "Failure",
 		"fileLabel": "Choose a JSON file",
 		"fileNotSelected": "No file selected",
 		"fileRequired": "Please select a JSON file.",
 		"forceDistrib": "Forced distribution",
 		"forceDistribHelp": "Shows an error when the sum of statistics is lower than the configured total",
 		"formula": "Formula",
+		"general": "General",
 		"import": "Import",
 		"importError": "Invalid file. Please check the JSON format.",
-		"createModalTitle": "Create a template",
-		"editModalTitle": "Edit template",
 		"importModalTitle": "Import a template",
 		"importSuccess": "Template imported successfully!",
 		"macros": "Macros",
+		"max": "Max",
 		"maxMacrosReached": "You reached the maximum number of macros",
 		"maxStatisticsReached": "You reached the maximum number of statistics ({max})",
+		"min": "Min",
 		"name": "Name",
 		"none": "No template registered for this server.",
 		"onNaturalDice": "Natural dice",
@@ -178,38 +207,11 @@
 		"section": "Statistical template",
 		"sign": "Sign",
 		"statistics": "Statistics",
+		"success": "Success",
 		"templateChannel": "Template channel",
 		"templateChannelHelp": "Channel where the template message will be posted (text only).",
 		"total": "Total",
-		"value": "Value",
-		"min": "Min",
-		"max": "Max",
-		"combination": "Combination",
-		"success": "Success",
-		"failure": "Failure",
-		"errors": {
-			"validation": "Template validation error",
-			"shared": {
-				"duplicateName": "This name is already used",
-				"emptyName": "Name cannot be empty",
-				"emptyValue": "Value cannot be empty"
-			},
-			"critical": {
-				"sameValues": "Both values cannot be identical",
-				"negative": "Value cannot be lower than 0"
-			},
-			"statistics": {
-				"minGreaterThanMax": "Minimum value cannot be greater than maximum value",
-				"minNegative": "Minimum value cannot be negative",
-				"minNotNumber": "Minimum value must be a number",
-				"maxLowerThanMin": "Maximum value cannot be lower than minimum value",
-				"maxNegative": "Maximum value cannot be negative",
-				"maxNotNumber": "Maximum value must be a number"
-			},
-			"customCritical": {
-				"emptyText": "Text cannot be empty"
-			}
-		}
+		"value": "Value"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribute \"{name}\" is invalid (non-numeric value).",

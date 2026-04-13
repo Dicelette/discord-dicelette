@@ -3,6 +3,7 @@ import type { SxProps, Theme } from "@mui/material/styles";
 export const SECTION_ROOT_SX = {
 	display: "flex",
 	flexDirection: "column",
+	gap: 2,
 } as const;
 
 export const SECTION_TITLE_SX = {

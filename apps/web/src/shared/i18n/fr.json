@@ -22,13 +22,13 @@
 		"discard": "Réinitialiser",
 		"discardSuccess": "Modifications annulées.",
 		"documentation": "Documentation",
+		"edit": "Modifier",
 		"here": "ici",
 		"lightTheme": "Thème clair",
 		"loading": "Chargement...",
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
-		"edit": "Modifier",
 		"save": "Sauvegarder",
 		"saving": "Sauvegarde..."
 	},
@@ -127,16 +127,17 @@
 		"title": "Vos serveurs"
 	},
 	"template": {
-		"general": "Général",
+		"add": {
+			"label": "Nouveau",
+			"max": "Vous avez atteint la valeur maximale autorisée ({{- maxLen}})."
+		},
 		"affectSkill": "Affecte compétences",
-		"addMacro": "Ajouter une macro",
-		"addStatistic": "Ajouter une statistique",
 		"channelRequired": "Veuillez sélectionner un channel.",
 		"charName": "Nom de personnage obligatoire",
+		"combination": "Combinaison",
+		"createModalTitle": "Créer un modèle",
 		"critical": "Critiques",
 		"customCritical": "Critiques personnalisés",
-		"duplicate": "Dupliquer",
-		"duplicateField": "Dupliquer ce champ",
 		"damage": "Dés de compétence",
 		"delete": "Supprimer",
 		"deleteCharacters": "Supprimer tous les personnages du serveur",
@@ -149,25 +150,53 @@
 		"diceType": "Dé type",
 		"download": "Vous pouvez générer un modèle",
 		"downloadLink": "https://www.dicelette.app/docs/sheet/form",
+		"duplicate": "Dupliquer",
+		"duplicateField": "Dupliquer ce champ",
+		"editModalTitle": "Modifier le modèle",
+		"errors": {
+			"critical": {
+				"negative": "La valeur ne peut pas être inférieure à 0",
+				"sameValues": "Les deux valeurs ne peuvent être identiques"
+			},
+			"customCritical": {
+				"emptyText": "Le texte ne peut pas être vide"
+			},
+			"shared": {
+				"duplicateName": "Ce nom est déjà utilisé",
+				"emptyName": "Le nom ne peut pas être vide",
+				"emptyValue": "La valeur ne peut pas être vide"
+			},
+			"statistics": {
+				"maxLowerThanMin": "La valeur maximale ne peut pas être inférieure à la valeur minimale",
+				"maxNegative": "La valeur maximale ne peut pas être négative",
+				"maxNotNumber": "La valeur maximale doit être un nombre",
+				"minGreaterThanMax": "La valeur minimale ne peut pas être supérieure à la valeur maximale",
+				"minNegative": "La valeur minimale ne peut pas être négative",
+				"minNotNumber": "La valeur minimale doit être un nombre"
+			},
+			"validation": "Erreur de validation du modèle"
+		},
 		"excluded": "Exclu",
 		"export": "Exporter",
 		"exportCharacters": "Exporter les personnages (CSV)",
 		"exportCharactersError": "Erreur lors de l'export des personnages.",
+		"failure": "Échec",
 		"fileLabel": "Choisir un fichier JSON",
 		"fileNotSelected": "Aucun fichier sélectionné",
 		"fileRequired": "Veuillez sélectionner un fichier JSON.",
 		"forceDistrib": "Distribution forcée",
 		"forceDistribHelp": "Renvoie une erreur si la somme des statistiques est inférieure au total défini",
 		"formula": "Formule",
+		"general": "Général",
 		"import": "Importer",
 		"importError": "Fichier invalide. Vérifiez le format JSON.",
-		"createModalTitle": "Créer un modèle",
-		"editModalTitle": "Modifier le modèle",
 		"importModalTitle": "Importer un modèle",
 		"importSuccess": "Modèle importé avec succès !",
 		"macros": "Macros",
+		"max": "Max",
 		"maxMacrosReached": "Vous avez atteint le nombre maximum de macros",
 		"maxStatisticsReached": "Vous avez atteint le nombre maximum de statistiques ({max})",
+		"min": "Min",
 		"name": "Nom",
 		"none": "Aucun modèle enregistré pour ce serveur.",
 		"onNaturalDice": "Dé naturel",
@@ -178,38 +207,11 @@
 		"section": "Template statistique",
 		"sign": "Signe",
 		"statistics": "Statistiques",
+		"success": "Succès",
 		"templateChannel": "Channel du modèle",
 		"templateChannelHelp": "Channel où sera envoyé le message du modèle (texte uniquement).",
 		"total": "Total",
-		"value": "Valeur",
-		"min": "Min",
-		"max": "Max",
-		"combination": "Combinaison",
-		"success": "Succès",
-		"failure": "Échec",
-		"errors": {
-			"validation": "Erreur de validation du modèle",
-			"shared": {
-				"duplicateName": "Ce nom est déjà utilisé",
-				"emptyName": "Le nom ne peut pas être vide",
-				"emptyValue": "La valeur ne peut pas être vide"
-			},
-			"critical": {
-				"sameValues": "Les deux valeurs ne peuvent être identiques",
-				"negative": "La valeur ne peut pas être inférieure à 0"
-			},
-			"statistics": {
-				"minGreaterThanMax": "La valeur minimale ne peut pas être supérieure à la valeur maximale",
-				"minNegative": "La valeur minimale ne peut pas être négative",
-				"minNotNumber": "La valeur minimale doit être un nombre",
-				"maxLowerThanMin": "La valeur maximale ne peut pas être inférieure à la valeur minimale",
-				"maxNegative": "La valeur maximale ne peut pas être négative",
-				"maxNotNumber": "La valeur maximale doit être un nombre"
-			},
-			"customCritical": {
-				"emptyText": "Le texte ne peut pas être vide"
-			}
-		}
+		"value": "Valeur"
 	},
 	"userConfig": {
 		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",

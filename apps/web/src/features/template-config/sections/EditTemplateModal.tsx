@@ -36,7 +36,16 @@ import {
 	useState,
 } from "react";
 
-const tabsSx = { mb: 2, borderBottom: 1, borderColor: "divider" } as const;
+const tabsSx = {
+	position: "sticky",
+	top: 0,
+	zIndex: 10,
+	bgcolor: "background.paper",
+	borderBottom: 1,
+	borderColor: "divider",
+	px: 3,
+	pt: 1,
+} as const;
 const hiddenSx = { display: "none" } as const;
 const visibleSx = {} as const;
 
@@ -299,33 +308,33 @@ export default function EditTemplateModal({
 				{isEditMode ? t("template.editModalTitle") : t("template.createModalTitle")}
 			</DialogTitle>
 
-			<DialogContent dividers sx={{ bgcolor: "background.paper" }}>
-				<Stack spacing={2}>
+			<DialogContent dividers sx={{ bgcolor: "background.paper", p: 0 }}>
+				{/* Hidden file input — always present, triggered by button in channels tab */}
+				<input
+					ref={importFileRef}
+					type="file"
+					accept=".json,application/json"
+					style={{ display: "none" }}
+					onChange={handleImportFile}
+				/>
+
+				{/* Sticky tabs bar — enfant direct du DialogContent (scroll container) */}
+				<Box sx={tabsSx}>
 					{state.error && (
 						<Alert
 							severity="error"
 							onClose={() => dispatch({ type: "set_error", value: null })}
+							sx={{ mb: 1 }}
 						>
 							{state.error}
 						</Alert>
 					)}
-
-					{/* Hidden file input — always present, triggered by button in channels tab */}
-					<input
-						ref={importFileRef}
-						type="file"
-						accept=".json,application/json"
-						style={{ display: "none" }}
-						onChange={handleImportFile}
-					/>
-
 					<Tabs
 						value={activeTab}
 						onChange={(_, v: TemplateTab) => setActiveTab(v)}
 						variant="scrollable"
 						scrollButtons="auto"
 						allowScrollButtonsMobile
-						sx={tabsSx}
 					>
 						<Tab value="channels" label={t("config.sections.channels")} />
 						<Tab value="general" label={t("template.general")} />
@@ -333,7 +342,10 @@ export default function EditTemplateModal({
 						<Tab value="macros" label={t("template.macros")} />
 						<Tab value="customCritical" label={t("template.customCritical")} />
 					</Tabs>
+				</Box>
 
+				{/* Contenu scrollable */}
+				<Stack spacing={2} sx={{ px: 3, pb: 2 }}>
 					{/* Channels tab */}
 					<Box sx={activeTab === "channels" ? visibleSx : hiddenSx}>
 						<Stack spacing={2}>

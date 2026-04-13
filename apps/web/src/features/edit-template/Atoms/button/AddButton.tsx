@@ -1,44 +1,35 @@
 import { AddCircleOutline } from "@mui/icons-material";
-import { IconButton, type SxProps, type Theme, Tooltip } from "@mui/material";
+import { Button, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
 import type { FC } from "react";
 
 type AddButtonProps = {
-	len?: number;
-	type?: "macro" | "stats" | "critical";
+	len: number;
+	type: "macro" | "stats" | "critical";
 	onClick: () => void;
-};
-
-const buttonSx: SxProps<Theme> = {
-	p: 0,
-	borderRadius: 0,
-	bgcolor: "transparent",
-	"&:hover": { bgcolor: "transparent", opacity: 0.8 },
 };
 
 const AddButton: FC<AddButtonProps> = ({ len, type, onClick }) => {
 	const { t } = useI18n();
-	const maxLen = 25;
-	const addLabel = type === "macro" ? t("template.addMacro") : t("template.addStatistic");
-	const maxLabel =
-		type === "macro"
-			? t("template.maxMacrosReached")
-			: t("template.maxStatisticsReached", { max: maxLen });
-	const isDisabled = type === "stats" && len !== undefined && len >= maxLen;
+	const maxLen = type === "critical" ? 22 : 25;
+	const addLabel = t("template.add.label");
+	const maxLabel = t("template.add.max", { maxLen });
+	const isDisabled = len >= maxLen;
 
 	return (
-		<Tooltip title={isDisabled ? maxLabel : addLabel} arrow>
+		<Tooltip title={isDisabled ? maxLabel : undefined} arrow>
 			<span>
-				<IconButton
+				<Button
 					onClick={onClick}
 					size="small"
 					color="success"
+					variant="outlined"
 					disabled={isDisabled}
-					disableRipple
-					sx={buttonSx}
+					sx={{ mb: 2 }}
+					startIcon={<AddCircleOutline />}
 				>
-					<AddCircleOutline fontSize="small" />
-				</IconButton>
+					{addLabel}
+				</Button>
 			</span>
 		</Tooltip>
 	);
