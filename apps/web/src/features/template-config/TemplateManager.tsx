@@ -1,4 +1,4 @@
-import { Delete, Download, Edit, Upload } from "@mui/icons-material";
+import { Delete, Edit, Upload } from "@mui/icons-material";
 import {
 	Alert,
 	Box,
@@ -13,7 +13,7 @@ import {
 import { getChannelPathById, type Props, SectionTitle, useI18n } from "@shared";
 import { exportJson } from "../user-config/utils.ts";
 import { useTemplateManager } from "./hooks";
-import { EditTemplateModal, TemplateModal, TemplateView } from "./sections";
+import { EditTemplateModal, TemplateView } from "./sections";
 
 const alertMbSx = { mb: 2 } as const;
 const actionsBoxSx = { display: "flex", gap: 1, mb: 2, flexWrap: "wrap" } as const;
@@ -37,7 +37,6 @@ export default function TemplateManager({
 		success,
 		saving,
 		confirmDelete,
-		importModalOpen,
 		editModalOpen,
 		hasCharacters,
 		templateChannelId,
@@ -80,22 +79,14 @@ export default function TemplateManager({
 			<Box sx={actionsBoxSx}>
 				<Button
 					variant="outlined"
-					startIcon={<Download />}
-					onClick={() => dispatch({ type: "import_modal", value: true })}
-					disabled={saving || loading}
-					size="small"
-				>
-					{t("import.name").toTitle()}
-				</Button>
-
-				<Button
-					variant="outlined"
 					startIcon={<Edit />}
 					onClick={() => dispatch({ type: "edit_modal", value: true })}
 					disabled={saving || loading}
 					size="small"
 				>
-					{t("common.edit").toTitle()}
+					{template
+						? t("common.edit").toTitle()
+						: t("template.createModalTitle").toTitle()}
 				</Button>
 
 				{template && (
@@ -146,18 +137,6 @@ export default function TemplateManager({
 					defaultPublicChannel={getChannelPathById(publicChannelId, channels)}
 				/>
 			)}
-
-			{/* Import from JSON file modal */}
-			<TemplateModal
-				open={importModalOpen}
-				onClose={() => dispatch({ type: "import_modal", value: false })}
-				onImport={handleModalImport}
-				channels={channels}
-				hasCharacters={hasCharacters}
-				defaultTemplateChannelId={templateChannelId}
-				defaultPublicChannelId={publicChannelId}
-				defaultPrivateChannelId={privateChannelId}
-			/>
 
 			{/* Edit / create template via form modal */}
 			<EditTemplateModal

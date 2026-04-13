@@ -22,7 +22,6 @@ interface State {
 	success: string | null;
 	saving: boolean;
 	confirmDelete: boolean;
-	importModalOpen: boolean;
 	editModalOpen: boolean;
 	hasCharacters: boolean;
 	templateChannelId: string | undefined;
@@ -36,7 +35,6 @@ type Action =
 	| { type: "set_error"; value: string | null }
 	| { type: "set_success"; value: string | null }
 	| { type: "confirm_delete"; value: boolean }
-	| { type: "import_modal"; value: boolean }
 	| { type: "edit_modal"; value: boolean }
 	| { type: "bulk_deleted" }
 	| {
@@ -70,8 +68,6 @@ function reducer(state: State, action: Action): State {
 			return { ...state, success: action.value };
 		case "confirm_delete":
 			return { ...state, confirmDelete: action.value };
-		case "import_modal":
-			return { ...state, importModalOpen: action.value };
 		case "edit_modal":
 			return { ...state, editModalOpen: action.value };
 		case "bulk_deleted":
@@ -110,7 +106,6 @@ export function useTemplateManager(
 		success: null,
 		saving: false,
 		confirmDelete: false,
-		importModalOpen: false,
 		editModalOpen: false,
 		hasCharacters: false,
 		templateChannelId: defaultTemplateChannelId,

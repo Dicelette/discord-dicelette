@@ -1,4 +1,5 @@
-import type { StatisticalTemplate } from "@dicelette/core";
+import { getEngine, type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
 	Alert,
 	Box,
@@ -10,6 +11,7 @@ import {
 	DialogTitle,
 	Divider,
 	FormControlLabel,
+	Paper,
 	Stack,
 	Switch,
 	Typography,
@@ -27,11 +29,15 @@ import {
 	useRef,
 	useState,
 } from "react";
+import type React from "react";
 import TemplateForm from "../../edit-template/TemplateForm";
 import type { ImportTemplateData } from "../types";
 
 const captionIndentSx = { mt: 0.5, pl: 0.5 } as const;
 const loadingBoxSx = { display: "flex", justifyContent: "center", py: 8 } as const;
+const filePaperSx = { p: 1.5, bgcolor: "action.hover", borderColor: "divider" } as const;
+const fileRowSx = { display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" } as const;
+const subtitleBoldSx = { fontWeight: 700 } as const;
 
 // ─── local state ───────────────────────────────────────────────────────────────
 
@@ -122,6 +128,36 @@ export default function EditTemplateModal({
 	const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 	const formId = useId();
 
+	// ── JSON import state ──────────────────────────────────────────────────────
+	const [importedTemplate, setImportedTemplate] = useState<StatisticalTemplate | null>(null);
+	const [importFile, setImportFile] = useState<File | null>(null);
+	const [importError, setImportError] = useState<string | null>(null);
+	const importFileRef = useRef<HTMLInputElement>(null);
+
+	const handleImportFile = useCallback(
+		async (e: React.ChangeEvent<HTMLInputElement>) => {
+			const file = e.target.files?.[0] ?? null;
+			e.target.value = "";
+			setImportFile(file);
+			setImportError(null);
+			if (!file) return;
+			try {
+				const json = JSON.parse(await file.text());
+				const engine = getEngine("browserCrypto");
+				const validated = verifyTemplateValue(json, true, engine);
+				setImportedTemplate(validated);
+			} catch {
+				setImportError(t("template.importError"));
+				setImportFile(null);
+			}
+		},
+		[t]
+	);
+
+	// The template fed to TemplateForm: JSON import takes priority over existing template.
+	const activeTemplate = importedTemplate ?? existingTemplate;
+
+	// ── Deferred form mount ────────────────────────────────────────────────────
 	// Defer TemplateForm mounting so the dialog animation plays first.
 	// The form is heavy (dnd, many hooks) — showing a spinner avoids UI freeze.
 	const [formReady, setFormReady] = useState(false);
@@ -173,6 +209,9 @@ export default function EditTemplateModal({
 	);
 
 	const handleClose = useCallback(() => {
+		setImportedTemplate(null);
+		setImportFile(null);
+		setImportError(null);
 		dispatch({
 			type: "reset",
 			defaults: makeDefaults(
@@ -247,6 +286,45 @@ export default function EditTemplateModal({
 							{state.error}
 						</Alert>
 					)}
+
+					{/* JSON import */}
+					<input
+						ref={importFileRef}
+						type="file"
+						accept=".json,application/json"
+						style={{ display: "none" }}
+						onChange={handleImportFile}
+					/>
+					<Paper variant="outlined" sx={filePaperSx}>
+						<Stack spacing={0.75}>
+							<Typography variant="subtitle2" sx={subtitleBoldSx}>
+								{t("template.importModalTitle")}
+							</Typography>
+							<Box sx={fileRowSx}>
+								<Button
+									variant="outlined"
+									startIcon={<DownloadIcon />}
+									onClick={() => importFileRef.current?.click()}
+									size="small"
+								>
+									{t("template.fileLabel")}
+								</Button>
+								<Typography
+									variant="body2"
+									color={importFile ? "text.primary" : "text.secondary"}
+								>
+									{importFile ? importFile.name : t("template.fileNotSelected")}
+								</Typography>
+							</Box>
+							{importError && (
+								<Alert severity="error" onClose={() => setImportError(null)}>
+									{importError}
+								</Alert>
+							)}
+						</Stack>
+					</Paper>
+
+					<Divider />
 
 					{/* Channel selection */}
 					<Stack spacing={1.5}>
@@ -335,7 +413,7 @@ export default function EditTemplateModal({
 
 					{formReady ? (
 						<TemplateForm
-							initialTemplate={existingTemplate}
+							initialTemplate={activeTemplate}
 							onSave={handleSave}
 							onError={(msg) => dispatch({ type: "set_error", value: msg })}
 							formId={formId}
