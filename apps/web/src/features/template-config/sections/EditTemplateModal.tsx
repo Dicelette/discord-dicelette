@@ -292,6 +292,7 @@ export default function EditTemplateModal({
 			maxWidth="lg"
 			fullWidth
 			scroll="paper"
+			PaperProps={{ sx: { height: "90vh" } }}
 		>
 			<DialogTitle>
 				{isEditMode ? t("template.editModalTitle") : t("template.createModalTitle")}
