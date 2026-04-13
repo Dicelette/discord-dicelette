@@ -6,11 +6,11 @@ import {
 	type StatisticalTemplate,
 	verifyTemplateValue,
 } from "@dicelette/core";
-import { Box, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useI18n } from "@shared";
 import { Form, Formik, type FormikHelpers } from "formik";
 import type { FC } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { CompactContext } from "./Atoms/CompactContext";
 import CriticalValue from "./Blocks/CriticalValue";
 import CustomCritical from "./Blocks/customCritical";
@@ -23,9 +23,8 @@ import { createFormItemId, isNumber } from "./utils";
 
 const engine = getEngine("browserCrypto");
 
-type TemplateTab = "general" | "statistics" | "macros" | "customCritical";
+export type TemplateTab = "channels" | "general" | "statistics" | "macros" | "customCritical";
 
-const tabsSx = { mb: 2, borderBottom: 1, borderColor: "divider" } as const;
 const hiddenSx = { display: "none" } as const;
 const visibleSx = {} as const;
 
@@ -166,6 +165,8 @@ export interface TemplateFormProps {
 	onError: (message: string) => void;
 	/** HTML id for the <form> — allows an external submit button via form={formId}. */
 	formId?: string;
+	/** Active tab — controlled by the parent modal so channels tab can share the same tab bar. */
+	activeTab: TemplateTab;
 }
 
 const TemplateForm: FC<TemplateFormProps> = ({
@@ -173,12 +174,12 @@ const TemplateForm: FC<TemplateFormProps> = ({
 	onSave,
 	onError,
 	formId,
+	activeTab,
 }) => {
 	const { t } = useI18n();
 	// Single media-query call: all button children read this via CompactContext.
 	const theme = useTheme();
 	const isNarrow = useMediaQuery(theme.breakpoints.down("xl"));
-	const [activeTab, setActiveTab] = useState<TemplateTab>("general");
 
 	const initialValues = useMemo<DataForm>(
 		() => (initialTemplate ? mapSchemaToFormValues(initialTemplate) : INITIAL_VALUES),
@@ -205,19 +206,6 @@ const TemplateForm: FC<TemplateFormProps> = ({
 			<Formik initialValues={initialValues} enableReinitialize onSubmit={handleSubmit}>
 				{({ values, setFieldValue }) => (
 					<Form id={formId}>
-						<Tabs
-							value={activeTab}
-							onChange={(_, v: TemplateTab) => setActiveTab(v)}
-							variant="scrollable"
-							scrollButtons="auto"
-							sx={tabsSx}
-						>
-							<Tab value="general" label={t("template.general")} />
-							<Tab value="statistics" label={t("template.statistics")} />
-							<Tab value="macros" label={t("template.macros")} />
-							<Tab value="customCritical" label={t("template.customCritical")} />
-						</Tabs>
-
 						<Box sx={activeTab === "general" ? visibleSx : hiddenSx}>
 							<General />
 							<CriticalValue critical={values.critical ?? { success: "", failure: "" }} />

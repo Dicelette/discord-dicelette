@@ -13,11 +13,12 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	Divider,
 	FormControlLabel,
 	Paper,
 	Stack,
 	Switch,
+	Tab,
+	Tabs,
 	Typography,
 	useMediaQuery,
 	useTheme,
@@ -34,7 +35,11 @@ import {
 	useRef,
 	useState,
 } from "react";
-import TemplateForm from "../../edit-template/TemplateForm";
+
+const tabsSx = { mb: 2, borderBottom: 1, borderColor: "divider" } as const;
+const hiddenSx = { display: "none" } as const;
+const visibleSx = {} as const;
+import TemplateForm, { type TemplateTab } from "../../edit-template/TemplateForm";
 import type { ImportTemplateData } from "../types";
 
 const captionIndentSx = { mt: 0.5, pl: 0.5 } as const;
@@ -136,6 +141,11 @@ export default function EditTemplateModal({
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 	const formId = useId();
+	const [activeTab, setActiveTab] = useState<TemplateTab>("channels");
+
+	useEffect(() => {
+		if (open) setActiveTab("channels");
+	}, [open]);
 
 	// ── JSON import state ──────────────────────────────────────────────────────
 	const [importedTemplate, setImportedTemplate] = useState<StatisticalTemplate | null>(
@@ -298,7 +308,7 @@ export default function EditTemplateModal({
 						</Alert>
 					)}
 
-					{/* JSON import */}
+					{/* Hidden file input — always present, triggered by button in channels tab */}
 					<input
 						ref={importFileRef}
 						type="file"
@@ -306,133 +316,171 @@ export default function EditTemplateModal({
 						style={{ display: "none" }}
 						onChange={handleImportFile}
 					/>
-					<Paper variant="outlined" sx={filePaperSx}>
-						<Stack spacing={0.75}>
-							<Typography variant="subtitle2" sx={subtitleBoldSx}>
-								{t("template.importModalTitle")}
-							</Typography>
-							<Box sx={fileRowSx}>
-								<Button
-									variant="outlined"
-									startIcon={<DownloadIcon />}
-									onClick={() => importFileRef.current?.click()}
-									size="small"
-								>
-									{t("template.fileLabel")}
-								</Button>
-								<Typography
-									variant="body2"
-									color={importFile ? "text.primary" : "text.secondary"}
-								>
-									{importFile ? importFile.name : t("template.fileNotSelected")}
-								</Typography>
-							</Box>
-							{importError && (
-								<Alert severity="error" onClose={() => setImportError(null)}>
-									{importError}
-								</Alert>
-							)}
-						</Stack>
-					</Paper>
 
-					<Divider />
+					<Tabs
+						value={activeTab}
+						onChange={(_, v: TemplateTab) => setActiveTab(v)}
+						variant="scrollable"
+						scrollButtons="auto"
+						sx={tabsSx}
+					>
+						<Tab value="channels" label={t("config.sections.channels")} />
+						<Tab value="general" label={t("template.general")} />
+						<Tab value="statistics" label={t("template.statistics")} />
+						<Tab value="macros" label={t("template.macros")} />
+						<Tab value="customCritical" label={t("template.customCritical")} />
+					</Tabs>
 
-					{/* Channel selection */}
-					<Stack spacing={1.5}>
-						<Box>
-							<ChannelSelect
-								label={`${t("template.templateChannel")} *`}
-								value={state.channelId || undefined}
-								channels={templateChannels}
-								allChannels={channels}
-								onChange={(value) => {
-									dispatch({ type: "set_channel", key: "channelId", value });
-									dispatch({ type: "set_error", value: null });
-								}}
-							/>
-							<Typography variant="caption" color="text.secondary" sx={captionIndentSx}>
-								{t("template.templateChannelHelp")}
-							</Typography>
-						</Box>
+					{/* Channels tab */}
+					<Box sx={activeTab === "channels" ? visibleSx : hiddenSx}>
+						<Stack spacing={2}>
+							<Paper variant="outlined" sx={filePaperSx}>
+								<Stack spacing={0.75}>
+									<Typography variant="subtitle2" sx={subtitleBoldSx}>
+										{t("template.importModalTitle")}
+									</Typography>
+									<Box sx={fileRowSx}>
+										<Button
+											variant="outlined"
+											startIcon={<DownloadIcon />}
+											onClick={() => importFileRef.current?.click()}
+											size="small"
+										>
+											{t("template.fileLabel")}
+										</Button>
+										<Typography
+											variant="body2"
+											color={importFile ? "text.primary" : "text.secondary"}
+										>
+											{importFile ? importFile.name : t("template.fileNotSelected")}
+										</Typography>
+									</Box>
+									{importError && (
+										<Alert severity="error" onClose={() => setImportError(null)}>
+											{importError}
+										</Alert>
+									)}
+								</Stack>
+							</Paper>
 
-						<Box>
-							<ChannelSelect
-								label={t("config.defaultSheet")}
-								value={state.publicChannelId || undefined}
-								channels={charChannels}
-								allChannels={channels}
-								onChange={(value) =>
-									dispatch({ type: "set_channel", key: "publicChannelId", value })
-								}
-							/>
-							<Typography variant="caption" color="text.secondary" sx={captionIndentSx}>
-								{t("template.publicChannelHelp")}
-							</Typography>
-						</Box>
+							<Stack spacing={1.5}>
+								<Box>
+									<ChannelSelect
+										label={`${t("template.templateChannel")} *`}
+										value={state.channelId || undefined}
+										channels={templateChannels}
+										allChannels={channels}
+										onChange={(value) => {
+											dispatch({ type: "set_channel", key: "channelId", value });
+											dispatch({ type: "set_error", value: null });
+										}}
+									/>
+									<Typography
+										variant="caption"
+										color="text.secondary"
+										sx={captionIndentSx}
+									>
+										{t("template.templateChannelHelp")}
+									</Typography>
+								</Box>
 
-						<Box>
-							<ChannelSelect
-								label={t("config.fields.privateChannel")}
-								value={state.privateChannelId || undefined}
-								channels={charChannels}
-								allChannels={channels}
-								onChange={(value) =>
-									dispatch({ type: "set_channel", key: "privateChannelId", value })
-								}
-							/>
-							<Typography variant="caption" color="text.secondary" sx={captionIndentSx}>
-								{t("template.privateChannelHelp")}
-							</Typography>
-						</Box>
-					</Stack>
-
-					{hasCharacters && (
-						<>
-							<Divider />
-							<Alert severity="warning">{t("template.deleteWarning")}</Alert>
-							<FormControlLabel
-								control={
-									<Switch
-										checked={state.deleteCharacters}
-										color="error"
-										onChange={(e) =>
+								<Box>
+									<ChannelSelect
+										label={t("config.defaultSheet")}
+										value={state.publicChannelId || undefined}
+										channels={charChannels}
+										allChannels={channels}
+										onChange={(value) =>
 											dispatch({
-												type: "set_delete_characters",
-												value: e.target.checked,
+												type: "set_channel",
+												key: "publicChannelId",
+												value,
 											})
 										}
 									/>
-								}
-								label={
-									<Box>
-										<Typography
-											variant="body2"
-											color={state.deleteCharacters ? "error" : undefined}
-										>
-											{t("template.deleteCharacters")}
-										</Typography>
-										<Typography variant="caption" color="text.secondary">
-											{t("template.deleteCharactersHelp")}
-										</Typography>
-									</Box>
-								}
-							/>
-						</>
-					)}
+									<Typography
+										variant="caption"
+										color="text.secondary"
+										sx={captionIndentSx}
+									>
+										{t("template.publicChannelHelp")}
+									</Typography>
+								</Box>
 
-					<Divider />
+								<Box>
+									<ChannelSelect
+										label={t("config.fields.privateChannel")}
+										value={state.privateChannelId || undefined}
+										channels={charChannels}
+										allChannels={channels}
+										onChange={(value) =>
+											dispatch({
+												type: "set_channel",
+												key: "privateChannelId",
+												value,
+											})
+										}
+									/>
+									<Typography
+										variant="caption"
+										color="text.secondary"
+										sx={captionIndentSx}
+									>
+										{t("template.privateChannelHelp")}
+									</Typography>
+								</Box>
+							</Stack>
 
+							{hasCharacters && (
+								<Stack spacing={1}>
+									<Alert severity="warning">{t("template.deleteWarning")}</Alert>
+									<FormControlLabel
+										control={
+											<Switch
+												checked={state.deleteCharacters}
+												color="error"
+												onChange={(e) =>
+													dispatch({
+														type: "set_delete_characters",
+														value: e.target.checked,
+													})
+												}
+											/>
+										}
+										label={
+											<Box>
+												<Typography
+													variant="body2"
+													color={state.deleteCharacters ? "error" : undefined}
+												>
+													{t("template.deleteCharacters")}
+												</Typography>
+												<Typography variant="caption" color="text.secondary">
+													{t("template.deleteCharactersHelp")}
+												</Typography>
+											</Box>
+										}
+									/>
+								</Stack>
+							)}
+						</Stack>
+					</Box>
+
+					{/* Template form tabs — deferred mount so dialog animation plays first */}
 					{formReady ? (
 						<TemplateForm
+							activeTab={activeTab}
 							initialTemplate={activeTemplate}
 							onSave={handleSave}
 							onError={(msg) => dispatch({ type: "set_error", value: msg })}
 							formId={formId}
 						/>
 					) : (
-						<Box sx={loadingBoxSx}>
-							<CircularProgress />
-						</Box>
+						activeTab !== "channels" && (
+							<Box sx={loadingBoxSx}>
+								<CircularProgress />
+							</Box>
+						)
 					)}
 				</Stack>
 			</DialogContent>
