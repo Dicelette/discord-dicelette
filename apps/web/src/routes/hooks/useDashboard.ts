@@ -31,11 +31,7 @@ interface State {
 	hasUnsavedChanges: boolean;
 }
 
-// ─── Actions ──────────────────────────────────────────────────────────────────
-// Each action represents a complete state transition, not a granular setter.
-
 type Action =
-	// Initial data load
 	| {
 			type: "user_loaded";
 			isAdmin: boolean;
@@ -44,26 +40,18 @@ type Action =
 			userConfigData: ApiUserConfig["userConfig"];
 			tab: ActiveTab;
 	  }
-	| {
-			type: "admin_data_loaded";
-			config: ApiGuildData;
-			channels: Channel[];
-			roles: Role[];
-			serverCharCount: number;
-	  }
+	| { type: "config_loaded"; config: ApiGuildData }
+	| { type: "set_channels"; channels: Channel[] }
+	| { type: "set_roles"; roles: Role[] }
+	| { type: "set_server_char_count"; count: number }
 	| { type: "set_loading"; value: boolean }
 	| { type: "set_error"; value: string | null }
-	// Config save lifecycle
-	| { type: "save_start" }
-	| { type: "save_success"; updates: Partial<ApiGuildData> }
-	| { type: "save_failed"; error: string }
-	| { type: "save_clear_success" }
-	// Characters refresh lifecycle
-	| { type: "refresh_start" }
-	| { type: "refresh_success" }
-	| { type: "refresh_failed"; error: string }
-	| { type: "refresh_clear_success" }
-	// Navigation
+	| { type: "set_saving"; value: boolean }
+	| { type: "set_save_success"; value: boolean }
+	| { type: "set_refreshing"; value: boolean }
+	| { type: "set_refresh_success"; value: boolean }
+	| { type: "increment_refresh_token" }
+	| { type: "update_config"; updates: Partial<ApiGuildData> }
 	| { type: "mount_tab"; tab: ActiveTab }
 	| { type: "set_tab"; tab: ActiveTab }
 	| { type: "set_dirty"; value: boolean };
@@ -80,47 +68,33 @@ function reducer(state: State, action: Action): State {
 				tab: action.tab,
 				mountedTabs: new Set([action.tab]),
 			};
-		case "admin_data_loaded":
-			return {
-				...state,
-				config: action.config,
-				channels: action.channels,
-				roles: action.roles,
-				serverCharCount: action.serverCharCount,
-			};
+		case "config_loaded":
+			return { ...state, config: action.config };
+		case "set_channels":
+			return { ...state, channels: action.channels };
+		case "set_roles":
+			return { ...state, roles: action.roles };
+		case "set_server_char_count":
+			return { ...state, serverCharCount: action.count };
 		case "set_loading":
 			return { ...state, loading: action.value };
 		case "set_error":
 			return { ...state, error: action.value };
-		// Save lifecycle
-		case "save_start":
-			return { ...state, saving: true, saveSuccess: false };
-		case "save_success":
+		case "set_saving":
+			return { ...state, saving: action.value };
+		case "set_save_success":
+			return { ...state, saveSuccess: action.value };
+		case "set_refreshing":
+			return { ...state, refreshingCharacters: action.value };
+		case "set_refresh_success":
+			return { ...state, refreshSuccess: action.value };
+		case "increment_refresh_token":
+			return { ...state, charactersRefreshToken: state.charactersRefreshToken + 1 };
+		case "update_config":
 			return {
 				...state,
-				saving: false,
-				saveSuccess: true,
 				config: state.config ? { ...state.config, ...action.updates } : state.config,
 			};
-		case "save_failed":
-			return { ...state, saving: false, error: action.error };
-		case "save_clear_success":
-			return { ...state, saveSuccess: false };
-		// Refresh lifecycle
-		case "refresh_start":
-			return { ...state, refreshingCharacters: true, refreshSuccess: false, error: null };
-		case "refresh_success":
-			return {
-				...state,
-				refreshingCharacters: false,
-				refreshSuccess: true,
-				charactersRefreshToken: state.charactersRefreshToken + 1,
-			};
-		case "refresh_failed":
-			return { ...state, refreshingCharacters: false, error: action.error };
-		case "refresh_clear_success":
-			return { ...state, refreshSuccess: false };
-		// Navigation
 		case "mount_tab":
 			return state.mountedTabs.has(action.tab)
 				? state
@@ -194,22 +168,24 @@ export function useDashboard(guildId: string | undefined) {
 					tab: initialTab,
 				});
 				if (admin) {
-					const [configRes, channelsRes, rolesRes, serverCharCount] = await Promise.all([
+					const [configRes] = await Promise.all([
 						guildApi.getConfig(guildId),
-						guildApi.getChannels(guildId).catch(() => ({ data: [] as Channel[] })),
-						guildApi.getRoles(guildId).catch(() => ({ data: [] as Role[] })),
+						guildApi
+							.getChannels(guildId)
+							.then((r) => dispatch({ type: "set_channels", channels: r.data }))
+							.catch(() => {}),
+						guildApi
+							.getRoles(guildId)
+							.then((r) => dispatch({ type: "set_roles", roles: r.data }))
+							.catch(() => {}),
 						charactersApi
 							.count(guildId)
-							.then((r) => r.data.count)
-							.catch(() => 0),
+							.then((r) =>
+								dispatch({ type: "set_server_char_count", count: r.data.count })
+							)
+							.catch(() => {}),
 					]);
-					dispatch({
-						type: "admin_data_loaded",
-						config: configRes.data,
-						channels: channelsRes.data,
-						roles: rolesRes.data,
-						serverCharCount,
-					});
+					dispatch({ type: "config_loaded", config: configRes.data });
 				}
 			})
 			.catch(() =>
@@ -221,13 +197,17 @@ export function useDashboard(guildId: string | undefined) {
 	const handleSave = useCallback(
 		async (updates: Partial<ApiGuildData>) => {
 			if (!guildId) return;
-			dispatch({ type: "save_start" });
+			dispatch({ type: "set_saving", value: true });
+			dispatch({ type: "set_save_success", value: false });
 			try {
 				await guildApi.updateConfig(guildId, updates);
-				dispatch({ type: "save_success", updates });
-				setTimeout(() => dispatch({ type: "save_clear_success" }), 3000);
+				dispatch({ type: "update_config", updates });
+				dispatch({ type: "set_save_success", value: true });
+				setTimeout(() => dispatch({ type: "set_save_success", value: false }), 3000);
 			} catch {
-				dispatch({ type: "save_failed", error: tRef.current("dashboard.saveError") });
+				dispatch({ type: "set_error", value: tRef.current("dashboard.saveError") });
+			} finally {
+				dispatch({ type: "set_saving", value: false });
 			}
 		},
 		[guildId]
@@ -235,16 +215,21 @@ export function useDashboard(guildId: string | undefined) {
 
 	const handleCharactersRefresh = useCallback(async () => {
 		if (!guildId) return;
-		dispatch({ type: "refresh_start" });
+		dispatch({ type: "set_refreshing", value: true });
+		dispatch({ type: "set_error", value: null });
+		dispatch({ type: "set_refresh_success", value: false });
 		try {
 			await charactersApi.refreshDashboard(guildId);
-			dispatch({ type: "refresh_success" });
-			setTimeout(() => dispatch({ type: "refresh_clear_success" }), 3000);
+			dispatch({ type: "increment_refresh_token" });
+			dispatch({ type: "set_refresh_success", value: true });
+			setTimeout(() => dispatch({ type: "set_refresh_success", value: false }), 3000);
 		} catch {
 			dispatch({
-				type: "refresh_failed",
-				error: tRef.current("dashboard.refreshCharactersError"),
+				type: "set_error",
+				value: tRef.current("dashboard.refreshCharactersError"),
 			});
+		} finally {
+			dispatch({ type: "set_refreshing", value: false });
 		}
 	}, [guildId]);
 
@@ -266,7 +251,7 @@ export function useDashboard(guildId: string | undefined) {
 	}, []);
 
 	const setRefreshSuccess = useCallback((value: boolean) => {
-		if (!value) dispatch({ type: "refresh_clear_success" });
+		dispatch({ type: "set_refresh_success", value });
 	}, []);
 
 	return {
