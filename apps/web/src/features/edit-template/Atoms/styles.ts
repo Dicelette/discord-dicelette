@@ -3,16 +3,13 @@ import type { SxProps, Theme } from "@mui/material/styles";
 export const SECTION_ROOT_SX = {
 	display: "flex",
 	flexDirection: "column",
-	mb: 2,
 } as const;
 
 export const SECTION_TITLE_SX = {
-	mb: 1,
+	m: 1,
 	display: "flex",
 	alignItems: "center",
 	gap: 1,
-	padding: 0,
-	margin: 0,
 } as const;
 
 export const mergeSx = (
@@ -84,6 +81,6 @@ export const getDesktopToggleSx = (
 	},
 });
 
-export const BASE_TEXTFIELD_SX = { width: { xs: "100%", xl: 400 }, mb: 2 } as const;
+export const BASE_TEXTFIELD_SX = { width: { xs: "100%", md: 400 }, mb: 2 } as const;
 
-export const BASE_TABLEFIELD_SX = { width: { xs: "100%", xl: 200 }, mb: 0 } as const;
+export const BASE_TABLEFIELD_SX = { width: { xs: "100%", md: 200 }, mb: 0 } as const;
