@@ -1,4 +1,8 @@
-import { getEngine, type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
+import {
+	getEngine,
+	type StatisticalTemplate,
+	verifyTemplateValue,
+} from "@dicelette/core";
 import DownloadIcon from "@mui/icons-material/Download";
 import {
 	Alert,
@@ -19,6 +23,7 @@ import {
 	useTheme,
 } from "@mui/material";
 import { type Channel, ChannelSelect, useI18n } from "@shared";
+import type React from "react";
 import {
 	startTransition,
 	useCallback,
@@ -29,14 +34,18 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type React from "react";
 import TemplateForm from "../../edit-template/TemplateForm";
 import type { ImportTemplateData } from "../types";
 
 const captionIndentSx = { mt: 0.5, pl: 0.5 } as const;
 const loadingBoxSx = { display: "flex", justifyContent: "center", py: 8 } as const;
 const filePaperSx = { p: 1.5, bgcolor: "action.hover", borderColor: "divider" } as const;
-const fileRowSx = { display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" } as const;
+const fileRowSx = {
+	display: "flex",
+	alignItems: "center",
+	gap: 1,
+	flexWrap: "wrap",
+} as const;
 const subtitleBoldSx = { fontWeight: 700 } as const;
 
 // ─── local state ───────────────────────────────────────────────────────────────
@@ -129,7 +138,9 @@ export default function EditTemplateModal({
 	const formId = useId();
 
 	// ── JSON import state ──────────────────────────────────────────────────────
-	const [importedTemplate, setImportedTemplate] = useState<StatisticalTemplate | null>(null);
+	const [importedTemplate, setImportedTemplate] = useState<StatisticalTemplate | null>(
+		null
+	);
 	const [importFile, setImportFile] = useState<File | null>(null);
 	const [importError, setImportError] = useState<string | null>(null);
 	const importFileRef = useRef<HTMLInputElement>(null);

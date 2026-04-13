@@ -122,7 +122,11 @@ export function useTemplateManager(
 	useEffect(() => {
 		const cached = templateClientCache.get(guildId);
 		if (cached && Date.now() < cached.expiresAt) {
-			dispatch({ type: "loaded", template: cached.template, hasCharacters: cached.hasCharacters });
+			dispatch({
+				type: "loaded",
+				template: cached.template,
+				hasCharacters: cached.hasCharacters,
+			});
 			return;
 		}
 
@@ -147,7 +151,11 @@ export function useTemplateManager(
 				.catch(() => {}),
 		]).finally(() => {
 			if (!signal.aborted) {
-				templateClientCache.set(guildId, { template, hasCharacters, expiresAt: Date.now() + TEMPLATE_CACHE_TTL });
+				templateClientCache.set(guildId, {
+					template,
+					hasCharacters,
+					expiresAt: Date.now() + TEMPLATE_CACHE_TTL,
+				});
 				dispatch({ type: "loaded", template, hasCharacters });
 			}
 		});
@@ -195,7 +203,8 @@ export function useTemplateManager(
 					dispatch({ type: "bulk_deleted" });
 					// Patch cache: template is still valid, only hasCharacters changed.
 					const existing = templateClientCache.get(guildId);
-					if (existing) templateClientCache.set(guildId, { ...existing, hasCharacters: false });
+					if (existing)
+						templateClientCache.set(guildId, { ...existing, hasCharacters: false });
 				}
 				await templateApi.import(guildId, {
 					template: data.template,
