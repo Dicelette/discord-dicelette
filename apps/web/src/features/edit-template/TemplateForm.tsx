@@ -23,12 +23,17 @@ import { createFormItemId, isNumber } from "./utils";
 
 const engine = getEngine("browserCrypto");
 
-export type TemplateTab = "channels" | "general" | "statistics" | "macros" | "customCritical";
+export type TemplateTab =
+	| "channels"
+	| "general"
+	| "statistics"
+	| "macros"
+	| "customCritical";
 
 const hiddenSx = { display: "none" } as const;
 const visibleSx = {} as const;
 
-export const INITIAL_VALUES: DataForm = {
+const INITIAL_VALUES: DataForm = {
 	isCharNameRequired: false,
 	isPrivate: false,
 	statistics: [],
@@ -48,7 +53,7 @@ function parseNumber(nb?: unknown): number | undefined {
 }
 
 /** Converts DataForm (form state) to a validated StatisticalTemplate. Throws on validation error. */
-export function dataFormToTemplate(data: DataForm): StatisticalTemplate {
+function dataFormToTemplate(data: DataForm): StatisticalTemplate {
 	const stat: Statistic = {};
 	const diceSkill: Record<string, string> = {};
 	const customCritical: Record<string, CustomCriticalType> = {};
@@ -103,7 +108,7 @@ export function dataFormToTemplate(data: DataForm): StatisticalTemplate {
 }
 
 /** Maps a StatisticalTemplate back to the form's DataForm shape. */
-export function mapSchemaToFormValues(
+function mapSchemaToFormValues(
 	schema: StatisticalTemplate,
 	current: DataForm = INITIAL_VALUES
 ): DataForm {
