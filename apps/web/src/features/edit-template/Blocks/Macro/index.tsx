@@ -68,7 +68,7 @@ const MacroBlock = ({ values, setFieldValue }: MacroProps) => {
 						<Section
 							length={values.damages.length}
 							type="macro"
-							label={t("template.damage")}
+							label={t("common.macro").toTitle()}
 							onAdd={() => push({ id: createFormItemId("macro"), name: "", value: "" })}
 						>
 							{""}
