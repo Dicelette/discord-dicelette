@@ -1,7 +1,7 @@
 import { type ApiUserConfig, charactersApi, guildApi, userApi } from "@dicelette/api";
 import type { ApiGuildData } from "@dicelette/types";
 import { type Channel, type Role, useI18n } from "@shared";
-import { startTransition, useCallback, useEffect, useReducer } from "react";
+import { startTransition, useCallback, useEffect, useReducer, useRef } from "react";
 
 export type ActiveTab =
 	| "admin"
@@ -31,7 +31,11 @@ interface State {
 	hasUnsavedChanges: boolean;
 }
 
+// ─── Actions ──────────────────────────────────────────────────────────────────
+// Each action represents a complete state transition, not a granular setter.
+
 type Action =
+	// Initial data load
 	| {
 			type: "user_loaded";
 			isAdmin: boolean;
@@ -40,18 +44,26 @@ type Action =
 			userConfigData: ApiUserConfig["userConfig"];
 			tab: ActiveTab;
 	  }
-	| { type: "config_loaded"; config: ApiGuildData }
-	| { type: "set_channels"; channels: Channel[] }
-	| { type: "set_roles"; roles: Role[] }
-	| { type: "set_server_char_count"; count: number }
+	| {
+			type: "admin_data_loaded";
+			config: ApiGuildData;
+			channels: Channel[];
+			roles: Role[];
+			serverCharCount: number;
+	  }
 	| { type: "set_loading"; value: boolean }
 	| { type: "set_error"; value: string | null }
-	| { type: "set_saving"; value: boolean }
-	| { type: "set_save_success"; value: boolean }
-	| { type: "set_refreshing"; value: boolean }
-	| { type: "set_refresh_success"; value: boolean }
-	| { type: "increment_refresh_token" }
-	| { type: "update_config"; updates: Partial<ApiGuildData> }
+	// Config save lifecycle
+	| { type: "save_start" }
+	| { type: "save_success"; updates: Partial<ApiGuildData> }
+	| { type: "save_failed"; error: string }
+	| { type: "save_clear_success" }
+	// Characters refresh lifecycle
+	| { type: "refresh_start" }
+	| { type: "refresh_success" }
+	| { type: "refresh_failed"; error: string }
+	| { type: "refresh_clear_success" }
+	// Navigation
 	| { type: "mount_tab"; tab: ActiveTab }
 	| { type: "set_tab"; tab: ActiveTab }
 	| { type: "set_dirty"; value: boolean };
@@ -68,33 +80,47 @@ function reducer(state: State, action: Action): State {
 				tab: action.tab,
 				mountedTabs: new Set([action.tab]),
 			};
-		case "config_loaded":
-			return { ...state, config: action.config };
-		case "set_channels":
-			return { ...state, channels: action.channels };
-		case "set_roles":
-			return { ...state, roles: action.roles };
-		case "set_server_char_count":
-			return { ...state, serverCharCount: action.count };
+		case "admin_data_loaded":
+			return {
+				...state,
+				config: action.config,
+				channels: action.channels,
+				roles: action.roles,
+				serverCharCount: action.serverCharCount,
+			};
 		case "set_loading":
 			return { ...state, loading: action.value };
 		case "set_error":
 			return { ...state, error: action.value };
-		case "set_saving":
-			return { ...state, saving: action.value };
-		case "set_save_success":
-			return { ...state, saveSuccess: action.value };
-		case "set_refreshing":
-			return { ...state, refreshingCharacters: action.value };
-		case "set_refresh_success":
-			return { ...state, refreshSuccess: action.value };
-		case "increment_refresh_token":
-			return { ...state, charactersRefreshToken: state.charactersRefreshToken + 1 };
-		case "update_config":
+		// Save lifecycle
+		case "save_start":
+			return { ...state, saving: true, saveSuccess: false };
+		case "save_success":
 			return {
 				...state,
+				saving: false,
+				saveSuccess: true,
 				config: state.config ? { ...state.config, ...action.updates } : state.config,
 			};
+		case "save_failed":
+			return { ...state, saving: false, error: action.error };
+		case "save_clear_success":
+			return { ...state, saveSuccess: false };
+		// Refresh lifecycle
+		case "refresh_start":
+			return { ...state, refreshingCharacters: true, refreshSuccess: false, error: null };
+		case "refresh_success":
+			return {
+				...state,
+				refreshingCharacters: false,
+				refreshSuccess: true,
+				charactersRefreshToken: state.charactersRefreshToken + 1,
+			};
+		case "refresh_failed":
+			return { ...state, refreshingCharacters: false, error: action.error };
+		case "refresh_clear_success":
+			return { ...state, refreshSuccess: false };
+		// Navigation
 		case "mount_tab":
 			return state.mountedTabs.has(action.tab)
 				? state
@@ -113,6 +139,11 @@ function reducer(state: State, action: Action): State {
  */
 export function useDashboard(guildId: string | undefined) {
 	const { t } = useI18n();
+	// Keep a stable ref to `t` so effects don't re-run on locale changes.
+	// The ref is updated synchronously on every render, so error messages are
+	// always translated in the current locale when they are actually dispatched.
+	const tRef = useRef(t);
+	tRef.current = t;
 
 	const [state, dispatch] = useReducer(reducer, {
 		tab: "admin",
@@ -163,65 +194,59 @@ export function useDashboard(guildId: string | undefined) {
 					tab: initialTab,
 				});
 				if (admin) {
-					const [configRes] = await Promise.all([
+					const [configRes, channelsRes, rolesRes, serverCharCount] = await Promise.all([
 						guildApi.getConfig(guildId),
-						guildApi
-							.getChannels(guildId)
-							.then((r) => dispatch({ type: "set_channels", channels: r.data }))
-							.catch(() => {}),
-						guildApi
-							.getRoles(guildId)
-							.then((r) => dispatch({ type: "set_roles", roles: r.data }))
-							.catch(() => {}),
+						guildApi.getChannels(guildId).catch(() => ({ data: [] as Channel[] })),
+						guildApi.getRoles(guildId).catch(() => ({ data: [] as Role[] })),
 						charactersApi
 							.count(guildId)
-							.then((r) =>
-								dispatch({ type: "set_server_char_count", count: r.data.count })
-							)
-							.catch(() => {}),
+							.then((r) => r.data.count)
+							.catch(() => 0),
 					]);
-					dispatch({ type: "config_loaded", config: configRes.data });
+					dispatch({
+						type: "admin_data_loaded",
+						config: configRes.data,
+						channels: channelsRes.data,
+						roles: rolesRes.data,
+						serverCharCount,
+					});
 				}
 			})
-			.catch(() => dispatch({ type: "set_error", value: t("dashboard.loadError") }))
+			.catch(() =>
+				dispatch({ type: "set_error", value: tRef.current("dashboard.loadError") })
+			)
 			.finally(() => dispatch({ type: "set_loading", value: false }));
-	}, [guildId, t]);
+	}, [guildId]); // `t` removed — tRef always holds the current translator
 
 	const handleSave = useCallback(
 		async (updates: Partial<ApiGuildData>) => {
 			if (!guildId) return;
-			dispatch({ type: "set_saving", value: true });
-			dispatch({ type: "set_save_success", value: false });
+			dispatch({ type: "save_start" });
 			try {
 				await guildApi.updateConfig(guildId, updates);
-				dispatch({ type: "update_config", updates });
-				dispatch({ type: "set_save_success", value: true });
-				setTimeout(() => dispatch({ type: "set_save_success", value: false }), 3000);
+				dispatch({ type: "save_success", updates });
+				setTimeout(() => dispatch({ type: "save_clear_success" }), 3000);
 			} catch {
-				dispatch({ type: "set_error", value: t("dashboard.saveError") });
-			} finally {
-				dispatch({ type: "set_saving", value: false });
+				dispatch({ type: "save_failed", error: tRef.current("dashboard.saveError") });
 			}
 		},
-		[guildId, t]
+		[guildId]
 	);
 
 	const handleCharactersRefresh = useCallback(async () => {
 		if (!guildId) return;
-		dispatch({ type: "set_refreshing", value: true });
-		dispatch({ type: "set_error", value: null });
-		dispatch({ type: "set_refresh_success", value: false });
+		dispatch({ type: "refresh_start" });
 		try {
 			await charactersApi.refreshDashboard(guildId);
-			dispatch({ type: "increment_refresh_token" });
-			dispatch({ type: "set_refresh_success", value: true });
-			setTimeout(() => dispatch({ type: "set_refresh_success", value: false }), 3000);
+			dispatch({ type: "refresh_success" });
+			setTimeout(() => dispatch({ type: "refresh_clear_success" }), 3000);
 		} catch {
-			dispatch({ type: "set_error", value: t("dashboard.refreshCharactersError") });
-		} finally {
-			dispatch({ type: "set_refreshing", value: false });
+			dispatch({
+				type: "refresh_failed",
+				error: tRef.current("dashboard.refreshCharactersError"),
+			});
 		}
-	}, [guildId, t]);
+	}, [guildId]);
 
 	const handleTabChange = useCallback(
 		(_: unknown, v: ActiveTab) => {
@@ -241,7 +266,7 @@ export function useDashboard(guildId: string | undefined) {
 	}, []);
 
 	const setRefreshSuccess = useCallback((value: boolean) => {
-		dispatch({ type: "set_refresh_success", value });
+		if (!value) dispatch({ type: "refresh_clear_success" });
 	}, []);
 
 	return {

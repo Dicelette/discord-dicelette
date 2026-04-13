@@ -56,16 +56,16 @@ const StatisticsRow = ({
 		isDuplicate ?? (duplicateIndices ? duplicateIndices.includes(statIndex) : false);
 	const { max, min, combinaison, excluded, name } = stat;
 
+	// Use destructured primitives as deps so memos invalidate on value changes,
+	// not on object reference changes (stat may be a new object each render).
 	const nameErrClass = useMemo(() => nameErrorClass(name), [name]);
 	const minErrClass = useMemo(
-		() => minimalErrorClass(stat),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[stat.min, stat.max, stat.combinaison, stat]
+		() => minimalErrorClass({ name, min, max, combinaison }),
+		[name, min, max, combinaison]
 	);
 	const maxErrClass = useMemo(
-		() => maximalErrorClass(stat),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[stat.min, stat.max, stat.combinaison, stat]
+		() => maximalErrorClass({ name, min, max, combinaison }),
+		[name, min, max, combinaison]
 	);
 
 	const nameMsgKey = useMemo(
@@ -73,12 +73,12 @@ const StatisticsRow = ({
 		[statIndex, normalizedDuplicate, name]
 	);
 	const minMsgKey = useMemo(
-		() => minimalErrorMessage(statIndex, stat),
-		[statIndex, stat]
+		() => minimalErrorMessage(statIndex, { name, min, max, combinaison }),
+		[statIndex, name, min, max, combinaison]
 	);
 	const maxMsgKey = useMemo(
-		() => maximalErrorMessage(statIndex, stat),
-		[statIndex, stat]
+		() => maximalErrorMessage(statIndex, { name, min, max, combinaison }),
+		[statIndex, name, min, max, combinaison]
 	);
 
 	const nameMsg = nameMsgKey ? t(nameMsgKey) : "";

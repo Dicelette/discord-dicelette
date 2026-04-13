@@ -2,6 +2,7 @@ import { charactersApi } from "@dicelette/api";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Typography } from "@mui/material";
 import { useI18n } from "@shared";
+import { useMemo } from "react";
 import { useCharactersList } from "./hooks/useCharactersList";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
@@ -40,14 +41,24 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 		t("characters.loadError")
 	);
 
-	const q = search.trim().toLowerCase();
-	const filtered = q
-		? characters.filter(
-				(c) => (c.charName ?? "").subText(q) || (c.ownerName ?? "").subText(q)
-			)
-		: characters;
-	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-	const pageChars = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+	const q = useMemo(() => search.trim().toLowerCase(), [search]);
+	const filtered = useMemo(
+		() =>
+			q
+				? characters.filter(
+						(c) => (c.charName ?? "").subText(q) || (c.ownerName ?? "").subText(q)
+					)
+				: characters,
+		[characters, q]
+	);
+	const totalPages = useMemo(
+		() => Math.ceil(filtered.length / PAGE_SIZE),
+		[filtered.length]
+	);
+	const pageChars = useMemo(
+		() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+		[filtered, page]
+	);
 
 	return (
 		<CharacterListLayout

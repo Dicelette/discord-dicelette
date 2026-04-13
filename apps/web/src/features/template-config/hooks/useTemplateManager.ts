@@ -221,9 +221,8 @@ export function useTemplateManager(
 					privateChannelId: data.privateChannelId || undefined,
 				});
 				flash("set_success", t("template.importSuccess"));
-			} catch (e) {
+			} catch {
 				flash("set_error", t("template.importError"));
-				console.error(e);
 			} finally {
 				dispatch({ type: "saving", value: false });
 			}

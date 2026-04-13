@@ -18,7 +18,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const pageHeaderSx = {
@@ -74,6 +74,20 @@ const addButtonSx = { flexShrink: 0 } as const;
 const GUILDS_CACHE_TTL = 5 * 60 * 1000;
 let guildsClientCache: { guilds: DiscordGuild[]; expiresAt: number } | null = null;
 
+function getErrorStatus(err: unknown): number | undefined {
+	if (
+		err &&
+		typeof err === "object" &&
+		"response" in err &&
+		err.response &&
+		typeof err.response === "object" &&
+		"status" in err.response
+	) {
+		return (err.response as { status: number }).status;
+	}
+	return undefined;
+}
+
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
 	const [search, setSearch] = useState("");
@@ -82,6 +96,8 @@ export default function Servers() {
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
 	const { t } = useI18n();
+	const tRef = useRef(t);
+	tRef.current = t;
 
 	useEffect(() => {
 		if (guildsClientCache && Date.now() < guildsClientCache.expiresAt) {
@@ -99,9 +115,9 @@ export default function Servers() {
 				};
 				setGuilds(res.data);
 			})
-			.catch(() => setError(t("servers.loadError")))
+			.catch(() => setError(tRef.current("servers.loadError")))
 			.finally(() => setLoading(false));
-	}, [t]);
+	}, []); // `t` removed — tRef always holds the current translator
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
@@ -113,39 +129,45 @@ export default function Servers() {
 			guildsClientCache = { guilds: res.data, expiresAt: Date.now() + GUILDS_CACHE_TTL };
 			setGuilds(res.data);
 		} catch (err: unknown) {
-			const status =
-				err &&
-				typeof err === "object" &&
-				"response" in err &&
-				err.response &&
-				typeof err.response === "object" &&
-				"status" in err.response
-					? (err.response as { status: number }).status
-					: undefined;
+			const status = getErrorStatus(err);
 			setError(status === 429 ? t("servers.rateLimitError") : t("servers.loadError"));
 		} finally {
 			setRefreshing(false);
 		}
 	};
 
-	const botGuilds = guilds
-		.filter((g) => g.botPresent)
-		.sort((a, b) => {
-			//on va trier par ordre alphabétique wtf
-			//first sort by owner status, then by name
-			if (a.owner && !b.owner) return -1;
-			if (!a.owner && b.owner) return 1;
-			return a.name.localeCompare(b.name);
-		});
-	const adminGuilds = guilds
-		.filter((g) => !g.botPresent)
-		.sort((a, b) => a.name.localeCompare(b.name));
+	const botGuilds = useMemo(
+		() =>
+			guilds
+				.filter((g) => g.botPresent)
+				.sort((a, b) => {
+					if (a.owner && !b.owner) return -1;
+					if (!a.owner && b.owner) return 1;
+					return a.name.localeCompare(b.name);
+				}),
+		[guilds]
+	);
+	const adminGuilds = useMemo(
+		() =>
+			guilds.filter((g) => !g.botPresent).sort((a, b) => a.name.localeCompare(b.name)),
+		[guilds]
+	);
 
-	const normalizedSearch = search.standardize();
-	const matchesSearch = (guild: DiscordGuild) =>
-		normalizedSearch.length === 0 || guild.name.subText(normalizedSearch);
-	const filteredBotGuilds = botGuilds.filter(matchesSearch);
-	const filteredAdminGuilds = adminGuilds.filter(matchesSearch);
+	const normalizedSearch = useMemo(() => search.standardize(), [search]);
+	const filteredBotGuilds = useMemo(
+		() =>
+			normalizedSearch.length === 0
+				? botGuilds
+				: botGuilds.filter((g) => g.name.subText(normalizedSearch)),
+		[botGuilds, normalizedSearch]
+	);
+	const filteredAdminGuilds = useMemo(
+		() =>
+			normalizedSearch.length === 0
+				? adminGuilds
+				: adminGuilds.filter((g) => g.name.subText(normalizedSearch)),
+		[adminGuilds, normalizedSearch]
+	);
 
 	const getGuildIcon = (guild: DiscordGuild) =>
 		guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : null;
@@ -264,13 +286,14 @@ export default function Servers() {
 											</Box>
 											{guild.isAdmin && (
 												<SvgIcon>
-													{/** biome-ignore lint/a11y/noSvgWithoutTitle: wtf */}
 													<svg
 														xmlns="http://www.w3.org/2000/svg"
 														width={24}
 														height={24}
 														viewBox="0 0 24 24"
 														opacity={0.4}
+														aria-hidden="true"
+														focusable="false"
 													>
 														<path
 															fill="currentColor"

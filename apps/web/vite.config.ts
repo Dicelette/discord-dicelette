@@ -46,7 +46,9 @@ export default defineConfig({
 						id.includes("/react/")
 					)
 						return "react";
+					if (id.includes("@mui/icons-material")) return "mui-icons";
 					if (id.includes("@mui/") || id.includes("@emotion/")) return "mui";
+					if (id.includes("@hello-pangea/dnd")) return "dnd";
 					if (id.includes("@dicelette/core")) return "dicelette";
 				},
 			},

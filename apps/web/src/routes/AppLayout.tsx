@@ -50,7 +50,10 @@ export default function AppLayout() {
 						<img
 							src="/logo.png"
 							alt="Dicelette"
-							style={{ height: 28, width: 28, flexShrink: 0 }}
+							width={28}
+							height={28}
+							loading="eager"
+							style={{ flexShrink: 0 }}
 						/>
 						<Typography variant="h6" component="span" sx={appTitleSx}>
 							{t("login.title")}
