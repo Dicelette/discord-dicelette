@@ -39,6 +39,7 @@ import {
 const tabsSx = { mb: 2, borderBottom: 1, borderColor: "divider" } as const;
 const hiddenSx = { display: "none" } as const;
 const visibleSx = {} as const;
+
 import TemplateForm, { type TemplateTab } from "../../edit-template/TemplateForm";
 import type { ImportTemplateData } from "../types";
 
@@ -292,7 +293,7 @@ export default function EditTemplateModal({
 			maxWidth="lg"
 			fullWidth
 			scroll="paper"
-			PaperProps={{ sx: { height: "90vh" } }}
+			slotProps={{ paper: { sx: { height: "80vh" } } }}
 		>
 			<DialogTitle>
 				{isEditMode ? t("template.editModalTitle") : t("template.createModalTitle")}
@@ -323,6 +324,7 @@ export default function EditTemplateModal({
 						onChange={(_, v: TemplateTab) => setActiveTab(v)}
 						variant="scrollable"
 						scrollButtons="auto"
+						allowScrollButtonsMobile
 						sx={tabsSx}
 					>
 						<Tab value="channels" label={t("config.sections.channels")} />
