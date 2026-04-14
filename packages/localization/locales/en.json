@@ -52,7 +52,7 @@
 		"edit": {
 			"dice": "Edit macros",
 			"name": "Rename a character",
-			"select": "Edit user data",
+			"select": "Edit sheet data",
 			"stats": "Edit statistics"
 		},
 		"name": "Change character name",

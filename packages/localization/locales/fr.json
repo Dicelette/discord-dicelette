@@ -52,7 +52,7 @@
 		"edit": {
 			"dice": "Modifier les macros",
 			"name": "Renommer un personnage",
-			"select": "Modifier les données de l'utilisateur",
+			"select": "Modifier les données de la fiche",
 			"stats": "Modifier les statistiques"
 		},
 		"name": "Modifier le nom du personnage",
