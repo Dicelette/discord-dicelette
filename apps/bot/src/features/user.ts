@@ -664,7 +664,8 @@ export class UserFeature extends BaseFeature {
 			this.client.settings,
 			getIdFromMention(channelToPost),
 			this.characters,
-			uniqueFiles
+			uniqueFiles,
+			false
 		);
 		try {
 			await interaction.message.delete();

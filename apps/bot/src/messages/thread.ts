@@ -110,6 +110,7 @@ export async function setTags(
  * @param characters - Character data for the guild.
  *
  * @param files
+ * @param deleteMsg - When true, also delete the previously registered message during database update.
  * @throws {Error} If the target thread or starter message cannot be found or created.
  */
 export async function repostInThread(
@@ -122,7 +123,8 @@ export async function repostInThread(
 	guildData: Settings,
 	threadId: string,
 	characters: Characters,
-	files: Djs.AttachmentBuilder[] = []
+	files: Djs.AttachmentBuilder[] = [],
+	deleteMsg = true
 ) {
 	userTemplate.userName = userTemplate.userName
 		? userTemplate.userName.toLowerCase()
@@ -197,7 +199,7 @@ export async function repostInThread(
 		userData: userTemplate,
 	});
 	logger.trace("User data updated", userData);
-	await registerUser(userRegister, interaction, guildData);
+	await registerUser(userRegister, interaction, guildData, deleteMsg);
 }
 
 /**

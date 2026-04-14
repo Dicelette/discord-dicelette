@@ -152,7 +152,9 @@ export class TravelFeature extends BaseFeature {
 			{ stats: haveStats, dice: haveDice },
 			this.client.settings,
 			targetChannel.id,
-			this.client.characters
+			this.client.characters,
+			[],
+			false
 		);
 
 		// repostInThread cannot delete across channels — handle it manually

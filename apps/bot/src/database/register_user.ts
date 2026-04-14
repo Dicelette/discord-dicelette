@@ -36,7 +36,6 @@ export async function registerUser(
 	errorOnDuplicate: boolean | undefined = false
 ) {
 	const { userID, charName, msgId, isPrivate, damage } = userData;
-	const ids: PersonnageIds = { channelId: msgId[1], messageId: msgId[0] };
 	if (!interaction.guild) return;
 	const guildData = enmap.get(interaction.guild.id);
 	if (!guildData) return;
@@ -63,19 +62,27 @@ export async function registerUser(
 			//delete old message
 			if (deleteMsg) {
 				try {
+					const previousIds: PersonnageIds = {
+						channelId: char.messageId[1],
+						messageId: char.messageId[0],
+					};
 					const threadOfChar = await searchUserChannel(
 						enmap,
 						interaction,
 						ln(interaction.locale),
-						ids.channelId
+						previousIds.channelId,
+						false,
+						true
 					);
 					if (threadOfChar) {
-						const oldMessage = await threadOfChar.messages.fetch(char.messageId[0]);
-						if (oldMessage) await oldMessage.delete();
+						const oldMessage = await threadOfChar.messages.fetch(previousIds.messageId);
+						logger.trace("Oldmessage found, deleting...");
+						await oldMessage.delete();
 					}
 				} catch (error) {
 					logger.trace(
-						`Failed to delete or find old message from ${charName} (${char.messageId.join("/")})`
+						`Failed to delete or find old message from ${charName} (${char.messageId.join("/")})`,
+						error
 					);
 					//logger.warn(error);
 					//skip unknown message

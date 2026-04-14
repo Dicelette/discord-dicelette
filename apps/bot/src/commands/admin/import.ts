@@ -40,7 +40,7 @@ function pLimit(concurrency: number) {
 		queue.shift()?.();
 	};
 
-	return function limit<T>(fn: () => Promise<T>): Promise<T> {
+	return async function limit<T>(fn: () => Promise<T>): Promise<T> {
 		if (activeCount >= concurrency) {
 			return new Promise<T>((resolve, reject) => {
 				queue.push(() => {
@@ -50,7 +50,10 @@ function pLimit(concurrency: number) {
 			});
 		}
 		activeCount++;
-		return fn().finally(next);
+		try {
+			return await fn();
+		} finally {
+		}
 	};
 }
 
@@ -255,7 +258,8 @@ async function processCharacter(params: {
 			client.settings,
 			targetChannel,
 			client.characters,
-			files
+			files,
+			false
 		);
 
 		await addAutoRole(interaction, member.id, flags.dice, flags.stats, client.settings);
