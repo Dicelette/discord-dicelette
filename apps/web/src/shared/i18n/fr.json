@@ -75,7 +75,7 @@
 			"timestamp": "Afficher l'horodatage dans les logs"
 		},
 		"sections": {
-			"channels": "Canaux",
+			"channels": "Channels",
 			"dashboardAccess": "Restriction d'accès au dashboard",
 			"diceBehaviour": "Comportement des dés",
 			"general": "Langue & Général",
@@ -83,7 +83,7 @@
 			"hiddenRollsDesc": "Permet aux MJ de cacher certains jets.",
 			"results": "Fils et canal de résultats",
 			"selfRegister": "Auto-inscription",
-			"sheetsChannels": "Canaux des fiches",
+			"sheetsChannels": "Channels fiches",
 			"stripOoc": "Suppression HRP (hors-roleplay)"
 		},
 		"unsaved": "Attention, il reste des modification non enregistrées !"

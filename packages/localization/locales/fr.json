@@ -421,13 +421,13 @@
 		"disable": {
 			"autoDelete": "L'auto-suppression des résultats a été désactivé.",
 			"mention": "Le channel {{- mention}} ne recevra plus les logs des dés.",
-			"prefix": "Les canaux préfixés par `🎲` ne recevront plus de logs non plus.",
+			"prefix": "Les channels préfixés par `🎲` ne recevront plus de logs non plus.",
 			"reply": "La création automatique des threads a été désactivée : les résultats des dés seront maintenant conservés dans le channel où la commande a été utilisée."
 		},
 		"enable": {
 			"autoDelete": "L'effacement automatique des réponses a été autorisé. Vous pouvez la configurer avec `/config supprimer_après`.",
 			"mention": "Le channel {{- mention}} recevra de nouveaux les logs des dés.",
-			"prefix": "Les canaux préfixés par `🎲` recevront à nouveau les résultats des dés.",
+			"prefix": "Les channels préfixés par `🎲` recevront à nouveau les résultats des dés.",
 			"reply": "Les résultats des dés seront automatiquement envoyés à un fil de discussion créé automatiquement."
 		},
 		"name": "désactiver_thread",
