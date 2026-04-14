@@ -88,7 +88,7 @@ export async function registerUser(
 	enmap.set(interaction.guild.id, [newChar], `user.${userID}`);
 }
 
-export async function moveUserInDatabase(
+export async function changeOwnerInDatabase(
 	client: EClient,
 	guild: Djs.Guild,
 	userId: string,

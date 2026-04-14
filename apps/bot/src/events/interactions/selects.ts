@@ -2,7 +2,12 @@ import type { SelectHandler } from "@dicelette/helpers";
 import type { Settings, Translation } from "@dicelette/types";
 import { profiler } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-import { AvatarFeature, ChangeOwnerFeature, RenameFeature } from "features";
+import {
+	AvatarFeature,
+	ChangeOwnerFeature,
+	RenameFeature,
+	TravelFeature,
+} from "features";
 
 /**
  * Dispatch map for select menu handlers
@@ -26,6 +31,13 @@ const SELECT_VALUE_HANDLERS: Record<string, SelectHandler> = {
 	},
 	user: async (interaction, ul, interactionUser, _db) => {
 		await new ChangeOwnerFeature({
+			interaction,
+			interactionUser,
+			ul,
+		}).start();
+	},
+	travel: async (interaction, ul, interactionUser, _db) => {
+		await new TravelFeature({
 			interaction,
 			interactionUser,
 			ul,

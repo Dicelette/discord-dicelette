@@ -15,18 +15,18 @@ import { isUserNameOrId } from "utils";
 import { BaseFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
-	cause: "validationMove",
+	cause: "validationChangeOwner",
 	level: BotErrorLevel.Warning,
 };
 
 /**
- * Move feature class - handles moving characters between users
+ * ChangeOwner feature class - handles transferring characters between users
  * Uses instance properties to store context and reduce parameter passing
  */
 export class ChangeOwnerFeature extends BaseFeature {
 	/**
-	 * Handles the start of move operation from a select menu interaction
-	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter
+	 * Handles the start of the change owner operation from a select menu interaction
+	 * Note: Unlike Avatar and Rename, ChangeOwner doesn't require the db parameter
 	 * as it only checks moderator permissions via guild member cache
 	 */
 	async start(): Promise<void> {
@@ -43,14 +43,14 @@ export class ChangeOwnerFeature extends BaseFeature {
 	}
 
 	/**
-	 * Displays a modal for selecting a user to move the character to
+	 * Displays a modal for selecting a user to transfer the character ownership to
 	 */
 	private async showChangeOwner(
 		interaction: Djs.StringSelectMenuInteraction
 	): Promise<void> {
 		const modal = new Djs.ModalBuilder()
 			.setCustomId("changeOwner")
-			.setTitle(this.ul("button.user"))
+			.setTitle(this.ul("button.user.name"))
 			.addLabelComponents((label) =>
 				label
 					.setLabel(this.ul("common.user"))
@@ -64,7 +64,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 	/**
 	 * Handles a Discord modal submission to validate and process the transfer of a character between users within a guild.
 	 *
-	 * Validates user input, retrieves and updates character ownership, and invokes the move command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
+	 * Validates user input, retrieves and updates character ownership, and invokes the changeOwner command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
 	 */
 	async validate(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;

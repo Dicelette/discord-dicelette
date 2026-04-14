@@ -58,10 +58,15 @@ export function selectEditMenu(ul: Translation) {
 				.setEmoji("🖼")
 				.setDescription(ul("button.avatar.description")),
 			new Djs.StringSelectMenuOptionBuilder()
-				.setLabel(ul("common.user"))
+				.setLabel(ul("button.user.name"))
 				.setValue("user")
 				.setEmoji("👤")
-				.setDescription(ul("button.user"))
+				.setDescription(ul("button.user.description")),
+			new Djs.StringSelectMenuOptionBuilder()
+				.setLabel(ul("button.travel.name"))
+				.setValue("travel")
+				.setEmoji("✈️")
+				.setDescription(ul("button.travel.description"))
 		);
 	return new Djs.ActionRowBuilder<Djs.StringSelectMenuBuilder>().addComponents(select);
 }

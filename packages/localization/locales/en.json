@@ -57,7 +57,14 @@
 		},
 		"name": "Change character name",
 		"refuse": "Refuse",
-		"user": "Edit associated user",
+		"travel": {
+			"description": "Move the character sheet to another channel",
+			"name": "Move the sheet"
+		},
+		"user": {
+			"description": "Edit associated user",
+			"name": "User transfer"
+		},
 		"validate": "Validate"
 	},
 	"calc": {
@@ -1062,6 +1069,9 @@
 		"enabled": "Timestamps are now displayed",
 		"name": "timestamp",
 		"options": "Enables or disables the timestamp"
+	},
+	"travel": {
+		"success": "The sheet has been successfully moved to {{- channel}} !"
 	},
 	"update": {
 		"description": "Update the template without editing the others options",

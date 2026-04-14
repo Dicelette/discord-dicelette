@@ -8,6 +8,7 @@ import {
 	MacroFeature,
 	RenameFeature,
 	StatsFeature,
+	TravelFeature,
 	UserFeature,
 } from "features";
 
@@ -46,6 +47,14 @@ const MODAL_HANDLERS: Record<string, ModalHandler> = {
 	},
 	rename: async (interaction, ul, interactionUser, client) => {
 		await new RenameFeature({
+			client,
+			interaction,
+			interactionUser,
+			ul,
+		}).validate();
+	},
+	travel: async (interaction, ul, interactionUser, client) => {
+		await new TravelFeature({
 			client,
 			interaction,
 			interactionUser,

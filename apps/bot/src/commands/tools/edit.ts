@@ -12,10 +12,10 @@ import type {
 } from "@dicelette/types";
 import { BotError, BotErrorLevel, type BotErrorOptions, logger } from "@dicelette/utils";
 import {
+	changeOwnerInDatabase,
 	deleteUser,
 	getRecordChar,
 	getUserByEmbed,
-	moveUserInDatabase,
 	registerUser,
 } from "database";
 import * as Djs from "discord.js";
@@ -406,7 +406,7 @@ export async function changeOwner(
 		msgId: oldData.messageId,
 		userID: newUser.id,
 	};
-	await moveUserInDatabase(
+	await changeOwnerInDatabase(
 		client,
 		interaction.guild!,
 		newUser.id,

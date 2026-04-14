@@ -57,7 +57,14 @@
 		},
 		"name": "Modifier le nom du personnage",
 		"refuse": "Refuser",
-		"user": "Modifier l'utilisateur associé",
+		"travel": {
+			"description": "Déplacer la fiche vers un autre channel",
+			"name": "Déplacer la fiche"
+		},
+		"user": {
+			"description": "Modifier l'utilisateur associé",
+			"name": "Transfert d'utilisateur"
+		},
 		"validate": "Valider"
 	},
 	"calc": {
@@ -1062,6 +1069,9 @@
 		"enabled": "Les timestamps sont maintenant affichés",
 		"name": "timestamp",
 		"options": "Active ou désactive le timestamp"
+	},
+	"travel": {
+		"success": "La fiche a bien été déplacée dans {{- channel}} !"
 	},
 	"update": {
 		"description": "Mettre à jour le modèle avec un nouveau fichier sans modifier les autres options",

@@ -6,4 +6,5 @@ export { ChangeOwnerFeature } from "./change_owner";
 export { MacroFeature } from "./macro";
 export { RenameFeature } from "./rename";
 export { StatsFeature } from "./stats";
+export { TravelFeature } from "./travel";
 export { UserFeature } from "./user";
