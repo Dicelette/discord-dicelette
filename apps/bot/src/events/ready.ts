@@ -260,7 +260,6 @@ function startCacheCleanup(
 function fixSortOrder(db: Settings, guild: Djs.Guild) {
 	const sortOrder = db.get(guild.id, "sortOrder");
 	if (!sortOrder) return;
-	console.log("sortOrder", sortOrder);
 	if (sortOrder.toString().toLowerCase() === "ascending") {
 		db.set(guild.id, SortOrder.Ascending, "sortOrder");
 	} else if (sortOrder.toString().toLowerCase() === "descending") {

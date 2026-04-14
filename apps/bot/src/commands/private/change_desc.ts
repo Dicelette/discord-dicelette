@@ -49,7 +49,6 @@ export default {
 		let text = interaction.options
 			.getString(t("activities.text.name"), true)
 			.replaceAll(/\\n/g, "\n");
-		console.log(text);
 		try {
 			const oldDesc = interaction.client.application?.description ?? "";
 			const option = interaction.options.getString(t("description.options.name")) as
