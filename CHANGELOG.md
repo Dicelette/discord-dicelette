@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.11.0](https://github.com/Dicelette/discord-dicelette/compare/3.10.7...3.11.0) (2026-04-14)
+
+
+### Features
+
+* **bot:tool:** allow to move a sheet to another channel ([dc66b95](https://github.com/Dicelette/discord-dicelette/commit/dc66b95962bf38f3f0bb5bd3a38ea057ae739605))
+* **template:** add components for managing templates including AddButton, CheckBox, and CopyButton ([61643b2](https://github.com/Dicelette/discord-dicelette/commit/61643b23e7f6cfd627b3a2d5f2aa4cb12db3b05e))
+
+
+### Bug Fixes
+
+* **dashboard:template:** fix modal height to prevent resize on tab switch ([6b22c68](https://github.com/Dicelette/discord-dicelette/commit/6b22c685ed21e93847ad341b226c4e986f564fbc))
+* **dashboard:template:** remove maxHeight property for improved scroll behavior ([0f07245](https://github.com/Dicelette/discord-dicelette/commit/0f07245046d341634533b1c1f1c6ba9d639e62a5))
+* **dashboard:template:** restore original reducer actions to fix react-hook-form error ([ab03b24](https://github.com/Dicelette/discord-dicelette/commit/ab03b243979ebbdd3a21b4d3597a3d4c32cf2632))
+* **edit-template:** adjust dialog height and enable scroll buttons for improved usability ([3bb9b40](https://github.com/Dicelette/discord-dicelette/commit/3bb9b408d0e8538c46828f51c88d50a07ffc19dc))
+* **pre-commit:** add missing newline at end of file ([557f4b2](https://github.com/Dicelette/discord-dicelette/commit/557f4b23de7cee11c971a3f98b31754e6f320d8e))
+
 ## [3.10.7](https://github.com/Dicelette/discord-dicelette/compare/3.10.6...3.10.7) (2026-04-11)
 
 
