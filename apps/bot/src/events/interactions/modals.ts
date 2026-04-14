@@ -4,8 +4,8 @@ import type { Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
 import {
 	AvatarFeature,
+	ChangeOwnerFeature,
 	MacroFeature,
-	MoveFeature,
 	RenameFeature,
 	StatsFeature,
 	UserFeature,
@@ -36,8 +36,8 @@ const MODAL_HANDLERS: Record<string, ModalHandler> = {
 	firstPage: async (interaction, ul, interactionUser, client) => {
 		await new UserFeature({ client, interaction, interactionUser, ul }).firstPage();
 	},
-	move: async (interaction, ul, interactionUser, client) => {
-		await new MoveFeature({
+	changeOwner: async (interaction, ul, interactionUser, client) => {
+		await new ChangeOwnerFeature({
 			client,
 			interaction,
 			interactionUser,

@@ -7,7 +7,7 @@ import {
 	getIdFromMention,
 	profiler,
 } from "@dicelette/utils";
-import { move, resetButton } from "commands";
+import { changeOwner, resetButton } from "commands";
 import { getUserByEmbed } from "database";
 import * as Djs from "discord.js";
 import { embedError, getEmbeds, reply } from "messages";
@@ -23,7 +23,7 @@ const botErrorOptions: BotErrorOptions = {
  * Move feature class - handles moving characters between users
  * Uses instance properties to store context and reduce parameter passing
  */
-export class MoveFeature extends BaseFeature {
+export class ChangeOwnerFeature extends BaseFeature {
 	/**
 	 * Handles the start of move operation from a select menu interaction
 	 * Note: Unlike Avatar and Rename, Move doesn't require the db parameter
@@ -34,7 +34,7 @@ export class MoveFeature extends BaseFeature {
 		const moderator = interaction.guild?.members.cache
 			.get(this.interactionUser.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-		if (moderator) await this.showMove(interaction);
+		if (moderator) await this.showChangeOwner(interaction);
 		else
 			await reply(interaction, {
 				content: this.ul("modals.noPermission"),
@@ -45,9 +45,11 @@ export class MoveFeature extends BaseFeature {
 	/**
 	 * Displays a modal for selecting a user to move the character to
 	 */
-	private async showMove(interaction: Djs.StringSelectMenuInteraction): Promise<void> {
+	private async showChangeOwner(
+		interaction: Djs.StringSelectMenuInteraction
+	): Promise<void> {
 		const modal = new Djs.ModalBuilder()
-			.setCustomId("move")
+			.setCustomId("changeOwner")
 			.setTitle(this.ul("button.user"))
 			.addLabelComponents((label) =>
 				label
@@ -162,7 +164,7 @@ export class MoveFeature extends BaseFeature {
 		const guildData = this.client.settings.get(interaction.guild.id);
 		if (!guildData) return;
 
-		await move(
+		await changeOwner(
 			user,
 			interaction,
 			this.ul,

@@ -136,7 +136,7 @@ export const editAvatar = {
 				thread
 			);
 		} else if (subcommand === t("edit.user.title")) {
-			await move(
+			await changeOwner(
 				options.getUser(t("edit.user.option.title"), true),
 				interaction,
 				ul,
@@ -373,7 +373,7 @@ export async function rename(
  *
  * @throws {Error} If the character embed or user field is not found in the message.
  */
-export async function move(
+export async function changeOwner(
 	newUser: Djs.User,
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
 	ul: Translation,
