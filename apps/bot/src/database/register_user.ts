@@ -74,7 +74,10 @@ export async function registerUser(
 						if (oldMessage) await oldMessage.delete();
 					}
 				} catch (error) {
-					logger.warn(error);
+					logger.trace(
+						`Failed to delete or find old message from ${charName} (${char.messageId.join("/")})`
+					);
+					//logger.warn(error);
 					//skip unknown message
 				}
 			}
