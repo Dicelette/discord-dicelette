@@ -557,9 +557,9 @@ export function replaceStatsInDiceFormula(
 					// If statsName is provided, try to restore original casing
 					statForSegment = statsName
 						? unNormalizeStatsName(uniqueSegmentStats, statsName)[0]
-						: uniqueSegmentStats[0];
+						: uniqueSegmentStats[0].capitalize();
 				}
-				statsPerSegment.push(statForSegment);
+				statsPerSegment.push(statForSegment.capitalize());
 			}
 		}
 
@@ -637,7 +637,7 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 		// First, try exact match
 		const exactMatch = normalizedStats.get(standardized);
 		if (exactMatch) {
-			unNormalized.push(exactMatch);
+			unNormalized.push(exactMatch.capitalize());
 		} else {
 			// If no exact match, try fuzzy match
 			const found = findBestStatMatch<string>(
@@ -645,8 +645,8 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 				normalizedStats,
 				MIN_THRESHOLD_MATCH
 			);
-			if (found) unNormalized.push(found);
-			else unNormalized.push(stat);
+			if (found) unNormalized.push(found.capitalize());
+			else unNormalized.push(stat.capitalize());
 		}
 	}
 	return unNormalized;
@@ -664,7 +664,7 @@ export function buildInfoRollFromStats(
 	const names =
 		statsName && statsName.length > 0
 			? unNormalizeStatsName(uniqueFound, statsName)
-			: uniqueFound;
+			: uniqueFound.capitalize();
 	const name = names.join(" ");
 	return { name, standardized: name.standardize() };
 }
@@ -696,10 +696,7 @@ export function findStatInDiceFormula(
 	statsToFind?: string[]
 ): string[] | undefined {
 	if (!statsToFind) return undefined;
-
 	const foundStats: string[] = [];
-
-	// Normaliser la formule et préparer les tokens (mots) à analyser
 	const text = diceFormula.standardize();
 	const tokens = text.match(/\p{L}[\p{L}0-9_.]*/gu) || [];
 
@@ -710,8 +707,6 @@ export function findStatInDiceFormula(
 		const match = findBestStatMatch<string>(token, normalizedStats, MIN_THRESHOLD_MATCH);
 		if (match) foundStats.push(match.capitalize());
 	}
-
-	// garder l'ordre unique
 	const unique = Array.from(new Set(foundStats));
 	return unique.length > 0 ? unique : undefined;
 }
