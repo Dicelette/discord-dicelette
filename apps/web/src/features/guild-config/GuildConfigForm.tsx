@@ -7,9 +7,10 @@ import {
 	useConfigForm,
 	useI18n,
 } from "@shared";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTemplateState } from "../user-config/hooks";
 import Links from "../user-config/ui/sections/Links";
+import { DEFAULT_TEMPLATE } from "../user-config/utils";
 import {
 	Channels,
 	DashboardAccess,
@@ -64,6 +65,11 @@ export default function GuildConfigForm({
 		externalValue: config.createLinkTemplate,
 		errorKey: "dashboard.saveError",
 	});
+
+	const isTemplateDirty = useMemo(() => {
+		const saved = config.createLinkTemplate ?? DEFAULT_TEMPLATE;
+		return JSON.stringify(templateState.value) !== JSON.stringify(saved);
+	}, [templateState.value, config.createLinkTemplate]);
 
 	const handleSaveAndReset = async (data: ApiGuildData) => {
 		await onSave({
@@ -126,9 +132,12 @@ export default function GuildConfigForm({
 				</Stack>
 
 				<ConfigFormFooter
-					isDirty={isDirty}
+					isDirty={isDirty || isTemplateDirty}
 					saving={saving}
-					onReset={() => reset()}
+					onReset={() => {
+						reset();
+						templateState.setValue(config.createLinkTemplate ?? DEFAULT_TEMPLATE);
+					}}
 					saveSuccess={saveSuccess}
 				/>
 			</Box>

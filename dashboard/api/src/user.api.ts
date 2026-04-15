@@ -11,7 +11,7 @@ export const userApi = {
 		guildId: string,
 		type: "snippets" | "attributes",
 		entries: Record<string, unknown>,
-		attributes?: Record<string, number>,
+		attributes?: Record<string, number | string>,
 		replaceUnknown?: string
 	) =>
 		api.post<ApiValidationResult>(`/guilds/${guildId}/validate-entries`, {

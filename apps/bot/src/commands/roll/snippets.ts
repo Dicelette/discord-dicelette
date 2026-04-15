@@ -4,6 +4,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	getSettingsAutoComplete,
 	macroOptions,
+	resolveUserAttributes,
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
@@ -37,7 +38,8 @@ export default {
 		const macroName = optMacro.standardize();
 		const userSettings = client.userSettings.get(guildId, userId);
 		const snippets = userSettings?.snippets ?? {};
-		const attributes = userSettings?.attributes;
+		const resolvedAttributes = resolveUserAttributes(userSettings?.attributes);
+		const attributes = resolvedAttributes.ok ? resolvedAttributes.value : undefined;
 		const expressionOpt = interaction.options.getString(t("common.expression")) ?? "0";
 		const sortOrder = client.settings.get(guildId)?.sortOrder;
 		const threshold = interaction.options

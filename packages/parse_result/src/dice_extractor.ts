@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
 import {
+	escapeRegex,
 	findBestStatMatch,
 	type Resultat,
 	roll,
@@ -492,11 +493,7 @@ export function replaceStatsInDiceFormula(
 	else comments = "";
 
 	// Pre-process stats for better performance
-	const normalizedStats = new Map<string, [string, number]>();
-	for (const [key, value] of Object.entries(stats)) {
-		const normalized = key.standardize();
-		normalizedStats.set(normalized, [key, value]);
-	}
+	const normalizedStats = normalizeStatsMap(stats);
 
 	// Check if this is a shared roll (contains ;)
 	const isSharedRoll = diceFormula.includes(";");
@@ -534,6 +531,7 @@ export function replaceStatsInDiceFormula(
 					normalizedStats,
 					MIN_THRESHOLD_MATCH
 				);
+
 				if (foundStat) {
 					const [original, statValue] = foundStat;
 					const capitalizedStat = original.capitalize();
@@ -542,9 +540,8 @@ export function replaceStatsInDiceFormula(
 					// Preserve surrounding parentheses that the regex may have consumed (e.g. `($s1+$s2)`)
 					const prefix = fullMatch.startsWith("(") ? "(" : "";
 					const suffix = fullMatch.endsWith(")") ? ")" : "";
-					const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 					processedSegment = processedSegment.replace(
-						new RegExp(escapedMatch, "gu"),
+						new RegExp(escapeRegex(fullMatch), "gu"),
 						`${prefix}${statValue}${suffix}`
 					);
 				}
@@ -584,6 +581,7 @@ export function replaceStatsInDiceFormula(
 				normalizedStats,
 				MIN_THRESHOLD_MATCH
 			);
+
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
@@ -592,9 +590,8 @@ export function replaceStatsInDiceFormula(
 				// `($s1` or `$s2)` → one paren consumed → keep it so `1d($s1+$s2)` → `1d(X+Y)`.
 				const prefix = fullMatch.startsWith("(") && !fullMatch.endsWith(")") ? "(" : "";
 				const suffix = fullMatch.endsWith(")") && !fullMatch.startsWith("(") ? ")" : "";
-				const escapedMatch = fullMatch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 				processedFormula = processedFormula.replace(
-					new RegExp(escapedMatch, "gu"),
+					new RegExp(escapeRegex(fullMatch), "gu"),
 					`${prefix}${statValue}${suffix}`
 				);
 			}
@@ -636,13 +633,21 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	const unNormalized: string[] = [];
 	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
-		const found = findBestStatMatch<string>(
-			stat.standardize(),
-			normalizedStats,
-			MIN_THRESHOLD_MATCH
-		);
-		if (found) unNormalized.push(found);
-		else unNormalized.push(stat);
+		const standardized = stat.standardize();
+		// First, try exact match
+		const exactMatch = normalizedStats.get(standardized);
+		if (exactMatch) {
+			unNormalized.push(exactMatch);
+		} else {
+			// If no exact match, try fuzzy match
+			const found = findBestStatMatch<string>(
+				standardized,
+				normalizedStats,
+				MIN_THRESHOLD_MATCH
+			);
+			if (found) unNormalized.push(found);
+			else unNormalized.push(stat);
+		}
 	}
 	return unNormalized;
 }
@@ -662,6 +667,20 @@ export function buildInfoRollFromStats(
 			: uniqueFound;
 	const name = names.join(" ");
 	return { name, standardized: name.standardize() };
+}
+
+/**
+ * Builds a lookup map from normalized stat names to [originalName, value] tuples.
+ * Used by replaceStatsInDiceFormula and graph utilities to avoid rebuilding the map inline.
+ */
+export function normalizeStatsMap(
+	stats: Record<string, number>
+): Map<string, [string, number]> {
+	const map = new Map<string, [string, number]>();
+	for (const [key, value] of Object.entries(stats)) {
+		map.set(key.standardize(), [key, value]);
+	}
+	return map;
 }
 
 function normalizedMap(statsName: string[]): Map<string, string> {

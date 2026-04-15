@@ -20,6 +20,7 @@ import {
 import { useI18n } from "@shared";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../providers";
 
 const pageHeaderSx = {
 	display: "flex",
@@ -96,6 +97,7 @@ export default function Servers() {
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
 	const { t } = useI18n();
+	const { enqueueToast } = useToast();
 	const tRef = useRef(t);
 	tRef.current = t;
 
@@ -128,6 +130,7 @@ export default function Servers() {
 			const res = await authApi.guilds();
 			guildsClientCache = { guilds: res.data, expiresAt: Date.now() + GUILDS_CACHE_TTL };
 			setGuilds(res.data);
+			enqueueToast(t("servers.refreshSuccess"));
 		} catch (err: unknown) {
 			const status = getErrorStatus(err);
 			setError(status === 429 ? t("servers.rateLimitError") : t("servers.loadError"));

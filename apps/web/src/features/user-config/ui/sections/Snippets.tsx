@@ -11,6 +11,7 @@ import {
 import { useI18n } from "@shared";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { List, type RowComponentProps, useListRef } from "react-window";
+import { useToast } from "../../../../providers";
 import type { SnippetsState } from "../..";
 import { useShake } from "../../hooks";
 import { exportJson } from "../../utils.ts";
@@ -71,6 +72,7 @@ interface Props {
 
 function Snippets({ state }: Props) {
 	const { t } = useI18n();
+	const { enqueueToast } = useToast();
 	const addErrorShaking = useShake(state.addError);
 	const {
 		data: snippets,
@@ -112,6 +114,10 @@ function Snippets({ state }: Props) {
 		scrollbarWidth: "thin" as const,
 		scrollbarColor: "rgba(255, 255, 255, 0.2) transparent",
 	};
+	useEffect(() => {
+		if (success) enqueueToast(t("userConfig.saveSuccess"));
+	}, [success, enqueueToast, t]);
+
 	const listRef = useListRef(null);
 	const prevCountRef = useRef(entries.length);
 	useEffect(() => {
@@ -193,11 +199,6 @@ function Snippets({ state }: Props) {
 			{warning && (
 				<Alert severity="warning" sx={alertMbSx} onClose={() => setWarning(null)}>
 					{warning}
-				</Alert>
-			)}
-			{success && (
-				<Alert severity="success" sx={alertMbSx}>
-					{t("userConfig.saveSuccess")}
 				</Alert>
 			)}
 			<Box sx={actionsBoxSx}>

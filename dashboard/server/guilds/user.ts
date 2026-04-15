@@ -15,7 +15,7 @@ export function createUserRouter(deps: DashboardDeps) {
 		const { type, entries, attributes, ignoreNotfound } = req.body as {
 			type: "snippets" | "attributes";
 			entries: Record<string, unknown>;
-			attributes?: Record<string, number>;
+			attributes?: Record<string, number | string>;
 			ignoreNotfound?: unknown;
 		};
 
@@ -94,7 +94,7 @@ export function createUserRouter(deps: DashboardDeps) {
 
 		const normalizedIgnoreNotfound = ignoreNotfound?.trim();
 
-		let validAttributes: Record<string, number> | undefined;
+		let validAttributes: Record<string, number | string> | undefined;
 		if (attributes !== undefined) {
 			if (typeof attributes !== "object" || Array.isArray(attributes)) {
 				res.status(400).json({ error: "Invalid attributes format" });
@@ -107,7 +107,7 @@ export function createUserRouter(deps: DashboardDeps) {
 				res.status(400).json({ errors });
 				return;
 			}
-			validAttributes = valid as Record<string, number>;
+			validAttributes = valid as Record<string, number | string>;
 		}
 
 		const currentUserSettings = userSettings.get(guildId, userId);

@@ -121,6 +121,7 @@
 		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
 		"rateLimitError": "Trop de requêtes. Veuillez patienter avant d'actualiser à nouveau.",
 		"refresh": "Actualiser",
+		"refreshSuccess": "Liste des serveurs mise à jour.",
 		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
 		"searchPlaceholder": "Rechercher un serveur...",
 		"subtitle": "Sélectionnez un serveur pour gérer sa configuration.",
@@ -214,7 +215,9 @@
 		"value": "Valeur"
 	},
 	"userConfig": {
-		"addInvalidAttr": "Attribut « {name} » invalide (valeur non numérique).",
+		"addInvalidAttr": "Attribut « {name} » invalide (la valeur doit être un nombre ou une formule valide).",
+		"formulaError": "Impossible de résoudre la formule (attributs inconnus ou expression invalide).",
+		"formulaResolved": "= {value}",
 		"addInvalidDice": "Expression de dés « {name} » invalide.",
 		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",

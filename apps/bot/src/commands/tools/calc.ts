@@ -1,6 +1,10 @@
 import type { EClient } from "@dicelette/client";
 import { generateStatsDice, isNumber } from "@dicelette/core";
-import { autoCompleteCharacters, calcOptions } from "@dicelette/helpers";
+import {
+	autoCompleteCharacters,
+	calcOptions,
+	resolveUserAttributes,
+} from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
 import { getRoll, replaceUnknown, timestamp } from "@dicelette/parse_result";
 import {
@@ -164,6 +168,8 @@ export async function calculate(
 	const userSettings = interaction.guild
 		? client.userSettings.get(interaction.guild.id, interaction.user.id)
 		: undefined;
+	const resolvedAttributes = resolveUserAttributes(userSettings?.attributes);
+	const attributes = resolvedAttributes.ok ? resolvedAttributes.value : undefined;
 
 	let statInfo:
 		| {
@@ -216,8 +222,8 @@ export async function calculate(
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
 		if (interaction.guild) {
-			const expansion = userSettings?.attributes;
-			if (expansion) formula = generateStatsDice(formula, expansion, MIN_THRESHOLD_MATCH);
+			if (attributes)
+				formula = generateStatsDice(formula, attributes, MIN_THRESHOLD_MATCH);
 		}
 		const isRoll = getRoll(formula, undefined, sortResult);
 		if (isRoll?.total != null) {

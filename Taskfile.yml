@@ -37,3 +37,11 @@ tasks:
     cmds:
       - pnpm run build
       - pm2 restart beta-dicelette
+
+  tunnel:
+    desc: Start ngrok tunnel (https://delicate-friendly-titmouse.ngrok-free.app → localhost:5173)
+    cmds:
+      - ngrok http --url={{.NGROK_DOMAIN}} --log=stdout 5173
+    vars:
+      NGROK_DOMAIN:
+        sh: echo "${NGROK_DOMAIN:-https://delicate-friendly-titmouse.ngrok-free.app}"

@@ -1,10 +1,11 @@
 import type { EClient } from "@dicelette/client";
-import { roll } from "@dicelette/core";
+import { escapeRegex, isNumber, roll, standardizeDice } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
 import type { Snippets, Translation } from "@dicelette/types";
 import { capitalizeBetweenPunct } from "@dicelette/utils";
 import * as Djs from "discord.js";
+import { evaluate } from "mathjs";
 
 export async function chunkMessage(
 	entries: [string, string | number][],
@@ -161,26 +162,160 @@ export async function getContentFile(
 
 export type ValidationResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
+function formatInvalidAttributeFormulaError(name?: string, value?: string) {
+	if (!name && !value) return "invalidAttributeFormula";
+	return `invalidAttributeFormula:${JSON.stringify({ name, value })}`;
+}
+
+function toNumber(value: unknown) {
+	if (typeof value === "number") return value;
+	if (isNumber(value)) return Number(value);
+	return undefined;
+}
+
+/**
+ * Single-pass builder: separates number attributes from formula attributes and
+ * pre-populates the resolved map with numeric values.
+ */
+function buildAttributeMaps(attributes: Record<string, number | string>) {
+	const numbersOnly: Record<string, number> = {};
+	const formulaOnly: Record<string, string> = {};
+	const resolved: Record<string, number> = {};
+	const formulaNameMap: Record<string, string> = {};
+
+	for (const [name, value] of Object.entries(attributes)) {
+		const norm = name.standardize();
+		if (typeof value === "number") {
+			numbersOnly[name] = value;
+			resolved[norm] = value;
+		} else {
+			const trimmed = value.trim();
+			if (!trimmed) continue;
+			formulaOnly[name] = trimmed;
+			formulaNameMap[norm] = name;
+		}
+	}
+
+	return { numbersOnly, formulaOnly, formulaNameMap, resolved };
+}
+
+/**
+ * Resolves user attributes that may reference each other as formulas.
+ *
+ * Uses a single-pass map build followed by incremental substitution: when a
+ * formula is resolved its value is immediately substituted into all remaining
+ * pending formulas, so each stat replacement is performed exactly once rather
+ * than rebuilding the full substitution map on every iteration.
+ */
+export function resolveUserAttributes(
+	attributes?: Record<string, number | string>
+): ValidationResult<Record<string, number> | undefined> {
+	if (!attributes) return { ok: true, value: undefined };
+
+	const { numbersOnly, formulaOnly, formulaNameMap, resolved } =
+		buildAttributeMaps(attributes);
+
+	if (Object.keys(formulaOnly).length === 0) return { ok: true, value: numbersOnly };
+
+	// Pre-substitute already-resolved number stats into each formula expression.
+	const pending: Record<string, string> = {};
+	for (const [normName, origName] of Object.entries(formulaNameMap)) {
+		let expr = standardizeDice(formulaOnly[origName]).standardize();
+		for (const [statNorm, statValue] of Object.entries(resolved)) {
+			expr = expr.replace(new RegExp(escapeRegex(statNorm), "gi"), statValue.toString());
+		}
+		pending[normName] = expr;
+	}
+
+	// Iterative resolution: try evaluate() on each pending expression.
+	// When one resolves, propagate its value into the remaining expressions
+	// immediately so each substitution is done exactly once.
+	while (Object.keys(pending).length > 0) {
+		let progress = false;
+		for (const [normName, expr] of Object.entries(pending)) {
+			try {
+				const result = toNumber(evaluate(expr));
+				if (result === undefined) continue;
+				resolved[normName] = result;
+				delete pending[normName];
+				progress = true;
+				// Propagate into remaining pending formulas right away.
+				const re = new RegExp(escapeRegex(normName), "gi");
+				for (const otherNorm of Object.keys(pending)) {
+					pending[otherNorm] = pending[otherNorm].replace(re, result.toString());
+				}
+			} catch {
+				// Expression still contains unresolved references — skip for now.
+			}
+		}
+
+		if (!progress) {
+			const [failingNorm, failingExpr] = Object.entries(pending)[0] ?? [];
+			const origName = failingNorm
+				? (formulaNameMap[failingNorm] ?? failingNorm)
+				: undefined;
+			const origFormula = origName ? formulaOnly[origName] : undefined;
+			return {
+				error: formatInvalidAttributeFormulaError(origName, origFormula ?? failingExpr),
+				ok: false,
+			};
+		}
+	}
+
+	const computed: Record<string, number> = {};
+	for (const [normName, origName] of Object.entries(formulaNameMap)) {
+		const value = resolved[normName];
+		if (!isNumber(value)) {
+			return {
+				error: formatInvalidAttributeFormulaError(origName, formulaOnly[origName]),
+				ok: false,
+			};
+		}
+		computed[origName] = Number(value);
+	}
+
+	return { ok: true, value: { ...numbersOnly, ...computed } };
+}
+
 export function validateAttributeEntry(
 	name: string,
 	value: unknown
-): ValidationResult<number> {
-	if (typeof value !== "number" || Number.isNaN(value))
-		return { error: JSON.stringify(value), ok: false };
+): ValidationResult<number | string> {
 	if (name.match(/-/)) return { error: "containsHyphen", ok: false };
-	return { ok: true, value };
+	if (typeof value === "number") {
+		if (Number.isNaN(value)) return { error: JSON.stringify(value), ok: false };
+		return { ok: true, value };
+	}
+	if (typeof value === "string") {
+		const trimmed = value.trim();
+		if (!trimmed) return { error: JSON.stringify(value), ok: false };
+		return { ok: true, value: trimmed };
+	}
+	return { error: JSON.stringify(value), ok: false };
 }
 
+/**
+ * Validates a snippet (dice formula) against resolved user attributes.
+ * Automatically resolves formula-based attributes (e.g., "strength + 2") to numeric values.
+ *
+ * @param content - The dice formula string to validate
+ * @param attributes - User attributes, can be plain numbers or formula strings
+ * @param replaceUnknow - Optional fallback value for unknown attributes
+ * @returns Validation result with the original content if valid
+ */
 export function validateSnippetEntry(
 	content: unknown,
-	attributes?: Record<string, number>,
+	attributes?: Record<string, number | string>,
 	replaceUnknow?: string
 ): ValidationResult<string> {
 	if (typeof content !== "string") return { error: String(content), ok: false };
 	try {
+		const resolvedAttributes = resolveUserAttributes(attributes);
+		if (!resolvedAttributes.ok) return { error: content, ok: false };
+
 		const substituted = replaceStatsInDiceFormula(
-			getExpression(content, "0", attributes).dice,
-			attributes,
+			getExpression(content, "0", resolvedAttributes.value).dice,
+			resolvedAttributes.value,
 			undefined,
 			undefined,
 			undefined,
@@ -194,7 +329,8 @@ export function validateSnippetEntry(
 		const r = roll(formula);
 		if (!r) return { error: content, ok: false };
 		return { ok: true, value: content };
-	} catch {
+	} catch (e) {
+		console.error(e, `Error validating snippet entry: ${content}`, content);
 		return { error: content, ok: false };
 	}
 }
@@ -331,7 +467,7 @@ export function getSettingsAutoComplete(
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
 	const data = client.userSettings.get(guildId, userId);
-	const macros: Snippets | Record<string, number> = data?.[type] ?? {};
+	const macros: Snippets | Record<string, number | string> = data?.[type] ?? {};
 	let choices: string[] = [];
 	if (focused.name === "name") {
 		const input = options.getString("name")?.standardize() ?? "";

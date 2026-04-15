@@ -6,7 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import { AuthProvider, I18nProvider } from "./providers";
+import { AuthProvider, I18nProvider, ToastProvider } from "./providers";
 import "./styles.css";
 
 const headingFont = { fontFamily: '"Karla Variable", "Inter", sans-serif' };
@@ -99,11 +99,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 		<I18nProvider>
 			<ThemeProvider theme={theme}>
 				<CssBaseline enableColorScheme />
-				<BrowserRouter>
-					<AuthProvider>
-						<App />
-					</AuthProvider>
-				</BrowserRouter>
+				<ToastProvider>
+					<BrowserRouter>
+						<AuthProvider>
+							<App />
+						</AuthProvider>
+					</BrowserRouter>
+				</ToastProvider>
 			</ThemeProvider>
 		</I18nProvider>
 	</React.StrictMode>

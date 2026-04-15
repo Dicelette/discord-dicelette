@@ -2,7 +2,6 @@ import type { EClient } from "@dicelette/client";
 import { fetchChannel, getGuildContext } from "@dicelette/helpers";
 import { lError, ln } from "@dicelette/localization";
 import {
-	buildInfoRollFromStats,
 	isRolling,
 	parseComparator,
 	rollCustomCriticalsFromDice,
@@ -64,7 +63,10 @@ export default (client: EClient): void => {
 				content = content.replace(CHARACTER_DETECTION, "").trim();
 			}
 			const ctx = getGuildContext(client, message.guild.id);
-			const statsName = ctx?.templateID?.statsName ?? [];
+			const statsName = [
+				...(ctx?.templateID?.statsName ?? []),
+				...(userData?.stats ? Object.keys(userData.stats) : []),
+			];
 			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
 				?.failure;
 			const pityThreshold = client.settings.get(message.guild.id, "pity") || undefined;
@@ -100,11 +102,9 @@ export default (client: EClient): void => {
 
 			const opposition = parseComparator(content, userData?.stats, infoRoll, sortOrder);
 
-			// Build infoRoll using helper to recover original accented name if available
-			const formattedInfoRoll = buildInfoRollFromStats(
-				infoRoll ? [infoRoll] : undefined,
-				statsName
-			);
+			const formattedInfoRoll = infoRoll
+				? { name: infoRoll, standardized: infoRoll.standardize() }
+				: undefined;
 
 			// Use the unified roll handler
 			await handleRollResult({

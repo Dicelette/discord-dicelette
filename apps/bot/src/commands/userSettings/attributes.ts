@@ -68,10 +68,10 @@ export async function importAttributes(
 	const data = await getContentFile(interaction, t, ul);
 	if (!data) return;
 	const { fileContent, guildId, overwrite, userId } = data;
-	let importedStats: Record<string, number>;
-	const ex: Record<string, number> = {
+	let importedStats: Record<string, number | string>;
+	const ex: Record<string, number | string> = {
 		stat1: 10,
-		stat2: 20,
+		stat2: "stat1 + 5",
 	};
 	try {
 		importedStats = JSON.parse(fileContent);
@@ -97,14 +97,15 @@ export async function importAttributes(
 		result: validated,
 		errors,
 		count,
-	} = await processEntries<number>(importedStats, async (name, value) =>
+	} = await processEntries<number | string>(importedStats, async (name, value) =>
 		validateAttributeEntry(name, value)
 	);
 	const key = `${userId}.attributes`;
 	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	if (overwrite) currentStats = {};
 
-	for (const [name, val] of Object.entries(validated)) currentStats[name] = val as number;
+	for (const [name, val] of Object.entries(validated))
+		currentStats[name] = val as number | string;
 
 	client.userSettings.set(guildId, currentStats, key);
 	const text = errorMessage("attributes", ul, errors, count, validated);
@@ -117,16 +118,24 @@ export async function register(
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const statName = interaction.options.getString(t("common.name"), true);
-	const initialValue = interaction.options.getNumber(
+	const initialValue = interaction.options.getString(
 		t("userSettings.attributes.create.value.title"),
 		true
 	);
+	const validated = validateAttributeEntry(statName, initialValue);
+	if (!validated.ok) {
+		await reply(interaction, {
+			content: ul("userConfig.addInvalidAttr", { name: statName }),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
+		return;
+	}
 	await registerEntry(
 		client,
 		interaction,
 		"attributes",
 		statName,
-		initialValue,
+		validated.value,
 		ul,
 		(name, value) => ({
 			name: `**${name.toTitle()}**`,
@@ -150,7 +159,7 @@ export async function setUnknowReplace(
 			`${interaction.user.id}.ignoreNotfound`
 		);
 		await reply(interaction, {
-			content: ul(ul("userSettings.attributes.replaceUnknown.reset")),
+			content: ul("userSettings.attributes.replaceUnknown.reset"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
@@ -161,7 +170,7 @@ export async function setUnknowReplace(
 		`${interaction.user.id}.ignoreNotfound`
 	);
 	await reply(interaction, {
-		content: ul(ul("userSettings.attributes.replaceUnknown.set"), { value }),
+		content: ul("userSettings.attributes.replaceUnknown.set", { value }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
 	return;

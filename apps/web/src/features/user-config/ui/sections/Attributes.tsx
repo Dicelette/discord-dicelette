@@ -8,9 +8,10 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
-import { useI18n } from "@shared";
+import { resolveFormulaHint, useI18n } from "@shared";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { List, type RowComponentProps, useListRef } from "react-window";
+import { useToast } from "../../../../providers";
 import type { AttributeSectionProps } from "../../types.ts";
 import { exportJson } from "../../utils.ts";
 import { AttributeRow, FormAccordion } from "../atoms";
@@ -30,12 +31,23 @@ import {
 
 const newNameFieldSx = { flex: 2 } as const;
 const newValueFieldSx = { flex: 1 } as const;
+
+const errorTooltipSlotProps = {
+	tooltip: { sx: { bgcolor: "error.main" } },
+	arrow: { sx: { color: "error.main" } },
+} as const;
+
+const hintTooltipSlotProps = {
+	tooltip: { sx: { bgcolor: "grey.700" } },
+	arrow: { sx: { color: "grey.700" } },
+} as const;
 const replaceUnknownFieldSx = { mb: 2, fontFamily: "var(--code-font-family)" } as const;
 
 interface AttributeItemData {
-	entries: [string, number][];
+	entries: [string, number | string][];
+	allData: Record<string, number | string>;
 	onRename: (oldName: string, newName: string) => string | null;
-	onValueChange: (name: string, value: number) => void;
+	onValueChange: (name: string, value: string) => void;
 	onDelete: (name: string) => void;
 }
 
@@ -43,6 +55,7 @@ function AttributeItem({
 	index,
 	style,
 	entries,
+	allData,
 	onRename,
 	onValueChange,
 	onDelete,
@@ -54,6 +67,7 @@ function AttributeItem({
 				key={name}
 				name={name}
 				value={value}
+				allData={allData}
 				onRename={onRename}
 				onValueChange={onValueChange}
 				onDelete={onDelete}
@@ -64,7 +78,14 @@ function AttributeItem({
 
 function Attributes({ state }: AttributeSectionProps) {
 	const { t } = useI18n();
+	const tRef = useRef(t);
+	tRef.current = t;
+
+	const { enqueueToast } = useToast();
 	const [addErrorShaking, setAddErrorShaking] = useState(false);
+	const [addFormulaHint, setAddFormulaHint] = useState<string | null>(null);
+	const [addFormulaError, setAddFormulaError] = useState(false);
+	const [addValueFocused, setAddValueFocused] = useState(false);
 	useEffect(() => {
 		if (state.addError) {
 			setAddErrorShaking(true);
@@ -82,6 +103,7 @@ function Attributes({ state }: AttributeSectionProps) {
 		error,
 		success,
 		saving,
+
 		importRef,
 		setReplaceUnknown,
 		setNewName,
@@ -96,13 +118,17 @@ function Attributes({ state }: AttributeSectionProps) {
 		onImportChange,
 	} = state;
 
+	useEffect(() => {
+		if (success) enqueueToast(t("userConfig.saveSuccess"));
+	}, [success, enqueueToast, t]);
+
 	const entries = useMemo(
-		() => Object.entries(attributes) as [string, number][],
+		() => Object.entries(attributes) as [string, number | string][],
 		[attributes]
 	);
 	const itemData = useMemo<AttributeItemData>(
-		() => ({ entries, onRename, onValueChange, onDelete }),
-		[entries, onRename, onValueChange, onDelete]
+		() => ({ entries, allData: attributes, onRename, onValueChange, onDelete }),
+		[entries, attributes, onRename, onValueChange, onDelete]
 	);
 
 	const listStyle = {
@@ -111,6 +137,32 @@ function Attributes({ state }: AttributeSectionProps) {
 		scrollbarWidth: "thin" as const,
 		scrollbarColor: "rgba(255, 255, 255, 0.2) transparent",
 	};
+	useEffect(() => {
+		const trimmed = newValue.trim();
+		if (!trimmed) {
+			setAddFormulaHint(null);
+			setAddFormulaError(false);
+			return;
+		}
+		const timer = setTimeout(() => {
+			const snapshot = { ...attributes, [newName.trim()]: trimmed };
+			const hint = resolveFormulaHint(trimmed, snapshot);
+			if (hint.kind === "resolved") {
+				setAddFormulaHint(
+					tRef.current("userConfig.formulaResolved", { value: hint.value })
+				);
+				setAddFormulaError(false);
+			} else if (hint.kind === "error") {
+				setAddFormulaHint(tRef.current("userConfig.formulaError"));
+				setAddFormulaError(true);
+			} else {
+				setAddFormulaHint(null);
+				setAddFormulaError(false);
+			}
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [newValue, newName, attributes]); // tRef stable — excluded intentionally
+
 	const listRef = useListRef(null);
 	const prevCountRef = useRef(entries.length);
 	useEffect(() => {
@@ -177,18 +229,28 @@ function Attributes({ state }: AttributeSectionProps) {
 					sx={newNameFieldSx}
 					slotProps={codeInputSlotProps}
 				/>
-				<TextField
-					size="small"
-					label={t("userSettings.attributes.create.value.title").toTitle()}
-					value={newValue}
-					onChange={(e) => {
-						setNewValue(e.target.value);
-						setAddError(null);
-					}}
-					type="number"
-					sx={newValueFieldSx}
-					onKeyDown={(e) => e.key === "Enter" && onAdd()}
-				/>
+				<Tooltip
+					title={addFormulaHint ?? ""}
+					open={Boolean(addFormulaHint) && addValueFocused ? true : undefined}
+					arrow
+					placement="top"
+					slotProps={addFormulaError ? errorTooltipSlotProps : hintTooltipSlotProps}
+				>
+					<TextField
+						size="small"
+						label={t("userSettings.attributes.create.value.title").toTitle()}
+						value={newValue}
+						onChange={(e) => {
+							setNewValue(e.target.value);
+							setAddError(null);
+						}}
+						onFocus={() => setAddValueFocused(true)}
+						onBlur={() => setAddValueFocused(false)}
+						sx={newValueFieldSx}
+						error={addFormulaError}
+						onKeyDown={(e) => e.key === "Enter" && onAdd()}
+					/>
+				</Tooltip>
 				<Button
 					variant="outlined"
 					startIcon={adding ? <CircularProgress size={16} /> : <Add />}
@@ -211,11 +273,6 @@ function Attributes({ state }: AttributeSectionProps) {
 			{error && (
 				<Alert severity="error" sx={alertMbSx} onClose={() => setError(null)}>
 					{error}
-				</Alert>
-			)}
-			{success && (
-				<Alert severity="success" sx={alertMbSx}>
-					{t("userConfig.saveSuccess")}
 				</Alert>
 			)}
 			<Box sx={actionsBoxSx}>

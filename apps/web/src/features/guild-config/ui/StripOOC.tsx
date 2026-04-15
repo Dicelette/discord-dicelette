@@ -1,3 +1,4 @@
+import { escapeRegex } from "@dicelette/core";
 import type { ApiGuildData } from "@dicelette/types";
 import {
 	Autocomplete,
@@ -23,10 +24,6 @@ import { type Control, Controller, useController, useWatch } from "react-hook-fo
 
 const fullSpanSx = { gridColumn: { xs: "span 1", md: "span 2" } } as const;
 const timerBoxSx = { width: "100%", maxWidth: { xs: "100%", md: 400 } } as const;
-
-function escapeRegex(str: string) {
-	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 
 function buildRegex(prefix: string, suffix: string): string | undefined {
 	if (!prefix && !suffix) return undefined;

@@ -121,7 +121,7 @@ export const userSettings = {
 								.setDescriptions("userSettings.attributes.create.name")
 								.setRequired(true)
 						)
-						.addNumberOption((option) =>
+						.addStringOption((option) =>
 							option
 								.setNames("userSettings.attributes.create.value.title")
 								.setDescriptions("userSettings.attributes.create.value.description")

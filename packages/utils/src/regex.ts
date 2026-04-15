@@ -1,4 +1,6 @@
 // Pre-compiled regex patterns for better performance
+import { escapeRegex } from "@dicelette/core";
+
 export const QUERY_URL_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
 	DISCORD_CDN: /(cdn|media)\.discordapp\.(net|com)/gi,
@@ -98,11 +100,6 @@ export function capitalizeBetweenPunct(input: string) {
 	result = result.replace(QUERY_URL_PATTERNS.WORD_BOUNDARY(remainingText), remainingText);
 	return result;
 }
-
-function escapeRegex(string: string) {
-	return string.replace(QUERY_URL_PATTERNS.REGEX_ESCAPE, "\\$&");
-}
-
 // Cache for compiled regex patterns to improve performance
 const regexCache = new Map<string, RegExp>();
 

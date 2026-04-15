@@ -5,7 +5,6 @@ import {
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
-	buildInfoRollFromStats,
 	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
@@ -129,12 +128,17 @@ export async function baseRoll(
 	}
 
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
+	// Merge template stats with user attributes for proper name resolution
+	const allStatNames = [
+		...(ctx?.templateID?.statsName ?? []),
+		...(userData?.stats ? Object.keys(userData.stats) : []),
+	];
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
 		true,
 		undefined,
-		ctx?.templateID?.statsName,
+		allStatNames.length > 0 ? allStatNames : undefined,
 		ul,
 		interaction.guild
 			? client.userSettings.get(interaction.guild.id, user.id)?.ignoreNotfound
@@ -150,11 +154,9 @@ export async function baseRoll(
 		sortOrder
 	);
 
-	// Build infoRoll using helper to recover original accented name if available
-	const infoRoll = buildInfoRollFromStats(
-		res.infoRoll ? [res.infoRoll] : undefined,
-		ctx?.templateID?.statsName
-	);
+	const infoRoll = res.infoRoll
+		? { name: res.infoRoll, standardized: res.infoRoll.standardize() }
+		: undefined;
 	const opts: RollOptions = {
 		charName,
 		critical: serverData?.critical,

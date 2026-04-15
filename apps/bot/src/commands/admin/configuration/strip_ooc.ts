@@ -1,4 +1,5 @@
 import type { EClient } from "@dicelette/client";
+import { escapeRegex } from "@dicelette/core";
 import { fetchChannel } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
@@ -122,10 +123,6 @@ export async function stripOOC(
 		});
 		return;
 	}
-}
-
-function escapeRegex(str: string) {
-	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 async function isCatOrChannel(channel: string, guild: Djs.Guild) {

@@ -1,3 +1,4 @@
+import { resolveUserAttributes } from "@dicelette/helpers";
 import type { UserData } from "@dicelette/types";
 import type { EClient } from "client";
 
@@ -14,6 +15,7 @@ export function mergeAttribute(
 	userId: string
 ) {
 	const attributes = client.userSettings.get(guildId, userId)?.attributes;
-	if (attributes) return Object.assign({}, attributes, getChara?.stats ?? {});
-	return getChara?.stats;
+	const resolved = resolveUserAttributes(attributes);
+	if (!resolved.ok) return getChara?.stats;
+	return Object.assign({}, resolved.value ?? {}, getChara?.stats ?? {});
 }

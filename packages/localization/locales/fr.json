@@ -58,12 +58,12 @@
 		"name": "Modifier le nom du personnage",
 		"refuse": "Refuser",
 		"travel": {
-			"description": "Déplacer la fiche vers un autre channel",
-			"name": "Déplacer la fiche"
+			"description": "Déplacer la fiche",
+			"name": "Déplacer"
 		},
 		"user": {
 			"description": "Modifier l'utilisateur associé",
-			"name": "Transfert d'utilisateur"
+			"name": "Utilisateur"
 		},
 		"validate": "Valider"
 	},

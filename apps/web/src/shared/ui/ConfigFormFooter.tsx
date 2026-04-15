@@ -1,5 +1,5 @@
 import { keyframes } from "@emotion/react";
-import { WarningAmber } from "@mui/icons-material";
+import { Error as ErrorIcon } from "@mui/icons-material";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import SaveIcon from "@mui/icons-material/Save";
 import {
@@ -167,7 +167,7 @@ export default function ConfigFormFooter({
 						tabIndex={-1}
 					>
 						<Typography variant="h6" fontWeight="medium" sx={typographySx}>
-							<WarningAmber sx={iconSx} /> {t("config.unsaved")}
+							<ErrorIcon color="warning" sx={iconSx} /> {t("config.unsaved")}
 						</Typography>
 
 						<Box sx={buttonBoxSx}>

@@ -20,7 +20,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
 	CharactersTab,
@@ -28,61 +28,10 @@ import {
 	ServerCharactersTab,
 	UserConfigForm,
 } from "../features";
+import { useToast } from "../providers";
 import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
-
-const tabHiddenSx = { display: "none" } as const;
-const tabVisibleSx = {} as const;
-const pageContainerSx = {
-	maxWidth: "56rem",
-	mx: "auto",
-	px: { xs: 2, sm: 3 },
-	py: 3,
-} as const;
-const backButtonSx = { mb: 3 } as const;
-const dashboardHeaderSx = {
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "space-between",
-	gap: 2,
-	mb: 1,
-} as const;
-const dashboardTitleSx = { mb: 0 } as const;
-const spinSx = { animation: `${spinAnimation} 1.4s linear infinite` } as const;
-const noSpinSx = { animation: "none" } as const;
-const alertSx = { mb: 3 } as const;
-const tabsSx = {
-	mb: 3,
-	borderBottom: 1,
-	borderColor: "divider",
-	"& .MuiTabs-flexContainer": {
-		flexWrap: { xs: "wrap", sm: "nowrap" },
-		rowGap: 0.5,
-	},
-	"& .MuiTab-root": {
-		minWidth: { xs: 0, sm: 90 },
-		px: { xs: 1, sm: 2 },
-		flex: { xs: "1 1 auto", sm: "0 0 auto" },
-		borderBottom: { xs: "2px solid transparent", sm: "none" },
-		mb: { xs: "-1px", sm: 0 },
-		"&.Mui-selected": {
-			borderBottomColor: { xs: "primary.main", sm: "transparent" },
-		},
-	},
-} as const;
-const tabIndicatorSx = { display: { xs: "none", sm: "block" } } as const;
-const tabsUnsavedSx = {
-	"& .MuiTab-root:not(.Mui-selected)": {
-		opacity: 0.4,
-		transition: "opacity 0.2s ease",
-		"& .MuiTouchRipple-root": { display: "none" },
-	},
-	"& .MuiTabScrollButton-root": {
-		pointerEvents: "none",
-		opacity: 0.2,
-	},
-} as const;
 
 function TabPanel({
 	value,
@@ -96,13 +45,14 @@ function TabPanel({
 	children: ReactNode;
 }) {
 	if (!mounted.has(value)) return null;
-	return <Box sx={current === value ? tabVisibleSx : tabHiddenSx}>{children}</Box>;
+	return <Box sx={{ display: current === value ? undefined : "none" }}>{children}</Box>;
 }
 
 export default function Dashboard() {
 	const { guildId } = useParams<{ guildId: string }>();
 	const navigate = useNavigate();
 	const { t } = useI18n();
+	const { enqueueToast } = useToast();
 
 	const {
 		tab,
@@ -120,16 +70,21 @@ export default function Dashboard() {
 		saveSuccess,
 		refreshingCharacters,
 		refreshSuccess,
-		setRefreshSuccess,
 		charactersRefreshToken,
 		channels,
 		roles,
-		hasUnsavedChanges,
-		setHasUnsavedChanges,
 		handleSave,
 		handleCharactersRefresh,
 		handleTabChange,
 	} = useDashboard(guildId);
+
+	useEffect(() => {
+		if (saveSuccess) enqueueToast(t("dashboard.saveSuccess"));
+	}, [saveSuccess, enqueueToast, t]);
+
+	useEffect(() => {
+		if (refreshSuccess) enqueueToast(t("dashboard.refreshCharactersSuccess"));
+	}, [refreshSuccess, enqueueToast, t]);
 
 	if (loading) {
 		return (
@@ -140,17 +95,21 @@ export default function Dashboard() {
 	}
 
 	return (
-		<Box sx={pageContainerSx}>
-			<Button
-				startIcon={<ArrowBackIcon />}
-				onClick={() => navigate("/")}
-				sx={backButtonSx}
-			>
+		<Box sx={{ maxWidth: "56rem", mx: "auto", px: { xs: 2, sm: 3 }, py: 3 }}>
+			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={{ mb: 3 }}>
 				{t("common.back")}
 			</Button>
 
-			<Box sx={dashboardHeaderSx}>
-				<Typography variant="h4" gutterBottom fontWeight={700} sx={dashboardTitleSx}>
+			<Box
+				sx={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "space-between",
+					gap: 2,
+					mb: 1,
+				}}
+			>
+				<Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 0 }}>
 					{t("dashboard.title")}
 				</Typography>
 				<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
@@ -161,20 +120,21 @@ export default function Dashboard() {
 							size="small"
 							aria-label={t("dashboard.refreshCharacters")}
 						>
-							<RefreshIcon sx={refreshingCharacters ? spinSx : noSpinSx} />
+							<RefreshIcon
+								sx={{
+									animation: refreshingCharacters
+										? `${spinAnimation} 1.4s linear infinite`
+										: "none",
+								}}
+							/>
 						</IconButton>
 					</Box>
 				</Tooltip>
 			</Box>
 
 			{error && (
-				<Alert severity="error" sx={alertSx} onClose={() => setError(null)}>
+				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
 					{error}
-				</Alert>
-			)}
-			{refreshSuccess && (
-				<Alert severity="success" sx={alertSx} onClose={() => setRefreshSuccess(false)}>
-					{t("dashboard.refreshCharactersSuccess")}
 				</Alert>
 			)}
 
@@ -185,10 +145,28 @@ export default function Dashboard() {
 				onChange={handleTabChange}
 				slotProps={{
 					indicator: {
-						sx: tabIndicatorSx,
+						sx: { display: { xs: "none", sm: "block" } },
 					},
 				}}
-				sx={[tabsSx, hasUnsavedChanges && tabsUnsavedSx]}
+				sx={{
+					mb: 3,
+					borderBottom: 1,
+					borderColor: "divider",
+					"& .MuiTabs-flexContainer": {
+						flexWrap: { xs: "wrap", sm: "nowrap" },
+						rowGap: 0.5,
+					},
+					"& .MuiTab-root": {
+						minWidth: { xs: 0, sm: 90 },
+						px: { xs: 1, sm: 2 },
+						flex: { xs: "1 1 auto", sm: "0 0 auto" },
+						borderBottom: { xs: "2px solid transparent", sm: "none" },
+						mb: { xs: "-1px", sm: 0 },
+						"&.Mui-selected": {
+							borderBottomColor: { xs: "primary.main", sm: "transparent" },
+						},
+					},
+				}}
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
@@ -212,8 +190,6 @@ export default function Dashboard() {
 						guildId={guildId!}
 						onSave={handleSave}
 						saving={saving}
-						saveSuccess={saveSuccess}
-						onDirtyChange={setHasUnsavedChanges}
 						channels={channels}
 						roles={roles}
 						isStrictAdmin={isStrictAdmin}
@@ -228,8 +204,6 @@ export default function Dashboard() {
 							guildId={guildId!}
 							onSave={handleSave}
 							saving={saving}
-							saveSuccess={saveSuccess}
-							onDirtyChange={setHasUnsavedChanges}
 							channels={channels}
 							roles={roles}
 						/>

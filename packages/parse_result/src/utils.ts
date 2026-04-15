@@ -46,8 +46,7 @@ export function convertExpression(
 	if (unknownReplacer) dice = replaceUnknown(dice, unknownReplacer);
 	try {
 		const evaluated = evaluate(dice);
-		if (typeof evaluated === "number")
-			return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
+		if (isNumber(evaluated)) return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
 	} catch (error) {
 		//pass
 		logger.warn(error);

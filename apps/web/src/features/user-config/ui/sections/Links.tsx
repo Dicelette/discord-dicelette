@@ -10,7 +10,15 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { type ChangeEvent, type ComponentProps, memo, useCallback, useMemo } from "react";
+import {
+	type ChangeEvent,
+	type ComponentProps,
+	memo,
+	useCallback,
+	useEffect,
+	useMemo,
+} from "react";
+import { useToast } from "../../../../providers";
 import type { TemplateSectionProps } from "../../types";
 import { FormAccordion } from "../atoms";
 import { descriptionSx } from "./styles.ts";
@@ -72,6 +80,7 @@ const TemplateInput = memo(function TemplateInput({
 
 function Links({ state, isTemplate }: TemplateSectionProps) {
 	const { t } = useI18n();
+	const { enqueueToast } = useToast();
 	const {
 		value: template,
 		setValue: setTemplate,
@@ -115,6 +124,10 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 		[updateFormatField]
 	);
 	const closeError = useCallback(() => setError(null), [setError]);
+
+	useEffect(() => {
+		if (success) enqueueToast(t("userConfig.saveSuccess"));
+	}, [success, enqueueToast, t]);
 
 	return (
 		<FormAccordion title={t("userConfig.sections.template")}>
@@ -186,11 +199,6 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 			{error && (
 				<Alert severity="error" sx={alertMtSx} onClose={closeError}>
 					{error}
-				</Alert>
-			)}
-			{success && (
-				<Alert severity="success" sx={alertMtSx}>
-					{t("userConfig.saveSuccess")}
 				</Alert>
 			)}
 		</FormAccordion>

@@ -59,11 +59,11 @@
 		"refuse": "Refuse",
 		"travel": {
 			"description": "Move the character sheet to another channel",
-			"name": "Move the sheet"
+			"name": "Move"
 		},
 		"user": {
 			"description": "Edit associated user",
-			"name": "User transfer"
+			"name": "User"
 		},
 		"validate": "Validate"
 	},

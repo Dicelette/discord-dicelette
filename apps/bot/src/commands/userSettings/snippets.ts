@@ -8,6 +8,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	processEntries,
 	registerEntry,
+	resolveUserAttributes,
 	validateSnippetEntry,
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
@@ -27,7 +28,8 @@ export async function register(
 		interaction.guild!.id,
 		interaction.user.id
 	);
-	const attributes = userSettings?.attributes;
+	const resolvedAttributes = resolveUserAttributes(userSettings?.attributes);
+	const attributes = resolvedAttributes.ok ? resolvedAttributes.value : undefined;
 	const dice = replaceStatsInDiceFormula(
 		getExpression(
 			diceValue,
@@ -42,7 +44,7 @@ export async function register(
 		undefined,
 		undefined,
 		ul,
-		client.userSettings.get(interaction.guild!.id, interaction.user.id)?.ignoreNotfound
+		userSettings?.ignoreNotfound
 	);
 	await baseRoll(dice.formula, interaction, client, false, true);
 	// store using generic helper

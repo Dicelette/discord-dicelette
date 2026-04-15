@@ -1,11 +1,13 @@
 import type { EClient } from "@dicelette/client";
-import { findBestStatMatch } from "@dicelette/core";
+import { findBestStatMatch, isNumber } from "@dicelette/core";
 import {
 	charUserOptions,
 	getInteractionContext as getLangAndConfig,
 	haveAccess,
+	resolveUserAttributes,
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
+import { normalizeStatsMap } from "@dicelette/parse_result";
 import {
 	type CharacterData,
 	MIN_THRESHOLD_MATCH,
@@ -70,14 +72,6 @@ function chartOptions(builder: Djs.SlashCommandSubcommandBuilder, attribute?: bo
 	return builder;
 }
 
-function normalizedAttributeMap(attributes: Record<string, number>) {
-	const normalizedAttributes = new Map<string, [string, number]>();
-	for (const [key, value] of Object.entries(attributes)) {
-		normalizedAttributes.set(key.standardize(), [key, value]);
-	}
-	return normalizedAttributes;
-}
-
 function parseRequestedAttributes(attributesFilter: string) {
 	return attributesFilter
 		.split(/[;,\n]/)
@@ -91,7 +85,7 @@ function selectAttributes(
 ) {
 	if (!attributesFilter?.trim()) return attributes;
 
-	const normalizedAttributes = normalizedAttributeMap(attributes);
+	const normalizedAttributes = normalizeStatsMap(attributes);
 	const selectedAttributes: string[] = [];
 	const selectedAttributeSet = new Set<string>();
 
@@ -338,7 +332,14 @@ async function graphAttributes(
 		// Get attributes from user settings
 		const userAttributes =
 			client.userSettings.get(interaction.guild.id, userId)?.attributes ?? {};
-		if (Object.keys(userAttributes).length === 0) {
+		const resolvedAttributes = resolveUserAttributes(userAttributes);
+		if (!resolvedAttributes.ok || !resolvedAttributes.value) {
+			await reply(interaction, {
+				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
+			});
+			return;
+		}
+		if (Object.keys(resolvedAttributes.value).length === 0) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			});
@@ -348,7 +349,10 @@ async function graphAttributes(
 		const attributesFilter = options
 			.getString(t("userSettings.attributes.title"))
 			?.trim();
-		const filteredAttributes = selectAttributes(userAttributes, attributesFilter);
+		const filteredAttributes = selectAttributes(
+			resolvedAttributes.value,
+			attributesFilter
+		);
 		if (attributesFilter && Object.keys(filteredAttributes).length === 0) {
 			await reply(interaction, {
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
@@ -359,11 +363,13 @@ async function graphAttributes(
 		const labels = Object.keys(filteredAttributes).map((key) => key.unidecode());
 		const values = Object.values(filteredAttributes);
 
+		function filterToNumber(values: unknown[]) {
+			return values.filter((v) => isNumber(v)).map((v) => Number(v));
+		}
 		// Adjust min/max based on found values if not provided
-		if (min === undefined)
-			min = Math.min(...(values.filter((v) => typeof v === "number") as number[]));
+		if (min === undefined) min = Math.min(...filterToNumber(values));
 		if (max === undefined && values.length > 0) {
-			max = Math.max(...(values.filter((v) => typeof v === "number") as number[]));
+			max = Math.max(...filterToNumber(values));
 		}
 
 		const lineColor = options.getString(t("graph.line.name"));
