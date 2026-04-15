@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.12.0](https://github.com/Dicelette/discord-dicelette/compare/3.11.0...3.12.0) (2026-04-15)
+
+
+### Features
+
+* **attributes:** allow formula in attributes (only between attributes) ([c0d797d](https://github.com/Dicelette/discord-dicelette/commit/c0d797d7a934b31282fe2344a7147a5debcd3851))
+
 ## [3.11.0](https://github.com/Dicelette/discord-dicelette/compare/3.10.7...3.11.0) (2026-04-14)
 
 
