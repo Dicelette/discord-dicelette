@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.12.1](https://github.com/Dicelette/discord-dicelette/compare/3.12.0...3.12.1) (2026-04-16)
+
+
+### Bug Fixes
+
+* **infostat:** capitalize on list doesn't work ([912a7d9](https://github.com/Dicelette/discord-dicelette/commit/912a7d95182068ef2f99cc049bf6fe073c542724))
+* **stats:** should be capitalized ([9657e0e](https://github.com/Dicelette/discord-dicelette/commit/9657e0e3b4a309416c96a6a81e13a564c08a143f))
+
 ## [3.12.0](https://github.com/Dicelette/discord-dicelette/compare/3.11.0...3.12.0) (2026-04-15)
 
 
