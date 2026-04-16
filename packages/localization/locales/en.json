@@ -786,7 +786,8 @@
 		"presentation": "Dicelette is a bot written in Typescript and open-source dedicated to dice rolls:\n- Complex expression support,\n- Automatic results organization and logging,\n- Creation of snippets\n- Character template creation\n- Advanced customization: auto-role, HRP deletion, etc.",
 		"title": "info",
 		"uptime": "Uptime",
-		"version": "Version"
+		"version": "Version",
+		"dashboard": "Dashboard"
 	},
 	"legacy": {
 		"dice": "Skill Dice"

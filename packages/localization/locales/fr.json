@@ -786,7 +786,8 @@
 		"presentation": "Dicelette est un bot écrit en Typescript et open-source dédié aux lancé de dés :\n- Support d'expressions complexes,\n- Organisation automatique des résultats et journalisation,\n- Création de snippets\n- Création de modèle de fiche de personnages\n- Personnalisation avancée : auto-rôle, suppression HRP,…",
 		"title": "info",
 		"uptime": "Uptime",
-		"version": "Version"
+		"version": "Version",
+		"dashboard": "Dashboard"
 	},
 	"legacy": {
 		"dice": "Dés de compétences"
