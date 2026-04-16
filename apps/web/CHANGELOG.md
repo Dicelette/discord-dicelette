@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.2.3](https://github.com/Dicelette/discord-dicelette/compare/@dicelette/web@0.2.2...@dicelette/web@0.2.3) (2026-04-16)
+
+
+### Features
+
+* **attributes:** allow formula in attributes (only between attributes) ([c0d797d](https://github.com/Dicelette/discord-dicelette/commit/c0d797d7a934b31282fe2344a7147a5debcd3851))
+* **bot:tool:** allow to move a sheet to another channel ([dc66b95](https://github.com/Dicelette/discord-dicelette/commit/dc66b95962bf38f3f0bb5bd3a38ea057ae739605))
+* **dashboard:** add proper page when user refuses Discord OAuth ([e49a9de](https://github.com/Dicelette/discord-dicelette/commit/e49a9dec7c52163ae5712a700b8a76c7c6e51578))
+
+
+### Bug Fixes
+
+* **infostat:** capitalize on list doesn't work ([912a7d9](https://github.com/Dicelette/discord-dicelette/commit/912a7d95182068ef2f99cc049bf6fe073c542724))
+* **stats:** should be capitalized ([9657e0e](https://github.com/Dicelette/discord-dicelette/commit/9657e0e3b4a309416c96a6a81e13a564c08a143f))
+
 ## [0.2.2](https://github.com/Dicelette/discord-dicelette/compare/@dicelette/web@0.2.1...@dicelette/web@0.2.2) (2026-04-13)
 
 
