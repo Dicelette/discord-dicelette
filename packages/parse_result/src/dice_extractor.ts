@@ -147,6 +147,7 @@ export function applyCommentsToResult(
  * @param disableCompare - Encapsulate the roll with `{}`
  * @param sort - Sort the result passed to roll
  * @param ul
+ * @param replaceUnknown
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
 export function processChainedDiceRoll(
@@ -227,6 +228,7 @@ export function processChainedDiceRoll(
  * @param disableCompare - If true, encapsulate the roll in `{}` to disable success/failure comparison
  * @param sort - Optional sort order for the roll results
  * @param ul
+ * @param replaceUnknown
  * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
  */
 export function isRolling(
@@ -664,7 +666,7 @@ export function buildInfoRollFromStats(
 	const names =
 		statsName && statsName.length > 0
 			? unNormalizeStatsName(uniqueFound, statsName)
-			: uniqueFound.capitalize();
+			: uniqueFound.map((s) => s.capitalize());
 	const name = names.join(" ");
 	return { name, standardized: name.standardize() };
 }
