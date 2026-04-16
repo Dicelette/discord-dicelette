@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { REMOVER_PATTERN } from "@dicelette/core";
+import { DiceTypeError, REMOVER_PATTERN } from "@dicelette/core";
 import { fetchChannel, getGuildContext } from "@dicelette/helpers";
 import { lError, ln } from "@dicelette/localization";
 import {
@@ -125,7 +125,7 @@ export default (client: EClient): void => {
 			return;
 		} catch (e) {
 			if (!message.guild) return;
-			if (!isApiError(e)) {
+			if (!isApiError(e) && !(e instanceof DiceTypeError)) {
 				logger.fatal(e);
 				sentry.fatal(e);
 			}
