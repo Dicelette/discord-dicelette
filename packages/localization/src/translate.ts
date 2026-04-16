@@ -160,6 +160,8 @@ export function diceTypeError(
 ): string {
 	if (error.cause === "createCriticalCustom") return ul("error.createCriticalCustom");
 	if (error.cause === "no_dice_type") return ul("error.noDiceType");
+	if (error.cause === "unknown_stats")
+		return ul("error.invalidDice.stats", { stats: error.message });
 	if (error.message === "no_roll_result" || error.cause === "no_roll_result")
 		return ul("error.noRollResult", {
 			dice: error.dice,
