@@ -111,6 +111,12 @@
 		"subtitle": "Sign in with Discord to manage your server configuration.",
 		"title": "Dicelette Dashboard"
 	},
+	"loginError": {
+		"back": "Back to login",
+		"retry": "Try again",
+		"subtitleDenied": "You cancelled the Discord authorization. Click below to try again.",
+		"subtitleGeneric": "An error occurred during Discord authentication. Please try again."
+	},
 	"servers": {
 		"addBotDesc": "You are an administrator on these servers — Dicelette can be added.",
 		"addBotPending": "Bot added? Click Refresh to update the list.",

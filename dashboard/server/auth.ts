@@ -41,7 +41,7 @@ export function createAuthRouter(
 	});
 
 	router.get("/callback", async (req: Request, res: Response) => {
-		const { code, state } = req.query;
+		const { code, state, error: oauthError } = req.query;
 
 		// Fix 1 (cont.): validate state before doing anything else
 		if (!state || typeof state !== "string" || state !== req.session.oauthState) {
@@ -51,8 +51,16 @@ export function createAuthRouter(
 		// Consume the state immediately so it can't be replayed
 		delete req.session.oauthState;
 
+		// User denied authorization on Discord's side
+		if (oauthError) {
+			res.redirect(
+				`${getfrontEndUrl()}/login/error?reason=${encodeURIComponent(String(oauthError))}`
+			);
+			return;
+		}
+
 		if (!code || typeof code !== "string") {
-			res.status(400).json({ error: "Missing code" });
+			res.redirect(`${getfrontEndUrl()}/login/error?reason=missing_code`);
 			return;
 		}
 
