@@ -1,4 +1,4 @@
-import { SHAKE_KEYFRAMES } from "../atoms/styles";
+import { SHAKE_KEYFRAMES } from "../atoms";
 
 export const ITEM_SIZE = 65;
 export const MAX_LIST_HEIGHT = 5 * ITEM_SIZE;

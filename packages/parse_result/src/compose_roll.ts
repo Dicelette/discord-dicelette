@@ -1,5 +1,4 @@
-import { DETECT_CRITICAL, generateStatsDice } from "@dicelette/core";
-import { MIN_THRESHOLD_MATCH } from "@dicelette/types";
+import { DETECT_CRITICAL, generateStatsDice, MIN_THRESHOLD_MATCH } from "@dicelette/core";
 import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
 

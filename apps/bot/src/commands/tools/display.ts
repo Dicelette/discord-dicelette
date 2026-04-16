@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { generateStatsDice } from "@dicelette/core";
+import { generateStatsDice, MIN_THRESHOLD_MATCH } from "@dicelette/core";
 import {
 	autoCompleteEdit,
 	charUserOptions,
@@ -8,7 +8,7 @@ import {
 	reuploadAvatar,
 } from "@dicelette/helpers";
 import { findln, t } from "@dicelette/localization";
-import { type CharacterData, MIN_THRESHOLD_MATCH } from "@dicelette/types";
+import type { CharacterData } from "@dicelette/types";
 import { logger, sentry } from "@dicelette/utils";
 import { findChara, getRecordChar } from "database";
 import * as Djs from "discord.js";

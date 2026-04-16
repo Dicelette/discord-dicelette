@@ -32,15 +32,6 @@ export const DICE_COMPILED_PATTERNS = {
 	TARGET_VALUE: /^\{(?<dice>.*?)}(?<comments>(?:^|\s)# ?(.*))?$/,
 } as const;
 
-export const REMOVER_PATTERN = {
-	ASTERISK_ESCAPE: /\*/g,
-	CRITICAL_BLOCK: /\{\*?c[fs]:([<>=]|!=)+.+?\}/gim,
-	EXP_REMOVER: /\{exp(.*?)\}/g,
-	SIGN_REMOVER: /([><=]|!=)+.*$/,
-	STAT_COMMENTS_REMOVER: /%%.*%%/,
-	STAT_MATCHER: /\(?\$([\p{L}\p{M}_.][\p{L}\p{M}0-9_.]*)\)?/giu,
-} as const;
-
 export const PARSE_RESULT_PATTERNS = {
 	allSharedSymbols: /[✓✕◈※]/,
 	beforeArrow: /^(?:※\s|◈\s[^—]+—\s)?/,
@@ -101,20 +92,6 @@ export function capitalizeBetweenPunct(input: string) {
 	return result;
 }
 // Cache for compiled regex patterns to improve performance
-const regexCache = new Map<string, RegExp>();
-
-/**
- * Get or create a cached regex pattern
- */
-export function getCachedRegex(pattern: string, flags = ""): RegExp {
-	const key = `${pattern}|${flags}`;
-	let regex = regexCache.get(key);
-	if (!regex) {
-		regex = new RegExp(pattern, flags);
-		regexCache.set(key, regex);
-	}
-	return regex;
-}
 
 // Generic overload: the return type depends on the input type
 export function getIdFromMention<T extends string | undefined>(

@@ -3,13 +3,10 @@ import {
 	type CustomCritical,
 	generateStatsDice,
 	isNumber,
+	MIN_THRESHOLD_MATCH,
 	type SortOrder,
 } from "@dicelette/core";
-import {
-	type CustomCriticalRoll,
-	MIN_THRESHOLD_MATCH,
-	type Translation,
-} from "@dicelette/types";
+import type { CustomCriticalRoll, Translation } from "@dicelette/types";
 import {
 	BotError,
 	BotErrorLevel,

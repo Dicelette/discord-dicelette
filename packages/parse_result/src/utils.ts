@@ -1,13 +1,19 @@
 /** biome-ignore-all lint/style/useNamingConvention: Until biome allow to set a specific rules for property of a global object, we stick against the naming convention */
 
 import type { SortOrder } from "@dicelette/core";
-import { generateStatsDice, isNumber } from "@dicelette/core";
-import { MIN_THRESHOLD_MATCH, type Translation } from "@dicelette/types";
-import { DICE_COMPILED_PATTERNS, logger, REMOVER_PATTERN } from "@dicelette/utils";
+import {
+	generateStatsDice,
+	isNumber,
+	MIN_THRESHOLD_MATCH,
+	REMOVER_PATTERN,
+	replaceUnknown,
+} from "@dicelette/core";
+import type { Translation } from "@dicelette/types";
+import { DICE_COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
-import { findStatInDiceFormula, getRoll, replaceUnknown } from "./dice_extractor";
+import { findStatInDiceFormula, getRoll } from "./dice_extractor";
 
 /**
  * Get or create cached regex for stats filtering

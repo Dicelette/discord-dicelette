@@ -1,5 +1,10 @@
 import type { EClient } from "@dicelette/client";
-import { DETECT_CRITICAL, findBestRecord, generateStatsDice } from "@dicelette/core";
+import {
+	DETECT_CRITICAL,
+	findBestRecord,
+	generateStatsDice,
+	MIN_THRESHOLD_MATCH,
+} from "@dicelette/core";
 import {
 	getInteractionContext as getLangAndConfig,
 	getSettingsAutoComplete,
@@ -15,7 +20,7 @@ import {
 	parseOpposition,
 	skillCustomCritical,
 } from "@dicelette/parse_result";
-import { MIN_THRESHOLD_MATCH, type RollOptions } from "@dicelette/types";
+import type { RollOptions } from "@dicelette/types";
 import { CHARACTER_DETECTION, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { rollWithInteraction } from "utils";

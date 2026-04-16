@@ -1,18 +1,18 @@
 import type { EClient } from "@dicelette/client";
-import { generateStatsDice, isNumber } from "@dicelette/core";
+import {
+	generateStatsDice,
+	isNumber,
+	MIN_THRESHOLD_MATCH,
+	replaceUnknown,
+} from "@dicelette/core";
 import {
 	autoCompleteCharacters,
 	calcOptions,
 	resolveUserAttributes,
 } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
-import { getRoll, replaceUnknown, timestamp } from "@dicelette/parse_result";
-import {
-	EMOJI_MATH,
-	MIN_THRESHOLD_MATCH,
-	type Translation,
-	type UserData,
-} from "@dicelette/types";
+import { getRoll, timestamp } from "@dicelette/parse_result";
+import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger, profiler } from "@dicelette/utils";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";

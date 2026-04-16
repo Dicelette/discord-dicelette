@@ -1,4 +1,5 @@
 import type { EClient } from "@dicelette/client";
+import { REMOVER_PATTERN } from "@dicelette/core";
 import { fetchChannel, getGuildContext } from "@dicelette/helpers";
 import { lError, ln } from "@dicelette/localization";
 import {
@@ -11,7 +12,6 @@ import {
 	CHARACTER_DETECTION,
 	logger,
 	profiler,
-	REMOVER_PATTERN,
 	sentry,
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage } from "database";

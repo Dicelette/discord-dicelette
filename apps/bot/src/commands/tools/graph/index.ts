@@ -1,5 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { findBestStatMatch, isNumber } from "@dicelette/core";
+import { findBestStatMatch, isNumber, MIN_THRESHOLD_MATCH } from "@dicelette/core";
 import {
 	charUserOptions,
 	getInteractionContext as getLangAndConfig,
@@ -8,12 +8,11 @@ import {
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import { normalizeStatsMap } from "@dicelette/parse_result";
-import {
-	type CharacterData,
-	MIN_THRESHOLD_MATCH,
-	type PersonnageIds,
-	type Translation,
-	type UserData,
+import type {
+	CharacterData,
+	PersonnageIds,
+	Translation,
+	UserData,
 } from "@dicelette/types";
 import { filterChoices, logger, sentry } from "@dicelette/utils";
 import {

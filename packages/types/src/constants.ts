@@ -6,7 +6,6 @@ import type { Translation } from "..";
 import type { TemplateResult } from "./database";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
-export const MIN_THRESHOLD_MATCH = 0.5;
 
 export const TUTORIAL_IMAGES = [
 	"https://github.com/Dicelette/dicelette.github.io/blob/main/static/assets/tuto/allow_commands_1.png?raw=true",

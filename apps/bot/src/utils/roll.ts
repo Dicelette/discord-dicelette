@@ -1,5 +1,11 @@
 import type { EClient } from "@dicelette/client";
-import type { CustomCritical, SortOrder, StatisticalTemplate } from "@dicelette/core";
+import {
+	type CustomCritical,
+	includeDiceType,
+	type SortOrder,
+	type StatisticalTemplate,
+	verifyStatMatcherPattern,
+} from "@dicelette/core";
 import {
 	extractRollOptions,
 	getGuildContext,
@@ -14,14 +20,12 @@ import {
 	getCriticalFromDice,
 	getExpression,
 	getRoll,
-	includeDiceType,
 	parseOpposition,
 	replaceStatInDiceName,
 	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 	type Server,
 	skillCustomCritical,
-	verifyStatMatcherPattern,
 } from "@dicelette/parse_result";
 import type {
 	RollOptions,
@@ -85,7 +89,7 @@ export async function rollWithInteraction(
 		sort = client.settings.get(interaction.guild.id, "sortOrder");
 		userSettings = client.userSettings.get(interaction.guild.id, data.userId!);
 	}
-	dice = verifyStatMatcherPattern(dice, ul, userSettings?.ignoreNotfound);
+	dice = verifyStatMatcherPattern(dice, userSettings?.ignoreNotfound);
 	const result = getRoll(dice, pity, sort);
 	if (!result) {
 		await reply(interaction, {

@@ -14,13 +14,12 @@ import {
 	DICE_COMPILED_PATTERNS,
 	logger,
 	profiler,
-	REMOVER_PATTERN,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
 import "@dicelette/discord_ext";
-import type { ComparedValue } from "@dicelette/core";
+import { type ComparedValue, REMOVER_PATTERN } from "@dicelette/core";
 import type { RollOptions } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction } from "database";
 

@@ -2,28 +2,21 @@
 import {
 	escapeRegex,
 	findBestStatMatch,
+	MIN_THRESHOLD_MATCH,
+	REMOVER_PATTERN,
 	type Resultat,
 	roll,
-	SIGN_REGEX,
 	type SortOrder,
+	verifyStatMatcherPattern,
 } from "@dicelette/core";
-import {
-	type ChainedComments,
-	type DiceData,
-	type DiceExtractionResult,
-	MIN_THRESHOLD_MATCH,
-	type Translation,
-	type UserData,
+import type {
+	ChainedComments,
+	DiceData,
+	DiceExtractionResult,
+	Translation,
+	UserData,
 } from "@dicelette/types";
-import {
-	BotError,
-	DICE_COMPILED_PATTERNS,
-	DICE_PATTERNS,
-	getCachedRegex,
-	logger,
-	NORMALIZE_SINGLE_DICE,
-	REMOVER_PATTERN,
-} from "@dicelette/utils";
+import { DICE_COMPILED_PATTERNS, DICE_PATTERNS, logger } from "@dicelette/utils";
 import { extractAndMergeComments, getComments } from "./comment_utils";
 import { trimAll } from "./utils";
 
@@ -439,38 +432,6 @@ export function getRoll(
 	return rollDice;
 }
 
-export function replaceUnknown(dice: string, replacer: string) {
-	return dice
-		.replaceAll(REMOVER_PATTERN.STAT_MATCHER, replacer)
-		.replaceAll("+0", "")
-		.replaceAll("-0", "");
-}
-
-export function verifyStatMatcherPattern(
-	dice: string,
-	ul?: Translation,
-	replaceUnknow?: string
-) {
-	if (REMOVER_PATTERN.STAT_MATCHER.test(dice)) {
-		if (replaceUnknow)
-			//remove ALL unknow value
-			return replaceUnknown(dice, replaceUnknow);
-
-		//find which one is not replaced
-		const matched = dice.matchAll(new RegExp(REMOVER_PATTERN.STAT_MATCHER));
-		const stats = matched
-			? Array.from(matched, (m) => m?.[0])
-					.map((s) => `\`${s}\``)
-					.join(", ")
-			: "unknown";
-		const errorMessage = ul
-			? ul("error.invalidDice.stats", { stats })
-			: `The dice contains unknown statistics: ${stats}. Verify the values before reprocessing.`;
-		throw new BotError(errorMessage);
-	}
-	return dice.replaceAll("+0", "").replaceAll("-0", "");
-}
-
 /**
  * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
  * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
@@ -482,10 +443,10 @@ export function replaceStatsInDiceFormula(
 	deleteComments = false,
 	shared = false,
 	statsName?: string[],
-	ul?: Translation,
+	_ul?: Translation,
 	replaceUnknow?: string
 ): { formula: string; infoRoll?: string; statsPerSegment?: string[] } {
-	if (!stats) return { formula: verifyStatMatcherPattern(content, ul, replaceUnknow) };
+	if (!stats) return { formula: verifyStatMatcherPattern(content, replaceUnknow) };
 	//remove secondary opposition
 
 	let comments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
@@ -570,7 +531,7 @@ export function replaceStatsInDiceFormula(
 		// Non-shared roll: process as before
 		const variableMatches = [...processedFormula.matchAll(REMOVER_PATTERN.STAT_MATCHER)];
 		if (!variableMatches.length)
-			return { formula: verifyStatMatcherPattern(content, ul, replaceUnknow) };
+			return { formula: verifyStatMatcherPattern(content, replaceUnknow) };
 
 		for (const match of variableMatches) {
 			const fullMatch = match[0];
@@ -619,13 +580,13 @@ export function replaceStatsInDiceFormula(
 			? `${processedFormula} ${originalComments}`.trim()
 			: processedFormula;
 		return {
-			formula: verifyStatMatcherPattern(finalFormula, ul, replaceUnknow),
+			formula: verifyStatMatcherPattern(finalFormula, replaceUnknow),
 			infoRoll: statsList,
 			statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 		};
 	}
 	return {
-		formula: `${verifyStatMatcherPattern(processedFormula, ul, replaceUnknow)} ${comments}`,
+		formula: `${verifyStatMatcherPattern(processedFormula, replaceUnknow)} ${comments}`,
 		infoRoll: statsList,
 		statsPerSegment: isSharedRoll ? statsPerSegment : undefined,
 	};
@@ -711,27 +672,4 @@ export function findStatInDiceFormula(
 	}
 	const unique = Array.from(new Set(foundStats));
 	return unique.length > 0 ? unique : undefined;
-}
-
-export function includeDiceType(dice: string, diceType?: string, userStats?: boolean) {
-	if (!diceType) return false;
-	// Normalize leading implicit single dice: treat `1d100` and `d100` as equivalent
-	diceType = NORMALIZE_SINGLE_DICE(diceType);
-	dice = NORMALIZE_SINGLE_DICE(dice);
-	if (userStats && diceType.includes("$")) {
-		//replace the $ in the diceType by a regex (like .+?)
-		diceType = diceType.replace("$", ".+?");
-	}
-	if (SIGN_REGEX.test(diceType)) {
-		//remove it from the diceType and the value after it like >=10 or <= 5 to prevent errors
-		diceType = diceType.replace(REMOVER_PATTERN.SIGN_REMOVER, "").trim();
-		dice = dice.replace(REMOVER_PATTERN.SIGN_REMOVER, "").trim();
-	}
-	//also prevent error with the {exp} value
-	if (diceType.includes("{exp")) {
-		diceType = diceType.replace(REMOVER_PATTERN.EXP_REMOVER, "").trim();
-		dice = dice.replace(REMOVER_PATTERN.EXP_REMOVER, "").trim();
-	}
-	const detectDiceType = getCachedRegex(`\\b${diceType}\\b`, "i");
-	return detectDiceType.test(dice);
 }

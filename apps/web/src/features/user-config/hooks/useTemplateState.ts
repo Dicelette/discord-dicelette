@@ -45,6 +45,7 @@ function reducer(state: State, action: Action): State {
  *
  * @param initialTemplate - initial template value (from config or user config)
  * @param saveFn - async function that persists the template
+ * @param options
  * @param options.externalValue - when provided, syncs the template state when this value changes
  *   (useful for GuildConfigForm where config can be updated from outside)
  * @param options.errorKey - i18n key used when save fails (default: "userConfig.saveError")

@@ -1,6 +1,5 @@
 import type { EClient } from "@dicelette/client";
-import { calculateSimilarity } from "@dicelette/core";
-import { MIN_THRESHOLD_MATCH } from "@dicelette/types";
+import { calculateSimilarity, MIN_THRESHOLD_MATCH } from "@dicelette/core";
 import { logger } from "@dicelette/utils";
 import { getUserFromInteraction } from "database";
 import type * as Djs from "discord.js";
@@ -132,11 +131,6 @@ export async function findBestMatchingDice(
 			}
 			const damageName = userData.damageName ?? [];
 			for (const atqName of damageName) {
-				if (charOptions) {
-					logger.info(
-						`Checking ${atqName.standardize()} against ${searchTerm}: similarity = ${calculateSimilarity(searchTerm, atqName.standardize())}`
-					);
-				}
 				const result = await findMacroName(
 					client,
 					interaction,
