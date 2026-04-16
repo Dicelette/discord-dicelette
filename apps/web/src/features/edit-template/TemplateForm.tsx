@@ -1,6 +1,7 @@
 import {
 	type CustomCritical as CustomCriticalType,
 	getEngine,
+	isNumber,
 	type Statistic,
 	type StatisticalSchema,
 	type StatisticalTemplate,
@@ -19,7 +20,7 @@ import Macro from "./Blocks/Macro";
 import Statistics from "./Blocks/Statistics";
 import { errorCode } from "./errorsTranslation";
 import type { DataForm } from "./interfaces";
-import { createFormItemId, isNumber } from "./utils";
+import { createFormItemId } from "./utils";
 
 const engine = getEngine("browserCrypto");
 

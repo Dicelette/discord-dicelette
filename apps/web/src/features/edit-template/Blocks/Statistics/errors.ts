@@ -1,5 +1,6 @@
+import { isNumber } from "@dicelette/core";
 import type { StatisticFields } from "../../interfaces";
-import { isNumber, under } from "../../utils";
+import { under } from "../../utils";
 
 type StatisticsErrorKey =
 	| "template.errors.statistics.minGreaterThanMax"
