@@ -1,4 +1,10 @@
-import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
+import type {
+	Characters,
+	Settings,
+	UserData,
+	UserDatabase,
+	UserGuildData,
+} from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
@@ -19,6 +25,7 @@ import {
 	userCanRefreshServerCharacters,
 	withTimeout,
 } from "../utils";
+import { logCharacterAction } from "./logs";
 
 function isAllowSelfRegister(guildData: {
 	allowSelfRegister?: boolean | string;
@@ -415,5 +422,295 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 	);
 
+	// POST /:guildId/characters/import — import characters from CSV (admin only)
+	router.post(
+		"/import",
+		requireAuth,
+		requireAdmin,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.session.userId!;
+
+			try {
+				const { csvText, channelId, overwrite } = req.body as {
+					csvText: string;
+					channelId: string;
+					overwrite?: boolean;
+				};
+
+				if (!csvText || !channelId) {
+					res.status(400).json({ error: "Missing csvText or channelId" });
+					return;
+				}
+
+				const guildData = settings.get(guildId);
+				if (!guildData) {
+					res.status(404).json({ error: "Guild not found" });
+					return;
+				}
+
+				const results = await parseCharactersCsv(
+					csvText,
+					guildId,
+					channelId,
+					overwrite ?? false,
+					{ settings, characters, botChannels }
+				);
+
+				// Log the import action
+				logCharacterAction(guildId, userId, "import", null, channelId, {
+					fieldsModified: ["import"],
+					newValues: { imported: results.success },
+				});
+
+				// Invalidate caches
+				charCache.delete(`${guildId}:*all*`);
+				for (const key of [...charCache.keys()]) {
+					if (key.startsWith(`${guildId}:`)) charCache.delete(key);
+				}
+
+				res.json(results);
+			} catch (error) {
+				important.error("Import error:", error);
+				res.status(500).json({
+					error: error instanceof Error ? error.message : "Import failed",
+				});
+			}
+		}
+	);
+
+	// PATCH /:guildId/characters/:messageId — edit a character (admin or owner)
+	router.patch("/:messageId", requireAuth, async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const messageId = req.params.messageId as string;
+		const userId = req.session.userId!;
+
+		try {
+			const { stats, avatar, isPrivate, charName } = req.body as {
+				stats?: Record<string, number>;
+				avatar?: string;
+				isPrivate?: boolean;
+				charName?: string;
+			};
+
+			const guildData = settings.get(guildId);
+			if (!guildData) {
+				res.status(404).json({ error: "Guild not found" });
+				return;
+			}
+
+			// Find the character
+			const userChars = guildData.user?.[userId] ?? [];
+			const charIndex = userChars.findIndex((c) => c.messageId[0] === messageId);
+
+			if (charIndex === -1) {
+				// Check if admin can edit others
+				const isAdmin = await userCanRefreshServerCharacters(userId, guildId, botGuilds);
+				if (!isAdmin) {
+					res.status(403).json({ error: "Forbidden" });
+					return;
+				}
+				// Find char in any user's list
+				let found = false;
+				for (const [uid, chars] of Object.entries(guildData.user ?? {})) {
+					const idx = chars.findIndex((c) => c.messageId[0] === messageId);
+					if (idx !== -1) {
+						// Update character
+						const oldChar = chars[idx];
+						const updates: Partial<UserGuildData> = {};
+						if (isPrivate !== undefined) updates.isPrivate = isPrivate;
+						if (charName !== undefined) updates.charName = charName;
+
+						chars[idx] = { ...oldChar, ...updates };
+						found = true;
+
+						logCharacterAction(
+							guildId,
+							userId,
+							"edit",
+							charName ?? oldChar.charName ?? null,
+							messageId,
+							{
+								fieldsModified: Object.keys(updates),
+								oldValues: oldChar,
+								newValues: chars[idx],
+							}
+						);
+						break;
+					}
+				}
+				if (!found) {
+					res.status(404).json({ error: "Character not found" });
+					return;
+				}
+			} else {
+				// Update own character
+				const char = userChars[charIndex];
+				const updates: Partial<UserGuildData> = {};
+				if (isPrivate !== undefined) updates.isPrivate = isPrivate;
+				if (charName !== undefined) updates.charName = charName;
+
+				userChars[charIndex] = { ...char, ...updates };
+
+				logCharacterAction(
+					guildId,
+					userId,
+					"edit",
+					charName ?? char.charName ?? null,
+					messageId,
+					{
+						fieldsModified: Object.keys(updates),
+						oldValues: char,
+						newValues: userChars[charIndex],
+					}
+				);
+			}
+
+			settings.set(guildId, guildData);
+
+			// Invalidate caches
+			charCache.delete(`${guildId}:${userId}`);
+			charCache.delete(`${guildId}:*all*`);
+
+			res.json({ ok: true });
+		} catch (error) {
+			important.error("Edit error:", error);
+			res.status(500).json({
+				error: error instanceof Error ? error.message : "Edit failed",
+			});
+		}
+	});
+
 	return router;
+}
+
+async function parseCharactersCsv(
+	csvText: string,
+	guildId: string,
+	channelId: string,
+	overwrite: boolean,
+	deps: { settings: Settings; characters: Characters; botChannels: BotChannels }
+): Promise<{ success: number; failed: number; errors: string[] }> {
+	const { settings, characters, botChannels } = deps;
+	const guildData = settings.get(guildId);
+
+	if (!guildData) throw new Error("Guild not found");
+
+	const errors: string[] = [];
+	let success = 0;
+	let failed = 0;
+
+	let csvData: Record<string, string | number | boolean | undefined>[] = [];
+	await new Promise<void>((resolve) => {
+		Papa.parse(csvText.replaceAll(/\s+;\s*/gi, ";"), {
+			header: true,
+			skipEmptyLines: true,
+			complete(
+				results: Papa.ParseResult<Record<string, string | number | boolean | undefined>>
+			) {
+				csvData = results.data;
+				resolve();
+			},
+		});
+	});
+
+	const limiter = pLimit(3);
+
+	const promises = csvData.map((row) =>
+		limiter(async () => {
+			try {
+				const userId = row.user?.toString().replaceAll("'", "").trim();
+				const charName = row.charName;
+				const avatar = row.avatar;
+
+				if (!userId) {
+					errors.push("Row skipped: missing user ID");
+					failed++;
+					return;
+				}
+
+				// Create character data
+				const userData: UserData = {
+					userName: charName,
+					avatar: avatar || undefined,
+					channel: channelId,
+					template: {},
+				};
+
+				// Register in settings
+				if (!guildData.user) guildData.user = {};
+				if (!guildData.user[userId]) guildData.user[userId] = [];
+
+				const userCharList = guildData.user[userId];
+
+				// Check for duplicates unless overwrite
+				const existing = userCharList.findIndex(
+					(c: UserGuildData) => c.charName === charName || (!charName && !c.charName)
+				);
+
+				if (existing !== -1 && !overwrite) {
+					errors.push(`${charName || "Default"} for user ${userId} already exists`);
+					failed++;
+					return;
+				}
+
+				// Create message placeholder
+				const messageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+				const charData: UserGuildData = {
+					charName,
+					messageId: [messageId, channelId],
+					isPrivate: row.isPrivate ?? false,
+				};
+
+				if (existing !== -1) {
+					userCharList[existing] = charData;
+				} else {
+					userCharList.push(charData);
+				}
+
+				// Register in memory cache
+				if (!characters.has(guildId)) characters.set(guildId, {});
+				if (!characters.has(guildId, userId)) characters.set(guildId, userId, []);
+				const memChars = characters.get(guildId, userId) as UserData[];
+				memChars.push(userData);
+
+				success++;
+			} catch (err) {
+				errors.push(err instanceof Error ? err.message : String(err));
+				failed++;
+			}
+		})
+	);
+
+	await Promise.all(promises);
+	settings.set(guildId, guildData);
+
+	return { success, failed, errors };
+}
+
+function pLimit(concurrency: number) {
+	let activeCount = 0;
+	const queue: Array<() => void> = [];
+
+	const next = () => {
+		activeCount--;
+		queue.shift()?.();
+	};
+
+	return async function limit<T>(fn: () => Promise<T>): Promise<T> {
+		if (activeCount >= concurrency) {
+			return new Promise<T>((resolve, reject) => {
+				queue.push(() => {
+					activeCount++;
+					fn().then(resolve).catch(reject).finally(next);
+				});
+			});
+		}
+		activeCount++;
+		try {
+			return await fn();
+		} finally {
+			next();
+		}
+	};
 }

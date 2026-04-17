@@ -4,6 +4,7 @@ import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/mate
 import "uniformize";
 import { useI18n } from "@shared";
 import { memo } from "react";
+import EditCharacterDialog from "./EditCharacterDialog";
 import StatCell from "./StatCell";
 
 const cardPaperSx = { p: 3 } as const;
@@ -32,9 +33,10 @@ const damageGridSx = {
 
 interface Props {
 	char: ApiCharacter;
+	onEdit?: () => void;
 }
 
-function CharacterCard({ char }: Props) {
+function CharacterCard({ char, onEdit }: Props) {
 	const { t } = useI18n();
 	const displayName = char.charName ?? t("characters.unnamed");
 
@@ -61,18 +63,21 @@ function CharacterCard({ char }: Props) {
 					</Box>
 				</Box>
 
-				{char.canLink && (
-					<Button
-						variant="outlined"
-						size="small"
-						endIcon={<OpenInNew />}
-						href={char.discordLink}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{t("characters.sheetLink")}
-					</Button>
-				)}
+				<Box sx={{ display: "flex", gap: 1 }}>
+					<EditCharacterDialog character={char} onSuccess={onEdit ?? (() => {})} />
+					{char.canLink && (
+						<Button
+							variant="outlined"
+							size="small"
+							endIcon={<OpenInNew />}
+							href={char.discordLink}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{t("characters.sheetLink")}
+						</Button>
+					)}
+				</Box>
 			</Box>
 
 			{char.stats && char.stats.length > 0 && (
