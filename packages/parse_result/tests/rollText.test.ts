@@ -270,6 +270,112 @@ describe("bulk comparison rolls", () => {
 		expect(lines[2]).toContain("**Failure**");
 		expect(lines[3]).toContain("**Success**");
 	});
+
+	it("should keep base comparison in header for bulk rolls with custom critical", () => {
+		// Test case: 5#d100<=60 with a success critical at natural 96+
+		const result: Resultat = {
+			compare: { sign: "<=", value: 60 },
+			dice: "5#d100<=60",
+			result:
+				"1d100: [88] = 88;1d100: [98] = 98;1d100: [28] = 28;1d100: [65] = 65;1d100: [35] = 35",
+			total: 314,
+		};
+
+		const customCritical: CustomCritical = {
+			onNaturalDice: true,
+			sign: ">=",
+			value: "96",
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, undefined, {
+			success: customCritical,
+		});
+		const text = res.defaultMessage();
+
+		// Should display the base comparison (<= 60) in header, not the critical comparison (>= 96)
+		expect(text).toMatch(/\(`[<>]=?\s*60`\)/);
+		expect(text).not.toMatch(/\(`[<>]=?\s*96`\)/);
+	});
+
+	it("should keep base comparison for bulk rolls in onMessageSend", () => {
+		// Test case: 5#d100<=60 with a success critical at natural 96+
+		const result: Resultat = {
+			compare: { sign: "<=", value: 60 },
+			dice: "5#d100<=60",
+			result:
+				"1d100: [88] = 88;1d100: [98] = 98;1d100: [28] = 28;1d100: [65] = 65;1d100: [35] = 35",
+			total: 314,
+		};
+
+		const customCritical: CustomCritical = {
+			onNaturalDice: true,
+			sign: ">=",
+			value: "96",
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, undefined, {
+			success: customCritical,
+		});
+		const text = res.onMessageSend(undefined, "189390243676422144");
+
+		// Should display the base comparison (<= 60) in header, not the critical comparison (>= 96)
+		expect(text).toMatch(/\(`[⩽⩾<=>\s]*60`\)/);
+		expect(text).not.toMatch(/\(`[⩽⩾<=>\s]*96`\)/);
+	});
+
+	it("should display custom critical comparison in bulk roll result lines", () => {
+		// Test case: 5#d100<=60 with a success critical at natural 98
+		const result: Resultat = {
+			compare: { sign: "<=", value: 60 },
+			dice: "5#d100<=60",
+			result:
+				"1d100: [88] = 88;1d100: [98] = 98;1d100: [28] = 28;1d100: [65] = 65;1d100: [35] = 35",
+			total: 314,
+		};
+
+		const customCritical: CustomCritical = {
+			onNaturalDice: true,
+			sign: ">=",
+			value: "98",
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, undefined, {
+			success: customCritical,
+		});
+		const text = res.defaultMessage();
+
+		// The critical result line (98) should display the custom critical comparison (>= 98)
+		// instead of the base comparison (<= 60)
+		expect(text).toMatch(/\[98\]\s+[⩾>=]*\s*98/);
+		// Check that the base comparison (60) also appears for other results
+		expect(text).toMatch(/\[88\]\s+[⩾>=]*\s*60/);
+	});
+
+	it("should keep base comparison for non-bulk rolls with custom critical", () => {
+		// Test case: 1d100<=50 with a success critical at natural 96
+		const result: Resultat = {
+			compare: { sign: "<=", value: 50 },
+			dice: "1d100<=50",
+			result: "1d100: [96] = 96",
+			total: 96,
+		};
+
+		const customCritical: CustomCritical = {
+			onNaturalDice: true,
+			sign: ">=",
+			value: "96",
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, undefined, undefined, {
+			success: customCritical,
+		});
+		const text = res.defaultMessage();
+
+		// For non-bulk rolls, the critical comparison should be in the header (not the base comparison)
+		expect(text).toMatch(/\(`[⩾>=]*\s*96`\)/);
+		// And the result line should show the base comparison
+		expect(text).toMatch(/\[96\]\s+[⩾>=]*\s*50/);
+	});
 });
 
 describe("shared roll without comment newline handling", () => {
