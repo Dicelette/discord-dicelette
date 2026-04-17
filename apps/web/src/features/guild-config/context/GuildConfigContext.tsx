@@ -1,6 +1,6 @@
 import type { ApiGuildData, TemplateResult } from "@dicelette/types";
-import { createContext, useContext, useMemo, useCallback } from "react";
 import type { Channel, Role } from "@shared";
+import { createContext, type ReactNode, useCallback, useContext, useMemo } from "react";
 import { useTemplateState } from "../../user-config/hooks";
 
 interface GuildConfigContextType {
@@ -32,7 +32,7 @@ interface GuildConfigProviderProps {
 	saving: boolean;
 	saveSuccess?: boolean;
 	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
-	children: React.ReactNode;
+	children: ReactNode;
 }
 
 export function GuildConfigProvider({
@@ -66,21 +66,10 @@ export function GuildConfigProvider({
 			onSave,
 			templateState,
 		}),
-		[
-			config,
-			channels,
-			roles,
-			isStrictAdmin,
-			saving,
-			saveSuccess,
-			onSave,
-			templateState,
-		]
+		[config, channels, roles, isStrictAdmin, saving, saveSuccess, onSave, templateState]
 	);
 
 	return (
-		<GuildConfigContext.Provider value={value}>
-			{children}
-		</GuildConfigContext.Provider>
+		<GuildConfigContext.Provider value={value}>{children}</GuildConfigContext.Provider>
 	);
 }

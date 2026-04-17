@@ -1,5 +1,6 @@
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
@@ -19,7 +20,7 @@ const themeModeContext = createContext<ThemeModeContextValue>({
 	toggleMode: () => {},
 });
 
-export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeModeProvider({ children }: { children: ReactNode }) {
 	const [mode, setMode] = useState<ThemeMode>(() => {
 		const stored = localStorage.getItem("themeMode");
 		const initial: ThemeMode =

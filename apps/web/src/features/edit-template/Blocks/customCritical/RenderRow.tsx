@@ -1,7 +1,13 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Autocomplete, Box, TextField, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
-import { memo, type ReactElement, useCallback, useMemo } from "react";
+import {
+	memo,
+	type ReactElement,
+	type SyntheticEvent,
+	useCallback,
+	useMemo,
+} from "react";
 import { Tablefield } from "../../Atoms";
 import CopyButton from "../../Atoms/button/copyButton";
 import RemoveButton from "../../Atoms/button/removeButton";
@@ -112,7 +118,7 @@ const CustomCriticalRow = ({
 	);
 	const handleRemove = useCallback(() => remove(index), [remove, index]);
 	const handleSelectionChange = useCallback(
-		(_e: React.SyntheticEvent, newValue: string | null) =>
+		(_e: SyntheticEvent, newValue: string | null) =>
 			setFieldValue(`customCritical[${index}].selection`, newValue || ""),
 		[setFieldValue, index]
 	);

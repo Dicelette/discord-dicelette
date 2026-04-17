@@ -1,7 +1,6 @@
-import { createGuildEndpoint } from "./api-builder";
 import type { StatisticalTemplate } from "@dicelette/core";
+import { createGuildEndpoint } from "./api-builder";
 import { api } from "./client";
-import type { TemplateImportPayload } from "./types";
 
 export const templateApi = {
 	get: createGuildEndpoint<StatisticalTemplate | null>(api, "get", "/template"),

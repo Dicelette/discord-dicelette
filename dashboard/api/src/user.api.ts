@@ -1,11 +1,14 @@
 import { createGuildEndpoint } from "./api-builder";
-import type { UserSettingsData } from "@dicelette/types";
 import { api } from "./client";
 import type { ApiUserConfig, ApiValidationResult } from "./types";
 
 const getUserConfig = createGuildEndpoint<ApiUserConfig>(api, "get", "/user-config");
 const updateUserConfig = createGuildEndpoint<void>(api, "patch", "/user-config");
-const validateEntriesRaw = createGuildEndpoint<ApiValidationResult>(api, "post", "/validate-entries");
+const validateEntriesRaw = createGuildEndpoint<ApiValidationResult>(
+	api,
+	"post",
+	"/validate-entries"
+);
 
 export const userApi = {
 	getUserConfig,

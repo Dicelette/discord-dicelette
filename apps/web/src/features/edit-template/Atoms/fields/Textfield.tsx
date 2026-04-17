@@ -1,6 +1,6 @@
 import { TextField, type TextFieldProps } from "@mui/material";
 import { FastField, type FieldProps } from "formik";
-import type { FC, HTMLInputTypeAttribute } from "react";
+import type { ChangeEvent, FC, HTMLInputTypeAttribute } from "react";
 import { useEffect, useRef, useState } from "react";
 import { BASE_TEXTFIELD_SX, mergeSx } from "../styles";
 
@@ -36,7 +36,7 @@ const DebouncedTextfield = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [field.value]);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setLocalValue(value);
 		clearTimeout(timeoutRef.current);
