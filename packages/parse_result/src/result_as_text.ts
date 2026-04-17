@@ -413,7 +413,8 @@ export class ResultAsText {
 		customCritical?: Record<string, CustomCritical>
 	): string {
 		const testValue = this.resultat!.compare;
-		const goodSign = this.goodCompareSign(testValue!, total);
+		let displayCompare = testValue;
+		let goodSign = this.goodCompareSign(testValue!, total);
 
 		if (isCritical === "custom" && customCritical) {
 			for (const [, custom] of Object.entries(customCritical)) {
@@ -424,9 +425,16 @@ export class ResultAsText {
 				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 
 				if (success) {
-					// Keep the CC comparison to display it next to the username,
-					// but keep the message displayed on the stat (basic comparison)
-					this.headerCompare = this.convertCustomCriticalToCompare(custom);
+					const isBulkRoll = this.resultat?.dice?.includes("#d");
+					if (!isBulkRoll) {
+						// Keep the CC comparison to display it next to the username,
+						// but keep the message displayed on the stat (basic comparison)
+						this.headerCompare = this.convertCustomCriticalToCompare(custom);
+					} else {
+						// For bulk rolls, display the custom critical comparison in the result line
+						displayCompare = this.convertCustomCriticalToCompare(custom);
+						goodSign = this.goodCompareSign(displayCompare, total);
+					}
 					break;
 				}
 			}
@@ -449,8 +457,8 @@ export class ResultAsText {
 		}
 		const text = opposition && oldCompareStr.length > 0 ? first : "";
 
-		const totalSuccess = testValue
-			? ` = \`[${total}] ${this.asciiSign(goodSign)} ${this.formatCompare(testValue, "`")}${text}${oldCompareStr}`
+		const totalSuccess = displayCompare
+			? ` = \`[${total}] ${this.asciiSign(goodSign)} ${this.formatCompare(displayCompare, "`")}${text}${oldCompareStr}`
 			: `= \`[${total}]\``;
 
 		const resMsg = this.message(r, totalSuccess);
