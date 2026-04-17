@@ -25,7 +25,7 @@ import {
 	userCanRefreshServerCharacters,
 	withTimeout,
 } from "../utils";
-import { logCharacterAction } from "./logs";
+import { sendDashboardLog } from "./logs";
 
 function isAllowSelfRegister(guildData: {
 	allowSelfRegister?: boolean | string;
@@ -457,11 +457,12 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					{ settings, characters, botChannels }
 				);
 
-				// Log the import action
-				logCharacterAction(guildId, userId, "import", null, channelId, {
-					fieldsModified: ["import"],
-					newValues: { imported: results.success },
-				});
+				await sendDashboardLog(
+					`[Dashboard] <@${userId}> imported ${results.success} character(s) via CSV (${results.failed} failed)`,
+					guildId,
+					settings,
+					botChannels
+				);
 
 				// Invalidate caches
 				charCache.delete(`${guildId}:*all*`);
@@ -524,17 +525,12 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						chars[idx] = { ...oldChar, ...updates };
 						found = true;
 
-						logCharacterAction(
+						const editedName = charName ?? oldChar.charName ?? null;
+						await sendDashboardLog(
+							`[Dashboard] <@${userId}> edited ${editedName ? `**${editedName}**` : "a character"} (message: ${messageId})`,
 							guildId,
-							userId,
-							"edit",
-							charName ?? oldChar.charName ?? null,
-							messageId,
-							{
-								fieldsModified: Object.keys(updates),
-								oldValues: oldChar,
-								newValues: chars[idx],
-							}
+							settings,
+							botChannels
 						);
 						break;
 					}
@@ -552,17 +548,12 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 				userChars[charIndex] = { ...char, ...updates };
 
-				logCharacterAction(
+				const editedName = charName ?? char.charName ?? null;
+				await sendDashboardLog(
+					`[Dashboard] <@${userId}> edited ${editedName ? `**${editedName}**` : "a character"} (message: ${messageId})`,
 					guildId,
-					userId,
-					"edit",
-					charName ?? char.charName ?? null,
-					messageId,
-					{
-						fieldsModified: Object.keys(updates),
-						oldValues: char,
-						newValues: userChars[charIndex],
-					}
+					settings,
+					botChannels
 				);
 			}
 
@@ -629,10 +620,13 @@ async function parseCharactersCsv(
 					return;
 				}
 
+				const charNameStr = typeof charName === "string" ? charName : undefined;
+				const avatarStr = typeof avatar === "string" ? avatar : undefined;
+
 				// Create character data
 				const userData: UserData = {
-					userName: charName,
-					avatar: avatar || undefined,
+					userName: charNameStr ?? null,
+					avatar: avatarStr || undefined,
 					channel: channelId,
 					template: {},
 				};
@@ -645,21 +639,23 @@ async function parseCharactersCsv(
 
 				// Check for duplicates unless overwrite
 				const existing = userCharList.findIndex(
-					(c: UserGuildData) => c.charName === charName || (!charName && !c.charName)
+					(c: UserGuildData) =>
+						c.charName === charNameStr || (!charNameStr && !c.charName)
 				);
 
 				if (existing !== -1 && !overwrite) {
-					errors.push(`${charName || "Default"} for user ${userId} already exists`);
+					errors.push(`${charNameStr || "Default"} for user ${userId} already exists`);
 					failed++;
 					return;
 				}
 
 				// Create message placeholder
 				const messageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+				const isPrivateVal = row.isPrivate === true || row.isPrivate === "true";
 				const charData: UserGuildData = {
-					charName,
+					charName: charNameStr,
 					messageId: [messageId, channelId],
-					isPrivate: row.isPrivate ?? false,
+					isPrivate: isPrivateVal,
 				};
 
 				if (existing !== -1) {
@@ -670,7 +666,8 @@ async function parseCharactersCsv(
 
 				// Register in memory cache
 				if (!characters.has(guildId)) characters.set(guildId, {});
-				if (!characters.has(guildId, userId)) characters.set(guildId, userId, []);
+				if (!characters.has(guildId, userId))
+					characters.set(guildId, [] as UserData[], userId);
 				const memChars = characters.get(guildId, userId) as UserData[];
 				memChars.push(userData);
 

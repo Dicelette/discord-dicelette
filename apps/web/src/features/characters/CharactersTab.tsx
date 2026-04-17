@@ -4,7 +4,6 @@ import { useI18n } from "@shared";
 import { useState } from "react";
 import { useCharacterPagination } from "./hooks/useCharacterPagination";
 import { useCharactersList } from "./hooks/useCharactersList";
-import LogsViewer from "./LogsViewer";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
 import ImportCsv from "./ui/ImportCsv";
@@ -48,7 +47,6 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 		<Box>
 			<Box sx={{ display: "flex", gap: 1, mb: 2 }}>
 				<ImportCsv guildId={guildId} onSuccess={handleRefresh} />
-				<LogsViewer guildId={guildId} />
 			</Box>
 
 			<CharacterListLayout

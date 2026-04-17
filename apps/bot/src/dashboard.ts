@@ -99,6 +99,24 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					return null;
 				}
 			},
+			sendMessage: async (channelId, content) => {
+				let channel: Djs.Channel | null | undefined =
+					client.channels.cache.get(channelId);
+				if (!channel) {
+					try {
+						channel = await client.channels.fetch(channelId);
+					} catch {
+						return false;
+					}
+				}
+				if (!channel?.isTextBased()) return false;
+				try {
+					await (channel as Djs.TextChannel).send({ content });
+					return true;
+				} catch {
+					return false;
+				}
+			},
 			deleteMessage: async (channelId, messageId) => {
 				let channel: Djs.Channel | null | undefined =
 					client.channels.cache.get(channelId);
