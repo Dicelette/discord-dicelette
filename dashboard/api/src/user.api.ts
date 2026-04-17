@@ -1,12 +1,15 @@
+import { createGuildEndpoint } from "./api-builder";
 import type { UserSettingsData } from "@dicelette/types";
 import { api } from "./client";
 import type { ApiUserConfig, ApiValidationResult } from "./types";
 
+const getUserConfig = createGuildEndpoint<ApiUserConfig>(api, "get", "/user-config");
+const updateUserConfig = createGuildEndpoint<void>(api, "patch", "/user-config");
+const validateEntriesRaw = createGuildEndpoint<ApiValidationResult>(api, "post", "/validate-entries");
+
 export const userApi = {
-	getUserConfig: (guildId: string) =>
-		api.get<ApiUserConfig>(`/guilds/${guildId}/user-config`),
-	updateUserConfig: (guildId: string, data: Partial<UserSettingsData>) =>
-		api.patch(`/guilds/${guildId}/user-config`, data),
+	getUserConfig,
+	updateUserConfig,
 	validateEntries: (
 		guildId: string,
 		type: "snippets" | "attributes",
@@ -14,7 +17,7 @@ export const userApi = {
 		attributes?: Record<string, number | string>,
 		replaceUnknown?: string
 	) =>
-		api.post<ApiValidationResult>(`/guilds/${guildId}/validate-entries`, {
+		validateEntriesRaw(guildId, {
 			type,
 			entries,
 			attributes,

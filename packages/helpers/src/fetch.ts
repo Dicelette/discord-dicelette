@@ -1,60 +1,63 @@
 import type { EClient } from "@dicelette/client";
 import type { Translation } from "@dicelette/types";
 import { BotError, BotErrorLevel, logger, QUERY_URL_PATTERNS } from "@dicelette/utils";
-import type { Guild, GuildMember, User } from "discord.js";
+import type { Collection, Guild, GuildMember, User } from "discord.js";
 import * as Djs from "discord.js";
+
+async function fetchWithCache<T>(
+	id: string,
+	cache: Collection<string, T> | undefined,
+	fetcher: (id: string) => Promise<T>,
+	errorId: string
+): Promise<T | undefined> {
+	try {
+		if (!id || (typeof id === "string" && id.trim().length === 0)) return undefined;
+		return cache?.get(id) ?? (await fetcher(id));
+	} catch (error) {
+		logger.warn(`Failed to fetch ${errorId} with ID ${id}:`, (error as Error).message);
+		return undefined;
+	}
+}
 
 export async function fetchChannel(
 	guild: Djs.Guild,
 	channelId: Djs.Snowflake,
 	channel?: Djs.GuildBasedChannel
 ): Promise<Djs.GuildBasedChannel | null> {
+	if (channel) return channel;
+
+	const cached = await fetchWithCache(
+		channelId as string,
+		guild.channels.cache,
+		(id) => guild.channels.fetch(id) as Promise<Djs.GuildBasedChannel>,
+		"channel"
+	);
+	if (cached) return cached;
+
 	try {
-		// If a channel instance is provided, trust it (must be guild-based for our usage)
-		if (channel) return channel;
-		if (typeof channelId === "string" && channelId.trim().length === 0) return null;
-		// Try guild cache first (returns GuildBasedChannel when present)
-		const cached = guild.channels.cache.get(channelId);
-		if (cached) return cached as Djs.GuildBasedChannel;
-
-		// Fetch from the guild API (also returns GuildBasedChannel when present)
-		const fetched = await guild.channels.fetch(channelId);
-		if (fetched) return fetched as Djs.GuildBasedChannel;
-
 		// Fallback for threads or non-guild cached channels accessible via the global client cache
-		const any = await guild.client.channels.fetch(channelId);
-		// Only return if it's a guild-based channel (e.g., threads) to avoid DM channels
+		const any = await guild.client.channels.fetch(channelId as string);
 		if (!any?.isDMBased()) return any as Djs.GuildBasedChannel;
-		return null;
 	} catch (error) {
-		logger.warn(
-			`Failed to fetch channel with ID ${channelId}:`,
-			(error as Error).message
-		);
-		return null;
+		logger.warn(`Fallback fetch failed for channel ${channelId}:`, (error as Error).message);
 	}
+	return null;
 }
 
 export async function fetchUser(client: EClient, userId: string) {
-	try {
-		return client.users.cache.get(userId) ?? (await client.users.fetch(userId));
-	} catch (error) {
-		logger.warn(`Failed to fetch user with ID ${userId}:`, error);
-		return undefined;
-	}
+	return fetchWithCache(userId, client.users.cache, (id) => client.users.fetch(id), "user");
 }
 
 export async function fetchMember(
 	guild: Djs.Guild,
 	memberId: string
 ): Promise<Djs.GuildMember | undefined> {
-	// Try to get the member from the cache first
-	try {
-		return guild.members.cache.get(memberId) ?? (await guild.members.fetch(memberId));
-	} catch (error) {
-		logger.warn(`Failed to fetch member with ID ${memberId}:`, error);
-		return undefined;
-	}
+	return fetchWithCache(
+		memberId,
+		guild.members.cache,
+		(id) => guild.members.fetch(id),
+		"member"
+	);
 }
 
 export async function fetchAvatarUrl(guild: Guild, user: User, member?: GuildMember) {

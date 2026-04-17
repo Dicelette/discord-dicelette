@@ -1,29 +1,14 @@
+import { createAuthEndpoint } from "./api-builder";
 import { api } from "./client";
 import type { DiscordGuild, DiscordUser } from "./types";
 
 export const authApi = {
-	/**
-	 * API: @me
-	 * GET /auth/me
-	 * @Server: /packages/server/auth.ts
-	 */
-	me: () => api.get<DiscordUser>("/auth/me"),
-	/**
-	 * @Api logout
-	 * POST /auth/logout
-	 * @Server /packages/server/auth.ts
-	 */
-	logout: () => api.post("/auth/logout"),
-	/**
-	 * @Api /auth/guilds
-	 * GET /auth/guilds
-	 * @Server /packages/server/auth.ts
-	 */
-	guilds: () => api.get<DiscordGuild[]>("/auth/guilds"),
-	/**
-	 * API: /auth/guilds/refresh
-	 * POST /auth/guilds/refresh
-	 * @see {@link file://packages/server/auth.ts}
-	 */
-	refreshGuilds: () => api.post("/auth/guilds/refresh"),
+	/** API: @me - GET /auth/me */
+	me: createAuthEndpoint<DiscordUser>(api, "get", "/auth/me"),
+	/** API: logout - POST /auth/logout */
+	logout: createAuthEndpoint<void>(api, "post", "/auth/logout"),
+	/** API: /auth/guilds - GET /auth/guilds */
+	guilds: createAuthEndpoint<DiscordGuild[]>(api, "get", "/auth/guilds"),
+	/** API: /auth/guilds/refresh - POST /auth/guilds/refresh */
+	refreshGuilds: createAuthEndpoint<void>(api, "post", "/auth/guilds/refresh"),
 };

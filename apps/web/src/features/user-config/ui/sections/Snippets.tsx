@@ -10,8 +10,7 @@ import {
 } from "@mui/material";
 import { useI18n } from "@shared";
 import { memo, useEffect, useMemo, useRef } from "react";
-import { List, type RowComponentProps, useListRef } from "react-window";
-import { useToast } from "../../../../providers";
+import { List, type RowComponentProps } from "react-window";
 import type { SnippetsState } from "../..";
 import { useShake } from "../../hooks";
 import { exportJson } from "../../utils.ts";
@@ -27,8 +26,8 @@ import {
 	ITEM_SIZE,
 	inputHiddenStyle,
 	listBoxSx,
-	MAX_LIST_HEIGHT,
 } from "./styles.ts";
+import { useAutoScrollToNewItem, useListStyle, useSaveSuccessToast } from "./hooks";
 
 const newNameFieldSx = { flex: 1 } as const;
 const newValueFieldSx = { flex: 2 } as const;
@@ -72,7 +71,6 @@ interface Props {
 
 function Snippets({ state }: Props) {
 	const { t } = useI18n();
-	const { enqueueToast } = useToast();
 	const addErrorShaking = useShake(state.addError);
 	const {
 		data: snippets,
@@ -108,24 +106,10 @@ function Snippets({ state }: Props) {
 		[entries, entryErrors, onRename, onValueChange, onDelete]
 	);
 
-	const listStyle = {
-		height: Math.min(entries.length * ITEM_SIZE, MAX_LIST_HEIGHT),
-		width: "100%" as const,
-		scrollbarWidth: "thin" as const,
-		scrollbarColor: "rgba(255, 255, 255, 0.2) transparent",
-	};
-	useEffect(() => {
-		if (success) enqueueToast(t("userConfig.saveSuccess"));
-	}, [success, enqueueToast, t]);
+	const listStyle = useListStyle(entries.length);
+	useSaveSuccessToast(success);
 
-	const listRef = useListRef(null);
-	const prevCountRef = useRef(entries.length);
-	useEffect(() => {
-		if (entries.length > prevCountRef.current) {
-			listRef.current?.scrollToRow({ index: entries.length - 1, align: "end" });
-		}
-		prevCountRef.current = entries.length;
-	}, [entries.length, listRef.current?.scrollToRow]); // listRef is a ref and never changes — excluded intentionally
+	const listRef = useAutoScrollToNewItem(entries.length);
 
 	return (
 		<FormAccordion title={t("common.snippets").toTitle()} defaultExpanded>

@@ -137,8 +137,13 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		makeRateLimit(60, 60_000),
 		createAuthRouter(deps.botGuilds, deps.guildEvents, deps.settings)
 	);
-	// Guild data routes: 120 req/min per user — protects Discord.js member fetches and settings writes
-	app.use("/api/guilds", makeRateLimit(120, 60_000), createGuildRouter(deps));
+	// Guild data routes: 120 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE)
+	app.use("/api/guilds", (req: Request, res: Response, next: NextFunction) => {
+		const isWrite = ["POST", "PATCH", "DELETE"].includes(req.method);
+		const limiter = isWrite ? makeRateLimit(30, 60_000) : makeRateLimit(120, 60_000);
+		limiter(req, res, next);
+	});
+	app.use("/api/guilds", createGuildRouter(deps));
 
 	if (process.env.NODE_ENV === "production") {
 		const distPath = fileURLToPath(new URL("../../../apps/web/dist", import.meta.url));

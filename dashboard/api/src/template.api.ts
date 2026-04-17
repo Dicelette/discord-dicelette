@@ -1,11 +1,10 @@
+import { createGuildEndpoint } from "./api-builder";
 import type { StatisticalTemplate } from "@dicelette/core";
 import { api } from "./client";
 import type { TemplateImportPayload } from "./types";
 
 export const templateApi = {
-	get: (guildId: string, config?: { signal?: AbortSignal }) =>
-		api.get<StatisticalTemplate | null>(`/guilds/${guildId}/template`, config),
-	import: (guildId: string, payload: TemplateImportPayload) =>
-		api.post<{ ok: boolean }>(`/guilds/${guildId}/template`, payload),
-	delete: (guildId: string) => api.delete<{ ok: boolean }>(`/guilds/${guildId}/template`),
+	get: createGuildEndpoint<StatisticalTemplate | null>(api, "get", "/template"),
+	import: createGuildEndpoint<{ ok: boolean }>(api, "post", "/template"),
+	delete: createGuildEndpoint<{ ok: boolean }>(api, "delete", "/template"),
 };

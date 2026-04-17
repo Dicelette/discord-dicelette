@@ -1,10 +1,9 @@
 import { charactersApi } from "@dicelette/api";
 import { useI18n } from "@shared";
 import { useCharactersList } from "./hooks/useCharactersList";
+import { useCharacterPagination } from "./hooks/useCharacterPagination";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
-
-const PAGE_SIZE = 5;
 
 interface Props {
 	guildId: string;
@@ -29,12 +28,11 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 		t("characters.loadError")
 	);
 
-	const q = search.trim().toLowerCase();
-	const filtered = q
-		? characters.filter((c) => (c.charName ?? "").toLowerCase().includes(q))
-		: characters;
-	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-	const pageChars = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+	const { pageChars, totalPages, query } = useCharacterPagination({
+		characters,
+		search,
+		page,
+	});
 
 	return (
 		<CharacterListLayout
@@ -50,7 +48,7 @@ export default function CharactersTab({ guildId, refreshToken = 0 }: Props) {
 			onPageChange={setPage}
 			pageChars={pageChars}
 			totalPages={totalPages}
-			emptyText={search.trim() ? t("characters.noResults") : t("characters.noCharacters")}
+			emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
 			renderCard={(char) => (
 				<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
 			)}

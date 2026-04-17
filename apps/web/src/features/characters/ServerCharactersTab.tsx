@@ -1,9 +1,10 @@
 import { charactersApi } from "@dicelette/api";
+import type { ApiCharacter } from "@dicelette/api";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Typography } from "@mui/material";
 import { useI18n } from "@shared";
-import { useMemo } from "react";
 import { useCharactersList } from "./hooks/useCharactersList";
+import { useCharacterPagination } from "./hooks/useCharacterPagination";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
 
@@ -15,8 +16,6 @@ const ownerLabelBoxSx = {
 	px: 0.5,
 } as const;
 const ownerIconSx = { fontSize: 14, color: "text.secondary" } as const;
-
-const PAGE_SIZE = 5;
 
 interface Props {
 	guildId: string;
@@ -41,24 +40,13 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 		t("characters.loadError")
 	);
 
-	const q = useMemo(() => search.trim().toLowerCase(), [search]);
-	const filtered = useMemo(
-		() =>
-			q
-				? characters.filter(
-						(c) => (c.charName ?? "").subText(q) || (c.ownerName ?? "").subText(q)
-					)
-				: characters,
-		[characters, q]
-	);
-	const totalPages = useMemo(
-		() => Math.ceil(filtered.length / PAGE_SIZE),
-		[filtered.length]
-	);
-	const pageChars = useMemo(
-		() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-		[filtered, page]
-	);
+	const { pageChars, totalPages, query } = useCharacterPagination({
+		characters,
+		search,
+		page,
+		filterFn: (char: ApiCharacter, q: string) =>
+			(char.charName ?? "").subText(q) || (char.ownerName ?? "").subText(q),
+	});
 
 	return (
 		<CharacterListLayout
@@ -74,7 +62,7 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 			onPageChange={setPage}
 			pageChars={pageChars}
 			totalPages={totalPages}
-			emptyText={q ? t("characters.noResults") : t("characters.noCharacters")}
+			emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
 			renderCard={(char) => (
 				<Box key={`${char.channelId}-${char.messageId}`}>
 					{char.ownerName && (

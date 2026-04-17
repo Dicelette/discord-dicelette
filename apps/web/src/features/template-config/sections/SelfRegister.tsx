@@ -26,7 +26,7 @@ export default function SelfRegister({ control, textChannels, allChannels }: Pro
 								control={
 									<Switch
 										checked={!!field.value}
-										onChange={(e) => field.onChange(e.target.checked ? true : undefined)}
+										onChange={(_, checked) => field.onChange(checked ? true : false)}
 									/>
 								}
 								label={t("config.fields.allowSelfRegister")}

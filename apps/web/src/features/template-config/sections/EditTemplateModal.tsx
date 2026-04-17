@@ -47,6 +47,18 @@ const fileRowSx = {
 	flexWrap: "wrap",
 } as const;
 const subtitleBoldSx = { fontWeight: 700 } as const;
+const loadingOverlaySx = {
+	position: "absolute",
+	top: 0,
+	left: 0,
+	right: 0,
+	bottom: 0,
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+	bgcolor: "rgba(0, 0, 0, 0.3)",
+	zIndex: 1000,
+} as const;
 
 // ─── component ──────────────────────────────────────────────────────────────────
 
@@ -100,7 +112,12 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 				{isEditMode ? t("template.editModalTitle") : t("template.createModalTitle")}
 			</DialogTitle>
 
-			<DialogContent dividers sx={{ bgcolor: "background.paper", p: 0 }}>
+			<DialogContent dividers sx={{ bgcolor: "background.paper", p: 0, position: "relative" }}>
+				{state.saving && (
+					<Box sx={loadingOverlaySx}>
+						<CircularProgress />
+					</Box>
+				)}
 				{/* Hidden file input — triggered by the button in the channels tab */}
 				<input
 					ref={importFileRef}
@@ -231,35 +248,63 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 							</Stack>
 
 							{hasCharacters && (
-								<Stack spacing={1}>
-									<Alert severity="warning">{t("template.deleteWarning")}</Alert>
-									<FormControlLabel
-										control={
-											<Switch
-												checked={state.deleteCharacters}
-												color="error"
-												onChange={(e) =>
-													dispatch({
-														type: "set_delete_characters",
-														value: e.target.checked,
-													})
-												}
-											/>
-										}
-										label={
-											<Box>
-												<Typography
-													variant="body2"
-													color={state.deleteCharacters ? "error" : undefined}
-												>
-													{t("template.deleteCharacters")}
-												</Typography>
-												<Typography variant="caption" color="text.secondary">
-													{t("template.deleteCharactersHelp")}
-												</Typography>
-											</Box>
-										}
-									/>
+								<Stack spacing={2}>
+									<Stack spacing={1}>
+										<Alert severity="info">{t("template.updateWarning")}</Alert>
+										<FormControlLabel
+											control={
+												<Switch
+													checked={state.updateCharacters}
+													onChange={(e) =>
+														dispatch({
+															type: "set_update_characters",
+															value: e.target.checked,
+														})
+													}
+												/>
+											}
+											label={
+												<Box>
+													<Typography variant="body2">
+														{t("template.updateCharacters")}
+													</Typography>
+													<Typography variant="caption" color="text.secondary">
+														{t("template.updateCharactersHelp")}
+													</Typography>
+												</Box>
+											}
+										/>
+									</Stack>
+									<Stack spacing={1}>
+										<Alert severity="warning">{t("template.deleteWarning")}</Alert>
+										<FormControlLabel
+											control={
+												<Switch
+													checked={state.deleteCharacters}
+													color="error"
+													onChange={(e) =>
+														dispatch({
+															type: "set_delete_characters",
+															value: e.target.checked,
+														})
+													}
+												/>
+											}
+											label={
+												<Box>
+													<Typography
+														variant="body2"
+														color={state.deleteCharacters ? "error" : undefined}
+													>
+														{t("template.deleteCharacters")}
+													</Typography>
+													<Typography variant="caption" color="text.secondary">
+														{t("template.deleteCharactersHelp")}
+													</Typography>
+												</Box>
+											}
+										/>
+									</Stack>
 								</Stack>
 							)}
 						</Stack>

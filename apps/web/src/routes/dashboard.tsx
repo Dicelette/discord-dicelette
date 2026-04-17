@@ -28,6 +28,7 @@ import {
 	ServerCharactersTab,
 	UserConfigForm,
 } from "../features";
+import { GuildConfigProvider } from "../features/guild-config/context";
 import { useToast } from "../providers";
 import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
@@ -185,15 +186,17 @@ export default function Dashboard() {
 
 			{isAdmin && config && (
 				<TabPanel value="admin" current={tab} mounted={mountedTabs}>
-					<GuildConfigForm
+					<GuildConfigProvider
 						config={config}
-						guildId={guildId!}
-						onSave={handleSave}
-						saving={saving}
 						channels={channels}
 						roles={roles}
 						isStrictAdmin={isStrictAdmin}
-					/>
+						saving={saving}
+						saveSuccess={saveSuccess}
+						onSave={handleSave}
+					>
+						<GuildConfigForm />
+					</GuildConfigProvider>
 				</TabPanel>
 			)}
 			{isAdmin && config && (

@@ -434,17 +434,15 @@ export async function getRecordChar(
 	if (charName && findln(charName) === "common.default") charName = undefined;
 
 	if (!user && charName) {
-		//get the character data in the database
 		const allUsersData = guildData.user ?? {};
-		const allUsers = Object.entries(allUsersData);
-		for (const [user, data] of allUsers) {
-			const userChar = data.find((char) => {
-				return char.charName?.subText(charName, strict);
-			});
+		const found = Object.entries(allUsersData).find(([, chars]) => {
+			return chars.some((char) => char.charName?.subText(charName, strict));
+		});
+		if (found?.[1]) {
+			const [userId, chars] = found;
+			const userChar = chars.find((char) => char.charName?.subText(charName, strict));
 			if (userChar) {
-				return {
-					[user as string]: userChar,
-				};
+				return { [userId]: userChar };
 			}
 		}
 	}

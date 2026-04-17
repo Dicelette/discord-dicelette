@@ -1,14 +1,12 @@
-import type { ApiGuildData, TemplateResult } from "@dicelette/types";
+import type { ApiGuildData } from "@dicelette/types";
 import { Box, Paper, Stack } from "@mui/material";
 import {
-	type Channel,
 	ConfigFormFooter,
-	type Role,
 	useConfigForm,
 	useI18n,
 } from "@shared";
-import { useCallback, useEffect, useMemo } from "react";
-import { useTemplateState } from "../user-config/hooks";
+import { useCallback, useMemo } from "react";
+import { useGuildConfig } from "./context/GuildConfigContext";
 import Links from "../user-config/ui/sections/Links";
 import { DEFAULT_TEMPLATE } from "../user-config/utils";
 import {
@@ -24,60 +22,44 @@ import {
 const paperSx = { p: 3 } as const;
 const linksPaperSx = { p: 0 } as const;
 
-interface Props {
-	config: ApiGuildData;
-	guildId: string;
-	onSave: (updates: Partial<ApiGuildData>) => Promise<void>;
-	saving: boolean;
-	saveSuccess?: boolean;
-	onDirtyChange?: (isDirty: boolean) => void;
-	channels: Channel[];
-	roles: Role[];
-	isStrictAdmin: boolean;
-}
-
-export default function GuildConfigForm({
-	config,
-	onSave,
-	saving,
-	saveSuccess,
-	onDirtyChange,
-	channels,
-	roles,
-	isStrictAdmin,
-}: Props) {
+export default function GuildConfigForm() {
 	const { t } = useI18n();
-	const { control, handleSubmit, isDirty, reset, textChannels } = useConfigForm(
+	const {
+		config,
+		channels,
+		roles,
+		isStrictAdmin,
+		saving,
+		saveSuccess,
+		onSave,
+		templateState,
+	} = useGuildConfig();
+
+	// Guard against undefined config - useConfigForm needs valid data
+	if (!config) {
+		return null; // Should not happen due to parent checks, but prevents errors
+	}
+
+	const { control, handleSubmit, reset, textChannels, isDirty } = useConfigForm(
 		config,
 		channels
 	);
-
-	useEffect(() => {
-		onDirtyChange?.(isDirty);
-	}, [isDirty, onDirtyChange]);
-
-	const saveFn = useCallback(
-		(template: TemplateResult) => onSave({ createLinkTemplate: template }),
-		[onSave]
-	);
-
-	const templateState = useTemplateState(config.createLinkTemplate, saveFn, {
-		externalValue: config.createLinkTemplate,
-		errorKey: "dashboard.saveError",
-	});
 
 	const isTemplateDirty = useMemo(() => {
 		const saved = config.createLinkTemplate ?? DEFAULT_TEMPLATE;
 		return JSON.stringify(templateState.value) !== JSON.stringify(saved);
 	}, [templateState.value, config.createLinkTemplate]);
 
-	const handleSaveAndReset = async (data: ApiGuildData) => {
-		await onSave({
-			...data,
-			createLinkTemplate: templateState.value,
-		});
-		reset(data);
-	};
+	const handleSaveAndReset = useCallback(
+		async (data: ApiGuildData) => {
+			await onSave({
+				...data,
+				createLinkTemplate: templateState.value,
+			});
+			reset(data);
+		},
+		[onSave, templateState.value, reset]
+	);
 
 	return (
 		<Stack spacing={2}>

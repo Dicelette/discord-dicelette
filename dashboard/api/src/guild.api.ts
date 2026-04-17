@@ -1,11 +1,12 @@
+import { createGuildEndpoint } from "./api-builder";
 import type { ApiGuildData } from "@dicelette/types";
+import type { ApiChannel, ApiRole } from "./channel-types";
 import { api } from "./client";
 
 export const guildApi = {
-	getConfig: (guildId: string) => api.get<ApiGuildData>(`/guilds/${guildId}/config`),
-	updateConfig: (guildId: string, data: Partial<ApiGuildData>) =>
-		api.patch(`/guilds/${guildId}/config`, data),
-	getChannels: (guildId: string) => api.get(`/guilds/${guildId}/channels`),
-	getRoles: (guildId: string) => api.get(`/guilds/${guildId}/roles`),
-	addBot: (guildId: string) => api.get<{ url: string }>(`/guilds/${guildId}/invite`),
+	getConfig: createGuildEndpoint<ApiGuildData>(api, "get", "/config"),
+	updateConfig: createGuildEndpoint<void>(api, "patch", "/config"),
+	getChannels: createGuildEndpoint<ApiChannel[]>(api, "get", "/channels"),
+	getRoles: createGuildEndpoint<ApiRole[]>(api, "get", "/roles"),
+	addBot: createGuildEndpoint<{ url: string }>(api, "get", "/invite"),
 };
