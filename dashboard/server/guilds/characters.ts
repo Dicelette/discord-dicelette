@@ -65,26 +65,24 @@ async function resolveCharacterData(
 	let stats: EmbedField[] | null = null;
 	let damage: EmbedField[] | null = null;
 
-	if (mem?.stats)
-		stats = Object.entries(mem.stats).map(([name, value]) => ({
-			name,
-			value: String(value),
-		}));
-	if (mem?.damage)
-		damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
-
 	const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
-	if (stats === null || damage === null || avatar === null || hasStaleAvatar) {
-		try {
-			const fetched = await fetchCharacterEmbeds(channelId, messageId, botChannels);
-			if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
-			stats = stats ?? fetched.stats;
-			damage = damage ?? fetched.damage;
-		} catch (err) {
-			important.warn(
-				`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
-			);
-		}
+	try {
+		const fetched = await fetchCharacterEmbeds(channelId, messageId, botChannels);
+		if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
+		stats = fetched.stats;
+		damage = fetched.damage;
+	} catch (err) {
+		important.warn(
+			`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
+		);
+		// Only use memory as fallback if Discord fetch fails
+		if (mem?.stats)
+			stats = Object.entries(mem.stats).map(([name, value]) => ({
+				name,
+				value: String(value),
+			}));
+		if (mem?.damage)
+			damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
 	}
 
 	return { avatar, stats, damage };
@@ -479,98 +477,6 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			}
 		}
 	);
-
-	// PATCH /:guildId/characters/:messageId — edit a character (admin or owner)
-	router.patch("/:messageId", requireAuth, async (req: Request, res: Response) => {
-		const guildId = req.params.guildId as string;
-		const messageId = req.params.messageId as string;
-		const userId = req.session.userId!;
-
-		try {
-			const { stats, avatar, isPrivate, charName } = req.body as {
-				stats?: Record<string, number>;
-				avatar?: string;
-				isPrivate?: boolean;
-				charName?: string;
-			};
-
-			const guildData = settings.get(guildId);
-			if (!guildData) {
-				res.status(404).json({ error: "Guild not found" });
-				return;
-			}
-
-			// Find the character
-			const userChars = guildData.user?.[userId] ?? [];
-			const charIndex = userChars.findIndex((c) => c.messageId[0] === messageId);
-
-			if (charIndex === -1) {
-				// Check if admin can edit others
-				const isAdmin = await userCanRefreshServerCharacters(userId, guildId, botGuilds);
-				if (!isAdmin) {
-					res.status(403).json({ error: "Forbidden" });
-					return;
-				}
-				// Find char in any user's list
-				let found = false;
-				for (const [uid, chars] of Object.entries(guildData.user ?? {})) {
-					const idx = chars.findIndex((c) => c.messageId[0] === messageId);
-					if (idx !== -1) {
-						// Update character
-						const oldChar = chars[idx];
-						const updates: Partial<UserGuildData> = {};
-						if (isPrivate !== undefined) updates.isPrivate = isPrivate;
-						if (charName !== undefined) updates.charName = charName;
-
-						chars[idx] = { ...oldChar, ...updates };
-						found = true;
-
-						const editedName = charName ?? oldChar.charName ?? null;
-						await sendDashboardLog(
-							`[Dashboard] <@${userId}> edited ${editedName ? `**${editedName}**` : "a character"} (message: ${messageId})`,
-							guildId,
-							settings,
-							botChannels
-						);
-						break;
-					}
-				}
-				if (!found) {
-					res.status(404).json({ error: "Character not found" });
-					return;
-				}
-			} else {
-				// Update own character
-				const char = userChars[charIndex];
-				const updates: Partial<UserGuildData> = {};
-				if (isPrivate !== undefined) updates.isPrivate = isPrivate;
-				if (charName !== undefined) updates.charName = charName;
-
-				userChars[charIndex] = { ...char, ...updates };
-
-				const editedName = charName ?? char.charName ?? null;
-				await sendDashboardLog(
-					`[Dashboard] <@${userId}> edited ${editedName ? `**${editedName}**` : "a character"} (message: ${messageId})`,
-					guildId,
-					settings,
-					botChannels
-				);
-			}
-
-			settings.set(guildId, guildData);
-
-			// Invalidate caches
-			charCache.delete(`${guildId}:${userId}`);
-			charCache.delete(`${guildId}:*all*`);
-
-			res.json({ ok: true });
-		} catch (error) {
-			important.error("Edit error:", error);
-			res.status(500).json({
-				error: error instanceof Error ? error.message : "Edit failed",
-			});
-		}
-	});
 
 	return router;
 }

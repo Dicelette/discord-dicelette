@@ -3,10 +3,12 @@ import { charactersApi } from "@dicelette/api";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Typography } from "@mui/material";
 import { useI18n } from "@shared";
+import { useState } from "react";
 import { useCharacterPagination } from "./hooks/useCharacterPagination";
 import { useCharactersList } from "./hooks/useCharactersList";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
+import ImportCsv from "./ui/ImportCsv";
 
 const ownerLabelBoxSx = {
 	display: "flex",
@@ -24,6 +26,7 @@ interface Props {
 
 export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props) {
 	const { t } = useI18n();
+	const [importRefreshTrigger, setImportRefreshTrigger] = useState(0);
 	const {
 		characters,
 		loading,
@@ -36,7 +39,7 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 	} = useCharactersList(
 		guildId,
 		charactersApi.getAllCharacters,
-		refreshToken,
+		refreshToken + importRefreshTrigger,
 		t("characters.loadError")
 	);
 
@@ -49,37 +52,45 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 	});
 
 	return (
-		<CharacterListLayout
-			title={t("characters.serverTitle")}
-			searchPlaceholder={t("characters.serverFilterPlaceholder")}
-			showSearch={true}
-			loading={loading}
-			error={error}
-			onCloseError={() => setError(null)}
-			search={search}
-			onSearchChange={handleSearchChange}
-			page={page}
-			onPageChange={setPage}
-			pageChars={pageChars}
-			totalPages={totalPages}
-			emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
-			renderCard={(char) => (
-				<Box key={`${char.channelId}-${char.messageId}`}>
-					{char.ownerName && (
-						<Box sx={ownerLabelBoxSx}>
-							<PersonIcon sx={ownerIconSx} />
-							<Typography
-								variant="subtitle1"
-								color="text.secondary"
-								fontFamily={"var(--code-font-family)"}
-							>
-								{char.ownerName}
-							</Typography>
-						</Box>
-					)}
-					<CharacterCard char={char} />
-				</Box>
-			)}
-		/>
+		<>
+			<Box sx={{ mb: 2 }}>
+				<ImportCsv
+					guildId={guildId}
+					onSuccess={() => setImportRefreshTrigger((prev) => prev + 1)}
+				/>
+			</Box>
+			<CharacterListLayout
+				title={t("characters.serverTitle")}
+				searchPlaceholder={t("characters.serverFilterPlaceholder")}
+				showSearch={true}
+				loading={loading}
+				error={error}
+				onCloseError={() => setError(null)}
+				search={search}
+				onSearchChange={handleSearchChange}
+				page={page}
+				onPageChange={setPage}
+				pageChars={pageChars}
+				totalPages={totalPages}
+				emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
+				renderCard={(char) => (
+					<Box key={`${char.channelId}-${char.messageId}`}>
+						{char.ownerName && (
+							<Box sx={ownerLabelBoxSx}>
+								<PersonIcon sx={ownerIconSx} />
+								<Typography
+									variant="subtitle1"
+									color="text.secondary"
+									fontFamily={"var(--code-font-family)"}
+								>
+									{char.ownerName}
+								</Typography>
+							</Box>
+						)}
+						<CharacterCard char={char} />
+					</Box>
+				)}
+			/>
+		</>
 	);
 }

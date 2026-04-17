@@ -8,13 +8,6 @@ export interface ImportResult {
 	errors: string[];
 }
 
-interface EditCharacterData {
-	stats?: Record<string, number>;
-	avatar?: string;
-	isPrivate?: boolean;
-	charName?: string;
-}
-
 export const charactersApi = {
 	getCharacters: createGuildEndpoint<ApiCharacter[]>(api, "get", "/characters"),
 	getAllCharacters: createGuildEndpoint<ApiCharacter[]>(api, "get", "/characters/all"),
@@ -38,6 +31,4 @@ export const charactersApi = {
 		"/characters/bulk-delete"
 	),
 	importCharacters: createGuildEndpoint<ImportResult>(api, "post", "/characters/import"),
-	editCharacter: (guildId: string, messageId: string, data: EditCharacterData) =>
-		api.patch(`/guilds/${guildId}/characters/${messageId}`, data),
 };
