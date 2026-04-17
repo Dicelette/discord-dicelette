@@ -176,7 +176,6 @@ async function exportToCsv(
 		delimiter: ";",
 		header: true,
 		quotes: false,
-		skipEmptyLines: true,
 	});
 	return Buffer.from(`\ufeff${csvText}`, "utf-8");
 }
