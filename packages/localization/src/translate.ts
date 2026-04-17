@@ -125,7 +125,7 @@ export function cmdLn(key: string) {
 	return localized;
 }
 
-// Cache pour accélérer la recherche de clé par texte traduit
+// Cache to speed up key search by translated text
 const translationKeyCache: Record<string, string> = {};
 let cacheBuilt = false;
 export function buildTranslationKeyCache() {

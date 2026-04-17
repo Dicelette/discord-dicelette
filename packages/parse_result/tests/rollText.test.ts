@@ -130,7 +130,7 @@ describe("shared roll with statsPerSegment", () => {
 		// Simulating the result of: 1d(55+5);&+2>5
 		// This should show:
 		// - First segment: `1d(55+5)`: 1d60 ⟶ [28] = [28]
-		// - Second segment: **Succès** — 1d60+2 ⟶ [28]+2 = [30] ⩾ 5
+		// - Second segment: **Success** — 1d60+2 ⟶ [28]+2 = [30] ⩾ 5
 		const result: Resultat = {
 			comment: undefined,
 			compare: undefined,

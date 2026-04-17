@@ -189,7 +189,7 @@ export async function getUser(
 	}
 }
 
-// Fonction interne factorisée pour extraire la logique commune aux deux variantes
+// Internal factored function to extract common logic between two variants
 async function getUserFrom(
 	client: EClient,
 	userId: string,
@@ -280,7 +280,7 @@ async function getUserFrom(
 
 		targetMessage = await thread.messages.fetch(userMessageId.messageId);
 	} else {
-		// contexte message
+		// message context
 		let channel = client.channels.cache.get(userMessageId.channelId);
 		if (!channel && context.message.guild) {
 			const fetchedChannel = await fetchChannel(

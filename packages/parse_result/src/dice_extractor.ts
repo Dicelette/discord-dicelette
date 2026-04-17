@@ -100,7 +100,7 @@ export function performDiceRoll(
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
 
-		// Nettoyage des marqueurs/commentaires avant le parseur de dés
+		// Clean markers/comments before the dice parser
 		rollContent = rollContent
 			.replace(/%%\[__.*?__]%%/g, "")
 			.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
@@ -573,7 +573,7 @@ export function replaceStatsInDiceFormula(
 		if (shared) comments = `#${comments}`;
 	} else comments = comments ? ` ${comments} ` : "";
 
-	// deleteComments = true : ne pas ajouter le marqueur %%[__Stats__]%%, mais préserver les commentaires originaux
+	// deleteComments = true : do not add the %%[__Stats__]%% marker, but preserve original comments
 	if (deleteComments) {
 		const originalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3] || "";
 		const finalFormula = originalComments
@@ -628,7 +628,7 @@ export function buildInfoRollFromStats(
 		statsName && statsName.length > 0
 			? unNormalizeStatsName(uniqueFound, statsName)
 			: uniqueFound.map((s) => s.capitalize());
-	const name = names.join(" ");
+	const name = names.join(" × ");
 	return { name, standardized: name.standardize() };
 }
 
@@ -663,7 +663,7 @@ export function findStatInDiceFormula(
 	const text = diceFormula.standardize();
 	const tokens = text.match(/\p{L}[\p{L}0-9_.]*/gu) || [];
 
-	// Préparer la map des stats normalisées -> original
+	// Prepare the map of normalized stats -> original
 	const normalizedStats = normalizedMap(statsToFind);
 
 	for (const token of tokens) {

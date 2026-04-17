@@ -88,7 +88,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	const router = Router({ mergeParams: true });
 	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
-	// GET /:guildId/characters — fiches du joueur courant (avec cache)
+	// GET /:guildId/characters — current player's character sheets (with cache)
 	router.get("/", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
@@ -110,7 +110,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const userChars = guildData.user?.[userId] ?? [];
 		const canLink = isAllowSelfRegister(guildData);
 
-		// Lookup dans le cache en mémoire du bot (même processus) — évite les appels Discord
+		// Lookup in the bot's in-memory cache (same process) — avoids Discord calls
 		const memChars: UserData[] =
 			(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
 		const memMaps = buildMemMaps(memChars);
@@ -121,7 +121,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				Promise.all(
 					userChars
 						.filter((char) => {
-							// Exclure les personnages issus d'un template (non enregistrés réellement)
+							// Exclude characters from a template (not actually registered)
 							const mem = memMaps.memByMessageId.get(char.messageId[0]);
 							return !mem?.isFromTemplate;
 						})
@@ -163,7 +163,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json(result);
 	});
 
-	// POST /:guildId/characters/refresh — invalide le cache du joueur courant
+	// POST /:guildId/characters/refresh — invalidates current player's cache
 	router.post("/refresh", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
@@ -171,7 +171,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ ok: true });
 	});
 
-	// POST /:guildId/characters/refresh-dashboard — refresh joueur, et serveur si MJ/admin
+	// POST /:guildId/characters/refresh-dashboard — refresh player and server if GM/admin
 	router.post("/refresh-dashboard", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
@@ -190,7 +190,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ ok: true, refreshedAll: canRefreshServer });
 	});
 
-	// GET /:guildId/characters/all — toutes les fiches du serveur (admin uniquement)
+	// GET /:guildId/characters/all — all character sheets on the server (admin only)
 	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const cacheKey = `${guildId}:*all*`;
@@ -217,7 +217,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		try {
 			result = await withTimeout(
 				(async () => {
-					// Résoudre les pseudos Discord de tous les joueurs en une passe parallèle
+					// Resolve Discord usernames of all players in one parallel pass
 					const uniqueUserIds = Object.keys(allUsers);
 					const nameEntries = await Promise.all(
 						uniqueUserIds.map(async (uid) => {
@@ -280,7 +280,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json(result);
 	});
 
-	// POST /:guildId/characters/refresh-all — invalide le cache serveur (admin uniquement)
+	// POST /:guildId/characters/refresh-all — invalidates server cache (admin only)
 	router.post(
 		"/refresh-all",
 		requireAuth,
@@ -292,7 +292,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 	);
 
-	// GET /:guildId/characters/count — nombre total de personnages du serveur (admin uniquement)
+	// GET /:guildId/characters/count — total number of characters on the server (admin only)
 	router.get("/count", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const users: Record<string, UserGuildData[]> = settings.get(guildId)?.user ?? {};
@@ -300,7 +300,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ count });
 	});
 
-	// GET /:guildId/characters/count-self — nombre de personnages du joueur courant (sans droits admin)
+	// GET /:guildId/characters/count-self — number of characters of current player (without admin rights)
 	router.get("/count-self", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
@@ -308,7 +308,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		res.json({ count: userChars.length });
 	});
 
-	// GET /:guildId/characters/export — export CSV de tous les personnages (admin uniquement)
+	// GET /:guildId/characters/export — CSV export of all characters (admin only)
 	router.get(
 		"/export",
 		requireAuth,
@@ -374,7 +374,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				skipEmptyLines: true,
 			});
 
-			// BOM UTF-8 pour Excel
+			// UTF-8 BOM for Excel
 			const buf = Buffer.from(`\ufeff${csv}`, "utf-8");
 			res.setHeader("Content-Type", "text/csv; charset=utf-8");
 			res.setHeader("Content-Disposition", 'attachment; filename="characters.csv"');
@@ -382,7 +382,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 	);
 
-	// POST /:guildId/characters/bulk-delete — supprime tous les personnages du serveur (admin uniquement)
+	// POST /:guildId/characters/bulk-delete — deletes all characters on the server (admin only)
 	router.post(
 		"/bulk-delete",
 		requireAuth,
@@ -393,7 +393,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			const guildData = settings.get(guildId);
 			const users: Record<string, UserGuildData[]> = guildData?.user ?? {};
 
-			// Supprime les messages Discord de chaque personnage (erreurs silencieuses)
+			// Deletes Discord messages for each character (silent errors)
 			const deletePromises: Promise<boolean>[] = [];
 			for (const userData of Object.values(users)) {
 				for (const char of userData) {
@@ -406,7 +406,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			settings.delete(guildId, "user");
 			characters.delete(guildId);
 
-			// Invalide le cache pour tous les utilisateurs du serveur
+			// Invalidates cache for all server users
 			for (const key of [...charCache.keys()]) {
 				if (key.startsWith(`${guildId}:`)) charCache.delete(key);
 			}

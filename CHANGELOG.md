@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.13.0](https://github.com/Dicelette/discord-dicelette/compare/3.12.2...3.13.0) (2026-04-17)
+
+
+### Features
+
+* **dashboard:** add proper page when user refuses Discord OAuth ([e49a9de](https://github.com/Dicelette/discord-dicelette/commit/e49a9dec7c52163ae5712a700b8a76c7c6e51578))
+* **dashboard:** when editing the template, allow to update sheet with the new template ([03f6aeb](https://github.com/Dicelette/discord-dicelette/commit/03f6aeb8ccd20a61aa617693504543e91efd56aa))
+
 ## [3.12.2](https://github.com/Dicelette/discord-dicelette/compare/3.12.1...3.12.2) (2026-04-16)
 
 ## [3.12.1](https://github.com/Dicelette/discord-dicelette/compare/3.12.0...3.12.1) (2026-04-16)

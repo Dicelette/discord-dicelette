@@ -194,7 +194,7 @@ export function parseComparator(
 	userStatStr?: string,
 	sort?: SortOrder
 ) {
-	// Ignore les blocs de critiques personnalisés lors de la détection
+	// Ignore custom critical blocks during detection
 	const cleanedDice = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 	const comparatorMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(cleanedDice);
 	let comparator = "";

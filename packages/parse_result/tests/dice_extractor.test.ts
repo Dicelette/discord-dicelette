@@ -1,5 +1,4 @@
 import type { DiceData } from "@dicelette/types";
-import { BotError } from "@dicelette/utils";
 import { describe, expect, it } from "vitest";
 import {
 	applyCommentsToResult,
@@ -9,7 +8,6 @@ import {
 	performDiceRoll,
 	processChainedComments,
 	replaceStatsInDiceFormula,
-	verifyStatMatcherPattern,
 } from "../src/dice_extractor";
 
 describe("dice_extractor", () => {
@@ -389,93 +387,6 @@ describe("dice_extractor", () => {
 			expect(result.formula).toContain("S1");
 			expect(result.formula).toContain("S2");
 			expect(result.formula).toContain("S3");
-		});
-	});
-
-	describe("verifyStatMatcherPattern", () => {
-		it("should throw error when unknown stat remains and no replaceUnknown value", () => {
-			const dice = "1d20+$unknown";
-
-			expect(() => verifyStatMatcherPattern(dice)).toThrow(BotError);
-		});
-
-		it("should throw error with default message when no translation provided", () => {
-			const dice = "1d20+$unknown+$other";
-
-			expect(() => verifyStatMatcherPattern(dice)).toThrow(
-				/The dice contains unknown statistics/
-			);
-		});
-
-		it("should throw error with specific unknown stats listed", () => {
-			const dice = "1d20+$mystat";
-
-			try {
-				verifyStatMatcherPattern(dice);
-				expect.fail("Should have thrown an error");
-			} catch (error) {
-				const botError = error as BotError;
-				expect(botError.message).toBeDefined();
-			}
-		});
-
-		it("should replace unknown stats with replaceUnknown value", () => {
-			const dice = "1d20+$unknown+5";
-			const replaceValue = "0";
-
-			const result = verifyStatMatcherPattern(dice, undefined, replaceValue);
-
-			expect(result).toBe("1d20+5");
-		});
-
-		it("should replace multiple unknown stats with replaceUnknown value", () => {
-			const dice = "1d20+$stat1+$stat2+10";
-			const replaceValue = "5";
-
-			const result = verifyStatMatcherPattern(dice, undefined, replaceValue);
-
-			expect(result).toBe("1d20+5+5+10");
-		});
-
-		it("should remove +0 and -0 when replacing with 0", () => {
-			const dice = "1d20+$unknown+5";
-			const replaceValue = "0";
-
-			const result = verifyStatMatcherPattern(dice, undefined, replaceValue);
-
-			expect(result).toBe("1d20+5");
-		});
-
-		it("should remove multiple +0 and -0 patterns", () => {
-			const dice = "1d20-$stat1+$stat2+10";
-			const replaceValue = "0";
-
-			const result = verifyStatMatcherPattern(dice, undefined, replaceValue);
-
-			expect(result).toBe("1d20+10");
-		});
-
-		it("should handle parentheses in stat patterns", () => {
-			const dice = "1d20+($unknown)";
-			const replaceValue = "5";
-
-			const result = verifyStatMatcherPattern(dice, undefined, replaceValue);
-
-			expect(result).toBe("1d20+5");
-		});
-
-		it("should return original dice when no unknown stats present", () => {
-			const dice = "1d20+5";
-
-			const result = verifyStatMatcherPattern(dice);
-
-			expect(result).toBe("1d20+5");
-		});
-
-		it("should not replace when no unknow parameter provided but stats present", () => {
-			const dice = "1d20+$unknown";
-
-			expect(() => verifyStatMatcherPattern(dice, undefined)).toThrow();
 		});
 	});
 });

@@ -108,7 +108,7 @@ describe("extractAndMergeComments", () => {
 
 	it("should handle dice message format", () => {
 		const result = extractAndMergeComments("strength 1d20+5");
-		// Le format "strength 1d20+5" est traité comme un dice complet
+		// The format "strength 1d20+5" is treated as a complete dice
 		expect(result.cleanedDice).toBeTruthy();
 		expect(result.cleanedDice.length).toBeGreaterThan(0);
 	});

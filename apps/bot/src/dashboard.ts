@@ -155,8 +155,8 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					} catch {
 						// Missing permissions — non-fatal
 					}
-					// Si pas de canal public fourni et que le canal template supporte les threads,
-					// on crée/récupère le thread par défaut pour y stocker les fiches.
+					// If no public channel provided and the template channel supports threads,
+					// we create/retrieve the default thread to store character sheets.
 					let resolvedPublicChannelId: string | undefined = publicChannelId;
 					if (!resolvedPublicChannelId && channel instanceof Djs.TextChannel) {
 						try {
@@ -168,7 +168,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 							);
 							if (thread) resolvedPublicChannelId = thread.id;
 						} catch {
-							// Non-fatal : le thread sera créé à la prochaine inscription
+							// Non-fatal: thread will be created on next registration
 						}
 					}
 					return { messageId: msg.id, publicChannelId: resolvedPublicChannelId };

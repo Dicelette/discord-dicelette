@@ -8,7 +8,7 @@ export function createUserRouter(deps: DashboardDeps) {
 	const { userSettings, botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
 
-	// POST /:guildId/validate-entries — validation snippets ou attributs (sans droits admin)
+	// POST /:guildId/validate-entries — validate snippets or attributes (without admin rights)
 	router.post("/validate-entries", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
@@ -49,7 +49,7 @@ export function createUserRouter(deps: DashboardDeps) {
 		res.json({ valid, errors });
 	});
 
-	// GET /:guildId/user-config — paramètres personnels de l'utilisateur (sans droits admin)
+	// GET /:guildId/user-config — user's personal settings (without admin rights)
 	router.get("/user-config", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
@@ -75,7 +75,7 @@ export function createUserRouter(deps: DashboardDeps) {
 		res.json({ isAdmin, isStrictAdmin, userConfig });
 	});
 
-	// PATCH /:guildId/user-config — mise à jour des paramètres personnels (sans droits admin)
+	// PATCH /:guildId/user-config — updates personal settings (without admin rights)
 	router.patch("/user-config", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;

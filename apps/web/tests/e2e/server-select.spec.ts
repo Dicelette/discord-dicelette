@@ -1,12 +1,12 @@
 /**
- * Tests de la page de sélection de serveur (/)
+ * Tests for the server selection page (/)
  *
- * Concepts Playwright utilisés ici :
- *   - `page.route()`            → intercepter des requêtes réseau (mock API)
- *   - `page.getByText()`        → sélectionner un élément par son texte
- *   - `page.getByRole()`        → sélectionner par rôle ARIA
- *   - `expect(locator).toBeVisible()` → assertion de visibilité
- *   - `page.waitForURL()`       → attendre une navigation vers une URL
+ * Playwright concepts used here:
+ *   - `page.route()`            → intercept network requests (mock API)
+ *   - `page.getByText()`        → select element by text
+ *   - `page.getByRole()`        → select by ARIA role
+ *   - `expect(locator).toBeVisible()` → visibility assertion
+ *   - `page.waitForURL()`       → wait for navigation to URL
  */
 
 import { expect, type Page, test } from "@playwright/test";
@@ -30,19 +30,19 @@ const { fr, en } = languages;
 async function conn(page: Page, NoInvit = MOCK_GUILD_NO_BOT, Invited = MOCK_GUILD) {
 	await mockAuthMe(page);
 	await mockGuilds(page, [NoInvit, Invited]);
-	await mockInviteUrl(page, NoInvit.id); // mock de l'URL d'invitation pour le serveur avec bot
-	await mockGuildConfig(page, Invited.id); // mock de la config de guilde pour que le dashboard puisse charger
+	await mockInviteUrl(page, NoInvit.id); // Mock invitation URL for server with bot
+	await mockGuildConfig(page, Invited.id); // Mock guild config so dashboard can load
 	await page.goto("/");
 	await page.waitForURL(/\/$/);
 }
 
 // ============================================================================
-// ✅ TEST IMPLÉMENTÉ — Exemple de référence
+// ✅ TEST IMPLEMENTED — Reference example
 // ============================================================================
 
-test("Les boutons principaux sont bien affichés", async ({ page }) => {
+test("Main buttons are displayed correctly", async ({ page }) => {
 	await conn(page);
-	await test.step("le nom de l'application et le bouton Documentation sont visibles", async () => {
+	await test.step("application name and Documentation button are visible", async () => {
 		await expect(page.getByRole("link", { name: /Dicelette/ })).toBeVisible();
 		await expect(page.getByRole("button", { name: /Test Server/ })).toBeVisible();
 		//app bar
@@ -51,10 +51,10 @@ test("Les boutons principaux sont bien affichés", async ({ page }) => {
 		await expect(page.getByText("Test User")).toBeVisible();
 		await expect(page.getByRole("heading", { name: fr.servers.title })).toBeVisible();
 	});
-	await test.step("La langue peut être changée", async () => {
-		//combo box
+	await test.step("Language can be changed", async () => {
+		// combo box
 		await expect(page.getByRole("combobox")).toBeVisible();
-		//test du click
+		// test click
 		const combobox = page.getByRole("combobox");
 		await combobox.click();
 		await expect(page.getByRole("option", { name: "EN" })).toBeVisible();
@@ -63,38 +63,38 @@ test("Les boutons principaux sont bien affichés", async ({ page }) => {
 			ignoreCase: true,
 			useInnerText: true,
 		});
-		//vérifions qu'on a bien changé de langue, on va utiliser ressource
+		// verify that we changed language correctly, we will use resources
 		await expect(page.getByRole("button", { name: /Documentation/ })).toBeVisible();
 		await expect(page.getByRole("button", { name: en.common.darkTheme })).toBeVisible();
 		await expect(page.getByRole("heading", { name: en.servers.title })).toBeVisible();
 	});
 	await expect(page.getByText("Test User")).toBeVisible();
-	await test.step("On passe bien en thème dark", async () => {
+	await test.step("Dark theme is switched correctly", async () => {
 		const darkButton = page.getByRole("button", { name: /Dark Theme/ });
 		await expect(darkButton).toBeVisible();
 		await darkButton.click();
-		//vérifions que le thème a bien changé, on va vérifier la présence d'un élément spécifique au thème dark
+		// verify that theme changed correctly, we will check for a dark-theme-specific element
 		await expect(page.getByRole("button", { name: /Light Theme/ })).toBeVisible();
 	});
 });
 
 // ============================================================================
-// 💬 EXERCICES — À compléter
+// 💬 EXERCISES — To complete
 // ============================================================================
 
-// Exercice 1 : Un serveur sans bot affiche le bouton "Add"
+// Exercise 1 : A server without bot displays the "Add" button
 //
-// Indice : MOCK_GUILD_NO_BOT a botPresent = false.
-//          L'application affiche une section "Add Dicelette" avec un bouton "Add".
-//          Utilise mockGuilds(page, [MOCK_GUILD_NO_BOT]) pour ne retourner
-//          qu'un serveur sans bot.
+// Hint : MOCK_GUILD_NO_BOT has botPresent = false.
+//        The application displays an "Add Dicelette" section with an "Add" button.
+//        Use mockGuilds(page, [MOCK_GUILD_NO_BOT]) to return
+//        only a server without bot.
 //
-test("un serveur sans bot affiche le bouton 'Add'", async ({ page }) => {
-	await mockInviteUrl(page, MOCK_GUILD_NO_BOT.id); // mock de l'URL d'invitation pour ce serveur
-	await conn(page, MOCK_GUILD_NO_BOT, MOCK_GUILD); // un seul serveur, pas de bot
-	// La section "Add Dicelette" doit être visible
+test("a server without bot displays the 'Add' button", async ({ page }) => {
+	await mockInviteUrl(page, MOCK_GUILD_NO_BOT.id); // Mock invitation URL for this server
+	await conn(page, MOCK_GUILD_NO_BOT, MOCK_GUILD); // only one server, no bot
+	// The "Add Dicelette" section must be visible
 	await expect(page.getByRole("button", { name: fr.common.add })).toBeVisible();
-	// Cliquons sur le bouton "Add" et vérifions que la requête d'invitation est bien émise
+	// Click the "Add" button and verify the invite request is sent
 	const [response] = await Promise.all([
 		page.waitForResponse((res) =>
 			res.url().includes(`/api/guilds/${MOCK_GUILD_NO_BOT.id}/invite`)
@@ -104,13 +104,13 @@ test("un serveur sans bot affiche le bouton 'Add'", async ({ page }) => {
 	expect(response.status()).toBe(200);
 });
 
-// Exercice 2 : Cliquer sur un serveur (avec bot) navigue vers /dashboard/:guildId
+// Exercise 2 : Click on a server (with bot) navigates to /dashboard/:guildId
 //
-// Indice : Les cartes de serveurs avec bot sont cliquables (CardActionArea).
-//          Clique sur la carte puis vérifie l'URL avec page.waitForURL().
-//          L'URL attendue est `/dashboard/${MOCK_GUILD.id}`.
+// Hint : Server cards with bot are clickable (CardActionArea).
+//        Click on the card then verify the URL with page.waitForURL().
+//        Expected URL is `/dashboard/${MOCK_GUILD.id}`.
 //
-test("cliquer sur un serveur navigue vers le dashboard", async ({ page }) => {
+test("clicking on a server navigates to dashboard", async ({ page }) => {
 	await mockUserConfig(page, MOCK_GUILD.id);
 	await mockGuildChannels(page, MOCK_GUILD.id);
 	await mockGuildRoles(page, MOCK_GUILD.id);
@@ -121,20 +121,20 @@ test("cliquer sur un serveur navigue vers le dashboard", async ({ page }) => {
 	await expect(page.getByRole("heading", { name: fr.dashboard.title })).toBeVisible();
 });
 
-// Exercice 3 : Le bouton "Refresh" envoie POST /api/auth/guilds/refresh
+// Exercise 3 : The "Refresh" button sends POST /api/auth/guilds/refresh
 //
-// Indice : Utilise `page.route()` directement dans le test pour intercepter la
-//          requête POST et vérifier qu'elle est bien émise.
-//          Tu peux utiliser `page.waitForRequest()` ou un compteur dans le handler.
-//          N'oublie pas de mocker aussi mockRefreshGuilds pour que la requête
-//          ne parte pas vers un vrai serveur.
+// Hint : Use `page.route()` directly in the test to intercept the
+//        POST request and verify it is sent.
+//        You can use `page.waitForRequest()` or a counter in the handler.
+//        Don't forget to also mock mockRefreshGuilds so the request
+//        doesn't go to a real server.
 //
-test("le bouton Refresh appelle POST /api/auth/guilds/refresh", async ({ page }) => {
+test("Refresh button calls POST /api/auth/guilds/refresh", async ({ page }) => {
 	await mockRefreshGuilds(page);
 	await conn(page, MOCK_GUILD_NO_BOT, MOCK_GUILD);
 	await expect(page.getByRole("button", { name: fr.servers.refresh })).toBeVisible();
-	//on doit utiliser mockRefreshGuilds pour que la requête ne parte pas vers un vrai serveur
-	//on va utiliser page.waitForRequest pour vérifier que la requête est bien émise
+	// we must use mockRefreshGuilds so the request doesn't go to a real server
+	// we will use page.waitForRequest to verify the request is sent
 	const [request] = await Promise.all([
 		page.waitForResponse((req) => req.url().includes("/api/auth/guilds/refresh")),
 		page.getByRole("button", { name: fr.servers.refresh }).click(),

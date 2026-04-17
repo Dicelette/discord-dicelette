@@ -13,7 +13,7 @@ import { leaderboard } from "./leaderboard";
 import { server } from "./server";
 
 /**
- * Crée les choix pour les options de classement
+ * Creates choices for leaderboard options
  */
 function leaderBoardChoices() {
 	return [
@@ -152,8 +152,8 @@ async function resetCount(
 	const resetAll = interaction.options.getBoolean(t("luckMeter.reset.all.name"));
 	const selectedUser = interaction.options.getUser("user");
 	const guildId = interaction.guild!.id;
-	//!!! D'abord, on vérifie si le user a la permission de faire ça
-	//!!! Seul les admins (gestions des rôles) peuvent réinitialiser le classement des autres
+	// First, we verify if the user has permission to do this
+	// Only admins (role management) can reset the leaderboard of others
 	const isRoleManager = interaction.memberPermissions?.has(
 		Djs.PermissionFlagsBits.ManageRoles
 	);

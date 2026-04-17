@@ -1,11 +1,11 @@
 /**
- * Tests de la page de connexion (/login)
+ * Tests for the login page (/login)
  *
- * Concepts Playwright utilisés ici :
- *   - `page.goto(url)`          → naviguer vers une URL
- *   - `page.getByRole()`        → sélectionner un élément par rôle ARIA
- *   - `page.getByText()`        → sélectionner un élément par son texte
- *   - `expect(locator).toBeVisible()` → assertion de visibilité
+ * Playwright concepts used here:
+ *   - `page.goto(url)`          → navigate to a URL
+ *   - `page.getByRole()`        → select an element by ARIA role
+ *   - `page.getByText()`        → select an element by its text
+ *   - `expect(locator).toBeVisible()` → visibility assertion
  */
 
 import { expect, test } from "@playwright/test";
@@ -17,36 +17,34 @@ import {
 } from "./fixtures/api-mocks";
 
 // ============================================================================
-// ✅ TEST IMPLÉMENTÉ — Exemple de référence
+// ✅ TEST IMPLEMENTED — Reference example
 // ============================================================================
 
-test("la page /login affiche le titre et le bouton de connexion Discord", async ({
-	page,
-}) => {
-	// On simule un utilisateur non connecté : /api/auth/me renvoie 401.
-	// L'application redirige alors vers /login automatiquement.
+test("the /login page displays the title and Discord login button", async ({ page }) => {
+	// We simulate a non-logged-in user: /api/auth/me returns 401.
+	// The application then automatically redirects to /login.
 	await mockAuthNotLoggedIn(page);
 
 	await page.goto("/login");
 
-	// Vérifie que le titre "Dicelette Dashboard" est affiché
+	// Verify that "Dicelette Dashboard" title is displayed
 	await expect(page.getByRole("heading", { name: /Dicelette/ })).toBeVisible();
 
-	// Vérifie que le bouton de connexion Discord est présent
+	// Verify that Discord login button is present
 	await expect(page.getByRole("button", { name: /Discord/ })).toBeVisible();
 });
 
 // ============================================================================
-// 💬 EXERCICES — À compléter
+// 💬 EXERCISES — To complete
 // ============================================================================
 
-// Exercice 1 : Accès à "/" sans authentification → redirection vers /login
+// Exercise 1 : Access to "/" without authentication → redirect to /login
 //
-// Indice : mockAuthNotLoggedIn fait échouer /api/auth/me avec un 401.
-//          L'application doit alors rediriger vers /login.
-//          Utilise `page.waitForURL()` pour vérifier l'URL finale.
+// Hint : mockAuthNotLoggedIn fails /api/auth/me with a 401.
+//        The application must then redirect to /login.
+//        Use `page.waitForURL()` to verify the final URL.
 //
-test("accéder à '/' sans être connecté redirige vers /login", async ({ page }) => {
+test("accessing '/' without being logged in redirects to /login", async ({ page }) => {
 	await mockAuthNotLoggedIn(page);
 	await page.goto("/");
 	await expect(page.getByRole("heading", { name: /Dicelette/ })).toBeVisible();
@@ -54,28 +52,28 @@ test("accéder à '/' sans être connecté redirige vers /login", async ({ page 
 	await expect(page).toHaveURL(/\/login$/);
 });
 
-// Exercice 2 : Le sélecteur de langue EN/FR est visible sur la page de login
+// Exercise 2 : The EN/FR language selector is visible on the login page
 //
-// Indice : Le sélecteur est un <select> MUI contenant les options "FR" et "EN".
-//          Cherche-le avec `page.getByRole("combobox")`.
-//          Vérifie ensuite qu'il est bien visible
-test("le sélecteur de langue est visible sur la page de login", async ({ page }) => {
+// Hint : The selector is a MUI <select> containing "FR" and "EN" options.
+//        Find it with `page.getByRole("combobox")`.
+//        Then verify it is visible
+test("the language selector is visible on the login page", async ({ page }) => {
 	await mockAuthNotLoggedIn(page);
 	await page.goto("/login");
 
 	await expect(page.getByRole("combobox")).toBeVisible();
-	//test du click
+	// test click
 	await page.getByRole("combobox").click();
-	//test de la présence des options
+	// test presence of options
 	await expect(page.getByRole("option", { name: "FR" })).toBeVisible();
 	await expect(page.getByRole("option", { name: "EN" })).toBeVisible();
-	//test de la sélection d'une option
+	// test selection of an option
 	await page.getByRole("option", { name: "EN" }).click();
 	await expect(page.getByRole("combobox")).toHaveText("EN", {
 		ignoreCase: true,
 		useInnerText: true,
 	});
-	//vérifions qu'on a bien changé de langue, on va utiliser ressource
+	// verify we changed language correctly, we will use resources
 	const en = languages.en;
 	await expect(page.getByRole("heading", { name: en.login.title })).toBeVisible();
 });
@@ -94,18 +92,16 @@ test("sur mobile, les actions d'entête restent visibles au-dessus de la carte d
 	await expect(page.getByRole("heading", { name: /Dicelette/ })).toBeVisible();
 });
 
-// Exercice 3 : Un utilisateur déjà connecté qui accède à /login est redirigé vers "/"
+// Exercise 3 : A logged-in user accessing /login is redirected to "/"
 //
-// Indice : mockAuthMe simule un utilisateur connecté (GET /api/auth/me → 200).
-//          L'application React redirige les utilisateurs connectés loin de /login.
-//          N'oublie pas de mocker aussi /api/auth/guilds pour que "/" se charge.
+// Hint : mockAuthMe simulates a logged-in user (GET /api/auth/me → 200).
+//        The React application redirects logged-in users away from /login.
+//        Don't forget to also mock /api/auth/guilds so that "/" loads.
 //
-test("un utilisateur connecté accédant à /login est redirigé vers /", async ({
-	page,
-}) => {
-	// Simule un utilisateur connecté
+test("a logged-in user accessing /login is redirected to /", async ({ page }) => {
+	// Simulate a logged-in user
 	await mockAuthMe(page);
-	await mockGuilds(page); // Mock des guildes pour que la page d'accueil puisse se charger correctement
+	await mockGuilds(page); // Mock guilds so the home page loads correctly
 	await page.goto("/login");
 	await page.waitForURL(/\/$/);
 	await expect(page).toHaveURL(/\/$/);

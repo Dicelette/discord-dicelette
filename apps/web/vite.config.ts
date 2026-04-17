@@ -29,7 +29,7 @@ export default defineConfig({
 			"/api": {
 				target: "http://localhost:3001",
 				changeOrigin: true,
-				xfwd: true, // transmet X-Forwarded-Host → permet de rediriger vers l'IP réelle
+				xfwd: true, // transmits X-Forwarded-Host → allows redirecting to the real IP
 			},
 		},
 	},

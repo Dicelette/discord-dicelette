@@ -1,14 +1,14 @@
 /**
- * Helpers pour mocker les réponses de l'API Express dans les tests Playwright.
+ * Helpers to mock Express API responses in Playwright tests.
  *
- * Chaque fonction intercepte une route avec `page.route()` et renvoie des données
- * fictives au lieu d'appeler le vrai serveur. À appeler AVANT `page.goto()`.
+ * Each function intercepts a route with `page.route()` and returns fake data
+ * instead of calling the real server. Should be called BEFORE `page.goto()`.
  *
- * Exemple d'utilisation :
+ * Usage example:
  *
- *   test("mon test", async ({ page }) => {
- *     await mockAuthMe(page);          // simule un utilisateur connecté
- *     await mockGuilds(page);          // simule la liste de serveurs
+ *   test("my test", async ({ page }) => {
+ *     await mockAuthMe(page);          // simulates a logged-in user
+ *     await mockGuilds(page);          // simulates server list
  *     await page.goto("/");
  *     // … assertions
  *   });
@@ -25,7 +25,7 @@ import type { Page } from "@playwright/test";
 import { en, fr } from "@shared";
 
 // ---------------------------------------------------------------------------
-// Données de test réutilisables
+// Reusable test data
 // ---------------------------------------------------------------------------
 
 export const MOCK_USER: DiscordUser = {
@@ -37,7 +37,7 @@ export const MOCK_USER: DiscordUser = {
 	global_name: "Test User",
 };
 
-/** Serveur Discord où le bot est déjà présent */
+/** Discord server where the bot is already present */
 export const MOCK_GUILD: DiscordGuild = {
 	id: "987654321098765432",
 	name: "Test Server",
@@ -48,7 +48,7 @@ export const MOCK_GUILD: DiscordGuild = {
 	isAdmin: true,
 };
 
-/** Serveur Discord où le bot N'est PAS présent (pour tester le bouton "Ajouter") */
+/** Discord server where the bot is NOT present (to test the "Add" button) */
 export const MOCK_GUILD_NO_BOT: DiscordGuild = {
 	...MOCK_GUILD,
 	id: "111111111111111112",
@@ -57,7 +57,7 @@ export const MOCK_GUILD_NO_BOT: DiscordGuild = {
 	owner: true,
 };
 
-/** Fiche de personnage minimaliste */
+/** Minimal character sheet */
 export const MOCK_CHARACTER: ApiCharacter = {
 	charName: "Aragorn",
 	messageId: "msg123456789",
@@ -74,21 +74,21 @@ export const MOCK_CHARACTER: ApiCharacter = {
 };
 
 // ---------------------------------------------------------------------------
-// Mocks d'authentification
+// Authentication mocks
 // ---------------------------------------------------------------------------
 
 /**
- * Simule un utilisateur authentifié.
- * Intercepte GET /api/auth/me et renvoie `user` (MOCK_USER par défaut).
+ * Simulates an authenticated user.
+ * Intercepts GET /api/auth/me and returns `user` (MOCK_USER by default).
  */
 export async function mockAuthMe(page: Page, user: DiscordUser = MOCK_USER) {
 	await page.route("**/api/auth/me", (route) => route.fulfill({ json: user }));
 }
 
 /**
- * Simule un utilisateur NON connecté.
- * Intercepte GET /api/auth/me et renvoie 401.
- * L'application redirige alors automatiquement vers /login.
+ * Simulates a NON-logged-in user.
+ * Intercepts GET /api/auth/me and returns 401.
+ * The application then automatically redirects to /login.
  */
 export async function mockAuthNotLoggedIn(page: Page) {
 	await page.route("**/api/auth/me", (route) =>
@@ -97,20 +97,20 @@ export async function mockAuthNotLoggedIn(page: Page) {
 }
 
 // ---------------------------------------------------------------------------
-// Mocks des guildes
+// Guild mocks
 // ---------------------------------------------------------------------------
 
 /**
- * Simule la liste des serveurs Discord de l'utilisateur.
- * Intercepte GET /api/auth/guilds.
+ * Simulates the list of user's Discord servers.
+ * Intercepts GET /api/auth/guilds.
  */
 export async function mockGuilds(page: Page, guilds: DiscordGuild[] = [MOCK_GUILD]) {
 	await page.route("**/api/auth/guilds", (route) => route.fulfill({ json: guilds }));
 }
 
 /**
- * Simule l'endpoint de rafraîchissement du cache de guildes.
- * Intercepte POST /api/auth/guilds/refresh.
+ * Simulates the guild cache refresh endpoint.
+ * Intercepts POST /api/auth/guilds/refresh.
  */
 export async function mockRefreshGuilds(page: Page) {
 	await page.route("**/api/auth/guilds/refresh", (route) =>
@@ -119,8 +119,8 @@ export async function mockRefreshGuilds(page: Page) {
 }
 
 /**
- * Simule l'URL d'invitation du bot pour un serveur donné.
- * Intercepte GET /api/guilds/:guildId/invite.
+ * Simulates the bot's invitation URL for a given server.
+ * Intercepts GET /api/guilds/:guildId/invite.
  */
 export async function mockInviteUrl(page: Page, guildId: string = MOCK_GUILD_NO_BOT.id) {
 	await page.route(`**/api/guilds/${guildId}/invite`, (route) =>
@@ -131,12 +131,12 @@ export async function mockInviteUrl(page: Page, guildId: string = MOCK_GUILD_NO_
 }
 
 // ---------------------------------------------------------------------------
-// Mocks de la configuration de guilde
+// Guild configuration mocks
 // ---------------------------------------------------------------------------
 
 /**
- * Simule la configuration d'un serveur (admin uniquement).
- * Intercepte GET /api/guilds/:guildId/config.
+ * Simulates a server's configuration (admin only).
+ * Intercepts GET /api/guilds/:guildId/config.
  */
 export async function mockGuildConfig(
 	page: Page,
@@ -149,8 +149,8 @@ export async function mockGuildConfig(
 }
 
 /**
- * Simule la liste des salons du serveur (utilisée par le formulaire admin).
- * Intercepte GET /api/guilds/:guildId/channels.
+ * Simulates the list of server channels (used by the admin form).
+ * Intercepts GET /api/guilds/:guildId/channels.
  */
 export async function mockGuildChannels(page: Page, guildId: string = MOCK_GUILD.id) {
 	await page.route(`**/api/guilds/${guildId}/channels`, (route) =>
@@ -159,8 +159,8 @@ export async function mockGuildChannels(page: Page, guildId: string = MOCK_GUILD
 }
 
 /**
- * Simule la liste des rôles du serveur (utilisée par le formulaire admin).
- * Intercepte GET /api/guilds/:guildId/roles.
+ * Simulates the list of server roles (used by the admin form).
+ * Intercepts GET /api/guilds/:guildId/roles.
  */
 export async function mockGuildRoles(page: Page, guildId: string = MOCK_GUILD.id) {
 	await page.route(`**/api/guilds/${guildId}/roles`, (route) =>
@@ -169,17 +169,17 @@ export async function mockGuildRoles(page: Page, guildId: string = MOCK_GUILD.id
 }
 
 // ---------------------------------------------------------------------------
-// Mocks de la configuration utilisateur
+// User configuration mocks
 // ---------------------------------------------------------------------------
 
 /**
- * Simule la configuration personnelle de l'utilisateur sur un serveur.
- * Intercepte GET /api/guilds/:guildId/user-config.
+ * Simulates the user's personal configuration on a server.
+ * Intercepts GET /api/guilds/:guildId/user-config.
  *
  * @param page
  * @param guildId
- * @param data  - `isAdmin: true` → les onglets Admin et Template sont affichés.
- *              - `isAdmin: false` → seuls User et Characters sont affichés.
+ * @param data  - `isAdmin: true` → Admin and Template tabs are displayed.
+ *              - `isAdmin: false` → only User and Characters tabs are displayed.
  */
 export async function mockUserConfig(
 	page: Page,
@@ -192,12 +192,12 @@ export async function mockUserConfig(
 }
 
 // ---------------------------------------------------------------------------
-// Mocks des personnages
+// Character mocks
 // ---------------------------------------------------------------------------
 
 /**
- * Simule la liste des personnages d'un utilisateur sur un serveur.
- * Intercepte GET /api/guilds/:guildId/characters.
+ * Simulates the list of user's characters on a server.
+ * Intercepts GET /api/guilds/:guildId/characters.
  */
 export async function mockCharacters(
 	page: Page,
@@ -210,8 +210,8 @@ export async function mockCharacters(
 }
 
 /**
- * Simule le nombre total de personnages enregistrés sur un serveur.
- * Intercepte GET /api/guilds/:guildId/characters/count.
+ * Simulates the total number of characters registered on a server.
+ * Intercepts GET /api/guilds/:guildId/characters/count.
  */
 export async function mockCharactersCount(
 	page: Page,
@@ -223,7 +223,7 @@ export async function mockCharactersCount(
 	);
 }
 
-// ---- Mock du langage, pas réellement un i18n parce que justement on test pas ça ici, juste la présence de certaines chaînes en fonction de la config de langue. ----
+// ---- Language mock, not really an i18n because we're not testing that here, just the presence of certain strings based on language config. ----
 
 export const languages = {
 	en: en,

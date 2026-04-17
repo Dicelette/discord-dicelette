@@ -61,7 +61,7 @@ function replaceOOC(regex: RegExp, message: string) {
 async function findOrCreateOoc(msgChannel: DiscordTextChannel, ul: Translation) {
 	if (msgChannel.isThread()) {
 		if (msgChannel.name.startsWith("📄")) return msgChannel;
-		//search for a thread with the "📄 OOC" prefix & same parent
+		// Search for a thread with the "📄 OOC" prefix and same parent
 		if (msgChannel.parent?.isTextBased()) {
 			const thread = await fetchThread(msgChannel.parent);
 			if (thread) return thread;

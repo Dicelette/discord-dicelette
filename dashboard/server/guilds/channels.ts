@@ -44,7 +44,7 @@ export function createChannelsRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		// @everyone est déjà exclu par l'adaptateur botGuilds
+		// @everyone is already excluded by the botGuilds adapter
 		res.json(guild.roles);
 	});
 

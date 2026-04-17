@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Types, interfaces et constantes partagées pour les routes /guilds
+// Types, interfaces and shared constants for /guilds routes
 // ---------------------------------------------------------------------------
 
 import type { StatisticalTemplate } from "@dicelette/core";

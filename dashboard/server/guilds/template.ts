@@ -11,21 +11,21 @@ export function createTemplateRouter(deps: DashboardDeps) {
 	const router = Router({ mergeParams: true });
 	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
-	// GET /guildId/template — récupère le template statistique du serveur (admin uniquement)
+	// GET /guildId/template — retrieves the statistical template of the server (admin only)
 	router.get("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 
-		// Priorité : cache mémoire
+		// Priority: in-memory cache
 		const cached = template.get(guildId);
 		if (cached) {
 			res.json(cached);
 			return;
 		}
 
-		// Fallback : récupération de la pièce jointe depuis Discord
+		// Fallback: retrieves the attachment from Discord
 		const config = settings.get(guildId);
 		if (!config?.templateID?.channelId || !config.templateID.messageId) {
-			// Comportement attendu : aucun template enregistré sur ce serveur
+			// Expected behavior: no template registered on this server
 			res.json(null);
 			return;
 		}
@@ -51,7 +51,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		}
 	});
 
-	// POST /:guildId/template — importe ou met à jour le template statistique (admin uniquement)
+	// POST /:guildId/template — imports or updates the statistical template (admin only)
 	router.post("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const body = req.body as Record<string, unknown>;
@@ -148,7 +148,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			if (hasPrivateChannelId) current.privateChannel = privateChannelId || undefined;
 			settings.set(guildId, current);
 		} else {
-			// Première importation — création des settings
+			// First import — creation of settings
 			const newData: GuildData = {
 				lang: settings.get(guildId, "lang") ?? Locale.EnglishUS,
 				managerId: effectivePublicChannelId,

@@ -1,12 +1,12 @@
 /**
- * Tests du tableau de bord (/dashboard/:guildId)
+ * Tests for the dashboard (/dashboard/:guildId)
  *
- * Concepts Playwright utilisés ici :
- *   - `page.getByRole("tab")`   → sélectionner un onglet MUI par son rôle ARIA
- *   - `locator.click()`         → simuler un clic
- *   - `locator.fill()`          → remplir un champ de formulaire
- *   - `expect(locator).toHaveCount()` → vérifier le nombre d'éléments
- *   - `expect(locator).not.toBeVisible()` → vérifier l'absence d'un élément
+ * Playwright concepts used here:
+ *   - `page.getByRole("tab")`   → select MUI tab by ARIA role
+ *   - `locator.click()`         → simulate a click
+ *   - `locator.fill()`          → fill form field
+ *   - `expect(locator).toHaveCount()` → verify number of elements
+ *   - `expect(locator).not.toBeVisible()` → verify element is not visible
  */
 
 import { expect, test } from "@playwright/test";
@@ -22,11 +22,11 @@ import {
 	mockUserConfig,
 } from "./fixtures/api-mocks";
 
-// URL du dashboard pour le serveur mocké
+// Dashboard URL for mocked server
 const DASHBOARD_URL = `/dashboard/${MOCK_GUILD.id}`;
 
 // ============================================================================
-// ✅ TEST IMPLÉMENTÉ — Exemple de référence
+// ✅ TEST IMPLEMENTED — Reference example
 // ============================================================================
 
 const { fr, en } = languages;
@@ -34,7 +34,7 @@ const { fr, en } = languages;
 test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 	page,
 }) => {
-	// 1. Mocker tous les endpoints nécessaires au chargement du dashboard admin
+	// 1. Mock all endpoints needed for dashboard admin loading
 	await mockAuthMe(page);
 	await mockGuilds(page);
 	await mockUserConfig(page, MOCK_GUILD.id, {
@@ -49,7 +49,7 @@ test("un admin voit les 4 onglets : Admin, Template, User, Characters", async ({
 
 	await page.goto(DASHBOARD_URL);
 
-	// 2. Vérifier la présence des 4 onglets (MUI Tab → role="tab")
+	// 2. Verify the presence of 4 tabs (MUI Tab → role="tab")
 	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.admin })).toBeVisible();
 	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.template })).toBeVisible();
 	await expect(page.getByRole("tab", { name: fr.dashboard.tabs.user })).toBeVisible();
@@ -80,49 +80,49 @@ test("l'onglet Mes personnages est masqué quand le serveur n'a aucun personnage
 });
 
 // ============================================================================
-// 💬 EXERCICES — À compléter
+// 💬 EXERCISES — To complete
 // ============================================================================
 
-// Exercice 1 : Cliquer sur l'onglet "Characters" affiche le personnage mocké
+// Exercise 1 : Clicking "Characters" tab displays mocked character
 //
-// Indice : Après avoir chargé le dashboard admin, clique sur l'onglet "Characters".
-//          mockCharacters() injecte MOCK_CHARACTER dont le charName est "Aragorn".
-//          Vérifie ensuite que le texte "Aragorn" est visible dans la page.
-//          N'oublie pas de mocker mockCharacters avant la navigation.
+// Hint : After loading dashboard admin, click "Characters" tab.
+//        mockCharacters() injects MOCK_CHARACTER with charName "Aragorn".
+//        Then verify "Aragorn" text is visible in the page.
+//        Don't forget to mock mockCharacters before navigation.
 //
-// test("l'onglet Characters affiche le personnage mocké", async ({ page }) => {
-//
-// });
-
-// Exercice 2 : Cliquer sur l'onglet "Personal configuration" affiche le formulaire snippets
-//
-// Indice : L'onglet "Personal configuration" (valeur "user") contient le composant
-//          UserConfigForm avec une section "Snippets".
-//          Après le clic, cherche le texte "Snippets" ou "snippets" dans la page.
-//          Utilise mockUserConfig avec isAdmin: true pour avoir les 4 onglets.
-//
-// test("l'onglet Personal configuration affiche la section snippets", async ({ page }) => {
+// test("Characters tab displays mocked character", async ({ page }) => {
 //
 // });
 
-// Exercice 3 : Un utilisateur non-admin voit seulement 2 onglets (User + Characters)
+// Exercise 2 : Clicking "Personal configuration" tab displays snippets form
 //
-// Indice : mockUserConfig avec `isAdmin: false` fait que l'application n'affiche
-//          que les onglets "Personal configuration" et "Characters".
-//          Utilise `not.toBeVisible()` pour vérifier l'absence des onglets admin.
-//          Attention : si isAdmin est false, il ne faut PAS mocker getConfig,
-//          channels et roles (ces endpoints ne seront pas appelés).
+// Hint : "Personal configuration" tab (value "user") contains
+//        UserConfigForm with a "Snippets" section.
+//        After clicking, search for "Snippets" or "snippets" text in page.
+//        Use mockUserConfig with isAdmin: true to get 4 tabs.
 //
-// test("un non-admin voit uniquement les onglets User et Characters", async ({ page }) => {
+// test("Personal configuration tab displays snippets section", async ({ page }) => {
 //
 // });
 
-// Exercice 4 : Le bouton "Back to servers" ramène à la page "/"
+// Exercise 3 : Non-admin user sees only 2 tabs (User + Characters)
 //
-// Indice : Le dashboard contient un bouton avec le texte "Back to servers".
-//          Clique dessus et vérifie que l'URL revient sur "/".
-//          Utilise page.waitForURL("/") pour attendre la navigation.
+// Hint : mockUserConfig with `isAdmin: false` makes the app display
+//        only "Personal configuration" and "Characters" tabs.
+//        Use `not.toBeVisible()` to verify absence of admin tabs.
+//        Caution: if isAdmin is false, do NOT mock getConfig,
+//        channels and roles (these endpoints won't be called).
 //
-// test("le bouton 'Back to servers' ramène à la liste des serveurs", async ({ page }) => {
+// test("non-admin user sees only User and Characters tabs", async ({ page }) => {
+//
+// });
+
+// Exercise 4 : "Back to servers" button returns to "/" page
+//
+// Hint : Dashboard contains a button with "Back to servers" text.
+//        Click it and verify URL returns to "/".
+//        Use page.waitForURL("/") to wait for navigation.
+//
+// test("Back to servers button returns to server list", async ({ page }) => {
 //
 // });
