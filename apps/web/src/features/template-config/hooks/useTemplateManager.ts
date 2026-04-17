@@ -211,6 +211,7 @@ export function useTemplateManager(
 					channelId: data.channelId,
 					publicChannelId: data.publicChannelId,
 					privateChannelId: data.privateChannelId,
+					updateCharacters: data.updateCharacters,
 				});
 				templateClientCache.delete(guildId);
 				dispatch({

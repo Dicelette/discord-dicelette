@@ -63,11 +63,13 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			channelId,
 			publicChannelId,
 			privateChannelId,
+			updateCharacters,
 		} = req.body as {
 			template: unknown;
 			channelId: string;
 			publicChannelId?: string;
 			privateChannelId?: string;
+			updateCharacters?: boolean;
 		};
 
 		if (!templateBody || typeof templateBody !== "object") {
@@ -155,6 +157,14 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			};
 			if (privateChannelId) newData.privateChannel = privateChannelId;
 			settings.set(guildId, newData);
+		}
+
+		if (updateCharacters && deps.bulkEditTemplateUser) {
+			try {
+				await deps.bulkEditTemplateUser(guildId, validated);
+			} catch (e) {
+				console.warn("Failed to bulk update characters:", e);
+			}
 		}
 
 		res.json({ ok: true });

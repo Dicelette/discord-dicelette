@@ -128,4 +128,8 @@ export interface DashboardDeps {
 	};
 	botChannels: BotChannels;
 	guildEvents: import("node:events").EventEmitter;
+	bulkEditTemplateUser?: (
+		guildId: string,
+		templateData: StatisticalTemplate
+	) => Promise<void>;
 }

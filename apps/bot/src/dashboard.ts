@@ -4,7 +4,7 @@ import { startDashboardServer } from "@dicelette/server";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
 import { templateEmbed } from "./commands/admin/template";
-import { createDefaultThread } from "./messages";
+import { bulkEditTemplateUserCore, createDefaultThread } from "./messages";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
 	startDashboardServer({
@@ -13,6 +13,11 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		userSettings: client.userSettings,
 		template: client.template,
 		characters: client.characters,
+		bulkEditTemplateUser: (guildId, template) => {
+			const lang = client.settings.get(guildId, "lang");
+			const ul = ln(lang ?? Djs.Locale.EnglishUS);
+			return bulkEditTemplateUserCore(client, guildId, template, ul);
+		},
 		botGuilds: {
 			has: (id) => client.guilds.cache.has(id),
 			get: (id) => {

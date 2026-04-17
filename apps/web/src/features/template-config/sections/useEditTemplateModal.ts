@@ -26,6 +26,7 @@ export interface ModalState {
 	publicChannelId: string;
 	privateChannelId: string;
 	deleteCharacters: boolean;
+	updateCharacters: boolean;
 	saving: boolean;
 	error: string | null;
 }
@@ -37,6 +38,7 @@ export type ModalAction =
 			value: string;
 	  }
 	| { type: "set_delete_characters"; value: boolean }
+	| { type: "set_update_characters"; value: boolean }
 	| { type: "set_saving"; value: boolean }
 	| { type: "set_error"; value: string | null }
 	| {
@@ -50,6 +52,8 @@ function reducer(state: ModalState, action: ModalAction): ModalState {
 			return { ...state, [action.key]: action.value };
 		case "set_delete_characters":
 			return { ...state, deleteCharacters: action.value };
+		case "set_update_characters":
+			return { ...state, updateCharacters: action.value };
 		case "set_saving":
 			return { ...state, saving: action.value };
 		case "set_error":
@@ -59,6 +63,7 @@ function reducer(state: ModalState, action: ModalAction): ModalState {
 				...state,
 				...action.defaults,
 				deleteCharacters: false,
+				updateCharacters: false,
 				saving: false,
 				error: null,
 			};
@@ -162,6 +167,7 @@ export function useEditTemplateModal({
 			defaultPrivateChannelId
 		),
 		deleteCharacters: false,
+		updateCharacters: false,
 		saving: false,
 		error: null,
 	}));
@@ -221,6 +227,7 @@ export function useEditTemplateModal({
 					publicChannelId: state.publicChannelId || undefined,
 					privateChannelId: state.privateChannelId || undefined,
 					deleteCharacters: state.deleteCharacters,
+					updateCharacters: state.updateCharacters,
 				});
 				handleClose();
 			} catch {
@@ -237,6 +244,7 @@ export function useEditTemplateModal({
 			state.publicChannelId,
 			state.privateChannelId,
 			state.deleteCharacters,
+			state.updateCharacters,
 		]
 	);
 

@@ -6,4 +6,5 @@ export interface ImportTemplateData {
 	publicChannelId?: string;
 	privateChannelId?: string;
 	deleteCharacters: boolean;
+	updateCharacters?: boolean;
 }

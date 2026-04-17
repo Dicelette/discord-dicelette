@@ -1,5 +1,6 @@
 import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
+import { fetchChannel } from "@dicelette/helpers";
 import type { PersonnageIds, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import { updateMemory } from "database";
@@ -13,23 +14,29 @@ import {
 import { searchUserChannel } from "utils";
 
 /**
- * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
+ * Core logic to update all user character template embeds.
+ * No user interaction — silent on errors.
  *
- * For each character belonging to users in the guild, fetches the corresponding message and replaces its template embed with one reflecting the updated template fields. Also updates the in-memory character data to match the new embed.
- *
- * @param {EClient} client
- * @param {Djs.CommandInteraction} interaction
- * @param {Translation} ul
- * @param {StatisticalTemplate} template - The updated statistical template to apply to all user character messages.
+ * @param client - The Discord bot client
+ * @param guildId - Guild ID where characters are located
+ * @param template - The updated statistical template
+ * @param ul - Localization function for building embeds
  */
-export async function bulkEditTemplateUser(
+export async function bulkEditTemplateUserCore(
 	client: EClient,
-	interaction: Djs.CommandInteraction,
-	ul: Translation,
-	template: StatisticalTemplate
-) {
+	guildId: string,
+	template: StatisticalTemplate,
+	ul: Translation
+): Promise<void> {
 	const guildData = client.settings;
-	const users = guildData.get(interaction.guild!.id, "user");
+	const users = guildData.get(guildId, "user");
+	if (!users) return;
+
+	const guild = client.guilds.cache.get(guildId);
+	if (!guild) {
+		logger.warn(`Guild ${guildId} not found for bulk template update`);
+		return;
+	}
 
 	for (const userID in users) {
 		for (const char of users[userID]) {
@@ -37,17 +44,14 @@ export async function bulkEditTemplateUser(
 				channelId: char.messageId[1],
 				messageId: char.messageId[0],
 			};
-			const thread = await searchUserChannel(
-				guildData,
-				interaction,
-				ul,
-				sheetLocation.channelId
-			);
-			if (!thread) continue;
 			try {
-				const userMessages = await thread.messages.fetch(sheetLocation.messageId);
+				const channel = await fetchChannel(guild, sheetLocation.channelId);
+				if (!channel?.isTextBased()) continue;
+
+				const userMessages = await channel.messages.fetch(sheetLocation.messageId);
 				const templateEmbed = getEmbeds(userMessages, "template");
 				if (!templateEmbed) continue;
+
 				let newEmbed = createTemplateEmbed(ul);
 				if (template.diceType && template.diceType.length > 0)
 					newEmbed.addFields({
@@ -78,7 +82,7 @@ export async function bulkEditTemplateUser(
 				await userMessages.edit({ embeds: listEmbed.list, files: listEmbed.files });
 				await updateMemory(
 					client.characters,
-					interaction.guild!.id,
+					guildId,
 					userID,
 					ul,
 					{
@@ -92,6 +96,25 @@ export async function bulkEditTemplateUser(
 			}
 		}
 	}
+}
+
+/**
+ * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
+ *
+ * For each character belonging to users in the guild, fetches the corresponding message and replaces its template embed with one reflecting the updated template fields. Also updates the in-memory character data to match the new embed.
+ *
+ * @param {EClient} client
+ * @param {Djs.CommandInteraction} interaction
+ * @param {Translation} ul
+ * @param {StatisticalTemplate} template - The updated statistical template to apply to all user character messages.
+ */
+export async function bulkEditTemplateUser(
+	client: EClient,
+	interaction: Djs.CommandInteraction,
+	ul: Translation,
+	template: StatisticalTemplate
+) {
+	return bulkEditTemplateUserCore(client, interaction.guild!.id, template, ul);
 }
 
 /**
