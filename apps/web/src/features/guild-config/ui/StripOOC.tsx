@@ -47,6 +47,8 @@ function StripOOC({ control, channels, textChannels }: Props) {
 	const { t } = useI18n();
 	const stripOOC = useWatch({ control, name: "stripOOC" });
 	const { field: regexField } = useController({ name: "stripOOC.regex", control });
+	const { field: timerField } = useController({ name: "stripOOC.timer", control });
+	const stripOOCEnabled = !!(timerField.value && timerField.value > 0);
 
 	const [advancedMode, setAdvancedMode] = useState(() => {
 		if (!stripOOC?.regex) return false;
@@ -77,27 +79,17 @@ function StripOOC({ control, channels, textChannels }: Props) {
 		<>
 			<SectionTitle>{t("config.stripOOC.title")}</SectionTitle>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<Controller
-					name="stripOOC"
-					control={control}
-					render={({ field }) => (
-						<FormControlLabel
-							control={
-								<Switch
-									checked={!!(field.value?.timer && field.value.timer > 0)}
-									onChange={(e) =>
-										field.onChange(
-											e.target.checked ? { timer: 180 * 1000 } : { timer: 0 }
-										)
-									}
-								/>
-							}
-							label={t("common.enable")}
+				<FormControlLabel
+					control={
+						<Switch
+							checked={stripOOCEnabled}
+							onChange={(e) => timerField.onChange(e.target.checked ? 180 * 1000 : 0)}
 						/>
-					)}
+					}
+					label={t("common.enable")}
 				/>
 			</div>
-			{!!(stripOOC?.timer && stripOOC.timer > 0) && (
+			{stripOOCEnabled && (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 					<FormControlLabel
 						sx={fullSpanSx}
@@ -165,28 +157,18 @@ function StripOOC({ control, channels, textChannels }: Props) {
 						/>
 					)}
 					<Box sx={timerBoxSx}>
-						<Controller
-							name="stripOOC.timer"
-							control={control}
-							render={({ field }) => {
-								const secondsValue = millisecondsToSeconds(field.value);
-
-								return (
-									<NumberField
-										label={t("config.fields.stripOocDelay")}
-										value={secondsValue}
-										size="small"
-										min={0}
-										max={3600}
-										helperText={t("config.fields.deleteAfterHelper", {
-											duration: formatDuration(secondsValue),
-										})}
-										onValueChange={(seconds) =>
-											field.onChange(secondsToMilliseconds(seconds))
-										}
-									/>
-								);
-							}}
+						<NumberField
+							label={t("config.fields.stripOocDelay")}
+							value={millisecondsToSeconds(timerField.value)}
+							size="small"
+							min={0}
+							max={3600}
+							helperText={t("config.fields.deleteAfterHelper", {
+								duration: formatDuration(millisecondsToSeconds(timerField.value)),
+							})}
+							onValueChange={(seconds) =>
+								timerField.onChange(secondsToMilliseconds(seconds))
+							}
 						/>
 					</Box>
 					<Controller

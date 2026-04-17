@@ -16,51 +16,41 @@ function HiddenRolls({ control, textChannels, allChannels }: HiddenRoleProps) {
 					name="hiddenRoll"
 					control={control}
 					render={({ field }) => (
-						<FormControlLabel
-							control={
-								<Switch
-									checked={field.value === true || typeof field.value === "string"}
-									onChange={(e) => field.onChange(e.target.checked)}
-								/>
-							}
-							label={t("common.enable")}
-						/>
+						<>
+							<FormControlLabel
+								control={
+									<Switch
+										checked={field.value === true || typeof field.value === "string"}
+										onChange={(e) => field.onChange(e.target.checked)}
+									/>
+								}
+								label={t("common.enable")}
+							/>
+							{(hiddenRoll === true || typeof hiddenRoll === "string") && (
+								<>
+									<FormControlLabel
+										control={
+											<Switch
+												checked={field.value === true}
+												onChange={(e) => field.onChange(e.target.checked ? true : "")}
+											/>
+										}
+										label={t("config.fields.hiddenRollDm")}
+									/>
+									{hiddenRoll !== true && (
+										<ChannelSelect
+											label={t("config.fields.channelId")}
+											value={typeof field.value === "string" ? field.value : ""}
+											channels={textChannels}
+											allChannels={allChannels}
+											onChange={(v) => field.onChange(v)}
+										/>
+									)}
+								</>
+							)}
+						</>
 					)}
 				/>
-				{(hiddenRoll === true || typeof hiddenRoll === "string") && (
-					<>
-						<Controller
-							name="hiddenRoll"
-							control={control}
-							render={({ field }) => (
-								<FormControlLabel
-									control={
-										<Switch
-											checked={field.value === true}
-											onChange={(e) => field.onChange(e.target.checked ? true : "")}
-										/>
-									}
-									label={t("config.fields.hiddenRollDm")}
-								/>
-							)}
-						/>
-						{hiddenRoll !== true && (
-							<Controller
-								name="hiddenRoll"
-								control={control}
-								render={({ field }) => (
-									<ChannelSelect
-										label={t("config.fields.channelId")}
-										value={typeof field.value === "string" ? field.value : ""}
-										channels={textChannels}
-										allChannels={allChannels}
-										onChange={(v) => field.onChange(v)}
-									/>
-								)}
-							/>
-						)}
-					</>
-				)}
 			</div>
 		</>
 	);

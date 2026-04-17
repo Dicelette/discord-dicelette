@@ -21,32 +21,28 @@ export default function SelfRegister({ control, textChannels, allChannels }: Pro
 					name="allowSelfRegister"
 					control={control}
 					render={({ field }) => (
-						<FormControlLabel
-							control={
-								<Switch
-									checked={!!field.value}
-									onChange={(e) => field.onChange(e.target.checked || undefined)}
+						<>
+							<FormControlLabel
+								control={
+									<Switch
+										checked={!!field.value}
+										onChange={(e) => field.onChange(e.target.checked ? true : undefined)}
+									/>
+								}
+								label={t("config.fields.allowSelfRegister")}
+							/>
+							{allowSelfRegister && (
+								<ChannelSelect
+									label={t("config.fields.moderationChannel")}
+									value={typeof field.value === "string" ? field.value : undefined}
+									channels={textChannels}
+									allChannels={allChannels}
+									onChange={(v) => field.onChange(v || true)}
 								/>
-							}
-							label={t("config.fields.allowSelfRegister")}
-						/>
+							)}
+						</>
 					)}
 				/>
-				{allowSelfRegister && (
-					<Controller
-						name="allowSelfRegister"
-						control={control}
-						render={({ field }) => (
-							<ChannelSelect
-								label={t("config.fields.moderationChannel")}
-								value={typeof field.value === "string" ? field.value : undefined}
-								channels={textChannels}
-								allChannels={allChannels}
-								onChange={(v) => field.onChange(v || true)}
-							/>
-						)}
-					/>
-				)}
 			</div>
 		</>
 	);
