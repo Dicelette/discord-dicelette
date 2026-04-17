@@ -1,14 +1,10 @@
 import type { ApiGuildData } from "@dicelette/types";
 import { Box, Paper, Stack } from "@mui/material";
-import {
-	ConfigFormFooter,
-	useConfigForm,
-	useI18n,
-} from "@shared";
+import { ConfigFormFooter, useConfigForm, useI18n } from "@shared";
 import { useCallback, useMemo } from "react";
-import { useGuildConfig } from "./context/GuildConfigContext";
 import Links from "../user-config/ui/sections/Links";
 import { DEFAULT_TEMPLATE } from "../user-config/utils";
+import { useGuildConfig } from "./context";
 import {
 	Channels,
 	DashboardAccess,

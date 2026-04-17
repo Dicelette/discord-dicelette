@@ -9,12 +9,13 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useMemo } from "react";
 import { List, type RowComponentProps } from "react-window";
 import type { SnippetsState } from "../..";
 import { useShake } from "../../hooks";
 import { exportJson } from "../../utils.ts";
 import { FormAccordion, SnippetRow } from "../atoms";
+import { useAutoScrollToNewItem, useListStyle, useSaveSuccessToast } from "./hooks";
 import {
 	actionsBoxSx,
 	addRowBoxSx,
@@ -27,7 +28,6 @@ import {
 	inputHiddenStyle,
 	listBoxSx,
 } from "./styles.ts";
-import { useAutoScrollToNewItem, useListStyle, useSaveSuccessToast } from "./hooks";
 
 const newNameFieldSx = { flex: 1 } as const;
 const newValueFieldSx = { flex: 2 } as const;
