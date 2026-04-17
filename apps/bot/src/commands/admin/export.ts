@@ -103,7 +103,6 @@ async function exportToCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
-	// build a list of tasks to run with limited concurrency (10 concurrent requests)
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
 
