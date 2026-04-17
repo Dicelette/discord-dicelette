@@ -51,7 +51,9 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 
 	const handleImport = async () => {
 		if (!csvText || !channelId) {
-			setError("Please provide CSV content and select a channel");
+			setError(
+				t("characters.importError") || "Please provide CSV content and select a channel"
+			);
 			return;
 		}
 
@@ -160,7 +162,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={() => setOpen(false)} disabled={loading}>
-						{result ? "Close" : "Cancel"}
+						{result ? t("common.close") : t("common.cancel")}
 					</Button>
 					{!result && (
 						<Button
