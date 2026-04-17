@@ -153,7 +153,8 @@
 		"total": "Total",
 		"true": "Vrai",
 		"user": "Joueur",
-		"yes": "✓"
+		"yes": "✓",
+		"close": "Fermer"
 	},
 	"config": {
 		"admin": {
@@ -1216,5 +1217,23 @@
 				"title": "lister"
 			}
 		}
+	},
+	"characters": {
+		"import": "Importer des personnages",
+		"importTitle": "Importer des personnages depuis CSV",
+		"importResult": "Import terminé: {{success}} personnages importés, {{failed}} échoués",
+		"csvFile": "Fichier CSV",
+		"channelId": "ID du canal",
+		"overwriteExisting": "Écraser les personnages existants",
+		"noCharacters": "Aucun personnage trouvé",
+		"noResults": "Aucun personnage ne correspond à votre recherche",
+		"serverTitle": "Personnages du serveur",
+		"serverFilterPlaceholder": "Chercher des personnages...",
+		"title": "Mes personnages",
+		"filterPlaceholder": "Chercher mes personnages...",
+		"unnamed": "Sans nom",
+		"sheetLink": "Ouvrir dans Discord",
+		"loadError": "Impossible de charger les personnages",
+		"importError": "Veuillez fournir un contenu CSV et sélectionner un canal"
 	}
 }

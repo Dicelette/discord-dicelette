@@ -153,7 +153,8 @@
 		"total": "Total",
 		"true": "True",
 		"user": "Player",
-		"yes": "✓"
+		"yes": "✓",
+		"close": "Close"
 	},
 	"config": {
 		"admin": {
@@ -1216,5 +1217,23 @@
 				"title": "list"
 			}
 		}
+	},
+	"characters": {
+		"import": "Import Characters",
+		"importTitle": "Import Characters from CSV",
+		"importResult": "Import completed: {{success}} characters imported, {{failed}} failed",
+		"csvFile": "CSV File",
+		"channelId": "Channel ID",
+		"overwriteExisting": "Overwrite existing characters",
+		"noCharacters": "No characters found",
+		"noResults": "No characters match your search",
+		"serverTitle": "Server Characters",
+		"serverFilterPlaceholder": "Search characters...",
+		"title": "My Characters",
+		"filterPlaceholder": "Search my characters...",
+		"unnamed": "Unnamed",
+		"sheetLink": "Open in Discord",
+		"loadError": "Failed to load characters",
+		"importError": "Please provide CSV content and select a channel"
 	}
 }
