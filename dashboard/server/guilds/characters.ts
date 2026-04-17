@@ -8,7 +8,7 @@ import type {
 import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import * as Papa from "papaparse";
+import Papa from "papaparse";
 import {
 	type ApiCharacter,
 	type BotChannels,
