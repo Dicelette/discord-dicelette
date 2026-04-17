@@ -1,10 +1,10 @@
-import { charactersApi } from "@dicelette/api";
 import type { ApiCharacter } from "@dicelette/api";
+import { charactersApi } from "@dicelette/api";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Typography } from "@mui/material";
 import { useI18n } from "@shared";
-import { useCharactersList } from "./hooks/useCharactersList";
 import { useCharacterPagination } from "./hooks/useCharacterPagination";
+import { useCharactersList } from "./hooks/useCharactersList";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
 

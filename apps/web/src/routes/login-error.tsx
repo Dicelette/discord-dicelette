@@ -31,7 +31,9 @@ export default function LoginError() {
 	const reason = searchParams.get("reason") ?? "unknown";
 
 	const isDenied = reason === "access_denied";
-	const subtitle = isDenied ? t("loginError.subtitleDenied") : t("loginError.subtitleGeneric");
+	const subtitle = isDenied
+		? t("loginError.subtitleDenied")
+		: t("loginError.subtitleGeneric");
 
 	const handleRetry = () => {
 		window.location.href = "/api/auth/discord";

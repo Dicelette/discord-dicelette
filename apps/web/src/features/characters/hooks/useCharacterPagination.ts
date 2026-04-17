@@ -1,5 +1,5 @@
-import { useMemo } from "react";
 import type { ApiCharacter } from "@dicelette/api";
+import { useMemo } from "react";
 
 const PAGE_SIZE = 5;
 
@@ -25,7 +25,10 @@ export function useCharacterPagination({
 		return characters.filter((c) => (c.charName ?? "").toLowerCase().includes(query));
 	}, [characters, query, filterFn]);
 
-	const totalPages = useMemo(() => Math.ceil(filtered.length / PAGE_SIZE), [filtered.length]);
+	const totalPages = useMemo(
+		() => Math.ceil(filtered.length / PAGE_SIZE),
+		[filtered.length]
+	);
 
 	const pageChars = useMemo(
 		() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),

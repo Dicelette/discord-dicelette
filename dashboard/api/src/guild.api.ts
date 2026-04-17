@@ -1,5 +1,5 @@
-import { createGuildEndpoint } from "./api-builder";
 import type { ApiGuildData } from "@dicelette/types";
+import { createGuildEndpoint } from "./api-builder";
 import type { ApiChannel, ApiRole } from "./channel-types";
 import { api } from "./client";
 

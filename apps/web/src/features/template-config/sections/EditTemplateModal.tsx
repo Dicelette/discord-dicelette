@@ -112,7 +112,10 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 				{isEditMode ? t("template.editModalTitle") : t("template.createModalTitle")}
 			</DialogTitle>
 
-			<DialogContent dividers sx={{ bgcolor: "background.paper", p: 0, position: "relative" }}>
+			<DialogContent
+				dividers
+				sx={{ bgcolor: "background.paper", p: 0, position: "relative" }}
+			>
 				{state.saving && (
 					<Box sx={loadingOverlaySx}>
 						<CircularProgress />

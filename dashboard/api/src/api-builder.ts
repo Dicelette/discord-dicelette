@@ -7,10 +7,17 @@ export function createGuildEndpoint<T>(
 	method: HttpMethod,
 	path: string,
 	responseType?: AxiosRequestConfig["responseType"]
-): (guildId: string, data?: unknown, config?: AxiosRequestConfig) => Promise<AxiosResponse<T>> {
+): (
+	guildId: string,
+	data?: unknown,
+	config?: AxiosRequestConfig
+) => Promise<AxiosResponse<T>> {
 	return (guildId: string, data?: unknown, config?: AxiosRequestConfig) => {
 		const fullPath = `/guilds/${guildId}${path}`;
-		const axiosConfig: AxiosRequestConfig = { ...config, ...(responseType && { responseType }) };
+		const axiosConfig: AxiosRequestConfig = {
+			...config,
+			...(responseType && { responseType }),
+		};
 
 		if (method === "get" || method === "delete") {
 			return api[method]<T>(fullPath, axiosConfig);

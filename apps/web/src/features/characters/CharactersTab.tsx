@@ -1,7 +1,7 @@
 import { charactersApi } from "@dicelette/api";
 import { useI18n } from "@shared";
-import { useCharactersList } from "./hooks/useCharactersList";
 import { useCharacterPagination } from "./hooks/useCharacterPagination";
+import { useCharactersList } from "./hooks/useCharactersList";
 import CharacterCard from "./ui/CharacterCard";
 import CharacterListLayout from "./ui/CharacterListLayout";
 

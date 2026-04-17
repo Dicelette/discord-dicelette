@@ -1,6 +1,6 @@
-import { useEffect, useRef, useMemo } from "react";
-import { useListRef } from "react-window";
 import { useI18n } from "@shared";
+import { useEffect, useMemo, useRef } from "react";
+import { useListRef } from "react-window";
 import { useToast } from "../../../../providers";
 
 const ITEM_SIZE = 32;

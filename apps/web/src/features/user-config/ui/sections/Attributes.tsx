@@ -14,6 +14,7 @@ import { List, type RowComponentProps } from "react-window";
 import type { AttributeSectionProps } from "../../types.ts";
 import { exportJson } from "../../utils.ts";
 import { AttributeRow, FormAccordion } from "../atoms";
+import { useAutoScrollToNewItem, useListStyle, useSaveSuccessToast } from "./hooks";
 import {
 	actionsBoxSx,
 	addRowBoxSx,
@@ -26,7 +27,6 @@ import {
 	inputHiddenStyle,
 	listBoxSx,
 } from "./styles.ts";
-import { useAutoScrollToNewItem, useListStyle, useSaveSuccessToast } from "./hooks";
 
 const newNameFieldSx = { flex: 2 } as const;
 const newValueFieldSx = { flex: 1 } as const;

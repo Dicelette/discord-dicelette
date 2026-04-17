@@ -39,13 +39,21 @@ export async function fetchChannel(
 		const any = await guild.client.channels.fetch(channelId as string);
 		if (!any?.isDMBased()) return any as Djs.GuildBasedChannel;
 	} catch (error) {
-		logger.warn(`Fallback fetch failed for channel ${channelId}:`, (error as Error).message);
+		logger.warn(
+			`Fallback fetch failed for channel ${channelId}:`,
+			(error as Error).message
+		);
 	}
 	return null;
 }
 
 export async function fetchUser(client: EClient, userId: string) {
-	return fetchWithCache(userId, client.users.cache, (id) => client.users.fetch(id), "user");
+	return fetchWithCache(
+		userId,
+		client.users.cache,
+		(id) => client.users.fetch(id),
+		"user"
+	);
 }
 
 export async function fetchMember(

@@ -31,20 +31,15 @@ export default function GuildConfigForm() {
 		templateState,
 	} = useGuildConfig();
 
-	// Guard against undefined config - useConfigForm needs valid data
-	if (!config) {
-		return null; // Should not happen due to parent checks, but prevents errors
-	}
-
 	const { control, handleSubmit, reset, textChannels, isDirty } = useConfigForm(
 		config,
 		channels
 	);
 
 	const isTemplateDirty = useMemo(() => {
-		const saved = config.createLinkTemplate ?? DEFAULT_TEMPLATE;
+		const saved = config?.createLinkTemplate ?? DEFAULT_TEMPLATE;
 		return JSON.stringify(templateState.value) !== JSON.stringify(saved);
-	}, [templateState.value, config.createLinkTemplate]);
+	}, [templateState.value, config?.createLinkTemplate]);
 
 	const handleSaveAndReset = useCallback(
 		async (data: ApiGuildData) => {
@@ -56,6 +51,8 @@ export default function GuildConfigForm() {
 		},
 		[onSave, templateState.value, reset]
 	);
+
+	if (!config) return null;
 
 	return (
 		<Stack spacing={2}>
