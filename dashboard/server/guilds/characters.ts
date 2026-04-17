@@ -338,39 +338,30 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 				for (const [uid, charList] of Object.entries(allUsers)) {
 					const memChars: UserData[] = allMemChars[uid] ?? [];
-					const memMaps = buildMemMaps(memChars);
+					const byName = new Map<string | null | undefined, UserData>(
+						memChars.map((c) => [c.userName ?? null, c])
+					);
 
 					for (const char of charList) {
-						const [messageId, channelId] = char.messageId;
-
-						// Try to get from memory first, then from Discord embeds
-						const { avatar, stats, damage } = await resolveCharacterData(
-							char.charName,
-							messageId,
-							channelId,
-							memMaps,
-							botChannels
-						);
-
+						const mem = byName.get(char.charName ?? null) ?? byName.get(null);
 						const row: CsvRow = {
 							user: `'${uid}`,
 							charName: char.charName ?? undefined,
-							avatar: avatar ?? undefined,
-							channel: char.messageId[1] ? `'${char.messageId[1]}` : undefined,
+							avatar: mem?.avatar ?? undefined,
+							channel: mem?.channel ? `'${mem.channel}` : undefined,
 						};
 
 						if (hasPrivateChannel) row.isPrivate = char.isPrivate ?? false;
 
-						// Add stats from resolved data (Discord embeds or memory fallback)
-						if (stats) {
-							for (const stat of stats) {
-								row[stat.name] = stat.value;
-							}
+						for (const name of statsName) {
+							const normalized = name.toLowerCase().replace(/\s+/g, "_");
+							row[name] = mem?.stats?.[normalized] ?? mem?.stats?.[name] ?? undefined;
 						}
 
-						// Add damage/dice
-						if (damage && damage.length > 0) {
-							row.dice = `'${damage.map((d) => `- ${d.name}: ${d.value}`).join("\n")}`;
+						if (mem?.damage && Object.keys(mem.damage).length > 0) {
+							row.dice = `'${Object.entries(mem.damage)
+								.map(([k, v]) => `- ${k}: ${v}`)
+								.join("\n")}`;
 						}
 
 						rows.push(row);
