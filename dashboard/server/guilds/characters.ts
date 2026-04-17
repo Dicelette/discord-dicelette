@@ -333,35 +333,71 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
 				const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
 
+				// Pre-load stats from Discord for all characters (automatic refresh)
+				const limiter = pLimit(10);
+				const charDataCache = new Map<
+					string,
+					{
+						avatar: string | null;
+						stats: EmbedField[] | null;
+						damage: EmbedField[] | null;
+					}
+				>();
+
+				const loadTasks: Promise<void>[] = [];
+				for (const [uid, charList] of Object.entries(allUsers)) {
+					const memChars: UserData[] = allMemChars[uid] ?? [];
+					const memMaps = buildMemMaps(memChars);
+
+					for (const char of charList) {
+						const [messageId, channelId] = char.messageId;
+						const cacheKey = `${uid}:${messageId}`;
+
+						loadTasks.push(
+							limiter(async () => {
+								const resolved = await resolveCharacterData(
+									char.charName,
+									messageId,
+									channelId,
+									memMaps,
+									botChannels
+								);
+								charDataCache.set(cacheKey, resolved);
+							})
+						);
+					}
+				}
+
+				await Promise.allSettled(loadTasks);
+
 				type CsvRow = Record<string, string | number | boolean | undefined>;
 				const rows: CsvRow[] = [];
 
 				for (const [uid, charList] of Object.entries(allUsers)) {
-					const memChars: UserData[] = allMemChars[uid] ?? [];
-					const byName = new Map<string | null | undefined, UserData>(
-						memChars.map((c) => [c.userName ?? null, c])
-					);
-
 					for (const char of charList) {
-						const mem = byName.get(char.charName ?? null) ?? byName.get(null);
+						const [messageId, channelId] = char.messageId;
+						const cacheKey = `${uid}:${messageId}`;
+						const charData = charDataCache.get(cacheKey);
+
 						const row: CsvRow = {
 							user: `'${uid}`,
 							charName: char.charName ?? undefined,
-							avatar: mem?.avatar ?? undefined,
-							channel: mem?.channel ? `'${mem.channel}` : undefined,
+							avatar: charData?.avatar ?? undefined,
+							channel: channelId ? `'${channelId}` : undefined,
 						};
 
 						if (hasPrivateChannel) row.isPrivate = char.isPrivate ?? false;
 
-						for (const name of statsName) {
-							const normalized = name.toLowerCase().replace(/\s+/g, "_");
-							row[name] = mem?.stats?.[normalized] ?? mem?.stats?.[name] ?? undefined;
+						// Add stats from resolved data
+						if (charData?.stats) {
+							for (const stat of charData.stats) {
+								row[stat.name] = stat.value;
+							}
 						}
 
-						if (mem?.damage && Object.keys(mem.damage).length > 0) {
-							row.dice = `'${Object.entries(mem.damage)
-								.map(([k, v]) => `- ${k}: ${v}`)
-								.join("\n")}`;
+						// Add damage/dice
+						if (charData?.damage && charData.damage.length > 0) {
+							row.dice = `'${charData.damage.map((d) => `- ${d.name}: ${d.value}`).join("\n")}`;
 						}
 
 						rows.push(row);
