@@ -8,7 +8,7 @@ import { ln, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getUser } from "../../database/get_user";
+import { getUserFromMessage } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -93,9 +93,6 @@ export async function exportCharactersCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
-	const guild = await client.guilds.fetch(guildId);
-	if (!guild) return null;
-
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
 
@@ -109,46 +106,77 @@ export async function exportCharactersCsv(
 		for (const char of chara) {
 			tasks.push(
 				limit(async () => {
-					const stats = await getUser(char.messageId, guild, client);
-					if (!stats) return;
-
-					// Only export macros saved in the character's fiche, using original names
-					const diceLines: string[] = [];
-					if (char.damageName && stats.damage) {
-						for (const originalName of char.damageName) {
-							const formula = stats.damage[originalName.standardize()];
-							if (formula)
-								diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
+					try {
+						const channel = await client.channels.fetch(char.messageId[1]);
+						if (
+							!channel ||
+							channel instanceof Djs.CategoryChannel ||
+							channel instanceof Djs.ForumChannel ||
+							channel instanceof Djs.MediaChannel ||
+							!("messages" in channel)
+						) {
+							return;
 						}
+
+						const message = await channel.messages.fetch(char.messageId[0]);
+						if (!message) return;
+
+						const result = await getUserFromMessage(
+							client,
+							user,
+							message,
+							char.charName,
+							{
+								fetchAvatar: true,
+								fetchChannel: true,
+								cleanUrl: false,
+								skipNotFound: true,
+							}
+						);
+						const stats = result?.userData;
+						if (!stats) return;
+
+						// Only export macros saved in the character's fiche, using original names
+						const diceLines: string[] = [];
+						if (char.damageName && stats.damage) {
+							for (const originalName of char.damageName) {
+								const formula = stats.damage[originalName.standardize()];
+								if (formula)
+									diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
+							}
+						}
+						const dice: undefined | string =
+							diceLines.length > 0 ? `'${diceLines.join("\n")}` : undefined;
+
+						let newStats: Record<string, number | undefined> = {};
+						if (statsNameNormalized && stats.stats) {
+							for (let i = 0; i < statsNameNormalized.length; i++) {
+								const name = statsName?.[i];
+								if (!name) continue;
+								const norm = statsNameNormalized[i];
+								newStats[name] = stats.stats?.[norm];
+							}
+						} else if (stats.stats) newStats = stats.stats;
+
+						const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
+						csv.push({
+							avatar: stats.avatar,
+							channel: statChannelAsString,
+							charName: char.charName,
+							dice,
+							isPrivate:
+								char.isPrivate !== undefined
+									? char.isPrivate
+									: isPrivateAllowed
+										? false
+										: undefined,
+							user: `'${user}`,
+							...newStats,
+						});
+					} catch (_e) {
+						// Skip character on error
+						return;
 					}
-					const dice: undefined | string =
-						diceLines.length > 0 ? `'${diceLines.join("\n")}` : undefined;
-
-					let newStats: Record<string, number | undefined> = {};
-					if (statsNameNormalized && stats.stats) {
-						for (let i = 0; i < statsNameNormalized.length; i++) {
-							const name = statsName?.[i];
-							if (!name) continue;
-							const norm = statsNameNormalized[i];
-							newStats[name] = stats.stats?.[norm];
-						}
-					} else if (stats.stats) newStats = stats.stats;
-
-					const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
-					csv.push({
-						avatar: stats.avatar,
-						channel: statChannelAsString,
-						charName: char.charName,
-						dice,
-						isPrivate:
-							char.isPrivate !== undefined
-								? char.isPrivate
-								: isPrivateAllowed
-									? false
-									: undefined,
-						user: `'${user}`,
-						...newStats,
-					});
 				})
 			);
 		}
