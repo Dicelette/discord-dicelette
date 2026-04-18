@@ -240,7 +240,7 @@ async function step(
 		const damageNameNormalized: Map<string, string> = new Map();
 		if (guildTemplate.damage) {
 			for (const name of Object.keys(guildTemplate.damage)) {
-				damageNameNormalized.set(name.unidecode(), name);
+				damageNameNormalized.set(name.standardize(), name);
 			}
 		}
 
@@ -251,7 +251,7 @@ async function step(
 						if (match) {
 							let key = match[1].trim();
 							// Map standardized key back to original template name if available
-							const originalKey = damageNameNormalized.get(key.unidecode());
+							const originalKey = damageNameNormalized.get(key.standardize());
 							if (originalKey) key = originalKey;
 							acc[key] = match[2].trim();
 						}
