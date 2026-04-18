@@ -3,6 +3,7 @@ import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import Papa from "papaparse";
+import "uniformize";
 import {
 	type ApiCharacter,
 	type BotChannels,
@@ -385,13 +386,13 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						// Add stats from resolved data
 						if (charData?.stats) {
 							for (const stat of charData.stats) {
-								row[stat.name] = stat.value;
+								row[stat.name.removeBacktick()] = stat.value.removeBacktick();
 							}
 						}
 
 						// Add damage/dice
 						if (charData?.damage && charData.damage.length > 0) {
-							row.dice = `'${charData.damage.map((d) => `- ${d.name}: ${d.value}`).join("\n")}`;
+							row.dice = `'${charData.damage.map((d) => `- ${d.name.removeBacktick()}: ${d.value.removeBacktick()}`).join("\n")}`;
 						}
 
 						rows.push(row);
