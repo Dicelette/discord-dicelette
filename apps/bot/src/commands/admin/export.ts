@@ -9,6 +9,7 @@ import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
 import { getCharacterMessage, getUserFrom } from "../../database/get_user";
+import { getEmbeds } from "../../messages";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -130,11 +131,23 @@ export async function exportCharactersCsv(
 
 						// Only export macros saved in the character's fiche, using original names
 						const diceLines: string[] = [];
-						if (char.damageName && stats.damage) {
-							for (const originalName of char.damageName) {
-								const formula = stats.damage[originalName.standardize()];
-								if (formula)
-									diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
+						if (stats.damage) {
+							// Use char.damageName if available, otherwise extract from embed
+							let macroNames = char.damageName;
+							if (!macroNames || macroNames.length === 0) {
+								// Fallback: extract macro names from Discord embed field names
+								const damageEmbed = getEmbeds(message, "damage");
+								if (damageEmbed?.data?.fields) {
+									macroNames = damageEmbed.data.fields.map((f: any) => f.name);
+								}
+							}
+
+							if (macroNames && macroNames.length > 0) {
+								for (const originalName of macroNames) {
+									const formula = stats.damage[originalName.standardize()];
+									if (formula)
+										diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
+								}
 							}
 						}
 						const dice: undefined | string =
