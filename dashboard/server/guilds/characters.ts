@@ -1,10 +1,4 @@
-import type {
-	Characters,
-	Settings,
-	UserData,
-	UserDatabase,
-	UserGuildData,
-} from "@dicelette/types";
+import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
@@ -483,17 +477,11 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					return;
 				}
 
-				const guildData = settings.get(guildId);
-				if (!guildData) {
-					res.status(404).json({ error: "Guild not found" });
-					return;
-				}
-
-				const results = await parseCharactersCsv(
-					csvText,
+				// Delegate fully to the bot — same logic as /import command
+				const results = await botChannels.bulkImportCharacters(
 					guildId,
-					deleteOldMessage ?? false,
-					{ settings, characters, botChannels }
+					csvText,
+					deleteOldMessage ?? false
 				);
 
 				await sendDashboardLog(
@@ -504,7 +492,6 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				);
 
 				// Invalidate caches
-				charCache.delete(`${guildId}:*all*`);
 				for (const key of [...charCache.keys()]) {
 					if (key.startsWith(`${guildId}:`)) charCache.delete(key);
 				}
@@ -522,147 +509,13 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	return router;
 }
 
-async function parseCharactersCsv(
-	csvText: string,
-	guildId: string,
-	deleteOldMessage: boolean,
-	deps: { settings: Settings; characters: Characters; botChannels: BotChannels }
-): Promise<{ success: number; failed: number; errors: string[] }> {
-	const { settings, characters, botChannels } = deps;
-	const guildData = settings.get(guildId);
-
-	if (!guildData) throw new Error("Guild not found");
-
-	const errors: string[] = [];
-	let success = 0;
-	let failed = 0;
-
-	let csvData: Record<string, string | number | boolean | undefined>[] = [];
-	await new Promise<void>((resolve) => {
-		Papa.parse(csvText.replaceAll(/\s+;\s*/gi, ";"), {
-			header: true,
-			skipEmptyLines: true,
-			complete(
-				results: Papa.ParseResult<Record<string, string | number | boolean | undefined>>
-			) {
-				csvData = results.data;
-				resolve();
-			},
-		});
-	});
-
-	const limiter = pLimit(3);
-
-	const promises = csvData.map((row) =>
-		limiter(async () => {
-			try {
-				const userId = row.user?.toString().replaceAll("'", "").trim();
-				const charName = row.charName;
-				const avatar = row.avatar;
-				const csvChannel = row.channel?.toString().replaceAll("'", "").trim();
-
-				if (!userId) {
-					errors.push("Row skipped: missing user ID");
-					failed++;
-					return;
-				}
-
-				const charNameStr = typeof charName === "string" ? charName : undefined;
-				const avatarStr = typeof avatar === "string" ? avatar : undefined;
-
-				// Register in settings if needed
-				if (!guildData.user) guildData.user = {};
-				if (!guildData.user[userId]) guildData.user[userId] = [];
-
-				const userCharList = guildData.user[userId];
-
-				// Check for existing character
-				const existing = userCharList.findIndex(
-					(c: UserGuildData) =>
-						c.charName === charNameStr || (!charNameStr && !c.charName)
-				);
-
-				let finalChannelId = csvChannel;
-				let finalMessageId: string;
-
-				if (existing !== -1) {
-					// Overwriting existing character
-					const oldChar = userCharList[existing];
-					const [oldMessageId, oldChannelId] = oldChar.messageId;
-
-					// Delete old Discord message if requested
-					if (deleteOldMessage && oldChannelId && oldMessageId) {
-						await botChannels.deleteMessage(oldChannelId, oldMessageId).catch(() => {
-							// Silent fail if message already deleted
-						});
-					}
-
-					// Use new channel from CSV, or keep old channel if CSV doesn't specify
-					finalChannelId = csvChannel || oldChannelId;
-					finalMessageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-				} else {
-					// New character
-					if (!finalChannelId) {
-						errors.push(
-							`${charNameStr || "Default"} for user ${userId}: missing channel in CSV`
-						);
-						failed++;
-						return;
-					}
-					finalMessageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-				}
-
-				// Create/update character data
-				const userData: UserData = {
-					userName: charNameStr ?? null,
-					avatar: avatarStr || undefined,
-					channel: finalChannelId,
-					template: {},
-				};
-
-				const isPrivateVal = row.isPrivate === true || row.isPrivate === "true";
-				const charData: UserGuildData = {
-					charName: charNameStr,
-					messageId: [finalMessageId, finalChannelId],
-					isPrivate: isPrivateVal,
-				};
-
-				if (existing !== -1) {
-					userCharList[existing] = charData;
-				} else {
-					userCharList.push(charData);
-				}
-
-				// Register in memory cache
-				if (!characters.has(guildId)) characters.set(guildId, {});
-				if (!characters.has(guildId, userId))
-					characters.set(guildId, [] as UserData[], userId);
-				const memChars = characters.get(guildId, userId) as UserData[];
-				memChars.push(userData);
-
-				success++;
-			} catch (err) {
-				errors.push(err instanceof Error ? err.message : String(err));
-				failed++;
-			}
-		})
-	);
-
-	await Promise.all(promises);
-	settings.set(guildId, guildData);
-
-	return { success, failed, errors };
-}
-
 function pLimit(concurrency: number) {
 	let activeCount = 0;
 	const queue: Array<() => void> = [];
-
 	const next = () => {
 		activeCount--;
 		queue.shift()?.();
 	};
-
 	return async function limit<T>(fn: () => Promise<T>): Promise<T> {
 		if (activeCount >= concurrency) {
 			return new Promise<T>((resolve, reject) => {
