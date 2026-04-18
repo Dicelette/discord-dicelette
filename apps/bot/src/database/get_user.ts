@@ -209,6 +209,39 @@ export async function getUser(
 	);
 }
 
+export async function getUserWithMacroNames(
+	messageId: UserMessageId,
+	guild: Djs.Guild,
+	client: EClient,
+	options?: {
+		integrateCombinaison?: boolean;
+		fetchAvatar?: boolean;
+		fetchChannel?: boolean;
+		cleanUrl?: boolean;
+	}
+) {
+	const message = await getCharacterMessage(messageId, guild, client);
+	if (!message) return;
+
+	const userData = getUserByEmbed(
+		{ message },
+		false,
+		options?.integrateCombinaison ?? true,
+		options?.fetchAvatar ?? false,
+		options?.fetchChannel ?? false,
+		options?.cleanUrl ?? true
+	);
+
+	// Extract original macro names from embed field names (preserve accents)
+	const macroNames: string[] = [];
+	const damageEmbed = getEmbeds(message, "damage");
+	if (damageEmbed?.data?.fields) {
+		macroNames.push(...damageEmbed.data.fields.map((f: any) => f.name));
+	}
+
+	return { userData, macroNames };
+}
+
 export async function getUserFrom(
 	client: EClient,
 	userId: string,

@@ -8,8 +8,7 @@ import { ln, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getEmbeds } from "messages";
-import { getCharacterMessage, getUser } from "../../database/get_user";
+import { getUserWithMacroNames } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -111,28 +110,21 @@ export async function exportCharactersCsv(
 			tasks.push(
 				limit(async () => {
 					try {
-						const userData = await getUser(char.messageId, guild, client, {
+						const result = await getUserWithMacroNames(char.messageId, guild, client, {
 							fetchAvatar: true,
 							fetchChannel: true,
 							cleanUrl: false,
 						});
+						if (!result) return;
+						const { userData, macroNames } = result;
 						if (!userData) return;
 
-						// Export macros with original field names from embed
+						// Export macros with original names (from embed field names)
 						const diceLines: string[] = [];
-						if (userData.damage) {
-							// userData.damage keys are standardized, but we need original names from embed
-							// Re-fetch the message to get original field names
-							const message = await getCharacterMessage(char.messageId, guild, client);
-							if (message) {
-								const damageEmbed = getEmbeds(message, "damage");
-								if (damageEmbed?.data?.fields) {
-									for (const field of damageEmbed.data.fields as Djs.APIEmbedField[]) {
-										const formula = userData.damage[field.name.standardize()];
-										if (formula)
-											diceLines.push(`- ${field.name}${ul("common.space")}: ${formula}`);
-									}
-								}
+						if (macroNames && userData.damage) {
+							for (const name of macroNames) {
+								const formula = userData.damage[name.standardize()];
+								if (formula) diceLines.push(`- ${name}${ul("common.space")}: ${formula}`);
 							}
 						}
 						const dice: undefined | string =
