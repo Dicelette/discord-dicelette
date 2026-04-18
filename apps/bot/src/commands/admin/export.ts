@@ -129,25 +129,14 @@ export async function exportCharactersCsv(
 						const userData = result?.userData;
 						if (!userData) return;
 
-						// Only export macros saved in the character's fiche, using original names
+						// Read macro names directly from embed fields (always up to date)
 						const diceLines: string[] = [];
-						if (userData.damage) {
-							// Use char.damageName if available, otherwise extract from embed
-							let macroNames = char.damageName;
-							if (!macroNames || macroNames.length === 0) {
-								// Fallback: extract macro names from Discord embed field names
-								const damageEmbed = getEmbeds(message, "damage");
-								if (damageEmbed?.data?.fields) {
-									macroNames = damageEmbed.data.fields.map((f: any) => f.name);
-								}
-							}
-
-							if (macroNames && macroNames.length > 0) {
-								for (const originalName of macroNames) {
-									const formula = userData.damage[originalName.standardize()];
-									if (formula)
-										diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
-								}
+						const damageEmbed = getEmbeds(message, "damage");
+						if (damageEmbed?.data?.fields && userData.damage) {
+							for (const field of damageEmbed.data.fields as Djs.APIEmbedField[]) {
+								const formula = userData.damage[field.name.standardize()];
+								if (formula)
+									diceLines.push(`- ${field.name}${ul("common.space")}: ${formula}`);
 							}
 						}
 						const dice: undefined | string =

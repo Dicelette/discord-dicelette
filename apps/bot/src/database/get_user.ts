@@ -196,7 +196,7 @@ export async function getUser(
 	return getUserByEmbed({ message });
 }
 
-async function getUserFrom(
+export async function getUserFrom(
 	client: EClient,
 	userId: string,
 	charName: string | null | undefined,
