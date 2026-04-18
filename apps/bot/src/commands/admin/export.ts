@@ -8,7 +8,7 @@ import { ln, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getUserFrom } from "../../database/get_user";
+import { getCharacterMessage, getUserFrom } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -93,6 +93,9 @@ export async function exportCharactersCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
+	const guild = await client.guilds.fetch(guildId);
+	if (!guild) return null;
+
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
 
@@ -107,18 +110,7 @@ export async function exportCharactersCsv(
 			tasks.push(
 				limit(async () => {
 					try {
-						const channel = await client.channels.fetch(char.messageId[1]);
-						if (
-							!channel ||
-							channel instanceof Djs.CategoryChannel ||
-							channel instanceof Djs.ForumChannel ||
-							channel instanceof Djs.MediaChannel ||
-							!("messages" in channel)
-						) {
-							return;
-						}
-
-						const message = await channel.messages.fetch(char.messageId[0]);
+						const message = await getCharacterMessage(char.messageId, guild, client);
 						if (!message) return;
 
 						const result = await getUserFrom(
