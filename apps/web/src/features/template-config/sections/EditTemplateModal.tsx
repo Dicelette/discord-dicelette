@@ -40,7 +40,12 @@ const hiddenSx = { display: "none" } as const;
 const visibleSx = {} as const;
 const captionIndentSx = { mt: 0.5, pl: 0.5 } as const;
 const loadingBoxSx = { display: "flex", justifyContent: "center", py: 8 } as const;
-const filePaperSx = { p: 1.5, bgcolor: "action.hover", borderColor: "divider" } as const;
+const filePaperSx = {
+	p: 1.5,
+	bgcolor: "action.hover",
+	borderColor: "divider",
+} as const;
+const channelsTabStackSx = { mt: 1 } as const;
 const fileRowSx = {
 	display: "flex",
 	alignItems: "center",
@@ -162,7 +167,7 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 				<Stack spacing={2} sx={{ px: 3, pb: 2 }}>
 					{/* Channels tab */}
 					<Box sx={activeTab === "channels" ? visibleSx : hiddenSx}>
-						<Stack spacing={2}>
+						<Stack spacing={2} sx={channelsTabStackSx}>
 							<Paper variant="outlined" sx={filePaperSx}>
 								<Stack spacing={0.75}>
 									<Typography variant="subtitle2" sx={subtitleBoldSx}>

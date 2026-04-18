@@ -196,8 +196,7 @@ export async function getUser(
 	return getUserByEmbed({ message });
 }
 
-// Factored function to extract common logic between variants
-export async function getUserFrom(
+async function getUserFrom(
 	client: EClient,
 	userId: string,
 	charName: string | null | undefined,
