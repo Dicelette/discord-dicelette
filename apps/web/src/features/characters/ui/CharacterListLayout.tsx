@@ -6,13 +6,19 @@ import {
 	CircularProgress,
 	InputAdornment,
 	Pagination,
+	type SxProps,
 	TextField,
+	type Theme,
 	Typography,
 } from "@mui/material";
 import type { ReactNode } from "react";
 
-const loadingBoxSx = { display: "flex", justifyContent: "center", p: 6 } as const;
-const headerGridWithSearchSx = {
+const loadingBoxSx: SxProps<Theme> = {
+	display: "flex",
+	justifyContent: "center",
+	p: 6,
+} as const;
+const headerGridWithSearchSx: SxProps<Theme> = {
 	display: "grid",
 	gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
 	gridTemplateAreas: { xs: '"title" "search"', sm: '"title search"' },
@@ -20,7 +26,7 @@ const headerGridWithSearchSx = {
 	gap: 2,
 	mb: 3,
 } as const;
-const headerGridNoSearchSx = {
+const headerGridNoSearchSx: SxProps<Theme> = {
 	display: "grid",
 	gridTemplateColumns: { xs: "1fr", sm: "auto 1fr" },
 	gridTemplateAreas: { xs: '"title"', sm: '"title ."' },
@@ -28,15 +34,26 @@ const headerGridNoSearchSx = {
 	gap: 2,
 	mb: 3,
 } as const;
-const titleTypographySx = { whiteSpace: "nowrap", gridArea: "title" } as const;
-const searchFieldSx = {
+const titleTypographySx: SxProps<Theme> = {
+	whiteSpace: "nowrap",
+	gridArea: "title",
+} as const;
+const searchFieldSx: SxProps<Theme> = {
 	gridArea: "search",
 	width: { xs: "100%", sm: 320 },
 	justifySelf: { xs: "stretch", sm: "end" },
 } as const;
-const alertSx = { mb: 2 } as const;
-const listBoxSx = { display: "flex", flexDirection: "column", gap: 3 } as const;
-const paginationBoxSx = { display: "flex", justifyContent: "center", mt: 3 } as const;
+const alertSx: SxProps<Theme> = { mb: 2 } as const;
+const listBoxSx: SxProps<Theme> = {
+	display: "flex",
+	flexDirection: "column",
+	gap: 3,
+} as const;
+const paginationBoxSx: SxProps<Theme> = {
+	display: "flex",
+	justifyContent: "center",
+	mt: 3,
+} as const;
 
 interface Props {
 	title: string;
@@ -53,7 +70,16 @@ interface Props {
 	totalPages: number;
 	emptyText: string;
 	renderCard: (char: ApiCharacter) => ReactNode;
+	actions?: ReactNode;
 }
+
+const actionSx: SxProps<Theme> = {
+	mb: 2,
+	display: "flex",
+	gap: 1,
+	justifyContent: "space-evenly",
+	flexDirection: { xs: "column", sm: "row" },
+} as const;
 
 export default function CharacterListLayout({
 	title,
@@ -70,6 +96,7 @@ export default function CharacterListLayout({
 	totalPages,
 	emptyText,
 	renderCard,
+	actions,
 }: Props) {
 	if (loading) {
 		return (
@@ -105,6 +132,8 @@ export default function CharacterListLayout({
 					/>
 				)}
 			</Box>
+
+			{actions && <Box sx={actionSx}>{actions}</Box>}
 
 			{error && (
 				<Alert severity="error" sx={alertSx} onClose={onCloseError}>
