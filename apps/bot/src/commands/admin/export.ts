@@ -5,10 +5,10 @@
 import type { EClient } from "@dicelette/client";
 import { type CSVRow, getGuildContext } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
-import type { UserData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
+import { getUser } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -32,6 +32,7 @@ function pLimit(concurrency: number) {
 		try {
 			return await fn();
 		} finally {
+			next();
 		}
 	};
 }
@@ -88,10 +89,12 @@ export async function exportCharactersCsv(
 	const statsName = ctx?.templateID?.statsName;
 	const isPrivateAllowed = !!client.settings.get(guildId, "privateChannel");
 
-	// precompute normalized stat keys if template provides names
 	const statsNameNormalized: string[] | undefined = statsName
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
+
+	const guild = await client.guilds.fetch(guildId);
+	if (!guild) return null;
 
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
@@ -106,16 +109,8 @@ export async function exportCharactersCsv(
 		for (const char of chara) {
 			tasks.push(
 				limit(async () => {
-					// Get character data from in-memory cache
-					const memChars: UserData[] =
-						(client.characters.get(guildId, user) as UserData[] | undefined) ?? [];
-					const charData = memChars.find((c) => {
-						if (c.userName && char.charName)
-							return c.userName.unidecode() === char.charName.unidecode();
-						return !c.userName && !char.charName;
-					});
-					if (!charData) return;
-					const stats = charData;
+					const stats = await getUser(char.messageId, guild, client);
+					if (!stats) return;
 
 					// Only export macros saved in the character's fiche, using original names
 					const diceLines: string[] = [];
@@ -129,7 +124,6 @@ export async function exportCharactersCsv(
 					const dice: undefined | string =
 						diceLines.length > 0 ? `'${diceLines.join("\n")}` : undefined;
 
-					// map stats according to template names (preserve accented names in CSV header)
 					let newStats: Record<string, number | undefined> = {};
 					if (statsNameNormalized && stats.stats) {
 						for (let i = 0; i < statsNameNormalized.length; i++) {
