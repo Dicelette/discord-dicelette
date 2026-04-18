@@ -93,6 +93,15 @@ export async function exportCharactersCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
+	// precompute damage name mapping (preserve original names with accents)
+	const damageName = ctx?.templateID?.damageName;
+	const damageNameNormalized: Map<string, string> = new Map();
+	if (damageName) {
+		for (const name of damageName) {
+			damageNameNormalized.set(name.unidecode(), name);
+		}
+	}
+
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
 
@@ -118,9 +127,13 @@ export async function exportCharactersCsv(
 					const stats = charData;
 
 					// dice lines with localized separator/space
+					// Map standardized keys back to original template names (preserve accents)
 					const dice: undefined | string = stats.damage
 						? `'${Object.keys(stats.damage)
-								.map((key) => `- ${key}${ul("common.space")}: ${stats.damage?.[key]}`)
+								.map((key) => {
+									const originalName = damageNameNormalized.get(key) ?? key;
+									return `- ${originalName}${ul("common.space")}: ${stats.damage?.[key]}`;
+								})
 								.join("\n")}`
 						: undefined;
 
