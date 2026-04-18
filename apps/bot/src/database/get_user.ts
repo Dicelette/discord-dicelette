@@ -189,8 +189,8 @@ export async function getUser(
 	}
 }
 
-// Internal factored function to extract common logic between two variants
-async function getUserFrom(
+// Factored function to extract common logic between variants
+export async function getUserFrom(
 	client: EClient,
 	userId: string,
 	charName: string | null | undefined,
