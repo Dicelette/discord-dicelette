@@ -217,7 +217,7 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 	const userPromises = Object.entries(allUsers).map(async ([userId, chars]) => {
 		if (!Array.isArray(chars)) return;
 		const characterPromises = chars.map((char) =>
-			getUser(char.messageId, guild, client).then((r) => r?.userData)
+			getUser(char.messageId, guild, client).then((r) => r)
 		);
 		const allCharacters = (await Promise.all(characterPromises)).filter(
 			Boolean

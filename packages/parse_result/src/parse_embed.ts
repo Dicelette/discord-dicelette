@@ -88,14 +88,22 @@ export function parseEmbedFields(
 	return parsedFields;
 }
 
-export function parseDamageFields(embed: Djs.Embed): Record<string, string> {
+export function parseDamageFields(
+	embed: Djs.Embed,
+	standardize?: boolean
+): Record<string, string> {
 	const fields = embed?.fields;
 	if (!fields) return {};
 	const parsedFields: Record<string, string> = {};
 	for (const field of fields) {
 		const { name, value } = field;
-		const standardizedValue = standardizeDice(value);
-		parsedFields[name.standardize()] = standardizedValue.removeBacktick();
+		let dice = value;
+		let fieldName = name;
+		if (standardize) {
+			dice = standardizeDice(value);
+			fieldName = name.standardize();
+		}
+		parsedFields[fieldName] = dice;
 	}
 	return parsedFields;
 }

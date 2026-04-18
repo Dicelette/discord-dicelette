@@ -60,7 +60,8 @@ export function getUserByEmbed(
 	integrateCombinaison = true,
 	fetchAvatar = false,
 	fetchChannel = false,
-	cleanUrl = true
+	cleanUrl = true,
+	standardize = true
 ) {
 	const { message, embeds } = data;
 	const user: Partial<UserData> = {};
@@ -77,7 +78,7 @@ export function getUserByEmbed(
 	const statsFields = getEmbeds(message, "stats", embeds)?.data as Djs.Embed;
 	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
 	const damageFields = getEmbeds(message, "damage", embeds)?.data as Djs.Embed;
-	const templateDamage = parseDamageFields(damageFields);
+	const templateDamage = parseDamageFields(damageFields, standardize);
 	const templateEmbed = first ? userEmbed : getEmbeds(message, "template", embeds);
 	user.damage = templateDamage;
 	user.template = parseTemplateField(parseEmbedFields(templateEmbed?.data as Djs.Embed));
@@ -195,28 +196,21 @@ export async function getUser(
 		fetchAvatar?: boolean;
 		fetchChannel?: boolean;
 		cleanUrl?: boolean;
+		standardize?: boolean;
 	}
 ) {
 	const message = await getCharacterMessage(messageId, guild, client);
 	if (!message) return;
 
-	const userData = getUserByEmbed(
+	return getUserByEmbed(
 		{ message },
 		false,
 		options?.integrateCombinaison ?? true,
 		options?.fetchAvatar ?? false,
 		options?.fetchChannel ?? false,
-		options?.cleanUrl ?? true
+		options?.cleanUrl ?? true,
+		options?.standardize ?? true
 	);
-
-	// Extract original macro names from embed field names (preserve accents)
-	const macroNames: string[] = [];
-	const damageEmbed = getEmbeds(message, "damage");
-	if (damageEmbed?.data?.fields) {
-		macroNames.push(...damageEmbed.data.fields.map((f: any) => f.name));
-	}
-
-	return { userData, macroNames };
 }
 
 export async function getUserFrom(
