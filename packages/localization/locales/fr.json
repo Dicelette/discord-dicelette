@@ -97,6 +97,26 @@
 		"options": "Channel des résultats",
 		"set": "Le channel {{- channel}} a été enregistré pour y envoyer les résultats des dés."
 	},
+	"characters": {
+		"csvFile": "Fichier CSV",
+		"dashboardImportLog": "[Dashboard] <@{{- userId}}> a importé {{success}} personnage(s) via l'import par CSV ({{failed}} import(s) échoué(s))",
+		"deleteOldMessage": "Supprimer l'ancien message",
+		"deleteOldMessageHelp": "Lors de la réimportation d'un personnage, supprimer l'ancien message pour éviter les doublons",
+		"filterPlaceholder": "Chercher mes personnages...",
+		"format": "Format",
+		"import": "Importer des personnages",
+		"importError": "Veuillez fournir un contenu CSV",
+		"importResult": "Import terminé: {{success}} personnages importés, {{failed}} échoués",
+		"importTitle": "Importer des personnages depuis CSV",
+		"loadError": "Impossible de charger les personnages",
+		"noCharacters": "Aucun personnage trouvé",
+		"noResults": "Aucun personnage ne correspond à votre recherche",
+		"serverFilterPlaceholder": "Chercher des personnages...",
+		"serverTitle": "Personnages du serveur",
+		"sheetLink": "Ouvrir dans Discord",
+		"title": "Mes personnages",
+		"unnamed": "Sans nom"
+	},
 	"choose": {
 		"description": "Choisir une valeur aléatoire dans une liste",
 		"list": {
@@ -123,6 +143,7 @@
 		"channel": "channel",
 		"charName": "Nom du personnage",
 		"character": "personnage",
+		"close": "Fermer",
 		"comments": "commentaires",
 		"confirm": "Confirmer la suppression",
 		"context": "Contexte",
@@ -153,8 +174,7 @@
 		"total": "Total",
 		"true": "Vrai",
 		"user": "Joueur",
-		"yes": "✓",
-		"close": "Fermer"
+		"yes": "✓"
 	},
 	"config": {
 		"admin": {
@@ -780,6 +800,7 @@
 	"info": {
 		"author": "Fait avec 💖 par Mara__Li",
 		"count": "Nombre de serveur",
+		"dashboard": "Dashboard",
 		"description": "Affiche des informations génériques sur le bot",
 		"docs": "Documentation",
 		"kofi": "Kofi",
@@ -787,8 +808,7 @@
 		"presentation": "Dicelette est un bot écrit en Typescript et open-source dédié aux lancé de dés :\n- Support d'expressions complexes,\n- Organisation automatique des résultats et journalisation,\n- Création de snippets\n- Création de modèle de fiche de personnages\n- Personnalisation avancée : auto-rôle, suppression HRP,…",
 		"title": "info",
 		"uptime": "Uptime",
-		"version": "Version",
-		"dashboard": "Dashboard"
+		"version": "Version"
 	},
 	"legacy": {
 		"dice": "Dés de compétences"
@@ -1217,23 +1237,5 @@
 				"title": "lister"
 			}
 		}
-	},
-	"characters": {
-		"import": "Importer des personnages",
-		"importTitle": "Importer des personnages depuis CSV",
-		"importResult": "Import terminé: {{success}} personnages importés, {{failed}} échoués",
-		"csvFile": "Fichier CSV",
-		"deleteOldMessage": "Supprimer l'ancien message",
-		"deleteOldMessageHelp": "Lors de la réimportation d'un personnage, supprimer l'ancien message pour éviter les doublons",
-		"noCharacters": "Aucun personnage trouvé",
-		"noResults": "Aucun personnage ne correspond à votre recherche",
-		"serverTitle": "Personnages du serveur",
-		"serverFilterPlaceholder": "Chercher des personnages...",
-		"title": "Mes personnages",
-		"filterPlaceholder": "Chercher mes personnages...",
-		"unnamed": "Sans nom",
-		"sheetLink": "Ouvrir dans Discord",
-		"loadError": "Impossible de charger les personnages",
-		"importError": "Veuillez fournir un contenu CSV"
 	}
 }

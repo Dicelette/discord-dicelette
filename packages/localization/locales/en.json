@@ -97,6 +97,26 @@
 		"options": "Results channel",
 		"set": "The channel {{- channel}} has been registered to send the dice results."
 	},
+	"characters": {
+		"csvFile": "CSV File",
+		"dashboardImportLog": "[Dashboard] <@{{- userId}}> imported {{success}} character(s) via CSV import ({{failed}} failed import)",
+		"deleteOldMessage": "Delete old message",
+		"deleteOldMessageHelp": "When reimporting a character, delete the old message to avoid duplicates",
+		"filterPlaceholder": "Search my characters...",
+		"format": "Format",
+		"import": "Import Characters",
+		"importError": "Please provide CSV content",
+		"importResult": "Import completed: {{success}} characters imported, {{failed}} failed",
+		"importTitle": "Import Characters from CSV",
+		"loadError": "Failed to load characters",
+		"noCharacters": "No characters found",
+		"noResults": "No characters match your search",
+		"serverFilterPlaceholder": "Search characters...",
+		"serverTitle": "Server Characters",
+		"sheetLink": "Open in Discord",
+		"title": "My Characters",
+		"unnamed": "Unnamed"
+	},
 	"choose": {
 		"description": "Choose a random value in a list",
 		"list": {
@@ -123,6 +143,7 @@
 		"channel": "channel",
 		"charName": "Character name",
 		"character": "character",
+		"close": "Close",
 		"comments": "comments",
 		"confirm": "Confirm deletion",
 		"context": "Context",
@@ -153,8 +174,7 @@
 		"total": "Total",
 		"true": "True",
 		"user": "Player",
-		"yes": "✓",
-		"close": "Close"
+		"yes": "✓"
 	},
 	"config": {
 		"admin": {
@@ -780,6 +800,7 @@
 	"info": {
 		"author": "Made with 💖 by Mara__Li",
 		"count": "Number of servers",
+		"dashboard": "Dashboard",
 		"description": "Display generic information on the bot",
 		"docs": "Documentation",
 		"kofi": "Kofi",
@@ -787,8 +808,7 @@
 		"presentation": "Dicelette is a bot written in Typescript and open-source dedicated to dice rolls:\n- Complex expression support,\n- Automatic results organization and logging,\n- Creation of snippets\n- Character template creation\n- Advanced customization: auto-role, HRP deletion, etc.",
 		"title": "info",
 		"uptime": "Uptime",
-		"version": "Version",
-		"dashboard": "Dashboard"
+		"version": "Version"
 	},
 	"legacy": {
 		"dice": "Skill Dice"
@@ -1217,23 +1237,5 @@
 				"title": "list"
 			}
 		}
-	},
-	"characters": {
-		"import": "Import Characters",
-		"importTitle": "Import Characters from CSV",
-		"importResult": "Import completed: {{success}} characters imported, {{failed}} failed",
-		"csvFile": "CSV File",
-		"deleteOldMessage": "Delete old message",
-		"deleteOldMessageHelp": "When reimporting a character, delete the old message to avoid duplicates",
-		"noCharacters": "No characters found",
-		"noResults": "No characters match your search",
-		"serverTitle": "Server Characters",
-		"serverFilterPlaceholder": "Search characters...",
-		"title": "My Characters",
-		"filterPlaceholder": "Search my characters...",
-		"unnamed": "Unnamed",
-		"sheetLink": "Open in Discord",
-		"loadError": "Failed to load characters",
-		"importError": "Please provide CSV content"
 	}
 }

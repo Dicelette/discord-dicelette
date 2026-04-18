@@ -1,4 +1,5 @@
 import type { EventEmitter } from "node:events";
+import { resolveCsvImportAvatar } from "@dicelette/helpers";
 import { ln } from "@dicelette/localization";
 import { startDashboardServer } from "@dicelette/server";
 import type { UserData, UserGuildData } from "@dicelette/types";
@@ -6,8 +7,7 @@ import * as Djs from "discord.js";
 import type { EClient } from "./client";
 import { exportCharactersCsv } from "./commands/admin/export";
 import { templateEmbed } from "./commands/admin/template";
-import { getTemplate } from "./database";
-import { updateMemory } from "./database/memory";
+import { getTemplate, updateMemory } from "./database";
 import {
 	bulkEditTemplateUserCore,
 	createDefaultThread,
@@ -340,16 +340,34 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 										);
 
 									// Build embeds — same logic as buildEmbedsForCharacter in import.ts
-									const memberUser = guild.members.cache.get(userId)?.user ?? null;
-									const avatarUrl = char.avatar ?? memberUser?.displayAvatarURL() ?? null;
-
-									const userDataEmbed = createUserEmbed(
-										ul,
-										avatarUrl,
-										userId,
-										char.userName ?? undefined
-									);
-									char.avatar = userDataEmbed.data?.thumbnail?.url;
+									const memberUser =
+										guild.members.cache.get(userId)?.user ??
+										(await guild.members
+											.fetch(userId)
+											.then((m) => m.user)
+											.catch(() => null));
+									let userDataEmbed: Djs.EmbedBuilder;
+									if (memberUser) {
+										const resolvedAvatar = await resolveCsvImportAvatar({
+											avatar: char.avatar,
+											guild,
+											user: memberUser,
+										});
+										userDataEmbed = createUserEmbed(
+											ul,
+											resolvedAvatar.avatarUrl,
+											userId,
+											char.userName ?? undefined
+										);
+										char.avatar = userDataEmbed.data?.thumbnail?.url;
+									} else {
+										userDataEmbed = createUserEmbed(
+											ul,
+											null,
+											userId,
+											char.userName ?? undefined
+										);
+									}
 
 									const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
 									let diceEmbed = guildTemplate.damage ? createDiceEmbed(ul) : undefined;
@@ -415,7 +433,6 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 									);
 									const hasDice = !!diceEmbed;
 									const hasStats = !!statsEmbed;
-									const hasTemplate = !!templateEmbedBuilder;
 
 									const components = [
 										editUserButtons(ul, hasStats, hasDice),

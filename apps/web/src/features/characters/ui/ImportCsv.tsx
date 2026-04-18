@@ -1,5 +1,6 @@
 import { charactersApi } from "@dicelette/api";
 import DownloadIcon from "@mui/icons-material/Download";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import {
 	Alert,
 	Box,
@@ -26,6 +27,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 	const { t } = useI18n();
 	const [open, setOpen] = useState(false);
 	const [csvText, setCsvText] = useState("");
+	const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 	const [deleteOldMessage, setDeleteOldMessage] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState<{
@@ -38,6 +40,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (!file) return;
+		setSelectedFileName(file.name);
 
 		const reader = new FileReader();
 		reader.onload = (e) => {
@@ -45,6 +48,16 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 			setCsvText(text);
 		};
 		reader.readAsText(file);
+		// Allow selecting the same file again and still trigger onChange.
+		event.target.value = "";
+	};
+
+	const handleCloseDialog = () => {
+		setOpen(false);
+		setSelectedFileName(null);
+		setCsvText("");
+		setError(null);
+		setResult(null);
 	};
 
 	const handleImport = async () => {
@@ -66,8 +79,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 			setResult(result);
 			if (result.failed === 0) {
 				onSuccess();
-				setOpen(false);
-				setCsvText("");
+				handleCloseDialog();
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Import failed");
@@ -86,7 +98,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 				{t("characters.import")}
 			</Button>
 
-			<Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+			<Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
 				<DialogTitle>{t("characters.importTitle")}</DialogTitle>
 				<DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
 					{error && <Alert severity="error">{error}</Alert>}
@@ -113,24 +125,41 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 					) : (
 						<>
 							<Box>
-								<Typography variant="subtitle2">{t("characters.csvFile")}</Typography>
-								<input
-									type="file"
-									accept=".csv"
-									onChange={handleFileUpload}
-									disabled={loading}
-								/>
+								<Box
+									sx={{
+										display: "flex",
+										alignItems: "center",
+										columnGap: 1,
+										rowGap: 0.5,
+										flexWrap: "wrap",
+									}}
+								>
+									<Button
+										variant="outlined"
+										component="label"
+										startIcon={<UploadFileIcon />}
+										disabled={loading}
+									>
+										{t("characters.csvFile")}
+										<input
+											hidden
+											type="file"
+											accept=".csv"
+											onChange={handleFileUpload}
+											disabled={loading}
+										/>
+									</Button>
+									<Typography
+										variant="body2"
+										color={selectedFileName ? "text.primary" : "text.secondary"}
+										sx={{ lineHeight: 1.4 }}
+									>
+										{selectedFileName || t("template.fileNotSelected")}
+									</Typography>
+								</Box>
 							</Box>
-
-							<Box sx={{ p: 2, bgcolor: "grey.100", borderRadius: 1 }}>
-								<Typography variant="caption">
-									<strong>CSV Format:</strong> user;charName;avatar;channel;[stats];dice
-									<br />
-									<strong>Note:</strong> user can be user ID, username, or Discord tag
-								</Typography>
-							</Box>
-
 							<FormControlLabel
+								sx={{ alignItems: "flex-start", ml: 0, mt: 0.5 }}
 								control={
 									<Checkbox
 										checked={deleteOldMessage}
@@ -139,7 +168,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 									/>
 								}
 								label={
-									<Box>
+									<Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
 										<Typography variant="body2">
 											{t("characters.deleteOldMessage")}
 										</Typography>
@@ -149,13 +178,19 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 									</Box>
 								}
 							/>
-
+							<Alert severity="info">
+								<Typography variant="caption" gutterBottom>
+									{t("characters.format")}
+									{t("common.space")}:{" "}
+									<code>user;charName;avatar;channel;[stats];dice</code>
+								</Typography>
+							</Alert>
 							{loading && <LinearProgress />}
 						</>
 					)}
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setOpen(false)} disabled={loading}>
+					<Button onClick={handleCloseDialog} disabled={loading}>
 						{result ? t("common.close") : t("common.cancel")}
 					</Button>
 					{!result && (

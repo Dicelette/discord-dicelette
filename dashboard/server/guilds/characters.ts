@@ -1,3 +1,4 @@
+import { ln } from "@dicelette/localization";
 import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
@@ -393,9 +394,17 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					csvText,
 					deleteOldMessage ?? false
 				);
+				const lang = (settings.get(guildId, "lang") ?? "en-US") as Parameters<
+					typeof ln
+				>[0];
+				const ul = ln(lang);
 
 				await sendDashboardLog(
-					`[Dashboard] <@${userId}> imported ${results.success} character(s) via CSV (${results.failed} failed)`,
+					ul("characters.dashboardImportLog", {
+						failed: results.failed,
+						success: results.success,
+						userId,
+					}),
 					guildId,
 					settings,
 					botChannels

@@ -93,3 +93,59 @@ export async function reuploadAvatar(
 	const name = `attachment://${avatar.name}`;
 	return { name, newAttachment };
 }
+
+/**
+ * Resolve avatar for CSV import: prefer input avatar, fallback to member/user avatar if CDN is stale,
+ * optionally reupload Discord CDN URLs to attachments.
+ */
+export async function resolveCsvImportAvatar(params: {
+	avatar?: string | null;
+	guild: Guild;
+	user: User;
+	member?: GuildMember;
+	reuploadDiscordCdn?: boolean;
+	ul?: Translation;
+}): Promise<{
+	avatarUrl: string | null;
+	files: Djs.AttachmentBuilder[];
+}> {
+	const { avatar, guild, user, member, reuploadDiscordCdn = false, ul } = params;
+	const fallbackAvatarUrl = await fetchAvatarUrl(guild, user, member);
+
+	if (!avatar)
+		return {
+			avatarUrl: fallbackAvatarUrl,
+			files: [],
+		};
+
+	if (!avatar.match(QUERY_URL_PATTERNS.DISCORD_CDN))
+		return {
+			avatarUrl: avatar,
+			files: [],
+		};
+
+	if (!reuploadDiscordCdn)
+		return {
+			avatarUrl: fallbackAvatarUrl,
+			files: [],
+		};
+
+	if (!ul)
+		throw new BotError("Missing translator for Discord CDN avatar reupload", {
+			cause: "CSV_AVATAR_REUPLOAD",
+			level: BotErrorLevel.Warning,
+		});
+
+	const res = await reuploadAvatar(
+		{
+			name: avatar.split("?")[0].split("/").pop() ?? "avatar.png",
+			url: avatar,
+		},
+		ul
+	);
+
+	return {
+		avatarUrl: res.name,
+		files: [res.newAttachment],
+	};
+}

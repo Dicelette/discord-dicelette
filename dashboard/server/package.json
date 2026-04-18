@@ -7,6 +7,7 @@
 	},
 	"dependencies": {
 		"@dicelette/core": "^1.26.0",
+		"@dicelette/localization": "workspace:*",
 		"@dicelette/types": "workspace:*",
 		"cors": "^2.8.5",
 		"discord-api-types": "^0.37.115",

@@ -103,7 +103,7 @@ export function parseDamageFields(
 			dice = standardizeDice(value);
 			fieldName = name.standardize();
 		}
-		parsedFields[fieldName] = dice;
+		parsedFields[fieldName.removeBacktick()] = dice.removeBacktick();
 	}
 	return parsedFields;
 }
