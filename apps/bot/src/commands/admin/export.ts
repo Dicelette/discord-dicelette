@@ -5,10 +5,11 @@
 import type { EClient } from "@dicelette/client";
 import { type CSVRow, getGuildContext } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
+import type { UserData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getUser } from "../../database/get_user";
+import { getUserFromInteraction } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -32,6 +33,7 @@ function pLimit(concurrency: number) {
 		try {
 			return await fn();
 		} finally {
+			next();
 		}
 	};
 }
@@ -55,7 +57,7 @@ export const exportData = {
 		const isPrivate = options.getBoolean(t("export.options.name")) ?? undefined;
 		const guildId = interaction.guild.id;
 		await interaction.deferReply();
-		const buffer = await exportCharactersCsv(client, guildId, isPrivate);
+		const buffer = await exportCharactersCsv(client, guildId, isPrivate, interaction);
 		if (!buffer) {
 			await interaction.editReply(t("export.error.noData"));
 			return;
@@ -74,7 +76,8 @@ export const exportData = {
 export async function exportCharactersCsv(
 	client: EClient,
 	guildId: string,
-	isPrivate?: boolean
+	isPrivate?: boolean,
+	interaction?: Djs.BaseInteraction
 ): Promise<Buffer | null> {
 	const guildData = client.settings.get(guildId);
 	if (!guildData) return null;
@@ -93,11 +96,10 @@ export async function exportCharactersCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
-	const guild = await client.guilds.fetch(guildId);
-	if (!guild) return null;
-
-	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
+
+	// p-limit only needed when fetching from Discord API (with interaction)
+	const limit = interaction ? pLimit(10) : <T>(fn: () => Promise<T>) => fn();
 
 	for (const [user, data] of Object.entries(allUser)) {
 		const chara = isPrivate
@@ -109,8 +111,27 @@ export async function exportCharactersCsv(
 		for (const char of chara) {
 			tasks.push(
 				limit(async () => {
-					// Get character data from Discord
-					const stats = await getUser(char.messageId, guild, client);
+					let stats: UserData | undefined;
+					if (interaction) {
+						// Fetch fresh from Discord embed
+						stats = (
+							await getUserFromInteraction(client, user, interaction, char.charName, {
+								cleanUrl: false,
+								fetchAvatar: true,
+								fetchChannel: true,
+								skipNotFound: true,
+							})
+						)?.userData;
+					} else {
+						// Dashboard: data already in memory cache
+						const memChars: UserData[] =
+							(client.characters.get(guildId, user) as UserData[] | undefined) ?? [];
+						stats = memChars.find((c) => {
+							if (c.userName && char.charName)
+								return c.userName.unidecode() === char.charName.unidecode();
+							return !c.userName && !char.charName;
+						});
+					}
 					if (!stats) return;
 
 					// Only export macros saved in the character's fiche, using original names
