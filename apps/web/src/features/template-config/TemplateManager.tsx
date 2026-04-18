@@ -24,10 +24,14 @@ export default function TemplateManager({
 	defaultPublicChannelId,
 	defaultPrivateChannelId,
 	defaultTemplateChannelId,
+	onTemplateChange,
+	onCharactersDeleted,
 }: Props & {
 	defaultPublicChannelId?: string;
 	defaultPrivateChannelId?: string;
 	defaultTemplateChannelId?: string;
+	onTemplateChange?: () => void;
+	onCharactersDeleted?: () => void;
 }) {
 	const { t } = useI18n();
 	const {
@@ -50,7 +54,9 @@ export default function TemplateManager({
 		guildId,
 		defaultTemplateChannelId,
 		defaultPublicChannelId,
-		defaultPrivateChannelId
+		defaultPrivateChannelId,
+		onTemplateChange,
+		onCharactersDeleted
 	);
 
 	const handleExportTemplate = () => {

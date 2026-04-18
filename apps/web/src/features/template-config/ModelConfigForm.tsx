@@ -15,6 +15,8 @@ export default function ModelConfigForm({
 	saving,
 	saveSuccess,
 	onDirtyChange,
+	onTemplateChange,
+	onCharactersDeleted,
 	channels,
 	roles,
 }: ConfigFormProps) {
@@ -43,6 +45,8 @@ export default function ModelConfigForm({
 							defaultTemplateChannelId={config.templateID?.channelId}
 							defaultPublicChannelId={config.managerId}
 							defaultPrivateChannelId={config.privateChannel}
+							onTemplateChange={onTemplateChange}
+							onCharactersDeleted={onCharactersDeleted}
 						/>
 					</Paper>
 

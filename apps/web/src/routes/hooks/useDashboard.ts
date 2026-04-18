@@ -213,6 +213,16 @@ export function useDashboard(guildId: string | undefined) {
 		[guildId]
 	);
 
+	const refetchConfig = useCallback(async () => {
+		if (!guildId) return;
+		try {
+			const res = await guildApi.getConfig(guildId);
+			dispatch({ type: "config_loaded", config: res.data });
+		} catch {
+			// silent — the template tab shows its own errors
+		}
+	}, [guildId]);
+
 	const handleCharactersRefresh = useCallback(async () => {
 		if (!guildId) return;
 		dispatch({ type: "set_refreshing", value: true });
@@ -262,5 +272,6 @@ export function useDashboard(guildId: string | undefined) {
 		handleSave,
 		handleCharactersRefresh,
 		handleTabChange,
+		refetchConfig,
 	};
 }

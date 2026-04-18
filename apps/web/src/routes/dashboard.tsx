@@ -77,6 +77,7 @@ export default function Dashboard() {
 		handleSave,
 		handleCharactersRefresh,
 		handleTabChange,
+		refetchConfig,
 	} = useDashboard(guildId);
 
 	useEffect(() => {
@@ -171,7 +172,7 @@ export default function Dashboard() {
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
-				{isAdmin && serverCharCount > 0 && (
+				{isAdmin && config?.templateID?.channelId && (
 					<Tab
 						value="server-characters"
 						label={t("dashboard.tabs.serverCharacters")}
@@ -209,6 +210,8 @@ export default function Dashboard() {
 							saving={saving}
 							channels={channels}
 							roles={roles}
+							onTemplateChange={refetchConfig}
+							onCharactersDeleted={handleCharactersRefresh}
 						/>
 					</Suspense>
 				</TabPanel>
@@ -221,7 +224,7 @@ export default function Dashboard() {
 					<CharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
 				</TabPanel>
 			)}
-			{isAdmin && (
+			{isAdmin && config?.templateID?.channelId && (
 				<TabPanel value="server-characters" current={tab} mounted={mountedTabs}>
 					<ServerCharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
 				</TabPanel>

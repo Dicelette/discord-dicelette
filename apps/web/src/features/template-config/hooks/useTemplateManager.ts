@@ -95,7 +95,9 @@ export function useTemplateManager(
 	guildId: string,
 	defaultTemplateChannelId: string | undefined,
 	defaultPublicChannelId: string | undefined,
-	defaultPrivateChannelId: string | undefined
+	defaultPrivateChannelId: string | undefined,
+	onTemplateChange?: () => void,
+	onCharactersDeleted?: () => void
 ) {
 	const { t } = useI18n();
 
@@ -205,6 +207,7 @@ export function useTemplateManager(
 					const existing = templateClientCache.get(guildId);
 					if (existing)
 						templateClientCache.set(guildId, { ...existing, hasCharacters: false });
+					onCharactersDeleted?.();
 				}
 				await templateApi.import(guildId, {
 					template: data.template,
@@ -221,6 +224,7 @@ export function useTemplateManager(
 					publicChannelId: data.publicChannelId || undefined,
 					privateChannelId: data.privateChannelId || undefined,
 				});
+				onTemplateChange?.();
 				flash("set_success", t("template.importSuccess"));
 			} catch {
 				flash("set_error", t("template.importError"));
@@ -228,7 +232,7 @@ export function useTemplateManager(
 				dispatch({ type: "saving", value: false });
 			}
 		},
-		[guildId, flash, t]
+		[guildId, flash, t, onTemplateChange, onCharactersDeleted]
 	);
 
 	const handleExportCharacters = useCallback(async () => {
@@ -252,13 +256,14 @@ export function useTemplateManager(
 			await templateApi.delete(guildId);
 			templateClientCache.delete(guildId);
 			dispatch({ type: "deleted" });
+			onTemplateChange?.();
 			flash("set_success", t("template.deleteSuccess"));
 		} catch {
 			flash("set_error", t("template.deleteError"));
 		} finally {
 			dispatch({ type: "saving", value: false });
 		}
-	}, [guildId, flash, t]);
+	}, [guildId, flash, t, onTemplateChange]);
 
 	return {
 		...state,

@@ -14,6 +14,8 @@ export interface ConfigFormProps {
 	saving: boolean;
 	saveSuccess?: boolean;
 	onDirtyChange?: (isDirty: boolean) => void;
+	onTemplateChange?: () => void;
+	onCharactersDeleted?: () => void;
 	channels: Channel[];
 	roles: Role[];
 }
