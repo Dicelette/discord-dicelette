@@ -1,5 +1,4 @@
 import type { StatisticalTemplate } from "@dicelette/core";
-import { Upload } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import {
@@ -71,7 +70,6 @@ interface Props {
 	channels: Channel[];
 	hasCharacters: boolean;
 	onExportTemplate?: () => void;
-	onExportCharacters?: () => void;
 	/** If provided, pre-populates the form (edit mode). */
 	existingTemplate?: StatisticalTemplate;
 	defaultTemplateChannelId?: string;
@@ -312,16 +310,6 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 											}
 										/>
 									</Stack>
-									{props.onExportCharacters && (
-										<Button
-											variant="outlined"
-											startIcon={<Upload />}
-											onClick={props.onExportCharacters}
-											fullWidth
-										>
-											{t("template.exportCharacters")}
-										</Button>
-									)}
 								</Stack>
 							)}
 						</Stack>

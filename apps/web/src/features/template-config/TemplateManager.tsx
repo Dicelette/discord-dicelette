@@ -128,7 +128,6 @@ export default function TemplateManager({
 				onClose={() => dispatch({ type: "edit_modal", value: false })}
 				onSave={handleModalImport}
 				onExportTemplate={handleExportTemplate}
-				onExportCharacters={handleExportCharacters}
 				channels={channels}
 				hasCharacters={hasCharacters}
 				existingTemplate={template ?? undefined}

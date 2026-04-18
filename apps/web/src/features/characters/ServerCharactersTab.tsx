@@ -1,7 +1,8 @@
 import type { ApiCharacter } from "@dicelette/api";
 import { charactersApi } from "@dicelette/api";
+import { Upload } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useI18n } from "@shared";
 import { useState } from "react";
 import { useCharacterPagination } from "./hooks/useCharacterPagination";
@@ -51,13 +52,34 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 			(char.charName ?? "").subText(q) || (char.ownerName ?? "").subText(q),
 	});
 
+	const handleExportCharacters = async () => {
+		try {
+			const res = await charactersApi.exportCsv(guildId);
+			const url = URL.createObjectURL(res.data);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "characters.csv";
+			a.click();
+			URL.revokeObjectURL(url);
+		} catch (err) {
+			console.error("Export failed:", err);
+		}
+	};
+
 	return (
 		<>
-			<Box sx={{ mb: 2 }}>
+			<Box sx={{ mb: 2, display: "flex", gap: 1 }}>
 				<ImportCsv
 					guildId={guildId}
 					onSuccess={() => setImportRefreshTrigger((prev) => prev + 1)}
 				/>
+				<Button
+					variant="outlined"
+					startIcon={<Upload />}
+					onClick={handleExportCharacters}
+				>
+					{t("template.exportCharacters")}
+				</Button>
 			</Box>
 			<CharacterListLayout
 				title={t("characters.serverTitle")}
