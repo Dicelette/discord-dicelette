@@ -8,8 +8,8 @@ import { ln, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getCharacterMessage, getUserFrom } from "../../database/get_user";
-import { getEmbeds } from "../../messages";
+import { getEmbeds } from "messages";
+import { getCharacterMessage, getUser } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -111,32 +111,28 @@ export async function exportCharactersCsv(
 			tasks.push(
 				limit(async () => {
 					try {
-						const message = await getCharacterMessage(char.messageId, guild, client);
-						if (!message) return;
-
-						const result = await getUserFrom(
-							client,
-							user,
-							char.charName,
-							{ message, type: "message" },
-							{
-								fetchAvatar: true,
-								fetchChannel: true,
-								cleanUrl: false,
-								skipNotFound: true,
-							}
-						);
-						const userData = result?.userData;
+						const userData = await getUser(char.messageId, guild, client, {
+							fetchAvatar: true,
+							fetchChannel: true,
+							cleanUrl: false,
+						});
 						if (!userData) return;
 
-						// Read macro names directly from embed fields (always up to date)
+						// Export macros with original field names from embed
 						const diceLines: string[] = [];
-						const damageEmbed = getEmbeds(message, "damage");
-						if (damageEmbed?.data?.fields && userData.damage) {
-							for (const field of damageEmbed.data.fields as Djs.APIEmbedField[]) {
-								const formula = userData.damage[field.name.standardize()];
-								if (formula)
-									diceLines.push(`- ${field.name}${ul("common.space")}: ${formula}`);
+						if (userData.damage) {
+							// userData.damage keys are standardized, but we need original names from embed
+							// Re-fetch the message to get original field names
+							const message = await getCharacterMessage(char.messageId, guild, client);
+							if (message) {
+								const damageEmbed = getEmbeds(message, "damage");
+								if (damageEmbed?.data?.fields) {
+									for (const field of damageEmbed.data.fields as Djs.APIEmbedField[]) {
+										const formula = userData.damage[field.name.standardize()];
+										if (formula)
+											diceLines.push(`- ${field.name}${ul("common.space")}: ${formula}`);
+									}
+								}
 							}
 						}
 						const dice: undefined | string =
