@@ -93,15 +93,6 @@ export async function exportCharactersCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
-	// precompute damage name mapping (preserve original names with accents)
-	const damageName = ctx?.templateID?.damageName;
-	const damageNameNormalized: Map<string, string> = new Map();
-	if (damageName) {
-		for (const name of damageName) {
-			damageNameNormalized.set(name.unidecode(), name);
-		}
-	}
-
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
 
@@ -126,16 +117,17 @@ export async function exportCharactersCsv(
 					if (!charData) return;
 					const stats = charData;
 
-					// dice lines with localized separator/space
-					// Map standardized keys back to original template names (preserve accents)
-					const dice: undefined | string = stats.damage
-						? `'${Object.keys(stats.damage)
-								.map((key) => {
-									const originalName = damageNameNormalized.get(key) ?? key;
-									return `- ${originalName}${ul("common.space")}: ${stats.damage?.[key]}`;
-								})
-								.join("\n")}`
-						: undefined;
+					// Only export macros saved in the character's fiche, using original names
+					const diceLines: string[] = [];
+					if (char.damageName && stats.damage) {
+						for (const originalName of char.damageName) {
+							const formula = stats.damage[originalName.standardize()];
+							if (formula)
+								diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
+						}
+					}
+					const dice: undefined | string =
+						diceLines.length > 0 ? `'${diceLines.join("\n")}` : undefined;
 
 					// map stats according to template names (preserve accented names in CSV header)
 					let newStats: Record<string, number | undefined> = {};
