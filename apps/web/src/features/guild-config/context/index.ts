@@ -1,1 +1,2 @@
-export { GuildConfigProvider, useGuildConfig } from "./GuildConfigContext";
+export { GuildConfigProvider } from "./GuildConfigContext";
+export { useGuildConfig } from "./useGuildConfig";

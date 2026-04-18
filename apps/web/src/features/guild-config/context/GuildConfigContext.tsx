@@ -1,9 +1,9 @@
 import type { ApiGuildData, TemplateResult } from "@dicelette/types";
 import type { Channel, Role } from "@shared";
-import { createContext, type ReactNode, useCallback, useContext, useMemo } from "react";
+import { createContext, type ReactNode, useCallback, useMemo } from "react";
 import { useTemplateState } from "../../user-config/hooks";
 
-interface GuildConfigContextType {
+export interface GuildConfigContextType {
 	config: ApiGuildData;
 	channels: Channel[];
 	roles: Role[];
@@ -14,15 +14,9 @@ interface GuildConfigContextType {
 	templateState: ReturnType<typeof useTemplateState>;
 }
 
-const GuildConfigContext = createContext<GuildConfigContextType | undefined>(undefined);
-
-export function useGuildConfig() {
-	const context = useContext(GuildConfigContext);
-	if (!context) {
-		throw new Error("useGuildConfig must be used within GuildConfigProvider");
-	}
-	return context;
-}
+export const GuildConfigContext = createContext<GuildConfigContextType | undefined>(
+	undefined
+);
 
 interface GuildConfigProviderProps {
 	config: ApiGuildData;
