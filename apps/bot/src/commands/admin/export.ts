@@ -8,7 +8,7 @@ import { ln, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getCharacterMessage, getUserFrom } from "../../database/get_user";
+import { getCharacterMessage, getUserFromMessage } from "database";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -113,11 +113,11 @@ export async function exportCharactersCsv(
 						const message = await getCharacterMessage(char.messageId, guild, client);
 						if (!message) return;
 
-						const result = await getUserFrom(
+						const result = await getUserFromMessage(
 							client,
 							user,
+							message,
 							char.charName,
-							{ message, type: "message" },
 							{
 								fetchAvatar: true,
 								fetchChannel: true,
@@ -185,6 +185,7 @@ export async function exportCharactersCsv(
 		delimiter: ";",
 		header: true,
 		quotes: false,
+		skipEmptyLines: true,
 	});
 	return Buffer.from(`\ufeff${csvText}`, "utf-8");
 }
