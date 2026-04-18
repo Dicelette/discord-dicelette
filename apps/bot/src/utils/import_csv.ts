@@ -236,12 +236,23 @@ async function step(
 				stats[key] = data[key] as number;
 			}
 		}
+		// Create mapping for damage names: standardized -> original (preserve accents)
+		const damageNameNormalized: Map<string, string> = new Map();
+		if (guildTemplate.damage) {
+			for (const name of Object.keys(guildTemplate.damage)) {
+				damageNameNormalized.set(name.unidecode(), name);
+			}
+		}
+
 		const dice: Record<string, string> | undefined = data.dice?.replaceAll("'", "")
 			? data.dice.split(/\r?\n/).reduce(
 					(acc, line) => {
 						const match = line.match(/-\s*([^:]+)\s*:\s*(.+)/);
 						if (match) {
-							const key = match[1].trim();
+							let key = match[1].trim();
+							// Map standardized key back to original template name if available
+							const originalKey = damageNameNormalized.get(key.unidecode());
+							if (originalKey) key = originalKey;
 							acc[key] = match[2].trim();
 						}
 						return acc;
