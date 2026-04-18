@@ -5,10 +5,10 @@
 import type { EClient } from "@dicelette/client";
 import { type CSVRow, getGuildContext } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
-import type { UserData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
+import { getUser } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -93,6 +93,9 @@ export async function exportCharactersCsv(
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
+	const guild = await client.guilds.fetch(guildId);
+	if (!guild) return null;
+
 	const limit = pLimit(10);
 	const tasks: Promise<void>[] = [];
 
@@ -106,16 +109,9 @@ export async function exportCharactersCsv(
 		for (const char of chara) {
 			tasks.push(
 				limit(async () => {
-					// Get character data from in-memory cache
-					const memChars: UserData[] =
-						(client.characters.get(guildId, user) as UserData[] | undefined) ?? [];
-					const charData = memChars.find((c) => {
-						if (c.userName && char.charName)
-							return c.userName.unidecode() === char.charName.unidecode();
-						return !c.userName && !char.charName;
-					});
-					if (!charData) return;
-					const stats = charData;
+					// Get character data from Discord
+					const stats = await getUser(char.messageId, guild, client);
+					if (!stats) return;
 
 					// Only export macros saved in the character's fiche, using original names
 					const diceLines: string[] = [];
