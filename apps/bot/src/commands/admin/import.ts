@@ -17,11 +17,9 @@ import { parseCSV } from "utils";
 import "@dicelette/discord_ext";
 import {
 	addAutoRole,
-	fetchAvatarUrl,
 	getInteractionContext as getLangAndConfig,
-	reuploadAvatar,
+	resolveCsvImportAvatar,
 } from "@dicelette/helpers";
-import { QUERY_URL_PATTERNS } from "@dicelette/utils";
 
 // Small helpers to reduce repetition and control concurrency
 // getFileExtension: safer/more readable than chaining split/pop
@@ -68,26 +66,18 @@ async function buildEmbedsForCharacter(
 	guildTemplate: StatisticalTemplate
 ) {
 	const files: Djs.AttachmentBuilder[] = [];
-
-	// Re-upload avatar if it's a Discord CDN link
-	if (char.avatar?.match(QUERY_URL_PATTERNS.DISCORD_CDN)) {
-		const res = await reuploadAvatar(
-			{
-				name: char.avatar.split("?")[0].split("/").pop() ?? "avatar.png",
-				url: char.avatar,
-			},
-			ul
-		);
-		files.push(res.newAttachment);
-		char.avatar = res.name;
-	}
-
-	const avatarUrl =
-		char.avatar ?? (await fetchAvatarUrl(interaction.guild!, member as Djs.User));
+	const resolvedAvatar = await resolveCsvImportAvatar({
+		avatar: char.avatar,
+		guild: interaction.guild!,
+		user: member as Djs.User,
+		reuploadDiscordCdn: true,
+		ul,
+	});
+	files.push(...resolvedAvatar.files);
 
 	const userDataEmbed = createUserEmbed(
 		ul,
-		avatarUrl,
+		resolvedAvatar.avatarUrl,
 		member.id,
 		char.userName ?? undefined
 	);
