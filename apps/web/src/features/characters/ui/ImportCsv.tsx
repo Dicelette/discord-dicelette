@@ -4,6 +4,7 @@ import {
 	Alert,
 	Box,
 	Button,
+	Checkbox,
 	CircularProgress,
 	Dialog,
 	DialogActions,
@@ -11,8 +12,6 @@ import {
 	DialogTitle,
 	FormControlLabel,
 	LinearProgress,
-	Switch,
-	TextField,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
@@ -27,8 +26,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 	const { t } = useI18n();
 	const [open, setOpen] = useState(false);
 	const [csvText, setCsvText] = useState("");
-	const [channelId, setChannelId] = useState("");
-	const [overwrite, setOverwrite] = useState(false);
+	const [deleteOldMessage, setDeleteOldMessage] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState<{
 		success: number;
@@ -50,10 +48,8 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 	};
 
 	const handleImport = async () => {
-		if (!csvText || !channelId) {
-			setError(
-				t("characters.importError") || "Please provide CSV content and select a channel"
-			);
+		if (!csvText) {
+			setError(t("characters.importError") || "Please provide CSV content");
 			return;
 		}
 
@@ -64,8 +60,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 		try {
 			const response = await charactersApi.importCharacters(guildId, {
 				csvText,
-				channelId,
-				overwrite,
+				deleteOldMessage,
 			});
 			const result = response.data || response;
 			setResult(result);
@@ -73,7 +68,6 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 				onSuccess();
 				setOpen(false);
 				setCsvText("");
-				setChannelId("");
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Import failed");
@@ -128,15 +122,6 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 								/>
 							</Box>
 
-							<TextField
-								label={t("characters.channelId")}
-								value={channelId}
-								onChange={(e) => setChannelId(e.target.value)}
-								disabled={loading}
-								fullWidth
-								placeholder="Enter Discord channel ID"
-							/>
-
 							<Box sx={{ p: 2, bgcolor: "grey.100", borderRadius: 1 }}>
 								<Typography variant="caption">
 									<strong>CSV Format:</strong> user;charName;avatar;channel;[stats];dice
@@ -147,13 +132,22 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 
 							<FormControlLabel
 								control={
-									<Switch
-										checked={overwrite}
-										onChange={(e) => setOverwrite(e.target.checked)}
+									<Checkbox
+										checked={deleteOldMessage}
+										onChange={(e) => setDeleteOldMessage(e.target.checked)}
+										disabled={loading}
 									/>
 								}
-								label={t("characters.overwriteExisting")}
-								disabled={loading}
+								label={
+									<Box>
+										<Typography variant="body2">
+											{t("characters.deleteOldMessage")}
+										</Typography>
+										<Typography variant="caption" color="text.secondary">
+											{t("characters.deleteOldMessageHelp")}
+										</Typography>
+									</Box>
+								}
 							/>
 
 							{loading && <LinearProgress />}

@@ -473,14 +473,13 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			const userId = req.session.userId!;
 
 			try {
-				const { csvText, channelId, overwrite } = req.body as {
+				const { csvText, deleteOldMessage } = req.body as {
 					csvText: string;
-					channelId: string;
-					overwrite?: boolean;
+					deleteOldMessage?: boolean;
 				};
 
-				if (!csvText || !channelId) {
-					res.status(400).json({ error: "Missing csvText or channelId" });
+				if (!csvText) {
+					res.status(400).json({ error: "Missing csvText" });
 					return;
 				}
 
@@ -493,8 +492,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				const results = await parseCharactersCsv(
 					csvText,
 					guildId,
-					channelId,
-					overwrite ?? false,
+					deleteOldMessage ?? false,
 					{ settings, characters, botChannels }
 				);
 
@@ -527,8 +525,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 async function parseCharactersCsv(
 	csvText: string,
 	guildId: string,
-	channelId: string,
-	overwrite: boolean,
+	deleteOldMessage: boolean,
 	deps: { settings: Settings; characters: Characters; botChannels: BotChannels }
 ): Promise<{ success: number; failed: number; errors: string[] }> {
 	const { settings, characters, botChannels } = deps;
@@ -562,6 +559,7 @@ async function parseCharactersCsv(
 				const userId = row.user?.toString().replaceAll("'", "").trim();
 				const charName = row.charName;
 				const avatar = row.avatar;
+				const csvChannel = row.channel?.toString().replaceAll("'", "").trim();
 
 				if (!userId) {
 					errors.push("Row skipped: missing user ID");
@@ -572,38 +570,60 @@ async function parseCharactersCsv(
 				const charNameStr = typeof charName === "string" ? charName : undefined;
 				const avatarStr = typeof avatar === "string" ? avatar : undefined;
 
-				// Create character data
-				const userData: UserData = {
-					userName: charNameStr ?? null,
-					avatar: avatarStr || undefined,
-					channel: channelId,
-					template: {},
-				};
-
-				// Register in settings
+				// Register in settings if needed
 				if (!guildData.user) guildData.user = {};
 				if (!guildData.user[userId]) guildData.user[userId] = [];
 
 				const userCharList = guildData.user[userId];
 
-				// Check for duplicates unless overwrite
+				// Check for existing character
 				const existing = userCharList.findIndex(
 					(c: UserGuildData) =>
 						c.charName === charNameStr || (!charNameStr && !c.charName)
 				);
 
-				if (existing !== -1 && !overwrite) {
-					errors.push(`${charNameStr || "Default"} for user ${userId} already exists`);
-					failed++;
-					return;
+				let finalChannelId = csvChannel;
+				let finalMessageId: string;
+
+				if (existing !== -1) {
+					// Overwriting existing character
+					const oldChar = userCharList[existing];
+					const [oldMessageId, oldChannelId] = oldChar.messageId;
+
+					// Delete old Discord message if requested
+					if (deleteOldMessage && oldChannelId && oldMessageId) {
+						await botChannels.deleteMessage(oldChannelId, oldMessageId).catch(() => {
+							// Silent fail if message already deleted
+						});
+					}
+
+					// Use new channel from CSV, or keep old channel if CSV doesn't specify
+					finalChannelId = csvChannel || oldChannelId;
+					finalMessageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+				} else {
+					// New character
+					if (!finalChannelId) {
+						errors.push(
+							`${charNameStr || "Default"} for user ${userId}: missing channel in CSV`
+						);
+						failed++;
+						return;
+					}
+					finalMessageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 				}
 
-				// Create message placeholder
-				const messageId = `import-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+				// Create/update character data
+				const userData: UserData = {
+					userName: charNameStr ?? null,
+					avatar: avatarStr || undefined,
+					channel: finalChannelId,
+					template: {},
+				};
+
 				const isPrivateVal = row.isPrivate === true || row.isPrivate === "true";
 				const charData: UserGuildData = {
 					charName: charNameStr,
-					messageId: [messageId, channelId],
+					messageId: [finalMessageId, finalChannelId],
 					isPrivate: isPrivateVal,
 				};
 

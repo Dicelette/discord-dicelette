@@ -1223,8 +1223,8 @@
 		"importTitle": "Importer des personnages depuis CSV",
 		"importResult": "Import terminé: {{success}} personnages importés, {{failed}} échoués",
 		"csvFile": "Fichier CSV",
-		"channelId": "ID du canal",
-		"overwriteExisting": "Écraser les personnages existants",
+		"deleteOldMessage": "Supprimer l'ancien message",
+		"deleteOldMessageHelp": "Lors de la réimportation d'un personnage, supprimer l'ancien message pour éviter les doublons",
 		"noCharacters": "Aucun personnage trouvé",
 		"noResults": "Aucun personnage ne correspond à votre recherche",
 		"serverTitle": "Personnages du serveur",
@@ -1234,6 +1234,6 @@
 		"unnamed": "Sans nom",
 		"sheetLink": "Ouvrir dans Discord",
 		"loadError": "Impossible de charger les personnages",
-		"importError": "Veuillez fournir un contenu CSV et sélectionner un canal"
+		"importError": "Veuillez fournir un contenu CSV"
 	}
 }
