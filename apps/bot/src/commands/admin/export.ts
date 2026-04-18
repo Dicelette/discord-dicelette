@@ -5,11 +5,10 @@
 import type { EClient } from "@dicelette/client";
 import { type CSVRow, getGuildContext } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
-import type { UserData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getUserFromInteraction } from "../../database/get_user";
+import { getUser } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -57,7 +56,7 @@ export const exportData = {
 		const isPrivate = options.getBoolean(t("export.options.name")) ?? undefined;
 		const guildId = interaction.guild.id;
 		await interaction.deferReply();
-		const buffer = await exportCharactersCsv(client, guildId, isPrivate, interaction);
+		const buffer = await exportCharactersCsv(client, guildId, isPrivate);
 		if (!buffer) {
 			await interaction.editReply(t("export.error.noData"));
 			return;
@@ -76,8 +75,7 @@ export const exportData = {
 export async function exportCharactersCsv(
 	client: EClient,
 	guildId: string,
-	isPrivate?: boolean,
-	interaction?: Djs.BaseInteraction
+	isPrivate?: boolean
 ): Promise<Buffer | null> {
 	const guildData = client.settings.get(guildId);
 	if (!guildData) return null;
@@ -91,15 +89,15 @@ export async function exportCharactersCsv(
 	const statsName = ctx?.templateID?.statsName;
 	const isPrivateAllowed = !!client.settings.get(guildId, "privateChannel");
 
-	// precompute normalized stat keys if template provides names
 	const statsNameNormalized: string[] | undefined = statsName
 		? statsName.map((n: string) => n.unidecode())
 		: undefined;
 
-	const tasks: Promise<void>[] = [];
+	const guild = await client.guilds.fetch(guildId);
+	if (!guild) return null;
 
-	// p-limit only needed when fetching from Discord API (with interaction)
-	const limit = interaction ? pLimit(10) : <T>(fn: () => Promise<T>) => fn();
+	const limit = pLimit(10);
+	const tasks: Promise<void>[] = [];
 
 	for (const [user, data] of Object.entries(allUser)) {
 		const chara = isPrivate
@@ -111,27 +109,7 @@ export async function exportCharactersCsv(
 		for (const char of chara) {
 			tasks.push(
 				limit(async () => {
-					let stats: UserData | undefined;
-					if (interaction) {
-						// Fetch fresh from Discord embed
-						stats = (
-							await getUserFromInteraction(client, user, interaction, char.charName, {
-								cleanUrl: false,
-								fetchAvatar: true,
-								fetchChannel: true,
-								skipNotFound: true,
-							})
-						)?.userData;
-					} else {
-						// Dashboard: data already in memory cache
-						const memChars: UserData[] =
-							(client.characters.get(guildId, user) as UserData[] | undefined) ?? [];
-						stats = memChars.find((c) => {
-							if (c.userName && char.charName)
-								return c.userName.unidecode() === char.charName.unidecode();
-							return !c.userName && !char.charName;
-						});
-					}
+					const stats = await getUser(char.messageId, guild, client);
 					if (!stats) return;
 
 					// Only export macros saved in the character's fiche, using original names
@@ -146,7 +124,6 @@ export async function exportCharactersCsv(
 					const dice: undefined | string =
 						diceLines.length > 0 ? `'${diceLines.join("\n")}` : undefined;
 
-					// map stats according to template names (preserve accented names in CSV header)
 					let newStats: Record<string, number | undefined> = {};
 					if (statsNameNormalized && stats.stats) {
 						for (let i = 0; i < statsNameNormalized.length; i++) {
