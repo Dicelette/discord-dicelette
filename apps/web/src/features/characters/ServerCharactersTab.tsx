@@ -66,13 +66,13 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 		}
 	};
 
-	return (
+	const actions = (
 		<>
-			<Box sx={{ mb: 2, display: "flex", gap: 1 }}>
-				<ImportCsv
-					guildId={guildId}
-					onSuccess={() => setImportRefreshTrigger((prev) => prev + 1)}
-				/>
+			<ImportCsv
+				guildId={guildId}
+				onSuccess={() => setImportRefreshTrigger((prev) => prev + 1)}
+			/>
+			{characters.length > 0 && (
 				<Button
 					variant="outlined"
 					startIcon={<Upload />}
@@ -80,39 +80,43 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 				>
 					{t("template.exportCharacters")}
 				</Button>
-			</Box>
-			<CharacterListLayout
-				title={t("characters.serverTitle")}
-				searchPlaceholder={t("characters.serverFilterPlaceholder")}
-				showSearch={true}
-				loading={loading}
-				error={error}
-				onCloseError={() => setError(null)}
-				search={search}
-				onSearchChange={handleSearchChange}
-				page={page}
-				onPageChange={setPage}
-				pageChars={pageChars}
-				totalPages={totalPages}
-				emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
-				renderCard={(char) => (
-					<Box key={`${char.channelId}-${char.messageId}`}>
-						{char.ownerName && (
-							<Box sx={ownerLabelBoxSx}>
-								<PersonIcon sx={ownerIconSx} />
-								<Typography
-									variant="subtitle1"
-									color="text.secondary"
-									fontFamily={"var(--code-font-family)"}
-								>
-									{char.ownerName}
-								</Typography>
-							</Box>
-						)}
-						<CharacterCard char={char} />
-					</Box>
-				)}
-			/>
+			)}
 		</>
+	);
+
+	return (
+		<CharacterListLayout
+			actions={actions}
+			title={t("characters.serverTitle")}
+			searchPlaceholder={t("characters.serverFilterPlaceholder")}
+			showSearch={true}
+			loading={loading}
+			error={error}
+			onCloseError={() => setError(null)}
+			search={search}
+			onSearchChange={handleSearchChange}
+			page={page}
+			onPageChange={setPage}
+			pageChars={pageChars}
+			totalPages={totalPages}
+			emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
+			renderCard={(char) => (
+				<Box key={`${char.channelId}-${char.messageId}`}>
+					{char.ownerName && (
+						<Box sx={ownerLabelBoxSx}>
+							<PersonIcon sx={ownerIconSx} />
+							<Typography
+								variant="subtitle1"
+								color="text.secondary"
+								fontFamily={"var(--code-font-family)"}
+							>
+								{char.ownerName}
+							</Typography>
+						</Box>
+					)}
+					<CharacterCard char={char} />
+				</Box>
+			)}
+		/>
 	);
 }
