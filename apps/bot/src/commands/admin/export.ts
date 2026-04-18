@@ -125,14 +125,14 @@ export async function exportCharactersCsv(
 								skipNotFound: true,
 							}
 						);
-						const stats = result?.userData;
-						if (!stats) return;
+						if (!result?.userData) return;
+						const { userData } = result; //prevent edition data
 
 						// Only export macros saved in the character's fiche, using original names
 						const diceLines: string[] = [];
-						if (char.damageName && stats.damage) {
+						if (char.damageName && userData.damage) {
 							for (const originalName of char.damageName) {
-								const formula = stats.damage[originalName.standardize()];
+								const formula = userData.damage[originalName.standardize()];
 								if (formula)
 									diceLines.push(`- ${originalName}${ul("common.space")}: ${formula}`);
 							}
@@ -141,18 +141,20 @@ export async function exportCharactersCsv(
 							diceLines.length > 0 ? `'${diceLines.join("\n")}` : undefined;
 
 						let newStats: Record<string, number | undefined> = {};
-						if (statsNameNormalized && stats.stats) {
+						if (statsNameNormalized && userData.stats) {
 							for (let i = 0; i < statsNameNormalized.length; i++) {
 								const name = statsName?.[i];
 								if (!name) continue;
 								const norm = statsNameNormalized[i];
-								newStats[name] = stats.stats?.[norm];
+								newStats[name] = userData.stats?.[norm];
 							}
-						} else if (stats.stats) newStats = stats.stats;
+						} else if (userData.stats) newStats = userData.stats;
 
-						const statChannelAsString = stats.channel ? `'${stats.channel}` : undefined;
+						const statChannelAsString = userData.channel
+							? `'${userData.channel}`
+							: undefined;
 						csv.push({
-							avatar: stats.avatar,
+							avatar: userData.avatar,
 							channel: statChannelAsString,
 							charName: char.charName,
 							dice,
