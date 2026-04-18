@@ -1,4 +1,5 @@
 import type { StatisticalTemplate } from "@dicelette/core";
+import { Upload } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
 import {
 	Alert,
@@ -68,6 +69,7 @@ interface Props {
 	onSave: (data: ImportTemplateData) => Promise<void>;
 	channels: Channel[];
 	hasCharacters: boolean;
+	onExportCharacters?: () => void;
 	/** If provided, pre-populates the form (edit mode). */
 	existingTemplate?: StatisticalTemplate;
 	defaultTemplateChannelId?: string;
@@ -332,18 +334,38 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 				</Stack>
 			</DialogContent>
 
-			<DialogActions sx={{ bgcolor: "background.paper" }}>
-				<Button onClick={handleClose} disabled={state.saving}>
-					{t("common.cancel")}
-				</Button>
-				<Button
-					type="submit"
-					form={formId}
-					variant="contained"
-					disabled={state.saving || !state.channelId || !formReady}
-				>
-					{state.saving ? t("common.saving") : t("common.save")}
-				</Button>
+			<DialogActions
+				sx={{
+					bgcolor: "background.paper",
+					display: "flex",
+					justifyContent: "space-between",
+				}}
+			>
+				{props.onExportCharacters && hasCharacters ? (
+					<Button
+						variant="outlined"
+						startIcon={<Upload />}
+						onClick={props.onExportCharacters}
+						size="small"
+					>
+						{t("template.exportCharacters")}
+					</Button>
+				) : (
+					<Box />
+				)}
+				<Box sx={{ display: "flex", gap: 1 }}>
+					<Button onClick={handleClose} disabled={state.saving}>
+						{t("common.cancel")}
+					</Button>
+					<Button
+						type="submit"
+						form={formId}
+						variant="contained"
+						disabled={state.saving || !state.channelId || !formReady}
+					>
+						{state.saving ? t("common.saving") : t("common.save")}
+					</Button>
+				</Box>
 			</DialogActions>
 		</Dialog>
 	);

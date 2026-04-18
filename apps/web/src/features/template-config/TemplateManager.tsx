@@ -99,16 +99,6 @@ export default function TemplateManager({
 						>
 							{t("export.name").toTitle()}
 						</Button>
-						{hasCharacters && (
-							<Button
-								variant="outlined"
-								startIcon={<Upload />}
-								onClick={handleExportCharacters}
-								size="small"
-							>
-								{t("template.exportCharacters")}
-							</Button>
-						)}
 						<Button
 							variant="outlined"
 							color="error"
@@ -143,6 +133,7 @@ export default function TemplateManager({
 				open={editModalOpen}
 				onClose={() => dispatch({ type: "edit_modal", value: false })}
 				onSave={handleModalImport}
+				onExportCharacters={handleExportCharacters}
 				channels={channels}
 				hasCharacters={hasCharacters}
 				existingTemplate={template ?? undefined}
