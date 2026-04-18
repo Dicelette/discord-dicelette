@@ -1223,8 +1223,8 @@
 		"importTitle": "Import Characters from CSV",
 		"importResult": "Import completed: {{success}} characters imported, {{failed}} failed",
 		"csvFile": "CSV File",
-		"channelId": "Channel ID",
-		"overwriteExisting": "Overwrite existing characters",
+		"deleteOldMessage": "Delete old message",
+		"deleteOldMessageHelp": "When reimporting a character, delete the old message to avoid duplicates",
 		"noCharacters": "No characters found",
 		"noResults": "No characters match your search",
 		"serverTitle": "Server Characters",
@@ -1234,6 +1234,6 @@
 		"unnamed": "Unnamed",
 		"sheetLink": "Open in Discord",
 		"loadError": "Failed to load characters",
-		"importError": "Please provide CSV content and select a channel"
+		"importError": "Please provide CSV content"
 	}
 }

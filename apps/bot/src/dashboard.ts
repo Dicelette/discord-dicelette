@@ -1,10 +1,22 @@
 import type { EventEmitter } from "node:events";
 import { ln } from "@dicelette/localization";
 import { startDashboardServer } from "@dicelette/server";
+import type { UserData, UserGuildData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
 import { templateEmbed } from "./commands/admin/template";
-import { bulkEditTemplateUserCore, createDefaultThread } from "./messages";
+import { getTemplate } from "./database";
+import { updateMemory } from "./database/memory";
+import {
+	bulkEditTemplateUserCore,
+	createDefaultThread,
+	createDiceEmbed,
+	createEmbedsList,
+	createStatsEmbed,
+	createUserEmbed,
+} from "./messages";
+import { editUserButtons, parseCSV, selectEditMenu } from "./utils";
+import "@dicelette/discord_ext";
 
 export function startBotDashboard(client: EClient, guildEvents: EventEmitter): void {
 	startDashboardServer({
@@ -194,6 +206,312 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 					return null;
 				}
 			},
+			bulkImportCharacters: async (guildId, csvText, deleteOldMessages) => {
+				const guild = client.guilds.cache.get(guildId);
+				if (!guild) return { success: 0, failed: 0, errors: ["Guild not found"] };
+
+				const lang = client.settings.get(guildId, "lang") ?? Djs.Locale.EnglishUS;
+				const ul = ln(lang);
+
+				const guildTemplate = await getTemplate(
+					guild,
+					client.settings,
+					ul,
+					client,
+					true
+				).catch(() => null);
+				if (!guildTemplate)
+					return {
+						success: 0,
+						failed: 0,
+						errors: ["No template configured for this guild"],
+					};
+
+				const hasPrivate = !!client.settings.get(guildId, "privateChannel");
+				const defaultChannelId = client.settings.get(guildId, "managerId") as
+					| string
+					| undefined;
+				const privateChannelId = client.settings.get(guildId, "privateChannel") as
+					| string
+					| undefined;
+
+				if (!defaultChannelId)
+					return {
+						success: 0,
+						failed: 0,
+						errors: ["No default channel configured"],
+					};
+
+				// parseCSV called without interaction: skips Discord member lookup,
+				// uses raw userId from CSV directly (trusted since dashboard is admin-only)
+				const { members, errors } = await parseCSV(
+					csvText,
+					guildTemplate,
+					undefined,
+					hasPrivate,
+					lang
+				);
+
+				const collectedErrors = [...errors];
+				let success = 0;
+				let failed = 0;
+
+				// Snapshot settings before processing to avoid race conditions
+				const guildData = client.settings.get(guildId);
+				if (!guildData)
+					return { success: 0, failed: 0, errors: ["Guild data not found"] };
+				if (!guildData.user) guildData.user = {};
+
+				// Collect post results before committing to settings
+				type PostResult = {
+					userId: string;
+					char: UserData;
+					messageId: string;
+					channelId: string;
+					existingIdx: number;
+				};
+				const postResults: PostResult[] = [];
+
+				// Pre-compute existing indices (before any insertions)
+				const existingIndices = new Map<string, number>();
+				for (const [userId, chars] of Object.entries(members)) {
+					const userChars: UserGuildData[] = guildData.user[userId] ?? [];
+					for (const char of chars) {
+						const idx = userChars.findIndex(
+							(c) => c.charName === char.userName || (!c.charName && !char.userName)
+						);
+						if (idx >= 0) existingIndices.set(`${userId}:${char.userName ?? ""}`, idx);
+					}
+				}
+
+				// Delete old messages first if requested (before posting new ones)
+				if (deleteOldMessages) {
+					for (const [userId, chars] of Object.entries(members)) {
+						const userChars: UserGuildData[] = guildData.user[userId] ?? [];
+						for (const char of chars) {
+							const key = `${userId}:${char.userName ?? ""}`;
+							const idx = existingIndices.get(key);
+							if (idx === undefined) continue;
+							const old = userChars[idx];
+							if (!old) continue;
+							const [oldMsgId, oldChannelId] = old.messageId;
+							try {
+								const oldChan = await client.channels
+									.fetch(oldChannelId)
+									.catch(() => null);
+								if (oldChan?.isTextBased()) {
+									const oldMsg = await (oldChan as Djs.TextChannel).messages
+										.fetch(oldMsgId)
+										.catch(() => null);
+									if (oldMsg) await oldMsg.delete();
+								}
+							} catch {
+								// Silent: message may already be gone
+							}
+						}
+					}
+				}
+
+				// Post all characters with bounded concurrency
+				const limit = pLimit(3);
+				const jobs: Promise<void>[] = [];
+
+				for (const [userId, chars] of Object.entries(members)) {
+					for (const char of chars) {
+						jobs.push(
+							limit(async () => {
+								try {
+									const targetChannelId =
+										char.channel ??
+										(char.private && privateChannelId
+											? privateChannelId
+											: defaultChannelId);
+
+									const channel = await client.channels
+										.fetch(targetChannelId)
+										.catch(() => null);
+									if (
+										!channel ||
+										(!channel.isTextBased() && !(channel instanceof Djs.ForumChannel))
+									)
+										throw new Error(
+											`Channel ${targetChannelId} not found or not postable`
+										);
+
+									// Build embeds — same logic as buildEmbedsForCharacter in import.ts
+									const memberUser = guild.members.cache.get(userId)?.user ?? null;
+									const avatarUrl = char.avatar ?? memberUser?.displayAvatarURL() ?? null;
+
+									const userDataEmbed = createUserEmbed(
+										ul,
+										avatarUrl,
+										userId,
+										char.userName ?? undefined
+									);
+									char.avatar = userDataEmbed.data?.thumbnail?.url;
+
+									const statsEmbed = char.stats ? createStatsEmbed(ul) : undefined;
+									let diceEmbed = guildTemplate.damage ? createDiceEmbed(ul) : undefined;
+
+									for (const [name, value] of Object.entries(char.stats ?? {})) {
+										const validateValue = guildTemplate.statistics?.[name];
+										const fieldValue = validateValue?.combinaison
+											? `\`${validateValue.combinaison}\` = ${value}`
+											: `\`${value}\``;
+										statsEmbed?.addFields({
+											inline: true,
+											name: name.capitalize(),
+											value: fieldValue,
+										});
+									}
+
+									for (const [name, dice] of Object.entries(guildTemplate.damage ?? {})) {
+										diceEmbed?.addFields({
+											inline: true,
+											name: name.capitalize(),
+											value: (dice as string).trim().length > 0 ? `\`${dice}\`` : "_ _",
+										});
+									}
+
+									for (const [name, dice] of Object.entries(char.damage ?? {})) {
+										if (!diceEmbed) diceEmbed = createDiceEmbed(ul);
+										diceEmbed.addFields({
+											inline: true,
+											name: name.capitalize(),
+											value: (dice as string).trim().length > 0 ? `\`${dice}\`` : "_ _",
+										});
+									}
+
+									let templateEmbedBuilder: Djs.EmbedBuilder | undefined;
+									if (guildTemplate.diceType || guildTemplate.critical) {
+										templateEmbedBuilder = new Djs.EmbedBuilder()
+											.setTitle(ul("embed.template"))
+											.setColor("DarkerGrey");
+										templateEmbedBuilder.addFields({
+											inline: true,
+											name: ul("common.dice").capitalize(),
+											value: `\`${guildTemplate.diceType}\``,
+										});
+										if (guildTemplate.critical?.success)
+											templateEmbedBuilder.addFields({
+												inline: true,
+												name: ul("roll.critical.success"),
+												value: `\`${guildTemplate.critical.success}\``,
+											});
+										if (guildTemplate.critical?.failure)
+											templateEmbedBuilder.addFields({
+												inline: true,
+												name: ul("roll.critical.failure"),
+												value: `\`${guildTemplate.critical.failure}\``,
+											});
+									}
+
+									const embeds = createEmbedsList(
+										userDataEmbed,
+										statsEmbed,
+										diceEmbed,
+										templateEmbedBuilder
+									);
+									const hasDice = !!diceEmbed;
+									const hasStats = !!statsEmbed;
+									const hasTemplate = !!templateEmbedBuilder;
+
+									const components = [
+										editUserButtons(ul, hasStats, hasDice),
+										selectEditMenu(ul),
+									];
+
+									// Post message — forum channels get a new thread
+									let msgId: string;
+									let finalChannelId: string;
+
+									if (channel instanceof Djs.ForumChannel) {
+										const threadName = char.userName ?? ul("common.character");
+										const newThread = await channel.threads.create({
+											autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneWeek,
+											message: { components, embeds },
+											name: threadName,
+										});
+										const starter = await newThread.fetchStarterMessage();
+										if (!starter)
+											throw new Error("Could not fetch forum thread starter message");
+										msgId = starter.id;
+										finalChannelId = newThread.id;
+									} else {
+										const msg = await (channel as Djs.TextChannel).send({
+											components,
+											embeds,
+										});
+										msgId = msg.id;
+										finalChannelId = channel.id;
+									}
+
+									const key = `${userId}:${char.userName ?? ""}`;
+									postResults.push({
+										char,
+										channelId: finalChannelId,
+										existingIdx: existingIndices.get(key) ?? -1,
+										messageId: msgId,
+										userId,
+									});
+
+									// Update in-memory character cache immediately
+									await updateMemory(client.characters, guildId, userId, ul, {
+										userData: char,
+									});
+
+									success++;
+								} catch (err) {
+									failed++;
+									collectedErrors.push(err instanceof Error ? err.message : String(err));
+								}
+							})
+						);
+					}
+				}
+
+				await Promise.allSettled(jobs);
+
+				// Commit all settings changes in one pass (sequential, no races)
+				for (const r of postResults) {
+					if (!guildData.user[r.userId]) guildData.user[r.userId] = [];
+					const entry: UserGuildData = {
+						charName: r.char.userName,
+						isPrivate: r.char.private ?? false,
+						messageId: [r.messageId, r.channelId],
+					};
+					if (r.existingIdx >= 0) guildData.user[r.userId][r.existingIdx] = entry;
+					else guildData.user[r.userId].push(entry);
+				}
+				client.settings.set(guildId, guildData);
+
+				return { success, failed, errors: collectedErrors };
+			},
 		},
 	});
+}
+
+function pLimit(concurrency: number) {
+	let activeCount = 0;
+	const queue: Array<() => void> = [];
+	const next = () => {
+		activeCount--;
+		queue.shift()?.();
+	};
+	return async function limit<T>(fn: () => Promise<T>): Promise<T> {
+		if (activeCount >= concurrency) {
+			return new Promise<T>((resolve, reject) => {
+				queue.push(() => {
+					activeCount++;
+					fn().then(resolve).catch(reject).finally(next);
+				});
+			});
+		}
+		activeCount++;
+		try {
+			return await fn();
+		} finally {
+			next();
+		}
+	};
 }

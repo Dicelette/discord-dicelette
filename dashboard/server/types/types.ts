@@ -117,6 +117,16 @@ export interface BotChannels {
 		publicChannel?: string,
 		privateChannel?: string
 	) => Promise<{ messageId: string; publicChannelId?: string } | null>;
+	/**
+	 * Import characters from CSV text, posting real Discord messages with embeds.
+	 * Mirrors the /import bot command logic: parses CSV, builds embeds, posts to Discord,
+	 * registers data in settings + memory. Optionally deletes the previous message on reimport.
+	 */
+	bulkImportCharacters: (
+		guildId: string,
+		csvText: string,
+		deleteOldMessages: boolean
+	) => Promise<{ success: number; failed: number; errors: string[] }>;
 }
 
 export interface DashboardDeps {
