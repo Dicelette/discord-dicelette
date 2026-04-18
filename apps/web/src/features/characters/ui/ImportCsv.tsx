@@ -1,5 +1,5 @@
 import { charactersApi } from "@dicelette/api";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
 	Alert,
 	Box,
@@ -86,7 +86,7 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 		<>
 			<Button
 				variant="contained"
-				startIcon={<CloudUploadIcon />}
+				startIcon={<DownloadIcon />}
 				onClick={() => setOpen(true)}
 			>
 				{t("characters.import")}
