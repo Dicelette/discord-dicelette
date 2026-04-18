@@ -1,4 +1,4 @@
-import { Delete, Edit, Upload } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import {
 	Alert,
 	Box,
@@ -53,6 +53,10 @@ export default function TemplateManager({
 		defaultPrivateChannelId
 	);
 
+	const handleExportTemplate = () => {
+		if (template) exportJson(template, "template.json");
+	};
+
 	return (
 		<>
 			<SectionTitle>{t("common.template").toTitle()}</SectionTitle>
@@ -90,26 +94,16 @@ export default function TemplateManager({
 				</Button>
 
 				{template && (
-					<>
-						<Button
-							variant="outlined"
-							startIcon={<Upload />}
-							onClick={() => exportJson(template, "template.json")}
-							size="small"
-						>
-							{t("export.name").toTitle()}
-						</Button>
-						<Button
-							variant="outlined"
-							color="error"
-							startIcon={<Delete />}
-							onClick={() => dispatch({ type: "confirm_delete", value: true })}
-							disabled={saving}
-							size="small"
-						>
-							{t("template.delete")}
-						</Button>
-					</>
+					<Button
+						variant="outlined"
+						color="error"
+						startIcon={<Delete />}
+						onClick={() => dispatch({ type: "confirm_delete", value: true })}
+						disabled={saving}
+						size="small"
+					>
+						{t("template.delete")}
+					</Button>
 				)}
 			</Box>
 
@@ -133,6 +127,7 @@ export default function TemplateManager({
 				open={editModalOpen}
 				onClose={() => dispatch({ type: "edit_modal", value: false })}
 				onSave={handleModalImport}
+				onExportTemplate={handleExportTemplate}
 				onExportCharacters={handleExportCharacters}
 				channels={channels}
 				hasCharacters={hasCharacters}

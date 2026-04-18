@@ -1,6 +1,7 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import { Upload } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import {
 	Alert,
 	Box,
@@ -69,6 +70,7 @@ interface Props {
 	onSave: (data: ImportTemplateData) => Promise<void>;
 	channels: Channel[];
 	hasCharacters: boolean;
+	onExportTemplate?: () => void;
 	onExportCharacters?: () => void;
 	/** If provided, pre-populates the form (edit mode). */
 	existingTemplate?: StatisticalTemplate;
@@ -310,6 +312,16 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 											}
 										/>
 									</Stack>
+									{props.onExportCharacters && (
+										<Button
+											variant="outlined"
+											startIcon={<Upload />}
+											onClick={props.onExportCharacters}
+											fullWidth
+										>
+											{t("template.exportCharacters")}
+										</Button>
+									)}
 								</Stack>
 							)}
 						</Stack>
@@ -341,14 +353,14 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 					justifyContent: "space-between",
 				}}
 			>
-				{props.onExportCharacters && hasCharacters ? (
+				{props.onExportTemplate && isEditMode ? (
 					<Button
 						variant="outlined"
-						startIcon={<Upload />}
-						onClick={props.onExportCharacters}
+						startIcon={<FileDownloadIcon />}
+						onClick={props.onExportTemplate}
 						size="small"
 					>
-						{t("template.exportCharacters")}
+						{t("export.name").toTitle()}
 					</Button>
 				) : (
 					<Box />
