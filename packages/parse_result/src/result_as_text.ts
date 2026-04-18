@@ -425,12 +425,12 @@ export class ResultAsText {
 				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 
 				if (success) {
-					const isBulkRoll = this.resultat?.dice?.includes("#d");
-					if (!isBulkRoll) {
-						// Keep the CC comparison to display it next to the username,
-						// but keep the message displayed on the stat (basic comparison)
+					const isBulkRoll =
+						this.resultat?.dice?.includes("#d") ||
+						(this.resultat?.result?.includes(";") ?? false);
+					if (!isBulkRoll)
 						this.headerCompare = this.convertCustomCriticalToCompare(custom);
-					} else {
+					else {
 						// For bulk rolls, display the custom critical comparison in the result line
 						displayCompare = this.convertCustomCriticalToCompare(custom);
 						goodSign = this.goodCompareSign(displayCompare, total);
