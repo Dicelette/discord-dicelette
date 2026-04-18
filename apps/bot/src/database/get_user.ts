@@ -148,11 +148,11 @@ export async function getFirstChar(
 	return { optionChar, userStatistique };
 }
 
-export async function getUser(
+export async function getCharacterMessage(
 	messageId: UserMessageId,
 	guild: Djs.Guild,
 	client: EClient
-) {
+): Promise<Message | undefined> {
 	const sheetLocation: PersonnageIds = {
 		channelId: messageId[1],
 		messageId: messageId[0],
@@ -161,9 +161,7 @@ export async function getUser(
 	if (channel instanceof Djs.CategoryChannel) return;
 
 	if (!channel) {
-		//get the channel from the guild
 		const fetchedChannel = await fetchChannel(guild, sheetLocation.channelId);
-		// noinspection SuspiciousTypeOfGuard
 		if (
 			!fetchedChannel ||
 			fetchedChannel instanceof Djs.CategoryChannel ||
@@ -181,12 +179,21 @@ export async function getUser(
 				logger.warn(`Message ${sheetLocation.messageId} not found`);
 				return;
 			}
-			return getUserByEmbed({ message });
+			return message;
 		}
 	} catch (_e) {
-		//logger.warn(_e);
 		return;
 	}
+}
+
+export async function getUser(
+	messageId: UserMessageId,
+	guild: Djs.Guild,
+	client: EClient
+) {
+	const message = await getCharacterMessage(messageId, guild, client);
+	if (!message) return;
+	return getUserByEmbed({ message });
 }
 
 // Factored function to extract common logic between variants
