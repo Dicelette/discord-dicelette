@@ -3,13 +3,9 @@
  */
 
 import type { EClient } from "@dicelette/client";
-import {
-	type CSVRow,
-	getGuildContext,
-	getInteractionContext as getLangAndConfig,
-} from "@dicelette/helpers";
-import { t } from "@dicelette/localization";
-import { getUserFromInteraction } from "database";
+import { type CSVRow, getGuildContext } from "@dicelette/helpers";
+import { ln, t } from "@dicelette/localization";
+import type { UserData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
@@ -59,7 +55,7 @@ export const exportData = {
 		const isPrivate = options.getBoolean(t("export.options.name")) ?? undefined;
 		const guildId = interaction.guild.id;
 		await interaction.deferReply();
-		const buffer = await exportToCsv(client, guildId, interaction, isPrivate);
+		const buffer = await exportCharactersCsv(client, guildId, isPrivate);
 		if (!buffer) {
 			await interaction.editReply(t("export.error.noData"));
 			return;
@@ -75,24 +71,18 @@ export const exportData = {
 	},
 };
 
-async function exportToCsv(
+export async function exportCharactersCsv(
 	client: EClient,
 	guildId: string,
-	interaction: Djs.CommandInteraction,
 	isPrivate?: boolean
-) {
+): Promise<Buffer | null> {
 	const guildData = client.settings.get(guildId);
-	if (!guildData) {
-		await interaction.editReply(t("export.error.noData"));
-		return;
-	}
+	if (!guildData) return null;
 	const allUser = guildData.user;
+	if (!allUser) return null;
 
-	if (!allUser) {
-		await interaction.editReply(t("export.error.noData"));
-		return;
-	}
-	const { ul } = getLangAndConfig(client, interaction);
+	const lang = client.settings.get(guildId, "lang");
+	const ul = ln(lang ?? Djs.Locale.EnglishUS);
 	const csv: CSVRow[] = [];
 	const ctx = getGuildContext(client, guildId);
 	const statsName = ctx?.templateID?.statsName;
@@ -116,15 +106,16 @@ async function exportToCsv(
 		for (const char of chara) {
 			tasks.push(
 				limit(async () => {
-					const stats = (
-						await getUserFromInteraction(client, user, interaction, char.charName, {
-							cleanUrl: false,
-							fetchAvatar: true,
-							fetchChannel: true,
-							skipNotFound: true,
-						})
-					)?.userData;
-					if (!stats) return;
+					// Get character data from in-memory cache
+					const memChars: UserData[] =
+						(client.characters.get(guildId, user) as UserData[] | undefined) ?? [];
+					const charData = memChars.find((c) => {
+						if (c.userName && char.charName)
+							return c.userName.unidecode() === char.charName.unidecode();
+						return !c.userName && !char.charName;
+					});
+					if (!charData) return;
+					const stats = charData;
 
 					// dice lines with localized separator/space
 					const dice: undefined | string = stats.damage
