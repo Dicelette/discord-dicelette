@@ -4,6 +4,7 @@ import { startDashboardServer } from "@dicelette/server";
 import type { UserData, UserGuildData } from "@dicelette/types";
 import * as Djs from "discord.js";
 import type { EClient } from "./client";
+import { exportCharactersCsv } from "./commands/admin/export";
 import { templateEmbed } from "./commands/admin/template";
 import { getTemplate } from "./database";
 import { updateMemory } from "./database/memory";
@@ -486,6 +487,9 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				client.settings.set(guildId, guildData);
 
 				return { success, failed, errors: collectedErrors };
+			},
+			exportCharactersCsv: (guildId, isPrivate) => {
+				return exportCharactersCsv(client, guildId, isPrivate);
 			},
 		},
 	});

@@ -127,6 +127,11 @@ export interface BotChannels {
 		csvText: string,
 		deleteOldMessages: boolean
 	) => Promise<{ success: number; failed: number; errors: string[] }>;
+	/**
+	 * Export characters to CSV buffer. Fetches all character data, builds CSV with proper backtick cleaning.
+	 * Same logic as /export bot command.
+	 */
+	exportCharactersCsv: (guildId: string, isPrivate?: boolean) => Promise<Buffer | null>;
 }
 
 export interface DashboardDeps {

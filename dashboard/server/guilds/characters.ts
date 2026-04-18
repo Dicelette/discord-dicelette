@@ -2,7 +2,6 @@ import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
 import { important } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import Papa from "papaparse";
 import "uniformize";
 import {
 	type ApiCharacter,
@@ -317,102 +316,12 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			const guildId = req.params.guildId as string;
 
 			try {
-				const guildData = settings.get(guildId);
-				if (!guildData) {
-					res.status(404).json({ error: "Guild not found" });
+				// Delegate to bot's export logic (same as /export command)
+				const buf = await botChannels.exportCharactersCsv(guildId);
+				if (!buf) {
+					res.status(404).json({ error: "No characters found" });
 					return;
 				}
-
-				const statsName: string[] = guildData.templateID?.statsName ?? [];
-				const hasPrivateChannel = !!guildData.privateChannel;
-				const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
-				const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
-
-				// Pre-load stats from Discord for all characters (automatic refresh)
-				const limiter = pLimit(10);
-				const charDataCache = new Map<
-					string,
-					{
-						avatar: string | null;
-						stats: EmbedField[] | null;
-						damage: EmbedField[] | null;
-					}
-				>();
-
-				const loadTasks: Promise<void>[] = [];
-				for (const [uid, charList] of Object.entries(allUsers)) {
-					const memChars: UserData[] = allMemChars[uid] ?? [];
-					const memMaps = buildMemMaps(memChars);
-
-					for (const char of charList) {
-						const [messageId, channelId] = char.messageId;
-						const cacheKey = `${uid}:${messageId}`;
-
-						loadTasks.push(
-							limiter(async () => {
-								const resolved = await resolveCharacterData(
-									char.charName,
-									messageId,
-									channelId,
-									memMaps,
-									botChannels
-								);
-								charDataCache.set(cacheKey, resolved);
-							})
-						);
-					}
-				}
-
-				await Promise.allSettled(loadTasks);
-
-				type CsvRow = Record<string, string | number | boolean | undefined>;
-				const rows: CsvRow[] = [];
-
-				for (const [uid, charList] of Object.entries(allUsers)) {
-					for (const char of charList) {
-						const [messageId, channelId] = char.messageId;
-						const cacheKey = `${uid}:${messageId}`;
-						const charData = charDataCache.get(cacheKey);
-
-						const row: CsvRow = {
-							user: `'${uid}`,
-							charName: char.charName ?? undefined,
-							avatar: charData?.avatar ?? undefined,
-							channel: channelId ? `'${channelId}` : undefined,
-						};
-
-						if (hasPrivateChannel) row.isPrivate = char.isPrivate ?? false;
-
-						// Add stats from resolved data
-						if (charData?.stats) {
-							for (const stat of charData.stats) {
-								row[stat.name.removeBacktick()] = stat.value.removeBacktick();
-							}
-						}
-
-						// Add damage/dice
-						if (charData?.damage && charData.damage.length > 0) {
-							row.dice = `'${charData.damage.map((d) => `- ${d.name.removeBacktick()}: ${d.value.removeBacktick()}`).join("\n")}`;
-						}
-
-						rows.push(row);
-					}
-				}
-
-				const columns = ["user", "charName", "avatar", "channel"];
-				if (hasPrivateChannel) columns.push("isPrivate");
-				if (statsName.length > 0) columns.push(...statsName);
-				columns.push("dice");
-
-				const csv = Papa.unparse(rows, {
-					columns,
-					delimiter: ";",
-					header: true,
-					quotes: false,
-				});
-
-				// UTF-8 BOM for Excel
-				const buf = Buffer.from(`\ufeff${csv}`, "utf-8");
 				res.setHeader("Content-Type", "text/csv; charset=utf-8");
 				res.setHeader("Content-Disposition", 'attachment; filename="characters.csv"');
 				res.send(buf);
