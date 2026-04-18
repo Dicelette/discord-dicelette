@@ -121,7 +121,7 @@ export async function changeOwnerInDatabase(
 	let char: UserData | undefined;
 	if (allCharsOldUser)
 		char = allCharsOldUser.find((char) => char?.userName?.subText(charName, true));
-	else char = await getUser(location, guild, client);
+	else char = (await getUser(location, guild, client))?.userData;
 	if (allCharsNewUser) {
 		//prevent duplicate
 		if (!allCharsNewUser.find((char) => char?.userName?.subText(charName, true))) {

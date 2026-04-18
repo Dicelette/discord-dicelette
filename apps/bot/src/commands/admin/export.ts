@@ -8,7 +8,7 @@ import { ln, t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "@dicelette/discord_ext";
-import { getUserWithMacroNames } from "../../database/get_user";
+import { getUser } from "../../database/get_user";
 
 // small p-limit helper to avoid concurrent bursts against Discord API
 function pLimit(concurrency: number) {
@@ -110,7 +110,7 @@ export async function exportCharactersCsv(
 			tasks.push(
 				limit(async () => {
 					try {
-						const result = await getUserWithMacroNames(char.messageId, guild, client, {
+						const result = await getUser(char.messageId, guild, client, {
 							fetchAvatar: true,
 							fetchChannel: true,
 							cleanUrl: false,

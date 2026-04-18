@@ -199,29 +199,6 @@ export async function getUser(
 ) {
 	const message = await getCharacterMessage(messageId, guild, client);
 	if (!message) return;
-	return getUserByEmbed(
-		{ message },
-		false,
-		options?.integrateCombinaison ?? true,
-		options?.fetchAvatar ?? false,
-		options?.fetchChannel ?? false,
-		options?.cleanUrl ?? true
-	);
-}
-
-export async function getUserWithMacroNames(
-	messageId: UserMessageId,
-	guild: Djs.Guild,
-	client: EClient,
-	options?: {
-		integrateCombinaison?: boolean;
-		fetchAvatar?: boolean;
-		fetchChannel?: boolean;
-		cleanUrl?: boolean;
-	}
-) {
-	const message = await getCharacterMessage(messageId, guild, client);
-	if (!message) return;
 
 	const userData = getUserByEmbed(
 		{ message },
