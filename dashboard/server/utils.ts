@@ -263,13 +263,16 @@ export function classifyEmbed(embed: RawEmbed): "user" | "stats" | "damage" | nu
 export async function fetchCharacterEmbeds(
 	channelId: string,
 	messageId: string,
-	botChannels: BotChannels
+	botChannels: BotChannels,
+	forceRefresh = false
 ): Promise<{
 	avatar: string | null;
 	stats: EmbedField[] | null;
 	damage: EmbedField[] | null;
 }> {
-	const msg = await botChannels.fetchMessage(channelId, messageId);
+	const msg = await botChannels.fetchMessage(channelId, messageId, {
+		force: forceRefresh,
+	});
 	if (!msg) return { avatar: null, stats: null, damage: null };
 	let avatar: string | null = null;
 	let stats: EmbedField[] | null = null;

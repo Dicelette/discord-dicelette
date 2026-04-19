@@ -9,6 +9,7 @@ import {
 	type BotChannels,
 	CHAR_CACHE_TTL,
 	charCache,
+	charForceRefresh,
 	type DashboardDeps,
 	type EmbedField,
 } from "../types";
@@ -40,7 +41,8 @@ async function resolveCharacterData(
 	messageId: string,
 	channelId: string,
 	memMaps: ReturnType<typeof buildMemMaps>,
-	botChannels: BotChannels
+	botChannels: BotChannels,
+	forceRefresh = false
 ): Promise<{
 	avatar: string | null;
 	stats: EmbedField[] | null;
@@ -58,7 +60,12 @@ async function resolveCharacterData(
 
 	const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
 	try {
-		const fetched = await fetchCharacterEmbeds(channelId, messageId, botChannels);
+		const fetched = await fetchCharacterEmbeds(
+			channelId,
+			messageId,
+			botChannels,
+			forceRefresh
+		);
 		if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
 		stats = fetched.stats;
 		damage = fetched.damage;
@@ -79,6 +86,15 @@ async function resolveCharacterData(
 	return { avatar, stats, damage };
 }
 
+function invalidateGuildCharacterCache(guildId: string) {
+	for (const key of [...charCache.keys()]) {
+		if (key.startsWith(`${guildId}:`)) charCache.delete(key);
+	}
+	for (const key of [...charForceRefresh]) {
+		if (key.startsWith(`${guildId}:`)) charForceRefresh.delete(key);
+	}
+}
+
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
 	const router = Router({ mergeParams: true });
@@ -89,9 +105,10 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
 		const cacheKey = `${guildId}:${userId}`;
+		const forceRefresh = charForceRefresh.delete(cacheKey);
 
 		const cached = charCache.get(cacheKey);
-		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+		if (!forceRefresh && cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
 			const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 			const data = await Promise.all(
 				cached.data.map(async (char) => ({
@@ -141,7 +158,8 @@ export function createCharactersRouter(deps: DashboardDeps) {
 								messageId,
 								channelId,
 								memMaps,
-								botChannels
+								botChannels,
+								forceRefresh
 							);
 							return {
 								charName: char.charName ?? null,
@@ -175,7 +193,9 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	router.post("/refresh", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
-		charCache.delete(`${guildId}:${userId}`);
+		const cacheKey = `${guildId}:${userId}`;
+		charCache.delete(cacheKey);
+		charForceRefresh.add(cacheKey);
 		res.json({ ok: true });
 	});
 
@@ -183,8 +203,10 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	router.post("/refresh-dashboard", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.session.userId!;
+		const userCacheKey = `${guildId}:${userId}`;
 
-		charCache.delete(`${guildId}:${userId}`);
+		charCache.delete(userCacheKey);
+		charForceRefresh.add(userCacheKey);
 
 		const canRefreshServer = await userCanRefreshServerCharacters(
 			userId,
@@ -192,7 +214,8 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			botGuilds
 		);
 		if (canRefreshServer) {
-			charCache.delete(`${guildId}:*all*`);
+			invalidateGuildCharacterCache(guildId);
+			charForceRefresh.add(`${guildId}:*all*`);
 		}
 
 		res.json({ ok: true, refreshedAll: canRefreshServer });
@@ -202,9 +225,10 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const cacheKey = `${guildId}:*all*`;
+		const forceRefresh = charForceRefresh.delete(cacheKey);
 
 		const cached = charCache.get(cacheKey);
-		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+		if (!forceRefresh && cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
 			res.setHeader("Cache-Control", "no-store");
 			res.json(cached.data);
 			return;
@@ -253,7 +277,8 @@ export function createCharactersRouter(deps: DashboardDeps) {
 										messageId,
 										channelId,
 										memMaps,
-										botChannels
+										botChannels,
+										forceRefresh
 									);
 									return {
 										charName: char.charName ?? null,
@@ -294,7 +319,8 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		requireAdmin,
 		(req: Request, res: Response) => {
 			const guildId = req.params.guildId as string;
-			charCache.delete(`${guildId}:*all*`);
+			invalidateGuildCharacterCache(guildId);
+			charForceRefresh.add(`${guildId}:*all*`);
 			res.json({ ok: true });
 		}
 	);
@@ -367,9 +393,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			characters.delete(guildId);
 
 			// Invalidates cache for all server users
-			for (const key of [...charCache.keys()]) {
-				if (key.startsWith(`${guildId}:`)) charCache.delete(key);
-			}
+			invalidateGuildCharacterCache(guildId);
 
 			res.json({ ok: true });
 		}
@@ -418,9 +442,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				);
 
 				// Invalidate caches
-				for (const key of [...charCache.keys()]) {
-					if (key.startsWith(`${guildId}:`)) charCache.delete(key);
-				}
+				invalidateGuildCharacterCache(guildId);
 
 				res.json(results);
 			} catch (error) {

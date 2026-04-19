@@ -46,6 +46,8 @@ export function startDashboardServer(deps: DashboardDeps): void {
 
 	const app = express();
 	app.set("trust proxy", 1);
+	// Keep conditional caching opt-in only (sendEtaggedJson), avoid implicit 304 on all GET routes.
+	app.set("etag", false);
 
 	// Security headers
 	app.use(

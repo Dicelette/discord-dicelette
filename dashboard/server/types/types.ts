@@ -102,7 +102,11 @@ export interface BotMessage {
 /** Channel accessor backed by the Discord.js client cache */
 export interface BotChannels {
 	/** Fetch a message; checks Discord.js message cache first, falls back to API */
-	fetchMessage: (channelId: string, messageId: string) => Promise<BotMessage | null>;
+	fetchMessage: (
+		channelId: string,
+		messageId: string,
+		options?: { force?: boolean }
+	) => Promise<BotMessage | null>;
 	/** Delete a message; returns true if deleted, false if not found or forbidden */
 	deleteMessage: (channelId: string, messageId: string) => Promise<boolean>;
 	/** Send a plain-text message to a channel; returns true if sent */

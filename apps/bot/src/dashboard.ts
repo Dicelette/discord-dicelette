@@ -102,7 +102,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 			},
 		},
 		botChannels: {
-			fetchMessage: async (channelId, messageId) => {
+			fetchMessage: async (channelId, messageId, options) => {
 				let channel: Djs.Channel | null | undefined =
 					client.channels.cache.get(channelId);
 				if (!channel) {
@@ -114,9 +114,10 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				}
 				if (!channel?.isTextBased()) return null;
 				try {
-					const msg =
-						channel.messages.cache.get(messageId) ??
-						(await channel.messages.fetch(messageId));
+					const force = options?.force ?? false;
+					if (force) channel.messages.cache.delete(messageId);
+					const cachedMsg = force ? undefined : channel.messages.cache.get(messageId);
+					const msg = cachedMsg ?? (await channel.messages.fetch(messageId));
 					return {
 						embeds: msg.embeds.map((e) => ({
 							title: e.title ?? undefined,
