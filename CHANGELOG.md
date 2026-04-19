@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.14.0](https://github.com/Dicelette/discord-dicelette/compare/3.13.0...3.14.0) (2026-04-19)
+
+
+### Features
+
+* integrate character import, edit, and logs on dashboard ([2a19d89](https://github.com/Dicelette/discord-dicelette/commit/2a19d8989fcd2fa6b76cf02c387f046dc9ef04f2))
+
+
+### Bug Fixes
+
+* **bot:roll:** enhance bulk roll handling in comparison logic ([0e35caa](https://github.com/Dicelette/discord-dicelette/commit/0e35caa34b8af23495991b23b42e79e76021d9e7))
+* **bulk:** should keep the original comparaison in the header ([8d0c857](https://github.com/Dicelette/discord-dicelette/commit/8d0c857e58be8eb4ffebe8a8a776912522a4fce2))
+* fallback to Discord embed field names when damageName missing ([eef7497](https://github.com/Dicelette/discord-dicelette/commit/eef74978b46094356bd713f39cf0fb818d6de572))
+* fetch character data from Discord instead of in-memory cache ([de6c683](https://github.com/Dicelette/discord-dicelette/commit/de6c6836784e93b3a1b6d68134f3c167fb9c2912))
+* preserve original macro/damage names with accents in export and import ([1e550ce](https://github.com/Dicelette/discord-dicelette/commit/1e550ce835fd8cf204c7005df0979b398ade12ce))
+* use char.damageName for export (original names, fiche-only macros) ([52775a8](https://github.com/Dicelette/discord-dicelette/commit/52775a83b9ba9d7507fa064d0e6457650850bd01))
+
 ## [3.13.0](https://github.com/Dicelette/discord-dicelette/compare/3.12.2...3.13.0) (2026-04-17)
 
 
