@@ -79,6 +79,8 @@ export interface BotMember {
 export interface BotGuild {
 	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
 	fetchMember: (userId: string) => Promise<BotMember | null>;
+	/** Returns true if the member can view/read the target channel */
+	memberCanAccessChannel: (userId: string, channelId: string) => Promise<boolean>;
 	/** Fetch the user's Discord handle (pomelo), formatted as @username */
 	fetchMemberName: (userId: string) => Promise<string | null>;
 	/** All channels in the guild (all types, let the caller filter) */

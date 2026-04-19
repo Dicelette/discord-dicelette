@@ -17,16 +17,12 @@ import {
 	isStaleDiscordCdnUrl,
 	makeRequireAdmin,
 	requireAuth,
+	userCanAccessChannel,
+	userCanManageGuild,
 	userCanRefreshServerCharacters,
 	withTimeout,
 } from "../utils";
 import { sendDashboardLog } from "./logs";
-
-function isAllowSelfRegister(guildData: {
-	allowSelfRegister?: boolean | string;
-}): boolean {
-	return guildData.allowSelfRegister === true || guildData.allowSelfRegister === "true";
-}
 
 function buildMemMaps(memChars: UserData[]) {
 	const memByMessageId = new Map<string, UserData>(
@@ -96,8 +92,17 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 		const cached = charCache.get(cacheKey);
 		if (cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+			const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
+			const data = await Promise.all(
+				cached.data.map(async (char) => ({
+					...char,
+					canLink:
+						isAdmin ||
+						(await userCanAccessChannel(userId, guildId, char.channelId, botGuilds)),
+				}))
+			);
 			res.setHeader("Cache-Control", "no-store");
-			res.json(cached.data);
+			res.json(data);
 			return;
 		}
 
@@ -108,7 +113,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 
 		const userChars = guildData.user?.[userId] ?? [];
-		const canLink = isAllowSelfRegister(guildData);
+		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 
 		// Lookup in the bot's in-memory cache (same process) — avoids Discord calls
 		const memChars: UserData[] =
@@ -128,6 +133,9 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						.map(async (char) => {
 							const [messageId, channelId] = char.messageId;
 							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+							const canLink =
+								isAdmin ||
+								(await userCanAccessChannel(userId, guildId, channelId, botGuilds));
 							const { avatar, stats, damage } = await resolveCharacterData(
 								char.charName,
 								messageId,
@@ -208,7 +216,6 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const canLink = isAllowSelfRegister(guildData);
 		const allUsers: Record<string, UserGuildData[]> = guildData.user ?? {};
 		const allMemChars = (characters.get(guildId) as UserDatabase | undefined) ?? {};
 		const guild = botGuilds.get(guildId);
@@ -253,7 +260,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 										messageId,
 										channelId,
 										discordLink,
-										canLink,
+										canLink: true,
 										isPrivate: char.isPrivate ?? false,
 										avatar,
 										stats,
@@ -426,29 +433,4 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	);
 
 	return router;
-}
-
-function pLimit(concurrency: number) {
-	let activeCount = 0;
-	const queue: Array<() => void> = [];
-	const next = () => {
-		activeCount--;
-		queue.shift()?.();
-	};
-	return async function limit<T>(fn: () => Promise<T>): Promise<T> {
-		if (activeCount >= concurrency) {
-			return new Promise<T>((resolve, reject) => {
-				queue.push(() => {
-					activeCount++;
-					fn().then(resolve).catch(reject).finally(next);
-				});
-			});
-		}
-		activeCount++;
-		try {
-			return await fn();
-		} finally {
-			next();
-		}
-	};
 }

@@ -194,6 +194,27 @@ export async function userCanRefreshServerCharacters(
 	}
 }
 
+export async function userCanAccessChannel(
+	userId: string,
+	guildId: string,
+	channelId: string,
+	botGuilds: DashboardDeps["botGuilds"]
+): Promise<boolean> {
+	const cacheKey = `channel:${userId}:${guildId}:${channelId}`;
+	const hit = getCached(cacheKey);
+	if (hit !== null) return hit;
+
+	const guild = botGuilds.get(guildId);
+	if (!guild) return setCached(cacheKey, false);
+
+	try {
+		const result = await guild.memberCanAccessChannel(userId, channelId);
+		return setCached(cacheKey, result);
+	} catch {
+		return false;
+	}
+}
+
 /**
  * Vérifie si un utilisateur peut gérer un serveur via son token OAuth.
  * Utilisé pour les serveurs où le bot n'est pas encore présent (ex. /invite),

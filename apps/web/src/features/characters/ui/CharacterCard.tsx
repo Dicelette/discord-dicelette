@@ -1,6 +1,15 @@
 import type { ApiCharacter } from "@dicelette/api";
 import { Lock, OpenInNew } from "@mui/icons-material";
-import { Avatar, Box, Button, Chip, Divider, Paper, Typography } from "@mui/material";
+import {
+	Avatar,
+	Box,
+	Button,
+	Chip,
+	Divider,
+	Link,
+	Paper,
+	Typography,
+} from "@mui/material";
 import "uniformize";
 import { useI18n } from "@shared";
 import { memo } from "react";
@@ -15,6 +24,11 @@ const nameRowSx = {
 	alignItems: "center",
 	gap: 1,
 	flexWrap: "wrap",
+} as const;
+const nameLinkSx = {
+	maxWidth: "100%",
+	textDecorationThickness: "0.08em",
+	textUnderlineOffset: "0.12em",
 } as const;
 const dividerSx = { mb: 1.5 } as const;
 const dividerWithStatsSx = { mb: 1.5, mt: 1.5 } as const;
@@ -47,9 +61,24 @@ function CharacterCard({ char }: Props) {
 
 				<Box sx={nameSectionSx}>
 					<Box sx={nameRowSx}>
-						<Typography variant="h4" fontWeight={600} noWrap>
-							{displayName.toTitle()}
-						</Typography>
+						{char.canLink ? (
+							<Link
+								href={char.discordLink}
+								target="_blank"
+								rel="noopener noreferrer"
+								color="inherit"
+								underline="hover"
+								sx={nameLinkSx}
+							>
+								<Typography variant="h4" fontWeight={600} noWrap>
+									{displayName.toTitle()}
+								</Typography>
+							</Link>
+						) : (
+							<Typography variant="h4" fontWeight={600} noWrap>
+								{displayName.toTitle()}
+							</Typography>
+						)}
 						{char.isPrivate && (
 							<Chip
 								icon={<Lock />}

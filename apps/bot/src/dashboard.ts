@@ -51,6 +51,26 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 							return null;
 						}
 					},
+					memberCanAccessChannel: async (userId, channelId) => {
+						try {
+							const member =
+								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
+							const channel =
+								guild.channels.cache.get(channelId) ??
+								(await guild.channels.fetch(channelId));
+							if (!channel) return false;
+
+							const permissions = channel.permissionsFor(member, true);
+							if (!permissions) return false;
+
+							return permissions.has([
+								Djs.PermissionFlagsBits.ViewChannel,
+								Djs.PermissionFlagsBits.ReadMessageHistory,
+							]);
+						} catch {
+							return false;
+						}
+					},
 					fetchMemberName: async (userId) => {
 						try {
 							const m =
