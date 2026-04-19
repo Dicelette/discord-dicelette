@@ -36,6 +36,28 @@ function buildMemMaps(memChars: UserData[]) {
 	return { memByMessageId, memByUserName, memWithoutName };
 }
 
+function mapMemStats(mem?: UserData): EmbedField[] | null {
+	if (!mem?.stats) return null;
+	return Object.entries(mem.stats).map(([name, value]) => ({
+		name,
+		value: String(value),
+	}));
+}
+
+function mapMemDamage(mem?: UserData): EmbedField[] | null {
+	if (!mem?.damage) return null;
+	return Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+}
+
+function sendNoStoreJson(res: Response, payload: unknown) {
+	res.setHeader("Cache-Control", "no-store");
+	res.json(payload);
+}
+
+function isTimeoutError(err: unknown): err is Error {
+	return err instanceof Error && err.message.startsWith("Timed out");
+}
+
 async function resolveCharacterData(
 	charName: string | null | undefined,
 	messageId: string,
@@ -55,8 +77,8 @@ async function resolveCharacterData(
 		(charName == null ? memWithoutName : undefined);
 
 	let avatar: string | null = mem?.avatar ?? null;
-	let stats: EmbedField[] | null = null;
-	let damage: EmbedField[] | null = null;
+	let stats: EmbedField[] | null;
+	let damage: EmbedField[] | null;
 
 	const hasStaleAvatar = isStaleDiscordCdnUrl(avatar);
 	try {
@@ -67,20 +89,15 @@ async function resolveCharacterData(
 			forceRefresh
 		);
 		if (avatar === null || hasStaleAvatar) avatar = fetched.avatar;
-		stats = fetched.stats;
-		damage = fetched.damage;
+		stats = fetched.stats ?? mapMemStats(mem);
+		damage = fetched.damage ?? mapMemDamage(mem);
 	} catch (err) {
 		important.warn(
 			`[characters] embed unavailable for ${messageId}: ${err instanceof Error ? err.message : String(err)}`
 		);
 		// Only use memory as fallback if Discord fetch fails
-		if (mem?.stats)
-			stats = Object.entries(mem.stats).map(([name, value]) => ({
-				name,
-				value: String(value),
-			}));
-		if (mem?.damage)
-			damage = Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
+		stats = mapMemStats(mem);
+		damage = mapMemDamage(mem);
 	}
 
 	return { avatar, stats, damage };
@@ -118,8 +135,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						(await userCanAccessChannel(userId, guildId, char.channelId, botGuilds)),
 				}))
 			);
-			res.setHeader("Cache-Control", "no-store");
-			res.json(data);
+			sendNoStoreJson(res, data);
 			return;
 		}
 
@@ -177,7 +193,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				15_000
 			);
 		} catch (err) {
-			if (err instanceof Error && err.message.startsWith("Timed out")) {
+			if (isTimeoutError(err)) {
 				res.status(504).json({ error: "Request timed out" });
 				return;
 			}
@@ -185,8 +201,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
-		res.setHeader("Cache-Control", "no-store");
-		res.json(result);
+		sendNoStoreJson(res, result);
 	});
 
 	// POST /:guildId/characters/refresh — invalidates current player's cache
@@ -229,8 +244,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 		const cached = charCache.get(cacheKey);
 		if (!forceRefresh && cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
-			res.setHeader("Cache-Control", "no-store");
-			res.json(cached.data);
+			sendNoStoreJson(res, cached.data);
 			return;
 		}
 
@@ -300,7 +314,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 				30_000
 			);
 		} catch (err) {
-			if (err instanceof Error && err.message.startsWith("Timed out")) {
+			if (isTimeoutError(err)) {
 				res.status(504).json({ error: "Request timed out" });
 				return;
 			}
@@ -308,8 +322,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
-		res.setHeader("Cache-Control", "no-store");
-		res.json(result);
+		sendNoStoreJson(res, result);
 	});
 
 	// POST /:guildId/characters/refresh-all — invalidates server cache (admin only)

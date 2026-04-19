@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { findln } from "@dicelette/localization";
 import type { Settings } from "@dicelette/types";
 import type { Request, Response } from "express";
 import {
@@ -17,6 +18,45 @@ import {
 const ADMINISTRATOR = BigInt(0x8);
 const MANAGE_GUILD = BigInt(0x20);
 const MANAGE_ROLES = BigInt(0x10000000);
+const USER_EMBED_KEYS = ["embed.user", "embed.add", "embed.old"] as const;
+const STATS_EMBED_KEYS = ["common.statistic", "common.statistics"] as const;
+const DAMAGE_EMBED_KEYS = ["embed.dice", "legacy.dice", "common.macro"] as const;
+const USER_EMBED_MARKERS_LOWER = USER_EMBED_MARKERS.map((m) => m.toLowerCase());
+const STATS_TITLES_LOWER = STATS_TITLES.map((s) => s.toLowerCase());
+
+type EmbedKind = "user" | "stats" | "damage";
+type EmbedTitleMeta = { title: string; titleKey: string };
+type EmbedClassifier = { kind: EmbedKind; match: (meta: EmbedTitleMeta) => boolean };
+
+function getEmbedTitleMeta(embed: RawEmbed): EmbedTitleMeta {
+	const rawTitle = embed.title ?? "";
+	return {
+		title: rawTitle.toLowerCase(),
+		titleKey: String(findln(rawTitle)).toLowerCase(),
+	};
+}
+
+const EMBED_CLASSIFIERS: ReadonlyArray<EmbedClassifier> = [
+	{
+		kind: "user",
+		match: ({ title, titleKey }) =>
+			USER_EMBED_MARKERS_LOWER.some((marker) => title.includes(marker)) ||
+			USER_EMBED_KEYS.includes(titleKey as (typeof USER_EMBED_KEYS)[number]),
+	},
+	{
+		kind: "stats",
+		match: ({ title, titleKey }) =>
+			STATS_TITLES_LOWER.includes(title) ||
+			STATS_EMBED_KEYS.includes(titleKey as (typeof STATS_EMBED_KEYS)[number]),
+	},
+	{
+		kind: "damage",
+		match: ({ title, titleKey }) =>
+			title === "macro" ||
+			title === "dice" ||
+			DAMAGE_EMBED_KEYS.includes(titleKey as (typeof DAMAGE_EMBED_KEYS)[number]),
+	},
+];
 
 function getCached(key: string): boolean | null {
 	const cached = permCache.get(key);
@@ -253,10 +293,10 @@ export async function userCanManageGuildViaOAuth(
 }
 
 export function classifyEmbed(embed: RawEmbed): "user" | "stats" | "damage" | null {
-	const title = (embed.title ?? "").toLowerCase();
-	if (USER_EMBED_MARKERS.some((m) => title.includes(m.toLowerCase()))) return "user";
-	if (STATS_TITLES.some((s) => title === s)) return "stats";
-	if (title === "macro") return "damage";
+	const meta = getEmbedTitleMeta(embed);
+	for (const classifier of EMBED_CLASSIFIERS) {
+		if (classifier.match(meta)) return classifier.kind;
+	}
 	return null;
 }
 
