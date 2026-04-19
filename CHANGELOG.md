@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.15.0](https://github.com/Dicelette/discord-dicelette/compare/3.14.0...3.15.0) (2026-04-19)
+
+
+### Features
+
+* **characters:** add force refresh option for character fetching and cache invalidation ([a9bb121](https://github.com/Dicelette/discord-dicelette/commit/a9bb1218a6b70bb0063b3913c7ea7f5a062d2953))
+* **dashboard:** add channel access check for members and update character linking logic ([7c89e07](https://github.com/Dicelette/discord-dicelette/commit/7c89e07a7e3a2ebc480be964d1ff7a5fe34198be))
+
 ## [3.14.0](https://github.com/Dicelette/discord-dicelette/compare/3.13.0...3.14.0) (2026-04-19)
 
 
