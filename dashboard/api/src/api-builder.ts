@@ -2,6 +2,18 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 type HttpMethod = "get" | "post" | "patch" | "delete" | "put";
 
+function isLikelyAxiosConfig(value: unknown): value is AxiosRequestConfig {
+	if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+	const candidate = value as Record<string, unknown>;
+	return (
+		"signal" in candidate ||
+		"headers" in candidate ||
+		"params" in candidate ||
+		"timeout" in candidate ||
+		"responseType" in candidate
+	);
+}
+
 export function createGuildEndpoint<T>(
 	api: AxiosInstance,
 	method: HttpMethod,
@@ -14,8 +26,14 @@ export function createGuildEndpoint<T>(
 ) => Promise<AxiosResponse<T>> {
 	return (guildId: string, data?: unknown, config?: AxiosRequestConfig) => {
 		const fullPath = `/guilds/${guildId}${path}`;
+		const requestConfig =
+			(method === "get" || method === "delete") &&
+			config === undefined &&
+			isLikelyAxiosConfig(data)
+				? data
+				: config;
 		const axiosConfig: AxiosRequestConfig = {
-			...config,
+			...requestConfig,
 			...(responseType && { responseType }),
 		};
 

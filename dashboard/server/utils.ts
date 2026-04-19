@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { Settings } from "@dicelette/types";
 import type { Request, Response } from "express";
 import {
@@ -283,4 +284,28 @@ export async function discordFetch(path: string, accessToken: string) {
 
 export function getfrontEndUrl() {
 	return process.env.FRONTEND_URL ?? "http://localhost:5173";
+}
+
+export function computeWeakEtag(payload: unknown): string {
+	const hash = createHash("sha1").update(JSON.stringify(payload)).digest("base64url");
+	return `W/"${hash}"`;
+}
+
+export function sendEtaggedJson(req: Request, res: Response, payload: unknown): void {
+	const etag = computeWeakEtag(payload);
+	res.setHeader("ETag", etag);
+
+	const ifNoneMatch = req.get("If-None-Match");
+	if (ifNoneMatch) {
+		const tags = ifNoneMatch
+			.split(",")
+			.map((value) => value.trim())
+			.filter(Boolean);
+		if (tags.includes("*") || tags.includes(etag)) {
+			res.status(304).end();
+			return;
+		}
+	}
+
+	res.json(payload);
 }

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { DashboardDeps } from "../types";
 import { isValidSnowflake } from "../utils";
+import { createBootstrapRouter } from "./bootstrap";
 import { createChannelsRouter } from "./channels";
 import { createCharactersRouter } from "./characters";
 import { createConfigRouter } from "./config";
@@ -20,6 +21,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 	});
 
 	router.use("/:guildId/config", createConfigRouter(deps));
+	router.use("/:guildId", createBootstrapRouter(deps));
 	router.use("/:guildId", createChannelsRouter(deps));
 	router.use("/:guildId", createUserRouter(deps));
 	router.use("/:guildId/characters", createCharactersRouter(deps));

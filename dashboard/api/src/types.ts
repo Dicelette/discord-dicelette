@@ -1,5 +1,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { ApiGuildData, UserSettingsData } from "@dicelette/types";
+import type { ApiChannel, ApiRole } from "./channel-types";
 
 export interface DiscordUser {
 	id: string;
@@ -63,4 +64,15 @@ export interface TemplateImportPayload {
 	privateChannelId?: string;
 	updateCharacters?: boolean;
 	deleteCharacters?: boolean;
+}
+
+export interface ApiDashboardBootstrap {
+	isAdmin: boolean;
+	isStrictAdmin: boolean;
+	userConfig: Partial<UserSettingsData> | null;
+	userCharCount: number;
+	serverCharCount: number;
+	config: ApiGuildData | null;
+	channels: ApiChannel[];
+	roles: ApiRole[];
 }
