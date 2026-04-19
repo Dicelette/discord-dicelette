@@ -18,7 +18,7 @@ const ownerLabelBoxSx = {
 	mb: 0.5,
 	px: 0.5,
 } as const;
-const ownerIconSx = { fontSize: 14, color: "text.secondary" } as const;
+const ownerIconSx = { fontSize: 18, color: "text.secondary" } as const;
 
 interface Props {
 	guildId: string;

@@ -1,16 +1,8 @@
 import type { ApiCharacter } from "@dicelette/api";
 import { Lock, OpenInNew } from "@mui/icons-material";
-import {
-	Avatar,
-	Box,
-	Button,
-	Chip,
-	Divider,
-	Link,
-	Paper,
-	Typography,
-} from "@mui/material";
+import { Avatar, Box, Chip, Divider, Link, Paper, Typography } from "@mui/material";
 import "uniformize";
+import { purple } from "@mui/material/colors";
 import { useI18n } from "@shared";
 import { memo } from "react";
 import StatCell from "./StatCell";
@@ -26,10 +18,28 @@ const nameRowSx = {
 	flexWrap: "wrap",
 } as const;
 const nameLinkSx = {
+	display: "inline-flex",
+	alignItems: "center",
+	gap: 0.75,
 	maxWidth: "100%",
-	textDecorationThickness: "0.08em",
-	textUnderlineOffset: "0.12em",
+	color: purple[200],
+	textDecoration: "none",
+	transition: "color 120ms ease, text-decoration-color 120ms ease",
+	"&:hover": {
+		color: purple[400],
+		textDecoration: "underline",
+		textDecorationThickness: "0.08em",
+		textUnderlineOffset: "0.12em",
+	},
+	"&:focus-visible": {
+		outline: "2px solid",
+		outlineColor: purple[200],
+		outlineOffset: 2,
+		borderRadius: 4,
+	},
 } as const;
+const nameTypographySx = { minWidth: 0, color: "inherit" } as const;
+const externalIconSx = { fontSize: 16, opacity: 0.8, flexShrink: 0 } as const;
 const dividerSx = { mb: 1.5 } as const;
 const dividerWithStatsSx = { mb: 1.5, mt: 1.5 } as const;
 const statsGridSx = {
@@ -50,7 +60,7 @@ interface Props {
 
 function CharacterCard({ char }: Props) {
 	const { t } = useI18n();
-	const displayName = char.charName ?? t("characters.unnamed");
+	const displayName = char.charName ?? t("common.default");
 
 	return (
 		<Paper variant="outlined" sx={cardPaperSx}>
@@ -66,16 +76,15 @@ function CharacterCard({ char }: Props) {
 								href={char.discordLink}
 								target="_blank"
 								rel="noopener noreferrer"
-								color="inherit"
-								underline="hover"
 								sx={nameLinkSx}
 							>
-								<Typography variant="h4" fontWeight={600} noWrap>
+								<Typography variant="h4" fontWeight={600} noWrap sx={nameTypographySx}>
 									{displayName.toTitle()}
 								</Typography>
+								<OpenInNew sx={externalIconSx} />
 							</Link>
 						) : (
-							<Typography variant="h4" fontWeight={600} noWrap>
+							<Typography variant="h4" fontWeight={600} noWrap sx={nameTypographySx}>
 								{displayName.toTitle()}
 							</Typography>
 						)}
@@ -89,19 +98,6 @@ function CharacterCard({ char }: Props) {
 						)}
 					</Box>
 				</Box>
-
-				{char.canLink && (
-					<Button
-						variant="outlined"
-						size="small"
-						endIcon={<OpenInNew />}
-						href={char.discordLink}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{t("characters.sheetLink")}
-					</Button>
-				)}
 			</Box>
 
 			{char.stats && char.stats.length > 0 && (
