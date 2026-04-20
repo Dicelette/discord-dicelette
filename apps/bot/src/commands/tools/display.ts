@@ -100,6 +100,14 @@ export const displayUser = {
 			user
 		);
 
+		const canSeeSheet =
+			thread != null &&
+			(await haveAccess(
+				interaction,
+				thread.id,
+				userData.userId ?? user?.id ?? interaction.user.id
+			));
+
 		try {
 			const userMessage = await thread?.messages.fetch(sheetLocation.messageId);
 			const statisticEmbed = getEmbeds(userMessage, "stats");
@@ -151,6 +159,10 @@ export const displayUser = {
 					value:
 						jsonDataChar?.value ?? userData.charName?.capitalize() ?? ul("common.noSet"),
 				});
+			if (canSeeSheet && interaction.guildId)
+				displayEmbed.setURL(
+					`https://discord.com/channels/${interaction.guildId}/${thread.id}/${sheetLocation.messageId}`
+				);
 			const newStatEmbed: Djs.EmbedBuilder | undefined = statsFields
 				? createStatsEmbed(ul).addFields(keepResultOnlyInFormula(statsFields))
 				: undefined;
