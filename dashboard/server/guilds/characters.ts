@@ -7,7 +7,6 @@ import "uniformize";
 import {
 	type ApiCharacter,
 	type BotChannels,
-	CHAR_CACHE_TTL,
 	charCache,
 	charForceRefresh,
 	type DashboardDeps,
@@ -17,6 +16,7 @@ import {
 	fetchCharacterEmbeds,
 	isStaleDiscordCdnUrl,
 	makeRequireAdmin,
+	mapConcurrent,
 	requireAuth,
 	userCanAccessChannel,
 	userCanManageGuild,
@@ -113,13 +113,39 @@ async function resolveCanLink(
 	return isAdmin || (await userCanAccessChannel(userId, guildId, channelId, botGuilds));
 }
 
+/**
+ * Build a per-request memo that resolves canLink for a given channel once.
+ * Two characters in the same channel would otherwise re-enter the permission
+ * cache path (and incur the extra Map lookup / Date.now() per entry).
+ */
+function makeCanLinkMemo(
+	isAdmin: boolean,
+	userId: string,
+	guildId: string,
+	botGuilds: DashboardDeps["botGuilds"]
+): (channelId: string) => Promise<boolean> {
+	if (isAdmin) return () => Promise.resolve(true);
+	const pending = new Map<string, Promise<boolean>>();
+	return (channelId: string) => {
+		let p = pending.get(channelId);
+		if (!p) {
+			p = resolveCanLink(isAdmin, userId, guildId, channelId, botGuilds);
+			pending.set(channelId, p);
+		}
+		return p;
+	};
+}
+
+/**
+ * Concurrency cap for outgoing Discord API fan-out. Guild list + character
+ * fetches happen on the hot path and must not saturate the bot's shared
+ * Discord client with hundreds of parallel requests.
+ */
+const DISCORD_FETCH_CONCURRENCY = 10;
+
 function invalidateGuildCharacterCache(guildId: string) {
-	for (const key of [...charCache.keys()]) {
-		if (key.startsWith(`${guildId}:`)) charCache.delete(key);
-	}
-	for (const key of [...charForceRefresh]) {
-		if (key.startsWith(`${guildId}:`)) charForceRefresh.delete(key);
-	}
+	charCache.deleteGuild(guildId);
+	charForceRefresh.deleteGuild(guildId);
 }
 
 export function createCharactersRouter(deps: DashboardDeps) {
@@ -134,19 +160,14 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		const cacheKey = `${guildId}:${userId}`;
 		const forceRefresh = charForceRefresh.delete(cacheKey);
 
-		const cached = charCache.get(cacheKey);
-		if (!forceRefresh && cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
+		const cached = !forceRefresh ? charCache.get(cacheKey) : undefined;
+		if (cached) {
 			const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
+			const canLinkFor = makeCanLinkMemo(isAdmin, userId, guildId, botGuilds);
 			const data = await Promise.all(
 				cached.data.map(async (char) => ({
 					...char,
-					canLink: await resolveCanLink(
-						isAdmin,
-						userId,
-						guildId,
-						char.channelId,
-						botGuilds
-					),
+					canLink: await canLinkFor(char.channelId),
 				}))
 			);
 			sendNoStoreJson(res, data);
@@ -161,53 +182,48 @@ export function createCharactersRouter(deps: DashboardDeps) {
 
 		const userChars = guildData.user?.[userId] ?? [];
 		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
+		const canLinkFor = makeCanLinkMemo(isAdmin, userId, guildId, botGuilds);
 
 		// Lookup in the bot's in-memory cache (same process) — avoids Discord calls
 		const memChars: UserData[] =
 			(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
 		const memMaps = buildMemMaps(memChars);
 
+		const pending = userChars.filter((char) => {
+			// Exclude characters from a template (not actually registered)
+			const mem = memMaps.memByMessageId.get(char.messageId[0]);
+			return !mem?.isFromTemplate;
+		});
+
 		let result: ApiCharacter[];
 		try {
 			result = await withTimeout(
-				Promise.all(
-					userChars
-						.filter((char) => {
-							// Exclude characters from a template (not actually registered)
-							const mem = memMaps.memByMessageId.get(char.messageId[0]);
-							return !mem?.isFromTemplate;
-						})
-						.map(async (char) => {
-							const [messageId, channelId] = char.messageId;
-							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-							const canLink = await resolveCanLink(
-								isAdmin,
-								userId,
-								guildId,
-								channelId,
-								botGuilds
-							);
-							const { avatar, stats, damage } = await resolveCharacterData(
-								char.charName,
-								messageId,
-								channelId,
-								memMaps,
-								botChannels,
-								forceRefresh
-							);
-							return {
-								charName: char.charName ?? null,
-								messageId,
-								channelId,
-								discordLink,
-								canLink,
-								isPrivate: char.isPrivate ?? false,
-								avatar,
-								stats,
-								damage,
-							};
-						})
-				),
+				mapConcurrent(pending, DISCORD_FETCH_CONCURRENCY, async (char) => {
+					const [messageId, channelId] = char.messageId;
+					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+					const [canLink, data] = await Promise.all([
+						canLinkFor(channelId),
+						resolveCharacterData(
+							char.charName,
+							messageId,
+							channelId,
+							memMaps,
+							botChannels,
+							forceRefresh
+						),
+					]);
+					return {
+						charName: char.charName ?? null,
+						messageId,
+						channelId,
+						discordLink,
+						canLink,
+						isPrivate: char.isPrivate ?? false,
+						avatar: data.avatar,
+						stats: data.stats,
+						damage: data.damage,
+					};
+				}),
 				15_000
 			);
 		} catch (err) {
@@ -255,14 +271,40 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	});
 
 	// GET /:guildId/characters/all — all character sheets on the server (admin only)
+	// Supports ?limit=N&offset=M; slicing happens on the cached payload so that a
+	// paginated caller doesn't force a full refetch.
 	router.get("/all", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const cacheKey = `${guildId}:*all*`;
 		const forceRefresh = charForceRefresh.delete(cacheKey);
 
-		const cached = charCache.get(cacheKey);
-		if (!forceRefresh && cached && Date.now() - cached.ts < CHAR_CACHE_TTL) {
-			sendNoStoreJson(res, cached.data);
+		const parseBoundedInt = (raw: unknown, min: number, max: number): number | null => {
+			if (typeof raw !== "string" || raw.length === 0) return null;
+			const n = Number(raw);
+			if (!Number.isInteger(n) || n < min || n > max) return null;
+			return n;
+		};
+		const limit = parseBoundedInt(req.query.limit, 1, 500);
+		const offset = parseBoundedInt(req.query.offset, 0, Number.MAX_SAFE_INTEGER) ?? 0;
+
+		const respond = (data: ApiCharacter[]) => {
+			if (limit == null && offset === 0) {
+				sendNoStoreJson(res, data);
+				return;
+			}
+			const total = data.length;
+			const end = limit == null ? total : Math.min(total, offset + limit);
+			sendNoStoreJson(res, {
+				total,
+				offset,
+				limit: limit ?? total,
+				items: data.slice(offset, end),
+			});
+		};
+
+		const cached = !forceRefresh ? charCache.get(cacheKey) : undefined;
+		if (cached) {
+			respond(cached.data);
 			return;
 		}
 
@@ -280,53 +322,63 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		try {
 			result = await withTimeout(
 				(async () => {
-					// Resolve Discord usernames of all players in one parallel pass
 					const uniqueUserIds = Object.keys(allUsers);
-					const nameEntries = await Promise.all(
-						uniqueUserIds.map(async (uid) => {
+					const nameEntries = await mapConcurrent(
+						uniqueUserIds,
+						DISCORD_FETCH_CONCURRENCY,
+						async (uid) => {
 							const name = await guild?.fetchMemberName(uid).catch(() => null);
 							return [uid, name ?? null] as const;
-						})
+						}
 					);
 					const ownerNames = new Map<string, string | null>(nameEntries);
 
-					return Promise.all(
-						Object.entries(allUsers).flatMap(([userId, userChars]) => {
-							const memChars: UserData[] = allMemChars[userId] ?? [];
-							const memMaps = buildMemMaps(memChars);
-							const ownerName = ownerNames.get(userId) ?? undefined;
+					type Job = {
+						userId: string;
+						ownerName: string | undefined;
+						memMaps: ReturnType<typeof buildMemMaps>;
+						char: UserGuildData;
+					};
+					const jobs: Job[] = [];
+					for (const [userId, userChars] of Object.entries(allUsers)) {
+						const memChars: UserData[] = allMemChars[userId] ?? [];
+						const memMaps = buildMemMaps(memChars);
+						const ownerName = ownerNames.get(userId) ?? undefined;
+						for (const char of userChars) {
+							const mem = memMaps.memByMessageId.get(char.messageId[0]);
+							if (mem?.isFromTemplate) continue;
+							jobs.push({ userId, ownerName, memMaps, char });
+						}
+					}
 
-							return userChars
-								.filter((char) => {
-									const mem = memMaps.memByMessageId.get(char.messageId[0]);
-									return !mem?.isFromTemplate;
-								})
-								.map(async (char): Promise<ApiCharacter> => {
-									const [messageId, channelId] = char.messageId;
-									const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-									const { avatar, stats, damage } = await resolveCharacterData(
-										char.charName,
-										messageId,
-										channelId,
-										memMaps,
-										botChannels,
-										forceRefresh
-									);
-									return {
-										charName: char.charName ?? null,
-										messageId,
-										channelId,
-										discordLink,
-										canLink: true,
-										isPrivate: char.isPrivate ?? false,
-										avatar,
-										stats,
-										damage,
-										userId,
-										ownerName,
-									};
-								});
-						})
+					return mapConcurrent(
+						jobs,
+						DISCORD_FETCH_CONCURRENCY,
+						async ({ userId, ownerName, memMaps, char }) => {
+							const [messageId, channelId] = char.messageId;
+							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+							const { avatar, stats, damage } = await resolveCharacterData(
+								char.charName,
+								messageId,
+								channelId,
+								memMaps,
+								botChannels,
+								forceRefresh
+							);
+							return {
+								charName: char.charName ?? null,
+								messageId,
+								channelId,
+								discordLink,
+								canLink: true,
+								isPrivate: char.isPrivate ?? false,
+								avatar,
+								stats,
+								damage,
+								userId,
+								ownerName,
+							} satisfies ApiCharacter;
+						}
 					);
 				})(),
 				30_000
@@ -340,7 +392,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
-		sendNoStoreJson(res, result);
+		respond(result);
 	});
 
 	// POST /:guildId/characters/refresh-all — invalidates server cache (admin only)

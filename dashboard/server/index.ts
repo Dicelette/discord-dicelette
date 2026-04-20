@@ -139,11 +139,14 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		makeRateLimit(60, 60_000),
 		createAuthRouter(deps.botGuilds, deps.guildEvents, deps.settings)
 	);
-	// Guild data routes: 120 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE)
+	// Guild data routes: 120 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE).
+	// Limiters are built once at startup — building them per-request would create a new bucket Map
+	// on every call, losing state and leaking memory.
+	const guildReadLimit = makeRateLimit(120, 60_000);
+	const guildWriteLimit = makeRateLimit(30, 60_000);
 	app.use("/api/guilds", (req: Request, res: Response, next: NextFunction) => {
 		const isWrite = ["POST", "PATCH", "DELETE"].includes(req.method);
-		const limiter = isWrite ? makeRateLimit(30, 60_000) : makeRateLimit(120, 60_000);
-		limiter(req, res, next);
+		(isWrite ? guildWriteLimit : guildReadLimit)(req, res, next);
 	});
 	app.use("/api/guilds", createGuildRouter(deps));
 

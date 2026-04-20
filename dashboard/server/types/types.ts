@@ -5,7 +5,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Characters, Settings, TemplateData, UserSettings } from "@dicelette/types";
 import type Enmap from "enmap";
-import { CHAR_CACHE_TTL, charCache, permCache } from "./cache";
 
 export interface EmbedField {
 	name: string;
@@ -33,23 +32,6 @@ export interface ApiCharacter {
 	/** Discord display name of the owner — only present in admin server-wide character list */
 	ownerName?: string;
 }
-
-setInterval(
-	() => {
-		const now = Date.now();
-		for (const [key, entry] of permCache) {
-			if (now >= entry.expiresAt) permCache.delete(key);
-		}
-	},
-	10 * 60 * 1000
-).unref();
-
-setInterval(() => {
-	const now = Date.now();
-	for (const [key, entry] of charCache) {
-		if (now - entry.ts >= CHAR_CACHE_TTL) charCache.delete(key);
-	}
-}, CHAR_CACHE_TTL).unref();
 
 export interface DiscordUser {
 	id: string;
