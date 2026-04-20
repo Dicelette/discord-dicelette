@@ -50,8 +50,11 @@ function weight(input: string[]): string[] {
 		const match = REPEAT_CHOOSE.exec(item);
 		if (match?.groups) {
 			const word = match.groups.word.trim();
-			const repeat = Number.parseInt(match.groups.repeat, 10);
-			results.push(...Array(repeat).fill(word));
+			if (!word) continue;
+			const repeatNumber = match.groups.repeat.trim();
+			const repeat = Number.parseInt(repeatNumber, 10);
+			if (repeat <= 0) results.push(item);
+			else results.push(...Array(repeat).fill(word));
 			continue;
 		}
 		results.push(item);
