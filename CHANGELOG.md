@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.16.1](https://github.com/Dicelette/discord-dicelette/compare/3.16.0...3.16.1) (2026-04-20)
+
+
+### Bug Fixes
+
+* **bot:choose:** `0` in weight should be treaten as if (like string) and not throwing an error or ignored ([8aa44cf](https://github.com/Dicelette/discord-dicelette/commit/8aa44cfeb67083e6088297d8ef99f297899a0581))
+
 ## [3.16.0](https://github.com/Dicelette/discord-dicelette/compare/3.15.0...3.16.0) (2026-04-20)
 
 
