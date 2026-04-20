@@ -38,14 +38,12 @@
 	"devDependencies": {
 		"@playwright/test": "^1.58.2",
 		"@tailwindcss/postcss": "^4.2.2",
-		"@types/node": "^25.5.0",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.1",
 		"autoprefixer": "^10.4.21",
 		"postcss": "^8.5.8",
 		"tailwindcss": "^4.2.2",
-		"typescript": "^5.9.3",
 		"vite": "^8.0.1"
 	}
 }
