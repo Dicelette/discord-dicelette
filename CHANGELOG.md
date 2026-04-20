@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.16.0](https://github.com/Dicelette/discord-dicelette/compare/3.15.0...3.16.0) (2026-04-20)
+
+
+### Features
+
+* **bot:display:** add access check for thread visibility and add an url to the sheet in the heading ([8addbff](https://github.com/Dicelette/discord-dicelette/commit/8addbff0c8120877477f5dae96fa187393ffc522))
+
 ## [3.15.0](https://github.com/Dicelette/discord-dicelette/compare/3.14.0...3.15.0) (2026-04-19)
 
 
