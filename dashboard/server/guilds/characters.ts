@@ -103,6 +103,16 @@ async function resolveCharacterData(
 	return { avatar, stats, damage };
 }
 
+async function resolveCanLink(
+	isAdmin: boolean,
+	userId: string,
+	guildId: string,
+	channelId: string,
+	botGuilds: DashboardDeps["botGuilds"]
+): Promise<boolean> {
+	return isAdmin || (await userCanAccessChannel(userId, guildId, channelId, botGuilds));
+}
+
 function invalidateGuildCharacterCache(guildId: string) {
 	for (const key of [...charCache.keys()]) {
 		if (key.startsWith(`${guildId}:`)) charCache.delete(key);
@@ -130,9 +140,13 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			const data = await Promise.all(
 				cached.data.map(async (char) => ({
 					...char,
-					canLink:
-						isAdmin ||
-						(await userCanAccessChannel(userId, guildId, char.channelId, botGuilds)),
+					canLink: await resolveCanLink(
+						isAdmin,
+						userId,
+						guildId,
+						char.channelId,
+						botGuilds
+					),
 				}))
 			);
 			sendNoStoreJson(res, data);
@@ -166,9 +180,13 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						.map(async (char) => {
 							const [messageId, channelId] = char.messageId;
 							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-							const canLink =
-								isAdmin ||
-								(await userCanAccessChannel(userId, guildId, channelId, botGuilds));
+							const canLink = await resolveCanLink(
+								isAdmin,
+								userId,
+								guildId,
+								channelId,
+								botGuilds
+							);
 							const { avatar, stats, damage } = await resolveCharacterData(
 								char.charName,
 								messageId,
