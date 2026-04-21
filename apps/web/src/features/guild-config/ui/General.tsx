@@ -53,8 +53,9 @@ function General({ control }: Props) {
 										{...params}
 										label={t("config.fields.lang")}
 										slotProps={{
-											input: { ...params.InputProps },
-											htmlInput: { ...params.inputProps, readOnly: true },
+											...params.slotProps,
+											input: { ...params.slotProps.input },
+											htmlInput: { ...params.slotProps.htmlInput, readOnly: true },
 										}}
 									/>
 								)}
@@ -82,8 +83,9 @@ function General({ control }: Props) {
 										{...params}
 										label={t("config.fields.sortOrder")}
 										slotProps={{
-											input: { ...params.InputProps },
-											htmlInput: { ...params.inputProps, readOnly: true },
+											...params.slotProps,
+											input: { ...params.slotProps.input },
+											htmlInput: { ...params.slotProps.htmlInput, readOnly: true },
 										}}
 									/>
 								)}

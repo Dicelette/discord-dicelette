@@ -83,8 +83,9 @@ const ChannelSelect = memo(
 							{...params}
 							label={label}
 							slotProps={{
-								input: { ...params.InputProps },
-								htmlInput: { ...params.inputProps },
+								...params.slotProps,
+								input: { ...params.slotProps.input },
+								htmlInput: { ...params.slotProps.htmlInput },
 							}}
 						/>
 					)}

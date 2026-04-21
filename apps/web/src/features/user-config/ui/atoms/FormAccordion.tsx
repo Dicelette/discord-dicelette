@@ -18,7 +18,13 @@ export default function FormAccordion({
 	return (
 		<Accordion defaultExpanded={defaultExpanded}>
 			<AccordionSummary expandIcon={<ExpandMore />} sx={accordionSummarySx}>
-				<Typography fontWeight={600}>{title}</Typography>
+				<Typography
+					sx={{
+						fontWeight: 600,
+					}}
+				>
+					{title}
+				</Typography>
 			</AccordionSummary>
 			<AccordionDetails>{children}</AccordionDetails>
 		</Accordion>

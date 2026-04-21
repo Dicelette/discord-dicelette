@@ -120,7 +120,15 @@ function StripOOC({ control, channels, textChannels }: Props) {
 								onBlur={() => regexField.onChange(buildRegex(prefix, suffix))}
 							/>
 							{(prefix || suffix) && (
-								<Typography variant="caption" color="text.secondary" sx={fullSpanSx}>
+								<Typography
+									variant="caption"
+									sx={[
+										{
+											color: "text.secondary",
+										},
+										...(Array.isArray(fullSpanSx) ? fullSpanSx : [fullSpanSx]),
+									]}
+								>
 									{t("config.fields.stripOocRegexPreview", {
 										regex: buildRegex(prefix, suffix) ?? "",
 									})}
@@ -205,8 +213,9 @@ function StripOOC({ control, channels, textChannels }: Props) {
 											{...params}
 											label={t("config.fields.stripOocChannels")}
 											slotProps={{
-												input: { ...params.InputProps },
-												htmlInput: { ...params.inputProps },
+												...params.slotProps,
+												input: { ...params.slotProps.input },
+												htmlInput: { ...params.slotProps.htmlInput },
 											}}
 										/>
 									)}

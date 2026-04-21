@@ -51,8 +51,9 @@ function DashboardAccess({ control, roles, isStrictAdmin }: Props) {
 											: t("config.fields.dashboardAccessAdminOnly")
 									}
 									slotProps={{
-										input: { ...params.InputProps },
-										htmlInput: { ...params.inputProps },
+										...params.slotProps,
+										input: { ...params.slotProps.input },
+										htmlInput: { ...params.slotProps.htmlInput },
 									}}
 								/>
 							)}

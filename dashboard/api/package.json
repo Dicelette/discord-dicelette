@@ -7,6 +7,6 @@
 	},
 	"dependencies": {
 		"@dicelette/types": "workspace:*",
-		"axios": "^1.9.0"
+		"axios": "^1.15.1"
 	}
 }

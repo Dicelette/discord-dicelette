@@ -159,7 +159,11 @@ function Attributes({ state }: AttributeSectionProps) {
 
 	return (
 		<FormAccordion title={t("userSettings.attributes.title").toTitle()} defaultExpanded>
-			<Box paddingTop={"1rem"}>
+			<Box
+				sx={{
+					paddingTop: "1rem",
+				}}
+			>
 				<TextField
 					fullWidth
 					size="small"
@@ -176,18 +180,36 @@ function Attributes({ state }: AttributeSectionProps) {
 			</Box>
 			<Typography
 				variant="h6"
-				fontSize={"1rem"}
-				borderTop={"1px solid rgba(255, 255, 255, 0.12)"}
-				paddingTop={"12px"}
 				gutterBottom
+				sx={{
+					fontSize: "1rem",
+					borderTop: "1px solid rgba(255, 255, 255, 0.12)",
+					paddingTop: "12px",
+				}}
 			>
 				{t("userConfig.sections.attributes")}
 			</Typography>
-			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
+			<Typography
+				variant="body2"
+				sx={[
+					{
+						color: "text.secondary",
+					},
+					...(Array.isArray(descriptionSx) ? descriptionSx : [descriptionSx]),
+				]}
+			>
 				{t("userSettings.attributes.description")}
 			</Typography>
 			{entries.length === 0 ? (
-				<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
+				<Typography
+					variant="body2"
+					sx={[
+						{
+							color: "text.secondary",
+						},
+						...(Array.isArray(emptyTextSx) ? emptyTextSx : [emptyTextSx]),
+					]}
+				>
 					{t("userConfig.noAttributes")}
 				</Typography>
 			) : (
@@ -245,7 +267,6 @@ function Attributes({ state }: AttributeSectionProps) {
 					{t("common.add")}
 				</Button>
 			</Box>
-
 			{addError && (
 				<Alert
 					severity="warning"

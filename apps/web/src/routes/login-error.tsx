@@ -52,7 +52,6 @@ export default function LoginError() {
 					<LanguageSelect />
 				</Box>
 			</Box>
-
 			<Box className="flex-1 flex items-center justify-center" sx={mainBoxSx}>
 				<Card sx={errorCardSx}>
 					<CardContent className="p-8">
@@ -62,11 +61,24 @@ export default function LoginError() {
 								alt="Dicelette"
 								style={{ height: 48, width: 48, objectFit: "contain" }}
 							/>
-							<Typography variant="h5" fontWeight={700}>
+							<Typography
+								variant="h5"
+								sx={{
+									fontWeight: 700,
+								}}
+							>
 								{t("login.title")}
 							</Typography>
 						</Box>
-						<Typography variant="body2" color="text.secondary" sx={subtitleSx}>
+						<Typography
+							variant="body2"
+							sx={[
+								{
+									color: "text.secondary",
+								},
+								...(Array.isArray(subtitleSx) ? subtitleSx : [subtitleSx]),
+							]}
+						>
 							{subtitle}
 						</Typography>
 						<Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>

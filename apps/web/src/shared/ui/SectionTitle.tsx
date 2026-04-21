@@ -15,7 +15,15 @@ const sectionTitleSx = {
 } as const;
 
 const SectionTitle = memo(({ children }: { children: React.ReactNode }) => (
-	<Typography variant="subtitle1" fontWeight={600} sx={sectionTitleSx}>
+	<Typography
+		variant="subtitle1"
+		sx={[
+			{
+				fontWeight: 600,
+			},
+			...(Array.isArray(sectionTitleSx) ? sectionTitleSx : [sectionTitleSx]),
+		]}
+	>
 		{children}
 	</Typography>
 ));

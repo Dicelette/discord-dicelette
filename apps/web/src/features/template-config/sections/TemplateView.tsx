@@ -101,7 +101,15 @@ export default function TemplateView({
 				(template.critical.success !== undefined ||
 					template.critical.failure !== undefined) && (
 					<Paper variant="outlined" sx={sectionPaperSx}>
-						<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
+						<Typography
+							variant="body2"
+							sx={[
+								{
+									fontWeight: 700,
+								},
+								...(Array.isArray(sectionTitleSx) ? sectionTitleSx : [sectionTitleSx]),
+							]}
+						>
 							{t("template.critical")}
 						</Typography>
 						<Box sx={criticalChipsSx}>
@@ -124,10 +132,17 @@ export default function TemplateView({
 						</Box>
 					</Paper>
 				)}
-
 			{customCriticalEntries.length > 0 && (
 				<Paper variant="outlined" sx={sectionPaperSx}>
-					<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
+					<Typography
+						variant="body2"
+						sx={[
+							{
+								fontWeight: 700,
+							},
+							...(Array.isArray(sectionTitleSx) ? sectionTitleSx : [sectionTitleSx]),
+						]}
+					>
 						{t("config.customCritical")}
 					</Typography>
 					<PaginatedTable
@@ -163,10 +178,17 @@ export default function TemplateView({
 					/>
 				</Paper>
 			)}
-
 			{statisticsEntries.length > 0 && (
 				<Paper variant="outlined" sx={sectionPaperSx}>
-					<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
+					<Typography
+						variant="body2"
+						sx={[
+							{
+								fontWeight: 700,
+							},
+							...(Array.isArray(sectionTitleSx) ? sectionTitleSx : [sectionTitleSx]),
+						]}
+					>
 						{t("common.statistics").toTitle()}
 					</Typography>
 					<PaginatedTable
@@ -216,10 +238,17 @@ export default function TemplateView({
 					/>
 				</Paper>
 			)}
-
 			{damageEntries.length > 0 && (
 				<Paper variant="outlined" sx={sectionPaperSx}>
-					<Typography variant="body2" fontWeight={700} sx={sectionTitleSx}>
+					<Typography
+						variant="body2"
+						sx={[
+							{
+								fontWeight: 700,
+							},
+							...(Array.isArray(sectionTitleSx) ? sectionTitleSx : [sectionTitleSx]),
+						]}
+					>
 						{t("common.macro").toTitle()}
 					</Typography>
 					<PaginatedTable
@@ -247,7 +276,6 @@ export default function TemplateView({
 					/>
 				</Paper>
 			)}
-
 			<Box sx={chipsContainerSx}>
 				{template.charName && (
 					<Chip
@@ -282,14 +310,23 @@ export default function TemplateView({
 					/>
 				)}
 			</Box>
-
 			<Paper variant="outlined" sx={sectionPaperSx}>
 				<Box sx={channelGridSx}>
 					{channelInfos.map(({ label, value }) => {
 						const isMissing = !value;
 						return (
 							<Box key={label} sx={channelItemSx}>
-								<Typography variant="caption" color="text.secondary" sx={channelLabelSx}>
+								<Typography
+									variant="caption"
+									sx={[
+										{
+											color: "text.secondary",
+										},
+										...(Array.isArray(channelLabelSx)
+											? channelLabelSx
+											: [channelLabelSx]),
+									]}
+								>
 									{label}
 								</Typography>
 								<Chip

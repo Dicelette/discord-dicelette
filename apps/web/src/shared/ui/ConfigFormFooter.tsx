@@ -166,7 +166,15 @@ export default function ConfigFormFooter({
 						aria-label={t("config.unsaved")}
 						tabIndex={-1}
 					>
-						<Typography variant="h6" fontWeight="medium" sx={typographySx}>
+						<Typography
+							variant="h6"
+							sx={[
+								{
+									fontWeight: "medium",
+								},
+								...(Array.isArray(typographySx) ? typographySx : [typographySx]),
+							]}
+						>
 							<ErrorIcon color="warning" sx={iconSx} /> {t("config.unsaved")}
 						</Typography>
 
@@ -201,13 +209,10 @@ export default function ConfigFormFooter({
 					</Paper>
 				</Fade>
 			</TrapFocus>
-
 			<Fade in={isDirty}>
 				<Box aria-hidden="true" sx={fadeBoxSx} />
 			</Fade>
-
 			{isDirty && <Box sx={{ height: 72 }} aria-hidden="true" />}
-
 			<Snackbar
 				open={saveOpen}
 				autoHideDuration={3000}
@@ -218,7 +223,6 @@ export default function ConfigFormFooter({
 					{t("dashboard.saveSuccess")}
 				</Alert>
 			</Snackbar>
-
 			<Snackbar
 				open={discardOpen}
 				autoHideDuration={3000}

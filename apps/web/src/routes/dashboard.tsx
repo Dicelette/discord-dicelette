@@ -101,7 +101,6 @@ export default function Dashboard() {
 			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={{ mb: 3 }}>
 				{t("common.back")}
 			</Button>
-
 			<Box
 				sx={{
 					display: "flex",
@@ -111,7 +110,14 @@ export default function Dashboard() {
 					mb: 1,
 				}}
 			>
-				<Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 0 }}>
+				<Typography
+					variant="h4"
+					gutterBottom
+					sx={{
+						fontWeight: 700,
+						mb: 0,
+					}}
+				>
 					{t("dashboard.title")}
 				</Typography>
 				<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
@@ -133,13 +139,11 @@ export default function Dashboard() {
 					</Box>
 				</Tooltip>
 			</Box>
-
 			{error && (
 				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
 					{error}
 				</Alert>
 			)}
-
 			<Tabs
 				value={tab}
 				variant="scrollable"
@@ -184,7 +188,6 @@ export default function Dashboard() {
 					<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 				)}
 			</Tabs>
-
 			{isAdmin && config && (
 				<TabPanel value="admin" current={tab} mounted={mountedTabs}>
 					<GuildConfigProvider

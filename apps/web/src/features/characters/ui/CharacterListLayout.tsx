@@ -109,7 +109,17 @@ export default function CharacterListLayout({
 	return (
 		<Box>
 			<Box sx={showSearch ? headerGridWithSearchSx : headerGridNoSearchSx}>
-				<Typography variant="h5" fontWeight={600} sx={titleTypographySx}>
+				<Typography
+					variant="h5"
+					sx={[
+						{
+							fontWeight: 600,
+						},
+						...(Array.isArray(titleTypographySx)
+							? titleTypographySx
+							: [titleTypographySx]),
+					]}
+				>
 					{title}
 				</Typography>
 
@@ -132,17 +142,20 @@ export default function CharacterListLayout({
 					/>
 				)}
 			</Box>
-
 			{actions && <Box sx={actionSx}>{actions}</Box>}
-
 			{error && (
 				<Alert severity="error" sx={alertSx} onClose={onCloseError}>
 					{error}
 				</Alert>
 			)}
-
 			{pageChars.length === 0 ? (
-				<Typography color="text.secondary">{emptyText}</Typography>
+				<Typography
+					sx={{
+						color: "text.secondary",
+					}}
+				>
+					{emptyText}
+				</Typography>
 			) : (
 				<>
 					<Box sx={listBoxSx}>{pageChars.map((char) => renderCard(char))}</Box>
