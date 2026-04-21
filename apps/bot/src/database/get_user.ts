@@ -279,7 +279,11 @@ export async function getUserFrom(
 	if (!user) {
 		if (options?.attributes) {
 			const stats = mergeAttribute(client, undefined, guildId, userId);
-			if (stats) return { userData: { stats, template: {} } };
+			if (stats) {
+				const userData: UserData = { stats, template: {} };
+				userData.displayStats = mergeDisplayStats(client, userData, guildId, userId);
+				return { userData };
+			}
 		}
 		return;
 	}

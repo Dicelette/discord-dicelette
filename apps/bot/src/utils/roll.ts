@@ -38,7 +38,7 @@ import {
 	DICE_COMPILED_PATTERNS,
 	profiler,
 } from "@dicelette/utils";
-import { getRightValue, getTemplate } from "database";
+import { getRightValue, getTemplate, resolveStatsNames } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";
 import { triggerPity } from "../commands";
@@ -279,6 +279,7 @@ export async function rollStatistique(
 	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let statistic = getStatisticOption(options, false);
 	const template = userStatistique.template;
+	const statsNames = resolveStatsNames(userStatistique, ctx?.templateID?.statsName);
 	let dice = template.diceType;
 	let standardizedStatistic = statistic?.standardize(true);
 	//return if the standardizedStatistic is excluded from the list
@@ -332,7 +333,7 @@ export async function rollStatistique(
 		expression,
 		userStatistique.stats,
 		userStatStr,
-		ctx?.templateID?.statsName,
+		statsNames,
 		client.userSettings.get(interaction.guildId!, interaction.user.id)?.ignoreNotfound
 	);
 	dice = expr.dice;
@@ -369,10 +370,10 @@ export async function rollStatistique(
 		: undefined;
 	let infoRoll =
 		statistic && standardizedStatistic
-			? buildInfoRollFromStats([standardizedStatistic], ctx?.templateID?.statsName)
+			? buildInfoRollFromStats([standardizedStatistic], statsNames)
 			: undefined;
 	if (!infoRoll && findStatsExpr)
-		infoRoll = buildInfoRollFromStats(findStatsExpr, ctx?.templateID?.statsName);
+		infoRoll = buildInfoRollFromStats(findStatsExpr, statsNames);
 
 	const roll = composed.roll;
 	const customCritical =

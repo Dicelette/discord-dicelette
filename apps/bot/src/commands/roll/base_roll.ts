@@ -21,7 +21,7 @@ import { getCritical, rollWithInteraction } from "utils";
 import "@dicelette/discord_ext";
 import { type ComparedValue, REMOVER_PATTERN } from "@dicelette/core";
 import type { RollOptions } from "@dicelette/types";
-import { getCharFromText, getUserFromInteraction } from "database";
+import { getCharFromText, getUserFromInteraction, resolveStatsNames } from "database";
 
 export const diceRoll = {
 	data: new Djs.SlashCommandBuilder()
@@ -127,17 +127,13 @@ export async function baseRoll(
 	}
 
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
-	// Use display names already deduplicated by normalized key.
-	const allStatNames =
-		userData?.displayStats && userData.displayStats.length > 0
-			? userData.displayStats
-			: ctx?.templateID?.statsName;
+	const allStatNames = resolveStatsNames(userData, ctx?.templateID?.statsName);
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
 		true,
 		undefined,
-		allStatNames && allStatNames.length > 0 ? allStatNames : undefined,
+		allStatNames,
 		ul,
 		interaction.guild
 			? client.userSettings.get(interaction.guild.id, user.id)?.ignoreNotfound

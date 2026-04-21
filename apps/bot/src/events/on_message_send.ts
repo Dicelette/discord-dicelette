@@ -14,7 +14,7 @@ import {
 	profiler,
 	sentry,
 } from "@dicelette/utils";
-import { getCharFromText, getUserFromMessage } from "database";
+import { getCharFromText, getUserFromMessage, resolveStatsNames } from "database";
 import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
 import { getCritical } from "utils";
@@ -66,10 +66,7 @@ export default (client: EClient): void => {
 				content = content.replace(CHARACTER_DETECTION, "").trim();
 			}
 			const ctx = getGuildContext(client, message.guild.id);
-			const statsName =
-				userData?.displayStats && userData.displayStats.length > 0
-					? userData.displayStats
-					: ctx?.templateID?.statsName;
+			const statsName = resolveStatsNames(userData, ctx?.templateID?.statsName);
 			logger.trace("Stats name:", statsName, "User stats:", userData?.stats);
 			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
 				?.failure;
