@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.16.2](https://github.com/Dicelette/discord-dicelette/compare/3.16.1...3.16.2) (2026-04-21)
+
+
+### Features
+
+* **web:** show guild avatar and name as dashboard header ([74eb658](https://github.com/Dicelette/discord-dicelette/commit/74eb6584961cfecb7736c09ea4c98cfba893ee46))
+
+
+### Bug Fixes
+
+* **bot:ready:** build PRIVATE_ID set inside the handler to avoid TDZ ([760e8ae](https://github.com/Dicelette/discord-dicelette/commit/760e8ae25a192d0299fbabf7c71e67e761a22e66))
+* **web:** stabilize Tooltip `open` prop to avoid controlled/uncontrolled switch ([46eeb1e](https://github.com/Dicelette/discord-dicelette/commit/46eeb1e7ca215810523b7a86f8c724e806d5cacd))
+
 ## [3.16.1](https://github.com/Dicelette/discord-dicelette/compare/3.16.0...3.16.1) (2026-04-20)
 
 
