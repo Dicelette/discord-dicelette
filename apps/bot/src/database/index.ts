@@ -9,6 +9,41 @@ export * from "./get_user";
 export * from "./memory";
 export * from "./register_user";
 
+export function dedupeStatsDisplayNames(names: string[]): string[] {
+	const seen = new Set<string>();
+	const deduped: string[] = [];
+	for (const rawName of names) {
+		const name = rawName.trim();
+		if (!name) continue;
+		const normalized = name.standardize();
+		if (seen.has(normalized)) continue;
+		seen.add(normalized);
+		deduped.push(name);
+	}
+	return deduped;
+}
+
+export function mergeDisplayStats(
+	client: EClient,
+	getChara: UserData | undefined,
+	guildId: string,
+	userId: string
+) {
+	const templateStats = client.settings.get(guildId, "templateID.statsName") ?? [];
+	const userDisplayStats =
+		getChara?.displayStats?.length && getChara.displayStats.length > 0
+			? getChara.displayStats
+			: Object.keys(getChara?.stats ?? {});
+	const attributes = client.userSettings.get(guildId, userId)?.attributes;
+	const attributeNames = attributes ? Object.keys(attributes) : [];
+	const merged = dedupeStatsDisplayNames([
+		...templateStats,
+		...userDisplayStats,
+		...attributeNames,
+	]);
+	return merged.length > 0 ? merged : undefined;
+}
+
 export function mergeAttribute(
 	client: EClient,
 	getChara: UserData | undefined,
