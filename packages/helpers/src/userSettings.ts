@@ -202,8 +202,6 @@ export function resolveUserAttributes(
 ): ValidationResult<Record<string, number> | undefined> {
 	if (!attributes) return { ok: true, value: undefined };
 
-	logger.trace("Resolving user attributes", { attributes });
-
 	const { numbersOnly, formulaOnly } = buildAttributeMaps(attributes);
 
 	if (Object.keys(formulaOnly).length === 0) return { ok: true, value: numbersOnly };
@@ -272,7 +270,10 @@ export function validateSnippetEntry(
 	if (typeof content !== "string") return { error: String(content), ok: false };
 	try {
 		const resolvedAttributes = resolveUserAttributes(attributes);
-		if (!resolvedAttributes.ok) return { error: content, ok: false };
+		if (!resolvedAttributes.ok) {
+			logger.error(resolvedAttributes);
+			return { error: content, ok: false };
+		}
 
 		const substituted = replaceStatsInDiceFormula(
 			getExpression(content, "0", resolvedAttributes.value).dice,

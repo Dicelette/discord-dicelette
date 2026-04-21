@@ -1,6 +1,6 @@
 import { resolveUserAttributes } from "@dicelette/helpers";
 import type { UserData } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { logger, uniformizeRecords } from "@dicelette/utils";
 import type { EClient } from "client";
 
 export * from "./delete_user";
@@ -53,8 +53,14 @@ export function mergeAttribute(
 	const attributes = client.userSettings.get(guildId, userId)?.attributes;
 	const resolved = resolveUserAttributes(attributes);
 	if (!resolved.ok) {
-		logger.trace("No attributes to resolve, returning chara stats only", { resolved });
+		logger.error("No attributes to resolve, returning chara stats only", { resolved });
 		return getChara?.stats;
 	}
-	return Object.assign({}, resolved.value ?? {}, getChara?.stats ?? {});
+	const normalizedAttributes = resolved.value
+		? (uniformizeRecords(resolved.value) as Record<string, number>)
+		: {};
+	const normalizedCharaStats = getChara?.stats
+		? (uniformizeRecords(getChara.stats) as Record<string, number>)
+		: {};
+	return Object.assign({}, normalizedAttributes, normalizedCharaStats);
 }

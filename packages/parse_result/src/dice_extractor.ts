@@ -563,7 +563,6 @@ export function replaceStatsInDiceFormula(
 
 	const uniqueStats = Array.from(new Set(statsFounds.filter((stat) => stat.length > 0)));
 	let statsList: string | undefined;
-	logger.trace("UniqueStats", uniqueStats, "Stats Name ?", statsName);
 	if (uniqueStats.length > 0) {
 		statsList = statsName
 			? unNormalizeStatsName(uniqueStats, statsName).join(" × ")

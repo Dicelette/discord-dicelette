@@ -246,7 +246,13 @@ export async function getUserFrom(
 		!options?.fetchMessage
 	) {
 		if (options?.attributes) {
-			getChara.stats = mergeAttribute(client, getChara, guildId, userId);
+			// Keep cache entry immutable here; return an enriched copy for this request only.
+			const userData: UserData = {
+				...getChara,
+				stats: mergeAttribute(client, getChara, guildId, userId),
+			};
+			userData.displayStats = mergeDisplayStats(client, userData, guildId, userId);
+			return { charName: charName?.capitalize(), userData };
 		}
 		return { charName: charName?.capitalize(), userData: getChara };
 	}
@@ -360,6 +366,7 @@ export async function getUserFrom(
 		if (options?.attributes) {
 			userData.stats = mergeAttribute(client, userData, guildId, userId);
 			userData.displayStats = mergeDisplayStats(client, userData, guildId, userId);
+			logger.trace("User stats", userData.stats, "User display", userData.displayStats);
 		}
 
 		return { charName: user.charName?.capitalize(), userData };
