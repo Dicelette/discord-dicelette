@@ -128,10 +128,12 @@ export async function baseRoll(
 
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
 	// Merge template stats with user attributes for proper name resolution
-	const allStatNames = [
-		...(ctx?.templateID?.statsName ?? []),
-		...(userData?.stats ? Object.keys(userData.stats) : []),
-	];
+	const allStatNames = Array.from(
+		new Set([
+			...(ctx?.templateID?.statsName ?? []),
+			...(userData?.stats ? Object.keys(userData.stats) : []),
+		])
+	);
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,

@@ -274,9 +274,11 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 		};
 		const labels = guildData.templateID.statsName;
 		//only keep labels that exists in the user stats
-		const userStatKeys = Object.keys(userStatistique.stats).map((key) => key.unidecode());
+		const userStatKeys = Object.keys(userStatistique.stats).map((key) =>
+			key.unidecode(true)
+		);
 		const filteredLabels = labels.filter((label) =>
-			userStatKeys.includes(label.unidecode())
+			userStatKeys.includes(label.unidecode(true))
 		);
 		//remove combined stats
 		const lineColor = options.getString(t("graph.line.name"));
@@ -359,7 +361,7 @@ async function graphAttributes(
 			return;
 		}
 
-		const labels = Object.keys(filteredAttributes).map((key) => key.unidecode());
+		const labels = Object.keys(filteredAttributes).map((key) => key.unidecode(true));
 		const values = Object.values(filteredAttributes);
 
 		function filterToNumber(values: unknown[]) {
