@@ -79,31 +79,6 @@ export function isStaleDiscordCdnUrl(url: string | null): boolean {
 	return /(cdn|media)\.discordapp\.(net|com)/i.test(url) && !url.includes("?");
 }
 
-/**
- * Run async tasks with a bounded concurrency. Keeps at most `limit` promises
- * in-flight at once — useful when fan-out would otherwise issue N parallel
- * Discord API calls and exhaust rate limits.
- */
-export async function mapConcurrent<T, R>(
-	items: readonly T[],
-	limit: number,
-	worker: (item: T, index: number) => Promise<R>
-): Promise<R[]> {
-	if (items.length === 0) return [];
-	const results: R[] = new Array(items.length);
-	const effective = Math.max(1, Math.min(limit, items.length));
-	let nextIndex = 0;
-	const runners = Array.from({ length: effective }, async () => {
-		while (true) {
-			const i = nextIndex++;
-			if (i >= items.length) return;
-			results[i] = await worker(items[i], i);
-		}
-	});
-	await Promise.all(runners);
-	return results;
-}
-
 /** Wraps a promise with a hard timeout; rejects with an Error if not resolved in time. */
 export async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 	let timer: ReturnType<typeof setTimeout>;

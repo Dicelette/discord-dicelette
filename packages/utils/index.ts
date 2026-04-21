@@ -111,3 +111,29 @@ export function allValueUndefOrEmptyString(obj: unknown): boolean {
 export function fontPath(fontName: string) {
 	return path.resolve(`assets/fonts/${fontName}.ttf`).replace("dist/", "");
 }
+
+/**
+ * Run async tasks over `items` with at most `limit` in-flight at once.
+ * Use this instead of an unbounded `Promise.all(items.map(...))` when the worker
+ * hits an external API (Discord, HTTP) — a wide fan-out across hundreds of
+ * items will otherwise trigger rate limits or starve the event loop.
+ */
+export async function mapConcurrent<T, R>(
+	items: readonly T[],
+	limit: number,
+	worker: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+	if (items.length === 0) return [];
+	const results: R[] = new Array(items.length);
+	const effective = Math.max(1, Math.min(limit, items.length));
+	let nextIndex = 0;
+	const runners = Array.from({ length: effective }, async () => {
+		while (true) {
+			const i = nextIndex++;
+			if (i >= items.length) return;
+			results[i] = await worker(items[i], i);
+		}
+	});
+	await Promise.all(runners);
+	return results;
+}

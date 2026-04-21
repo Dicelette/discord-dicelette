@@ -1,6 +1,6 @@
 import { ln } from "@dicelette/localization";
 import type { UserData, UserDatabase, UserGuildData } from "@dicelette/types";
-import { important } from "@dicelette/utils";
+import { important, mapConcurrent } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import "uniformize";
@@ -16,7 +16,6 @@ import {
 	fetchCharacterEmbeds,
 	isStaleDiscordCdnUrl,
 	makeRequireAdmin,
-	mapConcurrent,
 	requireAuth,
 	userCanAccessChannel,
 	userCanManageGuild,

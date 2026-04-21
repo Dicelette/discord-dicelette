@@ -72,8 +72,14 @@ export function replaceStatInDiceName(
 		.join("|");
 	if (!statName) return originalDice;
 
-	// Regex to detect parentheses with content matching one of the names in “statName”
-	const regex = new RegExp(`\\((${statName})\\)`, "gi");
+	// Regex to detect parentheses with content matching one of the names in "statName".
+	// Cached by stat-name signature because this function is on the hot roll path.
+	let regex = DICE_COMPILED_PATTERNS.STATS_PAREN_REGEX_CACHE.get(statName);
+	if (!regex) {
+		regex = new RegExp(`\\((${statName})\\)`, "gi");
+		DICE_COMPILED_PATTERNS.STATS_PAREN_REGEX_CACHE.set(statName, regex);
+	}
+	regex.lastIndex = 0;
 	const standardizedDice = originalDice.standardize();
 	const match = regex.exec(standardizedDice);
 	if (!match) return originalDice;
@@ -98,7 +104,11 @@ export function convertNameToValue(
 ): Partial<{ total: string; diceResult: string }> | undefined {
 	if (!statistics) return undefined;
 	const statName = Object.keys(statistics).join("|");
-	const formule = new RegExp(`\\((?<formula>${statName})\\)`, "i");
+	let formule = DICE_COMPILED_PATTERNS.STATS_NAMED_REGEX_CACHE.get(statName);
+	if (!formule) {
+		formule = new RegExp(`\\((?<formula>${statName})\\)`, "i");
+		DICE_COMPILED_PATTERNS.STATS_NAMED_REGEX_CACHE.set(statName, formule);
+	}
 	const match = formule.exec(diceName.standardize());
 	if (!match) return undefined;
 	const { formula } = match.groups || {};
