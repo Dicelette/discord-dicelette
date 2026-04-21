@@ -17,6 +17,8 @@ interface DashboardCacheEntry {
 		config: ApiGuildData | null;
 		channels: Channel[];
 		roles: Role[];
+		guildName: string | null;
+		guildIcon: string | null;
 	};
 }
 
@@ -53,6 +55,8 @@ interface State {
 	channels: Channel[];
 	roles: Role[];
 	hasUnsavedChanges: boolean;
+	guildName: string | null;
+	guildIcon: string | null;
 }
 
 type Action =
@@ -67,6 +71,7 @@ type Action =
 	| { type: "config_loaded"; config: ApiGuildData }
 	| { type: "set_channels"; channels: Channel[] }
 	| { type: "set_roles"; roles: Role[] }
+	| { type: "set_guild_identity"; name: string | null; icon: string | null }
 	| { type: "set_server_char_count"; count: number }
 	| { type: "set_loading"; value: boolean }
 	| { type: "set_error"; value: string | null }
@@ -98,6 +103,8 @@ function reducer(state: State, action: Action): State {
 			return { ...state, channels: action.channels };
 		case "set_roles":
 			return { ...state, roles: action.roles };
+		case "set_guild_identity":
+			return { ...state, guildName: action.name, guildIcon: action.icon };
 		case "set_server_char_count":
 			return { ...state, serverCharCount: action.count };
 		case "set_loading":
@@ -162,6 +169,8 @@ export function useDashboard(guildId: string | undefined) {
 		channels: [],
 		roles: [],
 		hasUnsavedChanges: false,
+		guildName: null,
+		guildIcon: null,
 	});
 
 	useEffect(() => {
@@ -177,6 +186,8 @@ export function useDashboard(guildId: string | undefined) {
 				config,
 				channels,
 				roles,
+				guildName,
+				guildIcon,
 			} = cached.data;
 			dispatch({
 				type: "user_loaded",
@@ -190,6 +201,7 @@ export function useDashboard(guildId: string | undefined) {
 			dispatch({ type: "set_channels", channels });
 			dispatch({ type: "set_roles", roles });
 			dispatch({ type: "set_server_char_count", count: serverCharCount });
+			dispatch({ type: "set_guild_identity", name: guildName, icon: guildIcon });
 			dispatch({ type: "set_error", value: null });
 			dispatch({ type: "set_loading", value: false });
 			return;
@@ -217,6 +229,8 @@ export function useDashboard(guildId: string | undefined) {
 					config,
 					channels,
 					roles,
+					guildName,
+					guildIcon,
 				} = bootstrapRes.data;
 				const admin = isAdmin;
 				const strictAdmin = isStrictAdmin;
@@ -247,12 +261,15 @@ export function useDashboard(guildId: string | undefined) {
 						config: nextConfig,
 						channels: nextChannels,
 						roles: nextRoles,
+						guildName,
+						guildIcon,
 					},
 				});
 
 				dispatch({ type: "set_server_char_count", count: nextServerCharCount });
 				dispatch({ type: "set_channels", channels: nextChannels });
 				dispatch({ type: "set_roles", roles: nextRoles });
+				dispatch({ type: "set_guild_identity", name: guildName, icon: guildIcon });
 				if (nextConfig) {
 					dispatch({ type: "config_loaded", config: nextConfig });
 				}
