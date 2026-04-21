@@ -112,7 +112,7 @@ const AttributeRow = memo(function AttributeRow({
 			</Tooltip>
 			<Tooltip
 				title={formulaHint ?? ""}
-				open={Boolean(formulaHint) && valueFocused ? true : undefined}
+				open={Boolean(formulaHint) && valueFocused}
 				arrow
 				placement="top"
 				slotProps={formulaError ? errorTooltipSlotProps : hintTooltipSlotProps}

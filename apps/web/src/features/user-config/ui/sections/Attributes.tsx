@@ -238,7 +238,7 @@ function Attributes({ state }: AttributeSectionProps) {
 				/>
 				<Tooltip
 					title={addFormulaHint ?? ""}
-					open={Boolean(addFormulaHint) && addValueFocused ? true : undefined}
+					open={Boolean(addFormulaHint) && addValueFocused}
 					arrow
 					placement="top"
 					slotProps={addFormulaError ? errorTooltipSlotProps : hintTooltipSlotProps}
