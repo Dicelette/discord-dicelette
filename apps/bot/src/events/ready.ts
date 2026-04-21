@@ -21,13 +21,13 @@ import { PRIVATE_ID, VERSION } from "../../index";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
-// Convert PRIVATE_ID from array to Set once so the per-guild membership check
-// below is O(1) instead of a linear scan per guild.
-const PRIVATE_ID_SET = new Set(PRIVATE_ID);
-
 export default (client: EClient): void => {
 	client.on("clientReady", async () => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
+		// Build the Set lazily inside the handler: PRIVATE_ID comes from the parent
+		// module (`../../index`) which sits in an import cycle with this file, so
+		// reading it at top-level trips a temporal dead zone at module load.
+		const privateIdSet = new Set(PRIVATE_ID);
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
 		let serializedCommands = COMMANDS_GLOBAL.map((x) => {
 			if (!x.data.contexts) x.data.setContexts(Djs.InteractionContextType.Guild);
@@ -73,7 +73,7 @@ export default (client: EClient): void => {
 						);
 						devCommands = devCommands.concat(serializedDbCmds);
 					}
-					if (PRIVATE_ID_SET.has(guild.id)) {
+					if (privateIdSet.has(guild.id)) {
 						devCommands = devCommands.concat(
 							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
 						);
@@ -101,7 +101,7 @@ export default (client: EClient): void => {
 					guildCommands = guildCommands.concat(serializedDbCmds);
 
 					logger.trace(`Registering commands for \`${guild.name}\``);
-					if (PRIVATE_ID_SET.has(guild.id)) {
+					if (privateIdSet.has(guild.id)) {
 						guildCommands = guildCommands.concat(
 							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
 						);
