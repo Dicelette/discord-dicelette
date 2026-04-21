@@ -1,11 +1,10 @@
 import type { EClient } from "@dicelette/client";
-import { escapeRegex, isNumber, roll, standardizeDice } from "@dicelette/core";
+import { isNumber, resolveFormulaHint, roll } from "@dicelette/core";
 import { t } from "@dicelette/localization";
 import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
 import type { Snippets, Translation } from "@dicelette/types";
-import { capitalizeBetweenPunct } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { evaluate } from "mathjs";
 
 export async function chunkMessage(
 	entries: [string, string | number][],
@@ -167,111 +166,73 @@ function formatInvalidAttributeFormulaError(name?: string, value?: string) {
 	return `invalidAttributeFormula:${JSON.stringify({ name, value })}`;
 }
 
-function toNumber(value: unknown) {
-	if (typeof value === "number") return value;
-	if (isNumber(value)) return Number(value);
-	return undefined;
-}
-
 /**
  * Single-pass builder: separates number attributes from formula attributes and
- * pre-populates the resolved map with numeric values.
+ * pre-populates plain number values.
  */
 function buildAttributeMaps(attributes: Record<string, number | string>) {
 	const numbersOnly: Record<string, number> = {};
 	const formulaOnly: Record<string, string> = {};
-	const resolved: Record<string, number> = {};
-	const formulaNameMap: Record<string, string> = {};
 
 	for (const [name, value] of Object.entries(attributes)) {
-		const norm = name.standardize();
 		if (typeof value === "number") {
 			numbersOnly[name] = value;
-			resolved[norm] = value;
 		} else {
 			const trimmed = value.trim();
 			if (!trimmed) continue;
-			formulaOnly[name] = trimmed;
-			formulaNameMap[norm] = name;
+			if (isNumber(trimmed)) {
+				numbersOnly[name] = Number(trimmed);
+			} else {
+				formulaOnly[name] = trimmed;
+			}
 		}
 	}
 
-	return { numbersOnly, formulaOnly, formulaNameMap, resolved };
+	return { numbersOnly, formulaOnly };
 }
 
 /**
  * Resolves user attributes that may reference each other as formulas.
  *
- * Uses a single-pass map build followed by incremental substitution: when a
- * formula is resolved its value is immediately substituted into all remaining
- * pending formulas, so each stat replacement is performed exactly once rather
- * than rebuilding the full substitution map on every iteration.
+ * Uses the shared fuzzy resolver from @dicelette/core so dashboard and bot
+ * evaluate formulas with the exact same matching behavior.
  */
 export function resolveUserAttributes(
 	attributes?: Record<string, number | string>
 ): ValidationResult<Record<string, number> | undefined> {
 	if (!attributes) return { ok: true, value: undefined };
 
-	const { numbersOnly, formulaOnly, formulaNameMap, resolved } =
-		buildAttributeMaps(attributes);
+	logger.trace("Resolving user attributes", { attributes });
+
+	const { numbersOnly, formulaOnly } = buildAttributeMaps(attributes);
 
 	if (Object.keys(formulaOnly).length === 0) return { ok: true, value: numbersOnly };
 
-	// Pre-substitute already-resolved number stats into each formula expression.
-	const pending: Record<string, string> = {};
-	for (const [normName, origName] of Object.entries(formulaNameMap)) {
-		let expr = standardizeDice(formulaOnly[origName]).standardize();
-		for (const [statNorm, statValue] of Object.entries(resolved)) {
-			expr = expr.replace(new RegExp(escapeRegex(statNorm), "gi"), statValue.toString());
-		}
-		pending[normName] = expr;
-	}
+	const computed: Record<string, number> = {};
+	const sourceAttributes: Record<string, number | string> = {
+		...numbersOnly,
+		...formulaOnly,
+	};
 
-	// Iterative resolution: try evaluate() on each pending expression.
-	// When one resolves, propagate its value into the remaining expressions
-	// immediately so each substitution is done exactly once.
-	while (Object.keys(pending).length > 0) {
-		let progress = false;
-		for (const [normName, expr] of Object.entries(pending)) {
-			try {
-				const result = toNumber(evaluate(expr));
-				if (result === undefined) continue;
-				resolved[normName] = result;
-				delete pending[normName];
-				progress = true;
-				// Propagate into remaining pending formulas right away.
-				const re = new RegExp(escapeRegex(normName), "gi");
-				for (const otherNorm of Object.keys(pending)) {
-					pending[otherNorm] = pending[otherNorm].replace(re, result.toString());
-				}
-			} catch {
-				// Expression still contains unresolved references — skip for now.
+	for (const [name, formula] of Object.entries(formulaOnly)) {
+		const resolved = resolveFormulaHint(formula, sourceAttributes);
+		if (resolved.kind === "resolved") {
+			computed[name] = resolved.value;
+			sourceAttributes[name] = resolved.value;
+			continue;
+		}
+		if (resolved.kind === "not-formula") {
+			const numeric = Number(formula.trim());
+			if (!Number.isNaN(numeric)) {
+				computed[name] = numeric;
+				sourceAttributes[name] = numeric;
+				continue;
 			}
 		}
-
-		if (!progress) {
-			const [failingNorm, failingExpr] = Object.entries(pending)[0] ?? [];
-			const origName = failingNorm
-				? (formulaNameMap[failingNorm] ?? failingNorm)
-				: undefined;
-			const origFormula = origName ? formulaOnly[origName] : undefined;
-			return {
-				error: formatInvalidAttributeFormulaError(origName, origFormula ?? failingExpr),
-				ok: false,
-			};
-		}
-	}
-
-	const computed: Record<string, number> = {};
-	for (const [normName, origName] of Object.entries(formulaNameMap)) {
-		const value = resolved[normName];
-		if (!isNumber(value)) {
-			return {
-				error: formatInvalidAttributeFormulaError(origName, formulaOnly[origName]),
-				ok: false,
-			};
-		}
-		computed[origName] = Number(value);
+		return {
+			error: formatInvalidAttributeFormulaError(name, formula),
+			ok: false,
+		};
 	}
 
 	return { ok: true, value: { ...numbersOnly, ...computed } };

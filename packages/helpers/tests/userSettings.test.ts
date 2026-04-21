@@ -1,3 +1,4 @@
+import { resolveFormulaHint } from "@dicelette/core";
 import { describe, expect, it } from "vitest";
 import {
 	resolveUserAttributes,
@@ -152,6 +153,18 @@ describe("resolveUserAttributes", () => {
 			expect(result.value?.["Another comb"]).toBe(13);
 		}
 	});
+
+	it("should resolve fuzzy prefixed references like volo+hack", () => {
+		const result = resolveUserAttributes({
+			Volonté: 15,
+			Hacking: -10,
+			expansion: "volo+hack",
+		});
+		expect(result.ok).toBe(true);
+		if (result.ok) {
+			expect(result.value?.expansion).toBe(5);
+		}
+	});
 });
 
 describe("validateSnippetEntry", () => {
@@ -184,5 +197,33 @@ describe("validateSnippetEntry", () => {
 	it("should reject non-string input", () => {
 		const result = validateSnippetEntry(123);
 		expect(result.ok).toBe(false);
+	});
+});
+
+describe("resolveFormulaHint (core integration)", () => {
+	it("should resolve a direct arithmetic formula", () => {
+		const result = resolveFormulaHint("strength + 2", { strength: 10 });
+		expect(result.kind).toBe("resolved");
+		if (result.kind === "resolved") expect(result.value).toBe(12);
+	});
+
+	it("should resolve formula with extra surrounding spaces", () => {
+		const result = resolveFormulaHint("  strength + 3  ", { strength: 10 });
+		expect(result.kind).toBe("resolved");
+		if (result.kind === "resolved") expect(result.value).toBe(13);
+	});
+
+	it("should resolve fuzzy prefixed names", () => {
+		const result = resolveFormulaHint("volo+hack", {
+			"Volont\u00e9": 15,
+			Hacking: -10,
+		});
+		expect(result.kind).toBe("resolved");
+		if (result.kind === "resolved") expect(result.value).toBe(5);
+	});
+
+	it("should return error on invalid formula", () => {
+		const result = resolveFormulaHint("strength ++ invalid", { strength: 10 });
+		expect(result.kind).toBe("error");
 	});
 });
