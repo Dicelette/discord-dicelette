@@ -105,9 +105,7 @@ export function createConfigRouter(deps: DashboardDeps) {
 		// When dashboardAccess changes, invalidate permission cache for this guild
 		// so access checks immediately reflect the new role list
 		if ("dashboardAccess" in updates) {
-			for (const key of permCache.keys()) {
-				if (key.endsWith(`:${guildId}`)) permCache.delete(key);
-			}
+			permCache.deleteGuild(guildId);
 		}
 
 		res.json({ ok: true });

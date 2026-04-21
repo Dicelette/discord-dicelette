@@ -97,7 +97,6 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 			>
 				{t("characters.import")}
 			</Button>
-
 			<Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
 				<DialogTitle>{t("characters.importTitle")}</DialogTitle>
 				<DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
@@ -172,7 +171,12 @@ export default function ImportCsv({ guildId, onSuccess }: Props) {
 										<Typography variant="body2">
 											{t("characters.deleteOldMessage")}
 										</Typography>
-										<Typography variant="caption" color="text.secondary">
+										<Typography
+											variant="caption"
+											sx={{
+												color: "text.secondary",
+											}}
+										>
 											{t("characters.deleteOldMessageHelp")}
 										</Typography>
 									</Box>

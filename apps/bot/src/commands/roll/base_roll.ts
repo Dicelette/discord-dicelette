@@ -127,17 +127,17 @@ export async function baseRoll(
 	}
 
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
-	// Merge template stats with user attributes for proper name resolution
-	const allStatNames = [
-		...(ctx?.templateID?.statsName ?? []),
-		...(userData?.stats ? Object.keys(userData.stats) : []),
-	];
+	// Use display names already deduplicated by normalized key.
+	const allStatNames =
+		userData?.displayStats && userData.displayStats.length > 0
+			? userData.displayStats
+			: ctx?.templateID?.statsName;
 	const res = replaceStatsInDiceFormula(
 		dice,
 		userData?.stats,
 		true,
 		undefined,
-		allStatNames.length > 0 ? allStatNames : undefined,
+		allStatNames && allStatNames.length > 0 ? allStatNames : undefined,
 		ul,
 		interaction.guild
 			? client.userSettings.get(interaction.guild.id, user.id)?.ignoreNotfound

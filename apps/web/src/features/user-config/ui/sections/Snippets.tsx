@@ -113,11 +113,27 @@ function Snippets({ state }: Props) {
 
 	return (
 		<FormAccordion title={t("common.snippets").toTitle()} defaultExpanded>
-			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
+			<Typography
+				variant="body2"
+				sx={[
+					{
+						color: "text.secondary",
+					},
+					...(Array.isArray(descriptionSx) ? descriptionSx : [descriptionSx]),
+				]}
+			>
 				{t("userConfig.snippetsDesc")}
 			</Typography>
 			{entries.length === 0 ? (
-				<Typography variant="body2" color="text.secondary" sx={emptyTextSx}>
+				<Typography
+					variant="body2"
+					sx={[
+						{
+							color: "text.secondary",
+						},
+						...(Array.isArray(emptyTextSx) ? emptyTextSx : [emptyTextSx]),
+					]}
+				>
 					{t("userSettings.snippets.list.empty")}
 				</Typography>
 			) : (

@@ -78,13 +78,35 @@ function CharacterCard({ char }: Props) {
 								rel="noopener noreferrer"
 								sx={nameLinkSx}
 							>
-								<Typography variant="h4" fontWeight={600} noWrap sx={nameTypographySx}>
+								<Typography
+									variant="h4"
+									noWrap
+									sx={[
+										{
+											fontWeight: 600,
+										},
+										...(Array.isArray(nameTypographySx)
+											? nameTypographySx
+											: [nameTypographySx]),
+									]}
+								>
 									{displayName.toTitle()}
 								</Typography>
 								<OpenInNew sx={externalIconSx} />
 							</Link>
 						) : (
-							<Typography variant="h4" fontWeight={600} noWrap sx={nameTypographySx}>
+							<Typography
+								variant="h4"
+								noWrap
+								sx={[
+									{
+										fontWeight: 600,
+									},
+									...(Array.isArray(nameTypographySx)
+										? nameTypographySx
+										: [nameTypographySx]),
+								]}
+							>
 								{displayName.toTitle()}
 							</Typography>
 						)}
@@ -99,11 +121,16 @@ function CharacterCard({ char }: Props) {
 					</Box>
 				</Box>
 			</Box>
-
 			{char.stats && char.stats.length > 0 && (
 				<>
 					<Divider sx={dividerSx} />
-					<Typography variant="h6" color="text.secondary" gutterBottom>
+					<Typography
+						variant="h6"
+						gutterBottom
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						{t("common.statistics").toTitle()}
 					</Typography>
 					<Box sx={statsGridSx}>
@@ -113,11 +140,16 @@ function CharacterCard({ char }: Props) {
 					</Box>
 				</>
 			)}
-
 			{char.damage && char.damage.length > 0 && (
 				<>
 					<Divider sx={char.stats ? dividerWithStatsSx : dividerSx} />
-					<Typography variant="h6" color="text.secondary" gutterBottom>
+					<Typography
+						variant="h6"
+						gutterBottom
+						sx={{
+							color: "text.secondary",
+						}}
+					>
 						{t("common.macro").toTitle()}
 					</Typography>
 					<Box sx={damageGridSx}>

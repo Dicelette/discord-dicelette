@@ -34,6 +34,7 @@ import {
 	getCharaInMemory,
 	getTemplateByInteraction,
 	mergeAttribute,
+	mergeDisplayStats,
 	updateMemory,
 } from "database";
 import type { EmbedBuilder, Message } from "discord.js";
@@ -76,7 +77,10 @@ export function getUserByEmbed(
 		user.userName = charNameFields.value;
 	}
 	const statsFields = getEmbeds(message, "stats", embeds)?.data as Djs.Embed;
-	user.stats = parseEmbedToStats(parseEmbedFields(statsFields), integrateCombinaison);
+	const stats = parseEmbedFields(statsFields);
+	const displayStats = Object.keys(stats);
+	if (displayStats.length > 0) user.displayStats = displayStats;
+	user.stats = parseEmbedToStats(stats, integrateCombinaison);
 	const damageFields = getEmbeds(message, "damage", embeds)?.data as Djs.Embed;
 	const templateDamage = parseDamageFields(damageFields, standardize);
 	const templateEmbed = first ? userEmbed : getEmbeds(message, "template", embeds);
@@ -353,8 +357,10 @@ export async function getUserFrom(
 		);
 		if (options.fetchMessage) userData.messageId = targetMessage.id;
 
-		if (options?.attributes)
+		if (options?.attributes) {
 			userData.stats = mergeAttribute(client, userData, guildId, userId);
+			userData.displayStats = mergeDisplayStats(client, userData, guildId, userId);
+		}
 
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
@@ -635,6 +641,12 @@ export async function getMacro(
 		interaction.guild!.id,
 		user.id
 	);
+	userStatistique.displayStats = mergeDisplayStats(
+		client,
+		userStatistique,
+		interaction.guild!.id,
+		user.id
+	);
 	return { optionChar: charOptions, userStatistique };
 }
 
@@ -769,6 +781,12 @@ export async function getStatistics(
 		}
 	}
 	userStatistique.stats = mergeAttribute(
+		client,
+		userStatistique,
+		interaction.guild!.id,
+		targetUserId
+	);
+	userStatistique.displayStats = mergeDisplayStats(
 		client,
 		userStatistique,
 		interaction.guild!.id,

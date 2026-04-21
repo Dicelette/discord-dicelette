@@ -27,9 +27,12 @@ export default (client: EClient): void => {
 			profiler.startProfiler();
 			if (message.channel.type === Djs.ChannelType.DM) return;
 			if (!message.guild) return;
+			// Single Enmap read instead of 4 path-based reads: each .get(id, path) runs
+			// a separate SQL SELECT + JSON parse on the Enmap-backed store.
+			const guildSettings = client.settings.get(message.guild.id);
 			const userLang =
 				client.guildLocale?.get(message.guild.id) ??
-				client.settings.get(message.guild.id, "lang") ??
+				guildSettings?.lang ??
 				message.guild.preferredLocale ??
 				Djs.Locale.EnglishUS;
 			const ul = ln(userLang);
@@ -63,17 +66,17 @@ export default (client: EClient): void => {
 				content = content.replace(CHARACTER_DETECTION, "").trim();
 			}
 			const ctx = getGuildContext(client, message.guild.id);
-			const statsName = [
-				...(ctx?.templateID?.statsName ?? []),
-				...(userData?.stats ? Object.keys(userData.stats) : []),
-			];
+			const statsName =
+				userData?.displayStats && userData.displayStats.length > 0
+					? userData.displayStats
+					: ctx?.templateID?.statsName;
+			logger.trace("Stats name:", statsName, "User stats:", userData?.stats);
 			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
 				?.failure;
-			const pityThreshold = client.settings.get(message.guild.id, "pity") || undefined;
+			const pityThreshold = guildSettings?.pity || undefined;
 			const pity = triggerPity(pityThreshold, pityNb);
-			const disableCompare =
-				client.settings.get(message.guild.id, "disableCompare") || undefined;
-			const sortOrder = client.settings.get(message.guild.id, "sortOrder") || undefined;
+			const disableCompare = guildSettings?.disableCompare || undefined;
+			const sortOrder = guildSettings?.sortOrder || undefined;
 			const isRoll = isRolling(
 				content,
 				userData,
@@ -129,16 +132,15 @@ export default (client: EClient): void => {
 				logger.fatal(e);
 				sentry.fatal(e);
 			}
+			const guildSettings = client.settings.get(message.guild.id);
 			const userLang =
-				client.settings.get(message.guild.id, "lang") ??
-				message.guild.preferredLocale ??
-				Djs.Locale.EnglishUS;
+				guildSettings?.lang ?? message.guild.preferredLocale ?? Djs.Locale.EnglishUS;
 			const msgError = lError(e as Error, undefined, userLang);
 			if (msgError.length === 0) return;
 			//await message.channel.send({ content: msgError });
 			await message.author.send({ content: msgError });
 
-			const logsId = client.settings.get(message.guild.id, "logs");
+			const logsId = guildSettings?.logs;
 			if (logsId) {
 				const logs = await fetchChannel(message.guild, logsId);
 				if (logs instanceof Djs.TextChannel) {

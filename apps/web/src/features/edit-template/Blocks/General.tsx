@@ -32,12 +32,15 @@ const General: FC = () => {
 					className="ml-0!"
 				/>
 			</Box>
-
 			<Stack
 				direction={{ xs: "column", sm: "row" }}
 				spacing={2}
-				alignItems={{ sm: "flex-start" }}
-				sx={GENERAL_STACK_SX}
+				sx={[
+					{
+						alignItems: { sm: "flex-start" },
+					},
+					...(Array.isArray(GENERAL_STACK_SX) ? GENERAL_STACK_SX : [GENERAL_STACK_SX]),
+				]}
 			>
 				<Textfield
 					label={t("template.total")}
@@ -59,7 +62,6 @@ const General: FC = () => {
 					</span>
 				</Tooltip>
 			</Stack>
-
 			<Textfield label={t("template.diceType")} name="diceType" />
 		</Section>
 	);

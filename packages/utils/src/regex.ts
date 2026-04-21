@@ -28,7 +28,12 @@ export const DICE_COMPILED_PATTERNS = {
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
 	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
 	OPPOSITION: /(?<first>(([><=]|!=)+)([^<>=!]+))(?<second>(([><=]|!=)+)([^<>=!]+))/,
+	/** `(stat1|stat2|…)` compiled once per alphabet. Used by `filterStatsInDamage`. */
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
+	/** `\((stat1|stat2|…)\)` for `replaceStatInDiceName` — same hot path, same keys. */
+	STATS_PAREN_REGEX_CACHE: new Map<string, RegExp>(),
+	/** `\((?<formula>stat1|stat2|…)\)` for `convertNameToValue`. */
+	STATS_NAMED_REGEX_CACHE: new Map<string, RegExp>(),
 	TARGET_VALUE: /^\{(?<dice>.*?)}(?<comments>(?:^|\s)# ?(.*))?$/,
 } as const;
 

@@ -58,14 +58,14 @@ const theme = createTheme({
 					height: 28,
 					fontSize: theme.typography.pxToRem(14),
 				}),
-				labelSmall: {
-					paddingInline: 11,
-				},
-				iconSmall: {
-					fontSize: 19,
-				},
-				deleteIconSmall: {
-					fontSize: 19,
+				root: {
+					variants: [
+						{ props: { size: "small" }, style: { "& .MuiChip-icon": { fontSize: 19 } } },
+						{
+							props: { size: "small" },
+							style: { "& .MuiChip-deleteIcon": { fontSize: 19 } },
+						},
+					],
 				},
 			},
 		},

@@ -1,4 +1,4 @@
-import { DeleteOutline } from "@mui/icons-material";
+import { DeleteOutlined } from "@mui/icons-material";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
 import type { FC } from "react";
@@ -24,7 +24,7 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 				color="error"
 				size="small"
 				aria-label={removeFieldLabel}
-				startIcon={<DeleteOutline fontSize="small" />}
+				startIcon={<DeleteOutlined fontSize="small" />}
 				sx={MOBILE_ACTION_BUTTON_SX}
 			>
 				{t("template.delete")}
@@ -39,7 +39,7 @@ const RemoveButton: FC<RemoveButtonProps> = ({ onClick }) => {
 						disableRipple
 						sx={TRANSPARENT_ICON_BUTTON_SX}
 					>
-						<DeleteOutline />
+						<DeleteOutlined />
 					</IconButton>
 				</Tooltip>
 			</Box>

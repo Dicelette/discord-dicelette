@@ -10,6 +10,7 @@ const spinAnimation = keyframes`
 
 import {
 	Alert,
+	Avatar,
 	Box,
 	Button,
 	CircularProgress,
@@ -74,11 +75,19 @@ export default function Dashboard() {
 		charactersRefreshToken,
 		channels,
 		roles,
+		guildName,
+		guildIcon,
 		handleSave,
 		handleCharactersRefresh,
 		handleTabChange,
 		refetchConfig,
 	} = useDashboard(guildId);
+
+	const guildIconUrl =
+		guildId && guildIcon
+			? `https://cdn.discordapp.com/icons/${guildId}/${guildIcon}.png`
+			: null;
+	const headerLabel = guildName ?? t("dashboard.title");
 
 	useEffect(() => {
 		if (saveSuccess) enqueueToast(t("dashboard.saveSuccess"));
@@ -101,7 +110,6 @@ export default function Dashboard() {
 			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={{ mb: 3 }}>
 				{t("common.back")}
 			</Button>
-
 			<Box
 				sx={{
 					display: "flex",
@@ -111,9 +119,25 @@ export default function Dashboard() {
 					mb: 1,
 				}}
 			>
-				<Typography variant="h4" gutterBottom fontWeight={700} sx={{ mb: 0 }}>
-					{t("dashboard.title")}
-				</Typography>
+				<Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
+					<Avatar
+						src={guildIconUrl ?? undefined}
+						alt={headerLabel}
+						sx={{ width: 44, height: 44, bgcolor: "primary.main" }}
+					>
+						{headerLabel[0]?.toUpperCase()}
+					</Avatar>
+					<Typography
+						variant="h4"
+						noWrap
+						sx={{
+							fontWeight: 700,
+							mb: 0,
+						}}
+					>
+						{headerLabel}
+					</Typography>
+				</Box>
 				<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
 					<Box component="span">
 						<IconButton
@@ -133,13 +157,11 @@ export default function Dashboard() {
 					</Box>
 				</Tooltip>
 			</Box>
-
 			{error && (
 				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
 					{error}
 				</Alert>
 			)}
-
 			<Tabs
 				value={tab}
 				variant="scrollable"
@@ -184,7 +206,6 @@ export default function Dashboard() {
 					<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 				)}
 			</Tabs>
-
 			{isAdmin && config && (
 				<TabPanel value="admin" current={tab} mounted={mountedTabs}>
 					<GuildConfigProvider

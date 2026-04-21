@@ -187,6 +187,11 @@ export interface UserData {
 	/** The statistics as value */
 	stats?: Record<string, number>;
 	/**
+	 * Display names for stats (non-normalized), deduplicated by normalized key.
+	 * Used for UI/info rendering while `stats` remains normalized for lookups.
+	 */
+	displayStats?: string[];
+	/**
 	 * Allow to prevent returning each time to the JSON template for roll
 	 */
 	template: {

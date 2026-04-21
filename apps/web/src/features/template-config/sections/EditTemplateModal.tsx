@@ -118,7 +118,6 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 			<DialogTitle>
 				{isEditMode ? t("template.editModalTitle") : t("template.createModalTitle")}
 			</DialogTitle>
-
 			<DialogContent
 				dividers
 				sx={{ bgcolor: "background.paper", p: 0, position: "relative" }}
@@ -211,8 +210,14 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 									/>
 									<Typography
 										variant="caption"
-										color="text.secondary"
-										sx={captionIndentSx}
+										sx={[
+											{
+												color: "text.secondary",
+											},
+											...(Array.isArray(captionIndentSx)
+												? captionIndentSx
+												: [captionIndentSx]),
+										]}
 									>
 										{t("template.templateChannelHelp")}
 									</Typography>
@@ -230,8 +235,14 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 									/>
 									<Typography
 										variant="caption"
-										color="text.secondary"
-										sx={captionIndentSx}
+										sx={[
+											{
+												color: "text.secondary",
+											},
+											...(Array.isArray(captionIndentSx)
+												? captionIndentSx
+												: [captionIndentSx]),
+										]}
 									>
 										{t("template.publicChannelHelp")}
 									</Typography>
@@ -249,8 +260,14 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 									/>
 									<Typography
 										variant="caption"
-										color="text.secondary"
-										sx={captionIndentSx}
+										sx={[
+											{
+												color: "text.secondary",
+											},
+											...(Array.isArray(captionIndentSx)
+												? captionIndentSx
+												: [captionIndentSx]),
+										]}
 									>
 										{t("template.privateChannelHelp")}
 									</Typography>
@@ -278,7 +295,12 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 													<Typography variant="body2">
 														{t("template.updateCharacters")}
 													</Typography>
-													<Typography variant="caption" color="text.secondary">
+													<Typography
+														variant="caption"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														{t("template.updateCharactersHelp")}
 													</Typography>
 												</Box>
@@ -308,7 +330,12 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 													>
 														{t("template.deleteCharacters")}
 													</Typography>
-													<Typography variant="caption" color="text.secondary">
+													<Typography
+														variant="caption"
+														sx={{
+															color: "text.secondary",
+														}}
+													>
 														{t("template.deleteCharactersHelp")}
 													</Typography>
 												</Box>
@@ -338,7 +365,6 @@ export default function EditTemplateModal({ hasCharacters, channels, ...props }:
 					)}
 				</Stack>
 			</DialogContent>
-
 			<DialogActions
 				sx={{
 					bgcolor: "background.paper",

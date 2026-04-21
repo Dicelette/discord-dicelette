@@ -21,13 +21,31 @@ import { resources } from "./types";
 
 export const t = i18next.getFixedT("en");
 
+// Memoize the Djs.Locale → i18n-tag lookup. `ln()` is called on every interaction,
+// every message, every roll — the linear `Object.entries(Djs.Locale).find(...)`
+// scan is pure waste once the table has been resolved once.
+const lnCache = new Map<string, TFunction<"translation", undefined>>();
+const localeTagIndex = (() => {
+	const index = new Map<string, string>();
+	for (const [name, abbr] of Object.entries(Djs.Locale)) {
+		index.set(name, abbr);
+		index.set(abbr, abbr);
+	}
+	return index;
+})();
+
 export function ln(userLang: Djs.Locale) {
-	if (userLang === Djs.Locale.EnglishUS || userLang === Djs.Locale.EnglishGB)
-		return i18next.getFixedT("en");
-	const localeName = Object.entries(Djs.Locale).find(([name, abbr]) => {
-		return name === userLang || abbr === userLang;
-	});
-	return i18next.getFixedT(localeName?.[1] ?? "en");
+	const cached = lnCache.get(userLang);
+	if (cached) return cached;
+	let tag: string;
+	if (userLang === Djs.Locale.EnglishUS || userLang === Djs.Locale.EnglishGB) {
+		tag = "en";
+	} else {
+		tag = localeTagIndex.get(userLang) ?? "en";
+	}
+	const fn = i18next.getFixedT(tag);
+	lnCache.set(userLang, fn);
+	return fn;
 }
 
 /**

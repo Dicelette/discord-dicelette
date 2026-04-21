@@ -5,7 +5,6 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { Characters, Settings, TemplateData, UserSettings } from "@dicelette/types";
 import type Enmap from "enmap";
-import { CHAR_CACHE_TTL, charCache, permCache } from "./cache";
 
 export interface EmbedField {
 	name: string;
@@ -34,23 +33,6 @@ export interface ApiCharacter {
 	ownerName?: string;
 }
 
-setInterval(
-	() => {
-		const now = Date.now();
-		for (const [key, entry] of permCache) {
-			if (now >= entry.expiresAt) permCache.delete(key);
-		}
-	},
-	10 * 60 * 1000
-).unref();
-
-setInterval(() => {
-	const now = Date.now();
-	for (const [key, entry] of charCache) {
-		if (now - entry.ts >= CHAR_CACHE_TTL) charCache.delete(key);
-	}
-}, CHAR_CACHE_TTL).unref();
-
 export interface DiscordUser {
 	id: string;
 	username: string;
@@ -77,6 +59,10 @@ export interface BotMember {
 
 /** A guild accessible through the bot's Discord.js client cache */
 export interface BotGuild {
+	/** Discord display name of the guild */
+	readonly name: string;
+	/** Discord icon hash (not the full URL) — `null` when the guild has no icon */
+	readonly icon: string | null;
 	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
 	fetchMember: (userId: string) => Promise<BotMember | null>;
 	/** Returns true if the member can view/read the target channel */

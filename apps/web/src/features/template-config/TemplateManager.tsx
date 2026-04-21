@@ -66,7 +66,6 @@ export default function TemplateManager({
 	return (
 		<>
 			<SectionTitle>{t("common.template").toTitle()}</SectionTitle>
-
 			{error && (
 				<Alert
 					severity="error"
@@ -85,7 +84,6 @@ export default function TemplateManager({
 					{success}
 				</Alert>
 			)}
-
 			<Box sx={actionsBoxSx}>
 				<Button
 					variant="outlined"
@@ -112,11 +110,15 @@ export default function TemplateManager({
 					</Button>
 				)}
 			</Box>
-
 			{loading ? (
 				<CircularProgress size={24} />
 			) : !template ? (
-				<Typography variant="body2" color="text.secondary">
+				<Typography
+					variant="body2"
+					sx={{
+						color: "text.secondary",
+					}}
+				>
 					{t("config.noTemplate")}
 				</Typography>
 			) : (
@@ -127,7 +129,6 @@ export default function TemplateManager({
 					defaultPublicChannel={getChannelPathById(publicChannelId, channels)}
 				/>
 			)}
-
 			{/* Edit / create template via form modal */}
 			<EditTemplateModal
 				open={editModalOpen}
@@ -141,7 +142,6 @@ export default function TemplateManager({
 				defaultPublicChannelId={publicChannelId}
 				defaultPrivateChannelId={privateChannelId}
 			/>
-
 			<Dialog
 				open={confirmDelete}
 				onClose={() => dispatch({ type: "confirm_delete", value: false })}

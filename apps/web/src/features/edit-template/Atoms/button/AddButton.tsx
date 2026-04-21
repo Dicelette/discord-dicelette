@@ -1,4 +1,4 @@
-import { AddCircleOutline } from "@mui/icons-material";
+import { AddCircleOutlined } from "@mui/icons-material";
 import { Button, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
 import type { FC } from "react";
@@ -26,7 +26,7 @@ const AddButton: FC<AddButtonProps> = ({ len, type, onClick }) => {
 					variant="outlined"
 					disabled={isDisabled}
 					sx={{ mb: 2 }}
-					startIcon={<AddCircleOutline />}
+					startIcon={<AddCircleOutlined />}
 				>
 					{addLabel}
 				</Button>

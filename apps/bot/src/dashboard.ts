@@ -37,6 +37,8 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 				const guild = client.guilds.cache.get(id);
 				if (!guild) return undefined;
 				return {
+					name: guild.name,
+					icon: guild.icon,
 					fetchMember: async (userId) => {
 						try {
 							// Check in-memory cache first (populated by GuildMembers intent),

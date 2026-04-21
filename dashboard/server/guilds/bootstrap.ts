@@ -19,6 +19,8 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 
 		let isStrictAdmin = false;
 		const guild = botGuilds.get(guildId);
+		const guildName = guild?.name ?? null;
+		const guildIcon = guild?.icon ?? null;
 		if (guild) {
 			try {
 				const member = await guild.fetchMember(userId);
@@ -40,6 +42,8 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 				config: null,
 				channels: [],
 				roles: [],
+				guildName,
+				guildIcon,
 			});
 			return;
 		}
@@ -69,6 +73,8 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 			config: safeConfig,
 			channels,
 			roles,
+			guildName,
+			guildIcon,
 		});
 	});
 

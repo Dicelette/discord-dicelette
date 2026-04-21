@@ -202,7 +202,12 @@ export default function Servers() {
 		<Box className="max-w-4xl mx-auto p-6">
 			<Box sx={pageHeaderSx}>
 				<Box sx={titleRowSx}>
-					<Typography variant="h4" fontWeight={700}>
+					<Typography
+						variant="h4"
+						sx={{
+							fontWeight: 700,
+						}}
+					>
 						{t("servers.title")}
 					</Typography>
 					<Box sx={refreshBoxSx}>
@@ -223,7 +228,15 @@ export default function Servers() {
 				</Box>
 
 				<Box sx={subtitleRowSx}>
-					<Typography variant="body2" color="text.secondary" sx={subtitleTextSx}>
+					<Typography
+						variant="body2"
+						sx={[
+							{
+								color: "text.secondary",
+							},
+							...(Array.isArray(subtitleTextSx) ? subtitleTextSx : [subtitleTextSx]),
+						]}
+					>
 						{t("servers.subtitle")}
 					</Typography>
 					<TextField
@@ -245,13 +258,11 @@ export default function Servers() {
 					/>
 				</Box>
 			</Box>
-
 			{error && (
 				<Alert severity="error" sx={alertSx}>
 					{error}
 				</Alert>
 			)}
-
 			{filteredBotGuilds.length > 0 && (
 				<>
 					<Typography variant="h6" sx={botSectionTitleSx}>
@@ -280,9 +291,11 @@ export default function Servers() {
 											<Box className="flex-1 min-w-0" sx={guildNameBoxSx}>
 												<Typography
 													variant="body1"
-													fontWeight={600}
-													fontSize={"1.1rem"}
-													fontFamily={"var(--ifm-heading-font-family)"}
+													sx={{
+														fontWeight: 600,
+														fontSize: "1.1rem",
+														fontFamily: "var(--ifm-heading-font-family)",
+													}}
 												>
 													{guild.name}
 												</Typography>
@@ -315,14 +328,21 @@ export default function Servers() {
 					</Grid>
 				</>
 			)}
-
 			{filteredAdminGuilds.length > 0 && (
 				<>
 					<Divider sx={dividerSx} />
 					<Typography variant="h6" sx={adminSectionTitleSx}>
 						{t("servers.addBotTitle")}
 					</Typography>
-					<Typography variant="body2" color="text.secondary" sx={adminSubtitleSx}>
+					<Typography
+						variant="body2"
+						sx={[
+							{
+								color: "text.secondary",
+							},
+							...(Array.isArray(adminSubtitleSx) ? adminSubtitleSx : [adminSubtitleSx]),
+						]}
+					>
 						{t("servers.addBotDesc")}
 					</Typography>
 					<Grid container spacing={2}>
@@ -337,7 +357,13 @@ export default function Servers() {
 											{guild.name[0]}
 										</Avatar>
 										<Box className="flex-1 min-w-0">
-											<Typography variant="body1" fontWeight={600} noWrap>
+											<Typography
+												variant="body1"
+												noWrap
+												sx={{
+													fontWeight: 600,
+												}}
+											>
 												{guild.name}
 											</Typography>
 										</Box>
@@ -357,14 +383,12 @@ export default function Servers() {
 					</Grid>
 				</>
 			)}
-
 			{guilds.length > 0 &&
 				normalizedSearch.length > 0 &&
 				filteredBotGuilds.length === 0 &&
 				filteredAdminGuilds.length === 0 && (
 					<Alert severity="info">{t("servers.noSearchResults")}</Alert>
 				)}
-
 			{!loading && guilds.length === 0 && (
 				<Alert severity="info">{t("servers.noServers")}</Alert>
 			)}

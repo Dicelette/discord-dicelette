@@ -131,7 +131,15 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 
 	return (
 		<FormAccordion title={t("userConfig.sections.template")}>
-			<Typography variant="body2" color="text.secondary" sx={descriptionSx}>
+			<Typography
+				variant="body2"
+				sx={[
+					{
+						color: "text.secondary",
+					},
+					...(Array.isArray(descriptionSx) ? descriptionSx : [descriptionSx]),
+				]}
+			>
 				{t("userConfig.templateDesc")}
 				<br />
 				<Link
@@ -166,7 +174,15 @@ function Links({ state, isTemplate }: TemplateSectionProps) {
 					sx={JOIN_FIELD_SX}
 				/>
 				<Divider />
-				<Typography variant="body2" color="text.secondary" sx={CODE_FONT_SX}>
+				<Typography
+					variant="body2"
+					sx={[
+						{
+							color: "text.secondary",
+						},
+						...(Array.isArray(CODE_FONT_SX) ? CODE_FONT_SX : [CODE_FONT_SX]),
+					]}
+				>
 					{t("userConfig.templateFormatSection")}
 				</Typography>
 				<Box sx={wrapBoxSx}>

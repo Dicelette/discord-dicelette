@@ -64,15 +64,25 @@ export default function StatCell({ name, value }: Props) {
 
 	return (
 		<Box sx={cellBoxSx}>
-			<Typography variant="caption" color="text.secondary" component={"div"}>
+			<Typography
+				variant="caption"
+				component={"div"}
+				sx={{
+					color: "text.secondary",
+				}}
+			>
 				{name}
 			</Typography>
 			<Typography
 				variant="body2"
-				sx={{ ...valueSx, mx: "auto", alignItems: "center" }}
 				component={"div"}
 				tabIndex={0}
-				fontFamily="var(--code-font-family)"
+				sx={{
+					fontFamily: "var(--code-font-family)",
+					...valueSx,
+					mx: "auto",
+					alignItems: "center",
+				}}
 			>
 				{clean}
 			</Typography>

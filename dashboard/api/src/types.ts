@@ -75,4 +75,8 @@ export interface ApiDashboardBootstrap {
 	config: ApiGuildData | null;
 	channels: ApiChannel[];
 	roles: ApiRole[];
+	/** Guild display name — `null` when the bot is no longer in the guild */
+	guildName: string | null;
+	/** Guild icon hash — `null` when the guild has no icon or the bot is no longer in it */
+	guildIcon: string | null;
 }

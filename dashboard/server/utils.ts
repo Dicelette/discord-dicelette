@@ -350,7 +350,23 @@ export function getfrontEndUrl() {
 	return process.env.FRONTEND_URL ?? "http://localhost:5173";
 }
 
+/**
+ * Memoize ETag computation by payload reference. When a route returns the same
+ * object across requests (e.g. a cached bootstrap payload), we skip the
+ * JSON.stringify + SHA1 roundtrip entirely. The WeakMap is keyed by object
+ * identity so it's GC-safe and requires no eviction policy.
+ */
+const etagMemo = new WeakMap<object, string>();
+
 export function computeWeakEtag(payload: unknown): string {
+	if (payload !== null && typeof payload === "object") {
+		const cached = etagMemo.get(payload as object);
+		if (cached) return cached;
+		const hash = createHash("sha1").update(JSON.stringify(payload)).digest("base64url");
+		const tag = `W/"${hash}"`;
+		etagMemo.set(payload as object, tag);
+		return tag;
+	}
 	const hash = createHash("sha1").update(JSON.stringify(payload)).digest("base64url");
 	return `W/"${hash}"`;
 }

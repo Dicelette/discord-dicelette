@@ -6,7 +6,7 @@ import type { EClient } from "@dicelette/client";
 import { SortOrder } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import type { Settings, UserData } from "@dicelette/types";
-import { dev, important, logger } from "@dicelette/utils";
+import { dev, important, logger, mapConcurrent } from "@dicelette/utils";
 import {
 	COMMANDS_GLOBAL,
 	contextMenus,
@@ -24,6 +24,10 @@ dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 export default (client: EClient): void => {
 	client.on("clientReady", async () => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
+		// Build the Set lazily inside the handler: PRIVATE_ID comes from the parent
+		// module (`../../index`) which sits in an import cycle with this file, so
+		// reading it at top-level trips a temporal dead zone at module load.
+		const privateIdSet = new Set(PRIVATE_ID);
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
 		let serializedCommands = COMMANDS_GLOBAL.map((x) => {
 			if (!x.data.contexts) x.data.setContexts(Djs.InteractionContextType.Guild);
@@ -69,7 +73,7 @@ export default (client: EClient): void => {
 						);
 						devCommands = devCommands.concat(serializedDbCmds);
 					}
-					if (PRIVATE_ID.includes(guild.id)) {
+					if (privateIdSet.has(guild.id)) {
 						devCommands = devCommands.concat(
 							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
 						);
@@ -97,7 +101,7 @@ export default (client: EClient): void => {
 					guildCommands = guildCommands.concat(serializedDbCmds);
 
 					logger.trace(`Registering commands for \`${guild.name}\``);
-					if (PRIVATE_ID.includes(guild.id)) {
+					if (privateIdSet.has(guild.id)) {
 						guildCommands = guildCommands.concat(
 							PRIVATES_COMMANDS.map((x) => x.data.toJSON())
 						);
@@ -209,24 +213,26 @@ function cleanData(client: EClient) {
 	}
 }
 
+// Concurrency cap for outgoing Discord fetches during startup backfill.
+// 10 keeps us well under Discord's global rate limit even on 10k-user guilds.
+const STARTUP_FETCH_CONCURRENCY = 10;
+
 async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 	const db = client.settings;
 	const characters = client.characters;
 	const allUsers = db.get(guild.id, "user");
 	if (!allUsers) return;
-	const userPromises = Object.entries(allUsers).map(async ([userId, chars]) => {
+	const entries = Object.entries(allUsers);
+	await mapConcurrent(entries, STARTUP_FETCH_CONCURRENCY, async ([userId, chars]) => {
 		if (!Array.isArray(chars)) return;
-		const characterPromises = chars.map((char) =>
-			getUser(char.messageId, guild, client).then((r) => r)
-		);
-		const allCharacters = (await Promise.all(characterPromises)).filter(
-			Boolean
-		) as UserData[];
+		const allCharacters = (
+			await mapConcurrent(chars, STARTUP_FETCH_CONCURRENCY, (char) =>
+				getUser(char.messageId, guild, client)
+			)
+		).filter(Boolean) as UserData[];
 		characters.set(guild.id, allCharacters, userId);
 		client.characterCacheTimestamps.set(`${guild.id}:${userId}`, Date.now());
 	});
-
-	await Promise.all(userPromises);
 }
 
 /**
@@ -242,6 +248,7 @@ function startCacheCleanup(
 	maxAge = 24 * 60 * 60 * 1000,
 	interval = 60 * 60 * 1000
 ) {
+	// unref so the timer doesn't block process exit on graceful shutdown.
 	setInterval(() => {
 		const now = Date.now();
 		let count = 0;
@@ -256,7 +263,7 @@ function startCacheCleanup(
 			}
 		}
 		if (count > 0) logger.info(`Cache cleanup: evicted ${count} stale character entries`);
-	}, interval);
+	}, interval).unref();
 }
 
 function fixSortOrder(db: Settings, guild: Djs.Guild) {

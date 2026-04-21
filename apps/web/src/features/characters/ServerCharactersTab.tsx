@@ -107,8 +107,10 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 							<PersonIcon sx={ownerIconSx} />
 							<Typography
 								variant="subtitle1"
-								color="text.secondary"
-								fontFamily={"var(--code-font-family)"}
+								sx={{
+									color: "text.secondary",
+									fontFamily: "var(--code-font-family)",
+								}}
 							>
 								{char.ownerName}
 							</Typography>
