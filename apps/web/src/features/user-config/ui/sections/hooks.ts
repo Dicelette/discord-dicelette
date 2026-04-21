@@ -3,9 +3,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useListRef } from "react-window";
 import { useToast } from "../../../../providers";
 
-const ITEM_SIZE = 32;
-const MAX_LIST_HEIGHT = 300;
-
+import { ITEM_SIZE, MAX_LIST_HEIGHT } from "./styles";
 /** Hook to auto-scroll list to bottom when items are added */
 export function useAutoScrollToNewItem(itemCount: number) {
 	const listRef = useListRef(null);
