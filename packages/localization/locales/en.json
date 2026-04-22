@@ -872,6 +872,14 @@
 				"description": "Type of classification (failure, success, critical, etc.)",
 				"title": "type",
 				"total": "Total"
+			},
+			"embedTitle": "{{- type}} leaderboard",
+			"sort": {
+				"brut": "Raw",
+				"description": "Sort by raw count or by ratio",
+				"footer": "Total {{- type}}: {{- count}}",
+				"ratio": "Ratio",
+				"title": "sort"
 			}
 		},
 		"moy": {

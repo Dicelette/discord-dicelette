@@ -4,6 +4,7 @@ export type Options =
 	| "success"
 	| "failure"
 	| "total";
+export type SortMode = "brut" | "ratio";
 export const ALL_OPTIONS: Options[] = [
 	"total",
 	"success",

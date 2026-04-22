@@ -872,6 +872,14 @@
 				"description": "Type de classement (échec, succès, critiques...)",
 				"title": "type",
 				"total": "Total"
+			},
+			"embedTitle": "Classement du nombre de {{- type}}",
+			"sort": {
+				"brut": "Brut",
+				"description": "Trier par valeur brute ou par ratio",
+				"footer": "Total {{- type}} : {{- count}}",
+				"ratio": "Ratio",
+				"title": "tri"
 			}
 		},
 		"moy": {

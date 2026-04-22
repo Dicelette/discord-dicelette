@@ -75,6 +75,24 @@ const getCount = {
 						.addChoices(...leaderBoardChoices())
 						.setRequired(false)
 				)
+				.addStringOption((option) =>
+					option
+						.setNames("luckMeter.leaderboard.sort.title")
+						.setDescriptions("luckMeter.leaderboard.sort.description")
+						.addChoices(
+							{
+								name: t("luckMeter.leaderboard.sort.brut"),
+								name_localizations: cmdLn("luckMeter.leaderboard.sort.brut"),
+								value: "brut",
+							},
+							{
+								name: t("luckMeter.leaderboard.sort.ratio"),
+								name_localizations: cmdLn("luckMeter.leaderboard.sort.ratio"),
+								value: "ratio",
+							}
+						)
+						.setRequired(false)
+				)
 				.addBooleanOption((option) =>
 					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
 				)
