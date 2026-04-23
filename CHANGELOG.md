@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.18.0](https://github.com/Dicelette/discord-dicelette/compare/3.17.0...3.18.0) (2026-04-23)
+
+
+### Features
+
+* **leaderboard:** add minimal threshold to create the leaderboard. ([f575ea1](https://github.com/Dicelette/discord-dicelette/commit/f575ea10a0cb562b445c082eafa31f4b0aca1165))
+
 ## [3.17.0](https://github.com/Dicelette/discord-dicelette/compare/3.16.4...3.17.0) (2026-04-23)
 
 
