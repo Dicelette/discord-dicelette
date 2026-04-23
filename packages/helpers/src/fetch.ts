@@ -12,7 +12,7 @@ async function fetchWithCache<T>(
 ): Promise<T | undefined> {
 	try {
 		if (!id || (typeof id === "string" && id.trim().length === 0)) return undefined;
-		return cache?.get(id) ?? (await fetcher(id));
+		return cache?.get(id) ?? (await fetcher(id)) ?? undefined;
 	} catch (error) {
 		logger.warn(`Failed to fetch ${errorId} with ID ${id}:`, (error as Error).message);
 		return undefined;

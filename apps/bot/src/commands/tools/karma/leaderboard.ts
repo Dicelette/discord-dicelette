@@ -2,11 +2,16 @@ import type { EClient } from "@dicelette/client";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { t } from "i18next";
+import { fetchUser } from "../../../../../../packages/helpers";
 import { generateRandomColor } from "./bilan";
 import { ALL_OPTIONS, type Options, type SortMode } from "./types";
 import { getTitle, percentage, serverStats } from "./utils";
 
-function descriptionLeaderBoard(guildCount: DBCount, option: Options, sortMode: SortMode) {
+function descriptionLeaderBoard(
+	guildCount: DBCount,
+	option: Options,
+	sortMode: SortMode
+) {
 	const sorted = Object.entries(guildCount).sort((a, b) => {
 		if (sortMode === "ratio" && option !== "total") {
 			const ratioA =
@@ -94,6 +99,10 @@ export async function leaderboard(
 	}
 
 	for (const userId in guildCount) {
+		if ((await fetchUser(client, userId)) === undefined) {
+			delete guildCount[userId];
+			continue;
+		}
 		const defaultCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
