@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.17.0](https://github.com/Dicelette/discord-dicelette/compare/3.16.4...3.17.0) (2026-04-23)
+
+
+### Features
+
+* **karma:** add sort option (raw/ratio) to leaderboard command ([b7f6d7f](https://github.com/Dicelette/discord-dicelette/commit/b7f6d7fba015047128784adb3083b340472edb0a))
+
 ## [3.16.4](https://github.com/Dicelette/discord-dicelette/compare/3.16.3...3.16.4) (2026-04-21)
 
 ## [3.16.3](https://github.com/Dicelette/discord-dicelette/compare/3.16.2...3.16.3) (2026-04-21)
