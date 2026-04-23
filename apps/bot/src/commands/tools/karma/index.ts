@@ -93,6 +93,11 @@ const getCount = {
 						)
 						.setRequired(false)
 				)
+				.addNumberOption((option) =>
+					option
+						.setNames("config.pity.option.name")
+						.setDescriptions("luckMeter.leaderboard.threshold")
+				)
 				.addBooleanOption((option) =>
 					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
 				)

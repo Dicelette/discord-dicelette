@@ -867,20 +867,21 @@
 		"ephemeral": "Send the reply in an ephemeral message",
 		"error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
 		"leaderboard": {
+			"embedTitle": "{{- type}} leaderboard",
 			"noData": "No data available for this server yet!",
 			"option": {
 				"description": "Type of classification (failure, success, critical, etc.)",
 				"title": "type",
 				"total": "Total"
 			},
-			"embedTitle": "{{- type}} leaderboard",
 			"sort": {
 				"brut": "Raw",
 				"description": "Sort by raw count or by ratio",
 				"footer": "Total {{- type}}: {{- count}}",
 				"ratio": "Ratio",
 				"title": "sort"
-			}
+			},
+			"threshold": "Only display user that have a total of roll above this number"
 		},
 		"moy": {
 			"desc": "Get number and mean of each roll type in the server",

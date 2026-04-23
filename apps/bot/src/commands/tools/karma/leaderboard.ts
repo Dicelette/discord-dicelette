@@ -2,7 +2,6 @@ import type { EClient } from "@dicelette/client";
 import type { Count, DBCount, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { t } from "i18next";
-import { fetchUser } from "../../../../../../packages/helpers";
 import { generateRandomColor } from "./bilan";
 import { ALL_OPTIONS, type Options, type SortMode } from "./types";
 import { getTitle, percentage, serverStats } from "./utils";
@@ -87,6 +86,9 @@ export async function leaderboard(
 		false
 	) as Options | null;
 
+	const threshold =
+		interaction.options.getNumber(t("config.pity.option.name"), false) ?? 10;
+
 	const sortMode = (interaction.options.getString(
 		t("luckMeter.leaderboard.sort.title"),
 		false
@@ -99,10 +101,6 @@ export async function leaderboard(
 	}
 
 	for (const userId in guildCount) {
-		if ((await fetchUser(client, userId)) === undefined) {
-			delete guildCount[userId];
-			continue;
-		}
 		const defaultCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
@@ -112,7 +110,12 @@ export async function leaderboard(
 		};
 		//fusion des valeurs manquantes
 		guildCount[userId] = Object.assign(defaultCount, guildCount[userId]);
-		guildCount[userId].total = guildCount[userId].success + guildCount[userId].failure;
+		const total = guildCount[userId].success + guildCount[userId].failure;
+		if (total < threshold) {
+			delete guildCount[userId];
+			continue;
+		}
+		guildCount[userId].total = total;
 	}
 	if (!option) {
 		// Display all leaderboards if no specific option is chosen

@@ -867,20 +867,21 @@
 		"ephemeral": "Envoie la résultat dans un message éphémère",
 		"error": "Les dés ne connaissent pas encore {{- user}}. Ses résultats ne peuvent donc pas être affichés !",
 		"leaderboard": {
+			"embedTitle": "Classement du nombre de {{- type}}",
 			"noData": "Il n'y a pas encore de données pour ce serveur !",
 			"option": {
 				"description": "Type de classement (échec, succès, critiques...)",
 				"title": "type",
 				"total": "Total"
 			},
-			"embedTitle": "Classement du nombre de {{- type}}",
 			"sort": {
 				"brut": "Brut",
 				"description": "Trier par valeur brute ou par ratio",
 				"footer": "Total {{- type}} : {{- count}}",
 				"ratio": "Ratio",
 				"title": "tri"
-			}
+			},
+			"threshold": "Ne compte que les utilisateurs dont le nombre de jets dépasse ce nombre"
 		},
 		"moy": {
 			"desc": "Obtenir le total et la moyenne de chaque type de lancer dans le serveur",
