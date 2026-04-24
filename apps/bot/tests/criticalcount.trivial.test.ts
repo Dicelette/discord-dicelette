@@ -48,7 +48,7 @@ function addCountLogic(
 			),
 			success: existing.longestStreak?.success ?? 0,
 		};
-	} else {
+	} else if (messageCount.success || messageCount.criticalSuccess) {
 		newCount.consecutive = {
 			failure: 0,
 			success:
@@ -63,6 +63,9 @@ function addCountLogic(
 				newCount.consecutive.success
 			),
 		};
+	} else {
+		newCount.consecutive = existing.consecutive ?? { failure: 0, success: 0 };
+		newCount.longestStreak = existing.longestStreak ?? { failure: 0, success: 0 };
 	}
 
 	return newCount;
@@ -159,5 +162,53 @@ describe("criticalcount trivial behavior", () => {
 		expect(updated.consecutive?.success).toBe(1);
 		expect(updated.longestStreak?.success).toBe(3);
 		expect(updated.longestStreak?.failure).toBe(2);
+	});
+
+	it("preserves failure streak when message has no results (no-op message)", () => {
+		const existing = criticalCount.get(guildId, userId)!;
+		const messageCount: Count = {
+			criticalFailure: 0,
+			criticalSuccess: 0,
+			failure: 0,
+			success: 0,
+		};
+
+		// A no-result message should not reset the ongoing failure streak
+		const updated = addCountLogic(existing, messageCount, false);
+
+		expect(updated.consecutive?.failure).toBe(2);
+		expect(updated.consecutive?.success).toBe(0);
+		expect(updated.longestStreak?.failure).toBe(2);
+		expect(updated.longestStreak?.success).toBe(3);
+	});
+
+	it("preserves success streak when message has no results (no-op message)", () => {
+		// Seed a success streak instead
+		const successStreak: Count = {
+			consecutive: { failure: 0, success: 4 },
+			criticalFailure: 0,
+			criticalSuccess: 0,
+			failure: 1,
+			longestStreak: { failure: 2, success: 4 },
+			success: 5,
+		};
+		criticalCount.set(guildId, successStreak, userId);
+
+		const messageCount: Count = {
+			criticalFailure: 0,
+			criticalSuccess: 0,
+			failure: 0,
+			success: 0,
+		};
+
+		const updated = addCountLogic(
+			criticalCount.get(guildId, userId)!,
+			messageCount,
+			false
+		);
+
+		expect(updated.consecutive?.success).toBe(4);
+		expect(updated.consecutive?.failure).toBe(0);
+		expect(updated.longestStreak?.success).toBe(4);
 	});
 });

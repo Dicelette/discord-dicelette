@@ -110,7 +110,7 @@ function addCount(
 			),
 			success: existingCount.longestStreak?.success ?? 0,
 		};
-	} else {
+	} else if (messageCount.success || messageCount.criticalSuccess) {
 		newCount.consecutive = {
 			failure: 0,
 			success: (existingCount.consecutive?.success ?? 0) + messageCount.success,
@@ -122,6 +122,9 @@ function addCount(
 				newCount.consecutive.success
 			),
 		};
+	} else {
+		newCount.consecutive = existingCount.consecutive ?? { failure: 0, success: 0 };
+		newCount.longestStreak = existingCount.longestStreak ?? { failure: 0, success: 0 };
 	}
 
 	criticalCount.set(guildId, newCount, userId);
