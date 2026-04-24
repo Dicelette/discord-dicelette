@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.18.1](https://github.com/Dicelette/discord-dicelette/compare/3.18.0...3.18.1) (2026-04-24)
+
+
+### Bug Fixes
+
+* **bot:criticalcount:** preserve streaks for no-op messages in addCountLogic ([b404f25](https://github.com/Dicelette/discord-dicelette/commit/b404f25f27773bb84bbe2d04d798dcadf005b688))
+
 ## [3.18.0](https://github.com/Dicelette/discord-dicelette/compare/3.17.0...3.18.0) (2026-04-23)
 
 
