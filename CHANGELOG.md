@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.19.0](https://github.com/Dicelette/discord-dicelette/compare/3.18.1...3.19.0) (2026-04-25)
+
+
+### Features
+
+* **dashboard:favorites:** implement favorites functionality for guilds ([ea6e5cf](https://github.com/Dicelette/discord-dicelette/commit/ea6e5cf3078cb26970d8bf26fbecbfe97ede2898))
+
+
+### Bug Fixes
+
+* **bot:guilds:** remove guild from user favorites and clean caches on deletion ([08064d1](https://github.com/Dicelette/discord-dicelette/commit/08064d104ca1fe005bc2a1505c0772db9e111d18))
+
 ## [3.18.1](https://github.com/Dicelette/discord-dicelette/compare/3.18.0...3.18.1) (2026-04-24)
 
 
