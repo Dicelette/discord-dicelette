@@ -28,6 +28,32 @@ export const onKick = (client: EClient): void => {
 			client.template.delete(guild.id);
 			client.criticalCount.delete(guild.id);
 			client.userSettings.delete(guild.id);
+			client.guildLocale.delete(guild.id);
+			// Remove this guild from every user's favorites
+			for (const [userId, prefs] of client.userPreferences.entries()) {
+				if (prefs?.favoris?.includes(guild.id)) {
+					client.userPreferences.set(
+						userId,
+						prefs.favoris.filter((id) => id !== guild.id),
+						"favoris"
+					);
+				}
+			}
+			// Clean in-memory caches keyed by guildId
+			const guildPrefix = `${guild.id}:`;
+			for (const key of client.trivialCache) {
+				if (key.startsWith(guildPrefix)) {
+					client.trivialCache.delete(key);
+					const timeout = client.trivialCacheTimeouts.get(key);
+					if (timeout) {
+						clearTimeout(timeout);
+						client.trivialCacheTimeouts.delete(key);
+					}
+				}
+			}
+			for (const key of client.characterCacheTimestamps.keys()) {
+				if (key.startsWith(guildPrefix)) client.characterCacheTimestamps.delete(key);
+			}
 		} catch (error) {
 			logger.fatal(error);
 		}
@@ -40,6 +66,28 @@ export const onUserQuit = (client: EClient): void => {
 			client.criticalCount.delete(member.guild.id, member.id);
 		if (client.userSettings.has(member.guild.id, member.id))
 			client.userSettings.delete(member.guild.id, member.id);
+		// Remove this guild from the leaving user's favorites
+		const prefs = client.userPreferences.get(member.id);
+		if (prefs?.favoris?.includes(member.guild.id)) {
+			client.userPreferences.set(
+				member.id,
+				prefs.favoris.filter((id) => id !== member.guild.id),
+				"favoris"
+			);
+		}
+		// Clean in-memory caches for this member
+		client.characterCacheTimestamps.delete(`${member.guild.id}:${member.id}`);
+		const memberPrefix = `${member.guild.id}:${member.id}:`;
+		for (const key of client.trivialCache) {
+			if (key.startsWith(memberPrefix)) {
+				client.trivialCache.delete(key);
+				const timeout = client.trivialCacheTimeouts.get(key);
+				if (timeout) {
+					clearTimeout(timeout);
+					client.trivialCacheTimeouts.delete(key);
+				}
+			}
+		}
 	});
 };
 
