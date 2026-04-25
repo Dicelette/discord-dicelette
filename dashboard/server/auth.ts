@@ -16,13 +16,15 @@ import {
 	discordFetch,
 	getfrontEndUrl,
 	redirectUri,
+	requireAuth,
 	userCanManageGuild,
 } from "./utils";
 
 export function createAuthRouter(
 	botGuilds: DashboardDeps["botGuilds"],
 	guildEvents: import("node:events").EventEmitter,
-	settings: DashboardDeps["settings"]
+	settings: DashboardDeps["settings"],
+	userPreferences: DashboardDeps["userPreferences"]
 ) {
 	const router = Router();
 
@@ -198,6 +200,23 @@ export function createAuthRouter(
 			);
 			res.status(500).json({ error: "Failed to fetch guilds" });
 		}
+	});
+
+	router.get("/favorites", requireAuth, (req: Request, res: Response) => {
+		const userId = req.session.userId!;
+		const prefs = userPreferences.get(userId);
+		res.json({ favoris: prefs?.favoris ?? [] });
+	});
+
+	router.patch("/favorites", requireAuth, (req: Request, res: Response) => {
+		const userId = req.session.userId!;
+		const { favoris } = req.body as { favoris?: unknown };
+		if (!Array.isArray(favoris) || !favoris.every((id) => typeof id === "string")) {
+			res.status(400).json({ error: "Invalid favoris: expected string[]" });
+			return;
+		}
+		userPreferences.set(userId, favoris as string[], "favoris");
+		res.json({ ok: true });
 	});
 
 	router.get("/guild-events", (req: Request, res: Response) => {

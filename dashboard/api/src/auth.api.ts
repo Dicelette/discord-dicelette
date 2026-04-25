@@ -1,6 +1,6 @@
 import { createAuthEndpoint } from "./api-builder";
 import { api } from "./client";
-import type { DiscordGuild, DiscordUser } from "./types";
+import type { ApiFavorites, DiscordGuild, DiscordUser } from "./types";
 
 export const authApi = {
 	/** API: @me - GET /auth/me */
@@ -11,4 +11,8 @@ export const authApi = {
 	guilds: createAuthEndpoint<DiscordGuild[]>(api, "get", "/auth/guilds"),
 	/** API: /auth/guilds/refresh - POST /auth/guilds/refresh */
 	refreshGuilds: createAuthEndpoint<void>(api, "post", "/auth/guilds/refresh"),
+	/** API: /auth/favorites - GET */
+	getFavorites: createAuthEndpoint<ApiFavorites>(api, "get", "/auth/favorites"),
+	/** API: /auth/favorites - PATCH */
+	updateFavorites: createAuthEndpoint<void>(api, "patch", "/auth/favorites"),
 };

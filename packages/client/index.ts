@@ -7,6 +7,7 @@ import type {
 	GuildData,
 	Settings,
 	TemplateData,
+	UserPreferences,
 	UserSettings,
 } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
@@ -87,6 +88,8 @@ export class EClient extends Djs.Client {
 
 	public userSettings: Enmap<UserSettings>;
 
+	public userPreferences: Enmap<UserPreferences>;
+
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
@@ -100,6 +103,10 @@ export class EClient extends Djs.Client {
 
 		this.userSettings = new Enmap({
 			name: "userSettings",
+		});
+
+		this.userPreferences = new Enmap({
+			name: "userPreferences",
 		});
 
 		//read status from files in ./data folder

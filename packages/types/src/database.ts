@@ -269,3 +269,7 @@ export type UserSettingsData = {
 	attributes?: Record<string, number | string>;
 	ignoreNotfound?: string;
 };
+
+export type UserPreferences = {
+	favoris?: string[];
+};

@@ -1,5 +1,5 @@
 import { authApi, type DiscordGuild, guildApi } from "@dicelette/api";
-import { Add, Refresh, Search } from "@mui/icons-material";
+import { Add, Refresh, Search, Star, StarBorder } from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -12,13 +12,23 @@ import {
 	Divider,
 	Grid,
 	InputAdornment,
+	ListItemIcon,
+	Menu,
+	MenuItem,
 	SvgIcon,
 	TextField,
 	Tooltip,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { startTransition, useEffect, useMemo, useRef, useState } from "react";
+import {
+	startTransition,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../providers";
 
@@ -52,6 +62,8 @@ const searchFieldSx = {
 	maxWidth: { xs: "100%", sm: 320 },
 } as const;
 const alertSx = { mb: 3 } as const;
+const favoriteSectionTitleSx = { mb: 2, opacity: 0.8 } as const;
+const favoriteGridSx = { mb: 4 } as const;
 const botSectionTitleSx = { mb: 2, opacity: 0.8 } as const;
 const botGridSx = { mb: 4 } as const;
 const gridItemSx = { display: "flex" } as const;
@@ -71,6 +83,14 @@ const adminSubtitleSx = { mb: 2 } as const;
 const adminGuildAvatarSx = { width: 44, height: 44, bgcolor: "secondary.dark" } as const;
 const adminGuildCardSx = { opacity: 0.7 } as const;
 const addButtonSx = { flexShrink: 0 } as const;
+const starIconSx = { color: "warning.main", flexShrink: 0 } as const;
+const sectionTitleBoxSx = {
+	display: "flex",
+	alignItems: "center",
+	gap: 0.75,
+	mb: 2,
+	opacity: 0.8,
+} as const;
 
 const GUILDS_CACHE_TTL = 5 * 60 * 1000;
 let guildsClientCache: { guilds: DiscordGuild[]; expiresAt: number } | null = null;
@@ -89,17 +109,61 @@ function getErrorStatus(err: unknown): number | undefined {
 	return undefined;
 }
 
+function useFavorites() {
+	const [favorites, setFavorites] = useState<string[]>([]);
+
+	useEffect(() => {
+		authApi
+			.getFavorites()
+			.then((res) => setFavorites(res.data.favoris))
+			.catch(() => {
+				// Non-critical: favorites simply won't be shown
+			});
+	}, []);
+
+	const toggleFavorite = useCallback(
+		(
+			guildId: string,
+			enqueueToast: (msg: string) => void,
+			msgAdded: string,
+			msgRemoved: string
+		) => {
+			const wasFav = favorites.includes(guildId);
+			const next = wasFav
+				? favorites.filter((id) => id !== guildId)
+				: [...favorites, guildId];
+			setFavorites(next);
+			authApi.updateFavorites({ favoris: next }).catch(() => {
+				// On failure silently revert on next load — optimistic update stays for session
+			});
+			enqueueToast(wasFav ? msgRemoved : msgAdded);
+		},
+		[favorites]
+	);
+
+	return { favorites, toggleFavorite };
+}
+
 export default function Servers() {
 	const [guilds, setGuilds] = useState<DiscordGuild[]>([]);
 	const [search, setSearch] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { favorites, toggleFavorite } = useFavorites();
+	const [contextMenu, setContextMenu] = useState<{
+		mouseX: number;
+		mouseY: number;
+		guild: DiscordGuild;
+	} | null>(null);
 	const navigate = useNavigate();
 	const { t } = useI18n();
 	const { enqueueToast } = useToast();
 	const tRef = useRef(t);
 	tRef.current = t;
+	const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const suppressNextClick = useRef(false);
+	const contextMenuIsFavRef = useRef(false);
 
 	useEffect(() => {
 		if (guildsClientCache && Date.now() < guildsClientCache.expiresAt) {
@@ -139,6 +203,42 @@ export default function Servers() {
 		}
 	};
 
+	const handleOpenContextMenu = useCallback(
+		(event: React.MouseEvent, guild: DiscordGuild) => {
+			event.preventDefault();
+			setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, guild });
+		},
+		[]
+	);
+
+	const handleCloseContextMenu = useCallback(() => setContextMenu(null), []);
+
+	const handleTouchStart = useCallback((event: React.TouchEvent, guild: DiscordGuild) => {
+		const touch = event.touches[0];
+		longPressTimer.current = setTimeout(() => {
+			suppressNextClick.current = true;
+			setContextMenu({ mouseX: touch.clientX, mouseY: touch.clientY, guild });
+		}, 500);
+	}, []);
+
+	const handleTouchEnd = useCallback(() => {
+		if (longPressTimer.current) {
+			clearTimeout(longPressTimer.current);
+			longPressTimer.current = null;
+		}
+	}, []);
+
+	const handleToggleFavorite = useCallback(() => {
+		if (!contextMenu) return;
+		toggleFavorite(
+			contextMenu.guild.id,
+			enqueueToast,
+			t("servers.favoriteAdded"),
+			t("servers.favoriteRemoved")
+		);
+		handleCloseContextMenu();
+	}, [contextMenu, toggleFavorite, t, enqueueToast, handleCloseContextMenu]);
+
 	const botGuilds = useMemo(
 		() =>
 			guilds
@@ -172,6 +272,16 @@ export default function Servers() {
 		[adminGuilds, normalizedSearch]
 	);
 
+	const filteredFavoriteGuilds = useMemo(
+		() => filteredBotGuilds.filter((g) => favorites.includes(g.id)),
+		[filteredBotGuilds, favorites]
+	);
+
+	const filteredNonFavoriteGuilds = useMemo(
+		() => filteredBotGuilds.filter((g) => !favorites.includes(g.id)),
+		[filteredBotGuilds, favorites]
+	);
+
 	const getGuildIcon = (guild: DiscordGuild) =>
 		guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : null;
 
@@ -190,6 +300,68 @@ export default function Servers() {
 		es.onerror = () => es.close();
 	};
 
+	const handleGuildCardClick = (guild: DiscordGuild) => {
+		if (suppressNextClick.current) {
+			suppressNextClick.current = false;
+			return;
+		}
+		startTransition(() => navigate(`/dashboard/${guild.id}`));
+	};
+
+	const renderBotGuildCard = (guild: DiscordGuild, isFav: boolean) => (
+		<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id} sx={gridItemSx}>
+			<Card sx={fullWidthCardSx}>
+				<CardActionArea
+					sx={fullHeightActionSx}
+					onClick={() => handleGuildCardClick(guild)}
+					onContextMenu={(e) => handleOpenContextMenu(e, guild)}
+					onTouchStart={(e) => handleTouchStart(e, guild)}
+					onTouchEnd={handleTouchEnd}
+					onTouchMove={handleTouchEnd}
+				>
+					<CardContent className="flex items-center gap-3 p-4" sx={cardContentSx}>
+						<Avatar src={getGuildIcon(guild) ?? undefined} sx={botGuildAvatarSx}>
+							{guild.name[0]}
+						</Avatar>
+						<Box className="flex-1 min-w-0" sx={guildNameBoxSx}>
+							<Typography
+								variant="body1"
+								sx={{
+									fontWeight: 600,
+									fontSize: "1.1rem",
+									fontFamily: "var(--ifm-heading-font-family)",
+								}}
+							>
+								{guild.name}
+							</Typography>
+						</Box>
+						{isFav && <Star fontSize="small" sx={starIconSx} />}
+						{guild.isAdmin && (
+							<SvgIcon>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width={24}
+									height={24}
+									viewBox="0 0 24 24"
+									opacity={0.4}
+									aria-hidden="true"
+									focusable="false"
+								>
+									<path
+										fill="currentColor"
+										d="M5.827 19v-1h12.346v1zm-.058-2.884L4.321 8.475q-.05.02-.112.022q-.063.003-.113.003q-.471 0-.783-.32T3 7.404q0-.473.313-.804q.312-.33.784-.33t.803.33q.33.331.33.804q0 .104-.008.193t-.059.176l3.202 1.285l2.971-4.045q-.217-.142-.344-.376q-.127-.233-.127-.503q0-.472.331-.803q.33-.331.803-.331q.472 0 .804.33t.332.8q0 .284-.127.512q-.127.23-.344.371l2.97 4.045l3.203-1.285q-.027-.08-.047-.175q-.02-.096-.02-.194q0-.473.312-.804q.312-.33.784-.33t.803.33q.331.331.331.804q0 .454-.332.775t-.806.321q-.038 0-.086-.012t-.104-.013l-1.441 7.64zm.854-1h10.754l1.227-6.137l-3.317 1.323L12 5.804l-3.286 4.498l-3.318-1.323zm5.377 0"
+										strokeWidth={0.5}
+										stroke="currentColor"
+									/>
+								</svg>
+							</SvgIcon>
+						)}
+					</CardContent>
+				</CardActionArea>
+			</Card>
+		</Grid>
+	);
+
 	if (loading) {
 		return (
 			<Box className="flex items-center justify-center p-16">
@@ -197,6 +369,11 @@ export default function Servers() {
 			</Box>
 		);
 	}
+
+	if (contextMenu !== null) {
+		contextMenuIsFavRef.current = favorites.includes(contextMenu.guild.id);
+	}
+	const contextMenuGuildIsFav = contextMenuIsFavRef.current;
 
 	return (
 		<Box className="max-w-4xl mx-auto p-6">
@@ -263,68 +440,25 @@ export default function Servers() {
 					{error}
 				</Alert>
 			)}
-			{filteredBotGuilds.length > 0 && (
+			{filteredFavoriteGuilds.length > 0 && (
+				<>
+					<Box sx={sectionTitleBoxSx}>
+						<Star fontSize="small" sx={{ color: "warning.main" }} />
+						<Typography variant="h6">{t("servers.favorites")}</Typography>
+					</Box>
+					<Grid container spacing={2} sx={favoriteGridSx}>
+						{filteredFavoriteGuilds.map((guild) => renderBotGuildCard(guild, true))}
+					</Grid>
+					{filteredNonFavoriteGuilds.length > 0 && <Divider sx={dividerSx} />}
+				</>
+			)}
+			{filteredNonFavoriteGuilds.length > 0 && (
 				<>
 					<Typography variant="h6" sx={botSectionTitleSx}>
 						{t("servers.botPresent")}
 					</Typography>
 					<Grid container spacing={2} sx={botGridSx}>
-						{filteredBotGuilds.map((guild) => (
-							<Grid size={{ xs: 12, sm: 6, md: 4 }} key={guild.id} sx={gridItemSx}>
-								<Card sx={fullWidthCardSx}>
-									<CardActionArea
-										sx={fullHeightActionSx}
-										onClick={() =>
-											startTransition(() => navigate(`/dashboard/${guild.id}`))
-										}
-									>
-										<CardContent
-											className="flex items-center gap-3 p-4"
-											sx={cardContentSx}
-										>
-											<Avatar
-												src={getGuildIcon(guild) ?? undefined}
-												sx={botGuildAvatarSx}
-											>
-												{guild.name[0]}
-											</Avatar>
-											<Box className="flex-1 min-w-0" sx={guildNameBoxSx}>
-												<Typography
-													variant="body1"
-													sx={{
-														fontWeight: 600,
-														fontSize: "1.1rem",
-														fontFamily: "var(--ifm-heading-font-family)",
-													}}
-												>
-													{guild.name}
-												</Typography>
-											</Box>
-											{guild.isAdmin && (
-												<SvgIcon>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														width={24}
-														height={24}
-														viewBox="0 0 24 24"
-														opacity={0.4}
-														aria-hidden="true"
-														focusable="false"
-													>
-														<path
-															fill="currentColor"
-															d="M5.827 19v-1h12.346v1zm-.058-2.884L4.321 8.475q-.05.02-.112.022q-.063.003-.113.003q-.471 0-.783-.32T3 7.404q0-.473.313-.804q.312-.33.784-.33t.803.33q.33.331.33.804q0 .104-.008.193t-.059.176l3.202 1.285l2.971-4.045q-.217-.142-.344-.376q-.127-.233-.127-.503q0-.472.331-.803q.33-.331.803-.331q.472 0 .804.33t.332.8q0 .284-.127.512q-.127.23-.344.371l2.97 4.045l3.203-1.285q-.027-.08-.047-.175q-.02-.096-.02-.194q0-.473.312-.804q.312-.33.784-.33t.803.33q.331.331.331.804q0 .454-.332.775t-.806.321q-.038 0-.086-.012t-.104-.013l-1.441 7.64zm.854-1h10.754l1.227-6.137l-3.317 1.323L12 5.804l-3.286 4.498l-3.318-1.323zm5.377 0"
-															strokeWidth={0.5}
-															stroke="currentColor"
-														/>
-													</svg>
-												</SvgIcon>
-											)}
-										</CardContent>
-									</CardActionArea>
-								</Card>
-							</Grid>
-						))}
+						{filteredNonFavoriteGuilds.map((guild) => renderBotGuildCard(guild, false))}
 					</Grid>
 				</>
 			)}
@@ -385,13 +519,35 @@ export default function Servers() {
 			)}
 			{guilds.length > 0 &&
 				normalizedSearch.length > 0 &&
-				filteredBotGuilds.length === 0 &&
+				filteredFavoriteGuilds.length === 0 &&
+				filteredNonFavoriteGuilds.length === 0 &&
 				filteredAdminGuilds.length === 0 && (
 					<Alert severity="info">{t("servers.noSearchResults")}</Alert>
 				)}
 			{!loading && guilds.length === 0 && (
 				<Alert severity="info">{t("servers.noServers")}</Alert>
 			)}
+			<Menu
+				open={contextMenu !== null}
+				onClose={handleCloseContextMenu}
+				anchorReference="anchorPosition"
+				anchorPosition={
+					contextMenu !== null
+						? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+						: undefined
+				}
+			>
+				<MenuItem onClick={handleToggleFavorite}>
+					<ListItemIcon>
+						{contextMenuGuildIsFav ? (
+							<Star fontSize="small" sx={{ color: "warning.main" }} />
+						) : (
+							<StarBorder fontSize="small" />
+						)}
+					</ListItemIcon>
+					{contextMenuGuildIsFav ? t("servers.removeFavorite") : t("servers.addFavorite")}
+				</MenuItem>
+			</Menu>
 		</Box>
 	);
 }

@@ -3,7 +3,13 @@
 // ---------------------------------------------------------------------------
 
 import type { StatisticalTemplate } from "@dicelette/core";
-import type { Characters, Settings, TemplateData, UserSettings } from "@dicelette/types";
+import type {
+	Characters,
+	Settings,
+	TemplateData,
+	UserPreferences,
+	UserSettings,
+} from "@dicelette/types";
 import type Enmap from "enmap";
 
 export interface EmbedField {
@@ -129,6 +135,7 @@ export interface BotChannels {
 export interface DashboardDeps {
 	settings: Settings;
 	userSettings: Enmap<UserSettings>;
+	userPreferences: Enmap<UserPreferences>;
 	template: TemplateData;
 	characters: Characters;
 	botGuilds: {

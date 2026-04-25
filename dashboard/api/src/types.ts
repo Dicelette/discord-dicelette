@@ -36,6 +36,10 @@ export interface ApiValidationResult {
 	errors: Record<string, string>;
 }
 
+export interface ApiFavorites {
+	favoris: string[];
+}
+
 export interface ApiCharacterField {
 	name: string;
 	value: string;

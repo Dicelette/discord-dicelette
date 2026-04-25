@@ -137,7 +137,12 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	app.use(
 		"/api/auth",
 		makeRateLimit(60, 60_000),
-		createAuthRouter(deps.botGuilds, deps.guildEvents, deps.settings)
+		createAuthRouter(
+			deps.botGuilds,
+			deps.guildEvents,
+			deps.settings,
+			deps.userPreferences
+		)
 	);
 	// Guild data routes: 120 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE).
 	// Limiters are built once at startup — building them per-request would create a new bucket Map

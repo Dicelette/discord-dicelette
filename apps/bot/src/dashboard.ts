@@ -24,6 +24,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		guildEvents,
 		settings: client.settings,
 		userSettings: client.userSettings,
+		userPreferences: client.userPreferences,
 		template: client.template,
 		characters: client.characters,
 		bulkEditTemplateUser: (guildId, template) => {
