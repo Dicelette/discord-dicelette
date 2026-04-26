@@ -864,7 +864,7 @@
 			"total_other": "Total: {{count}} rolls"
 		},
 		"description": "Get the number of success, failures (and critical ones) of an user.",
-		"ephemeral": "Send the reply in an ephemeral message",
+		"ephemeral": "Send the reply in an ephemeral message. True per default.",
 		"error": "The dice don't know {{- user}} yet. Therefore, their results cannot be displayed!",
 		"leaderboard": {
 			"embedTitle": "{{- type}} leaderboard",

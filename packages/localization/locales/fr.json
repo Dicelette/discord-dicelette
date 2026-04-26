@@ -864,7 +864,7 @@
 			"total_other": "Total : {{count}} jets"
 		},
 		"description": "Obtenir le nombre de réussites, d'échecs (et critiques) d'un utilisateur.",
-		"ephemeral": "Envoie la résultat dans un message éphémère",
+		"ephemeral": "Envoie la résultat dans un message éphémère. Vrai par défaut.",
 		"error": "Les dés ne connaissent pas encore {{- user}}. Ses résultats ne peuvent donc pas être affichés !",
 		"leaderboard": {
 			"embedTitle": "Classement du nombre de {{- type}}",

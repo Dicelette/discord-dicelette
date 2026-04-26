@@ -139,7 +139,7 @@ const getCount = {
 
 		const subcmd = interaction.options.getSubcommand();
 		const { ul } = getLangAndConfig(client, interaction, interaction.guild.id);
-		const flags = interaction.options.getBoolean(t("common.ephemeral"));
+		const flags = interaction.options.getBoolean(t("common.ephemeral")) ?? true;
 
 		await interaction.deferReply(
 			flags || subcmd === t("luckMeter.reset.title")
