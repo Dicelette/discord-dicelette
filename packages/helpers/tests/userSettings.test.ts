@@ -14,13 +14,15 @@ describe("validateAttributeEntry", () => {
 	});
 
 	it("should accept a simple formula string", () => {
-		const result = validateAttributeEntry("bonus", "strength + 2");
+		const result = validateAttributeEntry("bonus", "strength + 2", { strength: 10 });
 		expect(result.ok).toBe(true);
 		if (result.ok) expect(result.value).toBe("strength + 2");
 	});
 
 	it("should trim string values", () => {
-		const result = validateAttributeEntry("derived", "  strength * 2  ");
+		const result = validateAttributeEntry("derived", "  strength * 2  ", {
+			strength: 10,
+		});
 		expect(result.ok).toBe(true);
 		if (result.ok) expect(result.value).toBe("strength * 2");
 	});
@@ -48,6 +50,31 @@ describe("validateAttributeEntry", () => {
 
 	it("should reject non-string/non-number values", () => {
 		const result = validateAttributeEntry("bad", { value: 10 });
+		expect(result.ok).toBe(false);
+	});
+
+	it("should reject dice expressions", () => {
+		const result = validateAttributeEntry("exp", "1d100");
+		expect(result.ok).toBe(false);
+	});
+
+	it("should reject dice expressions with comparisons", () => {
+		const result = validateAttributeEntry("exp", "1d100<={exp|0}");
+		expect(result.ok).toBe(false);
+	});
+
+	it("should reject simple dice expressions", () => {
+		const result = validateAttributeEntry("exp", "1d20+5");
+		expect(result.ok).toBe(false);
+	});
+
+	it("should reject invalid formulas (syntactically invalid)", () => {
+		const result = validateAttributeEntry("exp", "strength ++ invalid");
+		expect(result.ok).toBe(false);
+	});
+
+	it("should reject formulas with comparison operators", () => {
+		const result = validateAttributeEntry("exp", "strength <= 10");
 		expect(result.ok).toBe(false);
 	});
 });

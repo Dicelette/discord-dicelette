@@ -41,7 +41,12 @@ export function createUserRouter(deps: DashboardDeps) {
 		const userAttrs = attributes ?? storedAttrs;
 		const validateFn =
 			type === "attributes"
-				? (name: string, value: unknown) => validateAttributeEntry(name, value)
+				? (name: string, value: unknown) =>
+						validateAttributeEntry(
+							name,
+							value,
+							userAttrs as Record<string, number | string>
+						)
 				: (_name: string, value: unknown) =>
 						validateSnippetEntry(value, userAttrs, replaceUnknown);
 
@@ -93,6 +98,7 @@ export function createUserRouter(deps: DashboardDeps) {
 		}
 
 		const normalizedIgnoreNotfound = ignoreNotfound?.trim();
+		const currentUserSettings = userSettings.get(guildId, userId);
 
 		let validAttributes: Record<string, number | string> | undefined;
 		if (attributes !== undefined) {
@@ -100,8 +106,9 @@ export function createUserRouter(deps: DashboardDeps) {
 				res.status(400).json({ error: "Invalid attributes format" });
 				return;
 			}
+			const currentAttrs = currentUserSettings?.attributes ?? {};
 			const { valid, errors } = validateEntries(attributes, (name, value) =>
-				validateAttributeEntry(name, value)
+				validateAttributeEntry(name, value, currentAttrs)
 			);
 			if (Object.keys(errors).length > 0) {
 				res.status(400).json({ errors });
@@ -110,7 +117,6 @@ export function createUserRouter(deps: DashboardDeps) {
 			validAttributes = valid as Record<string, number | string>;
 		}
 
-		const currentUserSettings = userSettings.get(guildId, userId);
 		const currentAttrs = currentUserSettings?.attributes;
 		const effectiveAttributes = validAttributes ?? currentAttrs;
 		const effectiveReplaceUnknown =

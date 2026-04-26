@@ -238,7 +238,8 @@ export function resolveUserAttributes(
 
 export function validateAttributeEntry(
 	name: string,
-	value: unknown
+	value: unknown,
+	existingAttributes?: Record<string, number | string>
 ): ValidationResult<number | string> {
 	if (name.match(/-/)) return { error: "containsHyphen", ok: false };
 	if (typeof value === "number") {
@@ -248,7 +249,23 @@ export function validateAttributeEntry(
 	if (typeof value === "string") {
 		const trimmed = value.trim();
 		if (!trimmed) return { error: JSON.stringify(value), ok: false };
-		return { ok: true, value: trimmed };
+
+		// Validate formula using the same resolver as the dashboard
+		// Pass existing attributes as context to validate formulas against known attributes
+		const hint = resolveFormulaHint(trimmed, existingAttributes ?? {});
+		if (hint.kind === "resolved") {
+			// Formula was successfully resolved using existing attributes
+			return { ok: true, value: trimmed };
+		}
+		if (hint.kind === "not-formula") {
+			// Not a formula reference, try to parse as plain number
+			const numeric = Number(trimmed);
+			if (!Number.isNaN(numeric)) {
+				return { ok: true, value: trimmed };
+			}
+		}
+		// Either syntactically invalid formula or references undefined attributes
+		return { error: JSON.stringify(value), ok: false };
 	}
 	return { error: JSON.stringify(value), ok: false };
 }

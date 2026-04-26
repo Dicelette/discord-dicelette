@@ -93,16 +93,17 @@ export async function importAttributes(
 		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
+	const key = `${userId}.attributes`;
+	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
+	if (overwrite) currentStats = {};
+
 	const {
 		result: validated,
 		errors,
 		count,
 	} = await processEntries<number | string>(importedStats, async (name, value) =>
-		validateAttributeEntry(name, value)
+		validateAttributeEntry(name, value, currentStats)
 	);
-	const key = `${userId}.attributes`;
-	let currentStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
-	if (overwrite) currentStats = {};
 
 	for (const [name, val] of Object.entries(validated))
 		currentStats[name] = val as number | string;
@@ -122,7 +123,10 @@ export async function register(
 		t("userSettings.attributes.create.value.title"),
 		true
 	);
-	const validated = validateAttributeEntry(statName, initialValue);
+	const userId = interaction.user.id;
+	const guildId = interaction.guild!.id;
+	const existingAttributes = client.userSettings.get(guildId, userId)?.attributes ?? {};
+	const validated = validateAttributeEntry(statName, initialValue, existingAttributes);
 	if (!validated.ok) {
 		await reply(interaction, {
 			content: ul("userConfig.addInvalidAttr", { name: statName }),
