@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.19.1](https://github.com/Dicelette/discord-dicelette/compare/3.19.0...3.19.1) (2026-04-26)
+
+
+### Bug Fixes
+
+* **attributes:** should refuse to save any invalid attributes ([5019afb](https://github.com/Dicelette/discord-dicelette/commit/5019afbcc2ec35467f149db86a6f6d95a0e8535b))
+* **bot:karma:** karma is now ephemeral per default ([8654383](https://github.com/Dicelette/discord-dicelette/commit/8654383cb32d611a7c1493bd47fba8b617279965))
+
 ## [3.19.0](https://github.com/Dicelette/discord-dicelette/compare/3.18.1...3.19.0) (2026-04-25)
 
 
