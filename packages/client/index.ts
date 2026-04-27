@@ -10,7 +10,7 @@ import type {
 	UserPreferences,
 	UserSettings,
 } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { important, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
 
@@ -113,9 +113,11 @@ export class EClient extends Djs.Client {
 		if (fs.existsSync(this.statusPath)) {
 			const data = fs.readFileSync(this.statusPath, "utf-8");
 			this.status = JSON.parse(data) as BotStatus;
+			important.info(`Status file loaded from ${this.statusPath}.`);
 		} else {
 			//create the file with default status
 			fs.writeFileSync(this.statusPath, JSON.stringify(this.status), "utf-8");
+			important.info(`Status file created at ${this.statusPath} with default status.`);
 		}
 
 		if (process.env.E2E) enmapSettings.dataDir = path.resolve(".\\data_e2e");
