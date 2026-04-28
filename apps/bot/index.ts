@@ -53,6 +53,7 @@ try {
 	event.onDisconnect(client);
 	event.onError(client);
 	event.onWarn(client);
+	event.onMemberJoin(client);
 	if (process.env.NODE_ENV === "development") event.onDebug(client);
 } catch (error) {
 	logger.fatal(error);

@@ -1,7 +1,8 @@
 import type { EventEmitter } from "node:events";
 import type { EClient } from "@dicelette/client";
-import { logger } from "@dicelette/utils";
+import { logger, mapConcurrent } from "@dicelette/utils";
 import { GUILD_ONLY_COMMANDS, helpAtInvit } from "commands";
+import { getUser } from "../database";
 
 export default (client: EClient, guildEvents?: EventEmitter): void => {
 	client.on("guildCreate", async (guild) => {
@@ -23,6 +24,25 @@ export default (client: EClient, guildEvents?: EventEmitter): void => {
 			await helpAtInvit(guild);
 		} catch (e) {
 			logger.fatal(e);
+		}
+	});
+};
+
+export const onMemberJoin = (client: EClient): void => {
+	client.on("guildMemberAdd", async (member) => {
+		const guildId = member.guild.id;
+		const memberId = member.id;
+		if (!client.characters.has(guildId, memberId)) {
+			const chars = client.settings.get(guildId, `user.${memberId}`);
+			if (!chars?.length) return;
+			const allChar = (
+				await mapConcurrent(chars, 10, (char) =>
+					getUser(char.messageId, member.guild, client)
+				)
+			).filter((x) => x != null);
+			if (!allChar.length) return;
+			client.characters.set(guildId, allChar, memberId);
+			client.characterCacheTimestamps.set(`${guildId}:${memberId}`, Date.now());
 		}
 	});
 };
