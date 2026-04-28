@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.20.0](https://github.com/Dicelette/discord-dicelette/compare/3.19.1...3.20.0) (2026-04-28)
+
+
+### Features
+
+* **bot:join:** add onMemberJoin event handler for new guild members ([59fbc8b](https://github.com/Dicelette/discord-dicelette/commit/59fbc8b747984f001c616f0d347e7c1da9cbc64e))
+* **bot:join:** enhance onMemberJoin with logging and character caching ([ec0a183](https://github.com/Dicelette/discord-dicelette/commit/ec0a183c48a3e27fdb54097c52f66158ab63ba99))
+* **bot:roll:** allow comments + critical_success + critical_failure without using `{c[fs]:(sign)(value)}` for accessibility. ([c32f097](https://github.com/Dicelette/discord-dicelette/commit/c32f0979c956c62716ff84ed1fd6c1953cacde95))
+
+
+### Bug Fixes
+
+* **bot:status:** log status file creation and loading events ([196cca2](https://github.com/Dicelette/discord-dicelette/commit/196cca29c2481e7e24acae64939532c2676730e9))
+
 ## [3.19.1](https://github.com/Dicelette/discord-dicelette/compare/3.19.0...3.19.1) (2026-04-26)
 
 
