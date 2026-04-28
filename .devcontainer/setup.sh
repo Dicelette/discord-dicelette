@@ -9,6 +9,7 @@ fish -c "fisher install jorgebucaran/nvm.fish"
 pnpm setup
 
 # Clone du repo core
+cd ..
 gh repo clone Dicelette/core
 cd core
 bun install
