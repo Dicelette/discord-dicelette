@@ -1,10 +1,15 @@
 #!/bin/bash
 set -e
 # Fisher
-fisher install jorgebucaran/nvm.fish
+fish -c "fisher install jorgebucaran/fisher"
+fish -c "fisher install PatrickF1/fzf.fish"
+fish -c "fisher install jorgebucaran/nvm.fish"
+
+# pnpm setup
+pnpm setup
 
 # Clone du repo core
-git clone git@github.com:dicelette/core.git
+gh repo clone Dicelette/core
 cd core
 bun install
 bun run build
