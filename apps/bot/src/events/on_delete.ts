@@ -88,6 +88,7 @@ export const onUserQuit = (client: EClient): void => {
 				}
 			}
 		}
+		client.characters.delete(member.guild.id, member.id);
 	});
 };
 

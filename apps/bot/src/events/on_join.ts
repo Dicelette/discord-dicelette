@@ -30,11 +30,16 @@ export default (client: EClient, guildEvents?: EventEmitter): void => {
 
 export const onMemberJoin = (client: EClient): void => {
 	client.on("guildMemberAdd", async (member) => {
+		logger.trace(`Member joined: ${member.displayName}`);
 		const guildId = member.guild.id;
 		const memberId = member.id;
 		if (!client.characters.has(guildId, memberId)) {
+			logger.trace("User doesn't have characters in cache");
 			const chars = client.settings.get(guildId, `user.${memberId}`);
 			if (!chars?.length) return;
+			logger.trace(
+				`Found ${chars.length} characters for user ${member.displayName} in settings, fetching...`
+			);
 			const allChar = (
 				await mapConcurrent(chars, 10, (char) =>
 					getUser(char.messageId, member.guild, client)
@@ -43,6 +48,9 @@ export const onMemberJoin = (client: EClient): void => {
 			if (!allChar.length) return;
 			client.characters.set(guildId, allChar, memberId);
 			client.characterCacheTimestamps.set(`${guildId}:${memberId}`, Date.now());
+			logger.trace(
+				`Cached ${allChar.length} characters for user ${member.displayName} (${memberId}) in guild ${member.guild.name} (${guildId})`
+			);
 		}
 	});
 };
