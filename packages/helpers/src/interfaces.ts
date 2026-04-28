@@ -1,3 +1,4 @@
+import type { CustomCritical } from "@dicelette/core";
 import type { GuildData, Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
 /**
@@ -31,6 +32,8 @@ export interface RollInteractionOptions {
 	threshold?: string;
 	/** Optional opposition value for contested rolls */
 	oppositionVal?: string;
+	/** Optional override critical conditions from command options */
+	customCritical?: Record<string, CustomCritical>;
 	/** User-provided comments for the roll */
 	userComments?: string;
 	/** Formatted comments string with # prefix if present */

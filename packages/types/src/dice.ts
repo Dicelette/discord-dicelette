@@ -40,4 +40,6 @@ export type RollOptions = {
 	silent?: boolean;
 	/** Stats names per segment for shared rolls (e.g., ['Dext', 'Force'] for `1d100+$dext;&+$force`) */
 	statsPerSegment?: string[];
+	/** Optional comment to attach to the result without going through the dice string */
+	comment?: string;
 };

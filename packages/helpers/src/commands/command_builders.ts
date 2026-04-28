@@ -99,12 +99,25 @@ export function macroOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	return commonOptions(builder, {
+	commonOptions(builder, {
 		character,
 		expression: true,
 		opposition: true,
 		threshold: true,
 	});
+	builder.addStringOption((option) =>
+		option
+			.setNames("roll.options.cs.name")
+			.setDescriptions("roll.options.cs.description")
+			.setRequired(false)
+	);
+	builder.addStringOption((option) =>
+		option
+			.setNames("roll.options.cf.name")
+			.setDescriptions("roll.options.cf.description")
+			.setRequired(false)
+	);
+	return builder;
 }
 
 /**
@@ -220,7 +233,24 @@ export function gmCommonOptions(
 						.setRequired(true)
 				)
 			) as Djs.SlashCommandSubcommandBuilder;
-
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("roll.options.cs.name")
+					.setDescriptions("roll.options.cs.description")
+					.setRequired(false)
+			);
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("roll.options.cf.name")
+					.setDescriptions("roll.options.cf.description")
+					.setRequired(false)
+			);
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("common.comments")
+					.setDescriptions("dbRoll.options.comments.description")
+					.setRequired(false)
+			);
 			break;
 		}
 		default:

@@ -1,6 +1,11 @@
 import type { EClient } from "@dicelette/client";
-import { extractCommonOptions, gmCommonOptions } from "@dicelette/helpers";
-import { ln, t } from "@dicelette/localization";
+import {
+	extractCommonOptions,
+	extractRollOptions,
+	getInteractionContext as getLangAndConfig,
+	gmCommonOptions,
+} from "@dicelette/helpers";
+import { t } from "@dicelette/localization";
 import type { UserMessageId } from "@dicelette/types";
 import { filterChoices } from "@dicelette/utils";
 import { getMacro, getStatistics } from "database";
@@ -126,22 +131,26 @@ export const mjRoll = {
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		if (!interaction.guild || !interaction.channel) return;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
-		const ul = ln(client.settings.get(interaction.guild.id)?.lang ?? interaction.locale);
+		const { ul } = getLangAndConfig(client, interaction);
 
 		const user = options.getUser(t("display.userLowercase"), false) ?? undefined;
 		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
 		const subcommand = options.getSubcommand(true);
 
 		// Handle the simple roll subcommand separately
-		if (subcommand === ul("roll.name"))
+		if (subcommand === ul("roll.name")) {
+			const { comments, customCritical } = extractRollOptions(options, ul);
 			return await baseRoll(
 				options.getString(t("common.dice"), true),
 				interaction,
 				client,
 				hide ?? undefined,
 				undefined,
-				user
+				user,
+				comments,
+				customCritical
 			);
+		}
 
 		// For all other subcommands (dbRoll, macro, calc), get character data
 		const isMacro = subcommand === ul("common.macro");

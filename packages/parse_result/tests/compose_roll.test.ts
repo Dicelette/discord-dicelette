@@ -189,7 +189,8 @@ describe("composeRollBase", () => {
 		);
 		expect(r.diceWithoutComparator).toBe("2d6");
 		expect(r.rawComparator).toBe(">=10");
-		expect(r.roll).toBe("2d6>=10 ");
+		expect(r.roll).toBe("2d6>=10");
+		expect(r.comment).toBeUndefined();
 	});
 	it("expression + comments", () => {
 		const r = composeRollBase(
@@ -201,7 +202,8 @@ describe("composeRollBase", () => {
 			"+3",
 			"# test"
 		);
-		expect(r.roll).toBe("2d6+3>=10 # test");
+		expect(r.roll).toBe("2d6+3>=10");
+		expect(r.comment).toBe("test");
 	});
 	it("threshold override", () => {
 		const r = composeRollBase(
@@ -214,7 +216,8 @@ describe("composeRollBase", () => {
 			""
 		);
 		expect(r.rawComparator).toBe(">=15");
-		expect(r.roll).toBe("2d6>=15 ");
+		expect(r.roll).toBe("2d6>=15");
+		expect(r.comment).toBeUndefined();
 	});
 	it("removes critical markers", () => {
 		const r = composeRollBase(
@@ -240,7 +243,7 @@ describe("composeRollBase", () => {
 		);
 		expect(r.diceWithoutComparator).toBe("1d20+3");
 		expect(r.rawComparator).toBe(">=15");
-		expect(r.roll).toBe("1d20+3>=15 ");
+		expect(r.roll).toBe("1d20+3>=15");
 	});
 	it("Statistics in comparator", () => {
 		const r = composeRollBase(
@@ -254,7 +257,7 @@ describe("composeRollBase", () => {
 		);
 		expect(r.diceWithoutComparator).toBe("1d20");
 		expect(r.rawComparator).toBe(">=4+5");
-		expect(r.roll).toBe("1d20>=4+5 ");
+		expect(r.roll).toBe("1d20>=4+5");
 	});
 	it("Statistics in threshold", () => {
 		const r = composeRollBase(
@@ -268,7 +271,7 @@ describe("composeRollBase", () => {
 		);
 		expect(r.diceWithoutComparator).toBe("1d20");
 		expect(r.rawComparator).toBe(">=6+5");
-		expect(r.roll).toBe("1d20>=6+5 ");
+		expect(r.roll).toBe("1d20>=6+5");
 	});
 });
 

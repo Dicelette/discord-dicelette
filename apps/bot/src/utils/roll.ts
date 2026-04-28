@@ -70,6 +70,7 @@ export async function rollWithInteraction(
 		opposition,
 		silent,
 		statsPerSegment,
+		comment,
 	} = opts;
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
@@ -91,6 +92,7 @@ export async function rollWithInteraction(
 	}
 	dice = verifyStatMatcherPattern(dice, userSettings?.ignoreNotfound);
 	const result = getRoll(dice, pity, sort);
+	if (result && comment) result.comment = comment;
 	if (!result) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],
@@ -146,8 +148,14 @@ export async function rollMacro(
 		standardized: atq.standardize(),
 	};
 	atq = atq.standardize();
-	const rollOpts = extractRollOptions(options);
-	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
+	const rollOpts = extractRollOptions(options, ul);
+	const {
+		expression,
+		threshold: thresholdOpt,
+		oppositionVal,
+		comments,
+		customCritical,
+	} = rollOpts;
 	let dice = userStatistique.damage?.[atq];
 	const threshold = thresholdOpt;
 
@@ -239,14 +247,19 @@ export async function rollMacro(
 			)
 		: undefined;
 	const roll = composed.roll;
+	const defaultCriticals = skillCustomCritical(
+		rCC || userStatistique.template.customCritical,
+		userStatistique.stats,
+		dollarValue?.total,
+		sortOrder
+	);
+	const mergedCustomCritical = customCritical
+		? Object.assign({}, defaultCriticals ?? {}, customCritical)
+		: defaultCriticals;
 	const opts: RollOptions = {
 		charName: charOptions,
-		customCritical: skillCustomCritical(
-			rCC || userStatistique.template.customCritical,
-			userStatistique.stats,
-			dollarValue?.total,
-			sortOrder
-		),
+		comment: composed.comment,
+		customCritical: mergedCustomCritical,
 		hideResult,
 		infoRoll,
 		opposition,
@@ -299,8 +312,14 @@ export async function rollStatistique(
 		return;
 	}
 	//model : {dice}{stats only if not comparator formula}{bonus/malus}{formula}{override/comparator}{comments}
-	const rollOpts = extractRollOptions(options);
-	const { expression, threshold: thresholdOpt, oppositionVal, comments } = rollOpts;
+	const rollOpts = extractRollOptions(options, ul);
+	const {
+		expression,
+		threshold: thresholdOpt,
+		oppositionVal,
+		comments,
+		customCritical,
+	} = rollOpts;
 	const threshold = thresholdOpt;
 	let userStat: undefined | number;
 	if (statistic && standardizedStatistic && dice?.includes("$")) {
@@ -376,7 +395,7 @@ export async function rollStatistique(
 		infoRoll = buildInfoRollFromStats(findStatsExpr, statsNames);
 
 	const roll = composed.roll;
-	const customCritical =
+	const defaultCustomCritical =
 		rCc ||
 		rollCustomCritical(
 			template.customCritical,
@@ -384,11 +403,15 @@ export async function rollStatistique(
 			userStatistique.stats,
 			sortOrder
 		);
+	const mergedCustomCritical = customCritical
+		? Object.assign({}, defaultCustomCritical ?? {}, customCritical)
+		: defaultCustomCritical;
 
 	const opts: RollOptions = {
 		charName: optionChar,
-		critical: template.critical,
-		customCritical,
+		comment: composed.comment,
+		critical: customCritical ? undefined : template.critical,
+		customCritical: mergedCustomCritical,
 		hideResult,
 		infoRoll,
 		opposition,

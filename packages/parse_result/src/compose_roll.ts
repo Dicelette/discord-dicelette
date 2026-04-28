@@ -41,6 +41,9 @@ export function getThreshold(dice: string, threshold?: string): string {
  * Compose the final roll string by applying critical removal, threshold substitution,
  * comparator extraction and evaluation in a single, optimized pass.
  * Centralizes duplicated logic from bot layer.
+ *
+ * The comment (if any) is returned separately and should be passed directly to the
+ * roll function rather than appended to the dice string, avoiding redundant strip/re-add cycles.
  */
 export function composeRollBase(
 	dice: string,
@@ -55,6 +58,7 @@ export function composeRollBase(
 	rawComparator: string;
 	comparatorEvaluated: string;
 	roll: string;
+	comment: string | undefined;
 } {
 	let working = dice.replace(DETECT_CRITICAL, "").trim();
 	working = getThreshold(working, threshold);
@@ -69,8 +73,10 @@ export function composeRollBase(
 		MIN_THRESHOLD_MATCH,
 		statTotal?.toString()
 	);
-	const roll = `${trimAll(noComparator)}${dollarValue}${comparatorEvaluated} ${comments}`;
+	const comment = comments.replace(/^#\s*/, "").trim() || undefined;
+	const roll = `${trimAll(noComparator)}${dollarValue}${comparatorEvaluated}`;
 	return {
+		comment,
 		comparatorEvaluated,
 		diceWithoutComparator: noComparator,
 		rawComparator,

@@ -1,4 +1,7 @@
+import type { CustomCritical } from "@dicelette/core";
 import { t } from "@dicelette/localization";
+import { parseCustomCritical } from "@dicelette/parse_result";
+import type { Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
 import type { CommonOptions, RollInteractionOptions } from "../interfaces";
 
@@ -101,13 +104,37 @@ export function getNameOption(
  * const opts = extractRollOptions(interaction.options);
  * // => { expression: "0", threshold: ">=15", oppositionVal: "12", userComments: "test", comments: "# test" }
  */
+function parseRollCriticalOption(
+	value: string | undefined,
+	name: string
+): Record<string, CustomCritical> | undefined {
+	if (!value) return undefined;
+	let normalized = value.trimAll();
+	if (/^-?\d+$/.test(normalized)) normalized = `==${normalized}`;
+	const parsed = parseCustomCritical(name, normalized);
+	return parsed;
+}
+
 export function extractRollOptions(
-	options: Djs.CommandInteractionOptionResolver
+	options: Djs.CommandInteractionOptionResolver,
+	ul: Translation
 ): RollInteractionOptions {
 	const expression = options.getString(t("common.expression")) ?? "0";
 	const threshold = options.getString(t("dbRoll.options.override.name"))?.trimAll();
 	const oppositionVal =
 		options.getString(t("dbRoll.options.opposition.name")) ?? undefined;
+	const customCriticalSuccess = parseRollCriticalOption(
+		options.getString(t("roll.options.cs.name")) ?? undefined,
+		ul("roll.critical.success")
+	);
+	const customCriticalFailure = parseRollCriticalOption(
+		options.getString(t("roll.options.cf.name")) ?? undefined,
+		ul("roll.critical.failure")
+	);
+	const customCritical =
+		customCriticalSuccess || customCriticalFailure
+			? Object.assign({}, customCriticalFailure ?? {}, customCriticalSuccess ?? {})
+			: undefined;
 	const userComments = options.getString(t("common.comments")) ?? undefined;
 
 	// Format comments with # prefix if present
@@ -118,6 +145,7 @@ export function extractRollOptions(
 		expression,
 		oppositionVal,
 		threshold,
+		customCritical,
 		userComments,
 	};
 }

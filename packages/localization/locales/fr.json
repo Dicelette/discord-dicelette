@@ -1057,6 +1057,16 @@
 		"option": {
 			"description": "Dé à lancer"
 		},
+		"options": {
+			"cf": {
+				"description": "Utiliser une valeur d'échec critique avec le signe",
+				"name": "échec_critique"
+			},
+			"cs": {
+				"description": "Utiliser une valeur de succès critique avec le signe",
+				"name": "succès_critique"
+			}
+		},
 		"other": " ",
 		"reason": "Nouveau thread de lancer",
 		"success": "Succès"

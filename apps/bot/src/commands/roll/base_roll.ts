@@ -1,5 +1,6 @@
 import type { EClient } from "@dicelette/client";
 import {
+	extractRollOptions,
 	getGuildContext,
 	getInteractionContext as getLangAndConfig,
 } from "@dicelette/helpers";
@@ -19,8 +20,12 @@ import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
 import "@dicelette/discord_ext";
-import { type ComparedValue, REMOVER_PATTERN } from "@dicelette/core";
-import type { RollOptions } from "@dicelette/types";
+import {
+	type ComparedValue,
+	type CustomCritical,
+	REMOVER_PATTERN,
+} from "@dicelette/core";
+import type { RollOptions, Translation } from "@dicelette/types";
 import { getCharFromText, getUserFromInteraction, resolveStatsNames } from "database";
 
 export const diceRoll = {
@@ -43,6 +48,24 @@ export const diceRoll = {
 			Djs.ApplicationIntegrationType.UserInstall
 		)
 
+		.addStringOption((option) =>
+			option
+				.setNames("common.comments")
+				.setDescriptions("dbRoll.options.comments.description")
+				.setRequired(false)
+		)
+		.addStringOption((option) =>
+			option
+				.setNames("roll.options.cs.name")
+				.setDescriptions("roll.options.cs.description")
+				.setRequired(false)
+		)
+		.addStringOption((option) =>
+			option
+				.setNames("roll.options.cf.name")
+				.setDescriptions("roll.options.cf.description")
+				.setRequired(false)
+		)
 		.addBooleanOption((option) =>
 			option
 				.setNames("dbRoll.options.hidden.name")
@@ -56,10 +79,24 @@ export const diceRoll = {
 		logger.info(
 			`Log: Executing /roll cmds for ${interaction.user.username} in ${interaction.guild?.name} - DM:${interaction.channel?.type === Djs.ChannelType.DM}`
 		);
+		const { ul } = getLangAndConfig(client, interaction);
+
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		const dice = option.getString(t("common.dice"), true);
 		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));
-		await baseRoll(dice, interaction, client, hidden ?? undefined);
+		const { customCritical } = extractRollOptions(option, ul);
+		const overrideComment = option.getString(t("common.comments")) ?? undefined;
+		await baseRoll(
+			dice,
+			interaction,
+			client,
+			hidden ?? undefined,
+			undefined,
+			undefined,
+			overrideComment,
+			customCritical,
+			ul
+		);
 	},
 };
 
@@ -69,10 +106,13 @@ export async function baseRoll(
 	client: EClient,
 	hidden?: boolean,
 	silent?: boolean,
-	user: Djs.User = interaction.user
+	user: Djs.User = interaction.user,
+	overrideComment?: string,
+	customCriticalFromOptions?: Record<string, CustomCritical>,
+	ul?: Translation
 ): Promise<void> {
 	profiler.startProfiler();
-	const { ul } = getLangAndConfig(client, interaction);
+	if (!ul) ul = getLangAndConfig(client, interaction).ul;
 
 	let firstChara: string | undefined;
 	if (dice.match(REMOVER_PATTERN.STAT_MATCHER) && interaction.guild)
@@ -139,23 +179,34 @@ export async function baseRoll(
 			? client.userSettings.get(interaction.guild.id, user.id)?.ignoreNotfound
 			: undefined
 	);
-	const { criticalsFromDice, serverData } = await getCritical(
+	const criticalsFromDice = rollCustomCriticalsFromDice(
+		dice,
+		ul,
+		undefined,
+		userData?.stats,
+		sortOrder
+	);
+	const { serverData } = await getCritical(
 		client,
 		ul,
 		res.formula,
 		interaction.guild || undefined,
 		userData,
-		rollCustomCriticalsFromDice(dice, ul, undefined, userData?.stats, sortOrder),
+		criticalsFromDice,
 		sortOrder
 	);
 
 	const infoRoll = res.infoRoll
 		? { name: res.infoRoll, standardized: res.infoRoll.standardize() }
 		: undefined;
+	const mergedCustomCritical = customCriticalFromOptions
+		? Object.assign({}, criticalsFromDice ?? {}, customCriticalFromOptions)
+		: criticalsFromDice;
 	const opts: RollOptions = {
 		charName,
-		critical: serverData?.critical,
-		customCritical: criticalsFromDice,
+		comment: overrideComment,
+		critical: customCriticalFromOptions ? undefined : serverData?.critical,
+		customCritical: mergedCustomCritical,
 		hideResult: hidden,
 		infoRoll,
 		opposition,

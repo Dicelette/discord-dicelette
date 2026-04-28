@@ -7,6 +7,7 @@ import {
 	type Resultat,
 	roll,
 	type SortOrder,
+	splitDiceComment,
 	verifyStatMatcherPattern,
 } from "@dicelette/core";
 import type {
@@ -100,16 +101,17 @@ export function performDiceRoll(
 	try {
 		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
 
-		// Clean markers/comments before the dice parser
+		// Clean markers before the dice parser
 		rollContent = rollContent
 			.replace(/%%\[__.*?__]%%/g, "")
-			.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
 			.replace(/%{4,}/g, "")
 			.replace(/\s*%%+\s*/g, " ")
 			.replace(/ @\w+/, "")
 			.trimEnd();
 		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
-		return { infoRoll, resultat: roll(rollContent, undefined, pity, sort) };
+		// Extract and pass the comment separately so roll() receives a clean dice string
+		const { dice: cleanDice, comment } = splitDiceComment(rollContent);
+		return { infoRoll, resultat: roll(cleanDice, undefined, pity, sort, comment) };
 	} catch (e) {
 		logger.warn(e);
 		return undefined;
@@ -380,13 +382,10 @@ export function isRolling(
  * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
  */
 function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
-	const main = DICE_PATTERNS.GLOBAL_COMMENTS_GROUP.exec(dice)?.groups?.comment;
-	dice = dice.replace(DICE_PATTERNS.GLOBAL_COMMENTS_GROUP, "");
-	const rollDice = roll(dice, undefined, pity, sort);
+	const { dice: cleanDice, comment } = splitDiceComment(dice);
+	const rollDice = roll(cleanDice, undefined, pity, sort, comment);
 	if (!rollDice) return undefined;
-
-	rollDice.dice = dice;
-	if (main) rollDice.comment = main;
+	rollDice.dice = cleanDice;
 	return rollDice;
 }
 
@@ -397,8 +396,8 @@ function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
  * @returns `true` if the cleaned expression contains a semicolon, `false` otherwise
  */
 function isSharedRoll(dice: string): boolean {
-	//we need to remove the comments to avoid false positive
-	const cleanedDice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
+	// Remove comment to avoid false positive on ";" in comment text
+	const { dice: cleanedDice } = splitDiceComment(dice);
 	return cleanedDice.includes(";");
 }
 
@@ -408,7 +407,7 @@ function isSharedRoll(dice: string): boolean {
  * @param dice - Dice expression to evaluate; may contain inline comment markers or shared-segment syntax.
  * @param pity - Optional flag forwarded to the rolling engine that alters roll behavior.
  * @param sort
- * @returns The computed Resultat with embedded comment and adjusted dice string when present, or `undefined` if the expression is invalid or rolling failed.
+ * @returns The computed Resultat with the comment set and adjusted dice string, or `undefined` if the expression is invalid or rolling failed.
  */
 export function getRoll(
 	dice: string,
@@ -417,19 +416,8 @@ export function getRoll(
 ): Resultat | undefined {
 	logger.trace("Getting roll for dice:", dice);
 	if (isSharedRoll(dice)) return getRollInShared(dice, pity, sort);
-	const comments = dice
-		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
-		.replaceAll("*", "\\*");
-	if (comments) dice = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1");
-
-	dice = dice.trim();
-	const rollDice = roll(dice, undefined, pity, sort);
-	if (!rollDice) return undefined;
-	if (comments) {
-		rollDice.comment = comments;
-		rollDice.dice = `${dice} /* ${comments} */`;
-	}
-	return rollDice;
+	const { dice: cleanDice, comment } = splitDiceComment(dice);
+	return roll(cleanDice, undefined, pity, sort, comment);
 }
 
 /**

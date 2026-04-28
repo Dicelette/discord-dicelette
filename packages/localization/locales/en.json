@@ -1057,6 +1057,16 @@
 		"option": {
 			"description": "roll die"
 		},
+		"options": {
+			"cf": {
+				"description": "Use a critical failure value with the sign",
+				"name": "critical_failure"
+			},
+			"cs": {
+				"description": "Use a critical success value with the sign",
+				"name": "critical_success"
+			}
+		},
 		"other": " ",
 		"reason": "New roll thread",
 		"success": "Success"

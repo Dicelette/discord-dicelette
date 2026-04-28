@@ -6,6 +6,7 @@ import {
 	MIN_THRESHOLD_MATCH,
 } from "@dicelette/core";
 import {
+	extractRollOptions,
 	getInteractionContext as getLangAndConfig,
 	getSettingsAutoComplete,
 	macroOptions,
@@ -45,16 +46,11 @@ export default {
 		const snippets = userSettings?.snippets ?? {};
 		const resolvedAttributes = resolveUserAttributes(userSettings?.attributes);
 		const attributes = resolvedAttributes.ok ? resolvedAttributes.value : undefined;
-		const expressionOpt = interaction.options.getString(t("common.expression")) ?? "0";
+		const { expression, threshold, oppositionVal, comments, customCritical } =
+			extractRollOptions(interaction.options as Djs.CommandInteractionOptionResolver, ul);
 		const sortOrder = client.settings.get(guildId)?.sortOrder;
-		const threshold = interaction.options
-			.getString(t("dbRoll.options.override.name"))
-			?.trimAll();
-
-		const oppositionVal = interaction.options.getString(
-			t("dbRoll.options.opposition.name")
-		);
-		const userComments = interaction.options.getString(t("common.comments")) ?? undefined;
+		const userComments =
+			comments ?? interaction.options.getString(t("common.comments")) ?? undefined;
 		let dice = snippets[macroName];
 		if (!dice) {
 			const bestMatch = findBestRecord(snippets, macroName, MIN_THRESHOLD_MATCH);
@@ -73,7 +69,7 @@ export default {
 
 		const expr = getExpression(
 			dice,
-			expressionOpt,
+			expression,
 			attributes,
 			undefined,
 			undefined,
@@ -109,8 +105,16 @@ export default {
 				""
 			);
 
+			const mergedCustomCriticalShared = customCritical
+				? Object.assign(
+						{},
+						skillCustomCritical(rCCShared, attributes, undefined, sortOrder) ?? {},
+						customCritical
+					)
+				: skillCustomCritical(rCCShared, attributes, undefined, sortOrder);
 			const opts: RollOptions = {
-				customCritical: skillCustomCritical(rCCShared, attributes, undefined, sortOrder),
+				comment: composed.comment,
+				customCritical: mergedCustomCriticalShared,
 				user: interaction.user,
 			};
 			await rollWithInteraction(interaction, composed.roll, client, opts);
@@ -158,9 +162,17 @@ export default {
 				)
 			: undefined;
 
+		const mergedCustomCritical = customCritical
+			? Object.assign(
+					{},
+					skillCustomCritical(rCC, attributes, undefined, sortOrder) ?? {},
+					customCritical
+				)
+			: skillCustomCritical(rCC, attributes, undefined, sortOrder);
 		const opts: RollOptions = {
 			charName: charOptions,
-			customCritical: skillCustomCritical(rCC, attributes, undefined, sortOrder),
+			comment: composed.comment,
+			customCritical: mergedCustomCritical,
 			opposition,
 			user: interaction.user,
 		};
