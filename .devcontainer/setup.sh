@@ -7,6 +7,9 @@ fish -c "fisher install jorgebucaran/nvm.fish"
 
 # pnpm setup
 pnpm setup
+source /home/node/.bashrc
+pnpm completion fish > ~/.config/fish/completions/pnpm.fish
+
 
 # Clone du repo core
 cd ..
@@ -15,11 +18,8 @@ cd core
 bun install
 bun run build
 pnpm link --global
-cd ..
-cd $(basename $(pwd))
-pnpm link --global @dicelette/core
-
-# Install dep
+cd ../discord-dicelette
+pnpm link ../core
 pnpm i
 
 # Create .env from env variable
