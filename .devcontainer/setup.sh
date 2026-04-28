@@ -1,10 +1,5 @@
 #!/bin/bash
 set -e
-# Fisher
-fish -c "fisher install jorgebucaran/fisher"
-fish -c "fisher install PatrickF1/fzf.fish"
-fish -c "fisher install jorgebucaran/nvm.fish"
-
 # pnpm setup
 pnpm setup
 source /home/node/.bashrc
