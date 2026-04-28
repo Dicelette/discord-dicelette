@@ -1,0 +1,55 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "Dicelette",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:4-24-trixie",
+	"hostRequirements": {
+		"cpus": 8,
+		"memory": "8gb",
+		"storage": "32gb"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"installDirectlyFromGitHubRelease": true,
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "24.14.0",
+			"pnpmVersion": "latest",
+			"nvmVersion": "latest"
+		},
+		"ghcr.io/meaningful-ooo/devcontainer-features/fish:2": {
+			"fisher": true
+		},
+		"ghcr.io/jckimble/devcontainer-features/ngrok:3": {
+			"version": "stable"
+		},
+		"ghcr.io/schlich/devcontainer-features/starship:0": {},
+		"ghcr.io/devcontainers-extra/features/bun:1": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainer-community/devcontainer-features/fzf:1": {
+			"version": "latest"
+		}
+	},
+	"remoteEnv": {
+		"NODE_ENV": "development",
+		"DASHBOARD_ENABLED": "true"
+	},
+	"secrets": {
+		"DISCORD_TOKEN": {},
+		"CLIENT_ID": {},
+		"OWNER_ID": {},
+		"PRIVATE_ID": {},
+		"CLIENT_SECRET": {},
+		"DISCORD_EMOJI_ID": {},
+		"GITHUB_EMOJI_ID": {},
+		"KOFI_EMOJI_ID": {},
+		"MATH_EMOJI_ID": {},
+		"FRONTEND_URL": {},
+		"DISCORD_REDIRECT_URI": {}
+	},
+	"postCreateCommand": "./.devcontainer/setup.sh"
+}
