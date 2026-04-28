@@ -2,7 +2,6 @@
 set -e
 # pnpm setup
 pnpm setup
-source /home/node/.bashrc
 pnpm completion fish > ~/.config/fish/completions/pnpm.fish
 
 
