@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.20.1](https://github.com/Dicelette/discord-dicelette/compare/3.20.0...3.20.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* **bot:roll:** re-integrate custom critical /critical in roll handling in slashcmds ([2dd1efb](https://github.com/Dicelette/discord-dicelette/commit/2dd1efb6994e2342286486c57f154b41e1e823db))
+
 ## [3.20.0](https://github.com/Dicelette/discord-dicelette/compare/3.19.1...3.20.0) (2026-04-28)
 
 
