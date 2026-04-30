@@ -186,7 +186,7 @@ export async function baseRoll(
 		userData?.stats,
 		sortOrder
 	);
-	const { serverData } = await getCritical(
+	const { criticalsFromDice: mergedServerCriticals, serverData } = await getCritical(
 		client,
 		ul,
 		res.formula,
@@ -200,8 +200,8 @@ export async function baseRoll(
 		? { name: res.infoRoll, standardized: res.infoRoll.standardize() }
 		: undefined;
 	const mergedCustomCritical = customCriticalFromOptions
-		? Object.assign({}, criticalsFromDice ?? {}, customCriticalFromOptions)
-		: criticalsFromDice;
+		? Object.assign({}, mergedServerCriticals ?? {}, customCriticalFromOptions)
+		: mergedServerCriticals;
 	const opts: RollOptions = {
 		charName,
 		comment: overrideComment,

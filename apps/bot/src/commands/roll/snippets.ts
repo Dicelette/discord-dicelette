@@ -24,7 +24,7 @@ import {
 import type { RollOptions } from "@dicelette/types";
 import { CHARACTER_DETECTION, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { rollWithInteraction } from "utils";
+import { getCritical, rollWithInteraction } from "utils";
 
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
@@ -105,15 +105,30 @@ export default {
 				""
 			);
 
+			const diceBasedCriticalsShared = skillCustomCritical(
+				rCCShared,
+				attributes,
+				undefined,
+				sortOrder
+			);
+			const {
+				criticalsFromDice: serverMergedCriticalsShared,
+				serverData: serverDataShared,
+			} = await getCritical(
+				client,
+				ul,
+				composed.roll,
+				interaction.guild!,
+				undefined,
+				diceBasedCriticalsShared,
+				sortOrder
+			);
 			const mergedCustomCriticalShared = customCritical
-				? Object.assign(
-						{},
-						skillCustomCritical(rCCShared, attributes, undefined, sortOrder) ?? {},
-						customCritical
-					)
-				: skillCustomCritical(rCCShared, attributes, undefined, sortOrder);
+				? Object.assign({}, serverMergedCriticalsShared ?? {}, customCritical)
+				: serverMergedCriticalsShared;
 			const opts: RollOptions = {
 				comment: composed.comment,
+				critical: customCritical ? undefined : serverDataShared?.critical,
 				customCritical: mergedCustomCriticalShared,
 				user: interaction.user,
 			};
@@ -162,16 +177,23 @@ export default {
 				)
 			: undefined;
 
+		const diceBasedCriticals = skillCustomCritical(rCC, attributes, undefined, sortOrder);
+		const { criticalsFromDice: serverMergedCriticals, serverData } = await getCritical(
+			client,
+			ul,
+			composed.roll,
+			interaction.guild!,
+			undefined,
+			diceBasedCriticals,
+			sortOrder
+		);
 		const mergedCustomCritical = customCritical
-			? Object.assign(
-					{},
-					skillCustomCritical(rCC, attributes, undefined, sortOrder) ?? {},
-					customCritical
-				)
-			: skillCustomCritical(rCC, attributes, undefined, sortOrder);
+			? Object.assign({}, serverMergedCriticals ?? {}, customCritical)
+			: serverMergedCriticals;
 		const opts: RollOptions = {
 			charName: charOptions,
 			comment: composed.comment,
+			critical: customCritical ? undefined : serverData?.critical,
 			customCritical: mergedCustomCritical,
 			opposition,
 			user: interaction.user,
