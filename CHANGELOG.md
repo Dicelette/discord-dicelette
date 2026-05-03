@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.21.0](https://github.com/Dicelette/discord-dicelette/compare/3.20.1...3.21.0) (2026-05-03)
+
+
+### Features
+
+* **bot:8ball:** add 8ball command with response handling and integration ([0753579](https://github.com/Dicelette/discord-dicelette/commit/0753579c2f3d85cb083a715277318f0771200c76))
+
 ## [3.20.1](https://github.com/Dicelette/discord-dicelette/compare/3.20.0...3.20.1) (2026-04-30)
 
 
