@@ -52,7 +52,7 @@ export const balls = {
 		const res = ul("choose.result", {
 			items,
 		});
-		const content = question ? `*${question}*\n${res}` : res;
+		const content = question ? `*${question}*\n  ${res}` : res;
 		await interaction.reply({ content });
 	},
 };

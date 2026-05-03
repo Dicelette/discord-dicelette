@@ -94,7 +94,7 @@ async function command(interaction: Djs.ChatInputCommandInteraction, client: ECl
 	const res = ul("choose.result", {
 		items: selected.map((x) => `\`${x}\``).join(", "),
 	});
-	const content = question ? `*${question}*\n${res}` : res;
+	const content = question ? `*${question}*\n  ${res}` : res;
 
 	await interaction.reply({ content });
 }
