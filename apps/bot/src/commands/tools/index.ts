@@ -6,6 +6,7 @@ import { graph } from "./graph";
 export { math } from "./math";
 
 export const GIMMICK = [displayUser, graph, editAvatar, calc];
+export * from "./8ball";
 export * from "./calc";
 export * from "./choose";
 export * from "./display";

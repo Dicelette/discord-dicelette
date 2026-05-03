@@ -31,8 +31,10 @@ export const choose = {
 				.setNames("choose.number.name")
 				.setDescriptions("choose.number.description")
 				.setRequired(false)
+		)
+		.addStringOption((option) =>
+			option.setNames("8ball.question.name").setDescriptions("choose.question")
 		),
-
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		await command(interaction, client);
 	},
@@ -88,9 +90,11 @@ async function command(interaction: Djs.ChatInputCommandInteraction, client: ECl
 		});
 
 	const selected = random.sample(items, howMany ?? 1);
-	await interaction.reply({
-		content: ul("choose.result", {
-			items: selected.map((x) => `\`${x}\``).join(", "),
-		}),
+	const question = interaction.options.getString(t("8ball.question.name"), false);
+	const res = ul("choose.result", {
+		items: selected.map((x) => `\`${x}\``).join(", "),
 	});
+	const content = question ? `*${question}*\n${res}` : res;
+
+	await interaction.reply({ content });
 }

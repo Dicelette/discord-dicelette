@@ -1,4 +1,42 @@
 {
+	"8ball": {
+		"description": "Pose une question et laisse la boule magique décider de ton destin.",
+		"name": "8ball",
+		"question": {
+			"description": "Votre question",
+			"name": "question"
+		},
+		"reply": {
+			"Negative": {
+				"AskAgainLater": "Essaye plus tard",
+				"BetterNotTellYouNow": "Mieux vaut ne pas te le dire maintenant",
+				"CannotPredictNow": "Impossible de prédire pour le moment",
+				"ConcentrateAndAskAgain": "Concentre-toi et repose la question",
+				"ReplyHazyTryAgain": "Réponse floue, réessaie"
+			},
+			"Noncommittal": {
+				"AsISeeItYes": "D'après moi, oui",
+				"MostLikely": "Très probablement",
+				"OutlookGood": "Ça s’annonce bien",
+				"SignsPointToYes": "Tout indique que oui",
+				"Yes": "Oui"
+			},
+			"VeryNegative": {
+				"DontCountOnIt": "N'y compte pas",
+				"MyReplyIsNo": "Ma réponse est non",
+				"MySourcesSayNo": "Mes sources disent non",
+				"OutlookNotSoGood": "Les perspectives ne sont pas bonnes",
+				"VeryDoubtful": "Très improbable"
+			},
+			"affirmative": {
+				"ItIsCertain": "C'est certain",
+				"ItIsDecidedlySo": "C'est indéniablement le cas",
+				"WithoutADoubt": "Sans aucun doute",
+				"YesDefinitely": "Oui absolument",
+				"YouMayRelyOnIt": "Tu peux compter dessus"
+			}
+		}
+	},
 	"activities": {
 		"competing": "Compétiter",
 		"custom": "Statut",
@@ -129,6 +167,7 @@
 			"description": "Nombre de valeurs à sélectionner",
 			"name": "combien"
 		},
+		"question": "La question ou un commentaire",
 		"result": "__Résultat__ : {{items}}",
 		"seed": {
 			"description": "Initialisez le générateur de nombres avec un seed pour obtenir la même séquence de nombres.",

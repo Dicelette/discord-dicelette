@@ -1,4 +1,42 @@
 {
+	"8ball": {
+		"description": "Ask a question and let the magic 8-ball decide your fate.",
+		"name": "8ball",
+		"question": {
+			"description": "Your question",
+			"name": "question"
+		},
+		"reply": {
+			"Negative": {
+				"AskAgainLater": "Ask again later",
+				"BetterNotTellYouNow": "Better not tell you now",
+				"CannotPredictNow": "Cannot predict now",
+				"ConcentrateAndAskAgain": "Concentrate and ask again",
+				"ReplyHazyTryAgain": "Reply hazy, try again"
+			},
+			"Noncommittal": {
+				"AsISeeItYes": "As I see it, yes",
+				"MostLikely": "Most likely",
+				"OutlookGood": "Outlook good",
+				"SignsPointToYes": "Signs point to yes",
+				"Yes": "Yes"
+			},
+			"VeryNegative": {
+				"DontCountOnIt": "Don't count on it",
+				"MyReplyIsNo": "My reply is no",
+				"MySourcesSayNo": "My sources say no",
+				"OutlookNotSoGood": "Outlook not so good",
+				"VeryDoubtful": "Very doubtful"
+			},
+			"affirmative": {
+				"ItIsCertain": "It is certain",
+				"ItIsDecidedlySo": "It is decidedly so",
+				"WithoutADoubt": "Without a doubt",
+				"YesDefinitely": "Yes definitely",
+				"YouMayRelyOnIt": "You may rely on it"
+			}
+		}
+	},
 	"activities": {
 		"competing": "Competing",
 		"custom": "Statut",
@@ -129,6 +167,7 @@
 			"description": "Number of values to select",
 			"name": "how_many"
 		},
+		"question": "The question or a comments",
 		"result": "__Result__: {{items}}",
 		"seed": {
 			"description": "Initialize the number generator with a seed to get the same sequence of number",
