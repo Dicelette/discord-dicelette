@@ -6,15 +6,15 @@
 		".": "./index.ts"
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.26.0",
+		"@dicelette/core": "^1.28.3",
 		"@dicelette/localization": "workspace:*",
 		"@dicelette/types": "workspace:*",
-		"cors": "^2.8.5",
-		"discord-api-types": "^0.37.115",
-		"enmap": "npm:@dicelette/enmap",
-		"express": "^5.1.0",
-		"express-session": "^1.18.1",
+		"cors": "^2.8.6",
+		"discord-api-types": "^0.37.120",
+		"enmap": "npm:@dicelette/enmap@^6.1.6",
+		"express": "^5.2.1",
+		"express-session": "^1.19.0",
 		"memorystore": "^1.6.7",
-		"papaparse": "^5.4.1"
+		"papaparse": "^5.5.3"
 	}
 }
