@@ -99,12 +99,7 @@ export function macroOptions(
 			.setRequired(true)
 			.setAutocomplete(true)
 	);
-	commonOptions(builder, {
-		character,
-		expression: true,
-		opposition: true,
-		threshold: true,
-	});
+
 	builder.addStringOption((option) =>
 		option
 			.setNames("roll.options.cs.name")
@@ -117,7 +112,13 @@ export function macroOptions(
 			.setDescriptions("roll.options.cf.description")
 			.setRequired(false)
 	);
-	return builder;
+
+	return commonOptions(builder, {
+		character,
+		expression: true,
+		opposition: true,
+		threshold: true,
+	});
 }
 
 /**
@@ -194,12 +195,20 @@ export function gmCommonOptions(
 	type: "dbroll" | "macro" | "calc" | "roll"
 ) {
 	let builderCopy = builder;
-	function addHiddenOpts(
-		builderInner: SlashCommandSubcommandBuilder
-	): Djs.SlashCommandSubcommandBuilder {
+	function addUserOpt(builderInner: SlashCommandSubcommandBuilder) {
+		builderInner.addUserOption((option) =>
+			option
+				.setNames("display.userLowercase")
+				.setDescriptions("mjRoll.user")
+				.setRequired(false)
+		);
+		return builderInner;
+	}
+
+	function addHiddenOpt(builderInner: SlashCommandSubcommandBuilder) {
 		builderInner.addBooleanOption((option) =>
 			option
-				.setNames("dbRoll.options.hidden.name")
+				.setNames("common.hidden")
 				.setDescriptions("dbRoll.options.hidden.description")
 				.setRequired(false)
 		);
@@ -207,32 +216,84 @@ export function gmCommonOptions(
 	}
 	switch (type) {
 		case "macro": {
-			builderCopy = addHiddenOpts(
-				macroOptions(builder) as Djs.SlashCommandSubcommandBuilder
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("common.name")
+					.setDescriptions("rAtq.atq_name.description")
+					.setRequired(true)
+					.setAutocomplete(true)
 			);
+			addUserOpt(builderCopy);
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("roll.options.cs.name")
+					.setDescriptions("roll.options.cs.description")
+					.setRequired(false)
+			);
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("roll.options.cf.name")
+					.setDescriptions("roll.options.cf.description")
+					.setRequired(false)
+			);
+			commonOptions(builderCopy, {
+				character: true,
+				expression: true,
+				opposition: true,
+				threshold: true,
+			});
 			break;
 		}
 		case "dbroll": {
-			builderCopy = addHiddenOpts(
-				dbRollOptions(builder) as Djs.SlashCommandSubcommandBuilder
-			);
+			addUserOpt(builderCopy);
+			dbRollOptions(builderCopy);
 			break;
 		}
 		case "calc": {
-			builderCopy = addHiddenOpts(
-				calcOptions(builder) as Djs.SlashCommandSubcommandBuilder
+			builderCopy
+				.addStringOption((option) =>
+					option
+						.setNames("common.statistic")
+						.setDescriptions("calc.statistic")
+						.setRequired(true)
+						.setAutocomplete(true)
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("calc.sign.title")
+						.setDescriptions("calc.sign.desc")
+						.setRequired(true)
+						.setAutocomplete(true)
+				)
+				.addStringOption((option) =>
+					option
+						.setNames("common.expression")
+						.setDescriptions("calc.formula.desc")
+						.setRequired(true)
+				);
+			addUserOpt(builderCopy);
+			builderCopy.addStringOption((option) =>
+				option
+					.setNames("calc.transform.title")
+					.setDescriptions("calc.transform.desc")
+					.setRequired(false)
+					.setAutocomplete(true)
 			);
+			commonOptions(builderCopy, {
+				character: true,
+				expression: false,
+				autoCompleteChar: true,
+			});
 			break;
 		}
 		case "roll": {
-			builderCopy = addHiddenOpts(
-				builder.addStringOption((option) =>
-					option
-						.setNames("common.dice")
-						.setDescriptions("roll.option.description")
-						.setRequired(true)
-				)
+			builderCopy = builder.addStringOption((option) =>
+				option
+					.setNames("common.dice")
+					.setDescriptions("roll.option.description")
+					.setRequired(true)
 			) as Djs.SlashCommandSubcommandBuilder;
+			addUserOpt(builderCopy);
 			builderCopy.addStringOption((option) =>
 				option
 					.setNames("roll.options.cs.name")
@@ -256,11 +317,6 @@ export function gmCommonOptions(
 		default:
 			break;
 	}
-	builderCopy.addUserOption((option) =>
-		option
-			.setNames("display.userLowercase")
-			.setDescriptions("mjRoll.user")
-			.setRequired(false)
-	);
+	addHiddenOpt(builderCopy);
 	return builderCopy;
 }

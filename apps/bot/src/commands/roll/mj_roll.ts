@@ -134,7 +134,7 @@ export const mjRoll = {
 		const { ul } = getLangAndConfig(client, interaction);
 
 		const user = options.getUser(t("display.userLowercase"), false) ?? undefined;
-		const hide = options.getBoolean(t("dbRoll.options.hidden.name"));
+		const hide = options.getBoolean(t("common.hidden"));
 		const subcommand = options.getSubcommand(true);
 
 		// Handle the simple roll subcommand separately

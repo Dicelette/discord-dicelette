@@ -61,7 +61,7 @@ const getCount = {
 						.setDescriptions("luckMeter.userOption.description")
 				)
 				.addBooleanOption((option) =>
-					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
+					option.setNames("common.hidden").setDescriptions("luckMeter.ephemeral")
 				)
 		)
 		.addSubcommand((subcommand) =>
@@ -99,7 +99,7 @@ const getCount = {
 						.setDescriptions("luckMeter.leaderboard.threshold")
 				)
 				.addBooleanOption((option) =>
-					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
+					option.setNames("common.hidden").setDescriptions("luckMeter.ephemeral")
 				)
 		)
 		.addSubcommand((subcommand) =>
@@ -107,7 +107,7 @@ const getCount = {
 				.setNames("luckMeter.moy.title")
 				.setDescriptions("luckMeter.moy.desc")
 				.addBooleanOption((option) =>
-					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
+					option.setNames("common.hidden").setDescriptions("luckMeter.ephemeral")
 				)
 		)
 		.addSubcommand((subcommand) =>
@@ -130,7 +130,7 @@ const getCount = {
 				.setNames("luckMeter.chart.title")
 				.setDescriptions("luckMeter.chart.description")
 				.addBooleanOption((option) =>
-					option.setNames("common.ephemeral").setDescriptions("luckMeter.ephemeral")
+					option.setNames("common.hidden").setDescriptions("luckMeter.ephemeral")
 				)
 		),
 
@@ -139,7 +139,7 @@ const getCount = {
 
 		const subcmd = interaction.options.getSubcommand();
 		const { ul } = getLangAndConfig(client, interaction, interaction.guild.id);
-		const flags = interaction.options.getBoolean(t("common.ephemeral")) ?? true;
+		const flags = interaction.options.getBoolean(t("common.hidden")) ?? true;
 
 		await interaction.deferReply(
 			flags || subcmd === t("luckMeter.reset.title")

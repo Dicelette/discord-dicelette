@@ -68,7 +68,7 @@ export const diceRoll = {
 		)
 		.addBooleanOption((option) =>
 			option
-				.setNames("dbRoll.options.hidden.name")
+				.setNames("common.hidden")
 				.setDescriptions("dbRoll.options.hidden.description")
 				.setRequired(false)
 		),
@@ -83,7 +83,7 @@ export const diceRoll = {
 
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
 		const dice = option.getString(t("common.dice"), true);
-		const hidden = option.getBoolean(t("dbRoll.options.hidden.name"));
+		const hidden = option.getBoolean(t("common.hidden"));
 		const { customCritical } = extractRollOptions(option, ul);
 		const overrideComment = option.getString(t("common.comments")) ?? undefined;
 		await baseRoll(

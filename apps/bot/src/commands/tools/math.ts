@@ -17,6 +17,8 @@ import { getStatistics } from "../../database";
 export const math = {
 	data: (calcOptions(new Djs.SlashCommandBuilder(), false) as Djs.SlashCommandBuilder)
 		.setNames("math.title")
+		.setDescriptions("math.description")
+
 		.setContexts(
 			Djs.InteractionContextType.BotDM,
 			Djs.InteractionContextType.Guild,
@@ -26,18 +28,29 @@ export const math = {
 			Djs.ApplicationIntegrationType.GuildInstall,
 			Djs.ApplicationIntegrationType.UserInstall
 		)
+		.addBooleanOption((option) =>
+			option.setNames("common.hidden").setDescriptions("luckMeter.ephemeral")
+		),
 
-		.setDescriptions("math.description"),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const ul = getLangAndConfig(client, interaction).ul;
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		let optionChar = options.getString(t("common.character"), false) ?? undefined;
+		const hide = options.getBoolean(t("common.hidden"), false) ?? undefined;
 		let userStatistics: UserData | undefined;
 		if (interaction.guild) {
 			const data = await getStatistics(interaction, client, true);
 			optionChar = data?.optionChar;
 			userStatistics = data?.userStatistique;
 		}
-		return await calculate(options, ul, interaction, client, userStatistics, optionChar);
+		return await calculate(
+			options,
+			ul,
+			interaction,
+			client,
+			userStatistics,
+			optionChar,
+			hide
+		);
 	},
 };

@@ -196,6 +196,7 @@
 		"expression": "expression",
 		"failure": "échec",
 		"false": "Faux",
+		"hidden": "caché",
 		"isPrivate": "Personnage privé",
 		"macro": "macro",
 		"name": "nom",
@@ -405,8 +406,7 @@
 				"description": "Description de l'action"
 			},
 			"hidden": {
-				"description": "Cache le résultat du dé (ignoré si la configuration n'est pas faite)",
-				"name": "caché"
+				"description": "Cache le résultat du dé (ignoré si la configuration n'est pas faite)"
 			},
 			"modificator": {
 				"description": "Expression (mathématique) appliqué au lancer"

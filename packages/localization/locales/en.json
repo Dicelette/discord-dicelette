@@ -196,6 +196,7 @@
 		"expression": "expression",
 		"failure": "fail",
 		"false": "False",
+		"hidden": "hidden",
 		"isPrivate": "Private character",
 		"macro": "macro",
 		"name": "name",
@@ -405,8 +406,7 @@
 				"description": "Action description"
 			},
 			"hidden": {
-				"description": "Hides the die result (ignored if configuration is not done)",
-				"name": "hidden"
+				"description": "Hides the die result (ignored if configuration is not done)"
 			},
 			"modificator": {
 				"description": "Mathematical expression applied to the dice"

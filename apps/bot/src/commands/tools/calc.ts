@@ -221,10 +221,9 @@ export async function calculate(
 		if (isNumber(formulaWithStats))
 			totalFormula = `${statInfo.value}${sign}${formulaWithStats}`;
 	} else {
-		if (interaction.guild) {
-			if (attributes)
-				formula = generateStatsDice(formula, attributes, MIN_THRESHOLD_MATCH);
-		}
+		if (interaction.guild && attributes)
+			formula = generateStatsDice(formula, attributes, MIN_THRESHOLD_MATCH);
+
 		const isRoll = getRoll(formula, undefined, sortResult);
 		if (isRoll?.total != null) {
 			originalFormula = isRoll.result;
@@ -261,7 +260,8 @@ export async function calculate(
 			client.settings,
 			ul,
 			user,
-			hide
+			hide,
+			true
 		);
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);

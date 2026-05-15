@@ -134,7 +134,8 @@ export async function sendResult(
 	settings: Settings,
 	ul: Translation,
 	user: Djs.User = interaction.user,
-	hide?: boolean | null
+	hide?: boolean | null,
+	skipConfigHide = false
 ) {
 	const channel = interaction.channel as
 		| null
@@ -152,7 +153,7 @@ export async function sendResult(
 	const hideResultConfig = interaction.guild
 		? (settings.get(interaction.guild.id, "hiddenRoll") as string | boolean | undefined)
 		: undefined;
-	const hidden = hide && hideResultConfig;
+	const hidden = !skipConfigHide ? hide && hideResultConfig : hide;
 	let isHidden: undefined | string;
 	const allowedMentions = { users: user ? [user.id] : [] };
 	const output = result.roll?.defaultMessage() ?? result.expression;
