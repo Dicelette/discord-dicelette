@@ -314,16 +314,19 @@ export const bulkAdd = {
 				}),
 			});
 		}
+		const privateChannelId = client.settings.get(
+			interaction.guild!.id,
+			"privateChannel"
+		) as string | undefined;
 		const { members, errors } = await parseCSV(
 			csvFile.url,
 			guildTemplate,
 			interaction,
-			!!client.settings.get(interaction.guild!.id, "privateChannel"),
+			!!privateChannelId,
 			langToUse
 		);
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
-		const privateChannel =
-			client.settings.get(interaction.guild!.id, "privateChannel") ?? undefined;
+		const privateChannel = privateChannelId;
 		if (!defaultChannel)
 			return reply(interaction, {
 				content: ul("error.channel.defaultChannel"),

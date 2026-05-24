@@ -2,7 +2,7 @@ import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import { fetchChannel } from "@dicelette/helpers";
 import type { PersonnageIds, Translation } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { logger, mapConcurrent } from "@dicelette/utils";
 import { updateMemory } from "database";
 import * as Djs from "discord.js";
 import {
@@ -38,64 +38,65 @@ export async function bulkEditTemplateUserCore(
 		return;
 	}
 
-	for (const userID in users) {
-		for (const char of users[userID]) {
-			const sheetLocation: PersonnageIds = {
-				channelId: char.messageId[1],
-				messageId: char.messageId[0],
-			};
-			try {
-				const channel = await fetchChannel(guild, sheetLocation.channelId);
-				if (!channel?.isTextBased()) continue;
+	const jobs = Object.entries(users).flatMap(([userID, userChars]) =>
+		userChars.map((char) => ({ char, userID }))
+	);
+	await mapConcurrent(jobs, 3, async ({ char, userID }) => {
+		const sheetLocation: PersonnageIds = {
+			channelId: char.messageId[1],
+			messageId: char.messageId[0],
+		};
+		try {
+			const channel = await fetchChannel(guild, sheetLocation.channelId);
+			if (!channel?.isTextBased()) return;
 
-				const userMessages = await channel.messages.fetch(sheetLocation.messageId);
-				const templateEmbed = getEmbeds(userMessages, "template");
-				if (!templateEmbed) continue;
+			const userMessages = await channel.messages.fetch(sheetLocation.messageId);
+			const templateEmbed = getEmbeds(userMessages, "template");
+			if (!templateEmbed) return;
 
-				let newEmbed = createTemplateEmbed(ul);
-				if (template.diceType && template.diceType.length > 0)
-					newEmbed.addFields({
-						inline: true,
-						name: ul("common.dice"),
-						value: `\`${template.diceType}\``,
-					});
-				if (template.critical?.success)
-					newEmbed.addFields({
-						inline: true,
-						name: ul("roll.critical.success"),
-						value: `\`${template.critical.success}\``,
-					});
-				if (template.critical?.failure)
-					newEmbed.addFields({
-						inline: true,
-						name: ul("roll.critical.failure"),
-						value: `\`${template.critical.failure}\``,
-					});
-				if (template.customCritical) {
-					newEmbed = createCustomCritical(newEmbed, template.customCritical);
-				}
-				const listEmbed = await replaceEmbedInList(
-					ul,
-					{ embed: newEmbed, which: "template" },
-					userMessages
-				);
-				await userMessages.edit({ embeds: listEmbed.list, files: listEmbed.files });
-				await updateMemory(
-					client.characters,
-					guildId,
-					userID,
-					ul,
-					{
-						embeds: listEmbed.list,
-					},
-					client.characterCacheTimestamps
-				);
-			} catch (e) {
-				logger.warn(e);
-				//pass
+			let newEmbed = createTemplateEmbed(ul);
+			if (template.diceType && template.diceType.length > 0)
+				newEmbed.addFields({
+					inline: true,
+					name: ul("common.dice"),
+					value: `\`${template.diceType}\``,
+				});
+			if (template.critical?.success)
+				newEmbed.addFields({
+					inline: true,
+					name: ul("roll.critical.success"),
+					value: `\`${template.critical.success}\``,
+				});
+			if (template.critical?.failure)
+				newEmbed.addFields({
+					inline: true,
+					name: ul("roll.critical.failure"),
+					value: `\`${template.critical.failure}\``,
+				});
+			if (template.customCritical) {
+				newEmbed = createCustomCritical(newEmbed, template.customCritical);
 			}
+			const listEmbed = await replaceEmbedInList(
+				ul,
+				{ embed: newEmbed, which: "template" },
+				userMessages
+			);
+			await userMessages.edit({ embeds: listEmbed.list, files: listEmbed.files });
+			await updateMemory(
+				client.characters,
+				guildId,
+				userID,
+				ul,
+				{
+					embeds: listEmbed.list,
+				},
+				client.characterCacheTimestamps
+			);
+		} catch (e) {
+			logger.warn(e);
+			//pass
 		}
-	}
+	});
 }
 
 /**
@@ -178,16 +179,15 @@ async function deleteMessageChar(
 ) {
 	const guildData = client.settings;
 	const users = guildData.get(interaction.guild!.id, "user");
-	for (const [, userData] of Object.entries(users ?? {})) {
-		for (const character of userData) {
-			const [messageId, channelId] = character.messageId;
-			const thread = await searchUserChannel(guildData, interaction, ul, channelId);
-			if (!thread) continue;
-			try {
-				await thread.messages.delete(messageId);
-			} catch (err) {
-				logger.warn(err);
-			}
+	const jobs = Object.values(users ?? {}).flat();
+	await mapConcurrent(jobs, 3, async (character) => {
+		const [messageId, channelId] = character.messageId;
+		const thread = await searchUserChannel(guildData, interaction, ul, channelId);
+		if (!thread) return;
+		try {
+			await thread.messages.delete(messageId);
+		} catch (err) {
+			logger.warn(err);
 		}
-	}
+	});
 }

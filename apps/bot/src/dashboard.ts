@@ -252,11 +252,11 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 						errors: ["No template configured for this guild"],
 					};
 
-				const hasPrivate = !!client.settings.get(guildId, "privateChannel");
-				const defaultChannelId = client.settings.get(guildId, "managerId") as
+				const privateChannelId = client.settings.get(guildId, "privateChannel") as
 					| string
 					| undefined;
-				const privateChannelId = client.settings.get(guildId, "privateChannel") as
+				const hasPrivate = !!privateChannelId;
+				const defaultChannelId = client.settings.get(guildId, "managerId") as
 					| string
 					| undefined;
 

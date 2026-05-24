@@ -250,8 +250,12 @@ export class UserFeature extends BaseFeature {
 
 		const charName = interaction.fields.getTextInputValue("charName");
 
+		const privateChannel = this.client.settings.get(
+			interaction.guild!.id,
+			"privateChannel"
+		);
 		const isPrivate =
-			this.client.settings.get(interaction.guild!.id, "privateChannel") && moderator // Allow private channel only if the user is a moderator
+			privateChannel && moderator // Allow private channel only if the user is a moderator
 				? interaction.fields.getCheckbox("private") //interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
 				: false;
 		const avatar = interaction.fields.getUploadedFiles("avatarFile")?.first();
@@ -267,10 +271,6 @@ export class UserFeature extends BaseFeature {
 			avatarStr = "error";
 
 		let sheetId = this.client.settings.get(interaction.guild!.id, "managerId");
-		const privateChannel = this.client.settings.get(
-			interaction.guild!.id,
-			"privateChannel"
-		);
 		if (isPrivate && privateChannel) sheetId = privateChannel;
 		if (customChannel) sheetId = customChannel.id;
 

@@ -10,7 +10,13 @@ import type {
 	UserData,
 	UserRegistration,
 } from "@dicelette/types";
-import { BotError, BotErrorLevel, type BotErrorOptions, logger } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	logger,
+	mapConcurrent,
+} from "@dicelette/utils";
 import { registerUser, setDefaultManagerId, updateMemory } from "database";
 import * as Djs from "discord.js";
 import { deleteAfter, embedError, reply, sendLogs } from "messages";
@@ -20,6 +26,28 @@ const botErrorOptions: BotErrorOptions = {
 	cause: "THREAD",
 	level: BotErrorLevel.Warning,
 };
+const THREADS_FETCH_TTL_MS = 15_000;
+const threadFetchTimestamps = new Map<string, number>();
+
+function sortThreadsByDate(threads: Iterable<Djs.AnyThreadChannel>) {
+	return [...threads].sort(
+		(a, b) => (b.createdTimestamp ?? 0) - (a.createdTimestamp ?? 0)
+	);
+}
+
+async function refreshThreadCacheIfNeeded(
+	channel: Djs.TextChannel | Djs.ForumChannel
+): Promise<void> {
+	const now = Date.now();
+	const lastFetch = threadFetchTimestamps.get(channel.id) ?? 0;
+	if (now - lastFetch < THREADS_FETCH_TTL_MS) return;
+	await Promise.allSettled([
+		channel.threads.fetchActive(),
+		channel.threads.fetchArchived(),
+	]);
+	threadFetchTimestamps.set(channel.id, now);
+}
+
 export async function createDefaultThread(
 	parent: Djs.ThreadChannel | Djs.TextChannel,
 	guildData: Settings,
@@ -27,9 +55,16 @@ export async function createDefaultThread(
 	save = true
 ) {
 	if (parent instanceof Djs.ThreadChannel) parent = parent.parent as Djs.TextChannel;
-	let thread = (await parent.threads.fetch()).threads.find(
-		(thread) => thread.name === "📝 • [STATS]"
-	) as Djs.AnyThreadChannel | undefined;
+	let thread = parent.threads.cache.find((thread) => thread.name === "📝 • [STATS]") as
+		| Djs.AnyThreadChannel
+		| undefined;
+	if (!thread) {
+		await refreshThreadCacheIfNeeded(parent);
+		thread = parent.threads.cache.find(
+			(cachedThread) => cachedThread.name === "📝 • [STATS]"
+		) as Djs.AnyThreadChannel | undefined;
+	}
+	if (thread?.archived) await thread.setArchived(false);
 	if (!thread) {
 		thread = (await parent.threads.create({
 			autoArchiveDuration: 10080,
@@ -298,37 +333,40 @@ export async function findThread(
 			await sendLogs(ul("error.roll.channelNotFound", { command }), channel.guild, db);
 		}
 	}
-	await channel.threads.fetch();
-	await channel.threads.fetchArchived();
-	const mostRecentThread = channel.threads.cache.sort((a, b) => {
-		const aDate = a.createdTimestamp;
-		const bDate = b.createdTimestamp;
-		if (aDate && bDate) {
-			return bDate - aDate;
-		}
-		return 0;
-	});
 	const threadName = `🎲 ${channel.name.replaceAll("-", " ")}`;
-	const thread = mostRecentThread.find(
-		(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
-	);
-	if (thread) {
-		const threadThatMustBeArchived = mostRecentThread.filter(
-			(tr) => tr.name.decode().startsWith("🎲") && !tr.archived && tr.id !== thread.id
+	const findThreadInCache = () => {
+		const sortedThreads = sortThreadsByDate(channel.threads.cache.values());
+		const rollThread = sortedThreads.find(
+			(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
 		);
-		for (const thread of threadThatMustBeArchived) {
-			await thread[1].setArchived(true);
-		}
-		return thread;
-	}
-	if (mostRecentThread.find((thread) => thread.name === threadName && thread.archived)) {
-		const thread = mostRecentThread.find(
+		const threadsToArchive = sortedThreads.filter(
+			(thread) =>
+				thread.name.decode().startsWith("🎲") &&
+				!thread.archived &&
+				thread.id !== rollThread?.id
+		);
+		const archivedNamedThread = sortedThreads.find(
 			(thread) => thread.name === threadName && thread.archived
 		);
-		if (thread) {
-			await thread.setArchived(false);
-			return thread;
-		}
+		return { archivedNamedThread, rollThread, threadsToArchive };
+	};
+
+	let { archivedNamedThread, rollThread, threadsToArchive } = findThreadInCache();
+	if (!rollThread && !archivedNamedThread) {
+		await refreshThreadCacheIfNeeded(channel);
+		({ archivedNamedThread, rollThread, threadsToArchive } = findThreadInCache());
+	}
+
+	const thread = rollThread;
+	if (thread) {
+		await mapConcurrent(threadsToArchive, 3, async (threadToArchive) =>
+			threadToArchive.setArchived(true)
+		);
+		return thread;
+	}
+	if (archivedNamedThread) {
+		await archivedNamedThread.setArchived(false);
+		return archivedNamedThread;
 	}
 	//create thread
 	const newThread = await channel.threads.create({
@@ -382,14 +420,8 @@ export async function findForumChannel(
 			await sendLogs(ul("error.roll.channelNotFound", { command }), forum.guild, db);
 		}
 	}
-	const allForumChannel = forum.threads.cache.sort((a, b) => {
-		const aDate = a.createdTimestamp;
-		const bDate = b.createdTimestamp;
-		if (aDate && bDate) {
-			return bDate - aDate;
-		}
-		return 0;
-	});
+	await refreshThreadCacheIfNeeded(forum);
+	const allForumChannel = sortThreadsByDate(forum.threads.cache.values());
 	const topic = thread.name;
 	const rollTopic = allForumChannel.find((thread) => thread.name === `🎲 ${topic}`);
 	const tags = await setTags(forum);

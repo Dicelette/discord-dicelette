@@ -351,6 +351,9 @@ export class MacroFeature extends BaseFeature {
 		const diceEmbed: Djs.EmbedBuilder = oldDiceEmbeds
 			? new Djs.EmbedBuilder(oldDiceEmbeds)
 			: createDiceEmbed(ul);
+		const existingNames = new Set(
+			diceEmbed.toJSON().fields?.map((field) => field.name.standardize()) ?? []
+		);
 		if (oldDiceEmbeds?.fields)
 			for (const field of oldDiceEmbeds.fields) {
 				const newField = {
@@ -359,15 +362,11 @@ export class MacroFeature extends BaseFeature {
 					value: field.value,
 				};
 				const leng = diceEmbed.data.fields?.length || 0;
-				if (
-					diceEmbed
-						.toJSON()
-						.fields?.findIndex(
-							(f) => f.name.standardize() === field.name.standardize()
-						) === -1 &&
-					leng + 1 <= 25
-				)
+				const standardizedName = field.name.standardize();
+				if (!existingNames.has(standardizedName) && leng + 1 <= 25) {
 					diceEmbed.addFields(newField);
+					existingNames.add(standardizedName);
+				}
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
