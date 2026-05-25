@@ -26,6 +26,9 @@ export function buildDamageAutocompleteChoices(
 
 	const user = client.settings.get(interaction.guild!.id, `user.${interaction.user.id}`);
 	if (!user && !ctx.templateID.damageName?.length) return [];
+	const hasUserDamageNames = Array.isArray(user)
+		? user.some((data) => (data.damageName?.length ?? 0) > 0)
+		: false;
 
 	let choices: string[] = [];
 
@@ -41,8 +44,8 @@ export function buildDamageAutocompleteChoices(
 			}
 		}
 
-		// Always merge global template damage names (like mj_roll does)
-		if (ctx.templateID.damageName?.length > 0) {
+		// /macro: show global template macros only when user has no saved macros
+		if (!hasUserDamageNames && ctx.templateID.damageName?.length > 0) {
 			choices = choices.concat(ctx.templateID.damageName);
 		}
 	} else if (focused.name === t("common.character") && user) {
