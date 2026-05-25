@@ -598,7 +598,8 @@ export class UserFeature extends BaseFeature {
 			if (!diceEmbed) diceEmbed = Messages.createDiceEmbed(this.ul);
 
 			//prevent duplicate fields in the dice embed
-			if (MacroFeature.findDuplicate(diceEmbed, name)) continue;
+			if (MacroFeature.findDuplicate(diceEmbed, MacroFeature.normalizeName(name)))
+				continue;
 			diceEmbed.addFields({
 				inline: true,
 				name: `${name}`,

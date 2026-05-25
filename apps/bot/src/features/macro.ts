@@ -157,7 +157,7 @@ async function ensureMacroEditor(params: {
  * This includes adding, editing, and validating macro dice.
  */
 export class MacroFeature extends BaseFeature {
-	private static normalizeName(value: string): string {
+	static normalizeName(value: string): string {
 		return value.unidecode().standardize();
 	}
 

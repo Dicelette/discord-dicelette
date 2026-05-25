@@ -1,9 +1,7 @@
 import type { EClient } from "@dicelette/client";
 import { getGuildContext } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
-import { filterStatsInDamage } from "@dicelette/parse_result";
 import { capitalizeBetweenPunct, filterChoices } from "@dicelette/utils";
-import { getTemplateByInteraction } from "database";
 import type * as Djs from "discord.js";
 import "@dicelette/discord_ext";
 
@@ -17,17 +15,17 @@ import "@dicelette/discord_ext";
  * @param options - Command options resolver
  * @returns Filtered choices array ready for respond()
  */
-export async function buildDamageAutocompleteChoices(
+export function buildDamageAutocompleteChoices(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,
 	focused: Djs.AutocompleteFocusedOption,
 	options: Djs.CommandInteractionOptionResolver
-): Promise<Djs.ApplicationCommandOptionChoiceData[]> {
+): Djs.ApplicationCommandOptionChoiceData[] {
 	const ctx = getGuildContext(client, interaction.guild!.id);
 	if (!ctx?.templateID) return [];
 
 	const user = client.settings.get(interaction.guild!.id, `user.${interaction.user.id}`);
-	if (!user && !ctx.templateID.damageName) return [];
+	if (!user && !ctx.templateID.damageName?.length) return [];
 
 	let choices: string[] = [];
 
@@ -43,18 +41,9 @@ export async function buildDamageAutocompleteChoices(
 			}
 		}
 
-		if (
-			ctx.templateID.damageName &&
-			ctx.templateID.damageName.length > 0 &&
-			choices.length === 0
-		) {
-			const template = await getTemplateByInteraction(interaction, client);
-			if (!template) choices = choices.concat(ctx.templateID.damageName);
-			else if (template.damage) {
-				choices = choices.concat(
-					filterStatsInDamage(template.damage, ctx.templateID.damageName)
-				);
-			}
+		// Always merge global template damage names (like mj_roll does)
+		if (ctx.templateID.damageName?.length > 0) {
+			choices = choices.concat(ctx.templateID.damageName);
 		}
 	} else if (focused.name === t("common.character") && user) {
 		const skill = options.getString(t("common.name"));
