@@ -9,10 +9,6 @@ type MacroSourceEntry = {
 	damageName?: string[];
 };
 
-function hasAnyDamage(entries: MacroSourceEntry[]) {
-	return entries.some((entry) => (entry.damageName?.length ?? 0) > 0);
-}
-
 function buildSettingsEntries(
 	data: { charName?: string | null; damageName?: string[] }[]
 ): MacroSourceEntry[] {
@@ -187,22 +183,22 @@ export async function findBestMatchingDice(
 		return undefined;
 	};
 
-	const getPrioritizedEntries = (currentChar?: string) => {
-		const scopedSettings = findScopedEntries(settingsEntries, currentChar);
-		if (hasAnyDamage(scopedSettings)) return scopedSettings;
-		const scopedMemory = findScopedEntries(memoryEntries, currentChar);
-		if (hasAnyDamage(scopedMemory)) return scopedMemory;
-		return [] as MacroSourceEntry[];
-	};
-
 	if (charOptions) {
-		const perfect = await processEntries(getPrioritizedEntries(charOptions));
-		if (perfect) return perfect;
-		const perfectSecond = await processEntries(getPrioritizedEntries());
-		if (perfectSecond) return perfectSecond;
+		const scopedSettings = findScopedEntries(settingsEntries, charOptions);
+		const scopedMemory = findScopedEntries(memoryEntries, charOptions);
+		const unscopedSettings = settingsEntries;
+		const unscopedMemory = memoryEntries;
+		const searchOrder = [scopedSettings, scopedMemory, unscopedSettings, unscopedMemory];
+		for (const entries of searchOrder) {
+			const perfect = await processEntries(entries);
+			if (perfect) return perfect;
+		}
 	} else {
-		const perfect = await processEntries(getPrioritizedEntries());
-		if (perfect) return perfect;
+		const searchOrder = [settingsEntries, memoryEntries];
+		for (const entries of searchOrder) {
+			const perfect = await processEntries(entries);
+			if (perfect) return perfect;
+		}
 	}
 	return bestMatch;
 }
