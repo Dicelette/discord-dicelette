@@ -182,9 +182,9 @@ async function deleteMessageChar(
 	const jobs = Object.values(users ?? {}).flat();
 	await mapConcurrent(jobs, 3, async (character) => {
 		const [messageId, channelId] = character.messageId;
-		const thread = await searchUserChannel(guildData, interaction, ul, channelId);
-		if (!thread) return;
 		try {
+			const thread = await searchUserChannel(guildData, interaction, ul, channelId);
+			if (!thread) return;
 			await thread.messages.delete(messageId);
 		} catch (err) {
 			logger.warn(err);
