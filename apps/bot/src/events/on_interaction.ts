@@ -1,6 +1,11 @@
 import type { EClient } from "@dicelette/client";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
-import { ALL_COMMANDS, AUTOCOMPLETE_COMMANDS, commandMenu, resetButton } from "commands";
+import {
+	ALL_COMMANDS_BY_NAME,
+	AUTOCOMPLETE_COMMANDS_BY_NAME,
+	commandMenu,
+	resetButton,
+} from "commands";
 import { fetchTemplate, getTemplateByInteraction } from "database";
 import type * as Djs from "discord.js";
 import { embedError } from "messages";
@@ -18,15 +23,13 @@ export default (client: EClient): void => {
 			if (interaction.isMessageContextMenuCommand()) {
 				await commandMenu(interaction, client);
 			} else if (interaction.isChatInputCommand()) {
-				const command = ALL_COMMANDS.find(
-					(cmd) => cmd.data.name === interaction.commandName
-				);
+				const command = ALL_COMMANDS_BY_NAME.get(interaction.commandName);
 				if (!command) return;
 				await command.execute(interaction, client);
 			} else if (interaction.isAutocomplete()) {
 				const autocompleteInteraction = interaction as Djs.AutocompleteInteraction;
-				const command = AUTOCOMPLETE_COMMANDS.find(
-					(cmd) => cmd.data.name === autocompleteInteraction.commandName
+				const command = AUTOCOMPLETE_COMMANDS_BY_NAME.get(
+					autocompleteInteraction.commandName
 				);
 				if (!command) return;
 				await command.autocomplete(autocompleteInteraction, client);

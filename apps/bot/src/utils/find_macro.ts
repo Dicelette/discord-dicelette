@@ -4,6 +4,41 @@ import { logger } from "@dicelette/utils";
 import { getUserFromInteraction } from "database";
 import type * as Djs from "discord.js";
 
+type MacroSourceEntry = {
+	charName?: string | null;
+	damageName?: string[];
+};
+
+function buildSettingsEntries(
+	data: { charName?: string | null; damageName?: string[] }[]
+): MacroSourceEntry[] {
+	return data.map((entry) => ({
+		charName: entry.charName,
+		damageName: entry.damageName ?? [],
+	}));
+}
+
+function buildMemoryEntries(
+	data: { userName?: string | null; damage?: Record<string, string> }[]
+): MacroSourceEntry[] {
+	return data.map((entry) => ({
+		charName: entry.userName,
+		damageName: Object.keys(entry.damage ?? {}),
+	}));
+}
+
+function findScopedEntries(entries: MacroSourceEntry[], charOptions?: string) {
+	if (!charOptions) return entries;
+	return entries.filter((entry) => {
+		const charName = entry.charName;
+		if (!charName) return false;
+		return (
+			charName.subText(charOptions) ||
+			charName.toLowerCase().includes(charOptions.toLowerCase())
+		);
+	});
+}
+
 /**
  * Get damage dice for a specific user and macro name
  */
@@ -112,7 +147,11 @@ export async function findBestMatchingDice(
 	charName?: string;
 	similarity: number;
 } | null> {
-	const allUserData = client.settings.get(interaction.guild!.id, `user.${userId}`) ?? [];
+	const settingsUserData =
+		client.settings.get(interaction.guild!.id, `user.${userId}`) ?? [];
+	const memoryUserData = client.characters.get(interaction.guild!.id, userId) ?? [];
+	const settingsEntries = buildSettingsEntries(settingsUserData);
+	const memoryEntries = buildMemoryEntries(memoryUserData);
 	let bestMatch: {
 		dice: string;
 		attackName: string;
@@ -121,14 +160,8 @@ export async function findBestMatchingDice(
 	} | null = null;
 	let bestSimilarity = 0;
 
-	const processUserData = async (applyCharFilter: boolean) => {
-		for (const userData of allUserData) {
-			if (applyCharFilter && charOptions) {
-				const charNameMatches =
-					userData.charName?.toLowerCase().includes(charOptions.toLowerCase()) ||
-					userData.charName?.subText(charOptions);
-				if (!charNameMatches) continue;
-			}
+	const processEntries = async (entries: MacroSourceEntry[]) => {
+		for (const userData of entries) {
 			const damageName = userData.damageName ?? [];
 			for (const atqName of damageName) {
 				const result = await findMacroName(
@@ -151,13 +184,21 @@ export async function findBestMatchingDice(
 	};
 
 	if (charOptions) {
-		const perfect = await processUserData(true);
-		if (perfect) return perfect;
-		const perfectSecond = await processUserData(false);
-		if (perfectSecond) return perfectSecond;
+		const scopedSettings = findScopedEntries(settingsEntries, charOptions);
+		const scopedMemory = findScopedEntries(memoryEntries, charOptions);
+		const unscopedSettings = settingsEntries;
+		const unscopedMemory = memoryEntries;
+		const searchOrder = [scopedSettings, scopedMemory, unscopedSettings, unscopedMemory];
+		for (const entries of searchOrder) {
+			const perfect = await processEntries(entries);
+			if (perfect) return perfect;
+		}
 	} else {
-		const perfect = await processUserData(false);
-		if (perfect) return perfect;
+		const searchOrder = [settingsEntries, memoryEntries];
+		for (const entries of searchOrder) {
+			const perfect = await processEntries(entries);
+			if (perfect) return perfect;
+		}
 	}
 	return bestMatch;
 }

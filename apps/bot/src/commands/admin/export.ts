@@ -87,7 +87,8 @@ export async function exportCharactersCsv(
 	const csv: CSVRow[] = [];
 	const ctx = getGuildContext(client, guildId);
 	const statsName = ctx?.templateID?.statsName;
-	const isPrivateAllowed = !!client.settings.get(guildId, "privateChannel");
+	const privateChannelId = client.settings.get(guildId, "privateChannel");
+	const isPrivateAllowed = !!privateChannelId;
 
 	const statsNameNormalized: string[] | undefined = statsName
 		? statsName.map((n: string) => n.unidecode())
@@ -168,7 +169,7 @@ export async function exportCharactersCsv(
 	await Promise.allSettled(tasks);
 
 	const columns = ["user", "charName", "avatar", "channel"];
-	if (client.settings.get(guildId, "privateChannel")) columns.push("isPrivate");
+	if (privateChannelId) columns.push("isPrivate");
 	if (statsName) columns.push(...statsName);
 	columns.push("dice");
 	const csvText = Papa.unparse(csv, {
