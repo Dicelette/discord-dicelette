@@ -36,16 +36,19 @@ function sortThreadsByDate(threads: Iterable<Djs.AnyThreadChannel>) {
 }
 
 async function refreshThreadCacheIfNeeded(
-	channel: Djs.TextChannel | Djs.ForumChannel
-): Promise<void> {
+	channel: Djs.TextChannel | Djs.ForumChannel,
+	options?: { force?: boolean }
+): Promise<boolean> {
 	const now = Date.now();
 	const lastFetch = threadFetchTimestamps.get(channel.id) ?? 0;
-	if (now - lastFetch < THREADS_FETCH_TTL_MS) return;
-	await Promise.allSettled([
+	if (!options?.force && now - lastFetch < THREADS_FETCH_TTL_MS) return true;
+	const results = await Promise.allSettled([
 		channel.threads.fetchActive(),
 		channel.threads.fetchArchived(),
 	]);
-	threadFetchTimestamps.set(channel.id, now);
+	const allFetchesSucceeded = results.every((result) => result.status === "fulfilled");
+	if (allFetchesSucceeded) threadFetchTimestamps.set(channel.id, now);
+	return allFetchesSucceeded;
 }
 
 export async function createDefaultThread(
@@ -59,7 +62,7 @@ export async function createDefaultThread(
 		| Djs.AnyThreadChannel
 		| undefined;
 	if (!thread) {
-		await refreshThreadCacheIfNeeded(parent);
+		await refreshThreadCacheIfNeeded(parent, { force: true });
 		thread = parent.threads.cache.find(
 			(cachedThread) => cachedThread.name === "📝 • [STATS]"
 		) as Djs.AnyThreadChannel | undefined;
@@ -353,7 +356,7 @@ export async function findThread(
 
 	let { archivedNamedThread, rollThread, threadsToArchive } = findThreadInCache();
 	if (!rollThread && !archivedNamedThread) {
-		await refreshThreadCacheIfNeeded(channel);
+		await refreshThreadCacheIfNeeded(channel, { force: true });
 		({ archivedNamedThread, rollThread, threadsToArchive } = findThreadInCache());
 	}
 
@@ -420,10 +423,17 @@ export async function findForumChannel(
 			await sendLogs(ul("error.roll.channelNotFound", { command }), forum.guild, db);
 		}
 	}
-	await refreshThreadCacheIfNeeded(forum);
-	const allForumChannel = sortThreadsByDate(forum.threads.cache.values());
+	let allForumChannel = sortThreadsByDate(forum.threads.cache.values());
 	const topic = thread.name;
-	const rollTopic = allForumChannel.find((thread) => thread.name === `🎲 ${topic}`);
+	const rollTopicName = `🎲 ${topic}`;
+	const getRollTopicFromCache = () =>
+		allForumChannel.find((forumThread) => forumThread.name === rollTopicName);
+	let rollTopic = getRollTopicFromCache();
+	if (!rollTopic) {
+		await refreshThreadCacheIfNeeded(forum, { force: true });
+		allForumChannel = sortThreadsByDate(forum.threads.cache.values());
+		rollTopic = getRollTopicFromCache();
+	}
 	const tags = await setTags(forum);
 	if (rollTopic) {
 		//archive all other roll topic
