@@ -36,15 +36,16 @@ export const mjRoll = {
 			damageName?: string[];
 			isPrivate?: boolean;
 		}[] = [];
+		const usersById = ctx.settings.user ?? {};
 
 		const userId = user?.id ?? interaction.user.id;
 		if (userId === interaction.user.id) {
-			for (const [, char] of Object.entries(ctx.settings.user)) {
+			for (const [, char] of Object.entries(usersById)) {
 				for (const data of char) {
 					allCharFromGuild.push(data);
 				}
 			}
-		} else allCharFromGuild = ctx.settings.user?.[userId];
+		} else allCharFromGuild = usersById?.[userId] ?? [];
 		if (fixed.name === t("common.character")) {
 			//get ALL characters from the guild
 			const skill = options.getString(t("common.name"));
