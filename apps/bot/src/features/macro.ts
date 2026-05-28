@@ -157,6 +157,10 @@ async function ensureMacroEditor(params: {
  * This includes adding, editing, and validating macro dice.
  */
 export class MacroFeature extends BaseFeature {
+	static normalizeName(value: string): string {
+		return value.unidecode().standardize();
+	}
+
 	/**
 	 * Handles the interaction for adding a new skill dice via a button press.
 	 * Checks if the user has permission to edit, then displays a modal for entering new skill dice details.
@@ -351,6 +355,10 @@ export class MacroFeature extends BaseFeature {
 		const diceEmbed: Djs.EmbedBuilder = oldDiceEmbeds
 			? new Djs.EmbedBuilder(oldDiceEmbeds)
 			: createDiceEmbed(ul);
+		const existingNames = new Set(
+			diceEmbed.toJSON().fields?.map((field) => MacroFeature.normalizeName(field.name)) ??
+				[]
+		);
 		if (oldDiceEmbeds?.fields)
 			for (const field of oldDiceEmbeds.fields) {
 				const newField = {
@@ -359,22 +367,22 @@ export class MacroFeature extends BaseFeature {
 					value: field.value,
 				};
 				const leng = diceEmbed.data.fields?.length || 0;
-				if (
-					diceEmbed
-						.toJSON()
-						.fields?.findIndex(
-							(f) => f.name.standardize() === field.name.standardize()
-						) === -1 &&
-					leng + 1 <= 25
-				)
+				const standardizedName = MacroFeature.normalizeName(field.name);
+				if (!existingNames.has(standardizedName) && leng + 1 <= 25) {
 					diceEmbed.addFields(newField);
+					existingNames.add(standardizedName);
+				}
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
 		value = evalStatsDice(value, user.stats);
 
-		if (!MacroFeature.findDuplicate(diceEmbed, name) || !diceEmbed.data.fields) {
+		const standardizedInputName = MacroFeature.normalizeName(name);
+		if (
+			!MacroFeature.findDuplicate(diceEmbed, standardizedInputName) ||
+			!diceEmbed.data.fields
+		) {
 			const len = diceEmbed.data.fields ? diceEmbed.data.fields.length : 0;
 			if (len + 1 > 25) throw new BotError(ul("modals.dice.max"), botErrorOptions);
 			diceEmbed.addFields({
@@ -384,7 +392,7 @@ export class MacroFeature extends BaseFeature {
 			});
 		} else {
 			const allFieldWithoutDuplicate = diceEmbed.data?.fields?.filter(
-				(field) => field.name.standardize() !== name.standardize()
+				(field) => MacroFeature.normalizeName(field.name) !== standardizedInputName
 			);
 			if (allFieldWithoutDuplicate && allFieldWithoutDuplicate.length + 1 <= 25)
 				diceEmbed.setFields([
@@ -565,11 +573,11 @@ export class MacroFeature extends BaseFeature {
 		return await sendLogs(`${msg}\n${compare.stats}`, interaction.guild as Djs.Guild, db);
 	}
 
-	static findDuplicate(diceEmbed: Djs.EmbedBuilder, name: string) {
+	static findDuplicate(diceEmbed: Djs.EmbedBuilder, normalizedName: string) {
 		if (!diceEmbed.data.fields) return false;
 		return (
 			diceEmbed.data.fields?.findIndex(
-				(f) => f.name.standardize() === name.standardize()
+				(f) => MacroFeature.normalizeName(f.name) === normalizedName
 			) !== -1
 		);
 	}
@@ -686,10 +694,6 @@ export class MacroFeature extends BaseFeature {
 		return parsedStats;
 	}
 
-	private compareUnidecode(a: string, b: string) {
-		return a.unidecode().standardize() === b.unidecode().standardize();
-	}
-
 	private createAndValidateDiceEmbed(values: string, message: Djs.Message) {
 		const diceEmbeds = getEmbeds(message ?? undefined, "damage");
 		if (!diceEmbeds)
@@ -730,11 +734,13 @@ export class MacroFeature extends BaseFeature {
 		if (statsEmbeds) statsValues = this.parseStatsString(statsEmbeds);
 
 		const newEmbedDice: Djs.APIEmbedField[] = [];
+		const newEmbedDiceNames = new Set<string>();
 		for (const [skill, dice] of Object.entries(dices)) {
-			if (newEmbedDice.find((field) => this.compareUnidecode(field.name, skill)))
-				continue;
+			const normalizedSkill = MacroFeature.normalizeName(skill);
+			if (newEmbedDiceNames.has(normalizedSkill)) continue;
 			if (dice.toLowerCase() === "x" || dice.trim().length === 0 || dice === "0") {
 				newEmbedDice.push({ inline: true, name: skill.capitalize(), value: "X" });
+				newEmbedDiceNames.add(normalizedSkill);
 				continue;
 			}
 			const toRoll = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
@@ -752,30 +758,34 @@ export class MacroFeature extends BaseFeature {
 				name: skill.capitalize(),
 				value: `\`${toRoll}\``,
 			});
+			newEmbedDiceNames.add(normalizedSkill);
 		}
 
 		const oldDice = diceEmbeds.data.fields;
 		if (oldDice) {
 			for (const field of oldDice) {
 				const name = field.name.toLowerCase();
-				const newValue = newEmbedDice.find((f) => this.compareUnidecode(f.name, name));
-				if (!newValue)
-					newEmbedDice.push({
-						inline: true,
-						name: name.capitalize(),
-						value: field.value,
-					});
+				const normalizedName = MacroFeature.normalizeName(name);
+				if (newEmbedDiceNames.has(normalizedName)) continue;
+				newEmbedDice.push({
+					inline: true,
+					name: name.capitalize(),
+					value: field.value,
+				});
+				newEmbedDiceNames.add(normalizedName);
 			}
 		}
 
 		const fieldsToAppend: Djs.APIEmbedField[] = [];
+		const fieldsToAppendNames = new Set<string>();
 		for (const field of newEmbedDice) {
 			const name = field.name.toLowerCase();
 			const dice = field.value;
+			const normalizedName = MacroFeature.normalizeName(name);
 			if (
 				!dice ||
 				!name ||
-				fieldsToAppend.find((f) => this.compareUnidecode(f.name, name)) ||
+				fieldsToAppendNames.has(normalizedName) ||
 				dice.toLowerCase() === "x" ||
 				dice.trim().length === 0 ||
 				dice === "0"
@@ -786,6 +796,7 @@ export class MacroFeature extends BaseFeature {
 				name: capitalizeBetweenPunct(name.capitalize()),
 				value: dice,
 			});
+			fieldsToAppendNames.add(normalizedName);
 		}
 
 		if (fieldsToAppend.length > 25)

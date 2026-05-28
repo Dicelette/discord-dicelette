@@ -41,6 +41,12 @@ export const DATABASE_NAMES = [
 ];
 
 export const ALL_COMMANDS = COMMANDS.concat(PRIVATES_COMMANDS);
+export const ALL_COMMANDS_BY_NAME = new Map(
+	ALL_COMMANDS.map((command) => [command.data.name, command])
+);
+export const AUTOCOMPLETE_COMMANDS_BY_NAME = new Map(
+	AUTOCOMPLETE_COMMANDS.map((command) => [command.data.name, command])
+);
 
 export * from "./admin";
 export { clearCacheKey, createCacheKey, triggerPity } from "./admin/configuration/pity";

@@ -13,7 +13,7 @@ import "@dicelette/discord_ext";
 
 export default {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
-		const choices = await buildDamageAutocompleteChoices(
+		const choices = buildDamageAutocompleteChoices(
 			interaction,
 			client,
 			interaction.options.getFocused(true),

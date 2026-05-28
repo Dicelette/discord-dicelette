@@ -40,6 +40,40 @@ interface RollHandlerOptions {
 	statsPerSegment?: string[];
 }
 
+const TRIVIAL_CACHE_TTL_MS = 300_000;
+const TRIVIAL_CACHE_MAX_SIZE = Math.max(
+	1,
+	Number.parseInt(process.env.TRIVIAL_CACHE_MAX_SIZE ?? "5000", 10) || 5000
+);
+
+function setTrivialCacheEntry(client: EClient, cacheKey: string): void {
+	const existingTimeout = client.trivialCacheTimeouts.get(cacheKey);
+	if (existingTimeout) {
+		clearTimeout(existingTimeout);
+		client.trivialCacheTimeouts.delete(cacheKey);
+	}
+
+	if (!client.trivialCache.has(cacheKey)) {
+		while (client.trivialCache.size >= TRIVIAL_CACHE_MAX_SIZE) {
+			const oldestKey = client.trivialCache.values().next().value as string | undefined;
+			if (!oldestKey) break;
+			client.trivialCache.delete(oldestKey);
+			const timeout = client.trivialCacheTimeouts.get(oldestKey);
+			if (timeout) {
+				clearTimeout(timeout);
+				client.trivialCacheTimeouts.delete(oldestKey);
+			}
+		}
+		client.trivialCache.add(cacheKey);
+	}
+
+	const timeoutId = setTimeout(() => {
+		client.trivialCache.delete(cacheKey);
+		client.trivialCacheTimeouts.delete(cacheKey);
+	}, TRIVIAL_CACHE_TTL_MS);
+	client.trivialCacheTimeouts.set(cacheKey, timeoutId);
+}
+
 /**
  * Orchestrates sending a dice roll result to the appropriate destination (direct reply, channel reply, or threaded message) and handles caching, logging links, and cleanup timers.
  *
@@ -91,13 +125,7 @@ export async function handleRollResult(
 		const guild = source.guildId ? source.guild : null;
 		if (guild) {
 			const { cacheKey } = createCacheKey(source, author.id);
-			client.trivialCache.add(cacheKey);
-			// Auto-cleanup after 5 minutes
-			const timeoutId = setTimeout(() => {
-				client.trivialCache.delete(cacheKey);
-				client.trivialCacheTimeouts.delete(cacheKey);
-			}, 300000);
-			client.trivialCacheTimeouts.set(cacheKey, timeoutId);
+			setTrivialCacheEntry(client, cacheKey);
 		}
 	}
 
