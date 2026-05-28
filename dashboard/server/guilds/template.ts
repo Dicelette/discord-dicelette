@@ -184,8 +184,9 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		const current = settings.get(guildId);
 		if (current) {
-			deps.clearTemplateDerivedAutocompleteCache?.(current.templateID);
+			const templateID = current.templateID;
 			settings.delete(guildId, "templateID");
+			deps.clearTemplateDerivedAutocompleteCache?.(templateID);
 		}
 
 		res.json({ ok: true });

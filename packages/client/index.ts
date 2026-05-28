@@ -161,6 +161,8 @@ export class EClient extends Djs.Client {
 		const cached = this.templateDerivedAutocompleteCache.get(templateID);
 		if (cached) return cached;
 		const computed = this.buildTemplateDerivedAutocompleteCache(templateID);
+		const duringCompute = this.templateDerivedAutocompleteCache.get(templateID);
+		if (duringCompute) return duringCompute;
 		this.templateDerivedAutocompleteCache.set(templateID, computed);
 		return computed;
 	}
