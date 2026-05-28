@@ -14,6 +14,8 @@ export interface GuildContext {
 	standardizedDamageNames?: string[];
 	/** Pre-standardized stats names for faster autocomplete */
 	standardizedStatsNames?: string[];
+	/** Pre-standardized excluded stat names for faster checks */
+	standardizedExcludedStats?: string[];
 	/** Template ID data */
 	templateID?: GuildData["templateID"];
 	sortOrder?: SortOrder;
@@ -40,11 +42,13 @@ export function getGuildContext(
 	if (!settings) return undefined;
 
 	const templateID = settings.templateID;
+	const derived = client.getTemplateDerivedAutocompleteCache(templateID);
 
 	return {
 		settings,
-		standardizedDamageNames: templateID?.damageName?.map((x: string) => x.standardize()),
-		standardizedStatsNames: templateID?.statsName?.map((x: string) => x.standardize()),
+		standardizedDamageNames: derived?.standardizedDamageNames,
+		standardizedExcludedStats: derived?.standardizedExcludedStats,
+		standardizedStatsNames: derived?.standardizedStatsNames,
 		templateID,
 	};
 }

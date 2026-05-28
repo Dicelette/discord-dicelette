@@ -13,6 +13,13 @@ import type {
 import { important, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
+import "uniformize";
+
+export interface TemplateDerivedAutocompleteCache {
+	standardizedDamageNames: string[];
+	standardizedExcludedStats: string[];
+	standardizedStatsNames: string[];
+}
 
 /**
  * Extended Discord.js Client with Dicelette-specific functionality.
@@ -90,6 +97,11 @@ export class EClient extends Djs.Client {
 
 	public userPreferences: Enmap<UserPreferences>;
 
+	public templateDerivedAutocompleteCache: WeakMap<
+		GuildData["templateID"],
+		TemplateDerivedAutocompleteCache
+	> = new WeakMap();
+
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
@@ -130,6 +142,39 @@ export class EClient extends Djs.Client {
 		this.characters = new Enmap({ inMemory: true });
 		this.template = new Enmap({ inMemory: true });
 		this.guildLocale = new Enmap({ inMemory: true });
+	}
+
+	private buildTemplateDerivedAutocompleteCache(
+		templateID: GuildData["templateID"]
+	): TemplateDerivedAutocompleteCache {
+		return {
+			standardizedDamageNames: (templateID.damageName ?? []).map((x) => x.standardize()),
+			standardizedExcludedStats: (templateID.excludedStats ?? []).map((x) =>
+				x.standardize()
+			),
+			standardizedStatsNames: (templateID.statsName ?? []).map((x) => x.standardize()),
+		};
+	}
+
+	getTemplateDerivedAutocompleteCache(templateID?: GuildData["templateID"]) {
+		if (!templateID) return undefined;
+		const cached = this.templateDerivedAutocompleteCache.get(templateID);
+		if (cached) return cached;
+		const computed = this.buildTemplateDerivedAutocompleteCache(templateID);
+		this.templateDerivedAutocompleteCache.set(templateID, computed);
+		return computed;
+	}
+
+	refreshTemplateDerivedAutocompleteCache(templateID?: GuildData["templateID"]) {
+		if (!templateID) return undefined;
+		const computed = this.buildTemplateDerivedAutocompleteCache(templateID);
+		this.templateDerivedAutocompleteCache.set(templateID, computed);
+		return computed;
+	}
+
+	clearTemplateDerivedAutocompleteCache(templateID?: GuildData["templateID"]) {
+		if (!templateID) return;
+		this.templateDerivedAutocompleteCache.delete(templateID);
 	}
 }
 

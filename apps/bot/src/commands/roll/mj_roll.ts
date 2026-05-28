@@ -2,6 +2,7 @@ import type { EClient } from "@dicelette/client";
 import {
 	extractCommonOptions,
 	extractRollOptions,
+	getGuildContext,
 	getInteractionContext as getLangAndConfig,
 	gmCommonOptions,
 } from "@dicelette/helpers";
@@ -25,8 +26,8 @@ export const mjRoll = {
 		if (transform) return await interaction.respond(transform);
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const fixed = options.getFocused(true);
-		const guildData = client.settings.get(interaction.guild!.id);
-		if (!guildData?.templateID) return;
+		const ctx = getGuildContext(client, interaction.guild!.id);
+		if (!ctx?.templateID) return;
 		let choices: string[] = [];
 		const { user } = extractCommonOptions(options);
 		let allCharFromGuild: {
@@ -38,26 +39,25 @@ export const mjRoll = {
 
 		const userId = user?.id ?? interaction.user.id;
 		if (userId === interaction.user.id) {
-			for (const [, char] of Object.entries(guildData.user)) {
+			for (const [, char] of Object.entries(ctx.settings.user)) {
 				for (const data of char) {
 					allCharFromGuild.push(data);
 				}
 			}
-		} else allCharFromGuild = guildData.user?.[userId];
+		} else allCharFromGuild = ctx.settings.user?.[userId];
 		if (fixed.name === t("common.character")) {
 			//get ALL characters from the guild
 			const skill = options.getString(t("common.name"));
 			if (skill) {
-				if (
-					guildData.templateID.damageName
-						?.map((x) => x.standardize())
-						.includes(skill.standardize())
-				) {
+				const standardizedSkill = skill.standardize();
+				if (ctx.standardizedDamageNames?.includes(standardizedSkill)) {
 					choices = allCharFromGuild.map((data) => data.charName ?? t("common.default"));
 				} else {
 					//search in all characters for the skill
 					const findSkillInAll = allCharFromGuild.filter((data) => {
-						return data.damageName?.includes(skill);
+						return data.damageName?.some(
+							(damageName) => damageName.standardize() === standardizedSkill
+						);
 					});
 					choices = findSkillInAll.map((data) => data.charName ?? t("common.default"));
 				}
@@ -67,10 +67,8 @@ export const mjRoll = {
 				}
 			}
 		} else if (fixed.name === t("common.statistic")) {
-			choices = guildData.templateID.statsName;
+			choices = ctx.templateID.statsName;
 		} else if (fixed.name === t("common.name")) {
-			const defaultDice = guildData.templateID.damageName;
-
 			const character = options.getString(t("common.character"), false);
 			if (character) {
 				const char = allCharFromGuild.find((c) => c.charName?.subText(character));
@@ -82,7 +80,7 @@ export const mjRoll = {
 					if (data.damageName) choices.push(...data.damageName);
 				}
 			}
-			choices.push(...defaultDice);
+			choices.push(...ctx.templateID.damageName);
 		}
 		if (!choices || choices.length === 0) return;
 		const filter = filterChoices(choices, interaction.options.getFocused());

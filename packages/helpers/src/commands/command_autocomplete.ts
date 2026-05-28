@@ -2,6 +2,7 @@ import type { EClient } from "@dicelette/client";
 import { findln, t } from "@dicelette/localization";
 import { filterChoices } from "@dicelette/utils";
 import type * as Djs from "discord.js";
+import { getGuildContext } from "../guild_context";
 import { getInteractionContext } from "../interaction_context";
 import { haveAccess } from "../roles";
 
@@ -59,16 +60,17 @@ export function autoCompleteCharacters(
 ): string[] {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const focused = options.getFocused(true);
-	const guildData = client.settings.get(interaction.guild!.id);
-	if (!guildData?.templateID) return [];
+	const ctx = getGuildContext(client, interaction.guild!.id);
+	if (!ctx?.templateID) return [];
 	let choices: string[] = [];
 
 	if (focused.name === t("common.statistic")) {
-		choices = guildData.templateID.statsName || [];
+		choices = ctx.templateID.statsName || [];
 		if (exclude && choices.length > 0)
-			choices = choices.filter(
-				(item) => !guildData.templateID.excludedStats?.includes(item)
-			);
+			choices = choices.filter((item) => {
+				const standardized = item.standardize();
+				return !ctx.standardizedExcludedStats?.includes(standardized);
+			});
 	} else if (focused.name === t("common.character")) {
 		//get user characters
 		const userData = client.settings.get(

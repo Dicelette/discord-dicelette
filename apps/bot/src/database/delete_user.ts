@@ -76,6 +76,8 @@ export async function deleteIfChannelOrThread(
 	const channelID = channel.id;
 	cleanUserDB(client, channel);
 	if (db.get(guildID, "templateID.channelId") === channelID) {
+		const templateID = db.get(guildID, "templateID");
+		client.clearTemplateDerivedAutocompleteCache(templateID);
 		db.delete(guildID, "templateID");
 		client.template.delete(guildID);
 		await addRestriction(client, guildID);

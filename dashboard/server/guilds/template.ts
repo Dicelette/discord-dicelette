@@ -143,10 +143,15 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		};
 
 		if (current) {
-			current.templateID = templateID;
-			current.managerId = effectivePublicChannelId;
-			if (hasPrivateChannelId) current.privateChannel = privateChannelId || undefined;
-			settings.set(guildId, current);
+			const updated: GuildData = {
+				...current,
+				managerId: effectivePublicChannelId,
+				templateID,
+				user: current.user ?? {},
+			};
+			if (hasPrivateChannelId) updated.privateChannel = privateChannelId || undefined;
+			settings.set(guildId, updated);
+			deps.refreshTemplateDerivedAutocompleteCache?.(updated.templateID);
 		} else {
 			// First import — creation of settings
 			const newData: GuildData = {
@@ -157,6 +162,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			};
 			if (privateChannelId) newData.privateChannel = privateChannelId;
 			settings.set(guildId, newData);
+			deps.refreshTemplateDerivedAutocompleteCache?.(newData.templateID);
 		}
 
 		if (updateCharacters && deps.bulkEditTemplateUser) {
@@ -178,8 +184,8 @@ export function createTemplateRouter(deps: DashboardDeps) {
 
 		const current = settings.get(guildId);
 		if (current) {
-			current.templateID = undefined as unknown as GuildData["templateID"];
-			settings.set(guildId, current);
+			deps.clearTemplateDerivedAutocompleteCache?.(current.templateID);
+			settings.delete(guildId, "templateID");
 		}
 
 		res.json({ ok: true });

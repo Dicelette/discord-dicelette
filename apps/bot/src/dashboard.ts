@@ -32,6 +32,12 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 			const ul = ln(lang ?? Djs.Locale.EnglishUS);
 			return bulkEditTemplateUserCore(client, guildId, template, ul);
 		},
+		clearTemplateDerivedAutocompleteCache: (templateID) => {
+			client.clearTemplateDerivedAutocompleteCache(templateID);
+		},
+		refreshTemplateDerivedAutocompleteCache: (templateID) => {
+			client.refreshTemplateDerivedAutocompleteCache(templateID);
+		},
 		botGuilds: {
 			has: (id) => client.guilds.cache.has(id),
 			get: (id) => {
