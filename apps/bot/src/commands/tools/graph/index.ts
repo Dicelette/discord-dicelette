@@ -195,7 +195,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 		return;
 	}
 	const serverTemplate = await getTemplateByInteraction(interaction, client);
-	if (!guildData.templateID.statsName || !serverTemplate?.statistics) {
+	if (!guildData?.templateID?.statsName || !serverTemplate?.statistics) {
 		await reply(interaction, {
 			embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 		});
