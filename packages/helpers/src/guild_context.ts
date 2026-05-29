@@ -42,13 +42,13 @@ export function getGuildContext(
 	if (!settings) return undefined;
 
 	const templateID = settings.templateID;
-	const derived = client.getTemplateDerivedAutocompleteCache(templateID);
+	const derived = client.getTemplateAutocompleteCache(templateID);
 
 	return {
 		settings,
-		standardizedDamageNames: derived?.standardizedDamageNames,
-		standardizedExcludedStats: derived?.standardizedExcludedStats,
-		standardizedStatsNames: derived?.standardizedStatsNames,
+		standardizedDamageNames: derived?.damageNames,
+		standardizedExcludedStats: derived?.excludedStats,
+		standardizedStatsNames: derived?.statsNames,
 		templateID,
 	};
 }

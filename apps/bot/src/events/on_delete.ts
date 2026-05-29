@@ -24,7 +24,7 @@ export const onKick = (client: EClient): void => {
 		//delete guild from database
 		try {
 			const templateID = client.settings.get(guild.id, "templateID");
-			client.clearTemplateDerivedAutocompleteCache(templateID);
+			client.clearTemplateAutocompleteCache(templateID);
 			client.settings.delete(guild.id);
 			client.characters.delete(guild.id);
 			client.template.delete(guild.id);
@@ -140,7 +140,7 @@ export const onDeleteMessage = (client: EClient): void => {
 			if (channel.isDMBased()) return;
 			if (client.settings.get(guildID, "templateID.messageId") === messageId) {
 				const templateID = client.settings.get(guildID, "templateID");
-				client.clearTemplateDerivedAutocompleteCache(templateID);
+				client.clearTemplateAutocompleteCache(templateID);
 				client.settings.delete(guildID, "templateID");
 				client.template.delete(guildID); //template is deleted
 				await addRestriction(client, guildID);

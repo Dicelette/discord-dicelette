@@ -15,10 +15,10 @@ import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
 import "uniformize";
 
-export interface TemplateDerivedAutocompleteCache {
-	standardizedDamageNames: string[];
-	standardizedExcludedStats: string[];
-	standardizedStatsNames: string[];
+export interface TemplateAutocompleteCache {
+	damageNames: string[];
+	excludedStats: string[];
+	statsNames: string[];
 }
 
 /**
@@ -97,9 +97,9 @@ export class EClient extends Djs.Client {
 
 	public userPreferences: Enmap<UserPreferences>;
 
-	public templateDerivedAutocompleteCache: WeakMap<
+	public templateAutocompleteCache: WeakMap<
 		GuildData["templateID"],
-		TemplateDerivedAutocompleteCache
+		TemplateAutocompleteCache
 	> = new WeakMap();
 
 	constructor(options: Djs.ClientOptions) {
@@ -144,39 +144,37 @@ export class EClient extends Djs.Client {
 		this.guildLocale = new Enmap({ inMemory: true });
 	}
 
-	private buildTemplateDerivedAutocompleteCache(
+	private buildTemplateAutocompleteCache(
 		templateID: GuildData["templateID"]
-	): TemplateDerivedAutocompleteCache {
+	): TemplateAutocompleteCache {
 		return {
-			standardizedDamageNames: (templateID.damageName ?? []).map((x) => x.standardize()),
-			standardizedExcludedStats: (templateID.excludedStats ?? []).map((x) =>
-				x.standardize()
-			),
-			standardizedStatsNames: (templateID.statsName ?? []).map((x) => x.standardize()),
+			damageNames: (templateID.damageName ?? []).map((x) => x.standardize()),
+			excludedStats: (templateID.excludedStats ?? []).map((x) => x.standardize()),
+			statsNames: (templateID.statsName ?? []).map((x) => x.standardize()),
 		};
 	}
 
-	getTemplateDerivedAutocompleteCache(templateID?: GuildData["templateID"]) {
+	getTemplateAutocompleteCache(templateID?: GuildData["templateID"]) {
 		if (!templateID) return undefined;
-		const cached = this.templateDerivedAutocompleteCache.get(templateID);
+		const cached = this.templateAutocompleteCache.get(templateID);
 		if (cached) return cached;
-		const computed = this.buildTemplateDerivedAutocompleteCache(templateID);
-		const duringCompute = this.templateDerivedAutocompleteCache.get(templateID);
+		const computed = this.buildTemplateAutocompleteCache(templateID);
+		const duringCompute = this.templateAutocompleteCache.get(templateID);
 		if (duringCompute) return duringCompute;
-		this.templateDerivedAutocompleteCache.set(templateID, computed);
+		this.templateAutocompleteCache.set(templateID, computed);
 		return computed;
 	}
 
-	refreshTemplateDerivedAutocompleteCache(templateID?: GuildData["templateID"]) {
+	refreshTemplateAutocompleteCache(templateID?: GuildData["templateID"]) {
 		if (!templateID) return undefined;
-		const computed = this.buildTemplateDerivedAutocompleteCache(templateID);
-		this.templateDerivedAutocompleteCache.set(templateID, computed);
+		const computed = this.buildTemplateAutocompleteCache(templateID);
+		this.templateAutocompleteCache.set(templateID, computed);
 		return computed;
 	}
 
-	clearTemplateDerivedAutocompleteCache(templateID?: GuildData["templateID"]) {
+	clearTemplateAutocompleteCache(templateID?: GuildData["templateID"]) {
 		if (!templateID) return;
-		this.templateDerivedAutocompleteCache.delete(templateID);
+		this.templateAutocompleteCache.delete(templateID);
 	}
 }
 

@@ -33,10 +33,10 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 			return bulkEditTemplateUser(client, guildId, template, ul);
 		},
 		clearTemplateDerivedAutocompleteCache: (templateID) => {
-			client.clearTemplateDerivedAutocompleteCache(templateID);
+			client.clearTemplateAutocompleteCache(templateID);
 		},
-		refreshTemplateDerivedAutocompleteCache: (templateID) => {
-			client.refreshTemplateDerivedAutocompleteCache(templateID);
+		refreshTemplateAutocompleteCache: (templateID) => {
+			client.refreshTemplateAutocompleteCache(templateID);
 		},
 		botGuilds: {
 			has: (id) => client.guilds.cache.has(id),

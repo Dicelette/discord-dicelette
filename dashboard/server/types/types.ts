@@ -150,7 +150,5 @@ export interface DashboardDeps {
 		templateData: StatisticalTemplate
 	) => Promise<void>;
 	clearTemplateDerivedAutocompleteCache?: (templateID?: GuildData["templateID"]) => void;
-	refreshTemplateDerivedAutocompleteCache?: (
-		templateID?: GuildData["templateID"]
-	) => void;
+	refreshTemplateAutocompleteCache?: (templateID?: GuildData["templateID"]) => void;
 }

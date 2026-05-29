@@ -161,7 +161,7 @@ async function deleteTemplate(
 ) {
 	const guildId = interaction.guild!.id;
 	const oldData = client.settings.get(interaction.guild!.id, "templateID");
-	client.clearTemplateDerivedAutocompleteCache(oldData);
+	client.clearTemplateAutocompleteCache(oldData);
 	const opts = interaction.options;
 	const deleteAllUsers = opts.getBoolean(t("deleteTemplate.user.title"));
 	if (deleteAllUsers) {
@@ -529,7 +529,7 @@ export async function updateMemory(
 
 		if (privateChannel) json.privateChannel = privateChannel;
 		client.settings.set(guild.id, json);
-		client.refreshTemplateDerivedAutocompleteCache(json.templateID);
+		client.refreshTemplateAutocompleteCache(json.templateID);
 	} else {
 		const newData: GuildData = {
 			lang: guild?.preferredLocale ?? locale,
@@ -545,7 +545,7 @@ export async function updateMemory(
 			user: {},
 		};
 		client.settings.set(guild.id, newData);
-		client.refreshTemplateDerivedAutocompleteCache(newData.templateID);
+		client.refreshTemplateAutocompleteCache(newData.templateID);
 	}
 }
 

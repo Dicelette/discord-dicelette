@@ -151,7 +151,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			};
 			if (hasPrivateChannelId) updated.privateChannel = privateChannelId || undefined;
 			settings.set(guildId, updated);
-			deps.refreshTemplateDerivedAutocompleteCache?.(updated.templateID);
+			deps.refreshTemplateAutocompleteCache?.(updated.templateID);
 		} else {
 			// First import — creation of settings
 			const newData: GuildData = {
@@ -162,7 +162,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			};
 			if (privateChannelId) newData.privateChannel = privateChannelId;
 			settings.set(guildId, newData);
-			deps.refreshTemplateDerivedAutocompleteCache?.(newData.templateID);
+			deps.refreshTemplateAutocompleteCache?.(newData.templateID);
 		}
 
 		if (updateCharacters && deps.bulkEditTemplateUser) {
