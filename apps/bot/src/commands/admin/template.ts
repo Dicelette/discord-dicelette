@@ -435,7 +435,7 @@ async function userDataUpdate(
 	options: Djs.CommandInteractionOptionResolver
 ) {
 	if (options.getBoolean(t("register.options.update.name")))
-		await bulkEditTemplateUser(client, interaction, ul, templateData);
+		await bulkEditTemplateUser(client, interaction.guild!.id, templateData, ul);
 	else if (options.getBoolean(t("register.options.delete.name")))
 		await bulkDeleteCharacters(client, interaction, ul);
 }

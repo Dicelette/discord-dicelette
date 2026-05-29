@@ -9,7 +9,7 @@ import { exportCharactersCsv } from "./commands/admin/export";
 import { templateEmbed } from "./commands/admin/template";
 import { getTemplate, updateMemory } from "./database";
 import {
-	bulkEditTemplateUserCore,
+	bulkEditTemplateUser,
 	createDefaultThread,
 	createDiceEmbed,
 	createEmbedsList,
@@ -30,7 +30,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		bulkEditTemplateUser: (guildId, template) => {
 			const lang = client.settings.get(guildId, "lang");
 			const ul = ln(lang ?? Djs.Locale.EnglishUS);
-			return bulkEditTemplateUserCore(client, guildId, template, ul);
+			return bulkEditTemplateUser(client, guildId, template, ul);
 		},
 		clearTemplateDerivedAutocompleteCache: (templateID) => {
 			client.clearTemplateDerivedAutocompleteCache(templateID);
