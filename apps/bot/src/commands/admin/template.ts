@@ -161,6 +161,7 @@ async function deleteTemplate(
 ) {
 	const guildId = interaction.guild!.id;
 	const oldData = client.settings.get(interaction.guild!.id, "templateID");
+	client.clearTemplateAutocompleteCache(oldData);
 	const opts = interaction.options;
 	const deleteAllUsers = opts.getBoolean(t("deleteTemplate.user.title"));
 	if (deleteAllUsers) {
@@ -434,7 +435,7 @@ async function userDataUpdate(
 	options: Djs.CommandInteractionOptionResolver
 ) {
 	if (options.getBoolean(t("register.options.update.name")))
-		await bulkEditTemplateUser(client, interaction, ul, templateData);
+		await bulkEditTemplateUser(client, interaction.guild!.id, templateData, ul);
 	else if (options.getBoolean(t("register.options.delete.name")))
 		await bulkDeleteCharacters(client, interaction, ul);
 }
@@ -528,6 +529,7 @@ export async function updateMemory(
 
 		if (privateChannel) json.privateChannel = privateChannel;
 		client.settings.set(guild.id, json);
+		client.refreshTemplateAutocompleteCache(json.templateID);
 	} else {
 		const newData: GuildData = {
 			lang: guild?.preferredLocale ?? locale,
@@ -543,6 +545,7 @@ export async function updateMemory(
 			user: {},
 		};
 		client.settings.set(guild.id, newData);
+		client.refreshTemplateAutocompleteCache(newData.templateID);
 	}
 }
 

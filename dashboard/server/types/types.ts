@@ -5,6 +5,7 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type {
 	Characters,
+	GuildData,
 	Settings,
 	TemplateData,
 	UserPreferences,
@@ -148,4 +149,6 @@ export interface DashboardDeps {
 		guildId: string,
 		templateData: StatisticalTemplate
 	) => Promise<void>;
+	clearTemplateDerivedAutocompleteCache?: (templateID?: GuildData["templateID"]) => void;
+	refreshTemplateAutocompleteCache?: (templateID?: GuildData["templateID"]) => void;
 }

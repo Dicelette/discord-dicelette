@@ -22,7 +22,7 @@ import { searchUserChannel } from "utils";
  * @param template - The updated statistical template
  * @param ul - Localization function for building embeds
  */
-export async function bulkEditTemplateUserCore(
+export async function bulkEditTemplateUser(
 	client: EClient,
 	guildId: string,
 	template: StatisticalTemplate,
@@ -97,25 +97,6 @@ export async function bulkEditTemplateUserCore(
 			//pass
 		}
 	});
-}
-
-/**
- * Updates all user character template messages in a guild to reflect changes made to the template by moderation.
- *
- * For each character belonging to users in the guild, fetches the corresponding message and replaces its template embed with one reflecting the updated template fields. Also updates the in-memory character data to match the new embed.
- *
- * @param {EClient} client
- * @param {Djs.CommandInteraction} interaction
- * @param {Translation} ul
- * @param {StatisticalTemplate} template - The updated statistical template to apply to all user character messages.
- */
-export async function bulkEditTemplateUser(
-	client: EClient,
-	interaction: Djs.CommandInteraction,
-	ul: Translation,
-	template: StatisticalTemplate
-) {
-	return bulkEditTemplateUserCore(client, interaction.guild!.id, template, ul);
 }
 
 /**

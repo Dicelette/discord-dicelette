@@ -194,6 +194,7 @@ async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
 	const ul = ln(lang);
 	const template = await getTemplate(guild, client.settings, ul, client, true, false);
 	if (template) client.template.set(guild.id, template);
+	client.refreshTemplateAutocompleteCache(client.settings.get(guild.id, "templateID"));
 }
 /**
  * Removes settings for guilds the bot is no longer a member of.

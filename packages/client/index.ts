@@ -13,6 +13,13 @@ import type {
 import { important, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import Enmap, { type EnmapOptions } from "enmap";
+import "uniformize";
+
+export interface TemplateAutocompleteCache {
+	damageNames: string[];
+	excludedStats: string[];
+	statsNames: string[];
+}
 
 /**
  * Extended Discord.js Client with Dicelette-specific functionality.
@@ -90,6 +97,11 @@ export class EClient extends Djs.Client {
 
 	public userPreferences: Enmap<UserPreferences>;
 
+	public templateAutocompleteCache: WeakMap<
+		GuildData["templateID"],
+		TemplateAutocompleteCache
+	> = new WeakMap();
+
 	constructor(options: Djs.ClientOptions) {
 		super(options);
 
@@ -130,6 +142,39 @@ export class EClient extends Djs.Client {
 		this.characters = new Enmap({ inMemory: true });
 		this.template = new Enmap({ inMemory: true });
 		this.guildLocale = new Enmap({ inMemory: true });
+	}
+
+	private buildTemplateAutocompleteCache(
+		templateID: GuildData["templateID"]
+	): TemplateAutocompleteCache {
+		return {
+			damageNames: (templateID.damageName ?? []).map((x) => x.standardize()),
+			excludedStats: (templateID.excludedStats ?? []).map((x) => x.standardize()),
+			statsNames: (templateID.statsName ?? []).map((x) => x.standardize()),
+		};
+	}
+
+	getTemplateAutocompleteCache(templateID?: GuildData["templateID"]) {
+		if (!templateID) return undefined;
+		const cached = this.templateAutocompleteCache.get(templateID);
+		if (cached) return cached;
+		const computed = this.buildTemplateAutocompleteCache(templateID);
+		const duringCompute = this.templateAutocompleteCache.get(templateID);
+		if (duringCompute) return duringCompute;
+		this.templateAutocompleteCache.set(templateID, computed);
+		return computed;
+	}
+
+	refreshTemplateAutocompleteCache(templateID?: GuildData["templateID"]) {
+		if (!templateID) return undefined;
+		const computed = this.buildTemplateAutocompleteCache(templateID);
+		this.templateAutocompleteCache.set(templateID, computed);
+		return computed;
+	}
+
+	clearTemplateAutocompleteCache(templateID?: GuildData["templateID"]) {
+		if (!templateID) return;
+		this.templateAutocompleteCache.delete(templateID);
 	}
 }
 
