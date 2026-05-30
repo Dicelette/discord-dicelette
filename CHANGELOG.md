@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.0.1](https://github.com/Dicelette/discord-dicelette/compare/v4.0.0...v4.0.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **bot:graph:** Cannot read properties of undefined (reading 'statsName') ([e73d2a9](https://github.com/Dicelette/discord-dicelette/commit/e73d2a9ae198a1f1bd787dc0187a03580258f404))
+
 ## 4.0.0 (2026-05-15)
 
 
