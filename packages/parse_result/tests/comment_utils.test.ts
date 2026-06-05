@@ -89,6 +89,20 @@ describe("extractAndMergeComments", () => {
 		expect(result.mergedComments).toBe("test");
 	});
 
+	it("should handle empty dice input", () => {
+		const result = extractAndMergeComments("");
+
+		expect(result.cleanedDice).toBe("");
+		expect(result.mergedComments).toBeUndefined();
+	});
+
+	it("should keep only user comments when dice has none", () => {
+		const result = extractAndMergeComments("1d20", "user comment");
+
+		expect(result.cleanedDice).toBe("1d20");
+		expect(result.mergedComments).toBe("user comment");
+	});
+
 	it("should strip # prefix from intermediate processing", () => {
 		const result = extractAndMergeComments("2d6", "# user comment");
 
@@ -115,6 +129,21 @@ describe("extractAndMergeComments", () => {
 		expect(result.mergedComments).toBeUndefined();
 	});
 
+	it("should remove stat markers from cleaned dice", () => {
+		const result = extractAndMergeComments("1d20+%%[__strength__]%% # attack");
+
+		expect(result.cleanedDice).toBe("1d20+");
+		expect(result.mergedComments).toContain("%%[__strength__]%%");
+		expect(result.mergedComments).toContain("attack");
+	});
+
+	it("should handle multiple # markers in comments", () => {
+		const result = extractAndMergeComments("1d20 # first # second");
+
+		expect(result.cleanedDice).toBe("1d20");
+		expect(result.mergedComments).toBeTruthy();
+	});
+
 	it("should handle whitespace in comments correctly", () => {
 		const result = extractAndMergeComments("2d6 #   spaced   ", "  more  space  ");
 
@@ -130,5 +159,18 @@ describe("extractAndMergeComments", () => {
 		expect(result.cleanedDice).toBe("2d6");
 		// Should only appear once
 		expect(result.mergedComments).toBe("test");
+	});
+
+	it("should keep shared format with multiple semicolons", () => {
+		const result = extractAndMergeComments("1d20; 2d6; 1d8 # multiple");
+
+		expect(result.cleanedDice).toContain(";");
+		expect(result.mergedComments).toMatch(/^# /);
+	});
+
+	it("should preserve bracketed data in cleaned dice", () => {
+		const result = extractAndMergeComments("1d20 [saving throw]");
+
+		expect(result.cleanedDice).toContain("1d20");
 	});
 });
