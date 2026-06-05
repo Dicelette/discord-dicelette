@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildInfoRollFromStats } from "../src/dice_extractor";
+import "uniformize";
 
 describe("buildInfoRollFromStats", () => {
 	it("returns undefined when no stats found", () => {
