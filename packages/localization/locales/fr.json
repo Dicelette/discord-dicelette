@@ -596,6 +596,10 @@
 			"url": "L'image fournie est invalide : elle doit contenir le format de l'image (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) et être un lien en `https`."
 		},
 		"botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
+		"bulk": {
+			"number": "Le nombre de dé à lancer dans `{{- dice}}` n'a pas été reconnu.",
+			"zero": "Le nombre de dé dans `{{- dice}}` doit être supérieur à 0."
+		},
 		"calc": "Une erreur est survenue avec la formule utilisée.",
 		"channel": {
 			"defaultChannel": "Vous devez fournir au moins un channel par défaut pour sauvegarder les fiches.",
@@ -629,7 +633,7 @@
 			"empty": " Aucun serveur n'a été trouvé."
 		},
 		"invalidDice": {
-			"default": "Le dé `{{- dice}}` est invalide. Journalisation :\n`{{- error}}`.",
+			"default": "Le dé `{{- dice}}` est invalide.\n\nJournalisation :\n`{{- error}}`.",
 			"embeds": "Aucun embed de macro détecté",
 			"eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
 			"minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",

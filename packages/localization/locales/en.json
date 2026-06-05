@@ -596,6 +596,10 @@
 			"url": "The image provided is invalid: it must contain the image format (`JPG`/`JPEG`/`PNG`/`WEBP`/`GIF`/`GIFV`) and be an `https` link."
 		},
 		"botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
+		"bulk": {
+			"number": "The dice's number was not recognized in `{{- dice}}`.",
+			"zero": "The dice's number in `{{-dice}}` must be greater than zero."
+		},
 		"calc": "An error occured with the formula used.",
 		"channel": {
 			"defaultChannel": "You must provide at least one default channel to save the records.",
@@ -629,7 +633,7 @@
 			"empty": "No guilds found"
 		},
 		"invalidDice": {
-			"default": "The dice type `{{- dice}}` is invalid. Logs:\n`{{- error}}`",
+			"default": "The dice type `{{- dice}}` is invalid.\n\nLogs:\n`{{- error}}`",
 			"embeds": "No macro embeds detected",
 			"eval": "Invalid die: `{{-dice}}` during evaluation validation.",
 			"minus": "Dices cannot be negative !\n\n-# Dice used: `{{- dice}}`.",

@@ -180,13 +180,16 @@ export function diceTypeError(
 	if (error.cause === "no_dice_type") return ul("error.noDiceType");
 	if (error.cause === "unknown_stats")
 		return ul("error.invalidDice.stats", { stats: error.message });
-	if (error.message === "no_roll_result" || error.cause === "no_roll_result")
+	if (error.message === "testDiceRegistered")
 		return ul("error.noRollResult", {
 			dice: error.dice,
 			formula: error.method?.toString(),
 		});
 	if (error.cause === "critical_dice_type")
 		return ul("error.criticalDiceType", { dice: error.dice });
+	if (error.cause === "empty_dice") return ul("error.invalidDice.notFound");
+	if (error.cause === "bulk_number") return ul("error.bulk.number", { dice: error.dice });
+	if (error.cause === "bulk_zero") return ul("error.bulk.zero", { dice: error.dice });
 	return ul("error.invalidDice.default", {
 		dice: error.dice,
 		error: error.method?.toString(),
