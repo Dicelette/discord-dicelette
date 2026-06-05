@@ -1,5 +1,4 @@
 import type { EClient } from "@dicelette/client";
-import { escapeRegex } from "@dicelette/core";
 import { fetchChannel } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
@@ -47,7 +46,7 @@ export async function stripOOC(
 	}
 	//construct regex based on prefix/suffix
 	if (suffix && prefix && !regex) {
-		regex = `^${escapeRegex(prefix)}(.*)${escapeRegex(suffix)}$`;
+		regex = `^${prefix.escapeRegex()}(.*)${suffix.escapeRegex()}$`;
 	}
 	if (!regex) throw new BotError(ul("config.stripOOC.error"), botErrorOptions);
 	const row = new Djs.ActionRowBuilder<Djs.ChannelSelectMenuBuilder>().addComponents(
