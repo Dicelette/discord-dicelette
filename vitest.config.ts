@@ -3,11 +3,10 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
 	test: {
+		silent: true,
+		reporters: ["minimal"],
 		alias: {
-			"@dicelette/helpers": path.resolve(
-				__dirname,
-				"packages/helpers/index.ts"
-			),
+			"@dicelette/helpers": path.resolve(__dirname, "packages/helpers/index.ts"),
 			"@dicelette/client": path.resolve(__dirname, "packages/client/index.ts"),
 			"@dicelette/localization": path.resolve(
 				__dirname,
