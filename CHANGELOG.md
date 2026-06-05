@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.1.0](https://github.com/Dicelette/discord-dicelette/compare/v4.0.1...v4.1.0) (2026-06-05)
+
+
+### Bug Fixes
+
+* **core:** do not roll bulk dice when the X in `X#dY` is not a number (for example `a#d100` or `hello world 1#d100`) ([67d0c54](https://github.com/Dicelette/discord-dicelette/commit/67d0c54e42f8dcb1fcc7a15cb221a10427ac456a)), closes [a#d100](https://github.com/Dicelette/a/issues/d100) [1#d100](https://github.com/Dicelette/1/issues/d100)
+* **dep:** escapeRegex was added to uniformize ([376de7b](https://github.com/Dicelette/discord-dicelette/commit/376de7b72069bff6b03c217bbc17dd217dc02ee5))
+* **dep:** remove escapeRegex and use the one in uniformize package ([1aa1ba6](https://github.com/Dicelette/discord-dicelette/commit/1aa1ba66e39c971d980a2093f024058b1d684fa6))
+
 ## [4.0.1](https://github.com/Dicelette/discord-dicelette/compare/v4.0.0...v4.0.1) (2026-05-30)
 
 
