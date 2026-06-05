@@ -50,8 +50,7 @@ describe("custom critical roll", () => {
 		const result = rollCustomCritical({ test: customCritical }, 6);
 		expect(result?.test.dice?.originalDice).toBe("round(6/2)+1d8");
 	});
-	it("replace the value with the stats with name");
-	{
+	it("replace the value with the stats with name", () => {
 		const userStats = { test: 6 };
 		const statValue = 5;
 		const customCritical: CustomCritical = {
@@ -61,7 +60,7 @@ describe("custom critical roll", () => {
 		};
 		const result = rollCustomCritical({ test: customCritical }, statValue, userStats);
 		expect(result?.test.dice?.originalDice).toBe("round(5/2)+6");
-	}
+	});
 	it("should display the name of critical roll", () => {
 		const result: Resultat = {
 			compare: {
