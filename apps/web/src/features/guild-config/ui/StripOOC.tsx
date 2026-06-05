@@ -1,4 +1,3 @@
-import { escapeRegex } from "@dicelette/core";
 import type { ApiGuildData } from "@dicelette/types";
 import {
 	Autocomplete,
@@ -27,7 +26,7 @@ const timerBoxSx = { width: "100%", maxWidth: { xs: "100%", md: 400 } } as const
 
 function buildRegex(prefix: string, suffix: string): string | undefined {
 	if (!prefix && !suffix) return undefined;
-	return `^${escapeRegex(prefix)}(.*)${escapeRegex(suffix)}$`;
+	return `^${prefix.escapeRegex()}(.*)${suffix.escapeRegex()}$`;
 }
 
 function decomposeSimpleRegex(regex: string) {

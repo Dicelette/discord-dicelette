@@ -1,5 +1,4 @@
 // Pre-compiled regex patterns for better performance
-import { escapeRegex } from "@dicelette/core";
 
 export const QUERY_URL_PATTERNS = {
 	AVATAR_URL: /^(https:\/{2})[\w\-./%]+\/[\w\-.%]+\.(jpe?g|gifv?|png|webp)$/gi,
@@ -8,7 +7,7 @@ export const QUERY_URL_PATTERNS = {
 	QUERY_PARAMS: /\?.*$/g,
 	REGEX_ESCAPE: /[.*+?^${}()|[\]\\]/g,
 	VALID_EXTENSIONS: /\.?(jpe?g|gifv?|png|webp)$/gi,
-	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${escapeRegex(text)}\\b`, "gi"),
+	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${text.escapeRegex()}\\b`, "gi"),
 } as const;
 
 export const DICE_PATTERNS = {

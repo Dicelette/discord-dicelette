@@ -1,6 +1,5 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
 import {
-	escapeRegex,
 	findBestStatMatch,
 	MIN_THRESHOLD_MATCH,
 	REMOVER_PATTERN,
@@ -492,7 +491,7 @@ export function replaceStatsInDiceFormula(
 					const prefix = fullMatch.startsWith("(") ? "(" : "";
 					const suffix = fullMatch.endsWith(")") ? ")" : "";
 					processedSegment = processedSegment.replace(
-						new RegExp(escapeRegex(fullMatch), "gu"),
+						new RegExp(fullMatch.escapeRegex(), "gu"),
 						`${prefix}${statValue}${suffix}`
 					);
 				}
@@ -542,7 +541,7 @@ export function replaceStatsInDiceFormula(
 				const prefix = fullMatch.startsWith("(") && !fullMatch.endsWith(")") ? "(" : "";
 				const suffix = fullMatch.endsWith(")") && !fullMatch.startsWith("(") ? ")" : "";
 				processedFormula = processedFormula.replace(
-					new RegExp(escapeRegex(fullMatch), "gu"),
+					new RegExp(fullMatch.escapeRegex(), "gu"),
 					`${prefix}${statValue}${suffix}`
 				);
 			}
