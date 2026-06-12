@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.0.3](https://github.com/Dicelette/discord-dicelette/compare/v4.0.2...v4.0.3) (2026-06-12)
+
+
+### Bug Fixes
+
+* comments without # works again in /roll commands ([b763fe9](https://github.com/Dicelette/discord-dicelette/commit/b763fe9b2f613952487eb9754052f66da7e880e9))
+
 ## [4.0.2](https://github.com/Dicelette/discord-dicelette/compare/v4.0.1...v4.0.2) (2026-06-05)
 
 
