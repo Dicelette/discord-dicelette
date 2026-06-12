@@ -6,6 +6,7 @@ import {
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
+	extractDiceData,
 	parseComparator,
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
@@ -166,6 +167,15 @@ export async function baseRoll(
 		dice = `{${dice}}${comments}`;
 	}
 
+	// Extraire le commentaire trailing non marqué (ex: "1d100 cc" → dice="1d100", trailingComment="cc")
+	// extractDiceData utilise DICE_PATTERNS.DETECT_DICE_MESSAGE qui capture le texte libre après le dé
+	const diceData = extractDiceData(dice);
+	let trailingComment: string | undefined;
+	if (diceData.comments && !overrideComment) {
+		trailingComment = diceData.comments;
+		dice = dice.replace(diceData.comments, "").trimEnd();
+	}
+
 	logger.trace(`Original dice formula for ${user.tag}: ${dice}`);
 	const allStatNames = resolveStatsNames(userData, ctx?.templateID?.statsName);
 	const res = replaceStatsInDiceFormula(
@@ -204,7 +214,7 @@ export async function baseRoll(
 		: mergedServerCriticals;
 	const opts: RollOptions = {
 		charName,
-		comment: overrideComment,
+		comment: overrideComment ?? trailingComment,
 		critical: customCriticalFromOptions ? undefined : serverData?.critical,
 		customCritical: mergedCustomCritical,
 		hideResult: hidden,
