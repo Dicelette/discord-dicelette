@@ -8,3 +8,10 @@ allowBuilds:
   better-sqlite3: true
   canvas: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - mathjs@15.2.0
+  - react-router@7.15.0
+overrides:
+  mathjs@>=13.1.0 <15.2.0: ^15.2.0
+  mathjs@>=13.1.1 <15.2.0: ^15.2.0
+  react-router@>=7.0.0 <7.15.0: ^7.15.0

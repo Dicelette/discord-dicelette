@@ -96,30 +96,13 @@
 		"vite-tsconfig-paths": "^6.1.1",
 		"vitest": "^4.1.8"
 	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"@go-task/cli",
-			"@sentry-internal/node-cpu-profiler",
-			"better-sqlite3",
-			"canvas",
-			"esbuild"
+	"commit-and-tag-version": {
+		"bumpFiles": [
+			{
+				"filename": "package.json",
+				"type": "json"
+			}
 		],
-		"commit-and-tag-version": {
-			"bumpFiles": [
-				{
-					"filename": "package.json",
-					"type": "json"
-				}
-			],
-			"t": ""
-		},
-		"packageManager": "pnpm@11.1.2",
-		"overrides": {
-			"mathjs@>=13.1.1 <15.2.0": ">=15.2.0",
-			"mathjs@>=13.1.0 <15.2.0": ">=15.2.0",
-			"qs@>=6.11.1 <=6.15.1": ">=6.15.2",
-			"react-router@>=7.0.0 <7.15.0": ">=7.15.0"
-		}
+		"t": ""
 	}
 }
