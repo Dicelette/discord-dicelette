@@ -8,10 +8,14 @@ allowBuilds:
   better-sqlite3: true
   canvas: true
   esbuild: true
+minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - mathjs@15.2.0
   - react-router@7.15.0
   - '@dicelette/core@1.28.5'
+  - @dicelette/core
+  - discord.js
+  - discord-api-types
 overrides:
   mathjs@>=13.1.0 <15.2.0: ^15.2.0
   mathjs@>=13.1.1 <15.2.0: ^15.2.0
