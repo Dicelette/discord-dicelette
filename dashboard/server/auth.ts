@@ -1,6 +1,8 @@
 import { randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
 import { Router } from "express";
+import jwt from "jsonwebtoken";
+import type { JwtPayload } from "./express";
 import { refreshRateLimit } from "./rateLimit";
 import {
 	type DashboardDeps,
@@ -15,23 +17,50 @@ import {
 	clientSecret,
 	discordFetch,
 	getfrontEndUrl,
+	parseCookieHeader,
 	redirectUri,
 	requireAuth,
 	userCanManageGuild,
 } from "./utils";
 
+export const AUTH_COOKIE = "auth_token";
+
+const OAUTH_STATE_COOKIE = "oauth_state";
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+
+function setAuthCookie(
+	res: Response,
+	payload: JwtPayload,
+	secret: string,
+	secure: boolean
+): void {
+	const token = jwt.sign(payload, secret, { expiresIn: "7d" });
+	res.cookie(AUTH_COOKIE, token, {
+		httpOnly: true,
+		sameSite: "lax",
+		secure,
+		maxAge: COOKIE_MAX_AGE,
+	});
+}
+
 export function createAuthRouter(
 	botGuilds: DashboardDeps["botGuilds"],
 	guildEvents: import("node:events").EventEmitter,
 	settings: DashboardDeps["settings"],
-	userPreferences: DashboardDeps["userPreferences"]
+	userPreferences: DashboardDeps["userPreferences"],
+	jwtSecret: string,
+	cookieSecure: boolean
 ) {
 	const router = Router();
 
-	// Fix 1: generate a random state and store it in session to prevent OAuth CSRF
-	router.get("/discord", (req: Request, res: Response) => {
+	router.get("/discord", (_req: Request, res: Response) => {
 		const state = randomBytes(16).toString("hex");
-		req.session.oauthState = state;
+		res.cookie(OAUTH_STATE_COOKIE, state, {
+			httpOnly: true,
+			sameSite: "lax",
+			secure: cookieSecure,
+			maxAge: 10 * 60 * 1000,
+		});
 		const params = new URLSearchParams({
 			client_id: clientId()!,
 			redirect_uri: redirectUri(),
@@ -45,15 +74,14 @@ export function createAuthRouter(
 	router.get("/callback", async (req: Request, res: Response) => {
 		const { code, state, error: oauthError } = req.query;
 
-		// Fix 1 (cont.): validate state before doing anything else
-		if (!state || typeof state !== "string" || state !== req.session.oauthState) {
+		const storedState = parseCookieHeader(req.headers.cookie, OAUTH_STATE_COOKIE);
+		if (!state || typeof state !== "string" || state !== storedState) {
 			res.status(400).json({ error: "Invalid OAuth state" });
 			return;
 		}
-		// Consume the state immediately so it can't be replayed
-		delete req.session.oauthState;
+		// Consume the state cookie immediately so it can't be replayed
+		res.clearCookie(OAUTH_STATE_COOKIE);
 
-		// User denied authorization on Discord's side
 		if (oauthError) {
 			res.redirect(
 				`${getfrontEndUrl()}/login/error?reason=${encodeURIComponent(String(oauthError))}`
@@ -93,18 +121,17 @@ export function createAuthRouter(
 
 			const user = (await discordFetch("/users/@me", tokens.access_token)) as DiscordUser;
 
-			// Fix 2: regenerate session ID after successful login to prevent session fixation
-			await new Promise<void>((resolve, reject) => {
-				req.session.regenerate((err) => {
-					if (err) reject(err);
-					else resolve();
-				});
-			});
-
-			req.session.accessToken = tokens.access_token;
-			req.session.refreshToken = tokens.refresh_token;
-			req.session.userId = user.id;
-			req.session.user = user;
+			setAuthCookie(
+				res,
+				{
+					userId: user.id,
+					user,
+					accessToken: tokens.access_token,
+					refreshToken: tokens.refresh_token,
+				},
+				jwtSecret,
+				cookieSecure
+			);
 
 			res.redirect(getfrontEndUrl());
 		} catch (err) {
@@ -117,40 +144,39 @@ export function createAuthRouter(
 	});
 
 	router.get("/me", (req: Request, res: Response) => {
-		if (!req.session.user) {
+		if (!req.auth?.user) {
 			res.status(401).json({ error: "Not authenticated" });
 			return;
 		}
-		res.json(req.session.user);
+		res.json(req.auth.user);
 	});
 
 	router.post("/logout", (req: Request, res: Response) => {
-		if (req.session.userId) userGuildCache.delete(req.session.userId);
-		req.session.destroy(() => {
-			res.json({ ok: true });
-		});
+		if (req.auth?.userId) userGuildCache.delete(req.auth.userId);
+		res.clearCookie(AUTH_COOKIE);
+		res.json({ ok: true });
 	});
 
 	router.post("/guilds/refresh", refreshRateLimit, (req: Request, res: Response) => {
-		if (!req.session.accessToken) {
+		if (!req.auth?.accessToken) {
 			res.status(401).json({ error: "Not authenticated" });
 			return;
 		}
 		// Only clear this user's own guild cache — bot guild presence is provided
 		// by client.guilds.cache (kept up-to-date via guildCreate/guildDelete events)
 		// so no global state is affected by a single user's refresh
-		if (req.session.userId) userGuildCache.delete(req.session.userId);
+		if (req.auth.userId) userGuildCache.delete(req.auth.userId);
 		res.json({ ok: true });
 	});
 
 	router.get("/guilds", async (req: Request, res: Response) => {
-		if (!req.session.accessToken) {
+		if (!req.auth?.accessToken) {
 			res.status(401).json({ error: "Not authenticated" });
 			return;
 		}
 
 		try {
-			const userId = req.session.userId!;
+			const userId = req.auth.userId;
 			const cached = userGuildCache.get(userId);
 			const userGuilds: DiscordGuild[] =
 				cached && Date.now() < cached.expiresAt
@@ -158,7 +184,7 @@ export function createAuthRouter(
 					: await (async () => {
 							const guilds = (await discordFetch(
 								"/users/@me/guilds",
-								req.session.accessToken!
+								req.auth!.accessToken
 							)) as DiscordGuild[];
 							userGuildCache.set(userId, {
 								guilds,
@@ -203,13 +229,13 @@ export function createAuthRouter(
 	});
 
 	router.get("/favorites", requireAuth, (req: Request, res: Response) => {
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const prefs = userPreferences.get(userId);
 		res.json({ favoris: prefs?.favoris ?? [] });
 	});
 
 	router.patch("/favorites", requireAuth, (req: Request, res: Response) => {
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const { favoris } = req.body as { favoris?: unknown };
 		if (!Array.isArray(favoris) || !favoris.every((id) => typeof id === "string")) {
 			res.status(400).json({ error: "Invalid favoris: expected string[]" });
@@ -220,7 +246,7 @@ export function createAuthRouter(
 	});
 
 	router.get("/guild-events", (req: Request, res: Response) => {
-		if (!req.session.userId) {
+		if (!req.auth?.userId) {
 			res.status(401).end();
 			return;
 		}

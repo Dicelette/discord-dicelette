@@ -155,7 +155,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	// GET /:guildId/characters — current player's character sheets (with cache)
 	router.get("/", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const cacheKey = `${guildId}:${userId}`;
 		const forceRefresh = charForceRefresh.delete(cacheKey);
 
@@ -240,7 +240,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	// POST /:guildId/characters/refresh — invalidates current player's cache
 	router.post("/refresh", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const cacheKey = `${guildId}:${userId}`;
 		charCache.delete(cacheKey);
 		charForceRefresh.add(cacheKey);
@@ -250,7 +250,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	// POST /:guildId/characters/refresh-dashboard — refresh player and server if GM/admin
 	router.post("/refresh-dashboard", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const userCacheKey = `${guildId}:${userId}`;
 
 		charCache.delete(userCacheKey);
@@ -418,7 +418,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 	// GET /:guildId/characters/count-self — number of characters of current player (without admin rights)
 	router.get("/count-self", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const userChars: UserGuildData[] = settings.get(guildId)?.user?.[userId] ?? [];
 		res.json({ count: userChars.length });
 	});
@@ -488,7 +488,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		requireAdmin,
 		async (req: Request, res: Response) => {
 			const guildId = req.params.guildId as string;
-			const userId = req.session.userId!;
+			const userId = req.auth!.userId;
 
 			try {
 				const { csvText, deleteOldMessage } = req.body as {

@@ -52,8 +52,8 @@ export function createChannelsRouter(deps: DashboardDeps) {
 	// Utilise le token OAuth de l'utilisateur car le bot n'est pas encore dans ce serveur.
 	router.get("/invite", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
-		const accessToken = req.session.accessToken!;
+		const userId = req.auth!.userId;
+		const accessToken = req.auth!.accessToken;
 
 		const canManage = await userCanManageGuildViaOAuth(userId, guildId, accessToken);
 		if (!canManage) {

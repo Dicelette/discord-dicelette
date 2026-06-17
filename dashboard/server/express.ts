@@ -1,11 +1,14 @@
 import type { DiscordUser } from "./types";
 
-declare module "express-session" {
-	interface SessionData {
-		accessToken?: string;
-		refreshToken?: string;
-		userId?: string;
-		user?: DiscordUser;
-		oauthState?: string;
+export interface JwtPayload {
+	userId: string;
+	user: DiscordUser;
+	accessToken: string;
+	refreshToken: string;
+}
+
+declare module "express" {
+	interface Request {
+		auth?: JwtPayload;
 	}
 }

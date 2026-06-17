@@ -11,7 +11,7 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 
 	router.get("/dashboard-bootstrap", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 
 		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		const userConfig = userSettings.get(guildId, userId) ?? null;

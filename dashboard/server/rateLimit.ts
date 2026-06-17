@@ -29,7 +29,7 @@ export function makeRateLimit(max: number, windowMs: number) {
 	}
 
 	return function rateLimit(req: Request, res: Response, next: NextFunction): void {
-		const key = (req.session as { userId?: string }).userId ?? req.ip ?? "anon";
+		const key = req.auth?.userId ?? req.ip ?? "anon";
 		const now = Date.now();
 		const cutoff = now - windowMs;
 		const hits = (buckets.get(key) ?? []).filter((t) => t > cutoff);

@@ -9,12 +9,12 @@
 		"@dicelette/core": "^1.28.3",
 		"@dicelette/localization": "workspace:*",
 		"@dicelette/types": "workspace:*",
+		"@types/jsonwebtoken": "^9.0.10",
 		"cors": "^2.8.6",
 		"discord-api-types": "^0.37.120",
 		"enmap": "npm:@dicelette/enmap@^6.1.6",
 		"express": "^5.2.1",
-		"express-session": "^1.19.0",
-		"memorystore": "^1.6.7",
+		"jsonwebtoken": "^9.0.3",
 		"papaparse": "^5.5.3"
 	}
 }

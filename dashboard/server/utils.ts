@@ -120,8 +120,22 @@ export function validateEntries(
 	return { valid, errors };
 }
 
+export function parseCookieHeader(
+	header: string | undefined,
+	name: string
+): string | undefined {
+	if (!header) return undefined;
+	for (const part of header.split(";")) {
+		const trimmed = part.trim();
+		const eqIdx = trimmed.indexOf("=");
+		if (eqIdx === -1) continue;
+		if (trimmed.slice(0, eqIdx).trim() === name) return trimmed.slice(eqIdx + 1);
+	}
+	return undefined;
+}
+
 export function requireAuth(req: Request, res: Response, next: () => void) {
-	if (!req.session?.userId) {
+	if (!req.auth?.userId) {
 		res.status(401).json({ error: "Not authenticated" });
 		return;
 	}
@@ -140,7 +154,7 @@ export function makeRequireAdmin(
 ) {
 	return async (req: Request, res: Response, next: () => void) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const canManage = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		if (!canManage) {
 			res.status(403).json({ error: "Insufficient permissions" });

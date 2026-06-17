@@ -73,7 +73,7 @@ export function createConfigRouter(deps: DashboardDeps) {
 
 			const guild = botGuilds.get(guildId);
 			if (guild) {
-				const member = await guild.fetchMember(req.session.userId!);
+				const member = await guild.fetchMember(req.auth!.userId);
 				const Administrator = BigInt(0x8);
 				if (!member?.hasPermission(Administrator)) {
 					res

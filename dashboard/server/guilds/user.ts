@@ -11,7 +11,7 @@ export function createUserRouter(deps: DashboardDeps) {
 	// POST /:guildId/validate-entries — validate snippets or attributes (without admin rights)
 	router.post("/validate-entries", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 		const { type, entries, attributes, ignoreNotfound } = req.body as {
 			type: "snippets" | "attributes";
 			entries: Record<string, unknown>;
@@ -57,7 +57,7 @@ export function createUserRouter(deps: DashboardDeps) {
 	// GET /:guildId/user-config — user's personal settings (without admin rights)
 	router.get("/user-config", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 
 		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		const userConfig = userSettings.get(guildId, userId) ?? null;
@@ -83,7 +83,7 @@ export function createUserRouter(deps: DashboardDeps) {
 	// PATCH /:guildId/user-config — updates personal settings (without admin rights)
 	router.patch("/user-config", requireAuth, (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const userId = req.session.userId!;
+		const userId = req.auth!.userId;
 
 		const { snippets, attributes, createLinkTemplate, ignoreNotfound } = req.body as {
 			snippets?: Record<string, unknown>;

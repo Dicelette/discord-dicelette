@@ -3,19 +3,23 @@ import { important } from "@dicelette/utils";
 import cors from "cors";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
-import session from "express-session";
-import MemoryStore from "memorystore";
-import { createAuthRouter } from "./auth";
+import jwt from "jsonwebtoken";
+import { AUTH_COOKIE, createAuthRouter } from "./auth";
+import type { JwtPayload } from "./express";
 import { createGuildRouter } from "./guilds";
 import { makeRateLimit } from "./rateLimit";
 import type { DashboardDeps } from "./types";
 
-const SessionStore = MemoryStore(session);
-
-// ---------------------------------------------------------------------------
-// Minimal structural interfaces for Discord.js data exposed to routes.
-// These avoid importing discord.js types in the routes package.
-// ---------------------------------------------------------------------------
+function parseCookie(header: string | undefined, name: string): string | undefined {
+	if (!header) return undefined;
+	for (const part of header.split(";")) {
+		const trimmed = part.trim();
+		const eqIdx = trimmed.indexOf("=");
+		if (eqIdx === -1) continue;
+		if (trimmed.slice(0, eqIdx).trim() === name) return trimmed.slice(eqIdx + 1);
+	}
+	return undefined;
+}
 
 export function startDashboardServer(deps: DashboardDeps): void {
 	const Port = process.env.DASHBOARD_PORT ?? 3001;
@@ -30,10 +34,10 @@ export function startDashboardServer(deps: DashboardDeps): void {
 	})();
 	const isLocalhostFrontend =
 		frontendHostname === "localhost" || frontendHostname === "127.0.0.1";
-	const sessionCookieSecure = isProduction && !isLocalhostFrontend;
+	const cookieSecure = isProduction && !isLocalhostFrontend;
 
-	const sessionSecret = process.env.SESSION_SECRET;
-	if (!sessionSecret) {
+	const jwtSecret = process.env.SESSION_SECRET;
+	if (!jwtSecret) {
 		if (isProduction) {
 			throw new Error(
 				"[dashboard] SESSION_SECRET environment variable is required in production"
@@ -43,6 +47,7 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			"[dashboard] SESSION_SECRET is not set — using insecure default. Set SESSION_SECRET in production!"
 		);
 	}
+	const secret = jwtSecret ?? "dicelette-dev-secret-change-in-prod";
 
 	const app = express();
 	app.set("trust proxy", 1);
@@ -81,21 +86,19 @@ export function startDashboardServer(deps: DashboardDeps): void {
 
 	app.use(express.json({ limit: "100kb" }));
 	app.use(cors({ origin: FrontendUrl, credentials: true }));
-	app.use(
-		session({
-			store: new SessionStore({ checkPeriod: 86_400_000 }), // prune expired entries every 24h
-			secret: sessionSecret ?? "dicelette-dev-secret-change-in-prod",
-			resave: false,
-			saveUninitialized: false,
-			cookie: {
-				// Keep secure cookies in real prod, but allow local prod-like tests on http://localhost.
-				secure: sessionCookieSecure,
-				httpOnly: true,
-				sameSite: "lax",
-				maxAge: 7 * 24 * 60 * 60 * 1000,
-			},
-		})
-	);
+
+	// JWT middleware: verify the auth cookie on every request and populate req.auth
+	app.use((req: Request, _res: Response, next: NextFunction) => {
+		const token = parseCookie(req.headers.cookie, AUTH_COOKIE);
+		if (token) {
+			try {
+				req.auth = jwt.verify(token, secret) as JwtPayload;
+			} catch {
+				// Invalid or expired token — treated as unauthenticated
+			}
+		}
+		next();
+	});
 
 	// CSRF: reject state-changing requests originating from unexpected origins.
 	// Same-origin requests from the SPA always carry a matching Origin header.
@@ -141,7 +144,9 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			deps.botGuilds,
 			deps.guildEvents,
 			deps.settings,
-			deps.userPreferences
+			deps.userPreferences,
+			secret,
+			cookieSecure
 		)
 	);
 	// Guild data routes: 120 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE).
