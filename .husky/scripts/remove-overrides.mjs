@@ -1,29 +1,28 @@
 import fs from "node:fs";
 import path from "node:path";
+import { parse, stringify } from "yaml";
 
-const pkgPath = path.resolve("package.json");
-const raw = fs.readFileSync(pkgPath, "utf-8");
-const pkg = JSON.parse(raw);
+const workspacePath = path.resolve("pnpm-workspace.yaml");
+const raw = fs.readFileSync(workspacePath, "utf-8");
+const workspace = parse(raw);
 
 let changed = false;
 
-if (pkg.pnpm?.overrides) {
-	for (const dep in pkg.pnpm.overrides) {
-		const value = pkg.pnpm.overrides[dep];
+if (workspace.overrides) {
+	for (const dep in workspace.overrides) {
+		const value = workspace.overrides[dep];
 		if (typeof value === "string" && value.startsWith("link:")) {
 			console.log(`🧹 Removing override for ${dep} (${value})`);
-			delete pkg.pnpm.overrides[dep];
+			delete workspace.overrides[dep];
 			changed = true;
 		}
 	}
-	if (Object.keys(pkg.pnpm.overrides).length === 0) {
-		delete pkg.pnpm.overrides;
-	}
+	if (Object.keys(workspace.overrides).length === 0) delete workspace.overrides;
 }
 
 if (changed) {
-	fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
-	console.log("✅ package.json cleaned");
-} else {
+	fs.writeFileSync(workspacePath, stringify(workspace));
+	console.log("✅ pnpm-workspace.yaml cleaned");
+} else 
 	console.log("👍 No local overrides found");
-}
+
