@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.0.4](https://github.com/Dicelette/discord-dicelette/compare/v4.0.3...v4.0.4) (2026-06-17)
+
+
+### Bug Fixes
+
+* **bot:on_delete:** enmap error for key not found when deleting ([93b799a](https://github.com/Dicelette/discord-dicelette/commit/93b799ad1fcb5c4beee9c75b23feddedc017dfcb))
+
 ## [4.0.3](https://github.com/Dicelette/discord-dicelette/compare/v4.0.2...v4.0.3) (2026-06-12)
 
 
