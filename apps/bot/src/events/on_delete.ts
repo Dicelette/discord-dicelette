@@ -78,7 +78,8 @@ export const onUserQuit = (client: EClient): void => {
 			);
 		}
 		// Clean in-memory caches for this member
-		client.characterCacheTimestamps.delete(`${member.guild.id}:${member.id}`);
+		if (client.characterCacheTimestamps.has(`${member.guild.id}:${member.id}`))
+			client.characterCacheTimestamps.delete(`${member.guild.id}:${member.id}`);
 		const memberPrefix = `${member.guild.id}:${member.id}:`;
 		for (const key of client.trivialCache) {
 			if (key.startsWith(memberPrefix)) {
@@ -90,7 +91,8 @@ export const onUserQuit = (client: EClient): void => {
 				}
 			}
 		}
-		client.characters.delete(member.guild.id, member.id);
+		if (client.characters.has(member.guild.id, member.id))
+			client.characters.delete(member.guild.id, member.id);
 	});
 };
 
