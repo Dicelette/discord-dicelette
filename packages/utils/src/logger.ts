@@ -112,19 +112,33 @@ if (hasSentry) {
 	});
 }
 
-export function setupProcessErrorHandlers() {
-	if (!hasSentry) return;
+export async function sentryFlush(timeout = 2000): Promise<void> {
+	if (hasSentry) await Sentry.flush(timeout);
+}
 
+export function setupProcessErrorHandlers() {
 	process.on("unhandledRejection", (reason) => {
-		Sentry.captureException(reason);
+		logger.error("Unhandled rejection:", reason);
+		if (hasSentry) Sentry.captureException(reason);
 	});
 
 	process.on("uncaughtException", (err) => {
-		Sentry.captureException(err);
-		void Sentry.flush(2000).then(() => {
+		logger.fatal("Uncaught exception:", err);
+		if (hasSentry) {
+			Sentry.captureException(err);
+			void Sentry.flush(2000).finally(() => process.exit(1));
+		} else {
 			process.exit(1);
-		});
+		}
 	});
+
+	const shutdown = (signal: string) => {
+		logger.warn(`${signal} received, shutting down...`);
+		void sentryFlush(2000).finally(() => process.exit(0));
+	};
+
+	process.on("SIGTERM", () => shutdown("SIGTERM"));
+	process.on("SIGINT", () => shutdown("SIGINT"));
 }
 
 export const sentry = {

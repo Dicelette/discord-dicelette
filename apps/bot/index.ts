@@ -18,17 +18,6 @@ import { startBotDashboard } from "./src/dashboard";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 setupProcessErrorHandlers();
-process.on("unhandledRejection", async (reason) => {
-	await event.sendErrorToWebhook(reason);
-	console.error(reason);
-	process.exit(1);
-});
-
-process.on("uncaughtException", async (err) => {
-	await event.sendErrorToWebhook(err);
-	console.error(err);
-	process.exit(1);
-});
 
 important.info("Starting bot...");
 //@ts-ignore
