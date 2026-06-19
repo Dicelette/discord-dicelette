@@ -1,7 +1,6 @@
 /** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
 import * as Sentry from "@sentry/node";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
@@ -87,6 +86,7 @@ const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "producti
 
 if (hasSentry) {
 	important.info("Sentry is enabled for logging errors.");
+	const { nodeProfilingIntegration } = await import("@sentry/profiling-node");
 	Sentry.init({
 		beforeBreadcrumb(breadcrumb, _hint) {
 			//remove ansi

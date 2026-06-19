@@ -1,5 +1,5 @@
-import type { DiceData } from "@dicelette/types";
 import { describe, expect, it } from "vitest";
+import type { DiceData } from "../../types";
 import {
 	applyCommentsToResult,
 	extractDiceData,

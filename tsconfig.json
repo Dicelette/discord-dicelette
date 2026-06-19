@@ -14,7 +14,7 @@
 		"inlineSourceMap": true,
 		"lib": ["ESNext"],
 		"module": "esnext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"outDir": "./dist/",
 		"incremental": true,
 		"tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo",
@@ -52,7 +52,6 @@
 	"exclude": [
 		"node_modules",
 		"dist",
-		"**/*.test.ts",
 		"apps/**/tests/**",
 		"apps/**/vitest.config.ts",
 		"@testing/**",

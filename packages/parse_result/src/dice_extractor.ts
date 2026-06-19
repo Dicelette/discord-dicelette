@@ -413,7 +413,6 @@ export function getRoll(
 	pity?: boolean,
 	sort?: SortOrder
 ): Resultat | undefined {
-	logger.trace("Getting roll for dice:", dice);
 	if (isSharedRoll(dice)) return getRollInShared(dice, pity, sort);
 	const { dice: cleanDice, comment } = splitDiceComment(dice);
 	return roll(cleanDice, undefined, pity, sort, comment);

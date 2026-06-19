@@ -166,29 +166,15 @@ export default function Dashboard() {
 				value={tab}
 				variant="scrollable"
 				scrollButtons="auto"
+				allowScrollButtonsMobile
 				onChange={handleTabChange}
-				slotProps={{
-					indicator: {
-						sx: { display: { xs: "none", sm: "block" } },
-					},
-				}}
 				sx={{
 					mb: 3,
 					borderBottom: 1,
 					borderColor: "divider",
-					"& .MuiTabs-flexContainer": {
-						flexWrap: { xs: "wrap", sm: "nowrap" },
-						rowGap: 0.5,
-					},
 					"& .MuiTab-root": {
-						minWidth: { xs: 0, sm: 90 },
+						minWidth: { xs: 72, sm: 90 },
 						px: { xs: 1, sm: 2 },
-						flex: { xs: "1 1 auto", sm: "0 0 auto" },
-						borderBottom: { xs: "2px solid transparent", sm: "none" },
-						mb: { xs: "-1px", sm: 0 },
-						"&.Mui-selected": {
-							borderBottomColor: { xs: "primary.main", sm: "transparent" },
-						},
 					},
 				}}
 			>

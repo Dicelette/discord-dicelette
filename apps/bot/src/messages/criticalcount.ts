@@ -74,7 +74,7 @@ export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | u
  * @param messageCount - Counts extracted from a single message to add
  * @param isTrivial - When true, preserve existing consecutive and longestStreak values (do not modify streaks)
  */
-function addCount(
+export function addCount(
 	criticalCount: CriticalCount,
 	userId: string,
 	guildId: string,

@@ -1,7 +1,7 @@
-import type { Count } from "@dicelette/types";
+import type { Count, CriticalCount } from "@dicelette/types";
 import { beforeEach, describe, expect, it } from "vitest";
+import { addCount } from "../src/messages";
 
-// Minimal CriticalCount mock implementing get/set per guild+user
 class CriticalCountMock {
 	private store = new Map<string, Count>();
 	get(guildId: string, userId: string): Count | undefined {
@@ -12,65 +12,6 @@ class CriticalCountMock {
 	}
 }
 
-// Inline implementations of the core logic we're testing
-function addCountLogic(
-	existing: Count | undefined,
-	messageCount: Count,
-	isTrivial = false
-): Count {
-	if (!existing) {
-		return messageCount;
-	}
-
-	const newCount: Count = {
-		criticalFailure: existing.criticalFailure + messageCount.criticalFailure,
-		criticalSuccess: existing.criticalSuccess + messageCount.criticalSuccess,
-		failure: existing.failure + messageCount.failure,
-		success: existing.success + messageCount.success,
-	};
-
-	// If the comparison is trivial, we ignore consecutive series
-	if (isTrivial) {
-		newCount.consecutive = existing.consecutive ?? { failure: 0, success: 0 };
-		newCount.longestStreak = existing.longestStreak ?? { failure: 0, success: 0 };
-	} else if (messageCount.failure || messageCount.criticalFailure) {
-		newCount.consecutive = {
-			failure:
-				(existing.consecutive?.failure ?? 0) +
-				messageCount.failure +
-				messageCount.criticalFailure,
-			success: 0,
-		};
-		newCount.longestStreak = {
-			failure: Math.max(
-				existing.longestStreak?.failure ?? 0,
-				newCount.consecutive.failure
-			),
-			success: existing.longestStreak?.success ?? 0,
-		};
-	} else if (messageCount.success || messageCount.criticalSuccess) {
-		newCount.consecutive = {
-			failure: 0,
-			success:
-				(existing.consecutive?.success ?? 0) +
-				messageCount.success +
-				messageCount.criticalSuccess,
-		};
-		newCount.longestStreak = {
-			failure: existing.longestStreak?.failure ?? 0,
-			success: Math.max(
-				existing.longestStreak?.success ?? 0,
-				newCount.consecutive.success
-			),
-		};
-	} else {
-		newCount.consecutive = existing.consecutive ?? { failure: 0, success: 0 };
-		newCount.longestStreak = existing.longestStreak ?? { failure: 0, success: 0 };
-	}
-
-	return newCount;
-}
-
 describe("criticalcount trivial behavior", () => {
 	let criticalCount: CriticalCountMock;
 	const guildId = "guild-1";
@@ -78,7 +19,6 @@ describe("criticalcount trivial behavior", () => {
 
 	beforeEach(() => {
 		criticalCount = new CriticalCountMock();
-		// Seed initial count with some ongoing failure streak
 		const initial: Count = {
 			consecutive: { failure: 2, success: 0 },
 			criticalFailure: 0,
@@ -91,7 +31,6 @@ describe("criticalcount trivial behavior", () => {
 	});
 
 	it("does not change consecutive when comparison is trivial (failure line)", () => {
-		const existing = criticalCount.get(guildId, userId)!;
 		const messageCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
@@ -99,19 +38,21 @@ describe("criticalcount trivial behavior", () => {
 			success: 0,
 		};
 
-		// Apply the logic with isTrivial = true
-		const updated = addCountLogic(existing, messageCount, true);
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			true
+		);
+		const updated = criticalCount.get(guildId, userId)!;
 
-		// Totals should update (failure incremented)
 		expect(updated.failure).toBe(4);
-		// Consecutive should remain unchanged
 		expect(updated.consecutive?.failure).toBe(2);
-		// Longest streak unchanged
 		expect(updated.longestStreak?.failure).toBe(2);
 	});
 
 	it("increments consecutive when comparison is NOT trivial (failure line)", () => {
-		const existing = criticalCount.get(guildId, userId)!;
 		const messageCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
@@ -119,8 +60,14 @@ describe("criticalcount trivial behavior", () => {
 			success: 0,
 		};
 
-		// Apply the logic with isTrivial = false
-		const updated = addCountLogic(existing, messageCount, false);
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			false
+		);
+		const updated = criticalCount.get(guildId, userId)!;
 
 		expect(updated.failure).toBe(4);
 		expect(updated.consecutive?.failure).toBe(3);
@@ -128,7 +75,6 @@ describe("criticalcount trivial behavior", () => {
 	});
 
 	it("ignores consecutive for trivial success as well", () => {
-		const existing = criticalCount.get(guildId, userId)!;
 		const messageCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
@@ -136,18 +82,22 @@ describe("criticalcount trivial behavior", () => {
 			success: 1,
 		};
 
-		// Apply the logic with isTrivial = true for a success message
-		const updated = addCountLogic(existing, messageCount, true);
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			true
+		);
+		const updated = criticalCount.get(guildId, userId)!;
 
 		expect(updated.success).toBe(3);
-		// Should not reset failure streak nor increase success streak
 		expect(updated.consecutive?.failure).toBe(2);
 		expect(updated.consecutive?.success).toBe(0);
 		expect(updated.longestStreak?.success).toBe(3);
 	});
 
 	it("switches from failure streak to success streak only when NOT trivial", () => {
-		const existing = criticalCount.get(guildId, userId)!;
 		const messageCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
@@ -155,8 +105,14 @@ describe("criticalcount trivial behavior", () => {
 			success: 1,
 		};
 
-		// Non-trivial success should reset failure streak and start success streak
-		const updated = addCountLogic(existing, messageCount, false);
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			false
+		);
+		const updated = criticalCount.get(guildId, userId)!;
 
 		expect(updated.consecutive?.failure).toBe(0);
 		expect(updated.consecutive?.success).toBe(1);
@@ -165,7 +121,6 @@ describe("criticalcount trivial behavior", () => {
 	});
 
 	it("preserves failure streak when message has no results (no-op message)", () => {
-		const existing = criticalCount.get(guildId, userId)!;
 		const messageCount: Count = {
 			criticalFailure: 0,
 			criticalSuccess: 0,
@@ -173,8 +128,14 @@ describe("criticalcount trivial behavior", () => {
 			success: 0,
 		};
 
-		// A no-result message should not reset the ongoing failure streak
-		const updated = addCountLogic(existing, messageCount, false);
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			false
+		);
+		const updated = criticalCount.get(guildId, userId)!;
 
 		expect(updated.consecutive?.failure).toBe(2);
 		expect(updated.consecutive?.success).toBe(0);
@@ -183,7 +144,6 @@ describe("criticalcount trivial behavior", () => {
 	});
 
 	it("preserves success streak when message has no results (no-op message)", () => {
-		// Seed a success streak instead
 		const successStreak: Count = {
 			consecutive: { failure: 0, success: 4 },
 			criticalFailure: 0,
@@ -201,14 +161,62 @@ describe("criticalcount trivial behavior", () => {
 			success: 0,
 		};
 
-		const updated = addCountLogic(
-			criticalCount.get(guildId, userId)!,
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
 			messageCount,
 			false
 		);
+		const updated = criticalCount.get(guildId, userId)!;
 
 		expect(updated.consecutive?.success).toBe(4);
 		expect(updated.consecutive?.failure).toBe(0);
 		expect(updated.longestStreak?.success).toBe(4);
+	});
+
+	it("critical failure triggers streak but does not double-count in consecutive", () => {
+		const messageCount: Count = {
+			criticalFailure: 1,
+			criticalSuccess: 0,
+			failure: 1,
+			success: 0,
+		};
+
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			false
+		);
+		const updated = criticalCount.get(guildId, userId)!;
+
+		// consecutive should add only messageCount.failure (not criticalFailure)
+		expect(updated.consecutive?.failure).toBe(3);
+		expect(updated.criticalFailure).toBe(1);
+	});
+
+	it("critical success triggers streak but does not double-count in consecutive", () => {
+		const messageCount: Count = {
+			criticalFailure: 0,
+			criticalSuccess: 1,
+			failure: 0,
+			success: 1,
+		};
+
+		addCount(
+			criticalCount as unknown as CriticalCount,
+			userId,
+			guildId,
+			messageCount,
+			false
+		);
+		const updated = criticalCount.get(guildId, userId)!;
+
+		// consecutive should add only messageCount.success (not criticalSuccess)
+		expect(updated.consecutive?.success).toBe(1);
+		expect(updated.consecutive?.failure).toBe(0);
+		expect(updated.criticalSuccess).toBe(1);
 	});
 });

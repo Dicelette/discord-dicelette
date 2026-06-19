@@ -24,6 +24,7 @@ export default defineConfig({
 				"**/playwright-report/**",
 			],
 		},
+		host: true,
 		port: 5173,
 		proxy: {
 			"/api": {
