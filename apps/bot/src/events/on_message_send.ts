@@ -67,7 +67,6 @@ export default (client: EClient): void => {
 			}
 			const ctx = getGuildContext(client, message.guild.id);
 			const statsName = resolveStatsNames(userData, ctx?.templateID?.statsName);
-			logger.trace("Stats name:", statsName, "User stats:", userData?.stats);
 			const pityNb = client.criticalCount.get(message.guild.id, author.id)?.consecutive
 				?.failure;
 			const pityThreshold = guildSettings?.pity || undefined;
