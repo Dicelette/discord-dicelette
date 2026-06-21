@@ -168,7 +168,7 @@ function Attributes({ state }: AttributeSectionProps) {
 					fullWidth
 					size="small"
 					label={t("userSettings.replaceUnknown.title")}
-					helperText={t("userSettings.replaceUnknown.description")}
+					helperText={t("userSettings.attributes.replaceUnknown.description")}
 					value={replaceUnknown}
 					onChange={(e) => {
 						setReplaceUnknown(e.target.value);

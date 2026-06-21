@@ -7,4 +7,5 @@ export { default as NumberField } from "./NumberField";
 export { default as RoleSelect } from "./RoleSelect";
 export { default as SectionTitle } from "./SectionTitle";
 export { default as ThemeToggleButton } from "./ThemeToggleButton";
+export { TransWithLink } from "./TransWithLink";
 export { default as UserAvatarMenu } from "./UserAvatarMenu";

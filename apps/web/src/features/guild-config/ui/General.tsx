@@ -1,7 +1,7 @@
 import { SortOrder, validateCustomFormula } from "@dicelette/core";
 import type { ApiGuildData } from "@dicelette/types";
 import { Autocomplete, TextField } from "@mui/material";
-import { SectionTitle, useI18n } from "@shared";
+import { SectionTitle, TransWithLink, useI18n } from "@shared";
 import { memo, useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 
@@ -117,9 +117,15 @@ function General({ control }: Props) {
 							onChange={(e) => field.onChange(e.target.value)}
 							error={!!fieldState.error}
 							helperText={
-								fieldState.error
-									? fieldState.error.message
-									: t("config.fields.customFormulaHelper")
+								fieldState.error ? (
+									fieldState.error.message
+								) : (
+									<TransWithLink
+										i18nKey="config.fields.customFormulaHelper"
+										href="https://mathjs.org"
+										linkText="Mathjs"
+									/>
+								)
 							}
 							slotProps={{
 								input: { sx: { fontFamily: "var(--code-font-family)" } },

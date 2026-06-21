@@ -1,7 +1,7 @@
 import { userApi } from "@dicelette/api";
 import { validateCustomFormula } from "@dicelette/core";
 import { Alert, Box, Button, CircularProgress, TextField } from "@mui/material";
-import { useI18n } from "@shared";
+import { TransWithLink, useI18n } from "@shared";
 import { memo, useState } from "react";
 import { FormAccordion } from "../atoms";
 import { useSaveSuccessToast } from "./hooks";
@@ -70,7 +70,15 @@ function General({ guildId, initialFormula }: Props) {
 					value={formula}
 					onChange={(e) => handleChange(e.target.value)}
 					error={!!formulaError}
-					helperText={formulaError ?? t("userConfig.customFormulaHelper")}
+					helperText={
+						formulaError ?? (
+							<TransWithLink
+								i18nKey="userConfig.customFormulaHelper"
+								href="https://mathjs.org"
+								linkText="Mathjs"
+							/>
+						)
+					}
 					slotProps={{
 						input: { sx: { fontFamily: "var(--code-font-family)" } },
 					}}

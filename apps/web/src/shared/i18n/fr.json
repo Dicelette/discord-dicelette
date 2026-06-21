@@ -40,7 +40,7 @@
 			"channelId": "Channel de réception",
 			"context": "Ajouter un lien de contexte dans les logs",
 			"customFormula": "Formule personnalisée",
-			"customFormulaHelper": "Une formule mathjs appliquée à tous les jets contenant [expr]. $ est remplacé par l'expression entre crochets. Laisser vide pour désactiver.",
+			"customFormulaHelper": "Applique une formule {link} à l'ensemble des jets du serveur où [expr] remplace $.",
 			"customFormulaInvalid": "Formule invalide : {error}",
 			"dashboardAccess": "Rôles autorisés",
 			"dashboardAccessAdminOnly": "Seuls les administrateurs du serveur peuvent modifier ce paramètre.",
@@ -237,7 +237,7 @@
 		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
 		"attrValue": "Valeur",
-		"customFormulaHelper": "Une formule mathjs personnelle appliquée aux jets contenant [expr]. $ est remplacé par l'expression entre crochets. Priorité au paramètre serveur si défini. Laisser vide pour désactiver.",
+		"customFormulaHelper": "Applique une formule {link} personnelle aux jets où [expr] remplace $. Écrasé par la configuration du serveur si présente.",
 		"customFormulaInvalid": "Formule invalide : {error}",
 		"export": "Exporter",
 		"exportTooltip": "Télécharger en JSON",
@@ -250,9 +250,6 @@
 		"invalidSnippetHelper": "Snippet « {name} » invalide : {value}",
 		"noAttributes": "Aucun attribut défini.",
 		"noSnippets": "Aucun raccourci défini.",
-		"replaceUnknown": {
-			"description": "Permet de remplacer tous les attributs inconnus par une valeur. Laissez vide pour désactiver."
-		},
 		"resetTemplate": "Réinitialiser",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveNoValidSnippets": "Aucun snippet valide à sauvegarder.",

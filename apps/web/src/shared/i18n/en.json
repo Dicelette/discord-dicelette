@@ -40,7 +40,7 @@
 			"channelId": "Reception channel",
 			"context": "Add context link in logs",
 			"customFormula": "Custom formula",
-			"customFormulaHelper": "A mathjs formula applied server-wide to [expr] in dice rolls. $ is replaced by the bracketed expression. Leave empty to disable.",
+			"customFormulaHelper": "Applies a server-wide formula {link} to all dice where [expr] replaces $",
 			"customFormulaInvalid": "Invalid formula: {error}",
 			"dashboardAccess": "Authorized roles",
 			"dashboardAccessAdminOnly": "Only server Administrators can modify this setting.",
@@ -237,7 +237,7 @@
 		"alreadyExists": "Name \"{name}\" already exists.",
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
 		"attrValue": "Value",
-		"customFormulaHelper": "A personal mathjs formula applied to [expr] in dice rolls. $ is replaced by the bracketed expression. Overridden by server formula if set. Leave empty to disable.",
+		"customFormulaHelper": "Applies a personal {link} formula to the rolls where [expr] replaces $. Overridden by the server configuration if any.",
 		"customFormulaInvalid": "Invalid formula: {error}",
 		"export": "Export",
 		"exportTooltip": "Download as JSON",
@@ -250,9 +250,6 @@
 		"invalidSnippetHelper": "Invalid snippet \"{name}\": {value}",
 		"noAttributes": "No attributes defined yet.",
 		"noSnippets": "No snippets defined yet.",
-		"replaceUnknown": {
-			"description": "Allow to replace all unknown attributes by a value. Let empty to disable."
-		},
 		"resetTemplate": "Reset to defaults",
 		"saveError": "Error while saving.",
 		"saveNoValidSnippets": "No valid snippet to save.",
