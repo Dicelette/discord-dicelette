@@ -1254,7 +1254,7 @@
 				"description": "Afficher la formule configurée.",
 				"reply": "La formule configurée est : `{{- formula}}`."
 			},
-			"invalid": "La formule personnalisée `{{- formula}}` est invalide.\n__Cause__: {{- error}}.",
+			"invalid": "La formule personnalisée `{{- formula}}` est invalide.\n__Erreur__: {{- error}}.",
 			"noDisplay": "Il n'y a aucune formule configurée pour ce serveur.",
 			"notFound": "Il n'y a aucune formule à supprimer.",
 			"reset": "La formule personnalisée a bien été supprimée.",

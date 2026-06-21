@@ -238,7 +238,6 @@
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
 		"attrValue": "Value",
 		"customFormulaHelper": "Applies a personal {link} formula to the rolls where [expr] replaces $. Overridden by the server configuration if any.",
-		"customFormulaInvalid": "Invalid formula: {error}",
 		"export": "Export",
 		"exportTooltip": "Download as JSON",
 		"formulaError": "Cannot resolve formula (unknown attributes or invalid expression).",

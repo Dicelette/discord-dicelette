@@ -31,7 +31,7 @@ function General({ guildId, initialFormula }: Props) {
 		}
 		const result = validateCustomFormula(value);
 		setFormulaError(
-			result.ok ? null : t("userConfig.customFormulaInvalid", { error: result.error })
+			result.ok ? null : t("config.fields.customFormulaInvalid", { error: result.error })
 		);
 	};
 
@@ -40,7 +40,7 @@ function General({ guildId, initialFormula }: Props) {
 		if (trimmed) {
 			const result = validateCustomFormula(trimmed);
 			if (!result.ok) {
-				setFormulaError(t("userConfig.customFormulaInvalid", { error: result.error }));
+				setFormulaError(t("config.fields.customFormulaInvalid", { error: result.error }));
 				return;
 			}
 		}
@@ -66,7 +66,7 @@ function General({ guildId, initialFormula }: Props) {
 				<TextField
 					fullWidth
 					size="small"
-					label={t("userConfig.customFormula")}
+					label={t("config.fields.customFormula")}
 					value={formula}
 					onChange={(e) => handleChange(e.target.value)}
 					error={!!formulaError}
