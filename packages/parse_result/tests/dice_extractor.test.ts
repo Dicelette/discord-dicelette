@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import type { DiceData } from "../../types";
 import {
 	applyCommentsToResult,
+	applyCustomFormula,
 	extractDiceData,
+	getRoll,
 	hasValidDice,
 	isRolling,
 	performDiceRoll,
@@ -368,6 +370,17 @@ describe("dice_extractor", () => {
 			expect(result.statsPerSegment![2]).toBe("Con");
 		});
 
+		it("should join multiple stats in the same segment with ×", () => {
+			const content = "1d100<=$dext+$prec;&+[$dext+$prec]";
+			const stats = { dext: 20, prec: 40 };
+
+			const result = replaceStatsInDiceFormula(content, stats);
+
+			expect(result.statsPerSegment).toHaveLength(2);
+			expect(result.statsPerSegment![0]).toBe("Dext × Prec");
+			expect(result.statsPerSegment![1]).toBe("Dext × Prec");
+		});
+
 		it("should preserve parentheses when replacing stats inside them", () => {
 			const content = "1d($s1+$s2)";
 			const stats = { s1: 5, s2: 10 };
@@ -387,6 +400,171 @@ describe("dice_extractor", () => {
 			expect(result.formula).toContain("S1");
 			expect(result.formula).toContain("S2");
 			expect(result.formula).toContain("S3");
+		});
+	});
+
+	describe("applyCustomFormula", () => {
+		const formula = "$>=85?85+floor(($-85)/5):$";
+
+		it("should replace [numeric value] with the formula applied to that value", () => {
+			const result = applyCustomFormula("1d100<=[90]", formula);
+			expect(result).toBe("1d100<={{(90)>=85?85+floor(((90)-85)/5):(90)}}");
+		});
+
+		it("should leave plain text comments like [attack roll] untouched", () => {
+			const result = applyCustomFormula("1d20 [attack roll]", formula);
+			expect(result).toBe("1d20 [attack roll]");
+		});
+
+		it("should replace [$ stat reference] with the formula applied to that expression", () => {
+			const result = applyCustomFormula("1d100<=[$dex]", formula);
+			expect(result).toBe("1d100<={{($dex)>=85?85+floor((($dex)-85)/5):($dex)}}");
+		});
+
+		it("should replace multiple [expr] in the same dice string", () => {
+			const simpleFormula = "$*2";
+			const result = applyCustomFormula("1d100<=[40];&+[10]", simpleFormula);
+			expect(result).toBe("1d100<={{(40)*2}};&+{{(10)*2}}");
+		});
+
+		it("should replace [math expression] like [40+5] with the formula applied", () => {
+			const simpleFormula = "$+1";
+			const result = applyCustomFormula("1d100<=[40+5]", simpleFormula);
+			expect(result).toBe("1d100<={{(40+5)+1}}");
+		});
+
+		it("should produce a rollable dice after formula application with a numeric value", () => {
+			const simpleFormula = "$";
+			const dice = applyCustomFormula("1d100<=[60]", simpleFormula);
+			// {{(60)}} evaluates to 60, so the roll is 1d100<=60
+			const result = getRoll(dice);
+			expect(result).toBeDefined();
+			expect(result!.total).toBeGreaterThanOrEqual(1);
+			expect(result!.total).toBeLessThanOrEqual(100);
+			expect(result!.compare).toBeDefined();
+			expect(result!.compare!.sign).toBe("<=");
+			expect(result!.compare!.value).toBe(60);
+		});
+
+		it("should produce a rollable dice after formula application with a math expression", () => {
+			const simpleFormula = "floor($)";
+			const dice = applyCustomFormula("1d20+[5+3]", simpleFormula);
+			// {{floor((5+3))}} evaluates to 8, so the roll is 1d20+8
+			const result = getRoll(dice);
+			expect(result).toBeDefined();
+			expect(result!.total).toBeGreaterThanOrEqual(9);
+			expect(result!.total).toBeLessThanOrEqual(28);
+		});
+
+		it("should not replace [expr] that is a plain word (no $ or math only)", () => {
+			const result = applyCustomFormula("1d6 [fire damage]", formula);
+			expect(result).toBe("1d6 [fire damage]");
+		});
+
+		it("getRoll: formula with {cs} in true branch rolls when stat >= threshold", () => {
+			// formula: $>=85?69{cs:<=5+($-85)}:$  — stat=90, condition true
+			const dice = applyCustomFormula("1d100<=[90]", "$>=85?69{cs:<=5+($-85)}:$");
+			// {{(90)>=85?69{cs:<=5+((90)-85)}:(90)}} → 69{cs:<=10} → 1d100<=69{cs:<=10}
+			const result = getRoll(dice);
+			expect(result).toBeDefined();
+			expect(result!.compare).toBeDefined();
+			expect(result!.compare!.sign).toBe("<=");
+			expect(result!.compare!.value).toBe(69);
+		});
+
+		it("getRoll: formula with {cs} in false branch keeps plain threshold", () => {
+			// formula: $>=85?69{cs:<=5+($-85)}:$  — stat=50, condition false
+			const dice = applyCustomFormula("1d100<=[50]", "$>=85?69{cs:<=5+($-85)}:$");
+			// {{(50)>=85?69{cs:<=5+((50)-85)}:(50)}} → 50{cs:<=-30} → 1d100<=50
+			const result = getRoll(dice);
+			expect(result).toBeDefined();
+			expect(result!.compare).toBeDefined();
+			expect(result!.compare!.sign).toBe("<=");
+			expect(result!.compare!.value).toBe(50);
+		});
+	});
+});
+
+describe("applyCustomFormula", () => {
+	describe("bracket expressions with $ or math — existing behaviour", () => {
+		it("wraps a dollar stat reference in the formula", () => {
+			const result = applyCustomFormula("1d100<=[$dex]", "$");
+			expect(result).toBe("1d100<={{($dex)}}");
+		});
+
+		it("wraps a pure-math bracket expression in the formula", () => {
+			const result = applyCustomFormula("1d100<=[50+10]", "$>=85?85:$");
+			expect(result).toBe("1d100<={{(50+10)>=85?85:(50+10)}}");
+		});
+
+		it("leaves a plain-text comment bracket untouched", () => {
+			const result = applyCustomFormula("1d20 [attack roll]", "$*2");
+			expect(result).toBe("1d20 [attack roll]");
+		});
+
+		it("leaves a bracket with unrecognised content untouched", () => {
+			const result = applyCustomFormula("1d20 [some label here]", "$*2");
+			expect(result).toBe("1d20 [some label here]");
+		});
+	});
+
+	describe("bracket expressions with dice notation — new behaviour", () => {
+		it("wraps a simple dice expression [1d6] in the formula", () => {
+			const result = applyCustomFormula("1d100<=[1d6]", "$");
+			expect(result).toBe("1d100<={{(1d6)}}");
+		});
+
+		it("wraps a complex dice expression [2d10+3] in the formula", () => {
+			const result = applyCustomFormula("1d100<=[2d10+3]", "$*2");
+			expect(result).toBe("1d100<={{(2d10+3)*2}}");
+		});
+
+		it("wraps a bare die [d20] in the formula", () => {
+			const result = applyCustomFormula("1d100<=[d20]", "$");
+			expect(result).toBe("1d100<={{(d20)}}");
+		});
+
+		it("wraps dice bracket inside a conditional formula", () => {
+			const result = applyCustomFormula("1d100<=[1d6]", "$>3?$*2:$");
+			expect(result).toBe("1d100<={{(1d6)>3?(1d6)*2:(1d6)}}");
+		});
+	});
+
+	describe("integration: isRolling after applyCustomFormula with dice in bracket", () => {
+		it("evaluates [1d6] bracket and produces a comparison in range [1,6]", () => {
+			// formula "$" simply evaluates the bracket expression as-is
+			const prepared = applyCustomFormula("1d100<=[1d6]", "$");
+			// prepared = "1d100<={{(1d6)}}"
+			const result = isRolling(prepared);
+			expect(result).toBeDefined();
+			expect(result!.result.compare).toBeDefined();
+			expect(result!.result.compare!.sign).toBe("<=");
+			const cmp = result!.result.compare!.value;
+			expect(cmp).toBeGreaterThanOrEqual(1);
+			expect(cmp).toBeLessThanOrEqual(6);
+		});
+
+		it("evaluates custom formula with dice in true branch when stat > threshold", () => {
+			// formula "$>85?1d10+$:$", bracket [90] → true branch: 1d10+90 ∈ [91,100]
+			const prepared = applyCustomFormula("1d100<=[90]", "$>85?1d10+$:$");
+			// prepared = "1d100<={{(90)>85?1d10+(90):(90)}}"
+			const result = isRolling(prepared);
+			expect(result).toBeDefined();
+			expect(result!.result.compare).toBeDefined();
+			expect(result!.result.compare!.sign).toBe("<=");
+			const cmp = result!.result.compare!.value;
+			expect(cmp).toBeGreaterThanOrEqual(91);
+			expect(cmp).toBeLessThanOrEqual(100);
+		});
+
+		it("evaluates custom formula with dice — false branch when stat <= threshold", () => {
+			// formula "$>85?1d10+$:$", bracket [70] → false branch: 70
+			const prepared = applyCustomFormula("1d100<=[70]", "$>85?1d10+$:$");
+			// prepared = "1d100<={{(70)>85?1d10+(70):(70)}}"
+			const result = isRolling(prepared);
+			expect(result).toBeDefined();
+			expect(result!.result.compare).toBeDefined();
+			expect(result!.result.compare!.value).toBe(70);
 		});
 	});
 });

@@ -25,6 +25,8 @@ export const DICE_COMPILED_PATTERNS = {
 	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,
 	COMPARATOR_SIMPLE: /(([><=]|!=)+)(.+)/,
 	DICE_EXPRESSION: /\{exp( ?\|\| ?(?<default>\d+))?\}/gi,
+	/** Matches dice notation (e.g. `1d6`, `d20`, `2d10`) within a larger expression. Used for search-and-replace inside `{{...}}` formula blocks. */
+	DICE_IN_FORMULA: /\b\d*d\d+\b/gi,
 	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
 	OPPOSITION: /(?<first>(([><=]|!=)+)([^<>=!]+))(?<second>(([><=]|!=)+)([^<>=!]+))/,
 	/** `(stat1|stat2|…)` compiled once per alphabet. Used by `filterStatsInDamage`. */

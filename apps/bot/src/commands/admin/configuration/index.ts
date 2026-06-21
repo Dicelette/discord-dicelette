@@ -6,15 +6,18 @@ import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import { cmdLn, t } from "@dicelette/localization";
 
 import * as Djs from "discord.js";
+
 import { localeList } from "locales";
 import "@dicelette/discord_ext";
 
 import {
 	createLinksCmdOptions,
+	formulaDisplay,
+	formulaSet,
 	getTemplateValues,
+	resetTemplate,
 	setTemplate,
 } from "../../userSettings";
-import { resetTemplate } from "../../userSettings/setTemplate";
 import { dice, stats } from "./auto_role";
 import { changeLanguage } from "./change_language";
 import { disableCompare } from "./disableCompare";
@@ -387,6 +390,27 @@ export const configuration = {
 							}
 						)
 				)
+		)
+		.addSubcommandGroup((group) =>
+			group
+				.setNames("userSettings.formula.title")
+				.setDescriptions("userSettings.formula.description")
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("userSettings.formula.set.title")
+						.setDescriptions("userSettings.formula.set.description")
+						.addStringOption((option) =>
+							option
+								.setNames("common.formula")
+								.setDescriptions("userSettings.formula.set.formula")
+								.setRequired(false)
+						)
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("display.title")
+						.setDescriptions("userSettings.formula.display.description")
+				)
 		),
 
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
@@ -421,6 +445,11 @@ export const configuration = {
 					if (subcommand === t("userSettings.createLink.reset.name"))
 						return resetTemplate(client, interaction, true);
 					break;
+				case t("userSettings.formula.title"):
+					if (subcommand === t("userSettings.formula.set.title"))
+						return formulaSet(client, interaction, true);
+					if (subcommand === t("display.title"))
+						return formulaDisplay(client, interaction, true);
 			}
 		switch (subcommand) {
 			case t("logs.name"):

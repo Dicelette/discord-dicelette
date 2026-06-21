@@ -119,6 +119,7 @@ describe("COMPILED_PATTERNS", () => {
 
 	it("should have PUNCTUATION_ENCLOSED pattern that matches content between punctuation", () => {
 		const text = "(hello) [world] {test}";
+		// @ts-expect-error For test is fine to ignore the global flag issue
 		const matches = [...text.matchAll(QUERY_URL_PATTERNS.PUNCTUATION_ENCLOSED)];
 
 		expect(matches.length).toBeGreaterThan(0);

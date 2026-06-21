@@ -39,6 +39,9 @@
 			"autoRoleStats": "Rôle auto (statistiques)",
 			"channelId": "Channel de réception",
 			"context": "Ajouter un lien de contexte dans les logs",
+			"customFormula": "Formule personnalisée",
+			"customFormulaHelper": "Une formule mathjs appliquée à tous les jets contenant [expr]. $ est remplacé par l'expression entre crochets. Laisser vide pour désactiver.",
+			"customFormulaInvalid": "Formule invalide : {error}",
 			"dashboardAccess": "Rôles autorisés",
 			"dashboardAccessAdminOnly": "Seuls les administrateurs du serveur peuvent modifier ce paramètre.",
 			"dashboardAccessHelper": "Seuls les utilisateurs possédant l'un de ces rôles pourront accéder au panneau d'administration du dashboard. Les administrateurs ont toujours accès.",
@@ -234,6 +237,8 @@
 		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
 		"attrValue": "Valeur",
+		"customFormulaHelper": "Une formule mathjs personnelle appliquée aux jets contenant [expr]. $ est remplacé par l'expression entre crochets. Priorité au paramètre serveur si défini. Laisser vide pour désactiver.",
+		"customFormulaInvalid": "Formule invalide : {error}",
 		"export": "Exporter",
 		"exportTooltip": "Télécharger en JSON",
 		"formulaError": "Impossible de résoudre la formule (attributs inconnus ou expression invalide).",
@@ -255,6 +260,7 @@
 		"saveSuccess": "Sauvegardé !",
 		"sections": {
 			"attributes": "Attributs personnels",
+			"general": "Général",
 			"template": "Modèle du lien vers les résultats"
 		},
 		"snippetDice": "Expression de dés",

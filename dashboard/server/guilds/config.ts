@@ -53,6 +53,7 @@ export function createConfigRouter(deps: DashboardDeps) {
 			"stripOOC",
 			"createLinkTemplate",
 			"dashboardAccess",
+			"customFormula",
 		];
 
 		const updates = req.body as Record<string, unknown>;
@@ -92,7 +93,8 @@ export function createConfigRouter(deps: DashboardDeps) {
 			if (
 				value === undefined ||
 				value === null ||
-				(Array.isArray(value) && value.length === 0)
+				(Array.isArray(value) && value.length === 0) ||
+				value === ""
 			) {
 				delete merged[key];
 			} else {

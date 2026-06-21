@@ -1,7 +1,7 @@
 import "uniformize";
 import type { EClient } from "@dicelette/client";
 import type { SortOrder } from "@dicelette/core";
-import type { GuildData } from "@dicelette/types";
+import type { GuildData, UserSettingsData } from "@dicelette/types";
 
 /**
  * Cached guild context to avoid repeated settings lookups.
@@ -80,4 +80,19 @@ export function getUserSnippets(
  */
 export function standardizeEquals(a: string, b: string): boolean {
 	return a.standardize() === b.standardize();
+}
+
+/**
+ * Resolves the active custom formula for a roll.
+ * Guild-level formula takes priority over the user-level formula.
+ *
+ * @param guildData - Guild settings (may be undefined/null)
+ * @param userSettings - Per-user settings (may be undefined/null)
+ * @returns The formula string to apply, or undefined if neither is set
+ */
+export function resolveCustomFormula(
+	guildData?: GuildData | null,
+	userSettings?: UserSettingsData | null
+): string | undefined {
+	return guildData?.customFormula ?? userSettings?.customFormula;
 }

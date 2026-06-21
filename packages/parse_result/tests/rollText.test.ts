@@ -155,6 +155,77 @@ describe("shared roll with statsPerSegment", () => {
 		expect(dynamicDiceCount).toBe(1); // Should appear only once
 	});
 
+	it("should display success on ※ line and no success on ◈ formula line for shared rolls with comparison", () => {
+		// 1d100<=60;&+5[coucou] — comparison on first segment only
+		// Result from core: "※ 1d100: [5] = 5;◈ __coucou__ — [1d100]+5: [5]+5 = 10"
+		const result: Resultat = {
+			dice: "1d100<=60",
+			result: "※ 1d100: [5] = 5;◈ __coucou__ — [1d100]+5: [5]+5 = 10",
+			compare: { sign: "<=", value: 60 },
+			total: 15,
+		};
+
+		const res = new ResultAsText(result, DATA);
+		const text = res.defaultMessage();
+
+		// No compare hint in header
+		expect(text).not.toMatch(/\(`[<>]=?\s*60`\)/);
+		// ※ line should include success/failure
+		expect(text).toMatch(/※.*\*\*(Success|Failure|Succès|Échec)\*\*/);
+		// ◈ formula line should NOT include success/failure
+		const lines = text.split("\n").filter((l) => l.trim().length > 0);
+		const formulaLine = lines.find((l) => l.includes("◈"));
+		expect(formulaLine).toBeDefined();
+		expect(formulaLine).not.toMatch(/\*\*(Success|Failure|Succès|Échec)\*\*/);
+		// ◈ line should show plain total, not a comparison
+		expect(formulaLine).not.toMatch(/[⩽⩾<>]=?\s*60/);
+	});
+
+	it("should not display compare hint in header for shared rolls with comparison (onMessageSend)", () => {
+		const result: Resultat = {
+			dice: "1d100<=60",
+			result: "※ 1d100: [5] = 5;◈ __coucou__ — [1d100]+5: [5]+5 = 10",
+			compare: { sign: "<=", value: 60 },
+			total: 15,
+		};
+
+		const res = new ResultAsText(result, DATA);
+		const text = res.onMessageSend(undefined, "189390243676422144");
+
+		expect(text).not.toMatch(/\(`[⩽⩾<=>\s]*60`\)/);
+		expect(text).toMatch(/※.*\*\*(Success|Failure|Succès|Échec)\*\*/);
+	});
+
+	it("should display stat name on ◈ formula line in compare path (no ⚐ marker)", () => {
+		// Reproduces: 1d100<=$dext+$prec;&+[$dext+$prec] where the ◈ segment has no comparison
+		// In the compare() path, ⚐ markers are never added, so hasSharedSymbol is true for ◈ lines.
+		// The stat name must still be injected.
+		const result: Resultat = {
+			dice: "1d100<=60;&+[60]",
+			result: "※ 1d100: [49] = 49;◈ [1d100]+60: [49]+60 = 109",
+			compare: { sign: "<=", value: 60 },
+			total: 109,
+		};
+
+		const statsPerSegment = ["Dext × Prec", "Dext × Prec"];
+		const res = new ResultAsText(
+			result,
+			DATA,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			statsPerSegment
+		);
+		const text = res.defaultMessage();
+
+		const lines = text.split("\n").filter((l) => l.trim().length > 0);
+		const formulaLine = lines.find((l) => l.includes("◈"));
+		expect(formulaLine).toBeDefined();
+		expect(formulaLine).toContain("__Dext × Prec__");
+	});
+
 	it("should not display stat names for non-shared rolls", () => {
 		const result: Resultat = {
 			dice: "1d100+40",

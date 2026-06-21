@@ -196,6 +196,7 @@
 		"expression": "expression",
 		"failure": "fail",
 		"false": "False",
+		"formula": "formula",
 		"hidden": "hidden",
 		"isPrivate": "Private character",
 		"macro": "macro",
@@ -1161,11 +1162,6 @@
 		"description": "Update the template without editing the others options",
 		"name": "update"
 	},
-	"userConfig": {
-		"replaceUnknown": {
-			"title": "Replace unknown value"
-		}
-	},
 	"userSettings": {
 		"attributes": {
 			"create": {
@@ -1252,7 +1248,28 @@
 			"title": "create_link"
 		},
 		"description": "Allows users to configure certain non-critical functions of the bot.",
+		"formula": {
+			"description": "Set a mathjs formula where $ is replaced by [expr] in dice rolls",
+			"display": {
+				"description": "Display the configured formula.",
+				"reply": "The formula set is: `{{- formula}}`."
+			},
+			"invalid": "The custom formula `{{- formula}}` is invalid.\\n__Errors__ : {{- error}} ",
+			"noDisplay": "There is no formula set for this server.",
+			"notFound": "There is no formula to delete.",
+			"reset": "The custom formula has been deleted.",
+			"saved": "The formula `{{- formula}}` has been saved.",
+			"set": {
+				"description": "Set up the formula. Run it without any options to reset.",
+				"formula": "Formula to use. Use $ to symbolise the value to replace.",
+				"title": "configure"
+			},
+			"title": "custom_formula"
+		},
 		"name": "user_config",
+		"replaceUnknown": {
+			"title": "Replace unknown value"
+		},
 		"snippets": {
 			"create": {
 				"content": {

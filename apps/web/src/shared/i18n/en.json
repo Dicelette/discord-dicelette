@@ -39,6 +39,9 @@
 			"autoRoleStats": "Auto role (stats)",
 			"channelId": "Reception channel",
 			"context": "Add context link in logs",
+			"customFormula": "Custom formula",
+			"customFormulaHelper": "A mathjs formula applied server-wide to [expr] in dice rolls. $ is replaced by the bracketed expression. Leave empty to disable.",
+			"customFormulaInvalid": "Invalid formula: {error}",
 			"dashboardAccess": "Authorized roles",
 			"dashboardAccessAdminOnly": "Only server Administrators can modify this setting.",
 			"dashboardAccessHelper": "Only users with one of these roles will be able to access the dashboard admin panel. Administrators always have access.",
@@ -234,6 +237,8 @@
 		"alreadyExists": "Name \"{name}\" already exists.",
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
 		"attrValue": "Value",
+		"customFormulaHelper": "A personal mathjs formula applied to [expr] in dice rolls. $ is replaced by the bracketed expression. Overridden by server formula if set. Leave empty to disable.",
+		"customFormulaInvalid": "Invalid formula: {error}",
 		"export": "Export",
 		"exportTooltip": "Download as JSON",
 		"formulaError": "Cannot resolve formula (unknown attributes or invalid expression).",
@@ -255,6 +260,7 @@
 		"saveSuccess": "Saved!",
 		"sections": {
 			"attributes": "Attributes",
+			"general": "General",
 			"template": "Result link's template"
 		},
 		"snippetDice": "Dice expression",

@@ -85,12 +85,14 @@ export function createUserRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.auth!.userId;
 
-		const { snippets, attributes, createLinkTemplate, ignoreNotfound } = req.body as {
-			snippets?: Record<string, unknown>;
-			attributes?: Record<string, unknown>;
-			createLinkTemplate?: unknown;
-			ignoreNotfound?: unknown;
-		};
+		const { snippets, attributes, createLinkTemplate, ignoreNotfound, customFormula } =
+			req.body as {
+				snippets?: Record<string, unknown>;
+				attributes?: Record<string, unknown>;
+				createLinkTemplate?: unknown;
+				ignoreNotfound?: unknown;
+				customFormula?: unknown;
+			};
 
 		if (ignoreNotfound !== undefined && typeof ignoreNotfound !== "string") {
 			res.status(400).json({ error: "Invalid ignoreNotfound format" });
@@ -150,6 +152,16 @@ export function createUserRouter(deps: DashboardDeps) {
 
 		if (createLinkTemplate !== undefined)
 			userSettings.set(guildId, createLinkTemplate, `${userId}.createLinkTemplate`);
+
+		if (customFormula !== undefined) {
+			if (typeof customFormula !== "string") {
+				res.status(400).json({ error: "customFormula must be a string" });
+				return;
+			}
+			const trimmed = customFormula.trim();
+			if (trimmed) userSettings.set(guildId, trimmed, `${userId}.customFormula`);
+			else userSettings.delete(guildId, `${userId}.customFormula`);
+		}
 
 		res.json({ ok: true });
 	});

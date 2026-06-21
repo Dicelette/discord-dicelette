@@ -1,4 +1,4 @@
-import { SortOrder } from "@dicelette/core";
+import { SortOrder, validateCustomFormula } from "@dicelette/core";
 import type { ApiGuildData } from "@dicelette/types";
 import { Autocomplete, TextField } from "@mui/material";
 import { SectionTitle, useI18n } from "@shared";
@@ -92,6 +92,40 @@ function General({ control }: Props) {
 							/>
 						);
 					}}
+				/>
+			</div>
+			<div className="mt-4">
+				<Controller
+					name="customFormula"
+					control={control}
+					rules={{
+						validate: (value) => {
+							if (!value?.trim()) return true;
+							const result = validateCustomFormula(value);
+							return (
+								result.ok ||
+								t("config.fields.customFormulaInvalid", { error: result.error })
+							);
+						},
+					}}
+					render={({ field, fieldState }) => (
+						<TextField
+							fullWidth
+							size="small"
+							label={t("config.fields.customFormula")}
+							value={field.value ?? ""}
+							onChange={(e) => field.onChange(e.target.value)}
+							error={!!fieldState.error}
+							helperText={
+								fieldState.error
+									? fieldState.error.message
+									: t("config.fields.customFormulaHelper")
+							}
+							slotProps={{
+								input: { sx: { fontFamily: "var(--code-font-family)" } },
+							}}
+						/>
+					)}
 				/>
 			</div>
 		</>

@@ -11,9 +11,11 @@ import {
 	getGuildContext,
 	getInteractionContext as getLangAndConfig,
 	getStatisticOption,
+	resolveCustomFormula,
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
+	applyCustomFormula,
 	buildInfoRollFromStats,
 	composeRollBase,
 	convertNameToValue,
@@ -61,12 +63,13 @@ export async function rollWithInteraction(
 		charName,
 		infoRoll,
 		hideResult,
-		customCritical,
+		customCritical: customCriticalFromOpts,
 		opposition,
 		silent,
 		statsPerSegment,
 		comment,
 	} = opts;
+	let customCritical = customCriticalFromOpts;
 	const { langToUse, ul, config } = getLangAndConfig(client, interaction);
 	const data: Server = {
 		config,
@@ -84,6 +87,25 @@ export async function rollWithInteraction(
 		pity = triggerPity(pityThreshold, pityNb);
 		sort = client.settings.get(interaction.guild.id, "sortOrder");
 		userSettings = client.userSettings.get(interaction.guild.id, data.userId!);
+
+		const guildData = client.settings.get(interaction.guild.id);
+		const customFormula = resolveCustomFormula(guildData, userSettings);
+		if (customFormula) {
+			dice = applyCustomFormula(dice, customFormula);
+			// {cs:...}/{cf:...} blocks are only visible after formula expansion,
+			// so baseRoll could not extract them from the unexpanded dice.
+			const expandedCriticals = rollCustomCriticalsFromDice(
+				dice,
+				ul,
+				undefined,
+				undefined,
+				sort
+			);
+			if (expandedCriticals)
+				customCritical = customCritical
+					? Object.assign({}, customCritical, expandedCriticals)
+					: expandedCriticals;
+		}
 	}
 	dice = verifyStatMatcherPattern(dice, userSettings?.ignoreNotfound);
 	const result = getRoll(dice, pity, sort);
@@ -105,7 +127,7 @@ export async function rollWithInteraction(
 			infoRoll,
 			lang: data.lang,
 			opposition,
-			result: result,
+			result,
 			serverCritical: critical,
 			source: interaction,
 			statsPerSegment,

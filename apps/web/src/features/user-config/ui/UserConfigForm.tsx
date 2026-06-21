@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import { useCallback } from "react";
 import "uniformize";
 import { useAttributesState, useSnippetsState, useTemplateState } from "../hooks";
-import { Attributes, Links, Snippets } from "./sections";
+import { Attributes, General, Links, Snippets } from "./sections";
 
 interface Props {
 	guildId: string;
@@ -36,6 +36,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 
 	return (
 		<Stack spacing={2}>
+			<General guildId={guildId} initialFormula={initialConfig?.customFormula} />
 			<Snippets state={snippets} />
 			<Attributes state={attrs} />
 			<Links state={templateState} />

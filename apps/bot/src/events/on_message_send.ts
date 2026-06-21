@@ -1,8 +1,9 @@
 import type { EClient } from "@dicelette/client";
 import { DiceTypeError, REMOVER_PATTERN } from "@dicelette/core";
-import { fetchChannel, getGuildContext } from "@dicelette/helpers";
+import { fetchChannel, getGuildContext, resolveCustomFormula } from "@dicelette/helpers";
 import { lError, ln } from "@dicelette/localization";
 import {
+	applyCustomFormula,
 	isRolling,
 	parseComparator,
 	rollCustomCriticalsFromDice,
@@ -11,7 +12,6 @@ import {
 	allValuesUndefined,
 	CHARACTER_DETECTION,
 	logger,
-	profiler,
 	sentry,
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage, resolveStatsNames } from "database";
@@ -24,7 +24,6 @@ import { isApiError } from "./on_error";
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
 		try {
-			profiler.startProfiler();
 			if (message.channel.type === Djs.ChannelType.DM) return;
 			if (!message.guild) return;
 			// Single Enmap read instead of 4 path-based reads: each .get(id, path) runs
@@ -73,6 +72,9 @@ export default (client: EClient): void => {
 			const pity = triggerPity(pityThreshold, pityNb);
 			const disableCompare = guildSettings?.disableCompare || undefined;
 			const sortOrder = guildSettings?.sortOrder || undefined;
+			const userSettingsData = client.userSettings.get(message.guild.id, author.id);
+			const customFormula = resolveCustomFormula(guildSettings, userSettingsData);
+			if (customFormula) content = applyCustomFormula(content, customFormula);
 			const isRoll = isRolling(
 				content,
 				userData,
@@ -81,7 +83,7 @@ export default (client: EClient): void => {
 				disableCompare,
 				sortOrder,
 				ul,
-				client.userSettings.get(message.guild.id, message.author.id)?.ignoreNotfound
+				userSettingsData?.ignoreNotfound
 			);
 
 			if (!isRoll || allValuesUndefined(isRoll))
@@ -143,8 +145,6 @@ export default (client: EClient): void => {
 					await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
 				}
 			}
-		} finally {
-			profiler.stopProfiler();
 		}
 	});
 };

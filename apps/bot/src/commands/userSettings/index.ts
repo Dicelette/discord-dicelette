@@ -7,6 +7,7 @@ import {
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import * as attributes from "./attributes";
+import { formulaDisplay, formulaSet } from "./formula";
 import {
 	createLinksCmdOptions,
 	getTemplateValues,
@@ -177,6 +178,27 @@ export const userSettings = {
 								.setDescriptions("userSettings.snippets.import.overwrite.description")
 						)
 				)
+		)
+		.addSubcommandGroup((group) =>
+			group
+				.setNames("userSettings.formula.title")
+				.setDescriptions("userSettings.formula.description")
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("userSettings.formula.set.title")
+						.setDescriptions("userSettings.formula.set.description")
+						.addStringOption((option) =>
+							option
+								.setNames("common.formula")
+								.setDescriptions("userSettings.formula.set.formula")
+								.setRequired(false)
+						)
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setNames("display.title")
+						.setDescriptions("userSettings.formula.display.description")
+				)
 		),
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		const group = interaction.options.getSubcommandGroup(true);
@@ -215,8 +237,22 @@ export const userSettings = {
 				case t("userSettings.attributes.replaceUnknown.title"):
 					return await attributes.setUnknowReplace(client, interaction);
 			}
+		} else if (group === t("userSettings.formula.title")) {
+			switch (subcommand) {
+				case t("userSettings.formula.set.title"):
+					return await formulaSet(client, interaction);
+				case t("display.title"):
+					return await formulaDisplay(client, interaction);
+			}
 		}
 	},
 };
 
-export { createLinksCmdOptions, getTemplateValues, setTemplate };
+export {
+	createLinksCmdOptions,
+	formulaDisplay,
+	formulaSet,
+	getTemplateValues,
+	resetTemplate,
+	setTemplate,
+};

@@ -104,6 +104,13 @@ export interface GuildData {
 	 * Dashboard-only setting — has no effect on the Discord bot itself.
 	 */
 	dashboardAccess?: string[];
+	/**
+	 * A mathjs formula applied server-wide when users use the [expr] syntax in dice rolls.
+	 * `$` in the formula is replaced by the expression inside the brackets.
+	 * Takes priority over the per-user customFormula.
+	 * @example "$>=85?85{cs:>=5+($-85)}:$"
+	 */
+	customFormula?: string;
 }
 
 export interface TemplateResult {
@@ -268,6 +275,13 @@ export type UserSettingsData = {
 	snippets?: Snippets;
 	attributes?: Record<string, number | string>;
 	ignoreNotfound?: string;
+	/**
+	 * A personal mathjs formula applied when using the [expr] syntax in dice rolls.
+	 * `$` in the formula is replaced by the expression inside the brackets.
+	 * Overridden by the guild-level customFormula if set.
+	 * @example "$>=85?85{cs:>=5+($-85)}:$"
+	 */
+	customFormula?: string;
 };
 
 export type UserPreferences = {

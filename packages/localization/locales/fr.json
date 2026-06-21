@@ -196,6 +196,7 @@
 		"expression": "expression",
 		"failure": "échec",
 		"false": "Faux",
+		"formula": "formule",
 		"hidden": "caché",
 		"isPrivate": "Personnage privé",
 		"macro": "macro",
@@ -1161,11 +1162,6 @@
 		"description": "Mettre à jour le modèle avec un nouveau fichier sans modifier les autres options",
 		"name": "modifier"
 	},
-	"userConfig": {
-		"replaceUnknown": {
-			"title": "Remplacer les valeurs inconnues"
-		}
-	},
 	"userSettings": {
 		"attributes": {
 			"create": {
@@ -1252,7 +1248,28 @@
 			"title": "créer_lien"
 		},
 		"description": "Permets de configurer certaines fonctions non-critique du bot par les utilisateurs.",
+		"formula": {
+			"description": " Définit une formule mathjs où $ est remplacé par [expr] dans vos jets",
+			"display": {
+				"description": "Afficher la formule configurée.",
+				"reply": "La formule configurée est : `{{- formula}}`."
+			},
+			"invalid": "La formule personnalisée `{{- formula}}` est invalide.\n__Cause__: {{- error}}.",
+			"noDisplay": "Il n'y a aucune formule configurée pour ce serveur.",
+			"notFound": "Il n'y a aucune formule à supprimer.",
+			"reset": "La formule personnalisée a bien été supprimée.",
+			"saved": "La formule `{{- formula}}` a été enregistrée.",
+			"set": {
+				"description": "Configurer la formule. Lancer sans options pour supprimer.",
+				"formula": "Formule à utiliser. Utiliser $ pour symboliser la valeur à remplacer.",
+				"title": "configurer"
+			},
+			"title": "formule_personnalisée"
+		},
 		"name": "user_config",
+		"replaceUnknown": {
+			"title": "Remplacer les valeurs inconnues"
+		},
 		"snippets": {
 			"create": {
 				"content": {

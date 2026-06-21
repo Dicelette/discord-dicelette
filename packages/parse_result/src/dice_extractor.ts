@@ -4,6 +4,7 @@ import {
 	MIN_THRESHOLD_MATCH,
 	REMOVER_PATTERN,
 	type Resultat,
+	replaceFormulaInDice,
 	roll,
 	type SortOrder,
 	splitDiceComment,
@@ -181,6 +182,12 @@ export function processChainedDiceRoll(
 		.replace(/%%.*%%/, "")
 		.trim();
 
+	// Evaluate {{...}} formula blocks before opposition detection so that comparison
+	// operators inside the formula (e.g. {{($>=0?$:0)}}) are not mistaken for a
+	// second opposition comparator.
+	finalContent = preRollDiceInBrackets(finalContent);
+	finalContent = replaceFormulaInDice(finalContent);
+
 	// Remove opposition before rolling (but keep original content for comments)
 	const contentForOpposition = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
 	const oppositionMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
@@ -213,6 +220,67 @@ export function processChainedDiceRoll(
 }
 
 /**
+ * Pre-rolls any dice notation found inside `{{...}}` formula blocks so that
+ * `replaceFormulaInDice` (which uses a pure math evaluator) can evaluate the
+ * remaining expression without stumbling on unknown dice symbols like `d6`.
+ *
+ * Also strips any `{cs:...}` / `{cf:...}` blocks from the inner formula before
+ * math evaluation (they are not valid mathjs syntax), evaluates the numeric
+ * expression inside each block, then reattaches the simplified blocks to the
+ * numeric result.
+ *
+ * For example `{{(90)>=85?69{cs:<=5+((90)-85)}:(90)}}` becomes `69{cs:<=10}`.
+ */
+function preRollDiceInBrackets(content: string): string {
+	if (!content.includes("{{")) return content;
+	return content.replace(/\{\{((?:[^}]|\}(?!\}))*)\}\}/g, (_match, inner: string) => {
+		// Roll any dice notation present in the inner content (including inside cs/cf blocks)
+		const rolledInner = inner.replace(
+			DICE_COMPILED_PATTERNS.DICE_IN_FORMULA,
+			(diceExpr) => {
+				try {
+					const res = roll(diceExpr);
+					if (res?.total !== undefined) return String(res.total);
+				} catch {}
+				return diceExpr;
+			}
+		);
+		// Strip {cs/cf:...} blocks so the math evaluator can handle the remaining
+		// expression; evaluate their numeric sub-expressions and save them for later.
+		const criticalBlocks: string[] = [];
+		const cleanedInner = rolledInner.replace(
+			/\{\*?c[fs]:(?:[<>=]|!=)+.+?\}/gim,
+			(block) => {
+				const parsed = /(\{\*?c[fs]:)((?:[<>=]|!=)+)(.+?)\}$/i.exec(block);
+				if (parsed) {
+					const [, prefix, operator, expr] = parsed;
+					try {
+						const evaled = replaceFormulaInDice(`{{${expr}}}`);
+						criticalBlocks.push(`${prefix}${operator}${evaled}}`);
+						return "";
+					} catch {}
+				}
+				criticalBlocks.push(block);
+				return "";
+			}
+		);
+		if (criticalBlocks.length > 0) {
+			try {
+				const result = replaceFormulaInDice(`{{${cleanedInner}}}`);
+				return `${result}${criticalBlocks.join("")}`;
+			} catch {
+				// Formula evaluation failed; return with cs/cf stripped so
+				// replaceFormulaInDice can still try to evaluate the formula.
+				console.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
+				return `{{${cleanedInner}}}`;
+			}
+		}
+		logger.info(`Pre-rolled inner formula: ${cleanedInner} → ${rolledInner}`);
+		return `{{${rolledInner}}}`;
+	});
+}
+
+/**
  * Determine whether a message contains a dice roll and, if so, extract, process (including stat substitution and chained/shared syntax), and execute the roll.
  *
  * @param content - The raw message or formula to analyze for dice expressions
@@ -237,6 +305,17 @@ export function isRolling(
 ): DiceExtractionResult | undefined {
 	// Process stats replacement if userData is available
 	let processedContent: string;
+
+	// Evaluate {{...}} formula blocks before any opposition/comment detection so that
+	// comparison operators inside the formula (e.g. {{$>=85?85:$}}) are not mistaken
+	// for dice opposition syntax or comment markers.
+	// Pre-roll dice inside {{...}} so the math evaluator doesn't choke on dice notation.
+	content = preRollDiceInBrackets(content);
+	try {
+		content = replaceFormulaInDice(content);
+	} catch {
+		// If formula evaluation fails, proceed with the original content unchanged.
+	}
 
 	// Preserve original content before any modifications for processChainedDiceRoll
 	const originalContent = content;
@@ -413,6 +492,7 @@ export function getRoll(
 	pity?: boolean,
 	sort?: SortOrder
 ): Resultat | undefined {
+	dice = preRollDiceInBrackets(dice);
 	if (isSharedRoll(dice)) return getRollInShared(dice, pity, sort);
 	const { dice: cleanDice, comment } = splitDiceComment(dice);
 	return roll(cleanDice, undefined, pity, sort, comment);
@@ -505,8 +585,8 @@ export function replaceStatsInDiceFormula(
 				if (uniqueSegmentStats.length > 0) {
 					// If statsName is provided, try to restore original casing
 					statForSegment = statsName
-						? unNormalizeStatsName(uniqueSegmentStats, statsName)[0]
-						: uniqueSegmentStats[0].capitalize();
+						? unNormalizeStatsName(uniqueSegmentStats, statsName).join(" × ")
+						: uniqueSegmentStats.map((s) => s.capitalize()).join(" × ");
 				}
 				statsPerSegment.push(statForSegment.capitalize());
 			}
@@ -658,4 +738,43 @@ export function findStatInDiceFormula(
 	}
 	const unique = Array.from(new Set(foundStats));
 	return unique.length > 0 ? unique : undefined;
+}
+
+/**
+ * Returns true if the content of a [...] bracket should be treated as a custom formula
+ * invocation rather than an inline comment.
+ * Rule: contains a `$` stat reference, or is a pure math expression (digits + operators).
+ */
+function isFormulaExpression(expr: string): boolean {
+	const trimmed = expr.trim();
+	if (trimmed.includes("$")) return true;
+	if (/^[\d\s+\-*/%.()^]+$/.test(trimmed)) return true;
+	// Allow dice notation (e.g. "1d6", "2d10+3", "d20") mixed with standard math operators
+	return /^[\d\s+\-*/%.()^d]+$/i.test(trimmed) && /\b\d*d\d+\b/i.test(trimmed);
+}
+
+/**
+ * Replaces `[expr]` markers in a dice string with the custom formula, injecting `(expr)`
+ * in place of every `$` placeholder and wrapping the result in `{{...}}` for mathjs evaluation.
+ *
+ * `[expr]` is only treated as a formula invocation when the expression contains `$` or
+ * consists solely of math characters — leaving plain text comments untouched.
+ *
+ * @example
+ * // formula = "$>=85?85{cs:>=5+($-85)}:$"
+ * applyCustomFormula("1d100<=[90]", formula)
+ * // → "1d100<={{(90)>=85?85{cs:>=5+((90)-85)}:(90)}}"
+ *
+ * applyCustomFormula("1d100<=[$dex+$str]", formula)
+ * // → "1d100<={{($dex+$str)>=85?85{cs:>=5+(($dex+$str)-85)}:($dex+$str)}}"
+ *
+ * applyCustomFormula("1d20 [attack roll]", formula)
+ * // → "1d20 [attack roll]"  (comment left intact)
+ */
+export function applyCustomFormula(dice: string, formula: string): string {
+	return dice.replace(/\[([^\]]+)\]/g, (match, expr: string) => {
+		if (!isFormulaExpression(expr)) return match;
+		const injected = formula.replaceAll("$", `(${expr.trim()})`);
+		return `{{${injected}}}`;
+	});
 }
