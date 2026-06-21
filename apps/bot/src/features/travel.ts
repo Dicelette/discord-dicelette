@@ -5,7 +5,6 @@ import {
 	type BotErrorOptions,
 	getIdFromMention,
 	logger,
-	profiler,
 } from "@dicelette/utils";
 import { getUserByEmbed } from "database";
 import * as Djs from "discord.js";
@@ -76,7 +75,6 @@ export class TravelFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
 		if (!this.client) return;
-		profiler.startProfiler();
 		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 
@@ -168,6 +166,5 @@ export class TravelFeature extends BaseFeature {
 			content: this.ul("travel.success", { channel: `<#${targetChannel.id}>` }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		profiler.stopProfiler();
 	}
 }

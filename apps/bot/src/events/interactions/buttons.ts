@@ -2,7 +2,6 @@ import type { EClient } from "@dicelette/client";
 import type { StatisticalTemplate } from "@dicelette/core";
 import type { ButtonHandler } from "@dicelette/helpers";
 import type { Translation } from "@dicelette/types";
-import { profiler } from "@dicelette/utils";
 import { desktopLink, mobileLink, resetButton } from "commands";
 import * as Djs from "discord.js";
 import { MacroFeature, StatsFeature, UserFeature } from "features";
@@ -219,18 +218,13 @@ export async function handleButtonSubmit(
 	template: StatisticalTemplate,
 	client: EClient
 ) {
-	profiler.startProfiler();
-
 	for (const { prefix, handler } of BUTTON_PREFIX_HANDLERS) {
 		if (interaction.customId.startsWith(prefix)) {
 			await handler(interaction, ul, interactionUser, template, client);
-			profiler.stopProfiler();
 			return;
 		}
 	}
 
 	const handler = BUTTON_HANDLERS[interaction.customId];
 	if (handler) await handler(interaction, ul, interactionUser, template, client);
-
-	profiler.stopProfiler();
 }

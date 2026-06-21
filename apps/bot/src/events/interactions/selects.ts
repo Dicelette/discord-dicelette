@@ -1,6 +1,5 @@
 import type { SelectHandler } from "@dicelette/helpers";
 import type { Settings, Translation } from "@dicelette/types";
-import { profiler } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import {
 	AvatarFeature,
@@ -51,11 +50,9 @@ export async function handleSelectSubmit(
 	interactionUser: Djs.User,
 	db: Settings
 ) {
-	profiler.startProfiler();
 	if (interaction.customId === "edit_select") {
 		const value = interaction.values[0];
 		const handler = SELECT_VALUE_HANDLERS[value];
 		if (handler) await handler(interaction, ul, interactionUser, db);
 	}
-	profiler.stopProfiler();
 }

@@ -13,7 +13,7 @@ import {
 import { ln, t } from "@dicelette/localization";
 import { getRoll, timestamp } from "@dicelette/parse_result";
 import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
-import { capitalizeBetweenPunct, logger, profiler } from "@dicelette/utils";
+import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import { getRightValue, getStatistics } from "database";
 import * as Djs from "discord.js";
 import { evaluate } from "mathjs";
@@ -155,7 +155,6 @@ export async function calculate(
 	user: Djs.User = interaction.user,
 	isCalc = false
 ) {
-	profiler.startProfiler();
 	let formula = options
 		.getString(t("common.expression"), true)
 		.replace(/^([><]=?|==|!=|[+*/%^])/, "");
@@ -267,8 +266,6 @@ export async function calculate(
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
 		await interaction.reply({ embeds: [embed] });
 		logger.warn(error);
-	} finally {
-		profiler.stopProfiler();
 	}
 }
 

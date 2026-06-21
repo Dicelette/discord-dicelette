@@ -11,12 +11,7 @@ import {
 	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
-import {
-	CHARACTER_DETECTION,
-	DICE_COMPILED_PATTERNS,
-	logger,
-	profiler,
-} from "@dicelette/utils";
+import { CHARACTER_DETECTION, DICE_COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 import { getCritical, rollWithInteraction } from "utils";
@@ -112,7 +107,6 @@ export async function baseRoll(
 	customCriticalFromOptions?: Record<string, CustomCritical>,
 	ul?: Translation
 ): Promise<void> {
-	profiler.startProfiler();
 	if (!ul) ul = getLangAndConfig(client, interaction).ul;
 
 	let firstChara: string | undefined;
@@ -226,5 +220,4 @@ export async function baseRoll(
 	};
 	logger.trace(`Rolling dice for ${user.tag}: ${res.formula}`);
 	await rollWithInteraction(interaction, res.formula, client, opts);
-	profiler.stopProfiler();
 }

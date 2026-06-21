@@ -30,7 +30,6 @@ import {
 	getIdFromMention,
 	isArrayEqual,
 	logger,
-	profiler,
 	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
@@ -630,7 +629,6 @@ export class StatsFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
 
-		profiler.startProfiler();
 		const allowance = selfRegisterAllowance(
 			this.client.settings.get(interaction.guild!.id, "allowSelfRegister")
 		);
@@ -682,7 +680,6 @@ export class StatsFeature extends BaseFeature {
 			ul: this.ul,
 		});
 		await userFeature.sendValidationMessage(replyMessage.url);
-		profiler.stopProfiler();
 	}
 
 	async couldBeValidated() {

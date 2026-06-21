@@ -86,7 +86,6 @@ const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "producti
 
 if (hasSentry) {
 	important.info("Sentry is enabled for logging errors.");
-	const { nodeProfilingIntegration } = await import("@sentry/profiling-node");
 	Sentry.init({
 		beforeBreadcrumb(breadcrumb, _hint) {
 			//remove ansi
@@ -99,7 +98,6 @@ if (hasSentry) {
 		enableLogs: true,
 		environment: process.env.NODE_ENV ?? "production",
 		integrations: [
-			nodeProfilingIntegration(),
 			Sentry.consoleLoggingIntegration({
 				levels: ["debug", "info", "warn", "error", "log", "assert", "trace"],
 			}),
@@ -172,5 +170,3 @@ export const sentry = {
 		Sentry.captureException(e, { extra, level: "warning" });
 	},
 };
-
-export const profiler = Sentry.profiler;

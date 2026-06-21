@@ -33,11 +33,7 @@ import type {
 	UserData,
 	UserSettingsData,
 } from "@dicelette/types";
-import {
-	capitalizeBetweenPunct,
-	DICE_COMPILED_PATTERNS,
-	profiler,
-} from "@dicelette/utils";
+import { capitalizeBetweenPunct, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { getRightValue, getTemplate, resolveStatsNames } from "database";
 import * as Djs from "discord.js";
 import { embedError, handleRollResult, reply } from "messages";
@@ -59,7 +55,6 @@ export async function rollWithInteraction(
 	client: EClient,
 	opts: RollOptions
 ) {
-	profiler.startProfiler();
 	const {
 		critical,
 		user,
@@ -118,7 +113,6 @@ export async function rollWithInteraction(
 			user,
 		});
 	}
-	profiler.stopProfiler();
 	return;
 }
 
@@ -140,7 +134,6 @@ export async function rollMacro(
 	 */
 	hideResult?: boolean | null
 ) {
-	profiler.startProfiler();
 	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let atq = options.getString(t("common.name"), true);
 	const infoRoll = {
@@ -266,7 +259,6 @@ export async function rollMacro(
 		user,
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
-	profiler.stopProfiler();
 }
 
 /**
@@ -287,7 +279,6 @@ export async function rollStatistique(
 	 */
 	hideResult?: boolean | null
 ) {
-	profiler.startProfiler();
 	const ctx = getGuildContext(client, interaction.guildId!);
 	const sortOrder = client.settings.get(interaction.guildId!, "sortOrder");
 	let statistic = getStatisticOption(options, false);
@@ -418,7 +409,6 @@ export async function rollStatistique(
 		user,
 	};
 	await rollWithInteraction(interaction, roll, client, opts);
-	profiler.stopProfiler();
 }
 /**
  * Gets custom criticals based on the server template and user data.

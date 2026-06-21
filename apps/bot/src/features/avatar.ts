@@ -4,7 +4,6 @@ import {
 	BotError,
 	BotErrorLevel,
 	cleanAvatarUrl,
-	profiler,
 	QUERY_URL_PATTERNS,
 	verifyAvatarUrl,
 } from "@dicelette/utils";
@@ -84,7 +83,6 @@ export class AvatarFeature extends BaseFeature {
 	async edit(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
-		profiler.startProfiler();
 		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const files: Djs.AttachmentBuilder[] = [];
@@ -143,6 +141,5 @@ export class AvatarFeature extends BaseFeature {
 			content: this.ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
-		profiler.stopProfiler();
 	}
 }

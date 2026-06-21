@@ -35,7 +35,6 @@ import {
 	getIdFromMention,
 	logger,
 	NoEmbed,
-	profiler,
 	QUERY_URL_PATTERNS,
 } from "@dicelette/utils";
 import {
@@ -265,7 +264,6 @@ export class MacroFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
 
-		profiler.startProfiler();
 		if (!(await getTemplateByInteraction(interaction, this.client))) {
 			await reply(interaction, {
 				embeds: [
@@ -289,12 +287,10 @@ export class MacroFeature extends BaseFeature {
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			profiler.stopProfiler();
 			return;
 		}
 
 		await this.registerDamageDice(interaction.customId.includes("first"));
-		profiler.stopProfiler();
 	}
 
 	/**
@@ -342,7 +338,6 @@ export class MacroFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
 
-		profiler.startProfiler();
 		const db = this.client.settings;
 		const { ul } = getLangAndConfig(this.client, interaction);
 		const name = interaction.fields.getTextInputValue("damageName");
@@ -522,7 +517,6 @@ export class MacroFeature extends BaseFeature {
 			compare,
 			first
 		);
-		profiler.stopProfiler();
 	}
 
 	private async editMessage(
@@ -589,7 +583,6 @@ export class MacroFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
 
-		profiler.startProfiler();
 		const db = this.client.settings;
 		if (!interaction.message) return;
 		const message = interaction.message;
@@ -677,7 +670,6 @@ export class MacroFeature extends BaseFeature {
 			userID,
 			userName,
 		});
-		profiler.stopProfiler();
 	}
 
 	private parseStatsString(statsEmbed: Djs.EmbedBuilder) {

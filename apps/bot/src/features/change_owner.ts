@@ -5,7 +5,6 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	getIdFromMention,
-	profiler,
 } from "@dicelette/utils";
 import { changeOwner, resetButton } from "commands";
 import { getUserByEmbed } from "database";
@@ -70,7 +69,6 @@ export class ChangeOwnerFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;
 		if (!this.client) return;
-		profiler.startProfiler();
 		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const user = interaction.fields.getSelectedUsers("user")?.first();
@@ -174,6 +172,5 @@ export class ChangeOwnerFeature extends BaseFeature {
 			oldData,
 			interaction.channel as DiscordChannel
 		);
-		profiler.stopProfiler();
 	}
 }

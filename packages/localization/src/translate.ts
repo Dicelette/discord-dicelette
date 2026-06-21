@@ -10,7 +10,6 @@ import {
 	logger,
 	NoChannel,
 	NoEmbed,
-	profiler,
 	sentry,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
@@ -165,10 +164,8 @@ export function buildTranslationKeyCache() {
 }
 
 export function findln(translatedText: string) {
-	profiler.startProfiler();
 	const normalized = translatedText.toLowerCase();
 	const res = translationKeyCache[normalized] ?? translatedText;
-	profiler.stopProfiler();
 	return res;
 }
 

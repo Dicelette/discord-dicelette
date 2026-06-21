@@ -15,7 +15,6 @@ import {
 	logger,
 	NoChannel,
 	NoEmbed,
-	profiler,
 	QUERY_URL_PATTERNS,
 	verifyAvatarUrl,
 } from "@dicelette/utils";
@@ -151,7 +150,6 @@ export class UserFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
 
-		profiler.startProfiler();
 		const pageNumberStr = interaction.customId.replace("page", "");
 		if (!isNumber(pageNumberStr)) return;
 		const template = await getTemplateByInteraction(interaction, this.client);
@@ -184,7 +182,6 @@ export class UserFeature extends BaseFeature {
 		const moderation = selfRegister.moderation && !moderator;
 
 		await stats.register(Number.parseInt(pageNumberStr, 10), moderation);
-		profiler.stopProfiler();
 	}
 
 	/**
@@ -211,7 +208,6 @@ export class UserFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!this.client) return;
 
-		profiler.startProfiler();
 		const channel = interaction.channel;
 		if (!channel) throw new NoChannel();
 
@@ -342,7 +338,6 @@ export class UserFeature extends BaseFeature {
 		);
 
 		await Messages.reply(interaction, { components: [allButtons], embeds: [embed] });
-		profiler.stopProfiler();
 	}
 
 	/**
