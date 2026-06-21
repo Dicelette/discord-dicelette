@@ -81,7 +81,8 @@ export class ResultAsText {
 		if (time) user += `${timestamp(this.data?.config?.timestamp)}`;
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
-		if (header) {
+		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
+		if (header && !isSharedRoll) {
 			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
 		}
 		if (user.trim().length > 0) user += `${this.ul("common.space")}${compareHint}:\n`;
@@ -465,7 +466,13 @@ export class ResultAsText {
 		if (resMsg.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
 			return `${this.message(r, totalSuccess).replace(PARSE_RESULT_PATTERNS.formulaDiceSymbols, `${successOrFailure} — `)}\n`;
 		}
-		if (resMsg.startsWith("※")) return `${resMsg}\n`;
+		// ※ marks the primary compared segment in a shared roll: include success/failure
+		if (resMsg.startsWith("※")) {
+			const rest = resMsg.replace(/^※\s*/, "");
+			return `※ ${successOrFailure} — ${rest}\n`;
+		}
+		// ◈ marks formula segments in a shared roll: no success/failure, no comparison
+		if (resMsg.startsWith("◈")) return `${resMsg}\n`;
 
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
@@ -614,7 +621,7 @@ export class ResultAsText {
 					if (parts.length > 0) {
 						const header = parts.join(" — ");
 
-						if (res.match(PARSE_RESULT_PATTERNS.successSymbol)) {
+						if (res.match(PARSE_RESULT_PATTERNS.sharedStartSymbol)) {
 							res = res.replace(
 								PARSE_RESULT_PATTERNS.sharedStartSymbol,
 								`◈ ${header} — `
@@ -754,10 +761,11 @@ export class ResultAsText {
 		if (this.charName)
 			mention = `**__${this.charName.capitalize()}__**${mention.length > 0 ? ` (${mention})` : ""}`;
 
-		// Display only the comparison next to the username
+		// Display only the comparison next to the username (not for shared rolls — it's inline)
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
-		if (header)
+		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
+		if (header && !isSharedRoll)
 			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
 
 		const headerLine = `${mention}${compareHint}${this.ignoreCount}${timestamp(this.data.config?.timestamp)}`;
