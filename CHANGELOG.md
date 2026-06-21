@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.1.1](https://github.com/Dicelette/discord-dicelette/compare/4.1.0...4.1.1) (2026-06-21)
+
+
+### Bug Fixes
+
+* **customFormula:** stats was not parsed properly ([fa10984](https://github.com/Dicelette/discord-dicelette/commit/fa10984ca05e84e981d53e7d2165f2eb2a45b9df))
+
 ## [4.1.0](https://github.com/Dicelette/discord-dicelette/compare/4.0.5...4.1.0) (2026-06-21)
 
 
