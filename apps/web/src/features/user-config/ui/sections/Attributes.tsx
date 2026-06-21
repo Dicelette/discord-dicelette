@@ -167,8 +167,8 @@ function Attributes({ state }: AttributeSectionProps) {
 				<TextField
 					fullWidth
 					size="small"
-					label={t("userConfig.replaceUnknown.title")}
-					helperText={t("userConfig.replaceUnknown.description")}
+					label={t("userSettings.replaceUnknown.title")}
+					helperText={t("userSettings.replaceUnknown.description")}
 					value={replaceUnknown}
 					onChange={(e) => {
 						setReplaceUnknown(e.target.value);
