@@ -12,7 +12,7 @@ import {
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
-import { reply } from "../../messages";
+import { reply } from "messages";
 
 export async function display(
 	client: EClient,
