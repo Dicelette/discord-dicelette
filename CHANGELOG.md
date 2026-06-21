@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.1.0](https://github.com/Dicelette/discord-dicelette/compare/4.0.5...4.1.0) (2026-06-21)
+
+
+### Features
+
+* custom formula ([ce9e108](https://github.com/Dicelette/discord-dicelette/commit/ce9e108ea0887b225966f5874e78e48af3959740))
+* **web:memory:** use jwt for caching memory, no disconnecting when bot restart! ([8cf12cf](https://github.com/Dicelette/discord-dicelette/commit/8cf12cf1a9db2c7f02f91d2151802387b0b4e1da))
+
+
+### Bug Fixes
+
+* **result:** wrong display with shared rolls ([3dc3f9a](https://github.com/Dicelette/discord-dicelette/commit/3dc3f9a4f900e98edaecd89015cf5ce21f7bb6ff))
+* **web:** overlap in dashboard + config fixes ([17cd029](https://github.com/Dicelette/discord-dicelette/commit/17cd02958f0a4405d23feb31c760080ddd011936))
+
 ## [4.0.5](https://github.com/Dicelette/discord-dicelette/compare/4.0.4...4.0.5) (2026-06-17)
 
 ## [4.0.4](https://github.com/Dicelette/discord-dicelette/compare/v4.0.3...v4.0.4) (2026-06-17)
