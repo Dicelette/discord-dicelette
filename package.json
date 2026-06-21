@@ -14,12 +14,12 @@
 		"build": "tsc --build && tsc-alias",
 		"localization:build": "tsx packages/localization/docs/build-help.ts --build",
 		"postbuild": "pnpm localization:build && pnpm dashboard:build",
-		"dev": "tsx watch --clear-screen=false --ignore apps/web --ignore dashboard apps/bot/index.ts",
-		"bot:watch": "tsx watch --clear-screen=false apps/bot/index.ts",
+		"dev": "nodemon",
+		"bot:watch": "nodemon",
 		"dashboard:release": "pnpm --filter @dicelette/web release",
 		"postdashboard:release": "pnpm postrelease",
 		"dashboard:build": "pnpm --filter @dicelette/web build",
-		"dev:prod": "cross-env PROD=true tsx watch --clear-screen=false apps/bot/index.ts",
+		"dev:prod": "cross-env PROD=true nodemon",
 		"lint": "biome check --write ./apps/ ./packages/ ./dashboard --unsafe",
 		"pm2:delete": "pm2 delete dicelette",
 		"pm2:restart": "pnpm run build && pm2 restart dicelette",
@@ -39,10 +39,9 @@
 		]
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.28.5",
+		"@dicelette/core": "^1.29.1",
 		"@discordjs/rest": "^2.6.1",
 		"@sentry/node": "^10.59.0",
-		"@sentry/profiling-node": "^10.59.0",
 		"canvas": "^3.2.3",
 		"chart.js": "4.5.1",
 		"chartjs-node-canvas": "^5.0.0",
@@ -69,6 +68,8 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.0",
 		"@go-task/cli": "^3.50.0",
+		"@swc-node/register": "^1.11.1",
+		"@swc/core": "^1.15.41",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/express-session": "^1.19.0",
@@ -95,7 +96,8 @@
 		"typescript": "^5.9.3",
 		"vite-tsconfig-paths": "^6.1.1",
 		"vitest": "^4.1.9",
-		"yaml": "^2.9.0"
+		"yaml": "^2.9.0",
+		"vite": "^8.0.16"
 	},
 	"commit-and-tag-version": {
 		"bumpFiles": [

@@ -1,11 +1,12 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "dashboard/*"
+  - apps/*
+  - packages/*
+  - dashboard/*
 allowBuilds:
-  '@go-task/cli': true
-  '@sentry-internal/node-cpu-profiler': true
-  '@sentry/node-cpu-profiler': true
+  "@go-task/cli": true
+  "@sentry-internal/node-cpu-profiler": true
+  "@sentry/node-cpu-profiler": true
+  "@swc/core": true
   better-sqlite3: true
   canvas: true
   esbuild: true
@@ -13,7 +14,7 @@ minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - mathjs@15.2.0
   - react-router@7.15.0
-  - '@dicelette/core'
+  - "@dicelette/core"
   - discord.js
   - discord-api-types
 overrides:
