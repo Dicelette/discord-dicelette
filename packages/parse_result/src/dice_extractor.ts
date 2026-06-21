@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/style/useNamingConvention: variable */
 import {
+	DETECT_CRITICAL_ALL,
 	findBestStatMatch,
 	MIN_THRESHOLD_MATCH,
 	REMOVER_PATTERN,
@@ -20,6 +21,15 @@ import type {
 import { DICE_COMPILED_PATTERNS, DICE_PATTERNS, logger } from "@dicelette/utils";
 import { extractAndMergeComments, getComments } from "./comment_utils";
 import { trimAll } from "./utils";
+
+/**
+ * Matches a `{{...}}` formula block (allowing single `}` inside).
+ * Used to neutralize formula blocks before opposition detection so that
+ * comparison operators inside them (e.g. `{{$>=85?85:$}}`) are not mistaken
+ * for an opposition comparator when the block still contains an unresolved
+ * `$stat` and therefore could not be pre-evaluated.
+ */
+const FORMULA_BLOCK_PATTERN = /\{\{(?:[^}]|\}(?!\}))*\}\}/g;
 
 export function extractDiceData(content: string): DiceData {
 	//exclude if the content is between codeblocks
@@ -248,22 +258,19 @@ function preRollDiceInBrackets(content: string): string {
 		// Strip {cs/cf:...} blocks so the math evaluator can handle the remaining
 		// expression; evaluate their numeric sub-expressions and save them for later.
 		const criticalBlocks: string[] = [];
-		const cleanedInner = rolledInner.replace(
-			/\{\*?c[fs]:(?:[<>=]|!=)+.+?\}/gim,
-			(block) => {
-				const parsed = /(\{\*?c[fs]:)((?:[<>=]|!=)+)(.+?)\}$/i.exec(block);
-				if (parsed) {
-					const [, prefix, operator, expr] = parsed;
-					try {
-						const evaled = replaceFormulaInDice(`{{${expr}}}`);
-						criticalBlocks.push(`${prefix}${operator}${evaled}}`);
-						return "";
-					} catch {}
-				}
-				criticalBlocks.push(block);
-				return "";
+		const cleanedInner = rolledInner.replace(REMOVER_PATTERN.CRITICAL_BLOCK, (block) => {
+			const parsed = DETECT_CRITICAL_ALL.exec(block);
+			if (parsed) {
+				const [, prefix, operator, expr] = parsed;
+				try {
+					const evaled = replaceFormulaInDice(`{{${expr}}}`);
+					criticalBlocks.push(`${prefix}${operator}${evaled}}`);
+					return "";
+				} catch {}
 			}
-		);
+			criticalBlocks.push(block);
+			return "";
+		});
 		if (criticalBlocks.length > 0) {
 			try {
 				const result = replaceFormulaInDice(`{{${cleanedInner}}}`);
@@ -271,7 +278,9 @@ function preRollDiceInBrackets(content: string): string {
 			} catch {
 				// Formula evaluation failed; return with cs/cf stripped so
 				// replaceFormulaInDice can still try to evaluate the formula.
-				console.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
+				if (!cleanedInner.includes("$"))
+					logger.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
+
 				return `{{${cleanedInner}}}`;
 			}
 		}
@@ -321,8 +330,12 @@ export function isRolling(
 	const originalContent = content;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
 	if (!evaluated) {
-		// Preclean to ignore {cs|cf:...} blocs
-		const contentForOpposition = content.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
+		// Preclean to ignore {cs|cf:...} blocs and neutralize {{...}} formula blocks
+		// (a still-unresolved `$stat` prevents their pre-evaluation, so a comparison
+		// operator inside them must not be detected as a second/opposition comparator).
+		const contentForOpposition = content
+			.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "")
+			.replace(FORMULA_BLOCK_PATTERN, "0");
 		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
 
 		// Extract comments before removing opposition part
