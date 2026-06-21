@@ -7,7 +7,6 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	getIdFromMention,
-	profiler,
 } from "@dicelette/utils";
 import { rename } from "commands";
 import { getUserByEmbed, updateMemory } from "database";
@@ -90,7 +89,6 @@ export class RenameFeature extends BaseFeature {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message) return;
 		if (!this.client) return;
-		profiler.startProfiler();
 		const message = interaction.message;
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const newName = interaction.fields.getTextInputValue("newName");
@@ -148,6 +146,5 @@ export class RenameFeature extends BaseFeature {
 			oldData,
 			interaction.channel as DiscordChannel
 		);
-		profiler.stopProfiler();
 	}
 }
