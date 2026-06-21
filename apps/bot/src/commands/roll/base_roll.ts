@@ -72,9 +72,6 @@ export const diceRoll = {
 		interaction: Djs.ChatInputCommandInteraction,
 		client: EClient
 	): Promise<void> {
-		logger.info(
-			`Log: Executing /roll cmds for ${interaction.user.username} in ${interaction.guild?.name} - DM:${interaction.channel?.type === Djs.ChannelType.DM}`
-		);
 		const { ul } = getLangAndConfig(client, interaction);
 
 		const option = interaction.options as Djs.CommandInteractionOptionResolver;
@@ -218,6 +215,5 @@ export async function baseRoll(
 		statsPerSegment: res.statsPerSegment,
 		user,
 	};
-	logger.trace(`Rolling dice for ${user.tag}: ${res.formula}`);
 	await rollWithInteraction(interaction, res.formula, client, opts);
 }
