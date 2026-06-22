@@ -4,19 +4,10 @@ import * as Djs from "discord.js";
 import type { EClient } from "../client";
 
 export default (client: EClient): void => {
-	client.on("shardDisconnect", async (event, shardId) => {
-		if (process.env.OWNER_ID) {
-			const dm = await client.users.createDM(process.env.OWNER_ID);
-			await dm.send({
-				content:
-					"## ❌ Le bot a été déconnecté du serveur Discord.\n\n" +
-					"Veuillez vérifier l'état du bot et le redémarrer si nécessaire.",
-			});
-			await sendErrorToWebhook(`Shard disconnected: ${event.toString()}`);
-		}
+	client.on("shardDisconnect", (event, shardId) => {
 		console.error(`Shard ${shardId} disconnected:`, event);
 		sentry.error(`Shard ${shardId} disconnected`, { event, shardId });
-		await sentryFlush();
+		void sentryFlush();
 		process.exit(1);
 	});
 };

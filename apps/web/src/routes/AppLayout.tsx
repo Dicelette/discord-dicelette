@@ -8,6 +8,7 @@ import {
 } from "@shared";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../providers";
+import PlaygroundButton from "../shared/ui/PlaygroundButton.tsx";
 
 const appBarSx = { borderBottom: "1px solid rgba(255,255,255,0.08)" } as const;
 const toolbarSx = {
@@ -62,6 +63,7 @@ export default function AppLayout() {
 					<Box sx={spacerSx} />
 					<Box sx={navBoxSx}>
 						<DocsButton />
+						<PlaygroundButton />
 						<ThemeToggleButton />
 						<LanguageSelect sx={languageSelectSx} />
 

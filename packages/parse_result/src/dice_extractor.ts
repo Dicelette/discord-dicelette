@@ -155,6 +155,48 @@ export function applyCommentsToResult(
  * @param replaceUnknown
  * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
  */
+/** Evaluate `total <sign> value` for the disable-compare success count. */
+function compareTotal(total: number, sign: string, value: number): boolean {
+	switch (sign) {
+		case ">":
+			return total > value;
+		case "<":
+			return total < value;
+		case ">=":
+			return total >= value;
+		case "<=":
+			return total <= value;
+		case "!=":
+			return total !== value;
+		default:
+			return total === value; // "==" / "="
+	}
+}
+
+/**
+ * Collapse a compared roll into a 0/1 success count for `disableCompare`.
+ *
+ * A pure `XdY>Z` pool already rolls as a success count, but core cannot pool an
+ * expression with a modifier (e.g. `1d20+5>=20`), so the result still carries a
+ * `compare` and the formatter would show a success/failure verdict. To keep the
+ * behaviour consistent, replace the total with the 0/1 count, re-inject the
+ * comparator into the dice label (so the threshold stays visible) and drop the
+ * comparison. Shared rolls are left untouched.
+ */
+function collapseCompareToCount(result?: Resultat): void {
+	if (!result?.compare || result.total === undefined || result.result.includes(";"))
+		return;
+	const { sign, value } = result.compare;
+	const numValue = typeof value === "number" ? value : Number(value);
+	if (Number.isNaN(numValue)) return;
+	const count = compareTotal(result.total, sign, numValue) ? 1 : 0;
+	result.result = result.result
+		.replace(/^([^:]*?)(\s*:)/, `$1${sign}${value}$2`)
+		.replace(/=\s*-?\d+(?:\.\d+)?\s*$/, `= ${count}`);
+	result.total = count;
+	result.compare = undefined;
+}
+
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
@@ -215,6 +257,7 @@ export function processChainedDiceRoll(
 		if (disableCompare) cleaned = `{${cleaned}}`;
 		const rollResult = roll(cleaned, undefined, pity, sort);
 		if (!rollResult) return undefined;
+		if (disableCompare) collapseCompareToCount(rollResult);
 		rollResult.dice = cleaned;
 		// For chained rolls with & and ;, only add comment if it's a true # comment
 		// (not the bracketed formula parts)
@@ -408,13 +451,15 @@ export function isRolling(
 			pity,
 			sort
 		);
-		if (diceRoll?.resultat)
+		if (diceRoll?.resultat) {
+			if (disableCompare) collapseCompareToCount(diceRoll.resultat);
 			return {
 				detectRoll: diceData.bracketRoll,
 				infoRoll: diceRoll.infoRoll,
 				result: diceRoll.resultat,
 				statsPerSegment: res.statsPerSegment,
 			};
+		}
 	}
 
 	if (
@@ -454,6 +499,7 @@ export function isRolling(
 		const diceRoll = performDiceRoll(finalContent, undefined, res.infoRoll, pity, sort);
 		if (!diceRoll?.resultat?.result.length) return undefined;
 		if (diceRoll) applyCommentsToResult(diceRoll.resultat, comments, undefined);
+		if (disableCompare) collapseCompareToCount(diceRoll.resultat);
 		return {
 			detectRoll: undefined,
 			result: diceRoll.resultat,

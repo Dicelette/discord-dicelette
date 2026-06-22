@@ -120,6 +120,35 @@
 		"subtitleDenied": "Vous avez annulé l'autorisation Discord. Cliquez ci-dessous pour réessayer.",
 		"subtitleGeneric": "Une erreur est survenue lors de l'authentification Discord. Veuillez réessayer."
 	},
+	"playground": {
+		"expression": {
+			"helper": "Comparateurs (>=, <=…), opposition (1d20>=10>20), critiques personnalisés {cs:>=15}{cf:<=2}, commentaires …",
+			"label": "Expression de dé",
+			"placeholder": "1d20+5>=15"
+		},
+		"onNaturalDice": "S'applique uniquement sur les dés naturels",
+		"options": {
+			"charName": "Nom du personnage",
+			"customFormulaHelper": "Une formule {link}  aux jets où [expr] remplace $.",
+			"disableCompare": "Désactiver la comparaison réussite/échec",
+			"hide": "Masquer les options",
+			"pseudo": "Pseudo",
+			"pseudoDefault": "Joueur",
+			"show": "Afficher les options",
+			"statName": "Nom de la statistique",
+			"timestamp": "Afficher l'horodatage"
+		},
+		"result": {
+			"copied": "Copié !",
+			"copy": "Copier",
+			"empty": "Saisissez une expression de dé pour voir le résultat.",
+			"invalid": "Ceci n'est pas une expression de dé valide.",
+			"rendered": "Rendu"
+		},
+		"roll": "Lancer",
+		"subtitle": "Lancer un dé et voyez comment le résultat s'afficherait.",
+		"title": "Bac à sable"
+	},
 	"servers": {
 		"addBotDesc": "Vous êtes administrateur sur ces serveurs — Dicelette peut y être ajouté.",
 		"addBotPending": "Bot ajouté ? Cliquez sur Actualiser pour mettre à jour la liste.",

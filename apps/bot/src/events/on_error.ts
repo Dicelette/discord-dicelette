@@ -3,13 +3,12 @@ import type { EClient } from "@dicelette/client";
 import { fetchChannel } from "@dicelette/helpers";
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
-import { type BotError, sentry } from "@dicelette/utils";
+import { type BotError, important, sentry } from "@dicelette/utils";
 import { DiscordAPIError } from "@discordjs/rest";
 import dedent from "dedent";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
 import { embedError, reply } from "messages";
-import { sendErrorToWebhook } from "./on_disconnect";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
@@ -41,17 +40,17 @@ export function isApiError(error: unknown) {
 
 export async function sendMessageError(error: unknown, client: EClient): Promise<void> {
 	if (isApiError(error)) return;
-	console.error(error);
+	important.error(error);
 	sentry.error(error);
 	if (!process.env.OWNER_ID) return;
 	const dm = await client.users.createDM(process.env.OWNER_ID);
 	await dm.send({ content: formatErrorMessage(error) });
-	await sendErrorToWebhook(error);
 }
 
 export default (client: EClient): void => {
-	client.on("error", async (error) => {
-		await sendMessageError(error, client);
+	client.on("error", (error) => {
+		important.error(error);
+		sentry.error(error);
 	});
 };
 

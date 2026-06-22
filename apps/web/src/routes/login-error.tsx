@@ -1,6 +1,7 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { DocsButton, LanguageSelect, ThemeToggleButton, useI18n } from "@shared";
 import { useSearchParams } from "react-router-dom";
+import PlaygroundButton from "../shared/ui/PlaygroundButton.tsx";
 
 const headerBoxSx = { px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } } as const;
 const toolbarBoxSx = {
@@ -48,6 +49,7 @@ export default function LoginError() {
 			<Box sx={headerBoxSx}>
 				<Box sx={toolbarBoxSx}>
 					<DocsButton color="default" />
+					<PlaygroundButton />
 					<ThemeToggleButton color="default" />
 					<LanguageSelect />
 				</Box>

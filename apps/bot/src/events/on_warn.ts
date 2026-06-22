@@ -17,3 +17,12 @@ export const onDebug = (client: EClient): void => {
 		}
 	});
 };
+
+export const shardDebug = (client: EClient): void => {
+	client.on("shardError", async (shardId, message) => {
+		important.error(`${shardId} has encountered an error: ${message}`);
+		sentry.error(`${shardId} has encountered an error: ${message}`, {
+			source: "discord-shardError",
+		});
+	});
+};

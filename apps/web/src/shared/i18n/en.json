@@ -120,6 +120,35 @@
 		"subtitleDenied": "You cancelled the Discord authorization. Click below to try again.",
 		"subtitleGeneric": "An error occurred during Discord authentication. Please try again."
 	},
+	"playground": {
+		"expression": {
+			"helper": "Comparators (>=, <=…), opposition (1d20>=10>20), custom criticals {cs:>=15}{cf:<=2}, comments…",
+			"label": "Dice expression",
+			"placeholder": "1d20+5>=15"
+		},
+		"onNaturalDice": "Applies only on natural dice",
+		"options": {
+			"charName": "Character name",
+			"customFormulaHelper": "A {link} formula to the rolls where [expr] replaces $.",
+			"disableCompare": "Disable success/failure comparison",
+			"hide": "Hide options",
+			"pseudo": "Pseudo",
+			"pseudoDefault": "Player",
+			"show": "Show options",
+			"statName": "Statistic name",
+			"timestamp": "Show timestamp"
+		},
+		"result": {
+			"copied": "Copied!",
+			"copy": "Copy",
+			"empty": "Enter a dice expression to see the result.",
+			"invalid": "This is not a valid dice expression.",
+			"rendered": "Rendered"
+		},
+		"roll": "Roll",
+		"subtitle": "Throw a dice and see how the result will be displayed.",
+		"title": "Playground"
+	},
 	"servers": {
 		"addBotDesc": "You are an administrator on these servers — Dicelette can be added.",
 		"addBotPending": "Bot added? Click Refresh to update the list.",

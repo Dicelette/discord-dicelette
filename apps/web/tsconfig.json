@@ -16,7 +16,12 @@
 		"resolveJsonModule": true,
 		"paths": {
 			"@shared/*": ["./src/shared/src/*"],
-			"@shared": ["./src/shared/index.js"]
+			"@shared": ["./src/shared/index.js"],
+			"@dicelette/parse_result": ["../../packages/parse_result/index.ts"],
+			"@dicelette/utils": ["./src/shims/dicelette-utils-browser.ts"],
+			"@dicelette/utils/*": ["../../packages/utils/src/*"],
+			"@dicelette/types": ["../../packages/types/index.ts"],
+			"@dicelette/localization": ["../../packages/localization/index.ts"]
 		}
 	},
 	"include": ["src", "vite.config.ts", "tests/**/*", "../../dashboard/api/**/*"]
