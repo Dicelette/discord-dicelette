@@ -43,7 +43,8 @@ try {
 	event.onError(client);
 	event.onWarn(client);
 	event.onMemberJoin(client);
-	if (process.env.NODE_ENV === "development") event.onDebug(client);
+	event.shardDebug(client);
+	event.onDebug(client);
 } catch (error) {
 	logger.fatal(error);
 	sentry.fatal("Failed to register bot events", { error });
