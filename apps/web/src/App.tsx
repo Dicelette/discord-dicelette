@@ -6,6 +6,8 @@ import { AppLayout, Dashboard, Login, LoginError, Playground, Servers } from "./
 function App() {
 	const { user, loading } = useAuth();
 
+	if (window.location.hostname.startsWith("playground.")) return <Playground />;
+
 	if (loading) return <LoadingSpinner />;
 
 	return (
