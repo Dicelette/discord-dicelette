@@ -288,8 +288,23 @@ export default function Playground() {
 		}
 	};
 
+	const title = "Dicelette Playground";
+	const description =
+		"Try the Dicelette dice parser live: roll dice, tweak the options and preview exactly how results appear on Discord.";
+
 	return (
 		<Box className="min-h-screen flex flex-col">
+			<meta charSet="UTF-8" />
+			<meta
+				name="viewport"
+				content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+			/>
+			<title>Dicelette Playground</title>
+			<meta name="description" content={description} />
+			<meta property="og:title" content={title} />
+			<meta name="twitter:title" content={title} />
+			<meta property="og:description" content={description} />
+			<meta name="twitter:description" content={description} />
 			<Box sx={headerBoxSx}>
 				<Box sx={toolbarBoxSx}>
 					<DocsButton color="default" />
