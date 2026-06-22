@@ -72,7 +72,8 @@ export function startDashboardServer(deps: DashboardDeps): void {
 				"Content-Security-Policy",
 				[
 					"default-src 'self'",
-					"connect-src 'self' https://discord.com",
+					// Iconify fetches icons from these CDNs at runtime via @iconify/react.
+					"connect-src 'self' https://discord.com https://api.iconify.design https://api.simplesvg.com https://api.unisvg.com",
 					"img-src 'self' data: https:",
 					"script-src 'self'",
 					"style-src 'self' 'unsafe-inline'",
