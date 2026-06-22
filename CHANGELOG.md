@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.2.0](https://github.com/Dicelette/discord-dicelette/compare/4.1.1...4.2.0) (2026-06-22)
+
+
+### Features
+
+* **web:** add playground page ([8d9c083](https://github.com/Dicelette/discord-dicelette/commit/8d9c0838a35cd0b163b457e7b7a420dfd8848200))
+
+
+### Bug Fixes
+
+* **web:i18n:** not found i18n key, AGAIN ([a5c62b8](https://github.com/Dicelette/discord-dicelette/commit/a5c62b8d1874e3f78e8c3c40b1f6c87911c1c366))
+
 ## [4.1.1](https://github.com/Dicelette/discord-dicelette/compare/4.1.0...4.1.1) (2026-06-21)
 
 
