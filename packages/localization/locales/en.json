@@ -251,6 +251,9 @@
 		},
 		"displayResult": "Displaying results",
 		"excludedStats": "Excluded statistics",
+		"fields": {
+			"pityHelperText": "After a certain number of consecutive failures, Dicelette guarantees automatic success on the next roll."
+		},
 		"hiddenRoll": {
 			"desc": "Allows you to hide the dice results from GMs and send them to a specific channel or in a ephemeral message.",
 			"title": "[GM] Roll display"

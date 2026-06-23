@@ -58,7 +58,7 @@
 			"logs": "Channel de logs",
 			"moderationChannel": "Channel de modération (optionnel)",
 			"moderationChannelHelp": "ID du channel pour modérer les inscriptions",
-			"pity": "Seuil de pitié (échecs critiques consécutifs)",
+			"pity": "Seuil de pitié",
 			"privateChannel": "Channel privé",
 			"rollChannel": "Channel de résultats",
 			"sortNone": "Aucun (défaut)",
@@ -129,12 +129,12 @@
 		"onNaturalDice": "S'applique uniquement sur les dés naturels",
 		"options": {
 			"charName": "Nom du personnage",
+			"context": "Afficher le lien vers le contexte",
 			"customFormulaHelper": "Une formule {link}  aux jets où [expr] remplace $.",
 			"disableCompare": "Désactiver la comparaison réussite/échec",
-			"hide": "Masquer les options",
 			"pseudo": "Pseudo",
 			"pseudoDefault": "Joueur",
-			"show": "Afficher les options",
+			"saveLink": "Lien vers la sauvegarde du dé",
 			"statName": "Nom de la statistique",
 			"timestamp": "Afficher l'horodatage"
 		},
@@ -146,6 +146,13 @@
 			"rendered": "Rendu"
 		},
 		"roll": "Lancer",
+		"sections": {
+			"character": "Personnage",
+			"contextLinks": "Liens de contexte",
+			"criticals": "Critiques",
+			"display": "Affichage",
+			"general": "Générale"
+		},
 		"subtitle": "Lancer un dé et voyez comment le résultat s'afficherait.",
 		"title": "Bac à sable"
 	},

@@ -1,3 +1,4 @@
+import { ChatBubbleOutlined, Tag } from "@mui/icons-material";
 import { Box, Link, type SxProps, type Theme } from "@mui/material";
 import { parse } from "discord-markdown-parser";
 import { Fragment, type ReactNode, useMemo } from "react";
@@ -21,6 +22,8 @@ type MdNode = {
 	format?: string;
 	lang?: string;
 	id?: string;
+	/** Unicode emoji glyph for `twemoji` nodes (e.g. the `↪` reply arrow). */
+	name?: string;
 };
 
 /** Rendering context threaded through the recursive renderer. */
@@ -28,6 +31,10 @@ type Ctx = {
 	locale: Locale;
 	/** Maps a mentioned user id to a display name (no real users to resolve). */
 	mentions?: Record<string, string>;
+	/** Maps a channel id to a display name (no real channels to resolve). */
+	channels?: Record<string, string>;
+	/** Maps a thread channel id to a name; rendered with a thread-style pill. */
+	threads?: Record<string, string>;
 };
 
 const inlineCodeSx: SxProps<Theme> = {
@@ -127,7 +134,16 @@ function formatTimestamp(
 function renderContent(content: string | MdNode[] | undefined, ctx: Ctx): ReactNode {
 	if (content === undefined) return null;
 	if (typeof content === "string") return content;
-	return content.map((child, i) => (
+	// Drop `<br>` nodes that immediately precede a subtext block: the bot footer
+	// uses "\n\n-# …", but the subtext already renders on its own line, so the
+	// extra blank line would just be wasted vertical space.
+	const nodes = content.filter((node, i) => {
+		if (node.type !== "br") return true;
+		let j = i + 1;
+		while (j < content.length && content[j].type === "br") j++;
+		return content[j]?.type !== "subtext";
+	});
+	return nodes.map((child, i) => (
 		// biome-ignore lint/suspicious/noArrayIndexKey: AST order is stable for a given input.
 		<Fragment key={i}>{renderNode(child, ctx)}</Fragment>
 	));
@@ -137,6 +153,22 @@ function mentionPill(label: string): ReactNode {
 	return (
 		<Box component="span" sx={mentionSx}>
 			{label}
+		</Box>
+	);
+}
+
+const pillIconSx: SxProps<Theme> = { fontSize: "0.9em", verticalAlign: "-0.15em" };
+
+/** Thread-mention pill: `# name › 💬`, mimicking how Discord renders a thread link. */
+function threadPill(label: string): ReactNode {
+	return (
+		<Box component="span" sx={mentionSx}>
+			<Tag sx={pillIconSx} />
+			{label}
+			<Box component="span" sx={{ mx: 0.3, opacity: 0.7 }}>
+				›
+			</Box>
+			<ChatBubbleOutlined sx={pillIconSx} />
 		</Box>
 	);
 }
@@ -166,6 +198,15 @@ function renderNode(node: MdNode, ctx: Ctx): ReactNode {
 					<code>{inner()}</code>
 				</Box>
 			);
+		case "subtext":
+			return (
+				<Box
+					component="span"
+					sx={{ display: "block", fontSize: "0.75em", color: "text.secondary", mt: 0.5 }}
+				>
+					{inner()}
+				</Box>
+			);
 		case "blockQuote":
 			return <Box sx={quoteSx}>{inner()}</Box>;
 		case "spoiler":
@@ -184,9 +225,16 @@ function renderNode(node: MdNode, ctx: Ctx): ReactNode {
 			);
 		case "user":
 			return mentionPill(`@${(node.id && ctx.mentions?.[node.id]) || "user"}`);
+		case "channel": {
+			const id = node.id ?? "";
+			if (ctx.threads?.[id]) return threadPill(ctx.threads[id]);
+			return mentionPill(`#${ctx.channels?.[id] ?? "channel"}`);
+		}
+		case "twemoji":
+			// Unicode emoji (e.g. the `↪` reply arrow in the footer); render as-is.
+			return node.name ?? null;
 		case "role":
-		case "channel":
-			return mentionPill(node.type === "channel" ? "#channel" : "@role");
+			return mentionPill("@role");
 		case "everyone":
 			return mentionPill("@everyone");
 		case "here":
@@ -212,11 +260,20 @@ const rootSx: SxProps<Theme> = {
 export default function DiscordMarkdown({
 	content,
 	mentions,
+	channels,
+	threads,
 }: {
 	content: string;
 	mentions?: Record<string, string>;
+	channels?: Record<string, string>;
+	threads?: Record<string, string>;
 }) {
 	const { locale } = useI18n();
-	const ast = useMemo(() => parse(content, "normal") as MdNode[], [content]);
-	return <Box sx={rootSx}>{renderContent(ast, { locale, mentions })}</Box>;
+	// "extended" mode adds the masked-link rule (`[text](url)`) on top of "normal".
+	// The roll output is a bot/app message, where masked links render as clickable
+	// links (e.g. the context/save-link footer) — exactly what we reproduce here.
+	const ast = useMemo(() => parse(content, "extended") as MdNode[], [content]);
+	return (
+		<Box sx={rootSx}>{renderContent(ast, { locale, mentions, channels, threads })}</Box>
+	);
 }

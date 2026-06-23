@@ -251,6 +251,9 @@
 		},
 		"displayResult": "Affichage des résultats",
 		"excludedStats": "Statistiques exclues",
+		"fields": {
+			"pityHelperText": "Après un certain nombre d'échecs consécutifs, Dicelette garantit un succès automatique au jet suivant."
+		},
 		"hiddenRoll": {
 			"desc": "Permet de cacher les résultats des dés des MJ et de l'envoyé dans un channel spécifique ou par message éphémère.",
 			"title": "[MJ] Jets invisibles"

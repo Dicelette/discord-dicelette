@@ -190,9 +190,27 @@ function collapseCompareToCount(result?: Resultat): void {
 	const numValue = typeof value === "number" ? value : Number(value);
 	if (Number.isNaN(numValue)) return;
 	const count = compareTotal(result.total, sign, numValue) ? 1 : 0;
-	result.result = result.result
+	let updated = result.result
 		.replace(/^([^:]*?)(\s*:)/, `$1${sign}${value}$2`)
 		.replace(/=\s*-?\d+(?:\.\d+)?\s*$/, `= ${count}`);
+	// Mirror pool behaviour: mark each die that individually passes the threshold.
+	// The total may pass via a modifier even when no individual die does, so we
+	// compare die values rather than `count`.
+	updated = updated.replace(
+		/\[([^\]]+)\]/g,
+		(_m, inner) =>
+			`[${inner
+				.split(",")
+				.map((v: string) => {
+					const trimmed = v.trimStart();
+					const dieValue = Number.parseInt(trimmed, 10);
+					if (!Number.isNaN(dieValue) && compareTotal(dieValue, sign, numValue))
+						return trimmed.replace(/^(-?\d+)/, "$1×");
+					return trimmed;
+				})
+				.join(",")}]`
+	);
+	result.result = updated;
 	result.total = count;
 	result.compare = undefined;
 }

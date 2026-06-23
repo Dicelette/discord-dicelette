@@ -51,6 +51,7 @@ function DiceBehaviour({ control }: Props) {
 							value={field.value ?? null}
 							min={0}
 							onValueChange={(e) => field.onChange(e ?? undefined)}
+							helperText={t("config.fields.pityHelperText")}
 						/>
 					)}
 				/>

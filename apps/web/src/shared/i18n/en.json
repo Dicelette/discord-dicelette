@@ -38,7 +38,7 @@
 			"autoRoleDice": "Auto role (dice)",
 			"autoRoleStats": "Auto role (stats)",
 			"channelId": "Reception channel",
-			"context": "Add context link in logs",
+			"context": "Lien vers le contexte du dé",
 			"customFormula": "Custom formula",
 			"customFormulaHelper": "Applies a server-wide formula {link} to all dice where [expr] replaces $",
 			"customFormulaInvalid": "Invalid formula: {error}",
@@ -58,7 +58,7 @@
 			"logs": "Logs channel",
 			"moderationChannel": "Moderation channel (optional)",
 			"moderationChannelHelp": "Channel ID for moderating registrations",
-			"pity": "Pity threshold (consecutive critical failures)",
+			"pity": "Pity threshold",
 			"privateChannel": "Private channel",
 			"rollChannel": "Roll results channel",
 			"sortNone": "None (default)",
@@ -129,12 +129,12 @@
 		"onNaturalDice": "Applies only on natural dice",
 		"options": {
 			"charName": "Character name",
+			"context": "Show a link to the context",
 			"customFormulaHelper": "A {link} formula to the rolls where [expr] replaces $.",
 			"disableCompare": "Disable success/failure comparison",
-			"hide": "Hide options",
 			"pseudo": "Pseudo",
 			"pseudoDefault": "Player",
-			"show": "Show options",
+			"saveLink": "Link to the saved dice",
 			"statName": "Statistic name",
 			"timestamp": "Show timestamp"
 		},
@@ -146,6 +146,13 @@
 			"rendered": "Rendered"
 		},
 		"roll": "Roll",
+		"sections": {
+			"character": "Character",
+			"contextLinks": "Context links",
+			"criticals": "Criticals",
+			"display": "Display",
+			"general": "General"
+		},
 		"subtitle": "Throw a dice and see how the result will be displayed.",
 		"title": "Playground"
 	},

@@ -342,6 +342,29 @@ describe("roll parsing — disableCompare", () => {
 		expect(r!.result.total).toBeGreaterThanOrEqual(6);
 		expect(r!.result.total).toBeLessThanOrEqual(25);
 	});
+
+	it("adds x marker on die when the natural die itself passes the threshold", () => {
+		// 1d20+5>=1: any d20 value (1–20) is itself >= 1, so x always appears
+		const r = isRolling("1d20+5>=1", undefined, undefined, undefined, true);
+		expect(r!.result.total).toBe(1);
+		expect(r!.result.result).toMatch(/\[\d+x/);
+	});
+
+	it("does not add x marker when no individual die reaches the threshold", () => {
+		// 1d20+5>=100: no d20 value reaches 100, so x never appears (even though
+		// +5 could push the total over a lower threshold; this tests the no-x case)
+		const r = isRolling("1d20+5>=100", undefined, undefined, undefined, true);
+		expect(r!.result.total).toBe(0);
+		expect(r!.result.result).not.toMatch(/\[\d+x/);
+	});
+
+	it("does not add x when die passes only via modifier, not naturally", () => {
+		// 1d6+10>=15: d6 max is 6, so no die is naturally >= 15, but total may be
+		// >= 15 (e.g. 6+10=16). x must NOT appear on the die.
+		const r = isRolling("1d6+10>=15", undefined, undefined, undefined, true);
+		// total is 1 when d6 roll + 10 >= 15, i.e. d6 >= 5
+		expect(r!.result.result).not.toMatch(/\[\d+x/);
+	});
 });
 
 describe("roll parsing — custom formula", () => {
