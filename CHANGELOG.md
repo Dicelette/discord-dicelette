@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.3.0](https://github.com/Dicelette/discord-dicelette/compare/4.2.0...4.3.0) (2026-06-23)
+
+
+### Features
+
+* **web:playground:** enhance dice rolling logic and UI options ([d01a58f](https://github.com/Dicelette/discord-dicelette/commit/d01a58f03fc01f1f53be20fa57e4b0720565a39d))
+* **web:** render Playground directly on playground.* hostname ([f370ec7](https://github.com/Dicelette/discord-dicelette/commit/f370ec71f3e40547a911c1137b8671320f564949))
+
+
+### Bug Fixes
+
+* **server:** allow Iconify CDN in Content-Security-Policy ([025b6fc](https://github.com/Dicelette/discord-dicelette/commit/025b6fc0633d0bbb60c24fe39c54985f03b8da4a))
+
 ## [4.2.0](https://github.com/Dicelette/discord-dicelette/compare/4.1.1...4.2.0) (2026-06-22)
 
 
