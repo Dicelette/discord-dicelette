@@ -151,7 +151,11 @@
 			"contextLinks": "Liens de contexte",
 			"criticals": "Critiques",
 			"display": "Affichage",
-			"general": "Générale"
+			"general": "Générale",
+			"statistics": "Statistiques"
+		},
+		"statistics": {
+			"helper": "Définissez des statistiques, puis utilisez-les dans vos dés avec $nom (ex. 1d20+$force)."
 		},
 		"subtitle": "Lancer un dé et voyez comment le résultat s'afficherait.",
 		"title": "Bac à sable"

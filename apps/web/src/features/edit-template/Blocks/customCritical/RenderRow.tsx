@@ -1,6 +1,6 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Autocomplete, Box, TextField, Tooltip } from "@mui/material";
-import { useI18n } from "@shared";
+import { SIGN_OPTIONS, useI18n } from "@shared";
 import {
 	memo,
 	type ReactElement,
@@ -18,8 +18,6 @@ import { BTN_CELL_SX, CELL_SX, DUPLICATE_ROW_SX, ROW_SX } from "../styles";
 import { customCriticalErrorMessage } from "./errors";
 
 export type Custom = DataForm["customCritical"][number];
-
-const SIGN_OPTIONS = [">", ">=", "<", "<=", "==", "!="] as const;
 
 const CODE_INPUT_SX = {
 	width: { xs: "100%", md: 200 },

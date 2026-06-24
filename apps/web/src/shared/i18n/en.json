@@ -38,7 +38,7 @@
 			"autoRoleDice": "Auto role (dice)",
 			"autoRoleStats": "Auto role (stats)",
 			"channelId": "Reception channel",
-			"context": "Lien vers le contexte du dé",
+			"context": "Link to dice's context",
 			"customFormula": "Custom formula",
 			"customFormulaHelper": "Applies a server-wide formula {link} to all dice where [expr] replaces $",
 			"customFormulaInvalid": "Invalid formula: {error}",
@@ -151,7 +151,11 @@
 			"contextLinks": "Context links",
 			"criticals": "Criticals",
 			"display": "Display",
-			"general": "General"
+			"general": "General",
+			"statistics": "Statistics"
+		},
+		"statistics": {
+			"helper": "Define statistics, then reference them in your dice with $name (e.g. 1d20+$strength)."
 		},
 		"subtitle": "Throw a dice and see how the result will be displayed.",
 		"title": "Playground"

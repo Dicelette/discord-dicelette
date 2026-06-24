@@ -66,7 +66,6 @@ export default function AppLayout() {
 						<PlaygroundButton />
 						<ThemeToggleButton />
 						<LanguageSelect sx={languageSelectSx} />
-
 						{user && (
 							<UserAvatarMenu
 								username={user.global_name ?? user.username}

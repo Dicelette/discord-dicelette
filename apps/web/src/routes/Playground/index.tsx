@@ -1,19 +1,13 @@
-// The dice engine swap MUST be imported before any roll happens. Keeping it as
-// the first import guarantees the browser-safe RNG is installed at module load.
-import "../shims/dice-engine";
-// Brings the `String.prototype.standardize` augmentation used below (and the
-// matching global types) into scope.
+import "../../shims/dice-engine";
 import "uniformize";
 
-import { type CustomCritical, SortOrder, validateCustomFormula } from "@dicelette/core";
+import { SortOrder, validateCustomFormula } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import {
 	applyCustomFormula,
 	isRolling,
 	parseComparator,
-	parseCustomCritical,
 	ResultAsText,
-	rollCustomCritical,
 	rollCustomCriticalsFromDice,
 	type Server,
 } from "@dicelette/parse_result";
@@ -45,150 +39,47 @@ import {
 	Typography,
 } from "@mui/material";
 import {
+	type ComparisonSign,
 	DiscordMarkdown,
 	DocsButton,
 	LanguageSelect,
+	SIGN_OPTIONS,
 	ThemeToggleButton,
 	TransWithLink,
 	useI18n,
 	useLocalStorageState,
 } from "@shared";
-import { Locale } from "discord-api-types/v10";
 import { useCallback, useMemo, useState } from "react";
-
-const headerBoxSx = { px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } } as const;
-const toolbarBoxSx = {
-	width: "100%",
-	display: "flex",
-	justifyContent: "flex-end",
-	alignItems: "center",
-	gap: 1,
-	flexWrap: "wrap",
-} as const;
-const mainBoxSx = { px: { xs: 2, sm: 4 }, py: { xs: 3, sm: 6 } } as const;
-const stackSx = { maxWidth: 720, mx: "auto" } as const;
-const paperSx = { p: 3 } as const;
-const summarySx = { bgcolor: "action.hover" } as const;
-const summaryTitleSx = { fontWeight: 600 } as const;
-const logoBoxSx = {
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "center",
-	gap: 1.5,
-	mb: 1,
-} as const;
-const boxBaseSx = {
-	mt: 0.5,
-	p: 2,
-	borderRadius: 1,
-	bgcolor: "var(--bg-default)",
-	border: "1px solid",
-	borderColor: "divider",
-	minHeight: 48,
-} as const;
-
-/** Maps the web UI locale to the Discord `Locale` the formatter expects. */
-function toDiscordLocale(locale: "en" | "fr"): Locale {
-	return locale === "en" ? Locale.EnglishUS : Locale.French;
-}
-
-// Stand-in ids for fake Discord entities used in the preview output.
-const FAKE_AUTHOR_ID = "0".repeat(18);
-const FAKE_SAVE_CHANNEL = "2".repeat(18);
-const FAKE_GUILD = "1".repeat(18);
-const FAKE_MESSAGEID = "3".repeat(18);
-
-const SIGN_OPTIONS = [">", ">=", "<", "<=", "==", "!="] as const;
-
-const SORT_OPTIONS: { value: SortOrder; labelKey: string }[] = [
-	{ value: SortOrder.Ascending, labelKey: "config.sort.options.ascending" },
-	{ value: SortOrder.Descending, labelKey: "config.sort.options.descending" },
-];
-
-/** A custom critical row, mirroring the template editor (name + sign + formula). */
-type CustomCriticalEntry = {
-	id: string;
-	name: string;
-	sign: string;
-	formula: string;
-	onNaturalDice: boolean;
-};
-
-/** The four collapsible option sections. */
-type SectionKey = "general" | "character" | "criticals" | "display";
-
-/**
- * Every persisted playground option in a single object — mirrors the dashboard's
- * `useForm({ defaultValues })`, so one `useLocalStorageState` replaces ~17.
- */
-type PlaygroundOptions = {
-	expression: string;
-	pseudo: string;
-	criticalSuccess: string;
-	criticalFailure: string;
-	charName: string;
-	statName: string;
-	customFormula: string;
-	timestamp: boolean;
-	disableCompare: boolean;
-	sortOrder: SortOrder;
-	showContext: boolean;
-	showSaveLink: boolean;
-	customCriticals: CustomCriticalEntry[];
-	open: Record<SectionKey, boolean>;
-};
-
-const DEFAULT_OPTIONS: PlaygroundOptions = {
-	expression: "1d20+5>=15",
-	pseudo: "",
-	criticalSuccess: "",
-	criticalFailure: "",
-	charName: "",
-	statName: "",
-	customFormula: "",
-	timestamp: false,
-	disableCompare: false,
-	sortOrder: SortOrder.None,
-	showContext: false,
-	showSaveLink: false,
-	customCriticals: [],
-	open: { general: false, character: false, criticals: false, display: false },
-};
-
-function newCustomCritical(): CustomCriticalEntry {
-	return {
-		id: crypto.randomUUID(),
-		name: "",
-		sign: ">=",
-		formula: "",
-		onNaturalDice: false,
-	};
-}
-
-/**
- * Builds the rolled custom-critical record the formatter expects from the UI
- * rows, reusing the bot's `parseCustomCritical` + `rollCustomCritical`.
- */
-function buildCustomCriticals(
-	entries: CustomCriticalEntry[]
-): Record<string, CustomCritical> {
-	const record: Record<string, CustomCritical> = {};
-	for (const cc of entries) {
-		const name = cc.name.trim();
-		const formula = cc.formula.trim();
-		if (!name || !formula) continue;
-		const prefixed = cc.onNaturalDice ? `(N)${name}` : name;
-		const parsed = parseCustomCritical(prefixed, `${cc.sign}${formula}`);
-		if (parsed) Object.assign(record, parsed);
-	}
-	return rollCustomCritical(record) ?? {};
-}
-
-function parseNumber(value: string): number | undefined {
-	if (value.trim() === "") return undefined;
-	const n = Number(value);
-	return Number.isFinite(n) ? n : undefined;
-}
+import { AttributeRow } from "../../features/user-config";
+import {
+	DEFAULT_OPTIONS,
+	FAKE_AUTHOR_ID,
+	FAKE_GUILD,
+	FAKE_MESSAGEID,
+	FAKE_SAVE_CHANNEL,
+	SORT_OPTIONS,
+} from "./constants";
+import DashboardButton from "./DashboardButton.tsx";
+import {
+	boxBaseSx,
+	headerBoxSx,
+	logoBoxSx,
+	mainBoxSx,
+	paperSx,
+	stackSx,
+	summarySx,
+	summaryTitleSx,
+	toolbarBoxSx,
+} from "./styles";
+import type { CustomCriticalEntry, PlaygroundOptions, SectionKey } from "./types";
+import {
+	buildCustomCriticals,
+	buildStats,
+	newCustomCritical,
+	parseNumber,
+	toDiscordLocale,
+	withStat,
+} from "./utils";
 
 export default function Playground() {
 	const { t, locale } = useI18n();
@@ -211,9 +102,14 @@ export default function Playground() {
 		sortOrder,
 		showContext,
 		showSaveLink,
+		statistics,
 		customCriticals,
 		open,
 	} = options;
+
+	// Transient inputs for the "add statistic" row (not persisted).
+	const [newStatName, setNewStatName] = useState("");
+	const [newStatValue, setNewStatValue] = useState("");
 
 	// Generic field setter — `update("charName", "Bob")`. Stable across renders.
 	const update = useCallback(
@@ -236,6 +132,52 @@ export default function Playground() {
 			})),
 		[setOptions]
 	);
+	// Attribute-style handlers over the stat record, mirroring AttributeRow's
+	// contract (rename returns an error string or null, value/delete by name).
+	const renameStat = useCallback(
+		(oldName: string, rawName: string): string | null => {
+			const name = rawName.trim();
+			if (!name) return t("template.errors.shared.emptyName");
+			if (
+				name !== oldName &&
+				Object.keys(options.statistics).some(
+					(k) => k.toLowerCase() === name.toLowerCase()
+				)
+			)
+				return t("template.errors.shared.duplicateName");
+			setOptions((o) => {
+				const next: Record<string, string> = {};
+				for (const [k, v] of Object.entries(o.statistics))
+					next[k === oldName ? name : k] = v;
+				return { ...o, statistics: next };
+			});
+			return null;
+		},
+		[options.statistics, setOptions, t]
+	);
+	const setStatValue = useCallback(
+		(name: string, value: string) =>
+			setOptions((o) => ({ ...o, statistics: { ...o.statistics, [name]: value } })),
+		[setOptions]
+	);
+	const deleteStat = useCallback(
+		(name: string) =>
+			setOptions((o) => {
+				const next = { ...o.statistics };
+				delete next[name];
+				return { ...o, statistics: next };
+			}),
+		[setOptions]
+	);
+	const addStat = useCallback(() => {
+		if (!newStatName.trim()) return;
+		setOptions((o) => ({
+			...o,
+			statistics: withStat(o.statistics, newStatName, newStatValue),
+		}));
+		setNewStatName("");
+		setNewStatValue("");
+	}, [newStatName, newStatValue, setOptions]);
 
 	// Sort-order options for the Autocomplete, mirroring the dashboard's General.tsx.
 	const sortOrders = useMemo(
@@ -243,19 +185,30 @@ export default function Playground() {
 		[t]
 	);
 
-	// Roll-affecting inputs are snapshotted here only when "Roll" is pressed, so
-	// typing in the dice/formula fields never triggers a fresh (random) roll.
+	// Roll-affecting inputs (including statistics) are snapshotted here only when
+	// "Roll" is pressed, so typing in the dice/formula fields or editing a stat
+	// value never triggers a fresh (random) roll on its own.
 	// Lazy-init from the restored options so the result matches on first load.
 	const [rollInput, setRollInput] = useState(() => ({
 		expression,
 		customFormula,
 		disableCompare,
 		sort: sortOrder,
+		statistics,
 	}));
 	const [copied, setCopied] = useState(false);
 
-	const doRoll = () =>
-		setRollInput({ expression, customFormula, disableCompare, sort: sortOrder });
+	const doRoll = () => {
+		// Fold a stat typed in the add row but not yet "Added" so it still applies.
+		if (newStatName.trim()) addStat();
+		setRollInput({
+			expression,
+			customFormula,
+			disableCompare,
+			sort: sortOrder,
+			statistics: withStat(statistics, newStatName, newStatValue),
+		});
+	};
 
 	// The actual (random) roll. Reused as the bot does for free-text rolls:
 	// isRolling handles inline opposition, comments, criticals and disableCompare.
@@ -281,10 +234,15 @@ export default function Playground() {
 					};
 				content = applyCustomFormula(content, formula);
 			}
+			// User statistics referenced in the dice via `$name`. Passing them lets the
+			// engine substitute the value (e.g. `1d20+$force` → `1d20+3`) like the bot.
+			// Snapshotted, so editing a stat value only applies on the next roll.
+			const { stats, statsName } = buildStats(rollInput.statistics);
+			const userData = statsName.length ? { stats, template: {} } : undefined;
 			const isRoll = isRolling(
 				content,
-				undefined,
-				undefined,
+				userData,
+				statsName.length ? statsName : undefined,
 				false,
 				rollInput.disableCompare,
 				rollInput.sort,
@@ -298,8 +256,20 @@ export default function Playground() {
 				isRoll,
 				// Criticals written inline in the dice (`{cs:}{cf:}`); the list-based
 				// ones are merged in the format memo so editing them doesn't re-roll.
-				diceCriticals: rollCustomCriticalsFromDice(content, ul) ?? {},
-				opposition: parseComparator(content, undefined, undefined, undefined),
+				diceCriticals:
+					rollCustomCriticalsFromDice(
+						content,
+						ul,
+						undefined,
+						userData?.stats,
+						rollInput.sort
+					) ?? {},
+				opposition: parseComparator(
+					content,
+					userData?.stats,
+					isRoll.infoRoll,
+					rollInput.sort
+				),
 			};
 		} catch (e) {
 			return {
@@ -410,6 +380,7 @@ export default function Playground() {
 			<meta property="og:description" content={description} />
 			<Box sx={headerBoxSx}>
 				<Box sx={toolbarBoxSx}>
+					<DashboardButton />
 					<DocsButton color="default" />
 					<ThemeToggleButton color="default" />
 					<LanguageSelect />
@@ -604,7 +575,63 @@ export default function Playground() {
 						</AccordionDetails>
 					</Accordion>
 
-					{/* ── Section 3: Critiques ── */}
+					{/* ── Section 3: Statistiques ── */}
+					<Accordion
+						expanded={open.statistics}
+						onChange={(_, v) => setSection("statistics", v)}
+					>
+						<AccordionSummary expandIcon={<ExpandMore />} sx={summarySx}>
+							<Typography sx={summaryTitleSx}>
+								{t("playground.sections.statistics")}
+							</Typography>
+						</AccordionSummary>
+						<AccordionDetails>
+							<Stack spacing={2}>
+								<Typography variant="body2" sx={{ color: "text.secondary" }}>
+									{t("playground.statistics.helper")}
+								</Typography>
+								{Object.entries(statistics).map(([name, value]) => (
+									<AttributeRow
+										key={name}
+										name={name}
+										value={value}
+										allData={statistics}
+										onRename={renameStat}
+										onValueChange={setStatValue}
+										onDelete={deleteStat}
+									/>
+								))}
+								<Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+									<TextField
+										label={t("template.name")}
+										value={newStatName}
+										onChange={(e) => setNewStatName(e.target.value)}
+										onKeyDown={(e) => e.key === "Enter" && addStat()}
+										size="small"
+										sx={{ flex: 2 }}
+									/>
+									<TextField
+										label={t("userConfig.attrValue")}
+										value={newStatValue}
+										onChange={(e) => setNewStatValue(e.target.value)}
+										onKeyDown={(e) => e.key === "Enter" && addStat()}
+										size="small"
+										sx={{ flex: 1 }}
+									/>
+									<Button
+										size="small"
+										startIcon={<Add />}
+										onClick={addStat}
+										disabled={!newStatName.trim()}
+									>
+										{t("common.add")}
+									</Button>
+								</Stack>
+							</Stack>
+						</AccordionDetails>
+					</Accordion>
+
+					{/* ── Section 4: Critiques ── */}
 					<Accordion
 						expanded={open.criticals}
 						onChange={(_, v) => setSection("criticals", v)}
@@ -678,7 +705,9 @@ export default function Playground() {
 											label={t("template.sign")}
 											value={cc.sign}
 											onChange={(e) =>
-												updateCustomCritical(cc.id, { sign: e.target.value })
+												updateCustomCritical(cc.id, {
+													sign: e.target.value as ComparisonSign,
+												})
 											}
 											size="small"
 											sx={{ minWidth: 80 }}
