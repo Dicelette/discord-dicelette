@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.0](https://github.com/Dicelette/discord-dicelette/compare/4.3.0...4.4.0) (2026-06-24)
+
+
+### Features
+
+* add statistics management to Playground component ([ef3a297](https://github.com/Dicelette/discord-dicelette/commit/ef3a2971c20baa51d2eec9440459d76267dac741))
+
 ## [4.3.0](https://github.com/Dicelette/discord-dicelette/compare/4.2.0...4.3.0) (2026-06-23)
 
 
