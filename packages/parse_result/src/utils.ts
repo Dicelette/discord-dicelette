@@ -217,3 +217,20 @@ export function parseComparator(
 		return parseOpposition(opposition, comparator, userStatistique, userStatStr, sort);
 	return undefined;
 }
+
+/**
+ * Detect if a message is a dice to make an early return for "obviously" not a dice, like:
+ * - Empty message (rare, but... Well?)
+ * - message containing only "_ _"
+ * - Message starting with some characteres (non words doesn't works as non words can be included in a valid dice)
+ * - Links
+ * @param {string} content the content of the message
+ */
+export function isNotADice(content: string) {
+	return (
+		content.trim().length === 0 ||
+		content === "_ _" ||
+		content.startsWith("https://") ||
+		content.match(/^[|\\_`/¤!µ*>~\-#§:;.,?%£€"'&°=]/)
+	);
+}
