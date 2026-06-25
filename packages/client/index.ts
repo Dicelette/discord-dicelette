@@ -238,45 +238,20 @@ export function createBotClient(options?: Partial<Djs.ClientOptions>): EClient {
 			Djs.Partials.User,
 			Djs.Partials.Reaction,
 		],
-		/**
-		 * Bound or disable Discord.js caches to prevent unbounded memory growth.
-		 *
-		 * The bot fetches members/users/messages on demand (see `@dicelette/helpers`
-		 * `fetchWithCache`), so it never depends on a deep, long-lived cache. We therefore
-		 * disable every manager tied to a feature/intent the bot does not use, and keep a
-		 * small bounded message cache.
-		 *
-		 * Caches we MUST keep:
-		 * - `ReactionManager`: read in `events/on_message_reaction.ts` (`message.reactions.cache`).
-		 * - The "required" managers (Guild/Channel/GuildChannel/Role/PermissionOverwrite) cannot
-		 *   be limited by Discord.js and are intentionally left untouched.
-		 *
-		 * `GuildMemberManager`/`UserManager` are intentionally NOT hard-limited here: a maxSize
-		 * limit can evict `client.user`/`guild.members.me`. They are cleaned via `sweepers` below.
-		 */
 		makeCache: Djs.Options.cacheWithLimits({
 			...Djs.Options.DefaultMakeCacheSettings,
-			// Bound the biggest grower: messages are fetched on demand when missing.
 			MessageManager: 25,
-			// No voice/stage intents → these never populate, disable them entirely.
 			VoiceStateManager: 0,
 			StageInstanceManager: 0,
-			// No GuildPresences intent.
 			PresenceManager: 0,
-			// Bot only uses Unicode emojis/reactions, never guild emojis or stickers.
 			GuildEmojiManager: 0,
 			GuildStickerManager: 0,
-			// Never read by the bot.
 			GuildBanManager: 0,
 			GuildInviteManager: 0,
 			GuildScheduledEventManager: 0,
 			AutoModerationRuleManager: 0,
 			ThreadMemberManager: 0,
 		}),
-		/**
-		 * Periodically evict cached entities the bot no longer needs. Filters keep the bot's
-		 * own user/member so permission checks and self-references never break.
-		 */
 		sweepers: {
 			...Djs.Options.DefaultSweeperSettings,
 			// Drop messages not touched in the last 30 min (re-fetched on demand if needed).

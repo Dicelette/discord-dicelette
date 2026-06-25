@@ -4,6 +4,7 @@ import { fetchChannel, getGuildContext, resolveCustomFormula } from "@dicelette/
 import { lError, ln } from "@dicelette/localization";
 import {
 	applyCustomFormula,
+	isNotADice,
 	isRolling,
 	parseComparator,
 	rollCustomCriticalsFromDice,
@@ -39,13 +40,15 @@ export default (client: EClient): void => {
 			if (message.author.bot && message.author.id === client.user?.id)
 				return saveCount(message, client.criticalCount, message.guild.id, client);
 			let content = message.content;
-			if (message.content.match(/^`.*`$/)) return await stripOOC(message, client, ul);
+			if (isNotADice(message.content)) return await stripOOC(message, client, ul);
 			let author = message.author;
+			//allow to roll for another member in the on_message_send, based on the first mention present in the dice
 			if (message.member?.permissions.has(Djs.PermissionFlagsBits.ManageRoles)) {
 				//verify if they are any mentions
 				if (message.mentions.users.size > 0) {
 					author = message.mentions.users.first()!;
 					content = content.replaceAll(`<@${author.id}>`, "").trim();
+					if (isNotADice(content)) return await stripOOC(message, client, ul);
 				}
 			}
 
