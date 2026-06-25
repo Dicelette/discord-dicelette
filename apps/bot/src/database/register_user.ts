@@ -113,7 +113,7 @@ export async function changeOwnerInDatabase(
 	const allCharsOldUser = characters.get(guildId, oldUserId);
 	if (allCharsOldUser)
 		//remove the character from the old user
-		characters.set(
+		client.setCharacter(
 			guildId,
 			allCharsOldUser.filter((char) => !char?.userName?.subText(charName, true)),
 			oldUserId
@@ -122,10 +122,11 @@ export async function changeOwnerInDatabase(
 	if (allCharsOldUser)
 		char = allCharsOldUser.find((char) => char?.userName?.subText(charName, true));
 	else char = await getUser(location, guild, client);
+	if (!char) return;
 	if (allCharsNewUser) {
 		//prevent duplicate
 		if (!allCharsNewUser.find((char) => char?.userName?.subText(charName, true))) {
-			characters.set(guildId, [...allCharsNewUser, char], userId);
+			client.setCharacter(guildId, [...allCharsNewUser, char], userId);
 		}
-	} else characters.set(guildId, [char], userId);
+	} else client.setCharacter(guildId, [char], userId);
 }

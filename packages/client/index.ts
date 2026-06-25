@@ -7,6 +7,7 @@ import type {
 	GuildData,
 	Settings,
 	TemplateData,
+	UserData,
 	UserPreferences,
 	UserSettings,
 } from "@dicelette/types";
@@ -176,6 +177,43 @@ export class EClient extends Djs.Client {
 		if (!templateID) return;
 		this.templateAutocompleteCache.delete(templateID);
 	}
+
+	/**
+	 * Write a user's character list to the in-memory cache **and** stamp its TTL timestamp.
+	 *
+	 * Always prefer this over calling `characters.set(...)` directly: the periodic cleanup
+	 * (see `startCacheCleanup`) can only evict entries that have a matching timestamp in
+	 * `characterCacheTimestamps`. A bare `characters.set` creates an entry the sweeper can
+	 * never reclaim, leaking memory until the next restart.
+	 *
+	 * @param guildId - Guild the character belongs to.
+	 * @param value - The user's full character list.
+	 * @param userId - Owner of the character list.
+	 */
+	setCharacter(guildId: string, value: UserData[], userId: string) {
+		this.characters.set(guildId, value, userId);
+		this.characterCacheTimestamps.set(`${guildId}:${userId}`, Date.now());
+	}
+
+	/**
+	 * Remove character data from the in-memory cache and drop the matching TTL timestamp(s),
+	 * keeping `characters` and `characterCacheTimestamps` in sync.
+	 *
+	 * @param guildId - Guild to clear.
+	 * @param userId - When provided, only that user's entry is removed; otherwise the whole guild.
+	 */
+	deleteCharacter(guildId: string, userId?: string) {
+		if (userId) {
+			this.characters.delete(guildId, userId);
+			this.characterCacheTimestamps.delete(`${guildId}:${userId}`);
+			return;
+		}
+		this.characters.delete(guildId);
+		const prefix = `${guildId}:`;
+		for (const key of this.characterCacheTimestamps.keys()) {
+			if (key.startsWith(prefix)) this.characterCacheTimestamps.delete(key);
+		}
+	}
 }
 
 /**
@@ -200,6 +238,61 @@ export function createBotClient(options?: Partial<Djs.ClientOptions>): EClient {
 			Djs.Partials.User,
 			Djs.Partials.Reaction,
 		],
+		/**
+		 * Bound or disable Discord.js caches to prevent unbounded memory growth.
+		 *
+		 * The bot fetches members/users/messages on demand (see `@dicelette/helpers`
+		 * `fetchWithCache`), so it never depends on a deep, long-lived cache. We therefore
+		 * disable every manager tied to a feature/intent the bot does not use, and keep a
+		 * small bounded message cache.
+		 *
+		 * Caches we MUST keep:
+		 * - `ReactionManager`: read in `events/on_message_reaction.ts` (`message.reactions.cache`).
+		 * - The "required" managers (Guild/Channel/GuildChannel/Role/PermissionOverwrite) cannot
+		 *   be limited by Discord.js and are intentionally left untouched.
+		 *
+		 * `GuildMemberManager`/`UserManager` are intentionally NOT hard-limited here: a maxSize
+		 * limit can evict `client.user`/`guild.members.me`. They are cleaned via `sweepers` below.
+		 */
+		makeCache: Djs.Options.cacheWithLimits({
+			...Djs.Options.DefaultMakeCacheSettings,
+			// Bound the biggest grower: messages are fetched on demand when missing.
+			MessageManager: 25,
+			// No voice/stage intents → these never populate, disable them entirely.
+			VoiceStateManager: 0,
+			StageInstanceManager: 0,
+			// No GuildPresences intent.
+			PresenceManager: 0,
+			// Bot only uses Unicode emojis/reactions, never guild emojis or stickers.
+			GuildEmojiManager: 0,
+			GuildStickerManager: 0,
+			// Never read by the bot.
+			GuildBanManager: 0,
+			GuildInviteManager: 0,
+			GuildScheduledEventManager: 0,
+			AutoModerationRuleManager: 0,
+			ThreadMemberManager: 0,
+		}),
+		/**
+		 * Periodically evict cached entities the bot no longer needs. Filters keep the bot's
+		 * own user/member so permission checks and self-references never break.
+		 */
+		sweepers: {
+			...Djs.Options.DefaultSweeperSettings,
+			// Drop messages not touched in the last 30 min (re-fetched on demand if needed).
+			messages: { interval: 3600, lifetime: 1800 },
+			// Clear reactions hourly; they are only needed transiently within a handler.
+			reactions: { interval: 3600, filter: () => () => true },
+			// Evict every user/member except the bot itself.
+			users: {
+				interval: 3600,
+				filter: () => (user) => user.id !== user.client.user?.id,
+			},
+			guildMembers: {
+				interval: 3600,
+				filter: () => (member) => member.id !== member.client.user?.id,
+			},
+		},
 		...options,
 	});
 }

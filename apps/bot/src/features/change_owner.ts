@@ -132,7 +132,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 
 		// Remove character from old user
 		if (allCharsOldUser) {
-			this.client.characters.set(
+			this.client.setCharacter(
 				interaction.guild.id,
 				allCharsOldUser.filter((char) => char?.userName !== charData?.userName),
 				oldUserId
@@ -141,7 +141,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 
 		// Add character to new user if not already present
 		if (!allCharsNewUser.find((char) => char?.userName === charData?.userName)) {
-			this.client.characters.set(
+			this.client.setCharacter(
 				interaction.guild.id,
 				[...allCharsNewUser, charData],
 				user.id

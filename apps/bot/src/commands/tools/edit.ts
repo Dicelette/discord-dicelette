@@ -302,7 +302,7 @@ export async function rename(
 		const userData = getUserByEmbed({ message });
 		if (!userData) return;
 		userData.userName = name;
-		client.characters.set(
+		client.setCharacter(
 			interaction.guild!.id,
 			[userData],
 			user?.id ?? interaction.user.id
@@ -318,14 +318,14 @@ export async function rename(
 			if (!userData) return;
 			oldChar.push(userData);
 			userData.userName = name;
-			client.characters.set(
+			client.setCharacter(
 				interaction.guild!.id,
 				oldChar,
 				user?.id ?? interaction.user.id
 			);
 		} else {
 			oldCharData.userName = name;
-			client.characters.set(
+			client.setCharacter(
 				interaction.guild!.id,
 				oldChar,
 				user?.id ?? interaction.user.id
