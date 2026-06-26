@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.2](https://github.com/Dicelette/discord-dicelette/compare/4.4.1...4.4.2) (2026-06-26)
+
+
+### Bug Fixes
+
+* handle missing parent channels in thread operations ([9a5d99b](https://github.com/Dicelette/discord-dicelette/commit/9a5d99b58dfcdf255250d0b337c2b552be9aa846))
+
 ## [4.4.1](https://github.com/Dicelette/discord-dicelette/compare/4.4.0...4.4.1) (2026-06-25)
 
 ## [4.4.0](https://github.com/Dicelette/discord-dicelette/compare/4.3.0...4.4.0) (2026-06-24)
