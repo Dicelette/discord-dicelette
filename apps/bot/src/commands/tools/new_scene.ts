@@ -80,6 +80,7 @@ export default {
 			if (!isTextChannel) {
 				if (!channel.parent) await channel.fetch();
 				if (!channel.parent) return;
+				await channel.parent.threads.fetchActive();
 			}
 			const threads = isTextChannel
 				? channel.threads.cache.filter(
