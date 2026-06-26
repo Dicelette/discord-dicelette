@@ -77,7 +77,10 @@ export default {
 			(channel.parent && channel.parent.type === Djs.ChannelType.GuildForum) ||
 			!channel.name.decode().startsWith("🎲")
 		) {
-			if (!isTextChannel && !channel.parent) return;
+			if (!isTextChannel) {
+				if (!channel.parent) await channel.fetch();
+				if (!channel.parent) return;
+			}
 			const threads = isTextChannel
 				? channel.threads.cache.filter(
 						(thread) => thread.name.decode().startsWith("🎲") && !thread.archived
