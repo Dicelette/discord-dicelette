@@ -58,9 +58,9 @@ export async function createDefaultThread(
 	save = true
 ) {
 	if (parent instanceof Djs.ThreadChannel) {
-		if (!parent.parent) await parent.fetch();
-		if (!parent.parent) return undefined;
-		parent = parent.parent as Djs.TextChannel;
+		const resolved = parent.parent ? parent : await parent.fetch();
+		if (!resolved.parent) return undefined;
+		parent = resolved.parent as Djs.TextChannel;
 	}
 	let thread = parent.threads.cache.find((thread) => thread.name === "📝 • [STATS]") as
 		| Djs.AnyThreadChannel
@@ -465,8 +465,10 @@ export async function threadToSend(
 	ul: Translation,
 	isHidden?: string
 ) {
-	if (channel instanceof Djs.ThreadChannel && !channel.parent) await channel.fetch();
-	const parentChannel = channel instanceof Djs.ThreadChannel ? channel.parent : channel;
+	const resolvedChannel =
+		channel instanceof Djs.ThreadChannel && !channel.parent ? await channel.fetch() : channel;
+	const parentChannel =
+		resolvedChannel instanceof Djs.ThreadChannel ? resolvedChannel.parent : resolvedChannel;
 	if (!parentChannel) return undefined;
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)

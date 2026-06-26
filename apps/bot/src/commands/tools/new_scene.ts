@@ -78,9 +78,11 @@ export default {
 			!channel.name.decode().startsWith("🎲")
 		) {
 			if (!isTextChannel) {
-				if (!channel.parent) await channel.fetch();
-				if (!channel.parent) return;
-				await channel.parent.threads.fetchActive();
+				const resolvedChannel = channel.parent
+					? channel
+					: await (channel as Djs.PublicThreadChannel).fetch();
+				if (!resolvedChannel.parent) return;
+				await (resolvedChannel.parent as Djs.ForumChannel).threads.fetchActive();
 			}
 			const threads = isTextChannel
 				? channel.threads.cache.filter(

@@ -233,6 +233,7 @@ export async function handleRollResult(
 		channel as Exclude<typeof channel, Djs.PartialGroupDMChannel | Djs.DMChannel>,
 		ul
 	);
+	if (!thread) return;
 	const msgToEdit = await thread.send("_ _");
 
 	// All remaining operations in background: edit thread, update reply with URL, apply timers
