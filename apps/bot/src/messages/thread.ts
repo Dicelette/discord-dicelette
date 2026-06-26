@@ -52,24 +52,38 @@ async function refreshThreadCacheIfNeeded(
 }
 
 export async function createDefaultThread(
-	parent: Djs.ThreadChannel | Djs.TextChannel,
+	from: Djs.ThreadChannel | Djs.TextChannel, //Si on est sur un thread on va remonter sur le parent, sinon on va créer dedans
 	guildData: Settings,
 	guild?: Djs.Guild,
 	save = true
 ) {
-	if (parent instanceof Djs.ThreadChannel) parent = parent.parent as Djs.TextChannel;
-	let thread = parent.threads.cache.find((thread) => thread.name === "📝 • [STATS]") as
+	if (from instanceof Djs.ThreadChannel) {
+		//n'est du coup pas le parent, mais un thread dont on va chercher à avoir le parent
+		const resolved = from.parent ? from : await from.fetch(true);
+		//resolved.parentId as an open issue about typing for that
+		//cf: https://github.com/discordjs/discord.js/issues/8471
+
+		const parent =
+			from.parent ??
+			(await from.guild.channels.fetch(resolved.parentId!).catch(() => null));
+		if (!parent)
+			throw new Error(
+				"Parent channel not found for requested thread - Should not happend."
+			);
+		from = parent as Djs.TextChannel;
+	}
+	let thread = from.threads.cache.find((thread) => thread.name === "📝 • [STATS]") as
 		| Djs.AnyThreadChannel
 		| undefined;
 	if (!thread) {
-		await refreshThreadCacheIfNeeded(parent, { force: true });
-		thread = parent.threads.cache.find(
+		await refreshThreadCacheIfNeeded(from, { force: true });
+		thread = from.threads.cache.find(
 			(cachedThread) => cachedThread.name === "📝 • [STATS]"
 		) as Djs.AnyThreadChannel | undefined;
 	}
 	if (thread?.archived) await thread.setArchived(false);
 	if (!thread) {
-		thread = (await parent.threads.create({
+		thread = (await from.threads.create({
 			autoArchiveDuration: 10080,
 			name: "📝 • [STATS]",
 		})) as Djs.AnyThreadChannel;
@@ -461,7 +475,15 @@ export async function threadToSend(
 	ul: Translation,
 	isHidden?: string
 ) {
-	const parentChannel = channel instanceof Djs.ThreadChannel ? channel.parent : channel;
+	const resolvedChannel =
+		channel instanceof Djs.ThreadChannel && !channel.parent
+			? await channel.fetch()
+			: channel;
+	const parentChannel =
+		resolvedChannel instanceof Djs.ThreadChannel
+			? resolvedChannel.parent
+			: resolvedChannel;
+	if (!parentChannel) return undefined;
 	return parentChannel instanceof Djs.TextChannel
 		? await findThread(db, parentChannel, ul, isHidden)
 		: await findForumChannel(

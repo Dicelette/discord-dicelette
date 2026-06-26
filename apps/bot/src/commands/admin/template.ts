@@ -294,6 +294,15 @@ async function registerTemplate(
 			interaction.guild ?? undefined,
 			false
 		);
+		if (!publicChannel) {
+			await reply(interaction, {
+				embeds: [
+					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
+				],
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
+		}
 	} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
 		await reply(interaction, {
 			embeds: [

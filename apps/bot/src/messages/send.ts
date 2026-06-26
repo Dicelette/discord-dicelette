@@ -197,6 +197,7 @@ export async function sendResult(
 			ul,
 			isHidden
 		);
+		if (!thread) return;
 		const forwarded = await thread.send("_ _");
 		const linkToLog = settings.get(interaction.guild!.id, "linkToLogs");
 		const logUrl = linkToLog ? forwarded.url : undefined;
