@@ -6,7 +6,6 @@ module.exports = {
 			node_args: "--max-old-space-size=1024",
 			max_memory_restart: "900M",
 			log_date_format: "YYYY-MM-DD HH:mm Z",
-			time: true,
 			interpreter: "node",
 			env: {
 				NODE_OPTIONS: "--max-old-space-size=1024",
