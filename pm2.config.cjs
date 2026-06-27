@@ -6,4 +6,7 @@ module.exports = {
 	log_date_format: "YYYY-MM-DD HH:mm Z",
 	time: true,
 	interpreter: "node",
+	env: {
+		NODE_OPTIONS: "--max-old-space-size=1024",
+	},
 };
