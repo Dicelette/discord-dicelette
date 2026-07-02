@@ -448,9 +448,7 @@ export default function Playground() {
 								mb: 1,
 							}}
 						>
-							<Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
-								{t("playground.result.rendered")}
-							</Typography>
+							<span />
 							<Tooltip
 								title={t(copied ? "playground.result.copied" : "playground.result.copy")}
 							>
