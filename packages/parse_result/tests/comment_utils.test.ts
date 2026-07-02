@@ -173,4 +173,16 @@ describe("extractAndMergeComments", () => {
 
 		expect(result.cleanedDice).toContain("1d20");
 	});
+
+	it("should not duplicate a multi-word bracketed # comment (snippets regression)", () => {
+		// DETECT_DICE_MESSAGE isn't anchored: with a "#" comment containing a
+		// repeated word (e.g. "Sang ... Sang"), it used to land mid-comment and
+		// capture a trailing fragment that got appended a second time.
+		const result = extractAndMergeComments(
+			"1d100<=[$vita+$volo+$res_physique] # [__Sang pour Sang__] -3 BIO"
+		);
+
+		expect(result.cleanedDice).toBe("1d100<=[$vita+$volo+$res_physique]");
+		expect(result.mergedComments).toBe("[__Sang pour Sang__] -3 BIO");
+	});
 });

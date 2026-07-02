@@ -273,6 +273,33 @@ describe("composeRollBase", () => {
 		expect(r.rawComparator).toBe(">=6+5");
 		expect(r.roll).toBe("1d20>=6+5");
 	});
+	it("Statistics inside a [...] bracket (custom-formula syntax) are resolved", () => {
+		// generateStatsDice (core) skips "$" tokens inside brackets by design —
+		// that bracket-stat resolution has to happen here, or the bracket reaches
+		// the roll engine with unresolved "$stat" text still in it.
+		const r = composeRollBase(
+			"1d100<=[$vita+$volo+$res]",
+			undefined,
+			DICE_COMPILED_PATTERNS.COMPARATOR,
+			{ res: 10, vita: 40, volo: 25 },
+			undefined,
+			"",
+			""
+		);
+		expect(r.roll).toBe("1d100<=[40+25+10]");
+	});
+	it("leaves a $-free bracket's content untouched", () => {
+		const r = composeRollBase(
+			"1d100<=[40+5]",
+			undefined,
+			DICE_COMPILED_PATTERNS.COMPARATOR,
+			{ strength: 3 },
+			undefined,
+			"",
+			""
+		);
+		expect(r.roll).toBe("1d100<=[40+5]");
+	});
 });
 
 describe("edge cases", () => {

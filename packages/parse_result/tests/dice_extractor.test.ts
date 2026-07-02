@@ -1,5 +1,7 @@
+import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { describe, expect, it } from "vitest";
 import type { DiceData } from "../../types";
+import { composeRollBase } from "../src/compose_roll";
 import {
 	applyCommentsToResult,
 	applyCustomFormula,
@@ -11,6 +13,7 @@ import {
 	processChainedComments,
 	replaceStatsInDiceFormula,
 } from "../src/dice_extractor";
+import { getExpression } from "../src/utils";
 
 describe("dice_extractor", () => {
 	describe("extractDiceData", () => {
@@ -565,6 +568,65 @@ describe("applyCustomFormula", () => {
 			expect(result).toBeDefined();
 			expect(result!.result.compare).toBeDefined();
 			expect(result!.result.compare!.value).toBe(70);
+		});
+	});
+
+	describe("free-text pipeline: {exp} macro inside a custom-formula bracket", () => {
+		// Mirrors on_message_send.ts / the web Playground: no interactive "expression"
+		// option exists, so `{exp}` is resolved via getExpression(content, "0") before
+		// applyCustomFormula runs — otherwise the literal "{exp||X}" text fails
+		// isFormulaExpression's check and the bracket is left untouched.
+		it("leaves the bracket untouched (and unrollable) without the getExpression pre-pass", () => {
+			const raw = applyCustomFormula("1d100<=[{exp||10}]", "$>=85?85:$");
+			expect(raw).toBe("1d100<=[{exp||10}]");
+		});
+
+		it("resolves the exp default then applies the custom formula", () => {
+			const resolved = getExpression("1d100<=[{exp||10}]", "0").dice;
+			expect(resolved).toBe("1d100<=[10]");
+			const prepared = applyCustomFormula(resolved, "$>=85?85:$");
+			expect(prepared).toBe("1d100<={{(10)>=85?85:(10)}}");
+			const result = isRolling(prepared);
+			expect(result?.result.compare).toEqual({ sign: "<=", value: 10 });
+		});
+
+		it("resolves a bare {exp} (no default) to 1 before applying the formula", () => {
+			const resolved = getExpression("1d100<=[{exp}]", "0").dice;
+			expect(resolved).toBe("1d100<=[1]");
+			const prepared = applyCustomFormula(resolved, "$*2");
+			expect(prepared).toBe("1d100<={{(1)*2}}");
+		});
+	});
+
+	describe("interaction pipeline: [$stat] bracket without a custom formula configured", () => {
+		// Mirrors snippets.ts + rollWithInteraction (roll.ts): getExpression, then
+		// composeRollBase (which resolves $stat everywhere, brackets included),
+		// then applyCustomFormula with the identity formula "$" as a fallback when
+		// no real custom formula is configured. Without that fallback, `[75]`
+		// would reach the roll engine as literal bracket text — read as mathjs
+		// array syntax instead of a grouped number, breaking the comparator.
+		it("resolves stats inside the bracket and rolls with the right threshold", () => {
+			const stats = { res_physique: 10, vita: 40, volo: 25 };
+			const raw = "1d100<=[$vita+$volo+$res_physique]";
+			const expr = getExpression(raw, "0");
+			const composed = composeRollBase(
+				expr.dice,
+				undefined,
+				DICE_COMPILED_PATTERNS.COMPARATOR,
+				stats,
+				undefined,
+				expr.expressionStr,
+				""
+			);
+			expect(composed.roll).toBe("1d100<=[40+25+10]");
+
+			// rollWithInteraction always calls applyCustomFormula, defaulting to "$"
+			// (identity) when resolveCustomFormula() returns nothing.
+			const finalDice = applyCustomFormula(composed.roll, "$");
+			expect(finalDice).toBe("1d100<={{(40+25+10)}}");
+
+			const result = getRoll(finalDice);
+			expect(result?.compare).toEqual({ sign: "<=", value: 75 });
 		});
 	});
 });
