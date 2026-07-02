@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.3](https://github.com/Dicelette/discord-dicelette/compare/4.4.2...4.4.3) (2026-07-02)
+
+
+### Bug Fixes
+
+* **bot:direct:** resolve {exp|0} with default value ([aaf1c26](https://github.com/Dicelette/discord-dicelette/commit/aaf1c26c26a1de61ebf8e9085023d1393521a357))
+* **bot:roll:** fallback to normalize the brackets ([77d358e](https://github.com/Dicelette/discord-dicelette/commit/77d358e247a1c4b93e41cb484d06fa4a945d888c))
+* **bot:roll:** resolve the $stats inside brackets before wrapping ([8290c96](https://github.com/Dicelette/discord-dicelette/commit/8290c96f9220aea1b53844ff2a384a7b099ebe5e))
+* **bot:snippets:** duplicated trailed comments ([271a320](https://github.com/Dicelette/discord-dicelette/commit/271a320345d9d4184463dc51fb8d7647ae910bf8))
+* **web:playground:** resolve {exp} ([e7e393c](https://github.com/Dicelette/discord-dicelette/commit/e7e393c49a8d2bfc63ae2580b7388d42d72129c5))
+
 ## [4.4.2](https://github.com/Dicelette/discord-dicelette/compare/4.4.1...4.4.2) (2026-06-26)
 
 
