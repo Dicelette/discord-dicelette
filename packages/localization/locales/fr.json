@@ -637,6 +637,7 @@
 			"empty": " Aucun serveur n'a été trouvé."
 		},
 		"invalidDice": {
+			"compare": "Impossible de reconnaître la valeur à comparer pour le dé `{{- dice}}` : `{{- total}}{{- compare}}{{- rollValue}}`",
 			"default": "Le dé `{{- dice}}` est invalide.\n\nJournalisation :\n`{{- error}}`.",
 			"embeds": "Aucun embed de macro détecté",
 			"eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",

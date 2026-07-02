@@ -637,6 +637,7 @@
 			"empty": "No guilds found"
 		},
 		"invalidDice": {
+			"compare": "Can't recognize the compared value for the dice `{{- dice}}` : `{{- total}}{{- compare}}{{- rollValue}}`",
 			"default": "The dice type `{{- dice}}` is invalid.\n\nLogs:\n`{{- error}}`",
 			"embeds": "No macro embeds detected",
 			"eval": "Invalid die: `{{-dice}}` during evaluation validation.",

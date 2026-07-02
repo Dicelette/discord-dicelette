@@ -1,4 +1,10 @@
-import type { Compare, ComparedValue, CustomCritical, Resultat } from "@dicelette/core";
+import {
+	type Compare,
+	type ComparedValue,
+	type CustomCritical,
+	isNumber,
+	type Resultat,
+} from "@dicelette/core";
 import {
 	AND,
 	type CustomCriticalRoll,
@@ -339,7 +345,6 @@ export class ResultAsText {
 		if (opposition && resultOfCompare) {
 			const newCompare = evaluate(`${total} ${opposition.sign} ${opposition.value}`);
 			oldCompare = structuredClone(this.resultat!.compare);
-
 			successOrFailure = newCompare
 				? `**${this.ul("roll.success")}**`
 				: `**${this.ul("roll.failure")}**`;
@@ -349,7 +354,18 @@ export class ResultAsText {
 			// If the opposition fails, the original comparison is retained but the failure is displayed.
 			else this.resultat!.compare = opposition;
 		}
-
+		if (this.resultat?.compare) {
+			const { rollValue, value, trivial } = this.resultat.compare;
+			if (!isNumber(rollValue) && value === 0 && trivial)
+				throw new Error(
+					this.ul("error.invalidDice.compare", {
+						dice: this.resultat?.compare.originalDice,
+						total,
+						compare: this.asciiSign(this.resultat?.compare.sign),
+						rollValue,
+					})
+				);
+		}
 		return { oldCompare, successOrFailure, total };
 	}
 
