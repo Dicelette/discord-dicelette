@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.5](https://github.com/Dicelette/discord-dicelette/compare/4.4.4...4.4.5) (2026-07-02)
+
+
+### Bug Fixes
+
+* **web:playground:** wrong url to dashboard in the playground ([fa88b98](https://github.com/Dicelette/discord-dicelette/commit/fa88b98e24470b6c262d733ace678469214927a0))
+
 ## [4.4.4](https://github.com/Dicelette/discord-dicelette/compare/4.4.3...4.4.4) (2026-07-02)
 
 
