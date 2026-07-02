@@ -38,6 +38,23 @@ export function getThreshold(dice: string, threshold?: string): string {
 }
 
 /**
+ * `generateStatsDice` (core) intentionally leaves `$stat` tokens inside `[...]` brackets untouched — that syntax is reserved for the custom-formula feature, which re-wraps the bracket in `{{...}}` afterwards.
+ * But nothing resolves the `$stat` to a number before that wrapping (or at all, when no custom formula is configured), so the bracket reaches the roll engine as inert literal text and the comparator silently falls back to 0.
+ * Resolve `$stat` inside brackets here, the same way it's already resolved outside of them.
+ */
+function resolveStatsInBrackets(
+	dice: string,
+	stats: Record<string, number> | undefined,
+	statTotal: string | undefined
+): string {
+	if (!stats || !dice.includes("[")) return dice;
+	return dice.replace(/\[([^\]]+)\]/g, (match, expr: string) => {
+		if (!expr.includes("$")) return match;
+		return `[${generateStatsDice(expr, stats, MIN_THRESHOLD_MATCH, statTotal)}]`;
+	});
+}
+
+/**
  * Compose the final roll string by applying critical removal, threshold substitution,
  * comparator extraction and evaluation in a single, optimized pass.
  * Centralizes duplicated logic from bot layer.
@@ -62,6 +79,7 @@ export function composeRollBase(
 } {
 	let working = dice.replace(DETECT_CRITICAL, "").trim();
 	working = getThreshold(working, threshold);
+	working = resolveStatsInBrackets(working, stats, statTotal?.toString());
 	working = generateStatsDice(working, stats, MIN_THRESHOLD_MATCH, statTotal?.toString());
 	const { dice: noComparator, comparator: rawComparator } = extractComparator(
 		working,
