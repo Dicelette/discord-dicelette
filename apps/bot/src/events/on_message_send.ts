@@ -4,6 +4,7 @@ import { fetchChannel, getGuildContext, resolveCustomFormula } from "@dicelette/
 import { lError, ln } from "@dicelette/localization";
 import {
 	applyCustomFormula,
+	getExpression,
 	isNotADice,
 	isRolling,
 	parseComparator,
@@ -77,7 +78,13 @@ export default (client: EClient): void => {
 			const sortOrder = guildSettings?.sortOrder || undefined;
 			const userSettingsData = client.userSettings.get(message.guild.id, author.id);
 			const customFormula = resolveCustomFormula(guildSettings, userSettingsData);
-			if (customFormula) content = applyCustomFormula(content, customFormula);
+			if (customFormula) {
+				// Free-text rolls have no "expression" option to feed getExpression, so
+				// `{exp}`/`{exp||X}` macros (e.g. inside a custom-formula `[...]` bracket)
+				// can only fall back to their default value here.
+				content = getExpression(content, "0").dice;
+				content = applyCustomFormula(content, customFormula);
+			}
 			const isRoll = isRolling(
 				content,
 				userData,
