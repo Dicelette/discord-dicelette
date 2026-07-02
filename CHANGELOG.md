@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.4](https://github.com/Dicelette/discord-dicelette/compare/4.4.3...4.4.4) (2026-07-02)
+
+
+### Bug Fixes
+
+* **roll:** throw an error in invalid comparator ([878ab3d](https://github.com/Dicelette/discord-dicelette/commit/878ab3d289db74195df03e06d9ad31d03cb8e998))
+
 ## [4.4.3](https://github.com/Dicelette/discord-dicelette/compare/4.4.2...4.4.3) (2026-07-02)
 
 
