@@ -40,8 +40,12 @@ export function extractAndMergeComments(
 	const diceData = extractDiceData(dice);
 	let tailComments = diceData.comments;
 
-	// Avoid duplicate if tail equals global
-	if (tailComments && globalRaw && tailComments === globalRaw) tailComments = undefined;
+	// `tailComments` is a heuristic for messages with no explicit "#" comment
+	// (DETECT_DICE_MESSAGE isn't anchored, so it can otherwise land mid-way
+	// through a multi-word bracketed comment and capture a fragment that
+	// overlaps — but doesn't exactly equal — the real global comment).
+	// Once an explicit "#" comment exists, it is authoritative; drop the heuristic.
+	if (tailComments && globalRaw) tailComments = undefined;
 
 	/**
 	 * Strip # prefix and trim whitespace from comment string
