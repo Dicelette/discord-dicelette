@@ -11,13 +11,13 @@ export default function DashboardButton({
 }: Props) {
 	const { t } = useI18n();
 	const label = t("info.dashboard");
-
+	const dashboardUrl = import.meta.env.DEV ? "/" : "https://dashboard.dicelette.app";
 	return (
 		<Tooltip title={label}>
 			<IconButton
 				aria-label={label}
 				color={color}
-				onClick={() => window.open("/", "_blank", "noopener,noreferrer")}
+				onClick={() => window.open(dashboardUrl, "_blank", "noopener,noreferrer")}
 				size={size}
 				sx={sx}
 			>
