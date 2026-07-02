@@ -5,6 +5,7 @@ import { SortOrder, validateCustomFormula } from "@dicelette/core";
 import { ln } from "@dicelette/localization";
 import {
 	applyCustomFormula,
+	getExpression,
 	isRolling,
 	parseComparator,
 	ResultAsText,
@@ -232,6 +233,10 @@ export default function Playground() {
 							error: "error" in valid ? String(valid.error) : "",
 						}),
 					};
+				// Free-text mode has no "expression" option to feed getExpression, so
+				// `{exp}`/`{exp||X}` macros (e.g. inside a custom-formula `[...]` bracket)
+				// can only fall back to their default value here.
+				content = getExpression(content, "0").dice;
 				content = applyCustomFormula(content, formula);
 			}
 			// User statistics referenced in the dice via `$name`. Passing them lets the
