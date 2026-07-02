@@ -89,23 +89,23 @@ export async function rollWithInteraction(
 		userSettings = client.userSettings.get(interaction.guild.id, data.userId!);
 
 		const guildData = client.settings.get(interaction.guild.id);
-		const customFormula = resolveCustomFormula(guildData, userSettings);
-		if (customFormula) {
-			dice = applyCustomFormula(dice, customFormula);
-			// {cs:...}/{cf:...} blocks are only visible after formula expansion,
-			// so baseRoll could not extract them from the unexpanded dice.
-			const expandedCriticals = rollCustomCriticalsFromDice(
-				dice,
-				ul,
-				undefined,
-				undefined,
-				sort
-			);
-			if (expandedCriticals)
-				customCritical = customCritical
-					? Object.assign({}, customCritical, expandedCriticals)
-					: expandedCriticals;
-		}
+		// `[expr]` brackets (e.g. from a snippet's `[$stat]`) are only meaningful through applyCustomFormula's `{{...}}` wrapping — left as literal `[...]`, the roll engine reads them as mathjs array syntax instead of a grouped expression.
+		// Fall back to the identity formula "$" so brackets are always normalized, even when no real custom formula is configured.
+		const customFormula = resolveCustomFormula(guildData, userSettings) ?? "$";
+		dice = applyCustomFormula(dice, customFormula);
+		// {cs:...}/{cf:...} blocks are only visible after formula expansion,
+		// so baseRoll could not extract them from the unexpanded dice.
+		const expandedCriticals = rollCustomCriticalsFromDice(
+			dice,
+			ul,
+			undefined,
+			undefined,
+			sort
+		);
+		if (expandedCriticals)
+			customCritical = customCritical
+				? Object.assign({}, customCritical, expandedCriticals)
+				: expandedCriticals;
 	}
 	dice = verifyStatMatcherPattern(dice, userSettings?.ignoreNotfound);
 	const result = getRoll(dice, pity, sort);
