@@ -1,4 +1,4 @@
-import { isNumber, type StatisticalTemplate } from "@dicelette/core";
+import { FormulaError, isNumber, type StatisticalTemplate } from "@dicelette/core";
 import {
 	addAutoRole,
 	fetchAvatarUrl,
@@ -568,8 +568,10 @@ export class UserFeature extends BaseFeature {
 		for (const [name, value] of Object.entries(parsedStats ?? {})) {
 			let statValue = Number.parseInt(value, 10);
 			if (!isNumber(value)) {
+				const splittedValue = value.removeBacktick().split("=")[1];
+				if (!splittedValue.length) throw new FormulaError(value, "validate_user");
 				statValue = Number.parseInt(
-					value.removeBacktick().split("=")[1].trim().removeBacktick().standardize(),
+					splittedValue.trim().removeBacktick().standardize(),
 					10
 				);
 			}
