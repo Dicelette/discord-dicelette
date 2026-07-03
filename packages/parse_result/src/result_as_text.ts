@@ -12,8 +12,8 @@ import {
 	type Translation,
 } from "@dicelette/types";
 import { evaluate } from "mathjs";
-import type { Server } from "./interfaces";
-import { createUrl, timestamp } from "./utils";
+import type { AsciiSign, Server } from "./interfaces";
+import { asciiSign, createUrl, goodSign, timestamp } from "./utils";
 import "uniformize";
 import { ln } from "@dicelette/localization";
 import { logger, PARSE_RESULT_PATTERNS } from "@dicelette/utils";
@@ -361,7 +361,7 @@ export class ResultAsText {
 					this.ul("error.invalidDice.compare", {
 						dice: this.resultat?.compare.originalDice,
 						total,
-						compare: this.asciiSign(this.resultat?.compare.sign),
+						compare: asciiSign(this.resultat?.compare.sign),
 						rollValue,
 					})
 				);
@@ -475,7 +475,7 @@ export class ResultAsText {
 		const text = opposition && oldCompareStr.length > 0 ? first : "";
 
 		const totalSuccess = displayCompare
-			? ` = \`[${total}] ${this.asciiSign(goodSign)} ${this.formatCompare(displayCompare, "`")}${text}${oldCompareStr}`
+			? ` = \`[${total}] ${asciiSign(goodSign)} ${this.formatCompare(displayCompare, "`")}${text}${oldCompareStr}`
 			: `= \`[${total}]\``;
 
 		const resMsg = this.message(r, totalSuccess);
@@ -710,7 +710,7 @@ export class ResultAsText {
 	): string {
 		const goodSignOld = this.goodCompareSign(oldCompare, total);
 		const text = this.ul(`roll.${is}`);
-		return ` ${AND} \`${this.asciiSign(goodSignOld)} ${this.formatCompare(oldCompare, "`")}${text}`;
+		return ` ${AND} \`${asciiSign(goodSignOld)} ${this.formatCompare(oldCompare, "`")}${text}`;
 	}
 
 	private formatCompare(compare?: ComparedValue, lastChar?: string) {
@@ -722,41 +722,13 @@ export class ResultAsText {
 		return `${this.resultat?.compare?.value}${char}`;
 	}
 
-	private goodCompareSign(
-		compare: Compare,
-		total: number
-	): "<" | ">" | "⩾" | "⩽" | "=" | "!=" | "==" | "" {
+	private goodCompareSign(compare: Compare, total: number): AsciiSign {
 		const { sign, value } = compare;
 		const success = evaluate(`${total} ${sign} ${value}`);
 		if (success) {
-			return sign.replace(">=", "⩾").replace("<=", "⩽") as
-				| "<"
-				| ">"
-				| "⩾"
-				| "⩽"
-				| "="
-				| ""
-				| "!="
-				| "==";
+			return sign.replace(">=", "⩾").replace("<=", "⩽") as AsciiSign;
 		}
-		switch (sign) {
-			case "<":
-				return ">";
-			case ">":
-				return "<";
-			case ">=":
-				return "⩽";
-			case "<=":
-				return "⩾";
-			case "=":
-				return "!=";
-			case "!=":
-				return "==";
-			case "==":
-				return "!=";
-			default:
-				return "";
-		}
+		return goodSign(sign);
 	}
 
 	onMessageSend(
@@ -782,7 +754,7 @@ export class ResultAsText {
 		const header = this.headerCompare ?? this.resultat?.compare;
 		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
 		if (header && !isSharedRoll)
-			compareHint = ` (\`${this.asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
+			compareHint = ` (\`${asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
 
 		const headerLine = `${mention}${compareHint}${this.ignoreCount}${timestamp(this.data.config?.timestamp)}`;
 		// For shared rolls with statsPerSegment, don't show global infoRoll
@@ -793,14 +765,6 @@ export class ResultAsText {
 			? `\n[__${this.infoRoll!.name.capitalize()}__]`
 			: "\n";
 		return `${headerLine}${infoLine}${this.parser}${linkToOriginal}`;
-	}
-
-	private asciiSign(sign: string) {
-		if (sign === "!=") return "≠";
-		if (sign === "==") return "═";
-		if (sign === ">=") return "⩾";
-		if (sign === "<=") return "⩽";
-		return sign;
 	}
 
 	private convertCustomCriticalToCompare(custom: CustomCriticalRoll): ComparedValue {

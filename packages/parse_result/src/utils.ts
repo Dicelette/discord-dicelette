@@ -14,6 +14,7 @@ import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
 import { findStatInDiceFormula, getRoll } from "./dice_extractor";
+import type { AsciiSign } from "./interfaces";
 
 /**
  * Get or create cached regex for stats filtering
@@ -233,4 +234,37 @@ export function isNotADice(content: string) {
 		content.startsWith("https://") ||
 		content.match(/^[|\\_`/¤!µ*>~\-#§:;.,?%£€"'&°=]/)
 	);
+}
+
+export function asciiSign(sign: string) {
+	if (sign === "!=") return "≠";
+	if (sign === "==") return "=";
+	if (sign === ">=") return "⩾";
+	if (sign === "<=") return "⩽";
+	return sign;
+}
+
+export function goodSign(sign: string): AsciiSign {
+	switch (sign) {
+		case "<":
+			return ">";
+		case ">":
+			return "<";
+		case ">=":
+			return "⩽";
+		case "<=":
+			return "⩾";
+		case "=":
+			return "!=";
+		case "!=":
+			return "==";
+		case "==":
+			return "!=";
+		default:
+			return "";
+	}
+}
+
+export function goodSignToAscii(sign: string) {
+	return asciiSign(goodSign(sign));
 }

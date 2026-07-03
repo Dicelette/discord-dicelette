@@ -11,7 +11,7 @@ import {
 	resolveUserAttributes,
 } from "@dicelette/helpers";
 import { ln, t } from "@dicelette/localization";
-import { getRoll, timestamp } from "@dicelette/parse_result";
+import { asciiSign, getRoll, goodSignToAscii, timestamp } from "@dicelette/parse_result";
 import { EMOJI_MATH, type Translation, type UserData } from "@dicelette/types";
 import { capitalizeBetweenPunct, logger } from "@dicelette/utils";
 import { getRightValue, getStatistics } from "database";
@@ -291,41 +291,6 @@ function infoUserCalc(
 	return `${user}${EMOJI_MATH}[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
 }
 
-function asciiSign(sign: string) {
-	if (sign === "!=") return " ≠ ";
-	if (sign === "==") return " = ";
-	if (sign === ">=") return " ⩾ ";
-	if (sign === "<=") return " ⩽ ";
-	return sign;
-}
-
-function goodSign(sign: string) {
-	switch (sign) {
-		case "≠":
-			return " = ";
-		case "!=":
-			return " = ";
-		case "⩾":
-			return " ⩽ ";
-		case ">=":
-			return " ⩽ ";
-		case "⩽":
-			return " ⩾ ";
-		case "<=":
-			return " ⩾ ";
-		case "=":
-			return " ≠ ";
-		case "==":
-			return " ≠ ";
-		case ">":
-			return " < ";
-		case " < ":
-			return " > ";
-		default:
-			return sign;
-	}
-}
-
 function multipleTransform(transform: string, res: string) {
 	const regex = /(?<exp1>\w+)\(?(?<exp2>\w+)?\(?\)?\)?/;
 	const match = regex.exec(transform);
@@ -361,7 +326,7 @@ function formatFormula(
 		return `${res} = \`${resultat}\``;
 	}
 	if (resultat.toLowerCase() === "false") {
-		if (sign) formula = formula.replace(asciiSign(sign[0]), goodSign(sign[0]));
+		if (sign) formula = formula.replace(asciiSign(sign[0]), goodSignToAscii(sign[0]));
 		return `\t  ${ul("common.false")}${ul("common.space")}: \`${originalFormula}\` → \`${formula}\``;
 	}
 	if (resultat.toLowerCase() === "true")
