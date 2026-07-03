@@ -1,13 +1,52 @@
 /** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
+import { formatWithOptions } from "node:util";
 import * as Sentry from "@sentry/node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
-import { type ILogObj, type ISettingsParam, Logger } from "tslog";
+import {
+	type ILogObj,
+	type IMeta,
+	type ISettings,
+	type ISettingsParam,
+	Logger,
+} from "tslog";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { BotError, BotErrorLevel } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
+
+const WARN_LEVEL_ID = 4;
+
+/**
+ * tslog's default pretty transport always writes through console.log, no matter
+ * the log level. PM2 splits stdout -> out.log and stderr -> error.log, so WARN/
+ * ERROR/FATAL logs never reached error.log. This routes them through console.error.
+ */
+function transportFormatted(
+	logMetaMarkup: string,
+	logArgs: unknown[],
+	logErrors: string[],
+	logMeta?: IMeta,
+	settings?: ISettings<ILogObj>
+) {
+	const prettyLogs = settings?.stylePrettyLogs !== false;
+	const metaMarkup = prettyLogs ? logMetaMarkup : stripAnsi(logMetaMarkup);
+	const logErrorsStr =
+		(logErrors.length > 0 && logArgs.length > 0 ? "\n" : "") + logErrors.join("\n");
+	if (settings?.prettyInspectOptions) settings.prettyInspectOptions.colors = prettyLogs;
+	const formattedArgs = formatWithOptions(
+		settings?.prettyInspectOptions ?? {},
+		...logArgs
+	);
+	const output = metaMarkup + formattedArgs + logErrorsStr;
+
+	if ((logMeta?.logLevelId ?? 0) >= WARN_LEVEL_ID) {
+		console.error(output);
+	} else {
+		console.log(output);
+	}
+}
 
 const LOG_LEVEL_COLORS = {
 	"*": ["bold", "black", "bgWhiteBright", "dim"],
@@ -39,6 +78,7 @@ const prodSettings: ISettingsParam<ILogObj> = {
 	hideLogPositionForProduction: true,
 	minLevel: 6,
 	name: "LOGGER",
+	overwrite: { transportFormatted },
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
 	prettyLogStyles: BASE_STYLE,
@@ -49,6 +89,7 @@ const prodSettings: ISettingsParam<ILogObj> = {
 
 const devSettings: ISettingsParam<ILogObj> = {
 	minLevel: 0, // everything
+	overwrite: { transportFormatted },
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
 	prettyLogStyles: BASE_STYLE,
@@ -71,6 +112,7 @@ export const important: Logger<ILogObj> = new Logger({
 	hideLogPositionForProduction: true,
 	minLevel: 1,
 	name: "IMPORTANT",
+	overwrite: { transportFormatted },
 	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
 	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
 	prettyLogStyles: {
