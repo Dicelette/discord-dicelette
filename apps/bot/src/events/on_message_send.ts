@@ -1,7 +1,7 @@
 import type { EClient } from "@dicelette/client";
 import { DiceTypeError, REMOVER_PATTERN } from "@dicelette/core";
 import { fetchChannel, getGuildContext, resolveCustomFormula } from "@dicelette/helpers";
-import { lError, ln } from "@dicelette/localization";
+import { ln } from "@dicelette/localization";
 import {
 	applyCustomFormula,
 	getExpression,
@@ -21,7 +21,7 @@ import * as Djs from "discord.js";
 import { handleRollResult, saveCount, stripOOC } from "messages";
 import { getCritical } from "utils";
 import { triggerPity } from "../commands";
-import { isApiError } from "./on_error";
+import { isApiError, sendErrorToDM } from "./on_error";
 
 export default (client: EClient): void => {
 	client.on("messageCreate", async (message) => {
@@ -135,7 +135,10 @@ export default (client: EClient): void => {
 			});
 			return;
 		} catch (e) {
-			if (!message.guild) return;
+			if (!message.guild) {
+				void sendErrorToDM(e as Error, Djs.Locale.EnglishUS, message.author);
+				return;
+			}
 			if (!isApiError(e) && !(e instanceof DiceTypeError)) {
 				logger.fatal(e);
 				sentry.fatal(e);
@@ -143,10 +146,7 @@ export default (client: EClient): void => {
 			const guildSettings = client.settings.get(message.guild.id);
 			const userLang =
 				guildSettings?.lang ?? message.guild.preferredLocale ?? Djs.Locale.EnglishUS;
-			const msgError = lError(e as Error, undefined, userLang);
-			if (msgError.length === 0) return;
-			//await message.channel.send({ content: msgError });
-			await message.author.send({ content: msgError });
+			void sendErrorToDM(e as Error, userLang, message.author);
 
 			const logsId = guildSettings?.logs;
 			if (logsId) {

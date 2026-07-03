@@ -38,8 +38,8 @@ export const LINKS = {
 	},
 } as const;
 
-export const DISCORD_ERROR_CODE = [50001, 50013];
-export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013)\]/;
+export const DISCORD_ERROR_CODE = [50001, 50013, 50007];
+export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013|50007)\]/;
 
 // Regex patterns for dice detection
 

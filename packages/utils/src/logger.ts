@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import { type ILogObj, type ISettingsParam, Logger } from "tslog";
 import pkgJson from "../../../package.json" with { type: "json" };
-import { BotError } from "./errors";
+import { BotError, BotErrorLevel } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
@@ -170,3 +170,24 @@ export const sentry = {
 		Sentry.captureException(e, { extra, level: "warning" });
 	},
 };
+
+export function consoleError(e: BotError | Error) {
+	if (e instanceof BotError) {
+		const { level } = e;
+		if (!level) return;
+		switch (level) {
+			case BotErrorLevel.Warning:
+				logger.warn(e);
+				break;
+			case BotErrorLevel.Error:
+				console.error(e);
+				break;
+			case BotErrorLevel.Critical:
+			case BotErrorLevel.Fatal:
+				important.fatal(e);
+				break;
+		}
+		return;
+	}
+	console.error(e);
+}
