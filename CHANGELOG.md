@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.7](https://github.com/Dicelette/discord-dicelette/compare/4.4.6...4.4.7) (2026-07-03)
+
+
+### Bug Fixes
+
+* **bot:register:** Cannot read properties of undefined (reading 'trim') ([8ae52e1](https://github.com/Dicelette/discord-dicelette/commit/8ae52e158b71d9d3984fd5172c598a193aa58e72))
+
 ## [4.4.6](https://github.com/Dicelette/discord-dicelette/compare/4.4.5...4.4.6) (2026-07-03)
 
 ## [4.4.5](https://github.com/Dicelette/discord-dicelette/compare/4.4.4...4.4.5) (2026-07-02)
