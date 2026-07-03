@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.8](https://github.com/Dicelette/discord-dicelette/compare/4.4.7...4.4.8) (2026-07-03)
+
+
+### Bug Fixes
+
+* **roll:** error when a formula use a sign & comparing the result to a sign ([d38cbcc](https://github.com/Dicelette/discord-dicelette/commit/d38cbcc9b5f4633a34922da463d3c4f8dba999cb))
+
 ## [4.4.7](https://github.com/Dicelette/discord-dicelette/compare/4.4.6...4.4.7) (2026-07-03)
 
 
