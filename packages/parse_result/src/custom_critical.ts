@@ -67,25 +67,6 @@ export function parseOpposition(
 	const comp = signRegex.exec(diceComparator);
 	let sign = match?.groups?.sign || comp?.groups?.sign;
 	if (!sign || !comparator) return;
-	try {
-		const rolledValue = getRoll(comparator, undefined, sort);
-		if (sign === "=") sign = "==";
-		if (rolledValue?.total) {
-			return {
-				originalDice: rolledValue.dice,
-				rollValue: rolledValue.result,
-				sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
-				value: rolledValue.total,
-			};
-		}
-		if (!isNumber(comparator)) return undefined;
-		return {
-			sign: sign as "<" | ">" | "<=" | ">=" | "!=" | "==",
-			value: Number(comparator),
-		};
-	} catch {
-		return undefined;
-	}
 	const rolledValue = getRoll(comparator, undefined, sort);
 	if (sign === "=") sign = "==";
 	if (rolledValue?.total) {

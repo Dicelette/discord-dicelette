@@ -7,3 +7,7 @@ export interface Server {
 	config?: Partial<GuildData>;
 	dice?: string;
 }
+
+export type AsciiSign = "<" | ">" | "⩾" | "⩽" | "=" | "" | "!=" | "==";
+
+export type Sign = "<" | ">" | "<=" | ">=" | "!=" | "==";
