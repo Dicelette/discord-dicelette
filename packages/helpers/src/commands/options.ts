@@ -97,12 +97,13 @@ export function getNameOption(
  * Centralizes the repetitive option extraction logic present in rollMacro, rollStatistique,
  * and snippet commands.
  *
- * @param options - The command interaction options resolver
  * @returns Normalized roll options object
  *
  * @example
  * const opts = extractRollOptions(interaction.options);
  * // => { expression: "0", threshold: ">=15", oppositionVal: "12", userComments: "test", comments: "# test" }
+ * @param value
+ * @param name
  */
 function parseRollCriticalOption(
 	value: string | undefined,
@@ -111,8 +112,7 @@ function parseRollCriticalOption(
 	if (!value) return undefined;
 	let normalized = value.trimAll();
 	if (/^-?\d+$/.test(normalized)) normalized = `==${normalized}`;
-	const parsed = parseCustomCritical(name, normalized);
-	return parsed;
+	return parseCustomCritical(name, normalized);
 }
 
 export function extractRollOptions(

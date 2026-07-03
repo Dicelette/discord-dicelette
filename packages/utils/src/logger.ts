@@ -222,7 +222,7 @@ export function consoleError(e: BotError | Error) {
 				logger.warn(e);
 				break;
 			case BotErrorLevel.Error:
-				console.error(e);
+				important.error(e);
 				break;
 			case BotErrorLevel.Critical:
 			case BotErrorLevel.Fatal:
