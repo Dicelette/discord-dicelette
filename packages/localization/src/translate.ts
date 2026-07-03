@@ -165,8 +165,7 @@ export function buildTranslationKeyCache() {
 
 export function findln(translatedText: string) {
 	const normalized = translatedText.toLowerCase();
-	const res = translationKeyCache[normalized] ?? translatedText;
-	return res;
+	return translationKeyCache[normalized] ?? translatedText;
 }
 
 export function diceTypeError(
@@ -187,6 +186,15 @@ export function diceTypeError(
 	if (error.cause === "empty_dice") return ul("error.invalidDice.notFound");
 	if (error.cause === "bulk_number") return ul("error.bulk.number", { dice: error.dice });
 	if (error.cause === "bulk_zero") return ul("error.bulk.zero", { dice: error.dice });
+	if (error.cause === "opposition") {
+		const { comparator } = error.method as {
+			comparator: string;
+		};
+
+		return ul("error.invalidDice.opposition", {
+			comparator,
+		});
+	}
 	return ul("error.invalidDice.default", {
 		dice: error.dice,
 		error: error.method?.toString(),

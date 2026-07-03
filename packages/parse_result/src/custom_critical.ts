@@ -86,6 +86,24 @@ export function parseOpposition(
 	} catch {
 		return undefined;
 	}
+	const rolledValue = getRoll(comparator, undefined, sort);
+	if (sign === "=") sign = "==";
+	if (rolledValue?.total) {
+		return {
+			originalDice: rolledValue.dice,
+			rollValue: rolledValue.result,
+			sign: sign as Sign,
+			value: rolledValue.total,
+		};
+	}
+	if (!isNumber(comparator))
+		throw new DiceTypeError(rolledValue?.dice ?? opposition, "opposition", {
+			comparator,
+		});
+	return {
+		sign: sign as Sign,
+		value: Number(comparator),
+	};
 }
 
 function rollOneCustomCritical(critical: CustomCritical, sort?: SortOrder) {
