@@ -643,6 +643,7 @@
 			"eval": "Dé invalide : `{{- dice}}` durant l'évaluation de validation.",
 			"minus": "Les dés ne peuvent être négatifs !\n\n-# Dé utilisé : `{{- dice}}`.",
 			"notFound": "Aucun dé n'a été retrouvé dans la commande !",
+			"opposition": "Impossible de reconnaître la valeur à comparer dans `{{- comparator}}`. Est ce que la valeur est un nombre ?",
 			"stats": "Le dé contient des valeurs inconnues: `{{- stats}}`. Merci de les vérifier.",
 			"withDice": "Le dé `{{- dice}}` est invalide."
 		},
