@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
+import { applyCustomFormula } from "../src/dice_extractor";
 import {
 	convertExpression,
+	parseComparator,
 	replaceStatInDiceName,
 	timestamp,
 	trimAll,
@@ -215,6 +217,41 @@ describe("trimAll", () => {
 		const result = trimAll("1d20 [first] [second]");
 		// trimAll processes brackets as part of formula
 		expect(result).toContain("1d20");
+	});
+});
+
+describe("parseComparator", () => {
+	it("should return undefined when there is no opposition", () => {
+		expect(parseComparator("1d100>50")).toBeUndefined();
+	});
+
+	it("should detect a real opposition", () => {
+		const result = parseComparator("1d100>50>=20");
+		expect(result).toEqual({ sign: ">=", value: 20 });
+	});
+
+	// Regression: a comparator inside a {{...}} custom-formula block (e.g. {{x>20}})
+	// must not be mistaken for a second/opposition comparator just because the
+	// formula still contains an unresolved stat and combines with a real
+	// comparator elsewhere in the dice (double-sign false positive).
+	it("should not treat a comparator inside a {{...}} formula block as an opposition", () => {
+		const stats = { dexterite: 40 };
+		const dice = applyCustomFormula("1d100<=[$dexterite]", "$>=85?85:$");
+		expect(dice).toBe("1d100<={{($dexterite)>=85?85:($dexterite)}}");
+		expect(() => parseComparator(dice, stats)).not.toThrow();
+		expect(parseComparator(dice, stats)).toBeUndefined();
+	});
+
+	it("should still detect a real opposition placed outside a {{...}} formula block", () => {
+		const stats = { dexterite: 40 };
+		const dice = applyCustomFormula("1d100<=[$dexterite]>=10", "$");
+		expect(dice).toBe("1d100<={{($dexterite)}}>=10");
+		const result = parseComparator(dice, stats);
+		expect(result).toEqual({ sign: ">=", value: 10 });
+	});
+
+	it("should still throw for a genuinely invalid opposition value", () => {
+		expect(() => parseComparator("1d100>50>invalid")).toThrow();
 	});
 });
 

@@ -29,7 +29,7 @@ import { trimAll } from "./utils";
  * for an opposition comparator when the block still contains an unresolved
  * `$stat` and therefore could not be pre-evaluated.
  */
-const FORMULA_BLOCK_PATTERN = /\{\{(?:[^}]|\}(?!\}))*\}\}/g;
+export const FORMULA_BLOCK_PATTERN = /\{\{(?:[^}]|\}(?!\}))*\}\}/g;
 
 export function extractDiceData(content: string): DiceData {
 	//exclude if the content is between codeblocks

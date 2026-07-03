@@ -13,7 +13,7 @@ import { DICE_COMPILED_PATTERNS, logger } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import moment from "moment";
 import { parseOpposition } from "./custom_critical";
-import { findStatInDiceFormula, getRoll } from "./dice_extractor";
+import { FORMULA_BLOCK_PATTERN, findStatInDiceFormula, getRoll } from "./dice_extractor";
 import type { AsciiSign } from "./interfaces";
 
 /**
@@ -205,8 +205,12 @@ export function parseComparator(
 	userStatStr?: string,
 	sort?: SortOrder
 ) {
-	// Ignore custom critical blocks during detection
-	const cleanedDice = dice.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
+	// Ignore custom critical blocks and neutralize {{...}} formula blocks during detection:
+	// a comparator inside a still-unresolved {{...}} block (e.g. {{$>=85?85:$}}) must not
+	// be mistaken for a second/opposition comparator.
+	const cleanedDice = dice
+		.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "")
+		.replace(FORMULA_BLOCK_PATTERN, "0");
 	const comparatorMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(cleanedDice);
 	let comparator = "";
 	let opposition: string | undefined;
