@@ -16,12 +16,25 @@ import { BotError, BotErrorLevel } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
-const WARN_LEVEL_ID = 4;
+// tslog log level ids: SILLY=0, TRACE=1, DEBUG=2, INFO=3, WARN=4, ERROR=5, FATAL=6
+function writeToConsole(output: string, logLevelId: number) {
+	if (logLevelId >= 5) {
+		console.error(output); // ERROR, FATAL
+	} else if (logLevelId === 4) {
+		console.warn(output); // WARN
+	} else if (logLevelId === 3) {
+		console.info(output); // INFO
+	} else {
+		console.debug(output); // SILLY, TRACE, DEBUG
+	}
+}
 
 /**
  * tslog's default pretty transport always writes through console.log, no matter
  * the log level. PM2 splits stdout -> out.log and stderr -> error.log, so WARN/
- * ERROR/FATAL logs never reached error.log. This routes them through console.error.
+ * ERROR/FATAL logs never reached error.log. This dispatches to the console method
+ * matching each level (console.debug/info/warn/error), which also keeps Sentry's
+ * consoleLoggingIntegration below tagging breadcrumbs with the correct level.
  */
 function transportFormatted(
 	logMetaMarkup: string,
@@ -39,13 +52,7 @@ function transportFormatted(
 		settings?.prettyInspectOptions ?? {},
 		...logArgs
 	);
-	const output = metaMarkup + formattedArgs + logErrorsStr;
-
-	if ((logMeta?.logLevelId ?? 0) >= WARN_LEVEL_ID) {
-		console.error(output);
-	} else {
-		console.log(output);
-	}
+	writeToConsole(metaMarkup + formattedArgs + logErrorsStr, logMeta?.logLevelId ?? 0);
 }
 
 const LOG_LEVEL_COLORS = {
