@@ -153,9 +153,8 @@ describe("parseOpposition", () => {
 		expect(result).toBeDefined();
 	});
 
-	it("should return undefined for non-numeric non-rollable values", async () => {
-		const res = parseOpposition(">invalid", ">=5");
-		expect(res).toBeUndefined();
+	it("should throw an error for non-numeric non-rollable values", async () => {
+		expect(() => parseOpposition(">invalid", ">=5")).toThrow();
 	});
 });
 
