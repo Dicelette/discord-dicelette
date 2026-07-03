@@ -1,6 +1,7 @@
 import {
 	type ComparedValue,
 	type CustomCritical,
+	DiceTypeError,
 	generateStatsDice,
 	isNumber,
 	MIN_THRESHOLD_MATCH,
@@ -15,6 +16,7 @@ import {
 } from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import { getRoll } from "./dice_extractor";
+import type { Sign } from "./interfaces";
 
 const botErrorOptions: BotErrorOptions = {
 	cause: "CUSTOM_CRITICAL",
@@ -42,7 +44,7 @@ export function parseCustomCritical(
 		[nameStr.trimStart()]: {
 			affectSkill,
 			onNaturalDice,
-			sign: sign.trimAll() as "<" | ">" | "<=" | ">=" | "!=" | "==",
+			sign: sign.trimAll() as Sign,
 			value: value.standardize().trimAll(),
 		},
 	};
