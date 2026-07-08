@@ -507,7 +507,11 @@ export class ResultAsText {
 
 	private setIgnoreCount(comment: string | undefined = this.resultat?.comment) {
 		if (this.ignoreCount !== "") return this.ignoreCount;
-		if (comment?.includes(IGNORE_COUNT_KEY.key)) return ` ${IGNORE_COUNT_KEY.emoji} `;
+		if (
+			comment?.includes(IGNORE_COUNT_KEY.key) ||
+			comment?.includes(IGNORE_COUNT_KEY.emoji)
+		)
+			return ` ${IGNORE_COUNT_KEY.emoji} `;
 		return "";
 	}
 
@@ -527,7 +531,10 @@ export class ResultAsText {
 
 	private removeIgnore(comment: string | undefined): string | undefined {
 		if (comment) {
-			const com = comment.replaceAll(IGNORE_COUNT_KEY.key, "").trim();
+			const com = comment
+				.replaceAll(IGNORE_COUNT_KEY.key, "")
+				.replaceAll(IGNORE_COUNT_KEY.emoji, "")
+				.trim();
 			if (com.trimAll() === "#") return undefined;
 			return com;
 		}
