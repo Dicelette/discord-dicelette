@@ -26,7 +26,6 @@ export const onKick = (client: EClient): void => {
 			const templateID = client.settings.get(guild.id, "templateID");
 			client.clearTemplateAutocompleteCache(templateID);
 			client.settings.delete(guild.id);
-			client.characters.delete(guild.id);
 			client.template.delete(guild.id);
 			client.criticalCount.delete(guild.id);
 			client.userSettings.delete(guild.id);
@@ -53,9 +52,7 @@ export const onKick = (client: EClient): void => {
 					}
 				}
 			}
-			for (const key of client.characterCacheTimestamps.keys()) {
-				if (key.startsWith(guildPrefix)) client.characterCacheTimestamps.delete(key);
-			}
+			client.deleteCharacter(guild.id);
 		} catch (error) {
 			logger.fatal(error);
 		}
@@ -78,8 +75,6 @@ export const onUserQuit = (client: EClient): void => {
 			);
 		}
 		// Clean in-memory caches for this member
-		if (client.characterCacheTimestamps.has(`${member.guild.id}:${member.id}`))
-			client.characterCacheTimestamps.delete(`${member.guild.id}:${member.id}`);
 		const memberPrefix = `${member.guild.id}:${member.id}:`;
 		for (const key of client.trivialCache) {
 			if (key.startsWith(memberPrefix)) {
@@ -91,8 +86,7 @@ export const onUserQuit = (client: EClient): void => {
 				}
 			}
 		}
-		if (client.characters.has(member.guild.id, member.id))
-			client.characters.delete(member.guild.id, member.id);
+		client.deleteCharacter(member.guild.id, member.id);
 	});
 };
 

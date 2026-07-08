@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: DiscordAPI doesn't follow this */
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type {
@@ -204,11 +205,13 @@ export class EClient extends Djs.Client {
 	 */
 	deleteCharacter(guildId: string, userId?: string) {
 		if (userId) {
-			this.characters.delete(guildId, userId);
-			this.characterCacheTimestamps.delete(`${guildId}:${userId}`);
+			const key = `${guildId}:${userId}`;
+			if (this.characters.has(guildId, userId)) this.characters.delete(guildId, userId);
+			if (this.characterCacheTimestamps.has(key))
+				this.characterCacheTimestamps.delete(key);
 			return;
 		}
-		this.characters.delete(guildId);
+		if (this.characters.has(guildId)) this.characters.delete(guildId);
 		const prefix = `${guildId}:`;
 		for (const key of this.characterCacheTimestamps.keys()) {
 			if (key.startsWith(prefix)) this.characterCacheTimestamps.delete(key);

@@ -42,7 +42,7 @@ export function deleteByMessageIds(
 			userChars.splice(char, 1);
 			if (userChars.length === 0) {
 				db.delete(guild.id, `user.${user}`);
-				if (characters.get(guild.id, user)) characters.delete(guild.id, user);
+				if (characters.get(guild.id, user)) client.deleteCharacter(guild.id, user);
 			} else {
 				db.set(guild.id, userChars, `user.${user}`);
 				deleteUserInChar(
@@ -112,7 +112,7 @@ function cleanUserDB(
 		);
 		if (filterChar.length === 0) {
 			guildDB.delete(thread.guild.id, `user.${user}`);
-			characters.delete(thread.guild.id, user);
+			client.deleteCharacter(thread.guild.id, user);
 		} else guildDB.set(thread.guild.id, filterChar, `user.${user}`);
 		if (charDeleted)
 			deleteUserInChar(

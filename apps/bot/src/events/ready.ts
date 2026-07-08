@@ -261,8 +261,7 @@ function startCacheCleanup(
 				const sep = key.indexOf(":");
 				const guildId = key.slice(0, sep);
 				const userId = key.slice(sep + 1);
-				client.characters.delete(guildId, userId);
-				client.characterCacheTimestamps.delete(key);
+				client.deleteCharacter(guildId, userId);
 				count++;
 			}
 		}

@@ -140,7 +140,7 @@ export async function bulkDeleteCharacters(
 		if (confirm.customId === "delete_all_confirm") {
 			await deleteMessageChar(client, interaction, ul);
 			guildData.delete(interaction.guild!.id, "user");
-			client.characters.delete(interaction.guild!.id);
+			client.deleteCharacter(interaction.guild!.id);
 			await rep.edit({
 				components: [],
 				content: ul("register.delete.done"),
