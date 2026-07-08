@@ -195,6 +195,24 @@ export function diceTypeError(
 			comparator,
 		});
 	}
+	if (error.cause === "invalidDice.compare") {
+		//method => {
+		// 					total,
+		// 					compare: asciiSign(this.resultat.compare.sign),
+		// 					rollValue,
+		// 				}
+		const { total, compare, rollValue } = error.method as {
+			total: number;
+			compare: string;
+			rollValue: string | undefined;
+		};
+		return ul("error.invalidDice.compare", {
+			dice: error.dice,
+			total,
+			compare,
+			rollValue,
+		});
+	}
 	return ul("error.invalidDice.default", {
 		dice: error.dice,
 		error: error.method?.toString(),

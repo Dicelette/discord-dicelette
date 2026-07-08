@@ -2,6 +2,7 @@ import {
 	type Compare,
 	type ComparedValue,
 	type CustomCritical,
+	DiceTypeError,
 	isNumber,
 	type Resultat,
 } from "@dicelette/core";
@@ -355,8 +356,9 @@ export class ResultAsText {
 			else this.resultat!.compare = opposition;
 		}
 		if (this.resultat?.compare) {
-			const { rollValue, value, trivial } = this.resultat.compare;
+			const { rollValue, value, trivial, originalDice } = this.resultat.compare;
 			if (!isNumber(rollValue) && value === 0 && trivial)
+				/*
 				throw new Error(
 					this.ul("error.invalidDice.compare", {
 						dice: this.resultat?.compare.originalDice,
@@ -364,6 +366,16 @@ export class ResultAsText {
 						compare: asciiSign(this.resultat?.compare.sign),
 						rollValue,
 					})
+				);
+				*/
+				throw new DiceTypeError(
+					originalDice ?? this.resultat.dice,
+					"invalidDice.compare",
+					{
+						total,
+						compare: asciiSign(this.resultat.compare.sign),
+						rollValue,
+					}
 				);
 		}
 		return { oldCompare, successOrFailure, total };
