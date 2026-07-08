@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.4.9](https://github.com/Dicelette/discord-dicelette/compare/4.4.8...4.4.9) (2026-07-08)
+
+
+### Bug Fixes
+
+* **bot:** enhance ignore count handling in comments ([10733a2](https://github.com/Dicelette/discord-dicelette/commit/10733a2b1dbd8045cdc23a497759985ab4d0f3fe))
+* **roll:** should not send roll typing error in sentry ([084a11f](https://github.com/Dicelette/discord-dicelette/commit/084a11f2625685f5934021ba2f2f363760be02ed))
+
 ## [4.4.8](https://github.com/Dicelette/discord-dicelette/compare/4.4.7...4.4.8) (2026-07-03)
 
 
