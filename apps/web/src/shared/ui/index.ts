@@ -1,3 +1,4 @@
+export { default as AppTopBar } from "./AppTopBar";
 export { default as ChannelSelect } from "./ChannelSelect";
 export { default as ConfigFormFooter } from "./ConfigFormFooter";
 export { default as DiscordMarkdown } from "./DiscordMarkdown";
