@@ -1,5 +1,5 @@
 import { authApi, type DiscordGuild, guildApi } from "@dicelette/api";
-import { Add, Refresh, Search, Star, StarBorder } from "@mui/icons-material";
+import { Add, Person, Refresh, Search, Star, StarBorder } from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -30,7 +30,7 @@ import {
 	useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../providers";
+import { useAuth, useToast } from "../providers";
 
 const pageHeaderSx = {
 	display: "flex",
@@ -158,6 +158,7 @@ export default function Servers() {
 	} | null>(null);
 	const navigate = useNavigate();
 	const { t } = useI18n();
+	const { user } = useAuth();
 	const { enqueueToast } = useToast();
 	const tRef = useRef(t);
 	tRef.current = t;
@@ -238,6 +239,16 @@ export default function Servers() {
 		);
 		handleCloseContextMenu();
 	}, [contextMenu, toggleFavorite, t, enqueueToast, handleCloseContextMenu]);
+
+	const handleOpenCharacters = useCallback(() => {
+		if (!contextMenu || !user) return;
+		window.open(
+			`/char/${contextMenu.guild.id}/${user.id}`,
+			"_blank",
+			"noopener,noreferrer"
+		);
+		handleCloseContextMenu();
+	}, [contextMenu, user, handleCloseContextMenu]);
 
 	const botGuilds = useMemo(
 		() =>
@@ -546,6 +557,12 @@ export default function Servers() {
 						)}
 					</ListItemIcon>
 					{contextMenuGuildIsFav ? t("servers.removeFavorite") : t("servers.addFavorite")}
+				</MenuItem>
+				<MenuItem onClick={handleOpenCharacters} disabled={!user}>
+					<ListItemIcon>
+						<Person fontSize="small" />
+					</ListItemIcon>
+					{t("servers.myCharacters")}
 				</MenuItem>
 			</Menu>
 		</Box>

@@ -171,6 +171,7 @@
 		"favoriteRemoved": "Serveur retiré des favoris.",
 		"favorites": "Favoris",
 		"loadError": "Impossible de charger les serveurs.",
+		"myCharacters": "Mes personnages",
 		"noSearchResults": "Aucun serveur ne correspond à votre recherche.",
 		"noServers": "Aucun serveur trouvé. Assurez-vous d'être administrateur d'au moins un serveur Discord.",
 		"rateLimitError": "Trop de requêtes. Veuillez patienter avant d'actualiser à nouveau.",
