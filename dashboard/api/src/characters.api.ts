@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from "axios";
 import { createGuildEndpoint } from "./api-builder";
 import { api } from "./client";
 import type { ApiCharacter } from "./types";
@@ -10,6 +11,8 @@ export interface ImportResult {
 
 export const charactersApi = {
 	getCharacters: createGuildEndpoint<ApiCharacter[]>(api, "get", "/characters"),
+	getPublicCharacters: (guildId: string, userId: string, config?: AxiosRequestConfig) =>
+		api.get<ApiCharacter[]>(`/guilds/${guildId}/characters/public/${userId}`, config),
 	getAllCharacters: createGuildEndpoint<ApiCharacter[]>(api, "get", "/characters/all"),
 	refreshAll: createGuildEndpoint<{ ok: boolean }>(
 		api,

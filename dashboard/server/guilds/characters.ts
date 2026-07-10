@@ -15,6 +15,7 @@ import {
 import {
 	fetchCharacterEmbeds,
 	isStaleDiscordCdnUrl,
+	isValidSnowflake,
 	makeRequireAdmin,
 	requireAuth,
 	userCanAccessChannel,
@@ -234,6 +235,72 @@ export function createCharactersRouter(deps: DashboardDeps) {
 		}
 
 		charCache.set(cacheKey, { data: result, ts: Date.now() });
+		sendNoStoreJson(res, result);
+	});
+
+	// GET /:guildId/characters/public/:userId — public read-only character list for a
+	// shareable profile link. No auth: private characters and Discord links are
+	// stripped since we can't check the viewer's channel permissions.
+	router.get("/public/:userId", async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.params.userId as string;
+		if (!isValidSnowflake(userId)) {
+			res.status(400).json({ error: "Invalid user ID" });
+			return;
+		}
+
+		const guildData = settings.get(guildId);
+		if (!guildData) {
+			res.status(404).json({ error: "Guild not found" });
+			return;
+		}
+
+		const userChars = guildData.user?.[userId] ?? [];
+		const memChars: UserData[] =
+			(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
+		const memMaps = buildMemMaps(memChars);
+
+		const pending = userChars.filter((char) => {
+			if (char.isPrivate) return false;
+			const mem = memMaps.memByMessageId.get(char.messageId[0]);
+			return !mem?.isFromTemplate;
+		});
+
+		let result: ApiCharacter[];
+		try {
+			result = await withTimeout(
+				mapConcurrent(pending, DISCORD_FETCH_CONCURRENCY, async (char) => {
+					const [messageId, channelId] = char.messageId;
+					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+					const data = await resolveCharacterData(
+						char.charName,
+						messageId,
+						channelId,
+						memMaps,
+						botChannels
+					);
+					return {
+						charName: char.charName ?? null,
+						messageId,
+						channelId,
+						discordLink,
+						canLink: false,
+						isPrivate: false,
+						avatar: data.avatar,
+						stats: data.stats,
+						damage: data.damage,
+					} satisfies ApiCharacter;
+				}),
+				15_000
+			);
+		} catch (err) {
+			if (isTimeoutError(err)) {
+				res.status(504).json({ error: "Request timed out" });
+				return;
+			}
+			throw err;
+		}
+
 		sendNoStoreJson(res, result);
 	});
 

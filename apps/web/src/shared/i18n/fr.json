@@ -6,6 +6,7 @@
 		"noCharacters": "Aucun personnage enregistré sur ce serveur.",
 		"noResults": "Aucun personnage ne correspond à la recherche.",
 		"private": "Fiche privée",
+		"publicTitle": "Personnages",
 		"refresh": "Actualiser",
 		"refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
 		"serverFilterPlaceholder": "Rechercher par nom ou joueur…",
