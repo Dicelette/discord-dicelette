@@ -1,7 +1,7 @@
 import { charactersApi } from "@dicelette/api";
 import { ArrowBack } from "@mui/icons-material";
 import { Alert, Box, Button, CircularProgress } from "@mui/material";
-import { AppTopBar, BackToDashboardButton, useI18n } from "@shared";
+import { AppTopBar, DocsButton, PlaygroundButton, useI18n } from "@shared";
 import { useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCharactersList } from "../../features/characters/hooks/useCharactersList";
@@ -49,7 +49,14 @@ export default function CharDetailPage() {
 				content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 			/>
 			<title>{`Dicelette — ${title}`}</title>
-			<AppTopBar leadingNav={<BackToDashboardButton />} />
+			<AppTopBar
+				leadingNav={
+					<>
+						<DocsButton />
+						<PlaygroundButton />
+					</>
+				}
+			/>
 			<Box component="main" className="flex-1" sx={mainSx}>
 				<Button
 					component={Link}

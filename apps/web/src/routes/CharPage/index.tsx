@@ -1,8 +1,9 @@
 import { charactersApi } from "@dicelette/api";
-import { Box } from "@mui/material";
-import { AppTopBar, BackToDashboardButton, useI18n } from "@shared";
+import { ArrowBack } from "@mui/icons-material";
+import { Box, Button } from "@mui/material";
+import { AppTopBar, DocsButton, PlaygroundButton, useI18n } from "@shared";
 import { useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useCharacterPagination } from "../../features/characters/hooks/useCharacterPagination";
 import { useCharactersList } from "../../features/characters/hooks/useCharactersList";
 import { buildCharShareHref } from "../../features/characters/shareLink";
@@ -16,6 +17,7 @@ const mainSx = {
 	py: 3,
 	width: "100%",
 } as const;
+const backButtonSx = { mb: 3 } as const;
 
 export default function CharPage() {
 	const { t } = useI18n();
@@ -53,8 +55,18 @@ export default function CharPage() {
 				content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 			/>
 			<title>{`Dicelette — ${title}`}</title>
-			<AppTopBar leadingNav={<BackToDashboardButton />} />
+			<AppTopBar
+				leadingNav={
+					<>
+						<DocsButton />
+						<PlaygroundButton />
+					</>
+				}
+			/>
 			<Box component="main" className="flex-1" sx={mainSx}>
+				<Button component={Link} to="/" startIcon={<ArrowBack />} sx={backButtonSx}>
+					{t("common.back")}
+				</Button>
 				<CharacterListLayout
 					title={title}
 					searchPlaceholder={t("characters.filterPlaceholder")}

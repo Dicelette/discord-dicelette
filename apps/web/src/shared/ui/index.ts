@@ -1,5 +1,4 @@
 export { default as AppTopBar } from "./AppTopBar";
-export { default as BackToDashboardButton } from "./BackToDashboardButton";
 export { default as ChannelSelect } from "./ChannelSelect";
 export { default as ConfigFormFooter } from "./ConfigFormFooter";
 export { default as DiscordMarkdown } from "./DiscordMarkdown";
@@ -7,6 +6,7 @@ export { default as DocsButton } from "./DocsButton";
 export { default as LanguageSelect } from "./LanguageSelect";
 export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as NumberField } from "./NumberField";
+export { default as PlaygroundButton } from "./PlaygroundButton";
 export { default as RoleSelect } from "./RoleSelect";
 export { default as SectionTitle } from "./SectionTitle";
 export { default as ThemeToggleButton } from "./ThemeToggleButton";
