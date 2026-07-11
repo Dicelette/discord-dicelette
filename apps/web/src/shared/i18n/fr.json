@@ -1,16 +1,19 @@
 {
 	"characters": {
+		"backToList": "Retour aux personnages",
 		"damage": "Dés de compétence",
 		"filterPlaceholder": "Rechercher par nom…",
 		"loadError": "Impossible de charger les personnages.",
 		"noCharacters": "Aucun personnage enregistré sur ce serveur.",
 		"noResults": "Aucun personnage ne correspond à la recherche.",
+		"notFound": "Personnage introuvable.",
 		"private": "Fiche privée",
 		"publicTitle": "Personnages",
 		"refresh": "Actualiser",
 		"refreshTooltip": "Les fiches sont mises en cache 5 min. Cliquez pour forcer une mise à jour.",
 		"serverFilterPlaceholder": "Rechercher par nom ou joueur…",
 		"serverTitle": "Personnages du serveur",
+		"share": "Partager ce personnage",
 		"sheetLink": "Voir la fiche",
 		"title": "Mes personnages",
 		"unnamed": "(Sans nom)"

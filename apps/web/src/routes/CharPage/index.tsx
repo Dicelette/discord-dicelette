@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useCharacterPagination } from "../../features/characters/hooks/useCharacterPagination";
 import { useCharactersList } from "../../features/characters/hooks/useCharactersList";
+import { buildCharShareHref } from "../../features/characters/shareLink";
 import CharacterCard from "../../features/characters/ui/CharacterCard";
 import CharacterListLayout from "../../features/characters/ui/CharacterListLayout";
 
@@ -69,7 +70,11 @@ export default function CharPage() {
 					totalPages={totalPages}
 					emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
 					renderCard={(char) => (
-						<CharacterCard key={`${char.channelId}-${char.messageId}`} char={char} />
+						<CharacterCard
+							key={`${char.channelId}-${char.messageId}`}
+							char={char}
+							shareHref={buildCharShareHref(guildId, userId, char.charName)}
+						/>
 					)}
 				/>
 			</Box>

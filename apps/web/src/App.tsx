@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./providers";
 import {
 	AppLayout,
+	CharDetailPage,
 	CharPage,
 	Dashboard,
 	Login,
@@ -24,6 +25,7 @@ function App() {
 			<Route path="/login/error" element={<LoginError />} />
 			<Route path="/playground" element={<Playground />} />
 			<Route path="/char/:guildId/:userId" element={<CharPage />} />
+			<Route path="/char/:guildId/:userId/:charName" element={<CharDetailPage />} />
 			<Route path="/" element={user ? <AppLayout /> : <Navigate to="/login" />}>
 				<Route index element={<Servers />} />
 				<Route path="dashboard/:guildId" element={<Dashboard />} />
