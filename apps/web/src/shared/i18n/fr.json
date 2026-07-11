@@ -1,5 +1,6 @@
 {
 	"characters": {
+		"backToDashboard": "Retour au dashboard",
 		"backToList": "Retour aux personnages",
 		"damage": "Dés de compétence",
 		"filterPlaceholder": "Rechercher par nom…",

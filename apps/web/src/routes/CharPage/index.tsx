@@ -1,6 +1,6 @@
 import { charactersApi } from "@dicelette/api";
 import { Box } from "@mui/material";
-import { AppTopBar, useI18n } from "@shared";
+import { AppTopBar, BackToDashboardButton, useI18n } from "@shared";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useCharacterPagination } from "../../features/characters/hooks/useCharacterPagination";
@@ -53,7 +53,7 @@ export default function CharPage() {
 				content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 			/>
 			<title>{`Dicelette — ${title}`}</title>
-			<AppTopBar />
+			<AppTopBar leadingNav={<BackToDashboardButton />} />
 			<Box component="main" className="flex-1" sx={mainSx}>
 				<CharacterListLayout
 					title={title}
