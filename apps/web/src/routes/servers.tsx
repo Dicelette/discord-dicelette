@@ -242,13 +242,9 @@ export default function Servers() {
 
 	const handleOpenCharacters = useCallback(() => {
 		if (!contextMenu || !user) return;
-		window.open(
-			`/char/${contextMenu.guild.id}/${user.id}`,
-			"_blank",
-			"noopener,noreferrer"
-		);
+		startTransition(() => navigate(`/char/${contextMenu.guild.id}/${user.id}`));
 		handleCloseContextMenu();
-	}, [contextMenu, user, handleCloseContextMenu]);
+	}, [contextMenu, user, navigate, handleCloseContextMenu]);
 
 	const botGuilds = useMemo(
 		() =>
