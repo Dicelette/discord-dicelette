@@ -162,8 +162,8 @@ export async function baseRoll(
 	// extractDiceData utilise DICE_PATTERNS.DETECT_DICE_MESSAGE qui capture le texte libre après le dé
 	const diceData = extractDiceData(dice);
 	let trailingComment: string | undefined;
-	if (diceData.comments && !overrideComment) {
-		trailingComment = diceData.comments;
+	if (diceData.comments) {
+		if (!overrideComment) trailingComment = diceData.comments;
 		dice = dice.replace(diceData.comments, "").trimEnd();
 	}
 
