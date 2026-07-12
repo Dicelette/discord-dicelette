@@ -252,9 +252,12 @@ export function processChainedDiceRoll(
 		.replace(/%%.*%%/, "")
 		.trim();
 
-	// Evaluate {{...}} formula blocks before opposition detection so that comparison
-	// operators inside the formula (e.g. {{($>=0?$:0)}}) are not mistaken for a
-	// second opposition comparator.
+	// getComments() falls back to a bare trailing-text heuristic (DETECT_DICE_MESSAGE) when no "#"-marked comment is found.
+	// GLOBAL_COMMENTS above only strips "#"-marked comments, so that bare text (e.g. "4#1d100<=55 cacax") would otherwise still be attached to finalContent and reach the dice parser, which rejects it as invalid syntax.
+	if (globalComments && finalContent.includes(globalComments))
+		finalContent = finalContent.replace(globalComments, "").trim();
+
+	// Evaluate {{...}} formula blocks before opposition detection so that comparison operators inside the formula (e.g. {{($>=0?$:0)}}) are not mistaken for a second opposition comparator.
 	finalContent = preRollDiceInBrackets(finalContent);
 	finalContent = replaceFormulaInDice(finalContent);
 
