@@ -647,7 +647,7 @@ export function replaceStatsInDiceFormula(
 					const prefix = fullMatch.startsWith("(") ? "(" : "";
 					const suffix = fullMatch.endsWith(")") ? ")" : "";
 					processedSegment = processedSegment.replace(
-						new RegExp(fullMatch.escapeRegex(), "gu"),
+						new RegExp(RegExp.escape(fullMatch), "gu"),
 						`${prefix}${statValue}${suffix}`
 					);
 				}
@@ -697,7 +697,7 @@ export function replaceStatsInDiceFormula(
 				const prefix = fullMatch.startsWith("(") && !fullMatch.endsWith(")") ? "(" : "";
 				const suffix = fullMatch.endsWith(")") && !fullMatch.startsWith("(") ? ")" : "";
 				processedFormula = processedFormula.replace(
-					new RegExp(fullMatch.escapeRegex(), "gu"),
+					new RegExp(RegExp.escape(fullMatch), "gu"),
 					`${prefix}${statValue}${suffix}`
 				);
 			}

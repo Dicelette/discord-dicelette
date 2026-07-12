@@ -1,6 +1,0 @@
-{
-	"exec": "node --enable-source-maps --import @swc-node/register/esm-register apps/bot/index.ts",
-	"ext": "ts,json",
-	"watch": ["apps/bot/src", "packages"],
-	"ignore": ["**/*.test.ts", "apps/web", "dashboard", "dist", "node_modules"]
-}

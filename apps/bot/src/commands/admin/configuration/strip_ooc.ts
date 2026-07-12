@@ -46,7 +46,7 @@ export async function stripOOC(
 	}
 	//construct regex based on prefix/suffix
 	if (suffix && prefix && !regex) {
-		regex = `^${prefix.escapeRegex()}(.*)${suffix.escapeRegex()}$`;
+		regex = `^${RegExp.escape(prefix)}(.*)${RegExp.escape(suffix)}$`;
 	}
 	if (!regex) throw new BotError(ul("config.stripOOC.error"), botErrorOptions);
 	const row = new Djs.ActionRowBuilder<Djs.ChannelSelectMenuBuilder>().addComponents(

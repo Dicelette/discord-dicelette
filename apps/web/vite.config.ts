@@ -1,6 +1,9 @@
 import path from "node:path";
+import { loadEnvFile } from "node:process";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+
+loadEnvFile(path.resolve(__dirname, "..", "..", ".env"));
 
 export default defineConfig({
 	plugins: [react()],
@@ -71,10 +74,10 @@ export default defineConfig({
 			],
 		},
 		host: true,
-		port: 5173,
+		port: process.env.PORT ?? 5173,
 		proxy: {
 			"/api": {
-				target: "http://localhost:3001",
+				target: "http://localhost:8091",
 				changeOrigin: true,
 				xfwd: true, // transmits X-Forwarded-Host → allows redirecting to the real IP
 			},

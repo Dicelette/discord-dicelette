@@ -26,7 +26,7 @@ const timerBoxSx = { width: "100%", maxWidth: { xs: "100%", md: 400 } } as const
 
 function buildRegex(prefix: string, suffix: string): string | undefined {
 	if (!prefix && !suffix) return undefined;
-	return `^${prefix.escapeRegex()}(.*)${suffix.escapeRegex()}$`;
+	return `^${RegExp.escape(prefix)}(.*)${RegExp.escape(suffix)}$`;
 }
 
 function decomposeSimpleRegex(regex: string) {

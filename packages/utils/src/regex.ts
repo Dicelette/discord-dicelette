@@ -7,7 +7,7 @@ export const QUERY_URL_PATTERNS = {
 	QUERY_PARAMS: /\?.*$/g,
 	REGEX_ESCAPE: /[.*+?^${}()|[\]\\]/g,
 	VALID_EXTENSIONS: /\.?(jpe?g|gifv?|png|webp)$/gi,
-	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${text.escapeRegex()}\\b`, "gi"),
+	WORD_BOUNDARY: (text: string) => new RegExp(`\\b${RegExp.escape(text)}\\b`, "gi"),
 } as const;
 
 export const DICE_PATTERNS = {
