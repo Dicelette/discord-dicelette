@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.0](https://github.com/Dicelette/discord-dicelette/compare/4.4.9...4.5.0) (2026-07-12)
+
+
+### Features
+
+* **web:** add a sharable web page with all characters + allwo to share only one ([1edfc9f](https://github.com/Dicelette/discord-dicelette/commit/1edfc9f0ab70cba7f5aff4e1a2a4d1e0bec0bb62))
+
+
+### Bug Fixes
+
+* **bot:calc:** ephemeral error when using hide + wrong attributes set to 0 ([885fdea](https://github.com/Dicelette/discord-dicelette/commit/885fdead948a053984119d7ee191c434a2cba55e))
+* **dice:** in bulk roll, comments without `#` was stripped. ([a423325](https://github.com/Dicelette/discord-dicelette/commit/a423325a817cfffa2450d20a5eecbd5aa63cb6ab))
+* **roll:comments:** broken parser when using slashcommands with comments in roll + comments options ([f73cda8](https://github.com/Dicelette/discord-dicelette/commit/f73cda8b9ae69475f48f4905dc5c6767d11996ae))
+* **roll:gm:** lost comments when used in dice ([acea0f3](https://github.com/Dicelette/discord-dicelette/commit/acea0f3c1e9f8d62e61d6922bc43cbabbf578304))
+
 ## [4.4.9](https://github.com/Dicelette/discord-dicelette/compare/4.4.8...4.4.9) (2026-07-08)
 
 
