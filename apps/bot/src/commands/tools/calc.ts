@@ -164,11 +164,14 @@ export async function calculate(
 	const sortResult = interaction.guild
 		? client.settings.get(interaction.guildId!, "sortOrder")
 		: undefined;
+	let attributes = userStatistique?.stats;
 	const userSettings = interaction.guild
 		? client.userSettings.get(interaction.guild.id, interaction.user.id)
 		: undefined;
-	const resolvedAttributes = resolveUserAttributes(userSettings?.attributes);
-	const attributes = resolvedAttributes.ok ? resolvedAttributes.value : undefined;
+	if (!attributes) {
+		const resolvedAttributes = resolveUserAttributes(userSettings?.attributes);
+		attributes = resolvedAttributes.ok ? resolvedAttributes.value : undefined;
+	}
 
 	let statInfo:
 		| {
@@ -183,7 +186,10 @@ export async function calculate(
 		if (sign === "-" && formula.match(/^-/)) formula = formula.replace(/^-/, "");
 		if (!sign.match(/^([><]=?|==|!=|[+\-*/%^])$/)) {
 			const embed = embedError(ul("error.sign", { sign }), ul);
-			return await interaction.reply({ embeds: [embed] });
+			return await interaction.reply({
+				embeds: [embed],
+				flags: hide ? Djs.MessageFlags.Ephemeral : undefined,
+			});
 		}
 		statInfo = {
 			name: options.getString(t("common.statistic"), true),
@@ -228,7 +234,7 @@ export async function calculate(
 			originalFormula = isRoll.result;
 			totalFormula = isRoll.total.toString();
 			needFormat = false;
-		}
+		} else totalFormula = formula;
 	}
 	const replacer = userSettings?.ignoreNotfound;
 	if (replacer) totalFormula = replaceUnknown(totalFormula, replacer);
@@ -264,7 +270,10 @@ export async function calculate(
 		);
 	} catch (error) {
 		const embed = embedError((error as Error).message ?? ul("error.calc"), ul);
-		await interaction.reply({ embeds: [embed] });
+		await interaction.reply({
+			embeds: [embed],
+			flags: hide ? Djs.MessageFlags.Ephemeral : undefined,
+		});
 		logger.warn(error);
 	}
 }

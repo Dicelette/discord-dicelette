@@ -40,6 +40,7 @@ export const math = {
 		let userStatistics: UserData | undefined;
 		if (interaction.guild) {
 			const data = await getStatistics(interaction, client, true);
+			if (interaction.replied) return;
 			optionChar = data?.optionChar;
 			userStatistics = data?.userStatistique;
 		}
