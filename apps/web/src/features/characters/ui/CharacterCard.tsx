@@ -1,10 +1,21 @@
 import type { ApiCharacter } from "@dicelette/api";
-import { Lock, OpenInNew } from "@mui/icons-material";
-import { Avatar, Box, Chip, Divider, Link, Paper, Typography } from "@mui/material";
+import { Lock, OpenInNew, Share } from "@mui/icons-material";
+import {
+	Avatar,
+	Box,
+	Chip,
+	Divider,
+	IconButton,
+	Link,
+	Paper,
+	Tooltip,
+	Typography,
+} from "@mui/material";
 import "uniformize";
 import { purple } from "@mui/material/colors";
 import { useI18n } from "@shared";
 import { memo } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import StatCell from "./StatCell";
 
 const cardPaperSx = { p: 3 } as const;
@@ -53,12 +64,15 @@ const damageGridSx = {
 	gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
 	gap: 1,
 } as const;
+const shareButtonSx = { flexShrink: 0 } as const;
 
 interface Props {
 	char: ApiCharacter;
+	/** When set, shows a share icon (top-right, level with the name) linking here. */
+	shareHref?: string;
 }
 
-function CharacterCard({ char }: Props) {
+function CharacterCard({ char, shareHref }: Props) {
 	const { t } = useI18n();
 	const displayName = char.charName ?? t("common.default");
 
@@ -120,6 +134,19 @@ function CharacterCard({ char }: Props) {
 						)}
 					</Box>
 				</Box>
+				{shareHref && (
+					<Tooltip title={t("characters.share")}>
+						<IconButton
+							component={RouterLink}
+							to={shareHref}
+							size="small"
+							aria-label={t("characters.share")}
+							sx={shareButtonSx}
+						>
+							<Share fontSize="small" />
+						</IconButton>
+					</Tooltip>
+				)}
 			</Box>
 			{char.stats && char.stats.length > 0 && (
 				<>

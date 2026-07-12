@@ -1,15 +1,19 @@
 {
 	"characters": {
+		"backToList": "Back to characters",
 		"damage": "Skill dice",
 		"filterPlaceholder": "Search by name…",
 		"loadError": "Could not load characters.",
 		"noCharacters": "No characters registered on this server.",
 		"noResults": "No characters match the search.",
+		"notFound": "Character not found.",
 		"private": "Private sheet",
+		"publicTitle": "Characters",
 		"refresh": "Refresh",
 		"refreshTooltip": "Sheets are cached for 5 min. Click to force an update.",
 		"serverFilterPlaceholder": "Search by name or player…",
 		"serverTitle": "Server characters",
+		"share": "Share this character",
 		"sheetLink": "View sheet",
 		"title": "My characters",
 		"unnamed": "(Unnamed)"
@@ -170,6 +174,7 @@
 		"favoriteRemoved": "Server removed from favorites.",
 		"favorites": "Favorites",
 		"loadError": "Could not load servers.",
+		"myCharacters": "My characters",
 		"noSearchResults": "No server matches your search.",
 		"noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
 		"rateLimitError": "Too many requests. Please wait before refreshing again.",

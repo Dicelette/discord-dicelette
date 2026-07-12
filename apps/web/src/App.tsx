@@ -1,7 +1,16 @@
 import { LoadingSpinner } from "@shared";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./providers";
-import { AppLayout, Dashboard, Login, LoginError, Playground, Servers } from "./routes";
+import {
+	AppLayout,
+	CharDetailPage,
+	CharPage,
+	Dashboard,
+	Login,
+	LoginError,
+	Playground,
+	Servers,
+} from "./routes";
 
 function App() {
 	const { user, loading } = useAuth();
@@ -15,6 +24,8 @@ function App() {
 			<Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
 			<Route path="/login/error" element={<LoginError />} />
 			<Route path="/playground" element={<Playground />} />
+			<Route path="/char/:guildId/:userId" element={<CharPage />} />
+			<Route path="/char/:guildId/:userId/:charName" element={<CharDetailPage />} />
 			<Route path="/" element={user ? <AppLayout /> : <Navigate to="/login" />}>
 				<Route index element={<Servers />} />
 				<Route path="dashboard/:guildId" element={<Dashboard />} />
