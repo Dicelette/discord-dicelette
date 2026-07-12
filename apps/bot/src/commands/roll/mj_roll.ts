@@ -138,7 +138,7 @@ export const mjRoll = {
 
 		// Handle the simple roll subcommand separately
 		if (subcommand === ul("roll.name")) {
-			const { comments, customCritical } = extractRollOptions(options, ul);
+			const { userComments, customCritical } = extractRollOptions(options, ul);
 			return await baseRoll(
 				options.getString(t("common.dice"), true),
 				interaction,
@@ -146,7 +146,7 @@ export const mjRoll = {
 				hide ?? undefined,
 				undefined,
 				user,
-				comments,
+				userComments,
 				customCritical
 			);
 		}
