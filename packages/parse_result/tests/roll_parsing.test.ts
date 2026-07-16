@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { UserData } from "../../types";
-import { applyCustomFormula, getRoll, isRolling } from "../src/dice_extractor";
+import {
+	applyCustomFormula,
+	applySemiDirectCustomFormula,
+	getRoll,
+	isRolling,
+} from "../src/dice_extractor";
 
 /**
  * Comprehensive coverage of the dice-roll *parsing* pipeline (`isRolling` / `getRoll`).
@@ -508,5 +513,85 @@ describe("roll parsing — mixed syntaxes", () => {
 		const r = isRolling("1d100+$dexterite;&+5", withStats(STATS), STATS_NAME);
 		expect(r!.result.dice).toBe("1d100+40;&+5");
 		expect(r!.statsPerSegment).toEqual(["Dextérité", ""]);
+	});
+});
+
+describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom formula", () => {
+	// Mirrors on_message_send.ts: applySemiDirectCustomFormula runs before isRolling
+	// whenever a guild/user custom formula is configured, so free chat text like
+	// "mon message [1d6]" must still resolve — see applySemiDirectCustomFormula's own
+	// unit tests in dice_extractor.test.ts for the string-transform behaviour; these
+	// exercise the full isRolling pipeline on top of it.
+
+	it("rolls a bare bracket with no nested formula target as a plain die", () => {
+		// "mon message [1d6]": the outer bracket only marks the semi-direct roll —
+		// its content ("1d6") has no further "[...]" for the formula to target.
+		const content = applySemiDirectCustomFormula("mon message [1d6]", "$>=85?85:$");
+		const r = isRolling(content);
+		expect(r!.detectRoll).toBe("1d6");
+		expect(r!.result.total).toBeGreaterThanOrEqual(1);
+		expect(r!.result.total).toBeLessThanOrEqual(6);
+	});
+
+	it("evaluates the false branch of a formula nested inside the semi-direct bracket", () => {
+		// "mon message [1d100<=[75]]" → inner "[75]" is itself a formula target.
+		const content = applySemiDirectCustomFormula(
+			"mon message [1d100<=[75]]",
+			"$>=85?85:$"
+		);
+		expect(content).toBe("mon message [1d100<={{(75)>=85?85:(75)}}]");
+		const r = isRolling(content);
+		expect(r!.detectRoll).toBe("1d100<=75");
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 75 });
+	});
+
+	it("evaluates the true branch of a formula nested inside the semi-direct bracket", () => {
+		const content = applySemiDirectCustomFormula(
+			"mon message [1d100<=[90]]",
+			"$>=85?85:$"
+		);
+		expect(content).toBe("mon message [1d100<={{(90)>=85?85:(90)}}]");
+		const r = isRolling(content);
+		expect(r!.detectRoll).toBe("1d100<=85");
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 85 });
+	});
+
+	it("handles free text on both sides of the bracket", () => {
+		const content = applySemiDirectCustomFormula("roule [1d100<=[40]] stp", "$*2");
+		expect(content).toBe("roule [1d100<={{(40)*2}}] stp");
+		const r = isRolling(content);
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 80 });
+	});
+
+	it("leaves a direct roll with no bracket unaffected by the formula", () => {
+		const content = applySemiDirectCustomFormula("1d100<=75", "$>=85?85:$");
+		expect(content).toBe("1d100<=75");
+		const r = isRolling(content);
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 75 });
+	});
+
+	it("resolves a stat-backed formula bracket when the bracket comes first", () => {
+		const content = applySemiDirectCustomFormula("[1d100<=[$dexterite]] stp", "$");
+		const r = isRolling(content, withStats(STATS), STATS_NAME);
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
+	});
+
+	it("resolves a stat-backed formula bracket when free text precedes the bracket (regression)", () => {
+		// Previously, isRolling fed the whole message to replaceStatsInDiceFormula,
+		// whose DETECT_DICE_MESSAGE comment-detection heuristic treated "roule" as
+		// the dice and swallowed the entire bracket (including $dexterite) as a
+		// trailing comment, so the stat was never substituted and the raw "$dexterite"
+		// reached the roll engine, throwing Invalid_Dice_Type. isRolling now scopes
+		// stat substitution to the bracket's own content when one is present.
+		const content = applySemiDirectCustomFormula("roule [1d100<=[$dexterite]] stp", "$");
+		const r = isRolling(content, withStats(STATS), STATS_NAME);
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
+	});
+
+	it("resolves a raw $stat inside a semi-direct bracket with no custom formula (regression)", () => {
+		// Same DETECT_DICE_MESSAGE pitfall, without going through applySemiDirectCustomFormula
+		// at all — a plain "$stat" typed directly inside a semi-direct bracket.
+		const r = isRolling("roule [1d100<=$dexterite] stp", withStats(STATS), STATS_NAME);
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
 	});
 });
