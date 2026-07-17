@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.1](https://github.com/Dicelette/discord-dicelette/compare/4.5.0...4.5.1) (2026-07-17)
+
+
+### Bug Fixes
+
+* **roll:** bracket roll (semi-direct notation) broken ([3652451](https://github.com/Dicelette/discord-dicelette/commit/365245153e6c5bfb226cde2ce5bdcc74844bf591))
+
 ## [4.5.0](https://github.com/Dicelette/discord-dicelette/compare/4.4.9...4.5.0) (2026-07-12)
 
 
