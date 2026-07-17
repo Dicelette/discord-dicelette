@@ -24,7 +24,7 @@ function getStatsRegex(statNames: string[]): RegExp {
 	let regex = DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.get(key);
 	if (!regex) {
 		regex = new RegExp(
-			`(${statNames.map((stat) => stat.standardize()).join("|")})`,
+			`(${statNames.map((stat) => stat.standardize().escapeRegex()).join("|")})`,
 			"gi"
 		);
 		DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.set(key, regex);
@@ -77,7 +77,11 @@ export function replaceStatInDiceName(
 	// Cached by stat-name signature because this function is on the hot roll path.
 	let regex = DICE_COMPILED_PATTERNS.STATS_PAREN_REGEX_CACHE.get(statName);
 	if (!regex) {
-		regex = new RegExp(`\\((${statName})\\)`, "gi");
+		const escapedStatName = statName
+			.split("|")
+			.map((name) => name.escapeRegex())
+			.join("|");
+		regex = new RegExp(`\\((${escapedStatName})\\)`, "gi");
 		DICE_COMPILED_PATTERNS.STATS_PAREN_REGEX_CACHE.set(statName, regex);
 	}
 	regex.lastIndex = 0;
@@ -107,7 +111,10 @@ export function convertNameToValue(
 	const statName = Object.keys(statistics).join("|");
 	let formule = DICE_COMPILED_PATTERNS.STATS_NAMED_REGEX_CACHE.get(statName);
 	if (!formule) {
-		formule = new RegExp(`\\((?<formula>${statName})\\)`, "i");
+		const escapedStatName = Object.keys(statistics)
+			.map((name) => name.escapeRegex())
+			.join("|");
+		formule = new RegExp(`\\((?<formula>${escapedStatName})\\)`, "i");
 		DICE_COMPILED_PATTERNS.STATS_NAMED_REGEX_CACHE.set(statName, formule);
 	}
 	const match = formule.exec(diceName.standardize());

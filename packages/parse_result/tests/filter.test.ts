@@ -25,3 +25,17 @@ it("Should remove all damages stats", () => {
 	const res = filterStatsInDamage(DAMAGES, statistics);
 	expect(res).toEqual(["perception"]);
 });
+
+it("Should treat regex metacharacters in stat names as literal text", () => {
+	// A stat named "1d.00" must not act as the regex wildcard "." and match "1dX00".
+	const damages = { safe: "1dX00", unsafe: "1d.00" };
+	const res = filterStatsInDamage(damages, ["1d.00"]);
+	expect(res).toEqual(["safe"]);
+});
+
+it("Should not hang on a stat name shaped like a catastrophic-backtracking regex", () => {
+	const damages = { attack: `1d${"a".repeat(40)}!` };
+	const start = performance.now();
+	filterStatsInDamage(damages, ["(a+)+"]);
+	expect(performance.now() - start).toBeLessThan(200);
+});

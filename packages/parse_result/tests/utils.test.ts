@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { applyCustomFormula } from "../src/dice_extractor";
 import {
 	convertExpression,
+	convertNameToValue,
 	parseComparator,
 	replaceStatInDiceName,
 	timestamp,
@@ -165,6 +166,33 @@ describe("replaceStatInDiceName", () => {
 	it("should handle undefined statistics", () => {
 		const result = replaceStatInDiceName("Attack(strength)");
 		expect(result).toBe("Attack(strength)");
+	});
+
+	it("should treat regex metacharacters in stat names as literal text", () => {
+		// A stat named "a.b" must not act as the regex wildcard "." and match "aXb".
+		const stats = { "a.b": 42 };
+		expect(replaceStatInDiceName("Roll(a.b)", stats)).toBe("Roll(42)");
+		expect(replaceStatInDiceName("Roll(aXb)", stats)).toBe("Roll(aXb)");
+	});
+
+	it("should not hang on a stat name shaped like a catastrophic-backtracking regex", () => {
+		// GM-uploaded template stat names are not sanitized; a name like this must be
+		// escaped before being compiled into a RegExp, or this call can block the
+		// event loop for a very long time (ReDoS) instead of returning quickly.
+		const stats = { "(a+)+": 1 };
+		const start = performance.now();
+		const result = replaceStatInDiceName(`Roll(${"a".repeat(40)}!)`, stats);
+		expect(performance.now() - start).toBeLessThan(200);
+		expect(result).toBe(`Roll(${"a".repeat(40)}!)`);
+	});
+});
+
+describe("convertNameToValue", () => {
+	it("should not hang on a stat name shaped like a catastrophic-backtracking regex", () => {
+		const stats = { "(a+)+": 1 };
+		const start = performance.now();
+		convertNameToValue(`Roll(${"a".repeat(40)}!)`, stats);
+		expect(performance.now() - start).toBeLessThan(200);
 	});
 });
 
