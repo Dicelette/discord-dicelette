@@ -5,6 +5,7 @@ import { composeRollBase } from "../src/compose_roll";
 import {
 	applyCommentsToResult,
 	applyCustomFormula,
+	applySemiDirectCustomFormula,
 	extractDiceData,
 	getRoll,
 	hasValidDice,
@@ -627,6 +628,46 @@ describe("applyCustomFormula", () => {
 
 			const result = getRoll(finalDice);
 			expect(result?.compare).toEqual({ sign: "<=", value: 75 });
+		});
+	});
+
+	describe("applySemiDirectCustomFormula", () => {
+		it("leaves a bare semi-direct bracket untouched (no inner target for the formula)", () => {
+			// "mon message [1d6]" — outer bracket unwraps to "1d6", which has no
+			// further bracket for the formula to target, so it's a no-op.
+			const result = applySemiDirectCustomFormula("mon message [1d6]", "$>85?1d10+$:$");
+			expect(result).toBe("mon message [1d6]");
+		});
+
+		it("transforms a formula-relevant bracket nested inside the semi-direct one", () => {
+			// "mon message [1d100<=[75]]" — outer bracket unwraps to "1d100<=[75]",
+			// whose own "[75]" is then a valid custom-formula target.
+			const result = applySemiDirectCustomFormula(
+				"mon message [1d100<=[75]]",
+				"$>85?1d10+$:$"
+			);
+			expect(result).toBe("mon message [1d100<={{(75)>85?1d10+(75):(75)}}]");
+		});
+
+		it("falls back to applyCustomFormula when there is no bracket at all", () => {
+			const result = applySemiDirectCustomFormula("1d100<=75", "$>85?1d10+$:$");
+			expect(result).toBe("1d100<=75");
+		});
+
+		it("isRolling still recognizes 'mon message [1d6]' as a bracket roll", () => {
+			const content = applySemiDirectCustomFormula("mon message [1d6]", "$");
+			const result = isRolling(content);
+			expect(result).toBeDefined();
+			expect(result!.detectRoll).toBe("1d6");
+		});
+
+		it("isRolling resolves the nested formula bracket and rolls the outer expression", () => {
+			// formula "$" is the identity, so [75] simply becomes {{(75)}} → 75.
+			const content = applySemiDirectCustomFormula("mon message [1d100<=[75]]", "$");
+			const result = isRolling(content);
+			expect(result).toBeDefined();
+			expect(result!.detectRoll).toBe("1d100<=75");
+			expect(result!.result.compare).toEqual({ sign: "<=", value: 75 });
 		});
 	});
 });

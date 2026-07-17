@@ -3,7 +3,7 @@ import { DiceTypeError, REMOVER_PATTERN } from "@dicelette/core";
 import { fetchChannel, getGuildContext, resolveCustomFormula } from "@dicelette/helpers";
 import { ln } from "@dicelette/localization";
 import {
-	applyCustomFormula,
+	applySemiDirectCustomFormula,
 	getExpression,
 	isNotADice,
 	isRolling,
@@ -83,7 +83,7 @@ export default (client: EClient): void => {
 				// `{exp}`/`{exp||X}` macros (e.g. inside a custom-formula `[...]` bracket)
 				// can only fall back to their default value here.
 				content = getExpression(content, "0").dice;
-				content = applyCustomFormula(content, customFormula);
+				content = applySemiDirectCustomFormula(content, customFormula);
 			}
 			const isRoll = isRolling(
 				content,
