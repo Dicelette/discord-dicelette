@@ -74,10 +74,10 @@ export default defineConfig({
 			],
 		},
 		host: true,
-		port: process.env.PORT ? Number(process.env.PORT) : 5173,
+		port: process.env.WEB_PORT ? Number(process.env.WEB_PORT) : 5173,
 		proxy: {
 			"/api": {
-				target: "http://localhost:8091",
+				target: `http://localhost:${process.env.DASHBOARD_PORT ?? 3001}`,
 				changeOrigin: true,
 				xfwd: true, // transmits X-Forwarded-Host → allows redirecting to the real IP
 			},
