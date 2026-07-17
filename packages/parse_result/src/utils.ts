@@ -24,7 +24,7 @@ function getStatsRegex(statNames: string[]): RegExp {
 	let regex = DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.get(key);
 	if (!regex) {
 		regex = new RegExp(
-			`(${statNames.map((stat) => stat.standardize().escapeRegex()).join("|")})`,
+			`(${statNames.map((stat) => RegExp.escape(stat.standardize())).join("|")})`,
 			"gi"
 		);
 		DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.set(key, regex);
@@ -79,7 +79,7 @@ export function replaceStatInDiceName(
 	if (!regex) {
 		const escapedStatName = statName
 			.split("|")
-			.map((name) => name.escapeRegex())
+			.map((name) => RegExp.escape(name))
 			.join("|");
 		regex = new RegExp(`\\((${escapedStatName})\\)`, "gi");
 		DICE_COMPILED_PATTERNS.STATS_PAREN_REGEX_CACHE.set(statName, regex);
@@ -112,7 +112,7 @@ export function convertNameToValue(
 	let formule = DICE_COMPILED_PATTERNS.STATS_NAMED_REGEX_CACHE.get(statName);
 	if (!formule) {
 		const escapedStatName = Object.keys(statistics)
-			.map((name) => name.escapeRegex())
+			.map((name) => RegExp.escape(name))
 			.join("|");
 		formule = new RegExp(`\\((?<formula>${escapedStatName})\\)`, "i");
 		DICE_COMPILED_PATTERNS.STATS_NAMED_REGEX_CACHE.set(statName, formule);
