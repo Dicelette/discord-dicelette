@@ -601,6 +601,7 @@
 		},
 		"botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nLe bot n'a pas les accès nécessaires pour effectuer l'action demandée. ",
 		"bulk": {
+			"max": "Le nombre de dé dans `{{- dice}}` est trop élevé (max {{- max}}).",
 			"number": "Le nombre de dé à lancer dans `{{- dice}}` n'a pas été reconnu.",
 			"zero": "Le nombre de dé dans `{{- dice}}` doit être supérieur à 0."
 		},

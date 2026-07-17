@@ -186,6 +186,10 @@ export function diceTypeError(
 	if (error.cause === "empty_dice") return ul("error.invalidDice.notFound");
 	if (error.cause === "bulk_number") return ul("error.bulk.number", { dice: error.dice });
 	if (error.cause === "bulk_zero") return ul("error.bulk.zero", { dice: error.dice });
+	if (error.cause === "bulk_max") {
+		const { max } = (error.method as { max: number } | undefined) ?? { max: 100 };
+		return ul("error.bulk.max", { dice: error.dice, max });
+	}
 	if (error.cause === "opposition") {
 		const { comparator } = error.method as {
 			comparator: string;
