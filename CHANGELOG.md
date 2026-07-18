@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.3](https://github.com/Dicelette/discord-dicelette/compare/4.5.2...4.5.3) (2026-07-18)
+
+### Bug Fixes
+
+* **regex:** ReDoS guard (again) ([f030389](https://github.com/Dicelette/discord-dicelette/commit/f03038925305957f0627313bb761337178aa9f98))
 ## [4.5.2](https://github.com/Dicelette/discord-dicelette/compare/4.5.1...4.5.2) (2026-07-18)
 
 ### Bug Fixes
