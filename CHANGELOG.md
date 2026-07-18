@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.2](https://github.com/Dicelette/discord-dicelette/compare/4.5.1...4.5.2) (2026-07-18)
+
+### Bug Fixes
+
+* **bulk:** add a limit for number of bulk & add translation for the generated error ([00a0bdd](https://github.com/Dicelette/discord-dicelette/commit/00a0bddbfe5b44493d451f704ddcea8adea21333))
+* cpu spike because statName was not escaped during the getStatsRegex that can lead to ReDoS ([738935b](https://github.com/Dicelette/discord-dicelette/commit/738935bfc0ddebc0c4bc742f5098e3e9ee8ff4cb))
 ## [4.5.1](https://github.com/Dicelette/discord-dicelette/compare/4.5.0...4.5.1) (2026-07-17)
 
 
