@@ -108,7 +108,7 @@ async function copyReaction(reaction: Djs.MessageReaction | Djs.PartialMessageRe
 	try {
 		await messageToCopy.react(reaction.emoji);
 	} catch (error) {
-		logger.warn(error);
+		logger.warn(error as Error);
 	}
 }
 

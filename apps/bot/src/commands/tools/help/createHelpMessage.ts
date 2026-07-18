@@ -66,7 +66,7 @@ export async function helpAtInvit(guild: Djs.Guild): Promise<void> {
 			await systemChannel.send(msg);
 		} catch (_e) {
 			await owner.send(msg);
-			logger.warn(_e);
+			logger.warn(_e as Error);
 		}
 	}
 }

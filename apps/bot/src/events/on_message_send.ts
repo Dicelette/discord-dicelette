@@ -140,7 +140,7 @@ export default (client: EClient): void => {
 				return;
 			}
 			if (!isApiError(e) && !(e instanceof DiceTypeError)) {
-				logger.fatal(e);
+				logger.fatal(e as Error);
 				sentry.fatal(e);
 			}
 			const guildSettings = client.settings.get(message.guild.id);

@@ -181,7 +181,7 @@ async function deleteOldMessageIfNeeded(
 			if (oldMessage) await oldMessage.delete();
 		} catch (error) {
 			// Skip unknown message errors quietly during bulk operations
-			logger.warn(error);
+			logger.warn(error as Error);
 		}
 	}
 }

@@ -123,7 +123,7 @@ export function performDiceRoll(
 		const { dice: cleanDice, comment } = splitDiceComment(rollContent);
 		return { infoRoll, resultat: roll(cleanDice, undefined, pity, sort, comment) };
 	} catch (e) {
-		logger.warn(e);
+		logger.warn(e as Error);
 		return undefined;
 	}
 }
@@ -288,7 +288,7 @@ export function processChainedDiceRoll(
 			rollResult.comment = globalComments;
 		return { infoRoll, resultat: rollResult, statsPerSegment };
 	} catch (e) {
-		logger.warn(e);
+		logger.warn(e as Error);
 		return undefined;
 	}
 }

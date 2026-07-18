@@ -739,7 +739,7 @@ export class MacroFeature extends BaseFeature {
 			try {
 				evalStatsDice(toRoll, statsValues);
 			} catch (error) {
-				logger.warn(error);
+				logger.warn(error as Error);
 				throw new BotError(
 					this.ul("error.invalidDice.eval", { dice }),
 					botErrorOptionsValidation

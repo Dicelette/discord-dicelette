@@ -274,7 +274,7 @@ export async function calculate(
 			embeds: [embed],
 			flags: hide ? Djs.MessageFlags.Ephemeral : undefined,
 		});
-		logger.warn(error);
+		logger.warn(error as Error);
 	}
 }
 

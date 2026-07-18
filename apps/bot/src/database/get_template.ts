@@ -88,7 +88,7 @@ export async function getTemplate(
 		}
 	} catch (error) {
 		if (skipNoFound) return undefined;
-		logger.warn(error);
+		logger.warn(error as Error);
 		if ((error as Error).message === "Unknown Message")
 			throw new BotError(
 				ul("error.template.id", { channelId, messageId }),

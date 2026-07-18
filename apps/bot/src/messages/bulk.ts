@@ -93,7 +93,7 @@ export async function bulkEditTemplateUser(
 				client.characterCacheTimestamps
 			);
 		} catch (e) {
-			logger.warn(e);
+			logger.warn(e as Error);
 			//pass
 		}
 	});
@@ -148,7 +148,7 @@ export async function bulkDeleteCharacters(
 			});
 		} else await rep.edit({ components: [] });
 	} catch (err) {
-		logger.warn(err);
+		logger.warn(err as Error);
 	}
 	return;
 }
@@ -168,7 +168,7 @@ async function deleteMessageChar(
 			if (!thread) return;
 			await thread.messages.delete(messageId);
 		} catch (err) {
-			logger.warn(err);
+			logger.warn(err as Error);
 		}
 	});
 }

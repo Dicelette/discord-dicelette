@@ -56,7 +56,7 @@ export function convertExpression(
 		if (isNumber(evaluated)) return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
 	} catch (error) {
 		//pass
-		logger.warn(error);
+		logger.warn(error as Error);
 	}
 	if (!dice.startsWith("+") && !dice.startsWith("-")) return `+${dice}`;
 	return dice;

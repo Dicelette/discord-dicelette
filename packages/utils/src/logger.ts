@@ -1,15 +1,14 @@
 /** biome-ignore-all lint/style/useNamingConvention: Logger us a specific non naming convention */
 import process from "node:process";
-import { formatWithOptions } from "node:util";
 import * as Sentry from "@sentry/node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
 import {
 	type ILogObj,
-	type IMeta,
-	type ISettings,
+	type IPrettyLogStyles,
 	type ISettingsParam,
 	Logger,
+	type Transport,
 } from "tslog";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { BotError, BotErrorLevel } from "./errors";
@@ -32,28 +31,15 @@ function writeToConsole(output: string, logLevelId: number) {
 /**
  * tslog's default pretty transport always writes through console.log, no matter
  * the log level. PM2 splits stdout -> out.log and stderr -> error.log, so WARN/
- * ERROR/FATAL logs never reached error.log. This dispatches to the console method
- * matching each level (console.debug/info/warn/error), which also keeps Sentry's
- * consoleLoggingIntegration below tagging breadcrumbs with the correct level.
+ * ERROR/FATAL logs never reached error.log. This transport dispatches to the console
+ * method matching each level (console.debug/info/warn/error), which also keeps Sentry's
+ * consoleLoggingIntegration below tagging breadcrumbs with the correct level. Every logger
+ * below sets `type: "hidden"` so this attached transport is the only thing writing to console.
  */
-function transportFormatted(
-	logMetaMarkup: string,
-	logArgs: unknown[],
-	logErrors: string[],
-	logMeta?: IMeta,
-	settings?: ISettings<ILogObj>
-) {
-	const prettyLogs = settings?.stylePrettyLogs !== false;
-	const metaMarkup = prettyLogs ? logMetaMarkup : stripAnsi(logMetaMarkup);
-	const logErrorsStr =
-		(logErrors.length > 0 && logArgs.length > 0 ? "\n" : "") + logErrors.join("\n");
-	if (settings?.prettyInspectOptions) settings.prettyInspectOptions.colors = prettyLogs;
-	const formattedArgs = formatWithOptions(
-		settings?.prettyInspectOptions ?? {},
-		...logArgs
-	);
-	writeToConsole(metaMarkup + formattedArgs + logErrorsStr, logMeta?.logLevelId ?? 0);
-}
+const consoleByLevelTransport: Transport<ILogObj> = {
+	format: "pretty",
+	write: (record, line) => writeToConsole(line, record._logMeta.logLevelId),
+};
 
 const LOG_LEVEL_COLORS = {
 	"*": ["bold", "black", "bgWhiteBright", "dim"],
@@ -66,7 +52,7 @@ const LOG_LEVEL_COLORS = {
 	WARN: ["bold", "yellow"],
 };
 
-const BASE_STYLE: ISettingsParam<ILogObj>["prettyLogStyles"] = {
+const BASE_STYLE: IPrettyLogStyles = {
 	dateIsoStr: ["dim"],
 	errorName: ["bold", "bgRedBright", "whiteBright"],
 	fileName: ["yellow"],
@@ -82,28 +68,34 @@ const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
 const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
 const prodSettings: ISettingsParam<ILogObj> = {
-	hideLogPositionForProduction: true,
+	attachedTransports: [consoleByLevelTransport],
 	minLevel: 6,
 	name: "LOGGER",
-	overwrite: { transportFormatted },
-	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
-	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
-	prettyLogStyles: BASE_STYLE,
-	prettyLogTemplate: PROD_TEMPLATE,
-	prettyLogTimeZone: "local",
-	stylePrettyLogs: true,
+	pretty: {
+		errorStackTemplate: BASE_STACK_TEMPLATE,
+		errorTemplate: BASE_ERROR_TEMPLATE,
+		style: true,
+		styles: BASE_STYLE,
+		template: PROD_TEMPLATE,
+		timeZone: "local",
+	},
+	stack: { capture: "off" },
+	type: "hidden",
 };
 
 const devSettings: ISettingsParam<ILogObj> = {
+	attachedTransports: [consoleByLevelTransport],
 	minLevel: 0, // everything
-	overwrite: { transportFormatted },
-	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
-	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
-	prettyLogStyles: BASE_STYLE,
-	prettyLogTemplate:
-		"{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} {{logLevelName}} [{{filePathWithLine}}{{name}}] ",
-	prettyLogTimeZone: "local",
-	stylePrettyLogs: true,
+	pretty: {
+		errorStackTemplate: BASE_STACK_TEMPLATE,
+		errorTemplate: BASE_ERROR_TEMPLATE,
+		style: true,
+		styles: BASE_STYLE,
+		template:
+			"{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} {{logLevelName}} [{{filePathWithLine}}{{name}}] ",
+		timeZone: "local",
+	},
+	type: "hidden",
 };
 
 export const logger: Logger<ILogObj> = new Logger(
@@ -116,19 +108,22 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
-	hideLogPositionForProduction: true,
+	attachedTransports: [consoleByLevelTransport],
 	minLevel: 1,
 	name: "IMPORTANT",
-	overwrite: { transportFormatted },
-	prettyErrorStackTemplate: BASE_STACK_TEMPLATE,
-	prettyErrorTemplate: BASE_ERROR_TEMPLATE,
-	prettyLogStyles: {
-		...BASE_STYLE,
-		logLevelName: LOG_LEVEL_COLORS,
+	pretty: {
+		errorStackTemplate: BASE_STACK_TEMPLATE,
+		errorTemplate: BASE_ERROR_TEMPLATE,
+		style: true,
+		styles: {
+			...BASE_STYLE,
+			logLevelName: LOG_LEVEL_COLORS,
+		},
+		template: IMPORTANT_LOG_TEMPLATE,
+		timeZone: "local",
 	},
-	prettyLogTemplate: IMPORTANT_LOG_TEMPLATE,
-	prettyLogTimeZone: "local",
-	stylePrettyLogs: true,
+	stack: { capture: "off" },
+	type: "hidden",
 });
 
 const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "production";
@@ -238,5 +233,5 @@ export function consoleError(e: BotError | Error) {
 		}
 		return;
 	}
-	console.error(e);
+	logger.error(e);
 }

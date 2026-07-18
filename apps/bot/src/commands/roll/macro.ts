@@ -52,7 +52,7 @@ export default {
 				optionChar
 			);
 		} catch (e) {
-			logger.fatal(e);
+			logger.fatal(e as Error);
 			const errorMessage = e instanceof Error ? e.message : String(e);
 			await replyEphemeralError(
 				interaction,

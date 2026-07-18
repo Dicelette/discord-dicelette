@@ -54,7 +54,7 @@ export const onKick = (client: EClient): void => {
 			}
 			client.deleteCharacter(guild.id);
 		} catch (error) {
-			logger.fatal(error);
+			logger.fatal(error as Error);
 		}
 	});
 };
@@ -98,7 +98,7 @@ export const onDeleteThread = (client: EClient): void => {
 			//verify if the user message was in the thread
 			await deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
-			logger.warn(error);
+			logger.warn(error as Error);
 			if (thread.isDMBased()) return;
 			await sendLogs((error as Error).message, thread.guild, client.settings);
 		}
@@ -168,7 +168,7 @@ export const onDeleteMessage = (client: EClient): void => {
 			}
 			client.settings.set(guildID, dbUser, "user");
 		} catch (error) {
-			logger.warn(error);
+			logger.warn(error as Error);
 			if (!message.guild) return;
 			await sendLogs((error as Error).message, message.guild, client.settings);
 		}

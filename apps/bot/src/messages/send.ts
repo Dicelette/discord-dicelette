@@ -18,7 +18,7 @@ export async function sendLogs(
 		const allowedMentions = allowMentions ? undefined : {};
 		await channelToSend.send({ allowedMentions, content: message });
 	} catch (error) {
-		logger.warn(error);
+		logger.warn(error as Error);
 		return;
 	}
 }
@@ -86,7 +86,7 @@ export async function deleteAfter(
 		try {
 			await message.delete();
 		} catch (error) {
-			logger.warn(error);
+			logger.warn(error as Error);
 			// Can't delete message, probably because the message was already deleted; ignoring the error.
 		}
 	}, time);

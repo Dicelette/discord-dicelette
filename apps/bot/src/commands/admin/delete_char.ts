@@ -130,7 +130,7 @@ export const deleteChar = {
 					});
 				}
 			} catch (e) {
-				logger.warn(e, "Timeout");
+				logger.warn(e as Error, "Timeout");
 				await interaction.editReply({
 					components: [],
 					content: ul("common.cancelled"),
@@ -200,7 +200,7 @@ export const deleteChar = {
 				});
 			}
 		} catch (e) {
-			logger.warn(e, "Timeout");
+			logger.warn(e as Error, "Timeout");
 			await interaction.editReply({
 				components: [],
 				content: ul("common.cancelled"),
@@ -223,7 +223,7 @@ async function deleteMessages(
 			const message = await userThread.messages.fetch(id[1]);
 			await message.delete();
 		} catch (e) {
-			logger.warn(e, "deleteChar: no message found - No problem");
+			logger.warn(e as Error, "deleteChar: no message found - No problem");
 		}
 	}
 }
@@ -302,7 +302,7 @@ async function deleteOneChar(
 		await reply(interaction, ul("deleteChar.success", { user: msg }));
 		client.settings.set(interaction.guildId as string, newGuildData);
 	} catch (e) {
-		logger.warn(e, "deleteChar: no message found - No problem");
+		logger.warn(e as Error, "deleteChar: no message found - No problem");
 		//no message found, delete the character from the database
 		const newGuildData = deleteUser(interaction, guildData, user, charName);
 		client.settings.set(interaction.guildId as string, newGuildData);

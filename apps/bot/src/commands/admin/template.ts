@@ -147,7 +147,7 @@ export const templateManager = {
 				await deleteTemplate(client, interaction, ul);
 			}
 		} catch (e) {
-			logger.warn(e, "updateTemplateFile: error while updating template");
+			logger.warn(e as Error, "updateTemplateFile: error while updating template");
 			const langToUse = getLangAndConfig(client, interaction).langToUse;
 			await interactionError(client, interaction, e as BotError, ul, langToUse);
 		}
@@ -200,7 +200,7 @@ async function removeMessage(
 				await msg.delete();
 			}
 		} catch (e) {
-			logger.warn(e, "deleteTemplate: delete message");
+			logger.warn(e as Error, "deleteTemplate: delete message");
 		}
 	}
 }
@@ -492,7 +492,7 @@ async function createEmbed(
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 			}
-		} else logger.warn(e, "registerTemplate: pin message");
+		} else logger.warn(e as Error, "registerTemplate: pin message");
 	}
 	return msg;
 }
@@ -630,7 +630,7 @@ async function deleteOldTemplate(json: GuildData, guild: Djs.Guild) {
 			);
 			await msg.delete();
 		} catch (e) {
-			logger.warn(e, "registerTemplate: delete message");
+			logger.warn(e as Error, "registerTemplate: delete message");
 		}
 	}
 }

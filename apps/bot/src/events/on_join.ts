@@ -23,7 +23,7 @@ export default (client: EClient, guildEvents?: EventEmitter): void => {
 			);
 			await helpAtInvit(guild);
 		} catch (e) {
-			logger.fatal(e);
+			logger.fatal(e as Error);
 		}
 	});
 };

@@ -228,7 +228,7 @@ async function avatar(
 		});
 	} catch (error) {
 		//send the correct error message
-		logger.warn(error);
+		logger.warn(error as Error);
 		await reply(interaction, {
 			embeds: [embedError((error as Error).message, ul)],
 		});
@@ -335,7 +335,7 @@ export async function rename(
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
-		logger.warn(error);
+		logger.warn(error as Error);
 		if ((error as Error).message === "DUPLICATE")
 			await reply(interaction, {
 				embeds: [embedError(ul("error.duplicate"), ul, "duplicate")],
@@ -417,7 +417,7 @@ export async function changeOwner(
 	try {
 		await registerUser(userRegister, interaction, client.settings, false, true);
 	} catch (error) {
-		logger.warn(error);
+		logger.warn(error as Error);
 		if ((error as Error).message === "DUPLICATE")
 			await reply(interaction, { embeds: [embedError(ul("error.duplicate"), ul)] });
 		else

@@ -376,7 +376,7 @@ export async function getUserFrom(
 		return { charName: user.charName?.capitalize(), userData };
 	} catch (error) {
 		if (skipNotFound) return;
-		logger.warn(error);
+		logger.warn(error as Error);
 		throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
 	}
 }

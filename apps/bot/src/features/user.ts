@@ -465,7 +465,7 @@ export class UserFeature extends BaseFeature {
 							}),
 						});
 					} catch (e) {
-						logger.warn(e, "button: can't send DM to the owner");
+						logger.warn(e as Error, "button: can't send DM to the owner");
 					}
 				}
 			}
@@ -668,7 +668,7 @@ export class UserFeature extends BaseFeature {
 		try {
 			await interaction.message.delete();
 		} catch (e) {
-			logger.warn(e, "validateUser: can't delete the message");
+			logger.warn(e as Error, "validateUser: can't delete the message");
 		}
 		await addAutoRole(
 			interaction,
