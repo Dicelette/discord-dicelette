@@ -39,7 +39,7 @@
 		]
 	},
 	"dependencies": {
-		"@dicelette/core": "^1.29.3",
+		"@dicelette/core": "^1.29.4",
 		"@discordjs/rest": "^2.6.1",
 		"@sentry/node": "^10.65.0",
 		"@types/jsonwebtoken": "^9.0.10",
@@ -49,7 +49,7 @@
 		"cors": "^2.8.6",
 		"dedent": "^1.7.2",
 		"discord-api-types": "^0.38.49",
-		"discord.js": "14.26.5",
+		"discord.js": "14.27.0",
 		"dotenv": "^17.4.2",
 		"enmap": "npm:@dicelette/enmap@^6.1.6",
 		"express": "^5.2.1",
@@ -62,7 +62,7 @@
 		"memorystore": "^1.6.8",
 		"parse-color": "^1.0.0",
 		"random-js": "^2.1.0",
-		"tslog": "^4.11.0",
+		"tslog": "^5.1.0",
 		"tsx": "^4.23.0",
 		"uniformize": "^2.6.1",
 		"zod": "latest"
@@ -70,7 +70,6 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.3",
 		"@go-task/cli": "^3.52.0",
-		"@typescript/native": "npm:typescript@^7.0.2",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/express-session": "^1.19.0",
@@ -78,7 +77,8 @@
 		"@types/papaparse": "^5.5.2",
 		"@types/parse-color": "^1.0.3",
 		"@types/semver": "^7.7.1",
-		"commit-and-tag-version": "^12.7.3",
+		"@typescript/native": "npm:typescript@^7.0.2",
+		"commit-and-tag-version": "^13.0.0",
 		"concurrently": "^10.0.3",
 		"cross-env": "^10.1.0",
 		"glob": "^13.0.6",
