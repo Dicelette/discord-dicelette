@@ -601,6 +601,7 @@
 		},
 		"botMissingPermission": "## [DISCORD] **MISSING ACCESS**\nThe bot does not have the access to perform the requested action. ",
 		"bulk": {
+			"max": "The dice's number in `{{- dice}}` is too high (max {{- max}}).",
 			"number": "The dice's number was not recognized in `{{- dice}}`.",
 			"zero": "The dice's number in `{{-dice}}` must be greater than zero."
 		},
