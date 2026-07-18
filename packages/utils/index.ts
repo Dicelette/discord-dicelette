@@ -9,6 +9,7 @@ export * from "./src/changelog";
 export { default as dev } from "./src/dev";
 export * from "./src/humanizeDuration";
 export * from "./src/logger";
+export * from "./src/redosGuard";
 export * from "./src/regex";
 
 /**

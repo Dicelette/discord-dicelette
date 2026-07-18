@@ -353,7 +353,8 @@
 				"end": " Regex must end with `$`.",
 				"error": "The regex is invalid: {{- e}}",
 				"name": "regex",
-				"start": "Regex must starts with `^`."
+				"start": "Regex must starts with `^`.",
+				"unsafe": "This regex is too complex and could freeze the bot for everyone (catastrophic backtracking). Please simplify it."
 			},
 			"select": "Choose channel where the OOC will be deleted.",
 			"success": "The OOC deletion is configured with:\n- Regex: `{{- regex}}`\n- Timer: `{{- timer}}`\n- Forward channel: {{- channel}}\n- Thread mode: {{- threadMode}}\n\nAnd will be done in:\n- {{- categories}}",

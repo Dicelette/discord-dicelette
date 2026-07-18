@@ -1,4 +1,5 @@
-import type { GuildData } from "@dicelette/types";
+import type { GuildData, StripOOC } from "@dicelette/types";
+import { isRegexSafe } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import { type DashboardDeps, permCache } from "../types";
@@ -82,6 +83,17 @@ export function createConfigRouter(deps: DashboardDeps) {
 						.json({ error: "Only Administrators can modify dashboard access roles" });
 					return;
 				}
+			}
+		}
+
+		if ("stripOOC" in updates) {
+			const stripOOC = updates.stripOOC as Partial<StripOOC> | null | undefined;
+			if (stripOOC?.regex && !isRegexSafe(stripOOC.regex, "i")) {
+				res.status(400).json({
+					error:
+						"stripOOC.regex is too complex and could freeze the bot (catastrophic backtracking)",
+				});
+				return;
 			}
 		}
 

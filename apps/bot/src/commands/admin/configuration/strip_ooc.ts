@@ -2,7 +2,13 @@ import type { EClient } from "@dicelette/client";
 import { fetchChannel } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import type { StripOOC, Translation } from "@dicelette/types";
-import { BotError, BotErrorLevel, type BotErrorOptions, sentry } from "@dicelette/utils";
+import {
+	BotError,
+	BotErrorLevel,
+	type BotErrorOptions,
+	isRegexSafe,
+	sentry,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 
@@ -43,6 +49,8 @@ export async function stripOOC(
 		} catch (e) {
 			throw new BotError(ul("config.stripOOC.regex.error", { e }), botErrorOptions);
 		}
+		if (!isRegexSafe(regex, "i"))
+			throw new BotError(ul("config.stripOOC.regex.unsafe"), botErrorOptions);
 	}
 	//construct regex based on prefix/suffix
 	if (suffix && prefix && !regex) {

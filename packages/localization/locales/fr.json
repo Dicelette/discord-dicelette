@@ -353,7 +353,8 @@
 				"end": " Les expressions régulières doivent finir par `$`.",
 				"error": "L'expression régulière est invalide: {{- e}}",
 				"name": "regex",
-				"start": "Les expressions régulières doivent commencer par `^`."
+				"start": "Les expressions régulières doivent commencer par `^`.",
+				"unsafe": "Cette expression régulière est trop complexe et pourrait geler le bot pour tout le monde (backtracking catastrophique). Merci de la simplifier."
 			},
 			"select": "Merci de choisir les salons ou catégories où le HRP sera supprimé.",
 			"success": "La suppression du texte HRP est bien configuré :\n- Expression régulière : `{{- regex}}`\n- Timer: `{{- timer}}`\n- Channel de transfert : {{- channel}}\n- Mode thread : {{- threadMode}}\n\nEt sera fait dans les channels suivants :\n- {{- categories}}",
