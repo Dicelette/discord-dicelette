@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.4](https://github.com/Dicelette/discord-dicelette/compare/4.5.3...4.5.4) (2026-07-19)
+
+### Bug Fixes
+
+* **roll:** semi-direct bracket roll broken if message stats with markdown ([0bc2792](https://github.com/Dicelette/discord-dicelette/commit/0bc2792f22a3d68282526346d9deb90bf21bcce1))
 ## [4.5.3](https://github.com/Dicelette/discord-dicelette/compare/4.5.2...4.5.3) (2026-07-18)
 
 ### Bug Fixes
