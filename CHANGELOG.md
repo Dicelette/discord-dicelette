@@ -2,6 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.5](https://github.com/Dicelette/discord-dicelette/compare/4.5.4...4.5.5) (2026-07-19)
 ## [4.5.4](https://github.com/Dicelette/discord-dicelette/compare/4.5.3...4.5.4) (2026-07-19)
 
 ### Bug Fixes
