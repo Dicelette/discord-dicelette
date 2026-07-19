@@ -8,27 +8,6 @@ import {
 } from "../src/dice_extractor";
 import { isNotADice } from "../src/utils";
 
-/**
- * Comprehensive coverage of the dice-roll *parsing* pipeline (`isRolling` / `getRoll`).
- *
- * The goal of this file is to walk through EVERY syntax branch the bot accepts and
- * assert that the dice are actually rolled correctly:
- *  - basic rolls, modifiers, math and dynamic dice
- *  - dice-roller notation (explode, keep/drop, percentile)
- *  - comments (`#`, `//`, inline, bracket labels)
- *  - comparison & opposition (`>`, `>=`, double comparator)
- *  - bulk rolls (`N#dice`)
- *  - shared / "unique" rolls (`;&`)
- *  - inline custom critical blocks (`{cs:}` / `{cf:}`)
- *  - stat substitution (`$stat`), including partial matching and `×` joins
- *  - `disableCompare` (wrap in `{}`) on every relevant branch
- *  - custom formula (`applyCustomFormula`) and its combination with `disableCompare`
- *  - mixed syntaxes
- *
- * Rolls are random, so assertions target deterministic structure (dice string,
- * comparator, comment, segment markers, value ranges) rather than exact results.
- */
-
 /** Build a minimal UserData carrying only the stats map. */
 function withStats(stats: Record<string, number>): UserData {
 	return { stats, template: {} };
@@ -473,8 +452,6 @@ describe("roll parsing — conditional custom formula with $stat (regression)", 
 	});
 
 	it("handles a real opposition outside a stat-backed formula block", () => {
-		// The >=10 opposition is outside {{...}} and must still be stripped,
-		// while the comparison inside the block is preserved.
 		const dice = applyCustomFormula("1d100<=[$dexterite]>=10", "$");
 		expect(dice).toBe("1d100<={{($dexterite)}}>=10");
 		const r = isRolling(dice, withStats(STATS), STATS_NAME);
@@ -518,12 +495,6 @@ describe("roll parsing — mixed syntaxes", () => {
 });
 
 describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom formula", () => {
-	// Mirrors on_message_send.ts: applySemiDirectCustomFormula runs before isRolling
-	// whenever a guild/user custom formula is configured, so free chat text like
-	// "mon message [1d6]" must still resolve — see applySemiDirectCustomFormula's own
-	// unit tests in dice_extractor.test.ts for the string-transform behaviour; these
-	// exercise the full isRolling pipeline on top of it.
-
 	it("rolls a bare bracket with no nested formula target as a plain die", () => {
 		// "mon message [1d6]": the outer bracket only marks the semi-direct roll —
 		// its content ("1d6") has no further "[...]" for the formula to target.
@@ -578,12 +549,6 @@ describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom
 	});
 
 	it("resolves a stat-backed formula bracket when free text precedes the bracket (regression)", () => {
-		// Previously, isRolling fed the whole message to replaceStatsInDiceFormula,
-		// whose DETECT_DICE_MESSAGE comment-detection heuristic treated "roule" as
-		// the dice and swallowed the entire bracket (including $dexterite) as a
-		// trailing comment, so the stat was never substituted and the raw "$dexterite"
-		// reached the roll engine, throwing Invalid_Dice_Type. isRolling now scopes
-		// stat substitution to the bracket's own content when one is present.
 		const content = applySemiDirectCustomFormula("roule [1d100<=[$dexterite]] stp", "$");
 		const r = isRolling(content, withStats(STATS), STATS_NAME);
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
@@ -595,13 +560,28 @@ describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom
 		const r = isRolling("roule [1d100<=$dexterite] stp", withStats(STATS), STATS_NAME);
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
 	});
+
+	it("resolves a multi-stat bracket that is only the comparator's value, not the whole roll (regression)", () => {
+		const stats = { autre: 20, combat: 35, pugilat: 10, vita: 40 };
+		const statsName = ["Vitalité", "Combat", "Pugilat", "Autre"];
+		const r = isRolling(
+			"1d100<=[$vita+$combat+$pugilat-$autre]",
+			withStats(stats),
+			statsName
+		);
+		expect(r!.result.dice).toContain("1d100");
+		expect(r!.result.compare?.sign).toBe("<=");
+		expect(r!.result.compare?.value).toBe(65);
+	});
+
+	it("keeps a dice-notation bracket wrapped in [...] even with a single stat inside it (regression)", () => {
+		const r = isRolling("roule [1d100<=$dexterite] stp", withStats(STATS), STATS_NAME);
+		expect(r!.detectRoll?.trim()).toBe("1d100<=40");
+		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
+	});
 });
 
 describe("roll parsing — semi-direct roll wrapped in Discord markdown (regression)", () => {
-	// on_message_send.ts calls isNotADice(message.content) as an early gate before
-	// isRolling ever runs. A message starting with a markdown emphasis marker
-	// (*, _, ~, |) used to be rejected there outright, so a roll like
-	// "*mon message [1d6]*" never reached isRolling at all.
 	it.each([
 		["*mon message [1d6]*", "italic (single *)"],
 		["**mon message [1d6]**", "bold (double *)"],

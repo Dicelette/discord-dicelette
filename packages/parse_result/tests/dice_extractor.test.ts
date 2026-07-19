@@ -669,5 +669,47 @@ describe("applyCustomFormula", () => {
 			expect(result!.detectRoll).toBe("1d100<=75");
 			expect(result!.result.compare).toEqual({ sign: "<=", value: 75 });
 		});
+
+		describe("a bracket with no dice notation is a comparator VALUE, not a roll marker (regression)", () => {
+			it("transforms the flat bracket directly, actually applying the formula", () => {
+				const result = applySemiDirectCustomFormula(
+					"1d100<=[$vita+$combat]",
+					"$>=85?85:$"
+				);
+				expect(result).toBe("1d100<={{($vita+$combat)>=85?85:($vita+$combat)}}");
+			});
+
+			it("evaluates the false branch through isRolling (formula actually ran, not a raw stat sum)", () => {
+				const content = applySemiDirectCustomFormula(
+					"1d100<=[$vita+$combat]",
+					"$>=85?85:$"
+				);
+				// vita=40, combat=35 → sum=75 < 85 → false branch → stays 75 (not clamped to 85)
+				const stats = { combat: 35, vita: 40 };
+				const statsName = ["Vitalité", "Combat"];
+				const result = isRolling(content, { stats, template: {} }, statsName);
+				expect(result!.result.compare?.value).toBe(75);
+			});
+
+			it("evaluates the true branch through isRolling (proves the ternary fired)", () => {
+				const content = applySemiDirectCustomFormula(
+					"1d100<=[$vita+$combat]",
+					"$>=85?85:$"
+				);
+				// vita=50, combat=40 → sum=90 >= 85 → true branch → clamped to 85
+				const stats = { combat: 40, vita: 50 };
+				const statsName = ["Vitalité", "Combat"];
+				const result = isRolling(content, { stats, template: {} }, statsName);
+				expect(result!.result.compare?.value).toBe(85);
+			});
+
+			it("still leaves a dice-notation bracket alone unless nested (unchanged behaviour)", () => {
+				const result = applySemiDirectCustomFormula(
+					"roule [1d100<=$dexterite] stp",
+					"$>=85?85:$"
+				);
+				expect(result).toBe("roule [1d100<=$dexterite] stp");
+			});
+		});
 	});
 });
