@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { important } from "@dicelette/utils";
+import { important, logger } from "@dicelette/utils";
 import cors from "cors";
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
@@ -170,6 +170,17 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			);
 		});
 	}
+
+	// Scanners routinely probe for path traversal using malformed/overlong percent-encoding
+	//prevent spam in log from these malformed requests
+	app.use((err: unknown, _req: Request, res: Response, next: NextFunction): void => {
+		if (err instanceof URIError) {
+			logger.debug(`[dashboard] Rejected malformed request URI: ${err.message}`);
+			res.status(400).end();
+			return;
+		}
+		next(err);
+	});
 
 	app.listen(Port, () => {
 		important.info(`[dashboard] Server running on http://localhost:${Port}`);
