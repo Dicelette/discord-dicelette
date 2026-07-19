@@ -452,12 +452,6 @@ export function isRolling(
 	if (userData?.stats) {
 		const bracketMatch = content.match(DICE_PATTERNS.BRACKET_ROLL);
 		if (bracketMatch?.index !== undefined) {
-			// Semi-direct roll (`text [dice]`): resolve stats only within the bracket's
-			// own content. Feeding the whole string to replaceStatsInDiceFormula lets its
-			// comment-detection heuristic (DETECT_DICE_MESSAGE) treat the leading free
-			// text as the "dice" and swallow the entire bracket — $stat included — as a
-			// trailing comment, so it never gets substituted (see applySemiDirectCustomFormula
-			// for the same bracket-scoping fix applied to the custom-formula step).
 			const inner = replaceStatsInDiceFormula(
 				bracketMatch[1],
 				userData.stats,
@@ -467,11 +461,25 @@ export function isRolling(
 				ul,
 				replaceUnknown
 			);
+			/*const isDiceTarget = /\b\d*d\d+\b/i.test(bracketMatch[1]);
+			let replacement: string;
+			if (isDiceTarget) {
+				replacement = `[${inner.formula.trim()}]`;
+			} else {
+				const markerIndex = inner.formula.indexOf("%%[__");
+				const value = (
+					markerIndex === -1 ? inner.formula : inner.formula.slice(0, markerIndex)
+				).trim();
+				const trailing =
+					markerIndex === -1 ? "" : ` ${inner.formula.slice(markerIndex).trim()}`;
+				replacement = `(${value})${trailing}`;
+			}*/
 			res = {
 				...inner,
 				formula:
 					content.slice(0, bracketMatch.index) +
 					`[${inner.formula}]` +
+					/*replacement +*/
 					content.slice(bracketMatch.index + bracketMatch[0].length),
 			};
 		} else {
@@ -886,31 +894,16 @@ export function applyCustomFormula(dice: string, formula: string): string {
 	});
 }
 
-/**
- * Apply a custom formula to a semi-direct roll (`some text [dice]`) without letting the
- * leading free text reach the formula transform. Only the outer bracket's own content is
- * passed to {@link applyCustomFormula}, then re-wrapped in `[...]` so `isRolling` still
- * detects it as a bracket roll. A formula-relevant bracket nested inside (e.g. the `[75]`
- * in `[1d100<=[75]]`) still gets transformed, since it becomes the innermost `[...]` once
- * the outer one is unwrapped.
- *
- * If `content` has no bracket at all, the formula is applied to the whole string, matching
- * `applyCustomFormula`'s direct-roll behaviour.
- *
- * @example
- * applySemiDirectCustomFormula("mon message [1d100<=[75]]", "$>85?1d10+$:$")
- * // → "mon message [1d100<={{(75)>85?1d10+(75):(75)}}]"
- *
- * applySemiDirectCustomFormula("mon message [1d6]", "$")
- * // → "mon message [1d6]"  (no inner bracket to target, formula is a no-op)
- */
 export function applySemiDirectCustomFormula(content: string, formula: string): string {
 	const bracketMatch = content.match(DICE_PATTERNS.BRACKET_ROLL);
 	if (bracketMatch?.index === undefined) return applyCustomFormula(content, formula);
-	const transformedInner = applyCustomFormula(bracketMatch[1], formula);
+	const isDiceTarget = /\b\d*d\d+\b/i.test(bracketMatch[1]);
+	const transformed = isDiceTarget
+		? `[${applyCustomFormula(bracketMatch[1], formula)}]`
+		: applyCustomFormula(bracketMatch[0], formula);
 	return (
 		content.slice(0, bracketMatch.index) +
-		`[${transformedInner}]` +
+		transformed +
 		content.slice(bracketMatch.index + bracketMatch[0].length)
 	);
 }
