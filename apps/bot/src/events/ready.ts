@@ -126,9 +126,7 @@ export default (client: EClient): void => {
 		await Promise.all(guildPromises);
 
 		important.info("Bot is ready");
-		important.error(
-			"test in production, should be removed in some times (if i don't forgot)"
-		);
+		console.warn(`----- Bot is ready v.${VERSION} --------`);
 		logger.info(
 			"Invite link: https://discord.com/api/oauth2/authorize?client_id=" +
 				process.env.CLIENT_ID +
