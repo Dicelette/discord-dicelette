@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.6](https://github.com/Dicelette/discord-dicelette/compare/4.5.5...4.5.6) (2026-07-19)
+
+### Bug Fixes
+
+* **roll:** bracket roll for custom formula broken ([d8790c1](https://github.com/Dicelette/discord-dicelette/commit/d8790c155cf332edfa8c695e600f9fb2fefca1fb))
 ## [4.5.5](https://github.com/Dicelette/discord-dicelette/compare/4.5.4...4.5.5) (2026-07-19)
 ## [4.5.4](https://github.com/Dicelette/discord-dicelette/compare/4.5.3...4.5.4) (2026-07-19)
 
