@@ -239,12 +239,15 @@ export function parseComparator(
  * @param {string} content the content of the message
  */
 export function isNotADice(content: string) {
-	return (
-		content.trim().length === 0 ||
-		content === "_ _" ||
-		content.startsWith("https://") ||
-		content.match(/^[|\\_`/¤!µ*>~\-#§:;.,?%£€"'&°=]/)
-	);
+	if (content.trim().length === 0 || content === "_ _" || content.startsWith("https://"))
+		return true;
+	// Strip a leading run of Discord markdown emphasis markers (*bold*, _italic_,
+	// ~~strikethrough~~, ||spoiler||) before the "obviously not dice" leading-character
+	// check, so a wrapped semi-direct roll (e.g. "*mon message [1d6]*") isn't rejected
+	// just because of the marker used to style it.
+	const unmarked = content.replace(/^[*_~|]+/, "");
+	if (unmarked.trim().length === 0) return true;
+	return !!unmarked.match(/^[|\\_`/¤!µ*>~\-#§:;.,?%£€"'&°=]/);
 }
 
 export function asciiSign(sign: string) {

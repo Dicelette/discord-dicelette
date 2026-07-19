@@ -3,6 +3,7 @@ import { applyCustomFormula } from "../src/dice_extractor";
 import {
 	convertExpression,
 	convertNameToValue,
+	isNotADice,
 	parseComparator,
 	replaceStatInDiceName,
 	timestamp,
@@ -310,5 +311,52 @@ describe("edge cases and integration", () => {
 		const result = convertExpression("zero", stats);
 		// convertExpression returns "0" for zero values, not empty string
 		expect(result).toBe("0");
+	});
+});
+
+describe("isNotADice", () => {
+	it("rejects an empty or whitespace-only message", () => {
+		expect(isNotADice("")).toBe(true);
+		expect(isNotADice("   ")).toBe(true);
+	});
+
+	it("rejects the '_ _' placeholder message", () => {
+		expect(isNotADice("_ _")).toBe(true);
+	});
+
+	it("rejects a message that is a link", () => {
+		expect(isNotADice("https://example.com")).toBe(true);
+	});
+
+	it("rejects a message starting with 'obviously not dice' punctuation", () => {
+		expect(isNotADice("- une phrase normale")).toBe(true);
+		expect(isNotADice("#hashtag")).toBe(true);
+		expect(isNotADice(":) smiley")).toBe(true);
+	});
+
+	// Regression: a semi-direct bracket roll wrapped in Discord markdown emphasis
+	// (bold/italic/underline/strikethrough/spoiler) starts with a marker character
+	// that used to trigger the "obviously not dice" rejection outright, silently
+	// dropping messages like "*mon message [1d6]*".
+	it.each([
+		["*mon message [1d6]*", "italic (single *)"],
+		["**mon message [1d6]**", "bold (double *)"],
+		["_mon message [1d6]_", "italic (single _)"],
+		["__mon message [1d6]__", "underline (double _)"],
+		["~~mon message [1d6]~~", "strikethrough"],
+		["||mon message [1d6]||", "spoiler"],
+	])("does not reject a semi-direct roll wrapped in markdown: %s (%s)", (content) => {
+		expect(isNotADice(content)).toBe(false);
+	});
+
+	it("still rejects markdown markers with no actual content inside", () => {
+		expect(isNotADice("***")).toBe(true);
+		expect(isNotADice("___")).toBe(true);
+		expect(isNotADice("~~~")).toBe(true);
+		expect(isNotADice("|||")).toBe(true);
+	});
+
+	it("does not reject a plain semi-direct roll without markdown", () => {
+		expect(isNotADice("mon message [1d6]")).toBe(false);
 	});
 });

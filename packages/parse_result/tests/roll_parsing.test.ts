@@ -6,6 +6,7 @@ import {
 	getRoll,
 	isRolling,
 } from "../src/dice_extractor";
+import { isNotADice } from "../src/utils";
 
 /**
  * Comprehensive coverage of the dice-roll *parsing* pipeline (`isRolling` / `getRoll`).
@@ -593,5 +594,26 @@ describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom
 		// at all — a plain "$stat" typed directly inside a semi-direct bracket.
 		const r = isRolling("roule [1d100<=$dexterite] stp", withStats(STATS), STATS_NAME);
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
+	});
+});
+
+describe("roll parsing — semi-direct roll wrapped in Discord markdown (regression)", () => {
+	// on_message_send.ts calls isNotADice(message.content) as an early gate before
+	// isRolling ever runs. A message starting with a markdown emphasis marker
+	// (*, _, ~, |) used to be rejected there outright, so a roll like
+	// "*mon message [1d6]*" never reached isRolling at all.
+	it.each([
+		["*mon message [1d6]*", "italic (single *)"],
+		["**mon message [1d6]**", "bold (double *)"],
+		["_mon message [1d6]_", "italic (single _)"],
+		["__mon message [1d6]__", "underline (double _)"],
+		["~~mon message [1d6]~~", "strikethrough"],
+		["||mon message [1d6]||", "spoiler"],
+	])("passes the isNotADice gate and rolls: %s (%s)", (content) => {
+		expect(isNotADice(content)).toBe(false);
+		const r = isRolling(content);
+		expect(r!.detectRoll).toBe("1d6");
+		expect(r!.result.total).toBeGreaterThanOrEqual(1);
+		expect(r!.result.total).toBeLessThanOrEqual(6);
 	});
 });
