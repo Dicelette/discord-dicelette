@@ -461,7 +461,7 @@ export function isRolling(
 				ul,
 				replaceUnknown
 			);
-			/*const isDiceTarget = /\b\d*d\d+\b/i.test(bracketMatch[1]);
+			const isDiceTarget = /\b\d*d\d+\b/i.test(bracketMatch[1]);
 			let replacement: string;
 			if (isDiceTarget) {
 				replacement = `[${inner.formula.trim()}]`;
@@ -473,13 +473,12 @@ export function isRolling(
 				const trailing =
 					markerIndex === -1 ? "" : ` ${inner.formula.slice(markerIndex).trim()}`;
 				replacement = `(${value})${trailing}`;
-			}*/
+			}
 			res = {
 				...inner,
 				formula:
 					content.slice(0, bracketMatch.index) +
-					`[${inner.formula}]` +
-					/*replacement +*/
+					replacement +
 					content.slice(bracketMatch.index + bracketMatch[0].length),
 			};
 		} else {

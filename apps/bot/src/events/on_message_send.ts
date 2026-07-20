@@ -77,14 +77,10 @@ export default (client: EClient): void => {
 			const disableCompare = guildSettings?.disableCompare || undefined;
 			const sortOrder = guildSettings?.sortOrder || undefined;
 			const userSettingsData = client.userSettings.get(message.guild.id, author.id);
-			const customFormula = resolveCustomFormula(guildSettings, userSettingsData);
-			if (customFormula) {
-				// Free-text rolls have no "expression" option to feed getExpression, so
-				// `{exp}`/`{exp||X}` macros (e.g. inside a custom-formula `[...]` bracket)
-				// can only fall back to their default value here.
-				content = getExpression(content, "0").dice;
-				content = applySemiDirectCustomFormula(content, customFormula);
-			}
+			const customFormula = resolveCustomFormula(guildSettings, userSettingsData) ?? "$";
+			// Free-text rolls have no "expression" option to feed getExpression, so
+			content = getExpression(content, "0").dice;
+			content = applySemiDirectCustomFormula(content, customFormula);
 			const isRoll = isRolling(
 				content,
 				userData,
