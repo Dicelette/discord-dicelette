@@ -451,7 +451,10 @@ export function isRolling(
 	};
 	if (userData?.stats) {
 		const bracketMatch = content.match(DICE_PATTERNS.BRACKET_ROLL);
-		if (bracketMatch?.index !== undefined) {
+		const isDiceTarget = !!bracketMatch && /\b\d*d\d+\b/i.test(bracketMatch[1]);
+		//allow to preserve comments in brackets and only apply to stats/formula
+		const isStatTarget = !!bracketMatch && isFormulaExpression(bracketMatch[1]);
+		if (bracketMatch?.index !== undefined && (isDiceTarget || isStatTarget)) {
 			const inner = replaceStatsInDiceFormula(
 				bracketMatch[1],
 				userData.stats,
@@ -461,7 +464,6 @@ export function isRolling(
 				ul,
 				replaceUnknown
 			);
-			const isDiceTarget = /\b\d*d\d+\b/i.test(bracketMatch[1]);
 			let replacement: string;
 			if (isDiceTarget) {
 				replacement = `[${inner.formula.trim()}]`;

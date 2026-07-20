@@ -579,6 +579,12 @@ describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom
 		expect(r!.detectRoll?.trim()).toBe("1d100<=40");
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 40 });
 	});
+
+	it("leaves a plain-text bracket comment untouched even when a character's stats are loaded (regression)", () => {
+		const r = isRolling("1d20 [attack roll]", withStats(STATS), STATS_NAME);
+		expect(r!.result.dice).toBe("1d20 /* [attack roll] */");
+		expect(r!.result.comment).toBe("[attack roll]");
+	});
 });
 
 describe("roll parsing — semi-direct roll wrapped in Discord markdown (regression)", () => {
