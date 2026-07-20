@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.7](https://github.com/Dicelette/discord-dicelette/compare/4.5.6...4.5.7) (2026-07-20)
+
+### Bug Fixes
+
+* **roll:** no custom formula + stats = broken in inline dice if used with [bracket] like `1d100<=[$dext+$agi]` ([22ea404](https://github.com/Dicelette/discord-dicelette/commit/22ea404d51c726241c501d88f46713698c18016a))
 ## [4.5.6](https://github.com/Dicelette/discord-dicelette/compare/4.5.5...4.5.6) (2026-07-19)
 
 ### Bug Fixes
