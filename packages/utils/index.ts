@@ -6,6 +6,7 @@ import { logger } from "@sentry/node";
 import { Random } from "random-js";
 
 export * from "./src/changelog";
+export * from "./src/cpu-monitor";
 export { default as dev } from "./src/dev";
 export * from "./src/humanizeDuration";
 export * from "./src/logger";

@@ -7,6 +7,7 @@ import {
 	logger,
 	sentry,
 	setupProcessErrorHandlers,
+	startCpuMonitor,
 } from "@dicelette/utils";
 import { client } from "client";
 import dotenv from "dotenv";
@@ -77,6 +78,13 @@ if (process.env.DASHBOARD_ENABLED === "true") {
 	logger.trace("Starting dashboard server...");
 	startBotDashboard(client, guildEvents);
 }
+
+startCpuMonitor({
+	thresholdPercent: Number(process.env.CPU_WARNING_THRESHOLD) || 80,
+	onAlert: (percent) => {
+		void event.sendErrorToWebhook(`⚠️ High CPU usage: ${percent.toFixed(1)}%`);
+	},
+});
 
 client
 	.login(process.env.DISCORD_TOKEN)
