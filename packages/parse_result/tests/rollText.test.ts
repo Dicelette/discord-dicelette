@@ -482,3 +482,31 @@ describe("shared roll without comment newline handling", () => {
 		expect(text).toMatch(/[※◈]/);
 	});
 });
+
+describe("comparison against 0", () => {
+	// A `1dX` roll can never be ≤ 0 nor < 0, so every comparison against 0 is flagged as
+	// `trivial` by the core parser — which must not be confused with an unreadable comparator.
+	const zeroComparisons = ["1d20>=0", "1d20>0", "1d20==0", "1d20<=0", "1d20<0"];
+	for (const dice of zeroComparisons) {
+		it(`should accept ${dice}`, () => {
+			const result = getRoll(dice);
+			expect(result?.compare?.value).toBe(0);
+			const res = new ResultAsText(result, DATA).parser;
+			// The comparison is rendered instead of blowing up on an "unreadable comparator"
+			expect(res).toContain(" 0`");
+			expect(res).toMatch(/Success|Failure/);
+		});
+	}
+
+	it("should accept a comparator expression that evaluates to 0", () => {
+		for (const dice of ["1d20>=0*1", "1d20>=(0)", "1d20>={{0}}"]) {
+			const res = new ResultAsText(getRoll(dice), DATA).parser;
+			expect(res).toMatch(/Success|Failure/);
+		}
+	});
+
+	it("should still reject a comparator that cannot be read", () => {
+		expect(() => new ResultAsText(getRoll("1d100<=abc"), DATA)).toThrow();
+		expect(() => new ResultAsText(getRoll("1d100<={{}}"), DATA)).toThrow();
+	});
+});

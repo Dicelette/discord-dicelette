@@ -1,10 +1,15 @@
 import type { CustomCritical } from "@dicelette/core";
+import { ln } from "@dicelette/localization";
+import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
 import {
+	mergeCustomCriticals,
 	parseCustomCritical,
 	parseOpposition,
+	rollCustomCriticalsFromDice,
 	skillCustomCritical,
 } from "../src/custom_critical";
+import { applyCustomFormula } from "../src/dice_extractor";
 
 describe("parseCustomCritical", () => {
 	it("should parse basic critical condition", () => {
@@ -155,6 +160,18 @@ describe("parseOpposition", () => {
 
 	it("should throw an error for non-numeric non-rollable values", async () => {
 		expect(() => parseOpposition(">invalid", ">=5")).toThrow();
+	});
+
+	it("should accept a comparator that rolls a total of 0", () => {
+		const result = parseOpposition(">1d1-1", ">=5");
+		expect(result).toBeDefined();
+		expect(result?.value).toBe(0);
+		expect(result?.originalDice).toBe("1d1-1");
+	});
+
+	it("should accept a plain 0 comparator", () => {
+		const result = parseOpposition(">=0", ">=5");
+		expect(result).toEqual({ sign: ">=", value: 0 });
 	});
 });
 
@@ -316,5 +333,68 @@ describe("integration tests", () => {
 			expect(filtered).toBeDefined();
 			expect(filtered?.complex).toBeDefined();
 		}
+	});
+});
+
+describe("mergeCustomCriticals", () => {
+	const success = (value: string): CustomCritical => ({
+		affectSkill: false,
+		onNaturalDice: false,
+		sign: "<=",
+		value,
+	});
+
+	it("should return undefined when every layer is empty", () => {
+		expect(mergeCustomCriticals(undefined, undefined)).toBeUndefined();
+		expect(mergeCustomCriticals({}, undefined)).toBeUndefined();
+	});
+
+	it("should keep the last layer when the names collide", () => {
+		const merged = mergeCustomCriticals(
+			{ "Succès critique": success("1") },
+			{ "Succès critique": success("2") },
+			{ "Succès critique": success("3") }
+		);
+		expect(merged?.["Succès critique"].value).toBe("3");
+	});
+
+	it("should keep the entries that no other layer overrides", () => {
+		const merged = mergeCustomCriticals({ "Échec critique": success("95") }, undefined, {
+			"Succès critique": success("5"),
+		});
+		expect(Object.keys(merged ?? {})).toEqual(["Échec critique", "Succès critique"]);
+	});
+
+	it("should ignore the criticals of a branch the formula does not take", () => {
+		const ul = ln(Djs.Locale.French);
+		// `$>85?85{cs:<=5+($-85)}:$` only redefines the critical success above the 85 cap.
+		// Below it, the template's own critical must survive untouched.
+		const below = applyCustomFormula("1d100<=[50]", "$>85?85{cs:<=5+($-85)}:$");
+		expect(rollCustomCriticalsFromDice(below, ul)).toBeUndefined();
+
+		const template = { [ul("roll.critical.success")]: success("5") };
+		expect(
+			mergeCustomCriticals(template, rollCustomCriticalsFromDice(below, ul))
+		).toEqual(template);
+
+		// Above the cap the block applies: `<=5+(92-85)` → `<=12`.
+		const above = applyCustomFormula("1d100<=[92]", "$>85?85{cs:<=5+($-85)}:$");
+		expect(
+			rollCustomCriticalsFromDice(above, ul)?.[ul("roll.critical.success")]?.value
+		).toBe("12");
+	});
+
+	it("should let the command option win over the custom formula criticals", () => {
+		const ul = ln(Djs.Locale.French);
+		// `/snippets` rolling `1d100<=[92]` on a server whose custom formula caps the target
+		// at 85 and moves the critical success accordingly — the branch is taken here.
+		const dice = applyCustomFormula("1d100<=[92]", "$>=85?85{cs:>=5+($-85)}:$");
+		const fromFormula = rollCustomCriticalsFromDice(dice, ul);
+		expect(fromFormula?.[ul("roll.critical.success")]).toBeDefined();
+
+		// …while the user asked for `succès_critique:<=5` on this roll only.
+		const fromOption = { [ul("roll.critical.success")]: success("5") };
+		const merged = mergeCustomCriticals(undefined, fromFormula, fromOption);
+		expect(merged?.[ul("roll.critical.success")]).toEqual(success("5"));
 	});
 });

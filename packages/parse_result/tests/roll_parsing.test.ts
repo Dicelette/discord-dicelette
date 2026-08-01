@@ -355,7 +355,7 @@ describe("roll parsing — disableCompare", () => {
 describe("roll parsing — custom formula", () => {
 	it("evaluates a numeric bracket through the formula", () => {
 		const dice = applyCustomFormula("1d100<=[90]", "$>=85?85:$");
-		expect(dice).toBe("1d100<={{(90)>=85?85:(90)}}");
+		expect(dice).toBe("1d100<={{85}}");
 		const r = isRolling(dice);
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 85 });
 	});
@@ -511,7 +511,7 @@ describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom
 			"mon message [1d100<=[75]]",
 			"$>=85?85:$"
 		);
-		expect(content).toBe("mon message [1d100<={{(75)>=85?85:(75)}}]");
+		expect(content).toBe("mon message [1d100<={{(75)}}]");
 		const r = isRolling(content);
 		expect(r!.detectRoll).toBe("1d100<=75");
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 75 });
@@ -522,7 +522,7 @@ describe("roll parsing — semi-direct roll (`text before [dice]`) with a custom
 			"mon message [1d100<=[90]]",
 			"$>=85?85:$"
 		);
-		expect(content).toBe("mon message [1d100<={{(90)>=85?85:(90)}}]");
+		expect(content).toBe("mon message [1d100<={{85}}]");
 		const r = isRolling(content);
 		expect(r!.detectRoll).toBe("1d100<=85");
 		expect(r!.result.compare).toEqual({ sign: "<=", value: 85 });
