@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.5.8](https://github.com/Dicelette/discord-dicelette/compare/4.5.7...4.5.8) (2026-08-01)
+
+### Bug Fixes
+
+* **comparator:** "0" should be a valid (but trivial) comparison ([5d346f5](https://github.com/Dicelette/discord-dicelette/commit/5d346f56a40ff30aef7167272a3518fed7977062))
+* **critical:** allow to override critical in the slashcommands ([a3e6dc2](https://github.com/Dicelette/discord-dicelette/commit/a3e6dc25bbd6ca76d221b72bef2d74b7296382fd))
+* **dice:** prevent errors when using the custom formula with cs/cf bloc ([6d7d7c0](https://github.com/Dicelette/discord-dicelette/commit/6d7d7c0f9190c66b2ef5d300f4e453da8f29c2d9))
+* **errors:** should notify the user when wrong evaluate ([ac508e8](https://github.com/Dicelette/discord-dicelette/commit/ac508e824fc5f15b290598978399027f1dddca46))
+* **roll:** preserve comments in bracket ([7b16e76](https://github.com/Dicelette/discord-dicelette/commit/7b16e767fd691aa5826bff973177ea5c975e2de0))
 ## [4.5.7](https://github.com/Dicelette/discord-dicelette/compare/4.5.6...4.5.7) (2026-07-20)
 
 ### Bug Fixes
