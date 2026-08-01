@@ -36,6 +36,7 @@ export type RollOptions = {
 	infoRoll?: { name: string; standardized: string };
 	hideResult?: false | true | null;
 	customCritical?: Record<string, CustomCritical> | undefined;
+	criticalOverrides?: Record<string, CustomCritical> | undefined;
 	opposition?: ComparedValue;
 	silent?: boolean;
 	/** Stats names per segment for shared rolls (e.g., ['Dext', 'Force'] for `1d100+$dext;&+$force`) */

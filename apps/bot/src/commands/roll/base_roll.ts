@@ -207,6 +207,7 @@ export async function baseRoll(
 		charName,
 		comment: overrideComment ?? trailingComment,
 		critical: customCriticalFromOptions ? undefined : serverData?.critical,
+		criticalOverrides: customCriticalFromOptions,
 		customCritical: mergedCustomCritical,
 		hideResult: hidden,
 		infoRoll,

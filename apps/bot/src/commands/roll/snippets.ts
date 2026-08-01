@@ -129,6 +129,7 @@ export default {
 			const opts: RollOptions = {
 				comment: composed.comment,
 				critical: customCritical ? undefined : serverDataShared?.critical,
+				criticalOverrides: customCritical,
 				customCritical: mergedCustomCriticalShared,
 				user: interaction.user,
 			};
@@ -194,6 +195,7 @@ export default {
 			charName: charOptions,
 			comment: composed.comment,
 			critical: customCritical ? undefined : serverData?.critical,
+			criticalOverrides: customCritical,
 			customCritical: mergedCustomCritical,
 			opposition,
 			user: interaction.user,

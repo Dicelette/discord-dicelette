@@ -131,6 +131,16 @@ export function rollCustomCritical(
 	return customCritical;
 }
 
+export function mergeCustomCriticals(
+	...layers: (Record<string, CustomCritical> | undefined)[]
+): Record<string, CustomCritical> | undefined {
+	const merged = Object.assign(
+		{},
+		...layers.filter((layer) => layer !== undefined)
+	) as Record<string, CustomCritical>;
+	return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
 /**
  * Filters and processes custom critical conditions that affect skills.
  *

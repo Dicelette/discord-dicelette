@@ -22,6 +22,7 @@ import {
 	getCriticalFromDice,
 	getExpression,
 	getRoll,
+	mergeCustomCriticals,
 	parseOpposition,
 	replaceStatInDiceName,
 	rollCustomCritical,
@@ -64,6 +65,7 @@ export async function rollWithInteraction(
 		infoRoll,
 		hideResult,
 		customCritical: customCriticalFromOpts,
+		criticalOverrides,
 		opposition,
 		silent,
 		statsPerSegment,
@@ -102,10 +104,11 @@ export async function rollWithInteraction(
 			undefined,
 			sort
 		);
-		if (expandedCriticals)
-			customCritical = customCritical
-				? Object.assign({}, customCritical, expandedCriticals)
-				: expandedCriticals;
+		customCritical = mergeCustomCriticals(
+			customCritical,
+			expandedCriticals,
+			criticalOverrides
+		);
 	}
 	dice = verifyStatMatcherPattern(dice, userSettings?.ignoreNotfound);
 	const result = getRoll(dice, pity, sort);
@@ -274,6 +277,7 @@ export async function rollMacro(
 	const opts: RollOptions = {
 		charName: charOptions,
 		comment: composed.comment,
+		criticalOverrides: customCritical,
 		customCritical: mergedCustomCritical,
 		hideResult,
 		infoRoll,
@@ -424,6 +428,7 @@ export async function rollStatistique(
 		charName: optionChar,
 		comment: composed.comment,
 		critical: customCritical ? undefined : template.critical,
+		criticalOverrides: customCritical,
 		customCritical: mergedCustomCritical,
 		hideResult,
 		infoRoll,
