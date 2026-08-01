@@ -1,6 +1,10 @@
 {
 	"8ball": {
 		"description": "Pose une question et laisse la boule magique décider de ton destin.",
+		"include_elusive": {
+			"description": "Inclut les réponses évasives du pool.",
+			"name": "inclure_évasive"
+		},
 		"name": "8ball",
 		"question": {
 			"description": "Votre question",

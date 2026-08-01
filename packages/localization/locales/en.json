@@ -1,6 +1,10 @@
 {
 	"8ball": {
 		"description": "Ask a question and let the magic 8-ball decide your fate.",
+		"include_elusive": {
+			"description": "Include pool elusive reply.",
+			"name": "include_elusive"
+		},
 		"name": "8ball",
 		"question": {
 			"description": "Your question",

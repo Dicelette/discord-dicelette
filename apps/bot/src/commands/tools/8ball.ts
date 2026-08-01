@@ -22,33 +22,47 @@ export const balls = {
 				.setNames("8ball.question.name")
 				.setDescriptions("8ball.question.description")
 				.setRequired(false)
+		)
+		.addBooleanOption((option) =>
+			option
+				.setNames("8ball.include_elusive.name")
+				.setDescriptions("8ball.include_elusive.description")
+				.setRequired(false)
 		),
 	async execute(interaction: Djs.ChatInputCommandInteraction, client: EClient) {
 		const { ul } = getLangAndConfig(client, interaction);
 		const question = interaction.options.getString(t("8ball.question.name"), false);
-		const replies = [
-			ul("8ball.reply.affirmative.ItIsCertain"),
-			ul("8ball.reply.affirmative.ItIsDecidedlySo"),
-			ul("8ball.reply.affirmative.WithoutADoubt"),
-			ul("8ball.reply.affirmative.YesDefinitely"),
-			ul("8ball.reply.affirmative.YouMayRelyOnIt"),
-			ul("8ball.reply.Noncommittal.AsISeeItYes"),
-			ul("8ball.reply.Noncommittal.MostLikely"),
-			ul("8ball.reply.Noncommittal.OutlookGood"),
-			ul("8ball.reply.Noncommittal.Yes"),
-			ul("8ball.reply.Noncommittal.SignsPointToYes"),
-			ul("8ball.reply.Negative.ReplyHazyTryAgain"),
-			ul("8ball.reply.Negative.AskAgainLater"),
-			ul("8ball.reply.Negative.BetterNotTellYouNow"),
-			ul("8ball.reply.Negative.CannotPredictNow"),
-			ul("8ball.reply.Negative.ConcentrateAndAskAgain"),
-			ul("8ball.reply.VeryNegative.DontCountOnIt"),
-			ul("8ball.reply.VeryNegative.MyReplyIsNo"),
-			ul("8ball.reply.VeryNegative.MySourcesSayNo"),
-			ul("8ball.reply.VeryNegative.OutlookNotSoGood"),
-			ul("8ball.reply.VeryNegative.VeryDoubtful"),
+		const includeElusive = interaction.options.getBoolean(
+			t("8ball.include_elusive.name"),
+			false
+		);
+		const replies: { reply: string; type: "affirmative" | "elusive" | "negative" }[] = [
+			{ reply: ul("8ball.reply.affirmative.ItIsCertain"), type: "affirmative" },
+			{ reply: ul("8ball.reply.affirmative.ItIsDecidedlySo"), type: "affirmative" },
+			{ reply: ul("8ball.reply.affirmative.WithoutADoubt"), type: "affirmative" },
+			{ reply: ul("8ball.reply.affirmative.YesDefinitely"), type: "affirmative" },
+			{ reply: ul("8ball.reply.affirmative.YouMayRelyOnIt"), type: "affirmative" },
+			{ reply: ul("8ball.reply.Noncommittal.AsISeeItYes"), type: "affirmative" },
+			{ reply: ul("8ball.reply.Noncommittal.MostLikely"), type: "affirmative" },
+			{ reply: ul("8ball.reply.Noncommittal.OutlookGood"), type: "affirmative" },
+			{ reply: ul("8ball.reply.Noncommittal.Yes"), type: "affirmative" },
+			{ reply: ul("8ball.reply.Noncommittal.SignsPointToYes"), type: "affirmative" },
+			{ reply: ul("8ball.reply.Negative.ReplyHazyTryAgain"), type: "elusive" },
+			{ reply: ul("8ball.reply.Negative.AskAgainLater"), type: "elusive" },
+			{ reply: ul("8ball.reply.Negative.BetterNotTellYouNow"), type: "elusive" },
+			{ reply: ul("8ball.reply.Negative.CannotPredictNow"), type: "elusive" },
+			{ reply: ul("8ball.reply.Negative.ConcentrateAndAskAgain"), type: "elusive" },
+			{ reply: ul("8ball.reply.VeryNegative.DontCountOnIt"), type: "negative" },
+			{ reply: ul("8ball.reply.VeryNegative.MyReplyIsNo"), type: "negative" },
+			{ reply: ul("8ball.reply.VeryNegative.MySourcesSayNo"), type: "negative" },
+			{ reply: ul("8ball.reply.VeryNegative.OutlookNotSoGood"), type: "negative" },
+			{ reply: ul("8ball.reply.VeryNegative.VeryDoubtful"), type: "negative" },
 		];
-		const items = random.pick(replies);
+		const reply: string[] = (
+			includeElusive ? replies : replies.filter((r) => r.type !== "elusive")
+		).map((r) => r.reply);
+
+		const items = random.pick(reply);
 		const res = ul("choose.result", {
 			items,
 		});
