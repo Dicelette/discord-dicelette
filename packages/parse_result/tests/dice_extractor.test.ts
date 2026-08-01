@@ -7,6 +7,7 @@ import {
 	applyCustomFormula,
 	applySemiDirectCustomFormula,
 	extractDiceData,
+	FORMULA_BLOCK_PATTERN,
 	getRoll,
 	hasValidDice,
 	isRolling,
@@ -474,6 +475,14 @@ describe("dice_extractor", () => {
 			expect(result!.compare).toBeDefined();
 			expect(result!.compare!.sign).toBe("<=");
 			expect(result!.compare!.value).toBe(69);
+		});
+
+		it("getRoll: formula whose {cs} block ends the formula stays rollable", () => {
+			const dice = applyCustomFormula("1d100<=[100]", "$<=85?$:85{cs:<=5+($-85)}");
+			expect(dice).toBe("1d100<={{(100)<=85?(100):85{cs:<=5+((100)-85)}}}");
+			expect(dice.replace(FORMULA_BLOCK_PATTERN, "0")).toBe("1d100<=0");
+			const result = getRoll(dice);
+			expect(result?.compare).toEqual({ sign: "<=", value: 85 });
 		});
 
 		it("getRoll: formula with {cs} in false branch keeps plain threshold", () => {

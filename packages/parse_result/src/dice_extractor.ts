@@ -19,17 +19,20 @@ import type {
 	UserData,
 } from "@dicelette/types";
 import { DICE_COMPILED_PATTERNS, DICE_PATTERNS, logger } from "@dicelette/utils";
+import { evaluate } from "mathjs";
 import { extractAndMergeComments, getComments } from "./comment_utils";
 import { trimAll } from "./utils";
 
+const FORMULA_BLOCK_SOURCE = "\\{\\{((?:[^{}]|\\{[^{}]*\\})*)\\}\\}";
+
 /**
- * Matches a `{{...}}` formula block (allowing single `}` inside).
+ * Matches a `{{...}}` formula block.
  * Used to neutralize formula blocks before opposition detection so that
  * comparison operators inside them (e.g. `{{$>=85?85:$}}`) are not mistaken
  * for an opposition comparator when the block still contains an unresolved
  * `$stat` and therefore could not be pre-evaluated.
  */
-export const FORMULA_BLOCK_PATTERN = /\{\{(?:[^}]|\}(?!\}))*\}\}/g;
+export const FORMULA_BLOCK_PATTERN = new RegExp(FORMULA_BLOCK_SOURCE, "g");
 
 export function extractDiceData(content: string): DiceData {
 	//exclude if the content is between codeblocks
@@ -307,50 +310,56 @@ export function processChainedDiceRoll(
  */
 function preRollDiceInBrackets(content: string): string {
 	if (!content.includes("{{")) return content;
-	return content.replace(/\{\{((?:[^}]|\}(?!\}))*)\}\}/g, (_match, inner: string) => {
-		// Roll any dice notation present in the inner content (including inside cs/cf blocks)
-		const rolledInner = inner.replace(
-			DICE_COMPILED_PATTERNS.DICE_IN_FORMULA,
-			(diceExpr) => {
-				try {
-					const res = roll(diceExpr);
-					if (res?.total !== undefined) return String(res.total);
-				} catch {}
-				return diceExpr;
-			}
-		);
-		// Strip {cs/cf:...} blocks so the math evaluator can handle the remaining
-		// expression; evaluate their numeric sub-expressions and save them for later.
-		const criticalBlocks: string[] = [];
-		const cleanedInner = rolledInner.replace(REMOVER_PATTERN.CRITICAL_BLOCK, (block) => {
-			const parsed = DETECT_CRITICAL_ALL.exec(block);
-			if (parsed) {
-				const [, prefix, operator, expr] = parsed;
-				try {
-					const evaled = replaceFormulaInDice(`{{${expr}}}`);
-					criticalBlocks.push(`${prefix}${operator}${evaled}}`);
+	return content.replace(
+		new RegExp(FORMULA_BLOCK_SOURCE, "g"),
+		(_match, inner: string) => {
+			// Roll any dice notation present in the inner content (including inside cs/cf blocks)
+			const rolledInner = inner.replace(
+				DICE_COMPILED_PATTERNS.DICE_IN_FORMULA,
+				(diceExpr) => {
+					try {
+						const res = roll(diceExpr);
+						if (res?.total !== undefined) return String(res.total);
+					} catch {}
+					return diceExpr;
+				}
+			);
+			// Strip {cs/cf:...} blocks so the math evaluator can handle the remaining
+			// expression; evaluate their numeric sub-expressions and save them for later.
+			const criticalBlocks: string[] = [];
+			const cleanedInner = rolledInner.replace(
+				REMOVER_PATTERN.CRITICAL_BLOCK,
+				(block) => {
+					const parsed = DETECT_CRITICAL_ALL.exec(block);
+					if (parsed) {
+						const [, prefix, operator, expr] = parsed;
+						try {
+							const evaled = replaceFormulaInDice(`{{${expr}}}`);
+							criticalBlocks.push(`${prefix}${operator}${evaled}}`);
+							return "";
+						} catch {}
+					}
+					criticalBlocks.push(block);
 					return "";
-				} catch {}
-			}
-			criticalBlocks.push(block);
-			return "";
-		});
-		if (criticalBlocks.length > 0) {
-			try {
-				const result = replaceFormulaInDice(`{{${cleanedInner}}}`);
-				return `${result}${criticalBlocks.join("")}`;
-			} catch {
-				// Formula evaluation failed; return with cs/cf stripped so
-				// replaceFormulaInDice can still try to evaluate the formula.
-				if (!cleanedInner.includes("$"))
-					logger.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
+				}
+			);
+			if (criticalBlocks.length > 0) {
+				try {
+					const result = replaceFormulaInDice(`{{${cleanedInner}}}`);
+					return `${result}${criticalBlocks.join("")}`;
+				} catch {
+					// Formula evaluation failed; return with cs/cf stripped so
+					// replaceFormulaInDice can still try to evaluate the formula.
+					if (!cleanedInner.includes("$"))
+						logger.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
 
-				return `{{${cleanedInner}}}`;
+					return `{{${cleanedInner}}}`;
+				}
 			}
+			logger.info(`Pre-rolled inner formula: ${cleanedInner} → ${rolledInner}`);
+			return `{{${rolledInner}}}`;
 		}
-		logger.info(`Pre-rolled inner formula: ${cleanedInner} → ${rolledInner}`);
-		return `{{${rolledInner}}}`;
-	});
+	);
 }
 
 /**
@@ -869,9 +878,35 @@ function isFormulaExpression(expr: string): boolean {
 	return /^[\d\s+\-*/%.()^d]+$/i.test(trimmed) && /\b\d*d\d+\b/i.test(trimmed);
 }
 
+/** A fresh instance per use: the shared pattern is global, so its `lastIndex` is stateful. */
+const criticalBlocks = () => new RegExp(REMOVER_PATTERN.CRITICAL_BLOCK.source, "gi");
+
+function isReachable(formula: string, index: number): boolean {
+	let current = 0;
+	const probe = formula.replace(criticalBlocks(), () =>
+		current++ === index ? "*NaN" : ""
+	);
+	try {
+		const value = evaluate(probe);
+		return typeof value !== "number" || Number.isNaN(value);
+	} catch {
+		return true;
+	}
+}
+
+function dropUnreachableCriticals(formula: string): string {
+	let index = 0;
+	return formula.replace(criticalBlocks(), (block) =>
+		isReachable(formula, index++) ? block : ""
+	);
+}
+
 /**
  * Replaces `[expr]` markers in a dice string with the custom formula, injecting `(expr)`
  * in place of every `$` placeholder and wrapping the result in `{{...}}` for mathjs evaluation.
+ *
+ * A `{cs:…}`/`{cf:…}` block the formula cannot reach is dropped, so the branch it sits in does not
+ * override the template's criticals from afar.
  *
  * `[expr]` is only treated as a formula invocation when the expression contains `$` or
  * consists solely of math characters — leaving plain text comments untouched.
@@ -879,10 +914,13 @@ function isFormulaExpression(expr: string): boolean {
  * @example
  * // formula = "$>=85?85{cs:>=5+($-85)}:$"
  * applyCustomFormula("1d100<=[90]", formula)
- * // → "1d100<={{(90)>=85?85{cs:>=5+((90)-85)}:(90)}}"
+ * // → "1d100<={{(90)>=85?85{cs:>=5+((90)-85)}:(90)}}"  (above the cap: the block applies)
+ *
+ * applyCustomFormula("1d100<=[50]", formula)
+ * // → "1d100<={{(50)>=85?85:(50)}}"                    (below the cap: the block is dropped)
  *
  * applyCustomFormula("1d100<=[$dex+$str]", formula)
- * // → "1d100<={{($dex+$str)>=85?85{cs:>=5+(($dex+$str)-85)}:($dex+$str)}}"
+ * // → "1d100<={{($dex+$str)>=85?85{cs:>=5+(($dex+$str)-85)}:($dex+$str)}}"  (stats unresolved)
  *
  * applyCustomFormula("1d20 [attack roll]", formula)
  * // → "1d20 [attack roll]"  (comment left intact)
@@ -891,7 +929,7 @@ export function applyCustomFormula(dice: string, formula: string): string {
 	return dice.replace(/\[([^\]]+)\]/g, (match, expr: string) => {
 		if (!isFormulaExpression(expr)) return match;
 		const injected = formula.replaceAll("$", `(${expr.trim()})`);
-		return `{{${injected}}}`;
+		return `{{${dropUnreachableCriticals(injected)}}}`;
 	});
 }
 
