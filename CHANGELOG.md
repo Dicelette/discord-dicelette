@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.6.0](https://github.com/Dicelette/discord-dicelette/compare/4.5.8...4.6.0) (2026-08-01)
+
+### Features
+
+* **8ball:** elusive reply are excluded by default now ([fc64fae](https://github.com/Dicelette/discord-dicelette/commit/fc64fae4753ad2abae839a94df471ed3a0fca0c5))
 ## [4.5.8](https://github.com/Dicelette/discord-dicelette/compare/4.5.7...4.5.8) (2026-08-01)
 
 ### Bug Fixes
