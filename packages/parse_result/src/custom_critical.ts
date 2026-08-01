@@ -71,7 +71,7 @@ export function parseOpposition(
 	if (!sign || !comparator) return;
 	const rolledValue = getRoll(comparator, undefined, sort);
 	if (sign === "=") sign = "==";
-	if (rolledValue?.total) {
+	if (rolledValue?.total !== undefined) {
 		return {
 			originalDice: rolledValue.dice,
 			rollValue: rolledValue.result,
@@ -91,7 +91,7 @@ export function parseOpposition(
 
 function rollOneCustomCritical(critical: CustomCritical, sort?: SortOrder) {
 	const rolledValue = getRoll(critical.value, undefined, sort);
-	if (rolledValue?.total)
+	if (rolledValue?.total !== undefined)
 		return {
 			affectSkill: critical.affectSkill,
 			dice: {

@@ -19,6 +19,16 @@ import "uniformize";
 import { ln } from "@dicelette/localization";
 import { logger, PARSE_RESULT_PATTERNS } from "@dicelette/utils";
 
+function isResolvedComparator(rollValue?: string, originalDice?: string): boolean {
+	if (originalDice || rollValue === undefined) return true;
+	if (isNumber(rollValue)) return true;
+	try {
+		return typeof evaluate(rollValue) === "number";
+	} catch {
+		return false;
+	}
+}
+
 export class ResultAsText {
 	parser?: string;
 	error?: boolean;
@@ -357,7 +367,7 @@ export class ResultAsText {
 		}
 		if (this.resultat?.compare) {
 			const { rollValue, value, trivial, originalDice } = this.resultat.compare;
-			if (!isNumber(rollValue) && value === 0 && trivial)
+			if (value === 0 && trivial && !isResolvedComparator(rollValue, originalDice))
 				/*
 				throw new Error(
 					this.ul("error.invalidDice.compare", {

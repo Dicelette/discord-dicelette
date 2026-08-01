@@ -124,7 +124,7 @@ export function convertNameToValue(
 
 	const result = generateStatsDice(formula, statistics, MIN_THRESHOLD_MATCH);
 	const isRoll = getRoll(result);
-	if (isRoll?.total)
+	if (isRoll?.total !== undefined)
 		return {
 			diceResult: isRoll.result,
 			total: isRoll.total.toString(),
