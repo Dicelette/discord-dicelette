@@ -38,31 +38,39 @@ export async function interactionError(
 		sentry.error(e);
 		consoleError(e);
 	}
-	if (!interaction.guild) return;
-	if (client.settings.has(interaction.guild.id)) {
+	if (interaction.guild && client.settings.has(interaction.guild.id)) {
 		const db = client.settings.get(interaction.guild.id, "logs");
-		if (!db) return;
-		const logs = (await fetchChannel(interaction.guild!, db)) as Djs.GuildBasedChannel;
-		if (logs instanceof Djs.TextChannel) {
-			await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
+		if (db) {
+			try {
+				const logs = (await fetchChannel(interaction.guild, db)) as Djs.GuildBasedChannel;
+				if (logs instanceof Djs.TextChannel) {
+					await logs.send(`\`\`\`\n${(e as Error).message}\n\`\`\``);
+				}
+			} catch (logError) {
+				if (!isApiError(logError)) consoleError(logError as Error);
+			}
 		}
 	}
 
-	if (
-		(interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) &&
-		(interaction.replied || interaction.deferred)
-	)
-		return;
 	const msgError = lError(e as Error, interaction, langToUse);
 	if (msgError.length === 0) return;
 	const cause = (e as Error).cause ? ((e as Error).cause as string) : undefined;
 	const embed = embedError(msgError, ul, cause);
 	if (interaction.isButton() || interaction.isModalSubmit() || interaction.isCommand()) {
 		try {
-			await reply(interaction, {
-				embeds: [embed],
-				flags: Djs.MessageFlags.Ephemeral,
-			});
+			// A reply was already sent: editing it would replace a legitimate answer with the
+			// error, so append it instead. A merely deferred interaction has nothing but its
+			// "thinking" placeholder, and `reply` turns that into an edit.
+			if (interaction.replied)
+				await interaction.followUp({
+					embeds: [embed],
+					flags: Djs.MessageFlags.Ephemeral,
+				});
+			else
+				await reply(interaction, {
+					embeds: [embed],
+					flags: Djs.MessageFlags.Ephemeral,
+				});
 		} catch (e) {
 			void sendErrorToDM(e as Error, langToUse ?? Djs.Locale.EnglishUS, interaction.user);
 		}
