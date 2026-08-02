@@ -3,21 +3,26 @@ packages:
   - packages/*
   - dashboard/*
 allowBuilds:
-  "@go-task/cli": true
-  "@sentry-internal/node-cpu-profiler": true
-  "@sentry/node-cpu-profiler": true
-  "@swc/core": true
+  '@go-task/cli': true
+  '@sentry-internal/node-cpu-profiler': true
+  '@sentry/node-cpu-profiler': true
+  '@swc/core': true
   better-sqlite3: true
   canvas: true
   esbuild: true
-minimumReleaseAge: 0
 enablePrePostScripts: true
+minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - mathjs@15.2.0
   - react-router@7.15.0
-  - "@dicelette/core"
+  - '@dicelette/core'
   - discord.js
   - discord-api-types
+onlyBuiltDependencies:
+  - '@go-task/cli'
+  - better-sqlite3
+  - canvas
+  - esbuild
 overrides:
   form-data@>=4.0.0 <4.0.6: ^4.0.6
   mathjs@>=13.1.0 <15.2.0: ^15.2.0
