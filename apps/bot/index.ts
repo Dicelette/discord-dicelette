@@ -44,7 +44,6 @@ try {
 	event.onWarn(client);
 	event.onMemberJoin(client);
 	event.shardDebug(client);
-	event.onDebug(client);
 } catch (error) {
 	logger.fatal(error as Error);
 	sentry.fatal("Failed to register bot events", { error });
