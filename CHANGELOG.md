@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.6.1](https://github.com/Dicelette/discord-dicelette/compare/4.6.0...4.6.1) (2026-08-07)
+
+### Bug Fixes
+
+* **stats:** silent skip unknow value, probably when a template was updated and a statistic was removed ([e56830c](https://github.com/Dicelette/discord-dicelette/commit/e56830c8ee1b90b240349ba8bb3f6285f67d6dca))
 ## [4.6.0](https://github.com/Dicelette/discord-dicelette/compare/4.5.8...4.6.0) (2026-08-01)
 
 ### Features
