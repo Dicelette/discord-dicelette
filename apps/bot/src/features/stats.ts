@@ -119,8 +119,12 @@ export class StatsFeature extends BaseFeature {
 		const inputs = [];
 		for (const stat of statsToDisplay) {
 			const cleanedName = stat.unidecode();
-			const value = statisticsLowerCase[cleanedName];
-			if (!value) continue; //silent skip unknow value between the display and the template, probably when a template was updated and a statistic was removed
+			const value = statisticsByKey[cleanedName];
+			if (!value) {
+				//skip unknow value between the display and the template, probably when a template was updated and a statistic was removed
+				logger.warn(`Statistic "${stat}" is missing from the template, skipping it`);
+				continue;
+			}
 			if (value.combinaison) continue; //do not display combinaison as they are automatically calculated
 			let msg = "";
 			if (value.min && value.max)
@@ -138,6 +142,14 @@ export class StatsFeature extends BaseFeature {
 				);
 			if (msg.length) input.setDescription(msg);
 			inputs.push(input);
+		}
+		if (inputs.length === 0) {
+			//a modal without any component is rejected by the builder ("Invalid Array length")
+			await reply(interaction, {
+				content: ul("error.stats.noneToDisplay"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
+			return;
 		}
 		modal.setLabelComponents(...inputs);
 		await interaction.showModal(modal);
@@ -376,7 +388,8 @@ export class StatsFeature extends BaseFeature {
 		const stats: Record<string, number> = {};
 		if (!templateData.statistics) return { combinaisonFields, stats };
 		for (const [key, value] of Object.entries(templateData.statistics)) {
-			const name = key.standardize();
+			//must match the customId set by `show()`
+			const name = key.unidecode();
 			if (!interaction.fields.fields.has(name) && !value.combinaison) continue;
 			if (value.combinaison) {
 				combinaisonFields[key] = value.combinaison;
@@ -547,7 +560,8 @@ export class StatsFeature extends BaseFeature {
 		if (!templateStats?.statistics) return;
 		const valuesAsStats = values.split("\n- ").map((stat) => {
 			const [name, value] = stat.split(/ ?: ?/);
-			return { name: name.replace(/^- /, "").trim().toLowerCase(), value };
+			//keep the label as-is: the lookups below normalize on their own side
+			return { name: name.replace(/^- /, "").trim(), value };
 		});
 		const stats = valuesAsStats.reduce(
 			(acc, { name, value }) => {

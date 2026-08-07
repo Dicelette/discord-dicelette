@@ -681,6 +681,7 @@
 			"char": "{{- char}} cannot be found.\nYou must select the user with this character to roll on `{{- stat}}`.",
 			"empty": "This combination is invalid: no statistics exist!",
 			"excluded": "This statistic is excluded: you cannot roll for it.",
+			"noneToDisplay": "No statistic can be displayed: the template was probably updated since this sheet was created.",
 			"notFound": "Statistic `{{-value}}` not found! Did you make a typing error?",
 			"notFound_plural": "This command cannot be used: no statistics have been recorded.",
 			"notFound_singular": "The statistic `{{- stat}}` cannot be found on the selected character {{ char, optional}}.",

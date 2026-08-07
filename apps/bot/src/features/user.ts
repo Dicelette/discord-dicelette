@@ -20,7 +20,7 @@ import {
 } from "@dicelette/utils";
 import { getTemplateByInteraction } from "database";
 import * as Djs from "discord.js";
-import { MacroFeature, StatsFeature } from "features";
+import { MacroFeature, STATS_PER_PAGE, StatsFeature } from "features";
 import * as Messages from "messages";
 import { continueCancelButtons, selfRegisterAllowance } from "utils";
 import { BaseFeature } from "./base";
@@ -59,9 +59,11 @@ export class UserFeature extends BaseFeature {
 
 		let nbOfPages = 1;
 		if (this.template.statistics) {
-			const nbOfStatistique = Object.keys(this.template.statistics).length;
-			nbOfPages =
-				Math.ceil(nbOfStatistique / 5) > 0 ? Math.ceil(nbOfStatistique / 5) + 1 : 2;
+			//combinaison are never prompted for, and the stats modals hold up to STATS_PER_PAGE of them
+			const nbOfStatistique = Object.values(this.template.statistics).filter(
+				(stat) => !stat.combinaison
+			).length;
+			nbOfPages = Math.ceil(nbOfStatistique / STATS_PER_PAGE) + 1;
 		}
 
 		const modal = new Djs.ModalBuilder()
@@ -359,7 +361,8 @@ export class UserFeature extends BaseFeature {
 			});
 			return;
 		}
-		const pageNumberStr = interaction.customId.replace("page", "");
+		//the button carries the page the sheet sits on, so the next modal is that page + 1
+		const pageNumberStr = interaction.customId.replace("continue", "");
 		const page = !isNumber(pageNumberStr) ? 1 : Number.parseInt(pageNumberStr, 10);
 		const embed = Messages.getEmbeds(interaction.message, "user");
 		if (!embed || !this.template.statistics) return;
