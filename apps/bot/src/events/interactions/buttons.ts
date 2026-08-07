@@ -26,16 +26,6 @@ const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 	cancel_by_user: async (interaction, ul, interactionUser, _template, client) => {
 		await cancel(interaction, ul, client, interactionUser, false, true);
 	},
-	continue: async (interaction, ul, interactionUser, template, client) => {
-		const selfRegister = client.settings.get(interaction.guild!.id, "allowSelfRegister");
-		await new UserFeature({
-			interaction,
-			interactionUser,
-			selfRegister,
-			template,
-			ul,
-		}).continuePage();
-	},
 	// biome-ignore lint/style/useNamingConvention: Must match customId discord
 	edit_dice: async (interaction, ul, interactionUser, _template, client) => {
 		await new MacroFeature({
@@ -101,6 +91,23 @@ const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
 				await resetButton(interaction.message, ul);
 		},
 		prefix: "add_dice",
+	},
+	{
+		//`continue` alone (buttons posted before the page was tracked) is read back as page 1
+		handler: async (interaction, ul, interactionUser, template, client) => {
+			const selfRegister = client.settings.get(
+				interaction.guild!.id,
+				"allowSelfRegister"
+			);
+			await new UserFeature({
+				interaction,
+				interactionUser,
+				selfRegister,
+				template,
+				ul,
+			}).continuePage();
+		},
+		prefix: "continue",
 	},
 	{
 		handler: async (interaction, ul, _interactionUser, _template, client) => {

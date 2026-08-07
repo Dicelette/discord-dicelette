@@ -155,11 +155,14 @@ export async function cancel(
 /**
  * Creates an action row with "continue" and "cancel" buttons for multi-page user registration.
  *
+ * @param page - The page the sheet currently sits on; the continue button carries it so the
+ * next modal knows which page to open. Buttons posted before this was tracked have a bare
+ * `continue` customId and are read back as page 1.
  * @returns An action row containing the "continue" and "cancel" buttons.
  */
-export function continueCancelButtons(ul: Translation) {
+export function continueCancelButtons(ul: Translation, page = 1) {
 	const continueButton = new Djs.ButtonBuilder()
-		.setCustomId("continue")
+		.setCustomId(`continue${page}`)
 		.setLabel(ul("button.continue"))
 		.setStyle(Djs.ButtonStyle.Success);
 	const cancelButton = new Djs.ButtonBuilder()

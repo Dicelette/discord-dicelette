@@ -64,6 +64,9 @@ const botErrorOptions: BotErrorOptions = {
 	level: BotErrorLevel.Warning,
 };
 
+/** Statistics prompted per modal, capped by the 5 components Discord allows in a modal. */
+export const STATS_PER_PAGE = 5;
+
 /**
  * StatsFeature handles all statistics operations for characters.
  * This includes showing modals, registering stats, editing stats, and validation.
@@ -87,13 +90,11 @@ export class StatsFeature extends BaseFeature {
 			Object.keys(this.template.statistics).filter((stat) => {
 				return !this.template!.statistics?.[stat]?.combinaison;
 			}) ?? [];
-		const nbOfPages =
-			Math.ceil(statsWithoutCombinaison.length / 5) >= 1
-				? Math.ceil(statsWithoutCombinaison.length / 5) + 1
-				: page;
+		//page 1 is the registration modal, the next ones hold up to 5 statistics each
+		const nbOfPages = Math.ceil(statsWithoutCombinaison.length / STATS_PER_PAGE) + 1;
 		const modal = new Djs.ModalBuilder()
 			.setCustomId(`page${page}`)
-			.setTitle(ul("modals.steps", { max: nbOfPages + 1, page }));
+			.setTitle(ul("modals.steps", { max: nbOfPages, page }));
 		let statToDisplay = statsWithoutCombinaison;
 		if (stats && stats.length > 0) {
 			statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
@@ -104,12 +105,14 @@ export class StatsFeature extends BaseFeature {
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 				await interaction.message.edit({ components: [button] });
+				return;
 			}
 		}
-		const statsToDisplay = statToDisplay.slice(0, 4);
-		const statisticsLowerCase = Object.fromEntries(
+		const statsToDisplay = statToDisplay.slice(0, STATS_PER_PAGE);
+		//indexed with `unidecode()` to match both the lookup below and the text input customId
+		const statisticsByKey = Object.fromEntries(
 			Object.entries(this.template.statistics).map(([key, value]) => [
-				key.standardize(),
+				key.unidecode(),
 				value,
 			])
 		);
@@ -351,7 +354,7 @@ export class StatsFeature extends BaseFeature {
 			: "";
 
 		await message.edit({
-			components: [continueCancelButtons(this.ul)],
+			components: [continueCancelButtons(this.ul, page)],
 			embeds: [userEmbed, statEmbeds],
 			files: uniqueFiles,
 		});
