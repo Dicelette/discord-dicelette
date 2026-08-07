@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.6.2](https://github.com/Dicelette/discord-dicelette/compare/4.6.1...4.6.2) (2026-08-07)
+
+### Bug Fixes
+
+* **modals:** track page stats to get a accurate number of page ([52d9327](https://github.com/Dicelette/discord-dicelette/commit/52d932758d2c3c3f9e5dc9954cdcb1ef85ffda2d))
+* **stats:** handle missing statistics and improve modal display logic ([89a0590](https://github.com/Dicelette/discord-dicelette/commit/89a05902dfa43e1a35c2cd2a793ed7129a24ffc8))
 ## [4.6.1](https://github.com/Dicelette/discord-dicelette/compare/4.6.0...4.6.1) (2026-08-07)
 
 ### Bug Fixes
