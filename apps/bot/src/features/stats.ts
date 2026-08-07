@@ -117,7 +117,8 @@ export class StatsFeature extends BaseFeature {
 		for (const stat of statsToDisplay) {
 			const cleanedName = stat.unidecode();
 			const value = statisticsLowerCase[cleanedName];
-			if (value.combinaison) continue;
+			if (!value) continue; //silent skip unknow value between the display and the template, probably when a template was updated and a statistic was removed
+			if (value.combinaison) continue; //do not display combinaison as they are automatically calculated
 			let msg = "";
 			if (value.min && value.max)
 				msg = ul("modals.enterValue.minAndMax", { max: value.max, min: value.min });

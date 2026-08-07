@@ -63,7 +63,7 @@
 		"parse-color": "^1.0.0",
 		"random-js": "^2.1.0",
 		"tslog": "^5.1.0",
-		"tsx": "^4.23.0",
+		"tsx": "^4.23.4",
 		"uniformize": "^2.6.1",
 		"zod": "latest"
 	},
@@ -76,7 +76,7 @@
 		"@types/node": "^26.1.1",
 		"@types/papaparse": "^5.5.2",
 		"@types/parse-color": "^1.0.3",
-		"@types/semver": "^7.7.1",
+		"@types/semver": "^7.8.0",
 		"@typescript/native": "npm:typescript@^7.0.2",
 		"commit-and-tag-version": "^13.0.0",
 		"concurrently": "^10.0.3",
