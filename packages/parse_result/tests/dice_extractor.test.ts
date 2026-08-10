@@ -1,3 +1,4 @@
+import { REMOVER_PATTERN } from "@dicelette/core";
 import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { describe, expect, it } from "vitest";
 import type { DiceData } from "../../types";
@@ -719,6 +720,69 @@ describe("applyCustomFormula", () => {
 				);
 				expect(result).toBe("roule [1d100<=$dexterite] stp");
 			});
+		});
+
+		describe("a space inside the expanded formula is not a comment separator (regression)", () => {
+			// Message detection expands the custom formula BEFORE substituting stats, so the
+			// `{{...}}` block still holds `$stat` tokens when the trailing-comment heuristic
+			// runs. Splitting the block on its first space left those tokens out of the dice
+			// and the whole roll was dropped silently — while /roll, which substitutes first,
+			// was unaffected.
+			const stats = { combat: 20, force: 10, vita: 30 };
+			const statsName = ["Vitalité", "Combat", "Force"];
+			const userData = { stats, template: {} } as never;
+
+			it.each([
+				["$ >= 85 ? 85 : $", "spaces around every operator"],
+				["$>=85 ? 85 : $", "spaces in the ternary only"],
+				["$ + 0", "a single trailing space"],
+			])("rolls through a formula with %s", (formula) => {
+				const content = applySemiDirectCustomFormula(
+					"1d100<=[$vita+$combat+$force]",
+					formula
+				);
+				const result = isRolling(content, userData, statsName);
+				expect(result).toBeDefined();
+				expect(result!.result.compare?.value).toBe(60);
+			});
+
+			it("rolls when the bracket expression itself is spaced", () => {
+				const content = applySemiDirectCustomFormula(
+					"1d100<=[$vita + $combat + $force]",
+					"$"
+				);
+				const result = isRolling(content, userData, statsName);
+				expect(result).toBeDefined();
+				expect(result!.result.compare?.value).toBe(60);
+			});
+
+			it("keeps a real comment written after the spaced formula", () => {
+				const content = applySemiDirectCustomFormula(
+					"1d100<=[$vita+$combat+$force] jet de test",
+					"$ >= 85 ? 85 : $"
+				);
+				const result = isRolling(content, userData, statsName);
+				expect(result).toBeDefined();
+				expect(result!.result.compare?.value).toBe(60);
+				expect(result!.result.comment).toContain("jet de test");
+			});
+		});
+	});
+
+	describe("replaceStatsInDiceFormula is immune to a dirty shared STAT_MATCHER", () => {
+		// STAT_MATCHER is a global regex: `matchAll` starts from its `lastIndex`, so an
+		// earlier `.test()` left mid-string would make the leading `$stat` invisible and
+		// send an unresolved formula to the dice parser.
+		it("replaces every stat even when lastIndex was left behind", () => {
+			REMOVER_PATTERN.STAT_MATCHER.lastIndex = 15;
+			const { formula } = replaceStatsInDiceFormula(
+				"1d100<={{($vita+$combat+$force)}}",
+				{ combat: 20, force: 10, vita: 30 },
+				true
+			);
+			REMOVER_PATTERN.STAT_MATCHER.lastIndex = 0;
+			expect(formula).not.toContain("$");
+			expect(formula).toContain("(30+20+10)");
 		});
 	});
 });

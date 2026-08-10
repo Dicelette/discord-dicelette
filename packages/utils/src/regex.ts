@@ -20,6 +20,69 @@ export const DICE_PATTERNS = {
 	INFO_STATS_COMMENTS: /%%(\[__.*__\])%%/,
 } as const;
 
+/** Source of a `{{…}}` formula block, allowing one level of nested single braces (`{cs:…}`). */
+export const FORMULA_BLOCK_SOURCE = "\\{\\{((?:[^{}]|\\{[^{}]*\\})*)\\}\\}";
+
+/** `DETECT_DICE_MESSAGE` with capture indices, so a match found on a masked copy can be sliced out of the original. */
+const DETECT_DICE_MESSAGE_INDICES = new RegExp(
+	DICE_PATTERNS.DETECT_DICE_MESSAGE.source,
+	"di"
+);
+
+/**
+ * Replaces every `{{…}}` formula block with a same-length, space-free stand-in.
+ *
+ * `DETECT_DICE_MESSAGE` splits a message on its first space, so a custom formula expanded
+ * before stat substitution (`1d100<={{($vita + $combat)}}`) would be cut in half and its
+ * tail parsed as a comment — leaving `$stat` tokens behind for the dice parser. Masking
+ * preserves offsets and lengths, so a match found on the masked copy maps 1:1 onto the
+ * original string.
+ */
+function maskFormulaBlocks(content: string): string {
+	// Global, but only ever used through `replace`, which resets `lastIndex` itself.
+	return content.replace(FORMULA_BLOCK_MASK, (block) => "0".repeat(block.length));
+}
+const FORMULA_BLOCK_MASK = new RegExp(FORMULA_BLOCK_SOURCE, "g");
+
+/** The `DETECT_DICE_MESSAGE` split of a dice message, blind to the interior of `{{…}}` blocks. */
+export function matchBareComment(content: string):
+	| {
+			/** Index of the whole heuristic match in `content`. */
+			start: number;
+			/** Index just past the whole heuristic match. */
+			end: number;
+			/** The dice part (group 1), as it appears in `content`. */
+			dice: string;
+			/** The trailing free text (group 3), as it appears in `content`. May be empty. */
+			comment: string;
+	  }
+	| undefined {
+	const match = DETECT_DICE_MESSAGE_INDICES.exec(maskFormulaBlocks(content));
+	const indices = match?.indices;
+	if (!match || !indices?.[1] || !indices[3]) return undefined;
+	return {
+		comment: content.slice(indices[3][0], indices[3][1]),
+		dice: content.slice(indices[1][0], indices[1][1]),
+		end: match.index + match[0].length,
+		start: match.index,
+	};
+}
+
+/**
+ * The trailing free-text comment of a dice message (the `DETECT_DICE_MESSAGE` group 3),
+ * without ever cutting into a `{{…}}` formula block.
+ */
+export function bareComment(content: string): string | undefined {
+	return matchBareComment(content)?.comment;
+}
+
+/** `content` stripped of its trailing free-text comment — the `DETECT_DICE_MESSAGE → "$1"` rewrite. */
+export function stripBareComment(content: string): string {
+	const found = matchBareComment(content);
+	if (!found) return content;
+	return content.slice(0, found.start) + found.dice + content.slice(found.end);
+}
+
 export const DICE_COMPILED_PATTERNS = {
 	COMMENTS_REGEX: /\[([^\]]*)\]/gi,
 	COMPARATOR: /(?<sign>([><=]|!=)+)(?<comparator>(.+))/,

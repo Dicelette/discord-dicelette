@@ -31,11 +31,11 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	capitalizeBetweenPunct,
-	DICE_PATTERNS,
 	getIdFromMention,
 	logger,
 	NoEmbed,
 	QUERY_URL_PATTERNS,
+	stripBareComment,
 } from "@dicelette/utils";
 import {
 	getTemplateByInteraction,
@@ -370,7 +370,7 @@ export class MacroFeature extends BaseFeature {
 			}
 		const user = getUserByEmbed({ message: interaction.message }, first);
 		if (!user) throw new BotError(ul("error.user.notFound.generic"), botErrorOptions);
-		value = value.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
+		value = stripBareComment(value).trim();
 		value = evalStatsDice(value, user.stats);
 
 		const standardizedInputName = MacroFeature.normalizeName(name);
@@ -735,7 +735,7 @@ export class MacroFeature extends BaseFeature {
 				newEmbedDiceNames.add(normalizedSkill);
 				continue;
 			}
-			const toRoll = dice.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
+			const toRoll = stripBareComment(dice).trim();
 			try {
 				evalStatsDice(toRoll, statsValues);
 			} catch (error) {

@@ -18,12 +18,17 @@ import type {
 	Translation,
 	UserData,
 } from "@dicelette/types";
-import { DICE_COMPILED_PATTERNS, DICE_PATTERNS, logger } from "@dicelette/utils";
+import {
+	bareComment,
+	DICE_COMPILED_PATTERNS,
+	DICE_PATTERNS,
+	FORMULA_BLOCK_SOURCE,
+	logger,
+	stripBareComment,
+} from "@dicelette/utils";
 import { evaluate } from "mathjs";
 import { extractAndMergeComments, getComments } from "./comment_utils";
 import { trimAll } from "./utils";
-
-const FORMULA_BLOCK_SOURCE = "\\{\\{((?:[^{}]|\\{[^{}]*\\})*)\\}\\}";
 
 /**
  * Matches a `{{...}}` formula block.
@@ -40,9 +45,7 @@ export function extractDiceData(content: string): DiceData {
 	const bracketRoll = content
 		.replace(/%%.*%%/, "")
 		.match(DICE_PATTERNS.BRACKET_ROLL)?.[1];
-	const comments = content
-		.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3]
-		?.replaceAll("*", "\\*");
+	const comments = bareComment(content)?.replaceAll("*", "\\*");
 	const diceValue = content.match(DICE_PATTERNS.DICE_VALUE);
 
 	return {
@@ -83,8 +86,7 @@ export function processChainedComments(
 		};
 	}
 
-	const finalContent = content
-		.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1")
+	const finalContent = stripBareComment(content)
 		.replace(/%%.*%%/, "")
 		.trimEnd();
 
@@ -416,8 +418,7 @@ export function isRolling(
 		if (reg?.groups) {
 			// Extract any comments from the content before removing the opposition
 			// Use DETECT_DICE_MESSAGE which captures comments without the leading "#"
-			const commentMatch = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
-			if (commentMatch?.[3]) preservedComments = commentMatch[3];
+			preservedComments = bareComment(content) || undefined;
 
 			// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
 			if (!preservedComments) {
@@ -624,6 +625,13 @@ export function getRoll(
 }
 
 /**
+ * A fresh instance per use: `STAT_MATCHER` is global, and `matchAll` starts from the
+ * shared instance's `lastIndex` — a stale offset silently skips the leading `$stat` of
+ * the formula, which then reaches the dice parser unresolved.
+ */
+const statMatcher = () => new RegExp(REMOVER_PATTERN.STAT_MATCHER.source, "giu");
+
+/**
  * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
  * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
  * For shared rolls (with ;), returns statsPerSegment to track which stat applies to each segment
@@ -640,7 +648,7 @@ export function replaceStatsInDiceFormula(
 	if (!stats) return { formula: verifyStatMatcherPattern(content, replaceUnknow) };
 	//remove secondary opposition
 
-	let comments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
+	let comments = bareComment(content);
 	let diceFormula = content;
 	const statsFounds: string[] = [];
 	if (comments) diceFormula = diceFormula.replace(comments, "").trim() ?? "";
@@ -672,7 +680,7 @@ export function replaceStatsInDiceFormula(
 			let processedSegment = segment;
 			const segmentStats: string[] = [];
 
-			const variableMatches = [...segment.matchAll(REMOVER_PATTERN.STAT_MATCHER)];
+			const variableMatches = [...segment.matchAll(statMatcher())];
 
 			for (const match of variableMatches) {
 				const fullMatch = match[0];
@@ -720,7 +728,7 @@ export function replaceStatsInDiceFormula(
 		processedFormula = processedSegments.join("");
 	} else {
 		// Non-shared roll: process as before
-		const variableMatches = [...processedFormula.matchAll(REMOVER_PATTERN.STAT_MATCHER)];
+		const variableMatches = [...processedFormula.matchAll(statMatcher())];
 		if (!variableMatches.length)
 			return { formula: verifyStatMatcherPattern(content, replaceUnknow) };
 
@@ -766,7 +774,7 @@ export function replaceStatsInDiceFormula(
 
 	// deleteComments = true : do not add the %%[__Stats__]%% marker, but preserve original comments
 	if (deleteComments) {
-		const originalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3] || "";
+		const originalComments = bareComment(content) || "";
 		const finalFormula = originalComments
 			? `${processedFormula} ${originalComments}`.trim()
 			: processedFormula;

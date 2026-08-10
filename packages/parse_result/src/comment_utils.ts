@@ -1,10 +1,9 @@
-import { DICE_PATTERNS } from "@dicelette/utils";
+import { bareComment, DICE_PATTERNS, matchBareComment } from "@dicelette/utils";
 import { extractDiceData } from "./dice_extractor";
 
 export function getComments(content: string, comments?: string) {
 	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];
-	if (!globalComments && !comments)
-		globalComments = content.match(DICE_PATTERNS.DETECT_DICE_MESSAGE)?.[3];
+	if (!globalComments && !comments) globalComments = bareComment(content);
 	if (comments && !globalComments) globalComments = comments;
 
 	const statValue = content.match(DICE_PATTERNS.INFO_STATS_COMMENTS);
@@ -89,11 +88,13 @@ export function extractAndMergeComments(
 		.trim();
 
 	// Handle dice message format extraction
-	if (DICE_PATTERNS.DETECT_DICE_MESSAGE.test(cleaned)) {
-		const simple = cleaned.match(DICE_PATTERNS.DETECT_DICE_MESSAGE);
-		if (simple?.[1] && simple?.[3])
-			cleaned = cleaned.replace(DICE_PATTERNS.DETECT_DICE_MESSAGE, "$1").trim();
-	}
+	const simple = matchBareComment(cleaned);
+	if (simple?.dice && simple.comment)
+		cleaned = (
+			cleaned.slice(0, simple.start) +
+			simple.dice +
+			cleaned.slice(simple.end)
+		).trim();
 
 	// Format merged comments based on shared dice notation
 	if (merged) {

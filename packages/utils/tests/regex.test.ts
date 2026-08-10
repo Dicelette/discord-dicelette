@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+	bareComment,
 	cleanAvatarUrl,
 	DICE_COMPILED_PATTERNS,
 	DICE_PATTERNS,
 	QUERY_URL_PATTERNS,
+	stripBareComment,
 	verifyAvatarUrl,
 } from "../src/regex";
 
@@ -177,5 +179,38 @@ describe("DICE_PATTERNS", () => {
 		for (const test of tests) {
 			expect(DICE_PATTERNS.DETECT_DICE_MESSAGE.test(test)).toBe(true);
 		}
+	});
+});
+
+describe("bareComment / stripBareComment", () => {
+	it("still splits a plain dice message on its trailing free text", () => {
+		expect(bareComment("1d20+5 attack roll")).toBe("attack roll");
+		expect(stripBareComment("1d20+5 attack roll")).toBe("1d20+5");
+	});
+
+	it("never cuts into a {{...}} formula block", () => {
+		// A custom formula expanded before stat substitution keeps its spaces; splitting
+		// there would leave `$stat` tokens in the "comment" and out of the dice.
+		const dice = "1d100<={{($vita + $combat) >= 85 ? 85 : ($vita + $combat)}}";
+		expect(bareComment(dice)).toBeUndefined();
+		expect(stripBareComment(dice)).toBe(dice);
+	});
+
+	it("still finds the comment that follows a spaced formula block", () => {
+		const dice = "1d100<={{($vita + $combat) >= 85 ? 85 : ($vita + $combat)}} mon jet";
+		expect(bareComment(dice)).toBe("mon jet");
+		expect(stripBareComment(dice)).toBe(
+			"1d100<={{($vita + $combat) >= 85 ? 85 : ($vita + $combat)}}"
+		);
+	});
+
+	it("tolerates a {cs:...} block nested in the formula", () => {
+		const dice = "1d100<={{($vita) >= 85 ? 85{cs:>= 5} : ($vita)}} bonus";
+		expect(bareComment(dice)).toBe("bonus");
+	});
+
+	it("returns undefined when there is nothing after the dice", () => {
+		expect(bareComment("1d20+5")).toBeUndefined();
+		expect(stripBareComment("1d20+5")).toBe("1d20+5");
 	});
 });
