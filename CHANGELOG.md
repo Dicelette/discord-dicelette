@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.6.3](https://github.com/Dicelette/discord-dicelette/compare/4.6.2...4.6.3) (2026-08-10)
+
+### Bug Fixes
+
+* **pnpm:** standardize quotes in pnpm-workspace.yaml ([bd71ee0](https://github.com/Dicelette/discord-dicelette/commit/bd71ee02cb0c80dcea83fb93f1393d215d337d54))
+* **roll:** custom formula with a space was silently dropped by dice detection ([4156bbe](https://github.com/Dicelette/discord-dicelette/commit/4156bbe21a9e1e9bcffc059c01289843f33bca89))
+* **translation:** adjust message when using from guild to get the formula ([2307abf](https://github.com/Dicelette/discord-dicelette/commit/2307abf5c2f40a15b8656fecb156d56a7155cb34))
 ## [4.6.2](https://github.com/Dicelette/discord-dicelette/compare/4.6.1...4.6.2) (2026-08-07)
 
 ### Bug Fixes
