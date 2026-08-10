@@ -258,6 +258,9 @@
 		"fields": {
 			"pityHelperText": "After a certain number of consecutive failures, Dicelette guarantees automatic success on the next roll."
 		},
+		"formula": {
+			"noDisplay": "There is no formula set by administrator for this server."
+		},
 		"hiddenRoll": {
 			"desc": "Allows you to hide the dice results from GMs and send them to a specific channel or in a ephemeral message.",
 			"title": "[GM] Roll display"
@@ -1267,7 +1270,7 @@
 				"reply": "The formula set is: `{{- formula}}`."
 			},
 			"invalid": "The custom formula `{{- formula}}` is invalid.\\n__Errors__ : {{- error}} ",
-			"noDisplay": "There is no formula set for this server.",
+			"noDisplay": "You have not configured any custom formula for this server.",
 			"notFound": "There is no formula to delete.",
 			"reset": "The custom formula has been deleted.",
 			"saved": "The formula `{{- formula}}` has been saved.",

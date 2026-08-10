@@ -258,6 +258,9 @@
 		"fields": {
 			"pityHelperText": "Après un certain nombre d'échecs consécutifs, Dicelette garantit un succès automatique au jet suivant."
 		},
+		"formula": {
+			"noDisplay": "Il n'y a aucune formule configurée par les administrateurs pour ce serveur."
+		},
 		"hiddenRoll": {
 			"desc": "Permet de cacher les résultats des dés des MJ et de l'envoyé dans un channel spécifique ou par message éphémère.",
 			"title": "[MJ] Jets invisibles"
@@ -1267,7 +1270,7 @@
 				"reply": "La formule configurée est : `{{- formula}}`."
 			},
 			"invalid": "La formule personnalisée `{{- formula}}` est invalide.\n__Erreur__: {{- error}}.",
-			"noDisplay": "Il n'y a aucune formule configurée pour ce serveur.",
+			"noDisplay": "Vous n'avez configuré aucune formule personnalisée pour ce serveur.",
 			"notFound": "Il n'y a aucune formule à supprimer.",
 			"reset": "La formule personnalisée a bien été supprimée.",
 			"saved": "La formule `{{- formula}}` a été enregistrée.",

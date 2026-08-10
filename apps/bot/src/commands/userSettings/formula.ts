@@ -85,6 +85,8 @@ export async function formulaDisplay(
 			content: ul("userSettings.formula.display.reply", { formula }),
 		});
 	} else {
-		await reply(interaction, { content: ul("userSettings.formula.noDisplay") });
+		let content = ul("config.formula.noDisplay");
+		if (!fromGuild) content = ul("userSettings.formula.noDisplay");
+		await reply(interaction, { content });
 	}
 }
