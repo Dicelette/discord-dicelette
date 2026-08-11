@@ -5,13 +5,8 @@ import { COMMENT_EDIT_PREFIX } from "@dicelette/types";
 import { MESSAGE_LINK_PATTERN, ROLL_MENTION_PATTERN } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError } from "./embeds";
-import { deleteAfter } from "./send";
 
-const DENIED_NOTICE_TTL_MS = 10_000;
-/** Don't re-DM the same "couldn't sync the copy" warning more than once per quarter. */
 const COPY_WARNING_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000;
-/** Never carries a body mention: avoids re-pinging the roll's owner on every comment edit. */
-const NO_PING: Djs.MessageMentionOptions = { parse: [] };
 
 /**
  * Reads the roll-result text of a bot message, regardless of whether it was sent as
@@ -26,12 +21,13 @@ function getRollMessageText(message: Djs.Message): string | undefined {
 }
 
 async function applyCommentEdit(message: Djs.Message, updated: string): Promise<void> {
+	const mentionnedUser = message.mentions.users.map((u) => u.id);
 	if (message.content) {
-		await message.edit({ allowedMentions: NO_PING, content: updated });
+		await message.edit({ allowedMentions: { users: mentionnedUser }, content: updated });
 		return;
 	}
 	await message.edit({
-		allowedMentions: NO_PING,
+		allowedMentions: { users: mentionnedUser },
 		components: [new Djs.TextDisplayBuilder().setContent(updated)],
 		flags: [Djs.MessageFlags.IsComponentsV2],
 	});
@@ -148,11 +144,10 @@ export async function handleCommentEditReply(
 	if (!rollAuthorId) return false;
 
 	if (rollAuthorId !== message.author.id) {
-		const denied = await message.reply({
+		await message.author.send({
 			allowedMentions: { repliedUser: true },
 			embeds: [embedError(ul("error.roll.notYourRoll"), ul)],
 		});
-		await deleteAfter(denied, DENIED_NOTICE_TTL_MS);
 		return true;
 	}
 
