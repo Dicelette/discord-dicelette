@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.7.1](https://github.com/Dicelette/discord-dicelette/compare/4.7.0...4.7.1) (2026-08-11)
+
+### Bug Fixes
+
+* **bracket-mention:** an "[@word](https://github.com/word)" outside the brackets is just narration, not a character/mention marker ([6be6069](https://github.com/Dicelette/discord-dicelette/commit/6be6069728c49289d314d20e73756b2251521c24))
 ## [4.7.0](https://github.com/Dicelette/discord-dicelette/compare/4.6.4...4.7.0) (2026-08-11)
 
 ### Features
