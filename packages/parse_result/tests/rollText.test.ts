@@ -393,6 +393,32 @@ describe("bulk comparison rolls", () => {
 		expect(text).not.toMatch(/\(`[⩽⩾<=>\s]*96`\)/);
 	});
 
+	it("should put the first result on its own line after infoRoll for bulk rolls (onMessageSend)", () => {
+		// Regression test: the infoRoll header line was missing its trailing newline
+		// for bulk/shared rolls, so the first result stuck to "[__Combat__]" instead
+		// of starting on a new line like the rest of the results.
+		const result: Resultat = {
+			compare: { sign: "<=", value: 40 },
+			dice: "10#d100<=40",
+			result:
+				"1d100: [14] = 14;1d100: [1] = 1;1d100: [3] = 3;1d100: [79] = 79;1d100: [62] = 62",
+			total: 159,
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, "Charles", {
+			name: "Combat",
+			standardized: "combat",
+		});
+		const text = res.onMessageSend(undefined, "189390243676422144");
+
+		const infoLine = text.split("\n").find((l) => l.includes("[__Combat__]"));
+		// The infoRoll line must stand alone, not carry the first result inline with it
+		expect(infoLine?.trim()).toBe("[__Combat__]");
+		expect(text).toMatch(
+			/\[__Combat__\]\s*\n\s*.*\*\*(Success|Failure|Succès|Échec)\*\*/
+		);
+	});
+
 	it("should display custom critical comparison in bulk roll result lines", () => {
 		// Test case: 5#d100<=60 with a success critical at natural 98
 		const result: Resultat = {

@@ -3,13 +3,18 @@ import { ln } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import { describe, expect, it } from "vitest";
 import {
+	getCriticalFromDice,
 	mergeCustomCriticals,
 	parseCustomCritical,
 	parseOpposition,
 	rollCustomCriticalsFromDice,
 	skillCustomCritical,
 } from "../src/custom_critical";
-import { applyCustomFormula } from "../src/dice_extractor";
+import {
+	applyCustomFormula,
+	applySemiDirectCustomFormula,
+	replaceStatsInDiceFormula,
+} from "../src/dice_extractor";
 
 describe("parseCustomCritical", () => {
 	it("should parse basic critical condition", () => {
@@ -396,5 +401,37 @@ describe("mergeCustomCriticals", () => {
 		const fromOption = { [ul("roll.critical.success")]: success("5") };
 		const merged = mergeCustomCriticals(undefined, fromFormula, fromOption);
 		expect(merged?.[ul("roll.critical.success")]).toEqual(success("5"));
+	});
+
+	it("should ignore a not-taken branch when the bracket only holds $stat tokens (free-text rolls)", () => {
+		// Free-text rolls inject the custom formula before stats are resolved (unlike slash
+		// commands, which resolve stats first), so applyCustomFormula can't yet tell whether
+		// `$>90?...` is reachable and keeps the {cs:...} block unconditionally.
+		const ul = ln(Djs.Locale.French);
+		const formula = "$>90?90{cs:<=5+($-90)}:$";
+		const dice = "1d100<=[$combat+$vita+$parade-15]";
+		const injected = applyCustomFormula(dice, formula);
+		expect(
+			getCriticalFromDice(injected, ul)?.[ul("roll.critical.success")]
+		).toBeDefined();
+
+		// Redo it in the same order the slash commands use — resolve stats first, then apply
+		// the formula — so reachability is decided on real numbers, same as applyCustomFormula
+		// already does for a slash-command roll.
+		// combat=40, vita=45, parade=10 → 80, which does not clear the 90 cap.
+		const stats = { combat: 40, vita: 45, parade: 10 };
+		const resolved = applySemiDirectCustomFormula(
+			replaceStatsInDiceFormula(dice, stats).formula,
+			formula
+		);
+		expect(rollCustomCriticalsFromDice(resolved, ul, undefined, stats)).toBeUndefined();
+
+		const template = { [ul("roll.critical.success")]: success("5") };
+		expect(
+			mergeCustomCriticals(
+				template,
+				rollCustomCriticalsFromDice(resolved, ul, undefined, stats)
+			)
+		).toEqual(template);
 	});
 });
