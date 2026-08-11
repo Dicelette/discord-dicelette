@@ -790,8 +790,11 @@ export class ResultAsText {
 		// as stat names are displayed per segment next to ※/◈ symbols
 		const showGlobalInfoRoll =
 			this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0);
+		// Bulk/shared results omit their own leading newline (see parse()), so the info
+		// line must supply the line break itself here or the first result sticks to it.
+		const isMultiSegmentRoll = (this.resultat?.result || "").includes(";");
 		const infoLine = showGlobalInfoRoll
-			? `\n[__${this.infoRoll!.name.capitalize()}__]`
+			? `\n[__${this.infoRoll!.name.capitalize()}__]${isMultiSegmentRoll ? "\n" : ""}`
 			: "\n";
 		return `${headerLine}${infoLine}${this.parser}${linkToOriginal}`;
 	}
