@@ -59,7 +59,6 @@ export class ResultAsText {
 		this.ul = ln(data.lang);
 		this.resultat = result;
 		this.ignoreCount = this.setIgnoreCount();
-		// Treat empty stats/comments as absent to avoid shared-roll placeholders when nothing is provided
 		this.statsPerSegment = statsPerSegment?.some((s) => s?.trim().length)
 			? statsPerSegment
 			: undefined;
@@ -99,12 +98,10 @@ export class ResultAsText {
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
 		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
-		if (header && !isSharedRoll) {
+		if (header && !isSharedRoll)
 			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
-		}
+
 		if (user.trim().length > 0) user += `${this.ul("common.space")}${compareHint}:\n`;
-		// For shared rolls with statsPerSegment, don't show global infoRoll
-		// as stat names are displayed per segment next to ※/◈ symbols
 		if (this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0))
 			return `${user}[__${this.infoRoll.name.capitalize()}__]\n`;
 		return user;
@@ -127,33 +124,23 @@ export class ResultAsText {
 		return createUrl(this.ul, context, logUrl);
 	}
 	private parseParenthesis(resultEdited: string) {
-		// Early exits for performance
 		const arrowPos = resultEdited.indexOf(" ⟶");
 		if (arrowPos === -1) return resultEdited;
-
-		// Detect dynamic dice from the original dice input
 		const diceMatch = PARSE_RESULT_PATTERNS.dynamicDice.exec(this.resultat!.dice);
 		if (!diceMatch) return resultEdited;
-
 		const diceOnly = diceMatch[1];
 		const parenMatch = PARSE_RESULT_PATTERNS.parenExpression.exec(diceOnly);
 		if (!parenMatch) return resultEdited;
-
 		try {
 			const expression = parenMatch[1];
 			const evaluated = evaluate(expression);
 			const simplifiedDice = diceOnly.replace(parenMatch[0], evaluated.toString());
-
 			const beforeArrow = resultEdited.substring(0, arrowPos);
 			const afterArrow = resultEdited.substring(arrowPos);
-
-			// Single pass to find dice position
 			const dicePos = beforeArrow.indexOf(diceOnly);
 			const simplifiedPos = dicePos === -1 ? beforeArrow.indexOf(simplifiedDice) : -1;
 			const foundPos = dicePos !== -1 ? dicePos : simplifiedPos;
 			const foundDice = dicePos !== -1 ? diceOnly : simplifiedDice;
-
-			// Check for comparison operators
 			const hasComparison =
 				foundPos !== -1
 					? PARSE_RESULT_PATTERNS.mathsSigns.test(
@@ -162,31 +149,23 @@ export class ResultAsText {
 					: PARSE_RESULT_PATTERNS.mathsSigns.test(beforeArrow.replace(/`/g, ""));
 
 			if (hasComparison) {
-				// Cache multi-segment check
 				const isMultiSegment = (this.resultat?.result || "").includes(";");
 				const isSharedCompareLine =
 					isMultiSegment && PARSE_RESULT_PATTERNS.allSharedSymbols.test(beforeArrow);
 
 				if (isSharedCompareLine) {
-					// Only replace if diceOnly is found, otherwise already simplified
 					const updatedBefore =
 						dicePos !== -1 ? beforeArrow.replace(diceOnly, simplifiedDice) : beforeArrow;
 					const updatedAfter = afterArrow.replaceAll(diceOnly, simplifiedDice);
 					return `${updatedBefore}${updatedAfter}`;
 				}
-				return resultEdited; // Keep original for non-shared compare lines
+				return resultEdited;
 			}
-
-			// Simple result lines: show mapping
 			const sharedPrefixMatch = beforeArrow.match(PARSE_RESULT_PATTERNS.beforeArrow);
 			const prefix = sharedPrefixMatch ? sharedPrefixMatch[0] : "";
 			const core = beforeArrow.substring(prefix.length);
-
-			// Determine shared context once
 			const isSharedContext =
 				prefix.includes("※") || (this.resultat?.result || "").includes(";");
-
-			// Build mapping based on what's found in core
 			let mappedCore: string;
 			const mapping = isSharedContext
 				? `\`${diceOnly}\` | ${simplifiedDice}`
@@ -196,7 +175,6 @@ export class ResultAsText {
 			else if (core.includes(simplifiedDice))
 				mappedCore = core.replace(simplifiedDice, mapping);
 			else mappedCore = mapping;
-
 			return `${prefix}${mappedCore}${afterArrow}`;
 		} catch (e) {
 			logger.warn("Failed to evaluate dynamic dice expression:", e);
@@ -206,16 +184,10 @@ export class ResultAsText {
 	private message(result: string, tot?: string | number) {
 		if (result.includes("◈")) tot = undefined;
 		let resultEdited = `${result.replaceAll(";", "\n").replaceAll(":", " ⟶")}`;
-
 		if (this.resultat?.dice?.includes("("))
 			resultEdited = this.parseParenthesis(resultEdited);
-
-		// Apply standard transformations after dynamic dice processing
 		resultEdited = resultEdited.replaceAll(";", "\n").replaceAll(":", " ⟶");
-
-		// Restore the custom colon placeholder for dynamic dice notation
 		resultEdited = resultEdited.replaceAll("⁚", ":");
-
 		if (!tot)
 			resultEdited = `${resultEdited.replaceAll(PARSE_RESULT_PATTERNS.resultEquals, " = ` $1 `")}`;
 		else
@@ -231,10 +203,7 @@ export class ResultAsText {
 		opposition?: ComparedValue
 	) {
 		if (!this.resultat) return "";
-
-		// Reset hint comparison for header at the beginning of parsing
 		this.headerCompare = undefined;
-
 		const messageResult = this.resultat.result.split(";");
 		const isSharedRoll = messageResult.length > 1;
 		let msgSuccess: string;
@@ -248,40 +217,28 @@ export class ResultAsText {
 			msgSuccess = result.msgSuccess;
 			criticalState = result.criticalState;
 		} else {
-			// Process each segment separately for shared rolls
 			const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
-			// If we have multiple segments (with or without statsPerSegment), process them individually
 			if (messageResult.length > 1) {
 				msgSuccess = "";
 				for (let i = 0; i < messageResult.length; i++) {
 					let r = messageResult[i];
-					// Remove comment from segment if we're processing shared rolls with stats
-					// The comment will be added back by formatMultipleRes via commentsPerSegment
 					if (hasStatsPerSegment && this.commentsPerSegment?.[i]) {
 						const commentToRemove = this.commentsPerSegment[i];
 						r = r.replace(`[${commentToRemove}]`, "").trim();
 					}
-					// Add a marker that formatMultipleRes can detect
 					const marker = hasStatsPerSegment ? "⚐" : "";
 					msgSuccess += `${marker}${this.message(r, " = ` [$1] `")}`;
 					msgSuccess += "\n";
 				}
 			} else msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
 		}
-
 		const comment = this.comment(interaction);
 		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
-		// Use double space indentation when there's a comment, single space otherwise
 		const separator = hasComment ? "\n  " : "\n ";
 		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join(separator);
-		// If comment contains only whitespace/newline, don't add extra space
 		if (hasComment) return ` ${comment} ${joinedRes.trimEnd()}`;
-
-		// For interaction without comment, comment() returns "\n", so prepend newline to joinedRes
 		if (comment === "\n") return `${isSharedRoll ? " " : "\n "}${joinedRes}`;
-
-		// Default case (non-interaction without comment): add space before result
 		return ` ${joinedRes}`;
 	}
 
@@ -359,25 +316,12 @@ export class ResultAsText {
 			successOrFailure = newCompare
 				? `**${this.ul("roll.success")}**`
 				: `**${this.ul("roll.failure")}**`;
-
-			// Update current comparison only if opposition is successful
 			if (newCompare) this.resultat!.compare = opposition;
-			// If the opposition fails, the original comparison is retained but the failure is displayed.
 			else this.resultat!.compare = opposition;
 		}
 		if (this.resultat?.compare) {
 			const { rollValue, value, trivial, originalDice } = this.resultat.compare;
 			if (value === 0 && trivial && !isResolvedComparator(rollValue, originalDice))
-				/*
-				throw new Error(
-					this.ul("error.invalidDice.compare", {
-						dice: this.resultat?.compare.originalDice,
-						total,
-						compare: asciiSign(this.resultat?.compare.sign),
-						rollValue,
-					})
-				);
-				*/
 				throw new DiceTypeError(
 					originalDice ?? this.resultat.dice,
 					"invalidDice.compare",
@@ -405,7 +349,6 @@ export class ResultAsText {
 		| { successOrFailure: string; isCritical: "failure" | "success" | "custom" }
 		| undefined {
 		if (critical) {
-			//if 0 is passed, ignore criticals
 			const failure = critical.failure || undefined;
 			const success = critical.success || undefined;
 			if (failure !== undefined && natural.includes(failure))
@@ -459,8 +402,7 @@ export class ResultAsText {
 			for (const [, custom] of Object.entries(customCritical)) {
 				const valueToCompare = custom.onNaturalDice ? [] : total;
 				let success: unknown;
-				if (custom.onNaturalDice)
-					success = true; // If we arrive here, the custom critical has been triggered.
+				if (custom.onNaturalDice) success = true;
 				else success = evaluate(`${valueToCompare} ${custom.sign} ${custom.value}`);
 
 				if (success) {
@@ -470,7 +412,6 @@ export class ResultAsText {
 					if (!isBulkRoll)
 						this.headerCompare = this.convertCustomCriticalToCompare(custom);
 					else {
-						// For bulk rolls, display the custom critical comparison in the result line
 						displayCompare = this.convertCustomCriticalToCompare(custom);
 						goodSign = this.goodCompareSign(displayCompare, total);
 					}
@@ -480,8 +421,6 @@ export class ResultAsText {
 		}
 
 		let oldCompareStr = "";
-		// Do not display opposition comparisons for critical failures
-		// A critical failure short-circuits any logic of comparison
 		let first = this.ul("roll.opposition");
 		if (isCritical !== "failure") {
 			if (isCritical === "custom" && opposition) {
@@ -504,14 +443,11 @@ export class ResultAsText {
 		if (resMsg.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
 			return `${this.message(r, totalSuccess).replace(PARSE_RESULT_PATTERNS.formulaDiceSymbols, `${successOrFailure} — `)}\n`;
 		}
-		// ※ marks the primary compared segment in a shared roll: include success/failure
 		if (resMsg.startsWith("※")) {
 			const rest = resMsg.replace(/^※\s*/, "");
 			return `※ ${successOrFailure} — ${rest}\n`;
 		}
-		// ◈ marks formula segments in a shared roll: no success/failure, no comparison
 		if (resMsg.startsWith("◈")) return `${resMsg}\n`;
-
 		return `${successOrFailure} — ${resMsg}\n`;
 	}
 
@@ -534,8 +470,6 @@ export class ResultAsText {
 			const commentMatch = segment.match(PARSE_RESULT_PATTERNS.commentBracket);
 			comments.push(commentMatch ? commentMatch[1] : "");
 		}
-
-		// If no actual comment is present, treat as undefined to avoid extra formatting
 		return comments.some((c) => c.trim().length > 0) ? comments : undefined;
 	}
 
@@ -593,7 +527,6 @@ export class ResultAsText {
 			const matches = PARSE_RESULT_PATTERNS.diceResultPattern.exec(res);
 			if (matches) {
 				const { entry, calc } = matches.groups || {};
-				// Decide if we should avoid backticks for simple dynamic dice mapping (non-shared, no compare)
 				const isShared =
 					(this.resultat?.result || "").includes(";") ||
 					(this.statsPerSegment && this.statsPerSegment.length > 0);
@@ -601,15 +534,10 @@ export class ResultAsText {
 				const isSimpleDynamic =
 					!isShared && !hasCompare && !!entry && entry.includes(":");
 				const entryIsBracketed = !!entry && /^\s*\[.*\]\s*$/.test(entry);
-				//const calcIsBracketed = !!calc && /^\s*\[.*\]\s*$/.test(calc);
-				// Detect if entry contains a pipe mapping (e.g., "1d(8+5) | 1d13")
 				const entryHasPipeMapping = !!entry && entry.includes(" | ");
-				// Detect if entry already has backticks (for dynamic dice mapping like `1d(8+5)`|`1d13`)
 				const entryHasBackticks = !!entry && entry.includes("`");
-
 				if (entry) {
 					const entryStr = entry.replaceAll("\\*", "×");
-					// Don't add backticks if entry already has pipe mapping, backticks, or is a simple dynamic dice
 					if (
 						!isSimpleDynamic &&
 						!(isShared && entryIsBracketed) &&
@@ -621,31 +549,24 @@ export class ResultAsText {
 				}
 				if (calc) {
 					const calcStr = calc.replaceAll("\\*", "×");
-					// Always backtick the calculation part after the arrow, even for shared rolls
 					res = res.replace(calc, `\`${calcStr.trim()}\``);
 				}
 			}
-
 			res = this.formatCriticalSymbols(
 				res,
 				criticalState.isCritical,
 				criticalState.successOrFailure
 			);
-
-			// Inject stat names and/or comments for shared rolls next to ※ or ◈ symbols
 			const hasStats = this.statsPerSegment && this.statsPerSegment.length > 0;
 			const hasComments = this.commentsPerSegment && this.commentsPerSegment.length > 0;
 
 			if (hasStats || hasComments) {
 				const hasSharedSymbol = res.match(PARSE_RESULT_PATTERNS.sharedSymbol);
-				// Detect if this is a dice result line with our marker or with ⟶ symbol
 				const hasMarker = res.startsWith("⚐");
 				const isDiceResult = res.includes(" ⟶ ");
 
-				// Remove the marker if present
-				if (hasMarker) {
-					res = res.substring(1);
-				}
+				if (hasMarker) res = res.substring(1);
+
 				if (
 					(hasSharedSymbol || hasMarker || isDiceResult) &&
 					segmentIndex <
@@ -672,35 +593,27 @@ export class ResultAsText {
 								`◈ ${header} — `
 							);
 						} else if (res.startsWith("※")) {
-							// Remove the existing ※ and add it back with the header
 							if (!res.includes(`__${comment}__`))
 								res = res.replace(/^※\s*/, `※ ${header} — `);
 							else if (statName && !res.includes(`__${statName}__`))
 								res = res.replace(/^※\s*/, `※ __${statName}__ — `);
 						} else if (isDiceResult && !hasSharedSymbol) {
-							// For lines without symbols but with dice results
-							// Use ※ for first segment, ◈ for subsequent ones
 							const symbol = segmentIndex === 0 ? "※" : "◈";
-							// Remove any existing comment/statName already present in res to avoid duplication
 							let cleanRes = res;
-							// The comment might appear as __comment__ or [comment] in the result
 							if (comment) {
 								cleanRes = cleanRes.replace(`__${comment}__ — `, "").trim();
 								cleanRes = cleanRes.replace(`[${comment}]`, "").trim();
 							}
 							if (statName) cleanRes = cleanRes.replace(`__${statName}__`, "").trim();
-
-							// Clean up any multiple or leading/trailing separators
 							cleanRes = cleanRes
 								.replace(PARSE_RESULT_PATTERNS.sharedStartSymbol, "")
-								.replace(/\s*—\s*/g, " — ") // Normalize all separators
-								.replace(/^—\s*|\s*—$/g, "") // Remove leading/trailing separators
-								.replace(/—\s*—/g, "—") // Remove double separators
+								.replace(/\s*—\s*/g, " — ")
+								.replace(/^—\s*|\s*—$/g, "")
+								.replace(/—\s*—/g, "—")
 								.trim();
 							res = `${symbol} ${header} — ${cleanRes}`;
 						}
 					}
-					// Increment segment index only if we processed a shared symbol line
 					segmentIndex++;
 				}
 			}
@@ -725,8 +638,6 @@ export class ResultAsText {
 				PARSE_RESULT_PATTERNS.formulaDiceSymbols,
 				`${successOrFailure} —`
 			);
-
-		// Do not replace the symbol ※, which is used for rolls without comparison.
 		return res
 			.replace("✕", `◈ **${this.ul("roll.failure")}** —`)
 			.replace("✓", `◈ **${this.ul("roll.success")}** —`);
@@ -772,29 +683,21 @@ export class ResultAsText {
 				messageId: context.messageId,
 			});
 		else if (context) linkToOriginal = this.createUrl(undefined, context);
-
-		// Build the reference (character > author if available)
 		let mention = authorId ? `*<@${authorId}>*` : "";
 		if (this.charName)
 			mention = `**__${this.charName.capitalize()}__**${mention.length > 0 ? ` (${mention})` : ""}`;
-
-		// Display only the comparison next to the username (not for shared rolls — it's inline)
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
 		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
 		if (header && !isSharedRoll)
 			compareHint = ` (\`${asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
-
 		const headerLine = `${mention}${compareHint}${this.ignoreCount}${timestamp(this.data.config?.timestamp)}`;
-		// For shared rolls with statsPerSegment, don't show global infoRoll
-		// as stat names are displayed per segment next to ※/◈ symbols
 		const showGlobalInfoRoll =
 			this.infoRoll && (!this.statsPerSegment || this.statsPerSegment.length === 0);
-		// Bulk/shared results omit their own leading newline (see parse()), so the info
-		// line must supply the line break itself here or the first result sticks to it.
 		const isMultiSegmentRoll = (this.resultat?.result || "").includes(";");
+		const hasComment = !!this.resultat?.comment;
 		const infoLine = showGlobalInfoRoll
-			? `\n[__${this.infoRoll!.name.capitalize()}__]${isMultiSegmentRoll ? "\n" : ""}`
+			? `\n[__${this.infoRoll!.name.capitalize()}__]${isMultiSegmentRoll && !hasComment ? "\n" : ""}`
 			: "\n";
 		return `${headerLine}${infoLine}${this.parser}${linkToOriginal}`;
 	}

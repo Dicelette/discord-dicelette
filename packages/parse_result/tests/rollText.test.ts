@@ -419,6 +419,33 @@ describe("bulk comparison rolls", () => {
 		);
 	});
 
+	it("should keep the comment on the same line as infoRoll for bulk rolls (onMessageSend)", () => {
+		// Regression test: fixing the missing newline above must not force a break
+		// between "[__Combat__]" and a comment — the comment stays on that line,
+		// and only the dice results move to their own (indented) lines below it.
+		const result: Resultat = {
+			comment: "cc",
+			compare: { sign: "<=", value: 90 },
+			dice: "10#d100<=90 /* cc */",
+			result:
+				"1d100: [53] = 53;1d100: [85] = 85;1d100: [3] = 3;1d100: [49] = 49;1d100: [24] = 24",
+			total: 214,
+		};
+
+		const res = new ResultAsText(result, DATA, undefined, "Charles", {
+			name: "Combat",
+			standardized: "combat",
+		});
+		const text = res.onMessageSend(undefined, "189390243676422144");
+
+		const infoLine = text.split("\n").find((l) => l.includes("[__Combat__]"));
+		expect(infoLine?.trim()).toBe("[__Combat__] *cc*");
+		// Dice results should still be on their own separate lines
+		expect(text).toMatch(
+			/\[__Combat__\]\s+\*cc\*\n\s*.*\*\*(Success|Failure|Succès|Échec)\*\*/
+		);
+	});
+
 	it("should display custom critical comparison in bulk roll result lines", () => {
 		// Test case: 5#d100<=60 with a success critical at natural 98
 		const result: Resultat = {
