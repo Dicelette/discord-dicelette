@@ -13,6 +13,7 @@ interface DashboardCacheEntry {
 		isStrictAdmin: boolean;
 		userCharCount: number;
 		userConfigData: ApiUserConfig["userConfig"];
+		hasTemplate: boolean;
 		serverCharCount: number;
 		config: ApiGuildData | null;
 		channels: Channel[];
@@ -42,6 +43,7 @@ interface State {
 	isAdmin: boolean;
 	isStrictAdmin: boolean;
 	userCharCount: number;
+	hasTemplate: boolean;
 	serverCharCount: number;
 	config: ApiGuildData | null;
 	userConfigData: ApiUserConfig["userConfig"];
@@ -66,6 +68,7 @@ type Action =
 			isStrictAdmin: boolean;
 			userCharCount: number;
 			userConfigData: ApiUserConfig["userConfig"];
+			hasTemplate: boolean;
 			tab: ActiveTab;
 	  }
 	| { type: "config_loaded"; config: ApiGuildData }
@@ -94,6 +97,7 @@ function reducer(state: State, action: Action): State {
 				isStrictAdmin: action.isStrictAdmin,
 				userCharCount: action.userCharCount,
 				userConfigData: action.userConfigData,
+				hasTemplate: action.hasTemplate,
 				tab: action.tab,
 				mountedTabs: new Set([action.tab]),
 			};
@@ -156,6 +160,7 @@ export function useDashboard(guildId: string | undefined) {
 		isAdmin: false,
 		isStrictAdmin: false,
 		userCharCount: 0,
+		hasTemplate: false,
 		serverCharCount: 0,
 		config: null,
 		userConfigData: null,
@@ -182,6 +187,7 @@ export function useDashboard(guildId: string | undefined) {
 				isStrictAdmin,
 				userCharCount,
 				userConfigData,
+				hasTemplate,
 				serverCharCount,
 				config,
 				channels,
@@ -195,6 +201,7 @@ export function useDashboard(guildId: string | undefined) {
 				isStrictAdmin,
 				userCharCount,
 				userConfigData,
+				hasTemplate,
 				tab: getInitialTab(isAdmin, userCharCount),
 			});
 			if (config) dispatch({ type: "config_loaded", config });
@@ -225,6 +232,7 @@ export function useDashboard(guildId: string | undefined) {
 					isStrictAdmin,
 					userConfig,
 					userCharCount,
+					hasTemplate,
 					serverCharCount,
 					config,
 					channels,
@@ -247,6 +255,7 @@ export function useDashboard(guildId: string | undefined) {
 					isStrictAdmin: strictAdmin,
 					userCharCount: nextUserCharCount,
 					userConfigData: userConfig,
+					hasTemplate,
 					tab: initialTab,
 				});
 
@@ -257,6 +266,7 @@ export function useDashboard(guildId: string | undefined) {
 						isStrictAdmin: strictAdmin,
 						userCharCount: nextUserCharCount,
 						userConfigData: userConfig,
+						hasTemplate,
 						serverCharCount: nextServerCharCount,
 						config: nextConfig,
 						channels: nextChannels,

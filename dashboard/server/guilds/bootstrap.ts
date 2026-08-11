@@ -15,7 +15,9 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 
 		const isAdmin = await userCanManageGuild(userId, guildId, botGuilds, settings);
 		const userConfig = userSettings.get(guildId, userId) ?? null;
-		const userCharCount = (settings.get(guildId)?.user?.[userId] ?? []).length;
+		const guildDataForCounts = settings.get(guildId);
+		const userCharCount = (guildDataForCounts?.user?.[userId] ?? []).length;
+		const hasTemplate = Boolean(guildDataForCounts?.templateID?.channelId);
 
 		let isStrictAdmin = false;
 		const guild = botGuilds.get(guildId);
@@ -38,6 +40,7 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 				isStrictAdmin,
 				userConfig,
 				userCharCount,
+				hasTemplate,
 				serverCharCount: 0,
 				config: null,
 				channels: [],
@@ -48,7 +51,7 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const guildConfig = settings.get(guildId);
+		const guildConfig = guildDataForCounts;
 		if (!guildConfig) {
 			res.status(404).json({ error: "Guild not configured or bot not present" });
 			return;
@@ -69,6 +72,7 @@ export function createBootstrapRouter(deps: DashboardDeps) {
 			isStrictAdmin,
 			userConfig,
 			userCharCount,
+			hasTemplate,
 			serverCharCount,
 			config: safeConfig,
 			channels,

@@ -75,6 +75,8 @@ export interface ApiDashboardBootstrap {
 	isStrictAdmin: boolean;
 	userConfig: Partial<UserSettingsData> | null;
 	userCharCount: number;
+	/** true = the server has a statistical template configured (visible to all members, read-only) */
+	hasTemplate: boolean;
 	serverCharCount: number;
 	config: ApiGuildData | null;
 	channels: ApiChannel[];

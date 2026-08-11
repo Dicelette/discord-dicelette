@@ -108,6 +108,7 @@
 			"characters": "My characters",
 			"serverCharacters": "Server characters",
 			"template": "Model configuration",
+			"templateView": "Model",
 			"user": "Personal configuration"
 		},
 		"title": "Server configuration",

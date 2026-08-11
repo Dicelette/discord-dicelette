@@ -108,6 +108,7 @@
 			"characters": "Mes personnages",
 			"serverCharacters": "Personnages du serveur",
 			"template": "Configuration du modèle",
+			"templateView": "Modèle",
 			"user": "Configuration personnelle"
 		},
 		"title": "Configuration du serveur",

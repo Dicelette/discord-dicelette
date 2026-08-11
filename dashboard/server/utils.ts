@@ -248,6 +248,48 @@ export async function userCanRefreshServerCharacters(
 	}
 }
 
+/**
+ * Vérifie si un utilisateur est simplement membre du serveur (sans exigence de
+ * permission particulière). Utilisé pour les routes en lecture seule ouvertes à
+ * tout le monde, comme la consultation du modèle statistique.
+ */
+export async function userIsGuildMember(
+	userId: string,
+	guildId: string,
+	botGuilds: DashboardDeps["botGuilds"]
+): Promise<boolean> {
+	const cacheKey = `member:${userId}:${guildId}`;
+	const hit = getCached(cacheKey);
+	if (hit !== null) return hit;
+
+	const guild = botGuilds.get(guildId);
+	if (!guild) return setCached(cacheKey, false);
+
+	try {
+		const member = await guild.fetchMember(userId);
+		return setCached(cacheKey, member !== null);
+	} catch {
+		return setCached(cacheKey, false);
+	}
+}
+
+/**
+ * Middleware factory qui autorise tout membre du serveur (pas seulement les
+ * admins). À utiliser sur les routes en lecture seule accessibles à tous.
+ */
+export function makeRequireGuildMember(botGuilds: DashboardDeps["botGuilds"]) {
+	return async (req: Request, res: Response, next: () => void) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.auth!.userId;
+		const isMember = await userIsGuildMember(userId, guildId, botGuilds);
+		if (!isMember) {
+			res.status(403).json({ error: "Not a member of this server" });
+			return;
+		}
+		next();
+	};
+}
+
 export async function userCanAccessChannel(
 	userId: string,
 	guildId: string,

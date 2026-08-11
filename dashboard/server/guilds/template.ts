@@ -4,52 +4,59 @@ import { Locale } from "discord-api-types/v6";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "../types";
-import { makeRequireAdmin, requireAuth } from "../utils";
+import { makeRequireAdmin, makeRequireGuildMember, requireAuth } from "../utils";
 
 export function createTemplateRouter(deps: DashboardDeps) {
 	const { settings, template, botChannels, botGuilds } = deps;
 	const router = Router({ mergeParams: true });
 	const requireAdmin = makeRequireAdmin(botGuilds, settings);
+	const requireGuildMember = makeRequireGuildMember(botGuilds);
 
-	// GET /guildId/template — retrieves the statistical template of the server (admin only)
-	router.get("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
-		const guildId = req.params.guildId as string;
+	// GET /guildId/template — retrieves the statistical template of the server
+	// (read-only, open to any member of the server)
+	router.get(
+		"/",
+		requireAuth,
+		requireGuildMember,
+		async (req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
 
-		// Priority: in-memory cache
-		const cached = template.get(guildId);
-		if (cached) {
-			res.json(cached);
-			return;
-		}
-
-		// Fallback: retrieves the attachment from Discord
-		const config = settings.get(guildId);
-		if (!config?.templateID?.channelId || !config.templateID.messageId) {
-			// Expected behavior: no template registered on this server
-			res.json(null);
-			return;
-		}
-
-		try {
-			const msg = await botChannels.fetchMessage(
-				config.templateID.channelId,
-				config.templateID.messageId
-			);
-			if (!msg) {
-				res.status(404).json({ error: "Template message not found" });
+			// Priority: in-memory cache
+			const cached = template.get(guildId);
+			if (cached) {
+				res.json(cached);
 				return;
 			}
-			const attachment = msg.attachments.find((a) => a.filename === "template.json");
-			if (!attachment) {
-				res.status(404).json({ error: "Template attachment not found" });
+
+			// Fallback: retrieves the attachment from Discord
+			const config = settings.get(guildId);
+			if (!config?.templateID?.channelId || !config.templateID.messageId) {
+				// Expected behavior: no template registered on this server
+				res.json(null);
 				return;
 			}
-			const templateData = await fetch(attachment.url).then((r) => r.json());
-			res.json(templateData);
-		} catch {
-			res.status(500).json({ error: "Failed to fetch template" });
+
+			try {
+				const msg = await botChannels.fetchMessage(
+					config.templateID.channelId,
+					config.templateID.messageId
+				);
+				if (!msg) {
+					res.status(404).json({ error: "Template message not found" });
+					return;
+				}
+				const attachment = msg.attachments.find((a) => a.filename === "template.json");
+				if (!attachment) {
+					res.status(404).json({ error: "Template attachment not found" });
+					return;
+				}
+				const templateData = await fetch(attachment.url).then((r) => r.json());
+				res.json(templateData);
+			} catch {
+				res.status(500).json({ error: "Failed to fetch template" });
+			}
 		}
-	});
+	);
 
 	// POST /:guildId/template — imports or updates the statistical template (admin only)
 	router.post("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {

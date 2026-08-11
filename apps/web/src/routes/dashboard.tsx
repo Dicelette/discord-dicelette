@@ -34,6 +34,9 @@ import { useToast } from "../providers";
 import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
+const TemplateReadOnly = lazy(
+	() => import("../features/template-config/TemplateReadOnly")
+);
 
 function TabPanel({
 	value,
@@ -62,6 +65,7 @@ export default function Dashboard() {
 		isAdmin,
 		isStrictAdmin,
 		userCharCount,
+		hasTemplate,
 		serverCharCount,
 		config,
 		userConfigData,
@@ -180,6 +184,9 @@ export default function Dashboard() {
 			>
 				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
 				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
+				{!isAdmin && hasTemplate && (
+					<Tab value="template" label={t("dashboard.tabs.templateView")} wrapped />
+				)}
 				{isAdmin && config?.templateID?.channelId && (
 					<Tab
 						value="server-characters"
@@ -220,6 +227,13 @@ export default function Dashboard() {
 							onTemplateChange={refetchConfig}
 							onCharactersDeleted={handleCharactersRefresh}
 						/>
+					</Suspense>
+				</TabPanel>
+			)}
+			{!isAdmin && hasTemplate && (
+				<TabPanel value="template" current={tab} mounted={mountedTabs}>
+					<Suspense fallback={<CircularProgress />}>
+						<TemplateReadOnly guildId={guildId!} />
 					</Suspense>
 				</TabPanel>
 			)}
