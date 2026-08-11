@@ -116,11 +116,24 @@ export const PARSE_RESULT_PATTERNS = {
 	sharedStartSymbol: /^◈\s+/,
 	sharedSymbol: /^([※◈])/,
 	successSymbol: /^◈\s+\*\*/,
+	/**
+	 * A single line's trailing italic span, capturing whatever precedes it (e.g. an
+	 * `[__Stat__] ` info-roll header) as `prefix`. Unlike `COMPILED_COMMENTS`, the prefix
+	 * isn't restricted to whitespace/`_ _` — callers that need to rule out matching inside a
+	 * dice-result line (which can itself contain `**bold**`) must do so before testing this.
+	 * `comment` is `undefined` when the line has no trailing italic span at all.
+	 */
+	trailingComment: /^(?<prefix>.*?)(?:\*(?<comment>.*)\*)?$/,
 } as const;
 
 export const CHARACTER_DETECTION = / @([\p{L}\p{M}._-]+)/u;
 export const MENTION_ID_DETECTION = /<[@#]&?(\d+)>>?/;
 export const COMPILED_COMMENTS = /^(_ _|\s+)?(?<comment>\*.*?\*)$/gm;
+/** The `*<@id>*` (or `<@id>*`/`*<@id>`) mention embedded in a rendered roll-result message. */
+export const ROLL_MENTION_PATTERN = /\*<?@(?<id>\d+)>?\*/;
+/** A Discord message link, as produced by `createUrl()` (`https://discord.com/channels/g/c/m`). */
+export const MESSAGE_LINK_PATTERN =
+	/https:\/\/discord\.com\/channels\/(?<guildId>\d+)\/(?<channelId>\d+)\/(?<messageId>\d+)/;
 
 export function verifyAvatarUrl(url: string) {
 	if (url.length === 0) return false;

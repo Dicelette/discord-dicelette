@@ -1,6 +1,7 @@
 import type { EClient } from "@dicelette/client";
 import { findln } from "@dicelette/localization";
 import { type Count, type CriticalCount, IGNORE_COUNT_KEY } from "@dicelette/types";
+import { ROLL_MENTION_PATTERN } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { clearCacheKey, createCacheKey } from "../commands";
 
@@ -60,9 +61,7 @@ export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | u
 	if (message.interactionMetadata?.user && !message.content)
 		return message.interactionMetadata.user.id;
 	if (!message.content) return undefined;
-	const regAuthor = /\*<?@(.*?)>?\*/;
-	const match = regAuthor.exec(message.content);
-	return match?.[1];
+	return ROLL_MENTION_PATTERN.exec(message.content)?.groups?.id;
 }
 
 /**

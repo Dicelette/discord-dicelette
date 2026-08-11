@@ -282,6 +282,11 @@ export type UserSettingsData = {
 	 * @example "$>=85?85{cs:>=5+($-85)}:$"
 	 */
 	customFormula?: string;
+	/**
+	 * Unix timestamp (ms) of the last time this user was DM'd that a roll-result copy couldn't be synced after a comment edit.
+	 * Used to throttle that warning.
+	 */
+	commentEditWarnedAt?: number;
 };
 
 export type UserPreferences = {

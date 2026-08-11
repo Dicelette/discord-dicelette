@@ -57,6 +57,12 @@ export const IGNORE_COUNT_KEY = {
 	key: "/ignore/",
 };
 
+/**
+ * Required prefix on a reply to a roll-result message for it to be treated as a
+ * comment edit, rather than an ordinary reply. Not configurable per-guild by design.
+ */
+export const COMMENT_EDIT_PREFIX = "/edit/";
+
 export enum LinksVariables {
 	NAME = "{{name}}",
 	INFO = "{{info}}",

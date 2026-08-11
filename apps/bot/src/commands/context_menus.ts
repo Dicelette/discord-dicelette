@@ -6,7 +6,7 @@ import {
 	type TemplateResult,
 	type Translation,
 } from "@dicelette/types";
-import { logger } from "@dicelette/utils";
+import { logger, MESSAGE_LINK_PATTERN } from "@dicelette/utils";
 import * as Djs from "discord.js";
 
 type Results = {
@@ -246,8 +246,10 @@ function getVariablesTemplate(message: string, messageUrl: string) {
 
 	const nameReg = /\[__(?<name>.*)__]/gi;
 	const name = nameReg.exec(message)?.groups?.name;
-	const regexSavedDice =
-		/-# ↪ (?<saved>https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+)/gi;
+	const regexSavedDice = new RegExp(
+		`-# ↪ (?<saved>${MESSAGE_LINK_PATTERN.source})`,
+		"gi"
+	);
 	const savedDice = regexSavedDice.exec(message)?.groups?.saved;
 
 	const characterReg = /__\*\*(?<character>.*)\*\*__/gi;
