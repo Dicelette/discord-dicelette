@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.6.4](https://github.com/Dicelette/discord-dicelette/compare/4.6.3...4.6.4) (2026-08-11)
+
+### Bug Fixes
+
+* **bulkroll:** display result on a new line for bulk roll that have comments ([dd5a71a](https://github.com/Dicelette/discord-dicelette/commit/dd5a71aae3afd892613737a6f4156b38e6c3f5e5))
+* **result:** new line for bulk roll comments with inforoll ([bb885bc](https://github.com/Dicelette/discord-dicelette/commit/bb885bc18fdcfdefaa40252a5c0a3d75fb734e6e))
+* **roll:** apply semi direct formula after replacing stats in dice formula, as in /roll ([43fc81e](https://github.com/Dicelette/discord-dicelette/commit/43fc81eb23118eaeb88abe251887a1222184e078))
 ## [4.6.3](https://github.com/Dicelette/discord-dicelette/compare/4.6.2...4.6.3) (2026-08-10)
 
 ### Bug Fixes
