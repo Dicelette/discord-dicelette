@@ -8,6 +8,7 @@ import {
 	isNotADice,
 	isRolling,
 	parseComparator,
+	replaceStatsInDiceFormula,
 	rollCustomCriticalsFromDice,
 } from "@dicelette/parse_result";
 import {
@@ -80,6 +81,7 @@ export default (client: EClient): void => {
 			const customFormula = resolveCustomFormula(guildSettings, userSettingsData) ?? "$";
 			// Free-text rolls have no "expression" option to feed getExpression, so
 			content = getExpression(content, "0").dice;
+			const rawContent = content;
 			content = applySemiDirectCustomFormula(content, customFormula);
 			const isRoll = isRolling(
 				content,
@@ -97,13 +99,35 @@ export default (client: EClient): void => {
 			const { result, detectRoll, infoRoll, statsPerSegment } = isRoll;
 			const deleteInput = !detectRoll;
 			if (!result) return;
+			// Same order as the slash commands (getExpression → resolve stats → apply the
+			// custom formula): the formula's {cs:...}/{cf:...} can only be pruned to the
+			// branch actually taken once $stat placeholders are real numbers.
+			const contentForCritical = userData?.stats
+				? applySemiDirectCustomFormula(
+						replaceStatsInDiceFormula(
+							rawContent,
+							userData.stats,
+							undefined,
+							undefined,
+							statsName,
+							ul
+						).formula,
+						customFormula
+					)
+				: content;
 			const { criticalsFromDice, serverData } = await getCritical(
 				client,
 				ul,
 				result.dice,
 				message.guild,
 				userData,
-				rollCustomCriticalsFromDice(content, ul, undefined, userData?.stats, sortOrder),
+				rollCustomCriticalsFromDice(
+					contentForCritical,
+					ul,
+					undefined,
+					userData?.stats,
+					sortOrder
+				),
 				sortOrder
 			);
 
