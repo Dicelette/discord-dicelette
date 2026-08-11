@@ -15,7 +15,7 @@ import dedent from "dedent";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 
-import { VERSION } from "../../../../index";
+import { VERSION } from "../../../../version";
 import "@dicelette/discord_ext";
 import { getConfigIds, getHelpDBCmd, getIDForAdminDB } from "./commandId";
 import { createHelpMessageDB } from "./createHelpMessage";

@@ -4,7 +4,7 @@ import { LINKS, type Translation } from "@dicelette/types";
 import { humanizeDuration } from "@dicelette/utils";
 import dedent from "dedent";
 import * as Djs from "discord.js";
-import { VERSION } from "../../..";
+import { VERSION } from "../../../version";
 
 export const info = {
 	data: new Djs.SlashCommandBuilder()

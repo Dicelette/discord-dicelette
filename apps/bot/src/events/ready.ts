@@ -17,16 +17,13 @@ import {
 import { getTemplate, getUser } from "database";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
-import { PRIVATE_ID, VERSION } from "../../index";
+import { PRIVATE_ID, VERSION } from "../../version";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
 export default (client: EClient): void => {
 	client.on("clientReady", async () => {
 		if (!client.user || !client.application || !process.env.CLIENT_ID) return;
-		// Build the Set lazily inside the handler: PRIVATE_ID comes from the parent
-		// module (`../../index`) which sits in an import cycle with this file, so
-		// reading it at top-level trips a temporal dead zone at module load.
 		const privateIdSet = new Set(PRIVATE_ID);
 		logger.trace(`${client.user.username} is online; v.${VERSION}`);
 		let serializedCommands = COMMANDS_GLOBAL.map((x) => {

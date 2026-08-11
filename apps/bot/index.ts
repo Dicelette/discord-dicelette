@@ -12,19 +12,14 @@ import { client } from "client";
 import dotenv from "dotenv";
 import * as event from "event";
 import express from "express";
-import packageJson from "../../package.json" with { type: "json" };
 import "uniformize";
 import { startBotDashboard } from "./src/dashboard";
+import { VERSION } from "./version";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 setupProcessErrorHandlers();
 
 important.info("Starting bot...");
-//@ts-ignore
-export const VERSION = packageJson.version ?? "/";
-export const PRIVATE_ID = (process.env.PRIVATE_ID ?? "453162143668371456")
-	.split(",")
-	.map((id) => id.trim());
 const guildEvents = new EventEmitter();
 
 try {
