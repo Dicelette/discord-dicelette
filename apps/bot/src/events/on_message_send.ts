@@ -14,6 +14,7 @@ import {
 import {
 	allValuesUndefined,
 	CHARACTER_DETECTION,
+	DICE_PATTERNS,
 	logger,
 	sentry,
 } from "@dicelette/utils";
@@ -62,10 +63,16 @@ export default (client: EClient): void => {
 				}
 			}
 
+			const bracketRollMatch = content.match(DICE_PATTERNS.BRACKET_ROLL);
+			const charDetectionSource = bracketRollMatch ? bracketRollMatch[1] : content;
+
 			let firstChara: string | undefined;
 			if (content.match(REMOVER_PATTERN.STAT_MATCHER))
 				firstChara = await getCharFromText(client, message.guild.id, author.id, content);
-			if (firstChara) content = content.replace(CHARACTER_DETECTION, "").trim();
+			if (firstChara) {
+				const charMatch = charDetectionSource.match(CHARACTER_DETECTION);
+				if (charMatch) content = content.replace(charMatch[0], "").trim();
+			}
 			const data = await getUserFromMessage(client, author.id, message, firstChara, {
 				attributes: true,
 				skipNotFound: true,
@@ -73,9 +80,12 @@ export default (client: EClient): void => {
 			const userData = data?.userData;
 			let charName = data?.charName ?? firstChara;
 
-			if (!charName && content.match(CHARACTER_DETECTION)) {
-				charName = content.match(CHARACTER_DETECTION)![1];
-				content = content.replace(CHARACTER_DETECTION, "").trim();
+			if (!charName) {
+				const charMatch = charDetectionSource.match(CHARACTER_DETECTION);
+				if (charMatch) {
+					charName = charMatch[1];
+					content = content.replace(charMatch[0], "").trim();
+				}
 			}
 			const ctx = getGuildContext(client, message.guild.id);
 			const statsName = resolveStatsNames(userData, ctx?.templateID?.statsName);
