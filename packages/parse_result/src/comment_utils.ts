@@ -18,6 +18,14 @@ export function getComments(content: string, comments?: string) {
 }
 
 /**
+ * Strip a leading `#` comment marker (and one following space) and trim whitespace.
+ */
+export function stripCommentPrefix(c?: string): string | undefined {
+	if (!c) return undefined;
+	return c.replace(/^# ?/, "").trim();
+}
+
+/**
  * Extract and merge comments from multiple sources (dice formula, user input)
  * Handles stat markers (%%[__stat__]%%), deduplicates comments, and formats
  * for shared vs single dice rolls.
@@ -46,14 +54,6 @@ export function extractAndMergeComments(
 	// Once an explicit "#" comment exists, it is authoritative; drop the heuristic.
 	if (tailComments && globalRaw) tailComments = undefined;
 
-	/**
-	 * Strip # prefix and trim whitespace from comment string
-	 */
-	function stripMeta(c?: string): string | undefined {
-		if (!c) return undefined;
-		return c.replace(/^# ?/, "").trim();
-	}
-
 	const partsRaw = [globalRaw, tailComments, userComments];
 	const statsMarkers: string[] = [];
 	const commentTexts: string[] = [];
@@ -63,7 +63,7 @@ export function extractAndMergeComments(
 		if (!part?.trim().length) continue;
 		const markers = part.match(/%%\[__.*?__]%%/g) ?? [];
 		for (const m of markers) if (!statsMarkers.includes(m)) statsMarkers.push(m);
-		const cleanedPart = stripMeta(part.replace(/%%\[__.*?__]%%/g, "").trim());
+		const cleanedPart = stripCommentPrefix(part.replace(/%%\[__.*?__]%%/g, "").trim());
 		if (cleanedPart && cleanedPart.length > 0) commentTexts.push(cleanedPart);
 	}
 

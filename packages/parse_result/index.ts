@@ -2,6 +2,7 @@ export * from "./src/comment_utils";
 export * from "./src/compose_roll";
 export * from "./src/custom_critical";
 export * from "./src/dice_extractor";
+export * from "./src/edit_comment";
 export * from "./src/interfaces";
 export * from "./src/parse_embed";
 export * from "./src/result_as_text";

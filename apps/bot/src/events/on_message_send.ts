@@ -19,7 +19,7 @@ import {
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage, resolveStatsNames } from "database";
 import * as Djs from "discord.js";
-import { handleRollResult, saveCount, stripOOC } from "messages";
+import { handleCommentEditReply, handleRollResult, saveCount, stripOOC } from "messages";
 import { getCritical } from "utils";
 import { triggerPity } from "../commands";
 import { isApiError, sendErrorToDM } from "./on_error";
@@ -38,6 +38,11 @@ export default (client: EClient): void => {
 				message.guild.preferredLocale ??
 				Djs.Locale.EnglishUS;
 			const ul = ln(userLang);
+
+			if (!message.author.bot && message.reference?.messageId) {
+				const editedComment = await handleCommentEditReply(message, client, ul);
+				if (editedComment) return;
+			}
 
 			if (message.author.bot && message.author.id === client.user?.id)
 				return saveCount(message, client.criticalCount, message.guild.id, client);

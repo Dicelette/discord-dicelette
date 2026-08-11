@@ -677,7 +677,9 @@
 		"private": "This character sheet is private! \nYou do not have permission to read it.",
 		"public": "You cannot choose the channel {{- chan}} without choosing a channel where to post the character sheet, because it will be impossible to create a thread there.",
 		"roll": {
-			"channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration."
+			"channelNotFound": "The channel configured by the `/{{- command}}` command was not found. \nUsing the default configuration.",
+			"copyNotSynced": "I updated the comment on your roll, but couldn't find the copy of that result (it was probably posted in a thread) to update it too. \nIt may still show the old comment.",
+			"notYourRoll": "You can only edit the comment of your own rolls."
 		},
 		"sign": "The used sign is invalid.\nSigns accepted are : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nYou used: `{{-sign}}`.",
 		"stats": {

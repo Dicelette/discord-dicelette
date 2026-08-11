@@ -677,7 +677,9 @@
 		"private": "Cette fiche est privée ! Vous n'avez pas la permissions pour la lire.",
 		"public": "Vous ne pouvez pas choisir le channel {{- chan}} sans choisir un channel où poster les fiches, car il sera impossible d'y créer un thread.",
 		"roll": {
-			"channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut."
+			"channelNotFound": "Le channel configuré par la commande `/{{- command}}` n'a pas été trouvé. Utilisation de la configuration par défaut.",
+			"copyNotSynced": "J'ai mis à jour le commentaire de ton jet, mais je n'ai pas retrouvé la copie de ce résultat (probablement postée dans un thread) pour la mettre à jour aussi. \nElle affichera peut-être encore l'ancien commentaire.",
+			"notYourRoll": "Vous ne pouvez modifier le commentaire que de vos propres jets de dés."
 		},
 		"sign": "Le signe utilisé est invalide.\nLes signes acceptés sont : `>`, `>=`, `<`, `<=`, `==`, `!=`, `+`, `-`, `*`, `/`, `%`.\nVous avez utilisé : `{{- sign}}`.",
 		"stats": {
