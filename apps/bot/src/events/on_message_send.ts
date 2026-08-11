@@ -41,7 +41,10 @@ export default (client: EClient): void => {
 
 			if (!message.author.bot && message.reference?.messageId) {
 				const editedComment = await handleCommentEditReply(message, client, ul);
-				if (editedComment) return;
+				if (editedComment) {
+					await message.delete();
+					return;
+				}
 			}
 
 			if (message.author.bot && message.author.id === client.user?.id)
