@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.7.0](https://github.com/Dicelette/discord-dicelette/compare/4.6.4...4.7.0) (2026-08-11)
+
+### Features
+
+* **comment:** add functionality to edit roll comments and handle synchronization ([505792e](https://github.com/Dicelette/discord-dicelette/commit/505792eb57fdc5e794f1fd15eba2c75f469de7df))
+* **comments:** add COMMENT_EDIT_PREFIX constant and enhance regex patterns for message handling ([bf0cc41](https://github.com/Dicelette/discord-dicelette/commit/bf0cc41cb42f12a81ffb2f44e5898935523aea2e))
+* **template:** add read-only template view for guild members ([f4e3785](https://github.com/Dicelette/discord-dicelette/commit/f4e37857c919bed873cf0bf03b5fef4697b91016))
 ## [4.6.4](https://github.com/Dicelette/discord-dicelette/compare/4.6.3...4.6.4) (2026-08-11)
 
 ### Bug Fixes
