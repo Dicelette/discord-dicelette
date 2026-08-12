@@ -296,7 +296,7 @@ function infoUserCalc(
 	mentionUser = charName ? `${titleCharName} (${mentionUser})` : mentionUser;
 	let user = mentionUser;
 	if (time) user += `${timestamp(time)}`;
-	if (user.trim().length > 0) user += `${data.ul("common.space")}:\n`;
+	if (user.trim().length > 0) user += "\n";
 	return `${user}${EMOJI_MATH}[__${stat ? stat.capitalize() : data.ul("math.result")}__]${comments ? ` *${comments}*` : ""}`;
 }
 
