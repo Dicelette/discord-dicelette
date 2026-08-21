@@ -61,8 +61,6 @@ export interface ApiCharacter {
 	ownerName?: string;
 }
 
-export type { Count };
-
 /** A single user's karma entry — used both for the dashboard's own/search list and the public share page. */
 export interface ApiKarmaEntry {
 	userId: string;
