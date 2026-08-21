@@ -106,6 +106,7 @@
 		"tabs": {
 			"admin": "Server configuration",
 			"characters": "My characters",
+			"karma": "Karma",
 			"serverCharacters": "Server characters",
 			"template": "Model configuration",
 			"templateView": "Model",
@@ -113,6 +114,23 @@
 		},
 		"title": "Server configuration",
 		"userOnlyNotice": "You don't have admin permissions on this server. You can still manage your personal settings below."
+	},
+	"karma": {
+		"average": "Average",
+		"loadError": "Could not load karma data.",
+		"myKarma": "My karma",
+		"noData": "No karma data available on this server yet.",
+		"noPersonalData": "You don't have any recorded rolls yet.",
+		"noSearchResults": "No player matches the search.",
+		"notFound": "No karma data for this user.",
+		"publicTitle": "Karma",
+		"searchPlaceholder": "Search by name…",
+		"searchTitle": "Search a player",
+		"serverStats": "Server statistics",
+		"share": "Share this karma page",
+		"title": "Karma",
+		"totalRolls": "Total rolls: {rollTotal} by {usersWithCounts} players",
+		"unnamed": "Unknown player"
 	},
 	"login": {
 		"button": "Sign in with Discord",

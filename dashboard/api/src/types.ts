@@ -61,6 +61,41 @@ export interface ApiCharacter {
 	ownerName?: string;
 }
 
+export interface ApiKarmaCount {
+	success: number;
+	failure: number;
+	criticalFailure: number;
+	criticalSuccess: number;
+	total?: number;
+	consecutive?: { success: number; failure: number };
+	longestStreak?: { success: number; failure: number };
+}
+
+/** A single user's karma entry — used both for the dashboard's own/search list and the public share page. */
+export interface ApiKarmaEntry {
+	userId: string;
+	/** Discord handle (@username) — `null` if unresolvable. */
+	displayName: string | null;
+	count: ApiKarmaCount;
+}
+
+export interface ApiKarmaOverview {
+	/** The requesting user's own karma — `null` if they have no tracked rolls yet. */
+	me: ApiKarmaCount | null;
+	server: {
+		rollTotal: number;
+		usersWithCounts: number;
+		totalCount: ApiKarmaCount;
+		avg: Record<"success" | "failure" | "criticalSuccess" | "criticalFailure", string>;
+		percent: Record<
+			"success" | "failure" | "criticalSuccess" | "criticalFailure",
+			string
+		>;
+	};
+	/** Every user tracked in the karma DB — powers the dashboard's search. */
+	users: ApiKarmaEntry[];
+}
+
 export interface TemplateImportPayload {
 	template: StatisticalTemplate;
 	channelId?: string;

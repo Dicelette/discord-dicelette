@@ -35,7 +35,8 @@ export type ActiveTab =
 	| "template"
 	| "user"
 	| "characters"
-	| "server-characters";
+	| "server-characters"
+	| "karma";
 
 interface State {
 	tab: ActiveTab;

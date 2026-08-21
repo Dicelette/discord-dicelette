@@ -106,6 +106,7 @@
 		"tabs": {
 			"admin": "Configuration serveur",
 			"characters": "Mes personnages",
+			"karma": "Karma",
 			"serverCharacters": "Personnages du serveur",
 			"template": "Configuration du modèle",
 			"templateView": "Modèle",
@@ -113,6 +114,23 @@
 		},
 		"title": "Configuration du serveur",
 		"userOnlyNotice": "Vous n'avez pas les permissions d'administration sur ce serveur. Vous pouvez tout de même gérer vos paramètres personnels ci-dessous."
+	},
+	"karma": {
+		"average": "Moyenne",
+		"loadError": "Impossible de charger les données de karma.",
+		"myKarma": "Mon karma",
+		"noData": "Aucune donnée de karma disponible sur ce serveur pour le moment.",
+		"noPersonalData": "Vous n'avez encore aucun jet enregistré.",
+		"noSearchResults": "Aucun joueur ne correspond à la recherche.",
+		"notFound": "Aucune donnée de karma pour cet utilisateur.",
+		"publicTitle": "Karma",
+		"searchPlaceholder": "Rechercher par nom…",
+		"searchTitle": "Rechercher un joueur",
+		"serverStats": "Statistiques du serveur",
+		"share": "Partager cette page de karma",
+		"title": "Karma",
+		"totalRolls": "Total des jets : {rollTotal} par {usersWithCounts} joueurs",
+		"unnamed": "Joueur inconnu"
 	},
 	"login": {
 		"button": "Se connecter avec Discord",

@@ -1,3 +1,5 @@
+export type { LeaderBoardRow } from "@dicelette/utils";
+
 export type Options =
 	| "criticalSuccess"
 	| "criticalFailure"
@@ -12,11 +14,3 @@ export const ALL_OPTIONS: Options[] = [
 	"criticalSuccess",
 	"criticalFailure",
 ];
-export type LeaderBoardRow = {
-	userId: string;
-	success: number;
-	failure: number;
-	criticalSuccess: number;
-	criticalFailure: number;
-	total: number;
-};

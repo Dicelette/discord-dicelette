@@ -5,6 +5,8 @@
 import type { StatisticalTemplate } from "@dicelette/core";
 import type {
 	Characters,
+	Count,
+	CriticalCount,
 	GuildData,
 	Settings,
 	TemplateData,
@@ -38,6 +40,31 @@ export interface ApiCharacter {
 	userId?: string;
 	/** Discord display name of the owner — only present in admin server-wide character list */
 	ownerName?: string;
+}
+
+/** A single user's karma entry — used both for the dashboard's own/search list and the public share page. */
+export interface ApiKarmaEntry {
+	userId: string;
+	/** Discord handle (@username), resolved via the bot's guild cache — `null` if unresolvable. */
+	displayName: string | null;
+	count: Count;
+}
+
+export interface ApiKarmaOverview {
+	/** The requesting user's own karma — `null` if they have no tracked rolls yet. */
+	me: Count | null;
+	server: {
+		rollTotal: number;
+		usersWithCounts: number;
+		totalCount: Count;
+		avg: Record<"success" | "failure" | "criticalSuccess" | "criticalFailure", string>;
+		percent: Record<
+			"success" | "failure" | "criticalSuccess" | "criticalFailure",
+			string
+		>;
+	};
+	/** Every user tracked in the karma DB — powers the dashboard's search. */
+	users: ApiKarmaEntry[];
 }
 
 export interface DiscordUser {
@@ -139,6 +166,7 @@ export interface DashboardDeps {
 	userPreferences: Enmap<UserPreferences>;
 	template: TemplateData;
 	characters: Characters;
+	criticalCount: CriticalCount;
 	botGuilds: {
 		has: (id: string) => boolean;
 		get: (id: string) => BotGuild | undefined;

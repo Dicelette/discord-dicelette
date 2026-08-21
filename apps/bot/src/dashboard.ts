@@ -27,6 +27,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		userPreferences: client.userPreferences,
 		template: client.template,
 		characters: client.characters,
+		criticalCount: client.criticalCount,
 		bulkEditTemplateUser: (guildId, template) => {
 			const lang = client.settings.get(guildId, "lang");
 			const ul = ln(lang ?? Djs.Locale.EnglishUS);

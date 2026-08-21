@@ -26,11 +26,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
 	CharactersTab,
 	GuildConfigForm,
+	KarmaTab,
 	ServerCharactersTab,
 	UserConfigForm,
 } from "../features";
 import { GuildConfigProvider } from "../features/guild-config/context";
-import { useToast } from "../providers";
+import { useAuth, useToast } from "../providers";
 import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
@@ -58,6 +59,7 @@ export default function Dashboard() {
 	const navigate = useNavigate();
 	const { t } = useI18n();
 	const { enqueueToast } = useToast();
+	const { user } = useAuth();
 
 	const {
 		tab,
@@ -198,6 +200,7 @@ export default function Dashboard() {
 				{userCharCount > 0 && (
 					<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
 				)}
+				<Tab value="karma" label={t("dashboard.tabs.karma")} wrapped />
 			</Tabs>
 			{isAdmin && config && (
 				<TabPanel value="admin" current={tab} mounted={mountedTabs}>
@@ -250,6 +253,13 @@ export default function Dashboard() {
 					<ServerCharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
 				</TabPanel>
 			)}
+			<TabPanel value="karma" current={tab} mounted={mountedTabs}>
+				<KarmaTab
+					guildId={guildId!}
+					currentUserId={user!.id}
+					refreshToken={charactersRefreshToken}
+				/>
+			</TabPanel>
 		</Box>
 	);
 }
