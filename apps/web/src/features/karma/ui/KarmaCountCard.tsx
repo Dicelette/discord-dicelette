@@ -1,4 +1,4 @@
-import type { ApiKarmaCount } from "@dicelette/api";
+import type { Count } from "@dicelette/types";
 import { Share } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
 import { Avatar, Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
@@ -22,7 +22,7 @@ function pct(partial: number, total: number): string {
 
 interface Props {
 	displayName: string | null;
-	count: ApiKarmaCount;
+	count: Count;
 	/** When set, shows a share icon (top-right, level with the name) linking here. */
 	shareHref?: string;
 }
