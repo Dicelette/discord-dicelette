@@ -6,4 +6,7 @@ export const karmaApi = {
 	getOverview: createGuildEndpoint<ApiKarmaOverview>(api, "get", "/karma"),
 	getPublicKarma: (guildId: string, userId: string) =>
 		api.get<ApiKarmaEntry>(`/guilds/${guildId}/karma/public/${userId}`),
+	resetSelf: createGuildEndpoint<{ ok: boolean }>(api, "post", "/karma/reset"),
+	resetUser: (guildId: string, userId: string) =>
+		api.post<{ ok: boolean }>(`/guilds/${guildId}/karma/reset/${userId}`),
 };

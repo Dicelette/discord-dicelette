@@ -124,6 +124,17 @@
 		"noSearchResults": "No player matches the search.",
 		"notFound": "No karma data for this user.",
 		"publicTitle": "Karma",
+		"reset": {
+			"button": "Reset",
+			"confirmBodySelf": "This will permanently reset your own karma. This action cannot be undone.",
+			"confirmBodyUser": "This will permanently reset {name}'s karma. This action cannot be undone.",
+			"confirmButton": "Reset",
+			"confirmTitle": "Are you sure?",
+			"error": "Could not reset karma.",
+			"searchLabel": "Select a player",
+			"success": "Karma reset successfully.",
+			"title": "Reset karma"
+		},
 		"searchPlaceholder": "Search by name…",
 		"searchTitle": "Search a player",
 		"serverStats": "Server statistics",

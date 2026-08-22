@@ -15,6 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "uniformize";
 import { buildKarmaShareHref } from "./shareLink";
 import KarmaCountCard from "./ui/KarmaCountCard";
+import KarmaResetPanel from "./ui/KarmaResetPanel";
 import KarmaServerStats from "./ui/KarmaServerStats";
 
 const PAGE_SIZE = 5;
@@ -26,10 +27,16 @@ const paginationBoxSx = { display: "flex", justifyContent: "center", mt: 3 } as 
 interface Props {
 	guildId: string;
 	currentUserId: string;
+	isAdmin: boolean;
 	refreshToken?: number;
 }
 
-export default function KarmaTab({ guildId, currentUserId, refreshToken = 0 }: Props) {
+export default function KarmaTab({
+	guildId,
+	currentUserId,
+	isAdmin,
+	refreshToken = 0,
+}: Props) {
 	const { t } = useI18n();
 	const [overview, setOverview] = useState<ApiKarmaOverview | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -88,6 +95,12 @@ export default function KarmaTab({ guildId, currentUserId, refreshToken = 0 }: P
 
 	return (
 		<Box>
+			<KarmaResetPanel
+				guildId={guildId}
+				isAdmin={isAdmin}
+				users={overview.users}
+				onReset={load}
+			/>
 			<Box sx={{ mb: 3 }}>
 				<Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
 					{t("karma.myKarma")}

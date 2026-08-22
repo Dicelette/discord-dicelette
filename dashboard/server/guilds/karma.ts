@@ -8,7 +8,12 @@ import {
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { ApiKarmaEntry, DashboardDeps } from "../types";
-import { isValidSnowflake, makeRequireGuildMember, requireAuth } from "../utils";
+import {
+	isValidSnowflake,
+	makeRequireAdmin,
+	makeRequireGuildMember,
+	requireAuth,
+} from "../utils";
 
 function sendNoStoreJson(res: Response, payload: unknown) {
 	res.setHeader("Cache-Control", "no-store");
@@ -40,9 +45,10 @@ async function resolveDisplayNames(
 }
 
 export function createKarmaRouter(deps: DashboardDeps) {
-	const { criticalCount, botGuilds } = deps;
+	const { criticalCount, botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
 	const requireGuildMember = makeRequireGuildMember(botGuilds);
+	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
 	// GET /:guildId/karma — the current user's karma, server-wide stats, and the
 	// list of every user tracked in the karma DB (used for the dashboard's search).
@@ -109,6 +115,31 @@ export function createKarmaRouter(deps: DashboardDeps) {
 
 		sendNoStoreJson(res, { userId, displayName, ...count } satisfies ApiKarmaEntry);
 	});
+
+	// POST /:guildId/karma/reset — resets the current user's own karma.
+	router.post("/reset", requireAuth, (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const userId = req.auth!.userId;
+		criticalCount.delete(guildId, userId);
+		res.json({ ok: true });
+	});
+
+	// POST /:guildId/karma/reset/:userId — resets another user's karma (admin only).
+	router.post(
+		"/reset/:userId",
+		requireAuth,
+		requireAdmin,
+		(req: Request, res: Response) => {
+			const guildId = req.params.guildId as string;
+			const userId = req.params.userId as string;
+			if (!isValidSnowflake(userId)) {
+				res.status(400).json({ error: "Invalid user ID" });
+				return;
+			}
+			criticalCount.delete(guildId, userId);
+			res.json({ ok: true });
+		}
+	);
 
 	return router;
 }

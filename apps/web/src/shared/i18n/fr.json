@@ -124,6 +124,17 @@
 		"noSearchResults": "Aucun joueur ne correspond à la recherche.",
 		"notFound": "Aucune donnée de karma pour cet utilisateur.",
 		"publicTitle": "Karma",
+		"reset": {
+			"button": "Réinitialiser",
+			"confirmBodySelf": "Ceci réinitialisera définitivement votre propre karma. Cette action est irréversible.",
+			"confirmBodyUser": "Ceci réinitialisera définitivement le karma de {name}. Cette action est irréversible.",
+			"confirmButton": "Réinitialiser",
+			"confirmTitle": "Êtes-vous sûr ?",
+			"error": "Impossible de réinitialiser le karma.",
+			"searchLabel": "Sélectionner un joueur",
+			"success": "Karma réinitialisé avec succès.",
+			"title": "Réinitialiser le karma"
+		},
 		"searchPlaceholder": "Rechercher par nom…",
 		"searchTitle": "Rechercher un joueur",
 		"serverStats": "Statistiques du serveur",
