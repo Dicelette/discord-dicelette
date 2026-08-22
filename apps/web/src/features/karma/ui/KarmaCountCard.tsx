@@ -3,6 +3,7 @@ import { Share } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
 import { Avatar, Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import { useI18n } from "@shared";
+import type { ReactNode } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import KarmaStatTile, { type KarmaTone } from "./KarmaStatTile";
 import KarmaStreakChip from "./KarmaStreakChip";
@@ -10,7 +11,6 @@ import KarmaStreakChip from "./KarmaStreakChip";
 const cardPaperSx = { p: 3 } as const;
 const headerBoxSx = { display: "flex", alignItems: "center", gap: 2, mb: 2 } as const;
 const nameSectionSx = { flex: 1, minWidth: 0 } as const;
-const streaksBoxSx = { display: "flex", gap: 1, flexWrap: "wrap", mb: 2 } as const;
 const statsGridSx = {
 	display: "grid",
 	gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
@@ -35,18 +35,43 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 	const total = count.total ?? count.success + count.failure;
 	const name = displayName ?? t("karma.unnamed");
 
-	const tiles: { tone: KarmaTone; label: string; value: number; caption: string }[] = [
+	const hasSuccessStreakInfo =
+		(count.consecutive?.success ?? 0) > 1 || (count.longestStreak?.success ?? 0) > 1;
+	const hasFailureStreakInfo =
+		(count.consecutive?.failure ?? 0) > 1 || (count.longestStreak?.failure ?? 0) > 1;
+
+	const tiles: {
+		tone: KarmaTone;
+		label: string;
+		value: number;
+		caption: string;
+		extra?: ReactNode;
+	}[] = [
 		{
 			tone: "success",
 			label: t("roll.success"),
 			value: count.success,
 			caption: `${pct(count.success, total)}%`,
+			extra: hasSuccessStreakInfo ? (
+				<KarmaStreakChip
+					type="success"
+					current={count.consecutive?.success}
+					longest={count.longestStreak?.success}
+				/>
+			) : undefined,
 		},
 		{
 			tone: "failure",
 			label: t("roll.failure"),
 			value: count.failure,
 			caption: `${pct(count.failure, total)}%`,
+			extra: hasFailureStreakInfo ? (
+				<KarmaStreakChip
+					type="failure"
+					current={count.consecutive?.failure}
+					longest={count.longestStreak?.failure}
+				/>
+			) : undefined,
 		},
 	];
 	if (count.criticalSuccess > 0) {
@@ -65,12 +90,6 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 			caption: `${pct(count.criticalFailure, total)}%`,
 		});
 	}
-
-	const hasStreakInfo =
-		(count.consecutive?.success ?? 0) > 1 ||
-		(count.consecutive?.failure ?? 0) > 1 ||
-		(count.longestStreak?.success ?? 0) > 1 ||
-		(count.longestStreak?.failure ?? 0) > 1;
 
 	return (
 		<Paper variant="outlined" sx={cardPaperSx}>
@@ -100,20 +119,6 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 					</Tooltip>
 				)}
 			</Box>
-			{hasStreakInfo && (
-				<Box sx={streaksBoxSx}>
-					<KarmaStreakChip
-						type="success"
-						current={count.consecutive?.success}
-						longest={count.longestStreak?.success}
-					/>
-					<KarmaStreakChip
-						type="failure"
-						current={count.consecutive?.failure}
-						longest={count.longestStreak?.failure}
-					/>
-				</Box>
-			)}
 			<Box sx={statsGridSx}>
 				{tiles.map((tile) => (
 					<KarmaStatTile key={tile.label} {...tile} />

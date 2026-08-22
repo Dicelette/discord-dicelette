@@ -28,9 +28,11 @@ interface Props {
 	value: number;
 	/** Supporting line under the value, e.g. a percentage or a per-user average. */
 	caption?: string;
+	/** Extra content under the caption — e.g. a streak indicator for this category. */
+	extra?: ReactNode;
 }
 
-export default function KarmaStatTile({ tone, label, value, caption }: Props) {
+export default function KarmaStatTile({ tone, label, value, caption, extra }: Props) {
 	const theme = useTheme();
 	const toneColor =
 		tone === "success"
@@ -67,6 +69,7 @@ export default function KarmaStatTile({ tone, label, value, caption }: Props) {
 						{caption}
 					</Typography>
 				)}
+				{extra && <Box sx={{ mt: 0.75 }}>{extra}</Box>}
 			</Box>
 		</Box>
 	);

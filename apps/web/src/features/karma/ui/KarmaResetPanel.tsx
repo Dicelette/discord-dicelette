@@ -18,14 +18,15 @@ import { useState } from "react";
 import { useToast } from "../../../providers";
 
 const panelPaperSx = { p: 3, mb: 3 } as const;
-const controlsBoxSx = {
+const controlsRowSx = {
 	display: "flex",
-	flexDirection: "column",
 	alignItems: "stretch",
 	gap: 1.5,
 	mt: 1.5,
-	width: { xs: "100%", sm: 320 },
+	flexWrap: "wrap",
 } as const;
+const searchFieldSx = { flex: "1 1 240px", minWidth: 200 } as const;
+const buttonSx = { flexShrink: 0 } as const;
 
 interface Props {
 	guildId: string;
@@ -67,10 +68,10 @@ export default function KarmaResetPanel({ guildId, isAdmin, users, onReset }: Pr
 			<Typography variant="h6" sx={{ fontWeight: 600 }}>
 				{t("karma.reset.title")}
 			</Typography>
-			<Box sx={controlsBoxSx}>
+			<Box sx={controlsRowSx}>
 				{isAdmin && (
 					<Autocomplete
-						fullWidth
+						sx={searchFieldSx}
 						size="small"
 						options={users}
 						getOptionLabel={(u) => u.displayName ?? u.userId}
@@ -83,7 +84,7 @@ export default function KarmaResetPanel({ guildId, isAdmin, users, onReset }: Pr
 					/>
 				)}
 				<Button
-					fullWidth
+					sx={buttonSx}
 					variant="outlined"
 					color="error"
 					startIcon={<RestartAlt />}

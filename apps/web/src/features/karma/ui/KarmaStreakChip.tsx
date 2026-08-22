@@ -18,11 +18,10 @@ export default function KarmaStreakChip({ type, current, longest }: Props) {
 		) : (
 			<AcUnit fontSize="small" />
 		);
-	const typeLabel = t(type === "success" ? "roll.success" : "roll.failure");
 
 	if (current && current > 1) {
 		return (
-			<Tooltip title={`${typeLabel} — ${t("karma.streakActive", { count: current })}`}>
+			<Tooltip title={t(`luckMeter.count.consecutive.${type}`)}>
 				<Chip
 					size="small"
 					icon={icon}
@@ -36,7 +35,7 @@ export default function KarmaStreakChip({ type, current, longest }: Props) {
 
 	if (longest && longest > 1) {
 		return (
-			<Tooltip title={`${typeLabel} — ${t("karma.streakRecord", { count: longest })}`}>
+			<Tooltip title={t(`luckMeter.count.longest.${type}`)}>
 				<Chip
 					size="small"
 					icon={icon}
