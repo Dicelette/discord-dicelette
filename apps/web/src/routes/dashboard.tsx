@@ -257,6 +257,7 @@ export default function Dashboard() {
 				<KarmaTab
 					guildId={guildId!}
 					currentUserId={user!.id}
+					currentUserName={user!.global_name ?? user!.username}
 					isAdmin={isAdmin}
 					refreshToken={charactersRefreshToken}
 				/>

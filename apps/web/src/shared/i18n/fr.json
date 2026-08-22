@@ -135,6 +135,8 @@
 			"success": "Karma réinitialisé avec succès.",
 			"title": "Réinitialiser le karma"
 		},
+		"rollCountOne": "{total} jet",
+		"rollCountOther": "{total} jets",
 		"searchPlaceholder": "Rechercher par nom…",
 		"searchTitle": "Rechercher un joueur",
 		"serverStats": "Statistiques du serveur",

@@ -135,6 +135,8 @@
 			"success": "Karma reset successfully.",
 			"title": "Reset karma"
 		},
+		"rollCountOne": "{total} roll",
+		"rollCountOther": "{total} rolls",
 		"searchPlaceholder": "Search by name…",
 		"searchTitle": "Search a player",
 		"serverStats": "Server statistics",

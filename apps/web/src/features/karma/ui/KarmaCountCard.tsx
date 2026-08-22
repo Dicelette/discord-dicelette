@@ -90,7 +90,7 @@ export default function KarmaCountCard({ displayName, count, shareHref }: Props)
 						{name}
 					</Typography>
 					<Typography variant="body2" sx={{ color: "text.secondary" }}>
-						{total} {t("karma.title").toLowerCase()}
+						{t(total === 1 ? "karma.rollCountOne" : "karma.rollCountOther", { total })}
 					</Typography>
 				</Box>
 				{shareHref && (

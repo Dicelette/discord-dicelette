@@ -27,6 +27,7 @@ const paginationBoxSx = { display: "flex", justifyContent: "center", mt: 3 } as 
 interface Props {
 	guildId: string;
 	currentUserId: string;
+	currentUserName: string;
 	isAdmin: boolean;
 	refreshToken?: number;
 }
@@ -34,6 +35,7 @@ interface Props {
 export default function KarmaTab({
 	guildId,
 	currentUserId,
+	currentUserName,
 	isAdmin,
 	refreshToken = 0,
 }: Props) {
@@ -107,7 +109,7 @@ export default function KarmaTab({
 				</Typography>
 				{overview.me ? (
 					<KarmaCountCard
-						displayName={null}
+						displayName={currentUserName}
 						count={overview.me}
 						shareHref={buildKarmaShareHref(guildId, currentUserId)}
 					/>
