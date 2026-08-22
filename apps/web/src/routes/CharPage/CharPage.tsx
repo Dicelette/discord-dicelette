@@ -9,6 +9,7 @@ import { useCharactersList } from "../../features/characters/hooks/useCharacters
 import { buildCharShareHref } from "../../features/characters/shareLink";
 import CharacterCard from "../../features/characters/ui/CharacterCard";
 import CharacterListLayout from "../../features/characters/ui/CharacterListLayout";
+import { useAuth } from "../../providers";
 
 const mainSx = {
 	maxWidth: "56rem",
@@ -21,6 +22,7 @@ const backButtonSx = { mb: 3 } as const;
 
 export default function CharPage() {
 	const { t } = useI18n();
+	const { user } = useAuth();
 	const { guildId = "", userId = "" } = useParams<{ guildId: string; userId: string }>();
 
 	const loadFn = useCallback(
@@ -64,9 +66,11 @@ export default function CharPage() {
 				}
 			/>
 			<Box component="main" className="flex-1" sx={mainSx}>
-				<Button component={Link} to="/" startIcon={<ArrowBack />} sx={backButtonSx}>
-					{t("common.back")}
-				</Button>
+				{user && (
+					<Button component={Link} to="/" startIcon={<ArrowBack />} sx={backButtonSx}>
+						{t("common.back")}
+					</Button>
+				)}
 				<CharacterListLayout
 					title={title}
 					searchPlaceholder={t("characters.filterPlaceholder")}

@@ -6,6 +6,7 @@ import { AppTopBar, DocsButton, PlaygroundButton, useI18n } from "@shared";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import KarmaCountCard from "../../features/karma/ui/KarmaCountCard";
+import { useAuth } from "../../providers";
 
 const mainSx = {
 	maxWidth: "40rem",
@@ -18,6 +19,7 @@ const backButtonSx = { mb: 3 } as const;
 
 export default function KarmaPage() {
 	const { t } = useI18n();
+	const { user } = useAuth();
 	const { guildId = "", userId = "" } = useParams<{ guildId: string; userId: string }>();
 	const [entry, setEntry] = useState<ApiKarmaEntry | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -65,9 +67,11 @@ export default function KarmaPage() {
 				}
 			/>
 			<Box component="main" className="flex-1" sx={mainSx}>
-				<Button component={Link} to="/" startIcon={<ArrowBack />} sx={backButtonSx}>
-					{t("common.back")}
-				</Button>
+				{user && (
+					<Button component={Link} to="/" startIcon={<ArrowBack />} sx={backButtonSx}>
+						{t("common.back")}
+					</Button>
+				)}
 				<Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
 					{title}
 				</Typography>
