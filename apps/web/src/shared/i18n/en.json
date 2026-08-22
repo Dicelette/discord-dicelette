@@ -141,6 +141,8 @@
 		"searchTitle": "Search a player",
 		"serverStats": "Server statistics",
 		"share": "Share this karma page",
+		"streakActive": "{count} in a row",
+		"streakRecord": "Record: {count}",
 		"title": "Karma",
 		"totalRolls": "Total rolls: {rollTotal} by {usersWithCounts} players",
 		"unnamed": "Unknown player"

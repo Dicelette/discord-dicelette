@@ -4,15 +4,17 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Avatar, Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import { useI18n } from "@shared";
 import { Link as RouterLink } from "react-router-dom";
-import StatCell from "../../characters/ui/StatCell";
+import KarmaStatTile, { type KarmaTone } from "./KarmaStatTile";
+import KarmaStreakChip from "./KarmaStreakChip";
 
 const cardPaperSx = { p: 3 } as const;
 const headerBoxSx = { display: "flex", alignItems: "center", gap: 2, mb: 2 } as const;
 const nameSectionSx = { flex: 1, minWidth: 0 } as const;
+const streaksBoxSx = { display: "flex", gap: 1, flexWrap: "wrap", mb: 2 } as const;
 const statsGridSx = {
 	display: "grid",
-	gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-	gap: 1,
+	gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
+	gap: 1.5,
 } as const;
 const shareButtonSx = { flexShrink: 0 } as const;
 
@@ -33,52 +35,42 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 	const total = count.total ?? count.success + count.failure;
 	const name = displayName ?? t("karma.unnamed");
 
-	const cells: { name: string; value: string }[] = [
+	const tiles: { tone: KarmaTone; label: string; value: number; caption: string }[] = [
 		{
-			name: t("roll.success"),
-			value: `${count.success} (${pct(count.success, total)}%)`,
+			tone: "success",
+			label: t("roll.success"),
+			value: count.success,
+			caption: `${pct(count.success, total)}%`,
 		},
 		{
-			name: t("roll.failure"),
-			value: `${count.failure} (${pct(count.failure, total)}%)`,
+			tone: "failure",
+			label: t("roll.failure"),
+			value: count.failure,
+			caption: `${pct(count.failure, total)}%`,
 		},
 	];
 	if (count.criticalSuccess > 0) {
-		cells.push({
-			name: t("roll.critical.success"),
-			value: `${count.criticalSuccess} (${pct(count.criticalSuccess, total)}%)`,
+		tiles.push({
+			tone: "criticalSuccess",
+			label: t("roll.critical.success"),
+			value: count.criticalSuccess,
+			caption: `${pct(count.criticalSuccess, total)}%`,
 		});
 	}
 	if (count.criticalFailure > 0) {
-		cells.push({
-			name: t("roll.critical.failure"),
-			value: `${count.criticalFailure} (${pct(count.criticalFailure, total)}%)`,
+		tiles.push({
+			tone: "criticalFailure",
+			label: t("roll.critical.failure"),
+			value: count.criticalFailure,
+			caption: `${pct(count.criticalFailure, total)}%`,
 		});
 	}
-	if (count.consecutive?.success && count.consecutive.success > 1) {
-		cells.push({
-			name: t("luckMeter.count.consecutive.success"),
-			value: String(count.consecutive.success),
-		});
-	}
-	if (count.consecutive?.failure && count.consecutive.failure > 1) {
-		cells.push({
-			name: t("luckMeter.count.consecutive.failure"),
-			value: String(count.consecutive.failure),
-		});
-	}
-	if (count.longestStreak?.success && count.longestStreak.success > 1) {
-		cells.push({
-			name: t("luckMeter.count.longest.success"),
-			value: String(count.longestStreak.success),
-		});
-	}
-	if (count.longestStreak?.failure && count.longestStreak.failure > 1) {
-		cells.push({
-			name: t("luckMeter.count.longest.failure"),
-			value: String(count.longestStreak.failure),
-		});
-	}
+
+	const hasStreakInfo =
+		(count.consecutive?.success ?? 0) > 1 ||
+		(count.consecutive?.failure ?? 0) > 1 ||
+		(count.longestStreak?.success ?? 0) > 1 ||
+		(count.longestStreak?.failure ?? 0) > 1;
 
 	return (
 		<Paper variant="outlined" sx={cardPaperSx}>
@@ -108,9 +100,23 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 					</Tooltip>
 				)}
 			</Box>
+			{hasStreakInfo && (
+				<Box sx={streaksBoxSx}>
+					<KarmaStreakChip
+						type="success"
+						current={count.consecutive?.success}
+						longest={count.longestStreak?.success}
+					/>
+					<KarmaStreakChip
+						type="failure"
+						current={count.consecutive?.failure}
+						longest={count.longestStreak?.failure}
+					/>
+				</Box>
+			)}
 			<Box sx={statsGridSx}>
-				{cells.map((cell) => (
-					<StatCell key={cell.name} name={cell.name} value={cell.value} />
+				{tiles.map((tile) => (
+					<KarmaStatTile key={tile.label} {...tile} />
 				))}
 			</Box>
 		</Paper>

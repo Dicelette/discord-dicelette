@@ -141,6 +141,8 @@
 		"searchTitle": "Rechercher un joueur",
 		"serverStats": "Statistiques du serveur",
 		"share": "Partager cette page de karma",
+		"streakActive": "{count} d'affilée",
+		"streakRecord": "Record : {count}",
 		"title": "Karma",
 		"totalRolls": "Total des jets : {rollTotal} par {usersWithCounts} joueurs",
 		"unnamed": "Joueur inconnu"
