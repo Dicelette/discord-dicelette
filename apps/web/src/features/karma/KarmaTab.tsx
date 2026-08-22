@@ -142,7 +142,7 @@ export default function KarmaTab({ guildId, currentUserId, refreshToken = 0 }: P
 							<KarmaCountCard
 								key={entry.userId}
 								displayName={entry.displayName}
-								count={entry.count}
+								count={entry}
 								shareHref={buildKarmaShareHref(guildId, entry.userId)}
 							/>
 						))}

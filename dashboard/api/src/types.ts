@@ -61,12 +61,15 @@ export interface ApiCharacter {
 	ownerName?: string;
 }
 
-/** A single user's karma entry — used both for the dashboard's own/search list and the public share page. */
-export interface ApiKarmaEntry {
+/**
+ * A single user's karma entry — a `DBCount` value (see `@dicelette/types`)
+ * augmented with the id/display name needed to render it in the dashboard.
+ * Used both for the own/search list and the public share page.
+ */
+export interface ApiKarmaEntry extends Count {
 	userId: string;
 	/** Discord handle (@username) — `null` if unresolvable. */
 	displayName: string | null;
-	count: Count;
 }
 
 export interface ApiKarmaOverview {

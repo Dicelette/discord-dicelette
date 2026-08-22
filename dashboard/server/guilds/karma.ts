@@ -69,7 +69,7 @@ export function createKarmaRouter(deps: DashboardDeps) {
 			const users: ApiKarmaEntry[] = trackedEntries.map(([uid, count]) => ({
 				userId: uid,
 				displayName: names.get(uid) ?? null,
-				count,
+				...count,
 			}));
 
 			const { rollTotal, totalCount, usersWithCounts } = calculateServerStats(guildCount);
@@ -107,7 +107,7 @@ export function createKarmaRouter(deps: DashboardDeps) {
 		const guild = botGuilds.get(guildId);
 		const displayName = (await guild?.fetchMemberName(userId).catch(() => null)) ?? null;
 
-		sendNoStoreJson(res, { userId, displayName, count } satisfies ApiKarmaEntry);
+		sendNoStoreJson(res, { userId, displayName, ...count } satisfies ApiKarmaEntry);
 	});
 
 	return router;
