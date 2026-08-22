@@ -21,24 +21,32 @@ function sendNoStoreJson(res: Response, payload: unknown) {
 }
 
 /**
- * Concurrency cap for resolving Discord display names when listing karma
- * entries — mirrors the cap used for character owner-name resolution.
+ * Concurrency cap for resolving Discord display names/avatars when listing
+ * karma entries — mirrors the cap used for character owner-name resolution.
  */
 const KARMA_FETCH_CONCURRENCY = 10;
 
-async function resolveDisplayNames(
+interface MemberInfo {
+	displayName: string | null;
+	avatar: string | null;
+}
+
+async function resolveMemberInfo(
 	userIds: string[],
 	guildId: string,
 	botGuilds: DashboardDeps["botGuilds"]
-): Promise<Map<string, string | null>> {
+): Promise<Map<string, MemberInfo>> {
 	const guild = botGuilds.get(guildId);
 	if (!guild) return new Map();
 	const entries = await mapConcurrent(
 		userIds,
 		KARMA_FETCH_CONCURRENCY,
 		async (userId) => {
-			const name = await guild.fetchMemberName(userId).catch(() => null);
-			return [userId, name] as const;
+			const [displayName, avatar] = await Promise.all([
+				guild.fetchMemberName(userId).catch(() => null),
+				guild.fetchMemberAvatar(userId).catch(() => null),
+			]);
+			return [userId, { displayName, avatar }] as const;
 		}
 	);
 	return new Map(entries);
@@ -66,15 +74,16 @@ export function createKarmaRouter(deps: DashboardDeps) {
 				.map(([uid, count]) => [uid, mergeCountDefaults(count)] as const)
 				.filter(([, count]) => (count.total ?? 0) > 0);
 
-			const names = await resolveDisplayNames(
-				trackedEntries.map(([uid]) => uid),
-				guildId,
-				botGuilds
-			);
+			// Fetch the current user's info in the same batch even if they have
+			// no tracked karma yet, so `meAvatar` still resolves.
+			const allUserIds = new Set(trackedEntries.map(([uid]) => uid));
+			allUserIds.add(userId);
+			const memberInfo = await resolveMemberInfo([...allUserIds], guildId, botGuilds);
 
 			const users: ApiKarmaEntry[] = trackedEntries.map(([uid, count]) => ({
 				userId: uid,
-				displayName: names.get(uid) ?? null,
+				displayName: memberInfo.get(uid)?.displayName ?? null,
+				avatar: memberInfo.get(uid)?.avatar ?? null,
 				...count,
 			}));
 
@@ -83,9 +92,11 @@ export function createKarmaRouter(deps: DashboardDeps) {
 
 			const meRaw = guildCount[userId];
 			const me: Count | null = meRaw ? mergeCountDefaults(meRaw) : null;
+			const meAvatar = memberInfo.get(userId)?.avatar ?? null;
 
 			sendNoStoreJson(res, {
 				me,
+				meAvatar,
 				server: { rollTotal, usersWithCounts, totalCount, avg, percent },
 				users,
 			});
@@ -111,9 +122,19 @@ export function createKarmaRouter(deps: DashboardDeps) {
 
 		const count = mergeCountDefaults(raw);
 		const guild = botGuilds.get(guildId);
-		const displayName = (await guild?.fetchMemberName(userId).catch(() => null)) ?? null;
+		const [displayName, avatar] = guild
+			? await Promise.all([
+					guild.fetchMemberName(userId).catch(() => null),
+					guild.fetchMemberAvatar(userId).catch(() => null),
+				])
+			: [null, null];
 
-		sendNoStoreJson(res, { userId, displayName, ...count } satisfies ApiKarmaEntry);
+		sendNoStoreJson(res, {
+			userId,
+			displayName,
+			avatar,
+			...count,
+		} satisfies ApiKarmaEntry);
 	});
 
 	// POST /:guildId/karma/reset — resets the current user's own karma.

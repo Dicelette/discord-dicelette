@@ -51,11 +51,15 @@ export interface ApiKarmaEntry extends Count {
 	userId: string;
 	/** Discord handle (@username), resolved via the bot's guild cache — `null` if unresolvable. */
 	displayName: string | null;
+	/** Per-guild avatar URL (falls back to the global Discord avatar) — `null` if unresolvable. */
+	avatar: string | null;
 }
 
 export interface ApiKarmaOverview {
 	/** The requesting user's own karma — `null` if they have no tracked rolls yet. */
 	me: Count | null;
+	/** The requesting user's own avatar URL — `null` if unresolvable. */
+	meAvatar: string | null;
 	server: {
 		rollTotal: number;
 		usersWithCounts: number;
@@ -106,6 +110,8 @@ export interface BotGuild {
 	memberCanAccessChannel: (userId: string, channelId: string) => Promise<boolean>;
 	/** Fetch the user's Discord handle (pomelo), formatted as @username */
 	fetchMemberName: (userId: string) => Promise<string | null>;
+	/** Fetch the member's per-guild avatar URL, falling back to their global Discord avatar */
+	fetchMemberAvatar: (userId: string) => Promise<string | null>;
 	/** All channels in the guild (all types, let the caller filter) */
 	readonly channels: ReadonlyArray<{ id: string; name: string; type: number }>;
 	/** All roles except @everyone */

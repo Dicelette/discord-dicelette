@@ -110,6 +110,7 @@ export default function KarmaTab({
 				{overview.me ? (
 					<KarmaCountCard
 						displayName={currentUserName}
+						avatar={overview.meAvatar}
 						count={overview.me}
 						shareHref={buildKarmaShareHref(guildId, currentUserId)}
 					/>
@@ -157,6 +158,7 @@ export default function KarmaTab({
 							<KarmaCountCard
 								key={entry.userId}
 								displayName={entry.displayName}
+								avatar={entry.avatar}
 								count={entry}
 								shareHref={buildKarmaShareHref(guildId, entry.userId)}
 							/>

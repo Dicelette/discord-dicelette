@@ -70,11 +70,15 @@ export interface ApiKarmaEntry extends Count {
 	userId: string;
 	/** Discord handle (@username) — `null` if unresolvable. */
 	displayName: string | null;
+	/** Per-guild avatar URL (falls back to the global Discord avatar) — `null` if unresolvable. */
+	avatar: string | null;
 }
 
 export interface ApiKarmaOverview {
 	/** The requesting user's own karma — `null` if they have no tracked rolls yet. */
 	me: Count | null;
+	/** The requesting user's own avatar URL — `null` if unresolvable. */
+	meAvatar: string | null;
 	server: {
 		rollTotal: number;
 		usersWithCounts: number;

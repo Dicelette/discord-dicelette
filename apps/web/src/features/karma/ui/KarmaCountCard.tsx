@@ -22,12 +22,13 @@ function pct(partial: number, total: number): string {
 
 interface Props {
 	displayName: string | null;
+	avatar?: string | null;
 	count: Count;
 	/** When set, shows a share icon (top-right, level with the name) linking here. */
 	shareHref?: string;
 }
 
-export default function KarmaCountCard({ displayName, count, shareHref }: Props) {
+export default function KarmaCountCard({ displayName, avatar, count, shareHref }: Props) {
 	const { t } = useI18n();
 	const total = count.total ?? count.success + count.failure;
 	const name = displayName ?? t("karma.unnamed");
@@ -82,7 +83,7 @@ export default function KarmaCountCard({ displayName, count, shareHref }: Props)
 	return (
 		<Paper variant="outlined" sx={cardPaperSx}>
 			<Box sx={headerBoxSx}>
-				<Avatar sx={{ width: 40, height: 40 }}>
+				<Avatar src={avatar ?? undefined} alt={name} sx={{ width: 40, height: 40 }}>
 					<PersonIcon />
 				</Avatar>
 				<Box sx={nameSectionSx}>

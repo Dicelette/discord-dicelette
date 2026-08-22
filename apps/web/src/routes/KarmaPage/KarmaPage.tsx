@@ -78,7 +78,13 @@ export default function KarmaPage() {
 				) : error ? (
 					<Alert severity="error">{error}</Alert>
 				) : (
-					entry && <KarmaCountCard displayName={entry.displayName} count={entry} />
+					entry && (
+						<KarmaCountCard
+							displayName={entry.displayName}
+							avatar={entry.avatar}
+							count={entry}
+						/>
+					)
 				)}
 			</Box>
 		</Box>
