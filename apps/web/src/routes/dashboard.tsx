@@ -9,19 +9,27 @@ const spinAnimation = keyframes`
 `;
 
 import {
+	Badge,
+	Casino,
+	Description,
+	Groups,
+	Menu as MenuIcon,
+	Person,
+	Settings,
+} from "@mui/icons-material";
+import {
 	Alert,
 	Avatar,
 	Box,
 	Button,
 	CircularProgress,
+	Drawer,
 	IconButton,
-	Tab,
-	Tabs,
 	Tooltip,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
 	CharactersTab,
@@ -32,12 +40,27 @@ import {
 } from "../features";
 import { GuildConfigProvider } from "../features/guild-config/context";
 import { useAuth, useToast } from "../providers";
+import DashboardNav, { type DashboardNavItem } from "./DashboardNav";
 import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
 const TemplateReadOnly = lazy(
 	() => import("../features/template-config/TemplateReadOnly")
 );
+
+const navIconSx = { fontSize: 20 } as const;
+const sidebarBoxSx = {
+	display: { xs: "none", md: "block" },
+	width: 232,
+	flexShrink: 0,
+} as const;
+const drawerPaperSx = { width: 260, pt: 1 } as const;
+const layoutRowSx = {
+	display: "flex",
+	gap: { md: 4 },
+	alignItems: "flex-start",
+} as const;
+const contentBoxSx = { flex: 1, minWidth: 0 } as const;
 
 function TabPanel({
 	value,
@@ -60,6 +83,7 @@ export default function Dashboard() {
 	const { t } = useI18n();
 	const { enqueueToast } = useToast();
 	const { user } = useAuth();
+	const [drawerOpen, setDrawerOpen] = useState(false);
 
 	const {
 		tab,
@@ -111,18 +135,82 @@ export default function Dashboard() {
 		);
 	}
 
+	const navItems: DashboardNavItem[] = [];
+	if (isAdmin) {
+		navItems.push({
+			value: "admin",
+			label: t("dashboard.tabs.admin"),
+			icon: <Settings sx={navIconSx} />,
+		});
+		navItems.push({
+			value: "template",
+			label: t("dashboard.tabs.template"),
+			icon: <Description sx={navIconSx} />,
+		});
+	} else if (hasTemplate) {
+		navItems.push({
+			value: "template",
+			label: t("dashboard.tabs.templateView"),
+			icon: <Description sx={navIconSx} />,
+		});
+	}
+	if (isAdmin && config?.templateID?.channelId) {
+		navItems.push({
+			value: "server-characters",
+			label: t("dashboard.tabs.serverCharacters"),
+			icon: <Groups sx={navIconSx} />,
+		});
+	}
+	navItems.push({
+		value: "user",
+		label: t("dashboard.tabs.user"),
+		icon: <Person sx={navIconSx} />,
+	});
+	if (userCharCount > 0) {
+		navItems.push({
+			value: "characters",
+			label: t("dashboard.tabs.characters"),
+			icon: <Badge sx={navIconSx} />,
+		});
+	}
+	navItems.push({
+		value: "karma",
+		label: t("dashboard.tabs.karma"),
+		icon: <Casino sx={navIconSx} />,
+	});
+
+	const selectTab = (value: ActiveTab) => {
+		handleTabChange(undefined, value);
+		setDrawerOpen(false);
+	};
+
 	return (
-		<Box sx={{ maxWidth: "56rem", mx: "auto", px: { xs: 2, sm: 3 }, py: 3 }}>
-			<Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")} sx={{ mb: 3 }}>
-				{t("common.back")}
-			</Button>
+		<Box sx={{ maxWidth: "72rem", mx: "auto", px: { xs: 2, sm: 3 }, py: 3 }}>
+			<Box
+				sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+			>
+				<Button
+					startIcon={<ArrowBackIcon />}
+					onClick={() => navigate("/")}
+					sx={{ mb: 3 }}
+				>
+					{t("common.back")}
+				</Button>
+				<IconButton
+					onClick={() => setDrawerOpen(true)}
+					sx={{ display: { xs: "inline-flex", md: "none" }, mb: 3 }}
+					aria-label={t("dashboard.openNav")}
+				>
+					<MenuIcon />
+				</IconButton>
+			</Box>
 			<Box
 				sx={{
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "space-between",
 					gap: 2,
-					mb: 1,
+					mb: 3,
 				}}
 			>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
@@ -168,100 +256,84 @@ export default function Dashboard() {
 					{error}
 				</Alert>
 			)}
-			<Tabs
-				value={tab}
-				variant="scrollable"
-				scrollButtons="auto"
-				allowScrollButtonsMobile
-				onChange={handleTabChange}
-				sx={{
-					mb: 3,
-					borderBottom: 1,
-					borderColor: "divider",
-					"& .MuiTab-root": {
-						minWidth: { xs: 72, sm: 90 },
-						px: { xs: 1, sm: 2 },
-					},
-				}}
-			>
-				{isAdmin && <Tab value="admin" label={t("dashboard.tabs.admin")} wrapped />}
-				{isAdmin && <Tab value="template" label={t("dashboard.tabs.template")} wrapped />}
-				{!isAdmin && hasTemplate && (
-					<Tab value="template" label={t("dashboard.tabs.templateView")} wrapped />
-				)}
-				{isAdmin && config?.templateID?.channelId && (
-					<Tab
-						value="server-characters"
-						label={t("dashboard.tabs.serverCharacters")}
-						wrapped
-					/>
-				)}
-				<Tab value="user" label={t("dashboard.tabs.user")} wrapped />
-				{userCharCount > 0 && (
-					<Tab value="characters" label={t("dashboard.tabs.characters")} wrapped />
-				)}
-				<Tab value="karma" label={t("dashboard.tabs.karma")} wrapped />
-			</Tabs>
-			{isAdmin && config && (
-				<TabPanel value="admin" current={tab} mounted={mountedTabs}>
-					<GuildConfigProvider
-						config={config}
-						channels={channels}
-						roles={roles}
-						isStrictAdmin={isStrictAdmin}
-						saving={saving}
-						saveSuccess={saveSuccess}
-						onSave={handleSave}
-					>
-						<GuildConfigForm />
-					</GuildConfigProvider>
-				</TabPanel>
-			)}
-			{isAdmin && config && (
-				<TabPanel value="template" current={tab} mounted={mountedTabs}>
-					<Suspense fallback={<CircularProgress />}>
-						<ModelConfigForm
-							config={config}
+			<Box sx={layoutRowSx}>
+				<Box component="nav" sx={sidebarBoxSx}>
+					<DashboardNav items={navItems} current={tab} onSelect={selectTab} />
+				</Box>
+				<Drawer
+					anchor="left"
+					open={drawerOpen}
+					onClose={() => setDrawerOpen(false)}
+					slotProps={{ paper: { sx: drawerPaperSx } }}
+				>
+					<DashboardNav items={navItems} current={tab} onSelect={selectTab} />
+				</Drawer>
+				<Box sx={contentBoxSx}>
+					{isAdmin && config && (
+						<TabPanel value="admin" current={tab} mounted={mountedTabs}>
+							<GuildConfigProvider
+								config={config}
+								channels={channels}
+								roles={roles}
+								isStrictAdmin={isStrictAdmin}
+								saving={saving}
+								saveSuccess={saveSuccess}
+								onSave={handleSave}
+							>
+								<GuildConfigForm />
+							</GuildConfigProvider>
+						</TabPanel>
+					)}
+					{isAdmin && config && (
+						<TabPanel value="template" current={tab} mounted={mountedTabs}>
+							<Suspense fallback={<CircularProgress />}>
+								<ModelConfigForm
+									config={config}
+									guildId={guildId!}
+									onSave={handleSave}
+									saving={saving}
+									channels={channels}
+									roles={roles}
+									onTemplateChange={refetchConfig}
+									onCharactersDeleted={handleCharactersRefresh}
+								/>
+							</Suspense>
+						</TabPanel>
+					)}
+					{!isAdmin && hasTemplate && (
+						<TabPanel value="template" current={tab} mounted={mountedTabs}>
+							<Suspense fallback={<CircularProgress />}>
+								<TemplateReadOnly guildId={guildId!} />
+							</Suspense>
+						</TabPanel>
+					)}
+					<TabPanel value="user" current={tab} mounted={mountedTabs}>
+						<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
+					</TabPanel>
+					{userCharCount > 0 && (
+						<TabPanel value="characters" current={tab} mounted={mountedTabs}>
+							<CharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
+						</TabPanel>
+					)}
+					{isAdmin && config?.templateID?.channelId && (
+						<TabPanel value="server-characters" current={tab} mounted={mountedTabs}>
+							<ServerCharactersTab
+								guildId={guildId!}
+								refreshToken={charactersRefreshToken}
+							/>
+						</TabPanel>
+					)}
+					<TabPanel value="karma" current={tab} mounted={mountedTabs}>
+						<KarmaTab
 							guildId={guildId!}
-							onSave={handleSave}
-							saving={saving}
-							channels={channels}
-							roles={roles}
-							onTemplateChange={refetchConfig}
-							onCharactersDeleted={handleCharactersRefresh}
+							currentUserId={user!.id}
+							currentUserName={user!.global_name ?? user!.username}
+							isAdmin={isAdmin}
+							refreshToken={charactersRefreshToken}
 						/>
-					</Suspense>
-				</TabPanel>
-			)}
-			{!isAdmin && hasTemplate && (
-				<TabPanel value="template" current={tab} mounted={mountedTabs}>
-					<Suspense fallback={<CircularProgress />}>
-						<TemplateReadOnly guildId={guildId!} />
-					</Suspense>
-				</TabPanel>
-			)}
-			<TabPanel value="user" current={tab} mounted={mountedTabs}>
-				<UserConfigForm guildId={guildId!} initialConfig={userConfigData} />
-			</TabPanel>
-			{userCharCount > 0 && (
-				<TabPanel value="characters" current={tab} mounted={mountedTabs}>
-					<CharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
-				</TabPanel>
-			)}
-			{isAdmin && config?.templateID?.channelId && (
-				<TabPanel value="server-characters" current={tab} mounted={mountedTabs}>
-					<ServerCharactersTab guildId={guildId!} refreshToken={charactersRefreshToken} />
-				</TabPanel>
-			)}
-			<TabPanel value="karma" current={tab} mounted={mountedTabs}>
-				<KarmaTab
-					guildId={guildId!}
-					currentUserId={user!.id}
-					currentUserName={user!.global_name ?? user!.username}
-					isAdmin={isAdmin}
-					refreshToken={charactersRefreshToken}
-				/>
-			</TabPanel>
+					</TabPanel>
+				</Box>
+			</Box>
 		</Box>
 	);
 }

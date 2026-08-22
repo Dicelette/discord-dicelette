@@ -97,6 +97,7 @@
 	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
+		"openNav": "Open navigation menu",
 		"refreshCharacters": "Refresh characters",
 		"refreshCharactersError": "Could not refresh characters.",
 		"refreshCharactersSuccess": "Characters refreshed!",

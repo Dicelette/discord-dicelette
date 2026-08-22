@@ -97,6 +97,7 @@
 	},
 	"dashboard": {
 		"loadError": "Impossible de charger la configuration.",
+		"openNav": "Ouvrir le menu de navigation",
 		"refreshCharacters": "Actualiser les personnages",
 		"refreshCharactersError": "Impossible d'actualiser les personnages.",
 		"refreshCharactersSuccess": "Personnages actualisés !",
