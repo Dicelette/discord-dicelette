@@ -955,15 +955,15 @@
 				"name": "tout_le_monde",
 				"success": "Le classement du serveur a été correctement réinitialisé."
 			},
-			"description": "Réinitialise le classement",
+			"description": "Réinitialise le karma",
 			"noPermission": "Vous n'avez pas les permissions pour faire ça.",
 			"self": {
-				"success": "Votre classement a correctement été réinitialisé."
+				"success": "Votre karma a correctement été réinitialisé."
 			},
 			"title": "réinitialisation",
 			"user": {
-				"description": "Réinitialise le classement pour une autre personne.",
-				"success": "Le classement de {{- user}} a correctement été réinitialisé."
+				"description": "Réinitialise le karma pour une autre personne.",
+				"success": "Le karma de {{- user}} a correctement été réinitialisé."
 			}
 		},
 		"title": "karma",

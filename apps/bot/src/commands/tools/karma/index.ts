@@ -173,19 +173,31 @@ async function resetCount(
 	ul: Translation
 ) {
 	const resetAll = interaction.options.getBoolean(t("luckMeter.reset.all.name"));
-	const selectedUser = interaction.options.getUser("user");
+	const selectedUser = interaction.options.getUser("user") ?? interaction.user;
 	const guildId = interaction.guild!.id;
 	// First, we verify if the user has permission to do this
 	// Only admins (role management) can reset the leaderboard of others
 	const isRoleManager = interaction.memberPermissions?.has(
 		Djs.PermissionFlagsBits.ManageRoles
 	);
-	if (!resetAll && !selectedUser) {
-		// Reset own count
-		client.criticalCount.delete(guildId, interaction.user.id);
+	//unless the user ask for themself?
+	const isSelf = selectedUser?.id === interaction.user.id;
+
+	async function resetUser(user: Djs.User = selectedUser) {
+		client.criticalCount.delete(guildId, user.id);
+		const content = isSelf
+			? ul("luckMeter.reset.self.success")
+			: ul("luckMeter.reset.user.success", {
+					user: Djs.userMention(user.id),
+				});
 		await interaction.editReply({
-			content: ul("luckMeter.reset.self.success"),
+			content,
 		});
+	}
+
+	if (!resetAll && (!selectedUser || isSelf)) {
+		// Reset own count
+		await resetUser();
 		return;
 	}
 	if (!isRoleManager && (resetAll || selectedUser)) {
@@ -202,13 +214,8 @@ async function resetCount(
 		});
 		return;
 	}
-	// Reset selected user's count
-	client.criticalCount.delete(guildId, selectedUser!.id);
-	await interaction.editReply({
-		content: ul("luckMeter.reset.user.success", {
-			user: Djs.userMention(selectedUser!.id),
-		}),
-	});
+	await resetUser();
+	return;
 }
 
 export default getCount;

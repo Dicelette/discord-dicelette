@@ -951,19 +951,19 @@
 		},
 		"reset": {
 			"all": {
-				"description": "Completely resets the ranking",
+				"description": "Completely resets the leaderboard",
 				"name": "everyone",
 				"success": "The server leaderboard has been correctly reset."
 			},
-			"description": "Reset ranking",
+			"description": "Reset karma",
 			"noPermission": "You don't have the permissions to do that.",
 			"self": {
-				"success": "Your ranking has been correctly reset."
+				"success": "Your karma has been correctly reset."
 			},
 			"title": "reset",
 			"user": {
-				"description": "Resets the leaderboard for another person.",
-				"success": "The {{- user}} ranking has been correctly reset."
+				"description": "Resets the karma for another person.",
+				"success": "The {{- user}} karma has been correctly reset."
 			}
 		},
 		"title": "karma",
