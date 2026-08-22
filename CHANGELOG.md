@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.7.2](https://github.com/Dicelette/discord-dicelette/compare/4.7.1...4.7.2) (2026-08-22)
+
+### Bug Fixes
+
+* **karma:** option for selectuser should allow self (as in empty selectedUser option) ([5551195](https://github.com/Dicelette/discord-dicelette/commit/555119539a4b040d001216fcc45376a1d10fa682))
 ## [4.7.1](https://github.com/Dicelette/discord-dicelette/compare/4.7.0...4.7.1) (2026-08-11)
 
 ### Bug Fixes
