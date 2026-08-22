@@ -110,6 +110,8 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 						<IconButton
 							component={RouterLink}
 							to={shareHref}
+							target="_blank"
+							rel="noopener noreferrer"
 							size="small"
 							aria-label={t("karma.share")}
 							sx={shareButtonSx}
