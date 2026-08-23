@@ -112,8 +112,8 @@
 				"configuration": "Configuration",
 				"karma": "Karma"
 			},
-			"karmaMe": "Personnel + Réinitialisation",
-			"karmaServer": "Serveur + Recherche",
+			"karmaMe": "Personnel",
+			"karmaServer": "Serveur",
 			"serverCharacters": "Serveur",
 			"template": "Modèle",
 			"templateView": "Modèle",
