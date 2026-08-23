@@ -12,6 +12,8 @@ import {
 	Badge,
 	Casino,
 	Description,
+	Dns,
+	Face,
 	Groups,
 	Leaderboard,
 	Menu as MenuIcon,
@@ -142,7 +144,7 @@ export default function Dashboard() {
 		configurationItems.push({
 			value: "admin",
 			label: t("dashboard.tabs.admin"),
-			icon: <Settings sx={navIconSx} />,
+			icon: <Dns sx={navIconSx} />,
 		});
 		configurationItems.push({
 			value: "template",
@@ -174,7 +176,7 @@ export default function Dashboard() {
 		charactersItems.push({
 			value: "characters",
 			label: t("dashboard.tabs.characters"),
-			icon: <Badge sx={navIconSx} />,
+			icon: <Face sx={navIconSx} />,
 		});
 	}
 

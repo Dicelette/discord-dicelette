@@ -27,7 +27,7 @@ export interface DashboardNavGroup {
 const groupButtonSx = { borderRadius: 1.5, mb: 0.25 } as const;
 const groupIconSx = { minWidth: 36 } as const;
 const groupLabelSx = { primary: { sx: { fontWeight: 600 } } } as const;
-const subItemSx = { borderRadius: 1.5, mb: 0.25, pl: 2 } as const;
+const subItemSx = { borderRadius: 1.5, mb: 0.25, pl: 5 } as const;
 const subItemIconSx = { minWidth: 32 } as const;
 
 interface Props {
