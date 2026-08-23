@@ -28,7 +28,7 @@ interface Props {
 	value: number;
 	/** Supporting line under the value, e.g. a percentage or a per-user average. */
 	caption?: string;
-	/** Extra content under the caption — e.g. a streak indicator for this category. */
+	/** Extra content shown inline next to the value — e.g. a streak indicator for this category. */
 	extra?: ReactNode;
 }
 
@@ -53,7 +53,7 @@ export default function KarmaStatTile({ tone, label, value, caption, extra }: Pr
 			}}
 		>
 			<Box sx={{ color: toneColor, display: "flex" }}>{TONE_ICON[tone]}</Box>
-			<Box sx={{ minWidth: 0 }}>
+			<Box sx={{ minWidth: 0, flex: 1 }}>
 				<Typography
 					variant="caption"
 					noWrap
@@ -61,15 +61,17 @@ export default function KarmaStatTile({ tone, label, value, caption, extra }: Pr
 				>
 					{label}
 				</Typography>
-				<Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-					{value}
-				</Typography>
+				<Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
+					<Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+						{value}
+					</Typography>
+					{extra}
+				</Box>
 				{caption && (
 					<Typography variant="caption" noWrap sx={{ color: "text.secondary" }}>
 						{caption}
 					</Typography>
 				)}
-				{extra && <Box sx={{ mt: 0.75 }}>{extra}</Box>}
 			</Box>
 		</Box>
 	);
