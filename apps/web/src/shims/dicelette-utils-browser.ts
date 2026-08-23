@@ -11,6 +11,7 @@
  */
 
 export * from "@dicelette/utils/errors";
+export * from "@dicelette/utils/karma";
 export * from "@dicelette/utils/regex";
 
 type LogFn = (...args: unknown[]) => void;

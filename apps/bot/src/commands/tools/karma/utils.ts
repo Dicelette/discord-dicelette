@@ -1,13 +1,8 @@
-import type { Count, Translation } from "@dicelette/types";
+import type { Translation } from "@dicelette/types";
+import { averageValue, gaugeEmoji, percentage, serverStats } from "@dicelette/utils";
 import type { Options } from "./types";
 
-export function percentage(partial: number, total: number) {
-	return total === 0 ? "0.00" : ((partial / total) * 100).toFixed(2);
-}
-
-export function averageValue(total: number, count: number) {
-	return count === 0 ? "0.00" : (total / count).toFixed(2);
-}
+export { averageValue, gaugeEmoji, percentage, serverStats };
 
 /**
  * Return the localized title corresponding to the given option.
@@ -25,43 +20,4 @@ export function getTitle(option: Options, ul: Translation) {
 		total: ul("common.total"),
 	};
 	return titles[option];
-}
-
-/**
- * Selects an emoji representing a consecutive success or failure streak.
- *
- * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
- * @param value - The consecutive-streak length
- * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji (`"😎"` or `"😔"`); for `value` > 5 and ≤ 10 the second emoji (`"🔥"` or `"💔"`); for `value` > 10 the third emoji (`"🐐"` or `"💀"`)
- */
-export function gaugeEmoji(type: "success" | "failure", value: number) {
-	if (value <= 1) return "";
-	const successEmoji = ["😎", "🔥", "🐐"];
-	const failureEmoji = ["😔", "💔", "💀"];
-	const emoji = type === "success" ? successEmoji : failureEmoji;
-	if (value > 1 && value <= 5) return emoji[0];
-	if (value > 5 && value <= 10) return emoji[1];
-	if (value > 10) return emoji[2];
-	return "";
-}
-
-export function serverStats(
-	totalCount: Count,
-	rollTotal: number,
-	usersWithCounts: number
-) {
-	const percent = {
-		criticalFailure: percentage(totalCount.criticalFailure, rollTotal),
-		criticalSuccess: percentage(totalCount.criticalSuccess, rollTotal),
-		failure: percentage(totalCount.failure, rollTotal),
-		success: percentage(totalCount.success, rollTotal),
-	};
-
-	const avg = {
-		criticalFailure: averageValue(totalCount.criticalFailure, usersWithCounts),
-		criticalSuccess: averageValue(totalCount.criticalSuccess, usersWithCounts),
-		failure: averageValue(totalCount.failure, usersWithCounts),
-		success: averageValue(totalCount.success, usersWithCounts),
-	};
-	return { avg, percent };
 }

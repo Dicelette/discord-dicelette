@@ -5,6 +5,7 @@ import { createBootstrapRouter } from "./bootstrap";
 import { createChannelsRouter } from "./channels";
 import { createCharactersRouter } from "./characters";
 import { createConfigRouter } from "./config";
+import { createKarmaRouter } from "./karma";
 import { createTemplateRouter } from "./template";
 import { createUserRouter } from "./user";
 
@@ -25,6 +26,7 @@ export function createGuildRouter(deps: DashboardDeps) {
 	router.use("/:guildId", createChannelsRouter(deps));
 	router.use("/:guildId", createUserRouter(deps));
 	router.use("/:guildId/characters", createCharactersRouter(deps));
+	router.use("/:guildId/karma", createKarmaRouter(deps));
 	router.use("/:guildId/template", createTemplateRouter(deps));
 
 	return router;

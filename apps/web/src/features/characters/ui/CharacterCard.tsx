@@ -139,6 +139,8 @@ function CharacterCard({ char, shareHref }: Props) {
 						<IconButton
 							component={RouterLink}
 							to={shareHref}
+							target="_blank"
+							rel="noopener noreferrer"
 							size="small"
 							aria-label={t("characters.share")}
 							sx={shareButtonSx}

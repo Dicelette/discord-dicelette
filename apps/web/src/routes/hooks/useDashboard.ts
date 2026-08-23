@@ -35,7 +35,9 @@ export type ActiveTab =
 	| "template"
 	| "user"
 	| "characters"
-	| "server-characters";
+	| "server-characters"
+	| "karma-server"
+	| "karma-me";
 
 interface State {
 	tab: ActiveTab;
@@ -350,6 +352,16 @@ export function useDashboard(guildId: string | undefined) {
 		}
 	}, [guildId]);
 
+	/**
+	 * Bumps the characters refresh token without busting the server-side cache
+	 * — used to re-fetch characters on tab click (cheap: the server just
+	 * returns the cached list if it's still fresh). For a guaranteed-fresh
+	 * read that bypasses the cache, use `handleCharactersRefresh` instead.
+	 */
+	const bumpCharactersRefreshToken = useCallback(() => {
+		dispatch({ type: "increment_refresh_token" });
+	}, []);
+
 	const handleCharactersRefresh = useCallback(async () => {
 		if (!guildId) return;
 		dispatch({ type: "set_refreshing", value: true });
@@ -401,5 +413,6 @@ export function useDashboard(guildId: string | undefined) {
 		handleCharactersRefresh,
 		handleTabChange,
 		refetchConfig,
+		bumpCharactersRefreshToken,
 	};
 }

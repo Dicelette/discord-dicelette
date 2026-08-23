@@ -1,22 +1,6 @@
-export type Options =
-	| "criticalSuccess"
-	| "criticalFailure"
-	| "success"
-	| "failure"
-	| "total";
-export type SortMode = "brut" | "ratio";
-export const ALL_OPTIONS: Options[] = [
-	"total",
-	"success",
-	"failure",
-	"criticalSuccess",
-	"criticalFailure",
-];
-export type LeaderBoardRow = {
-	userId: string;
-	success: number;
-	failure: number;
-	criticalSuccess: number;
-	criticalFailure: number;
-	total: number;
-};
+export type {
+	KarmaOption as Options,
+	KarmaSortMode as SortMode,
+	LeaderBoardRow,
+} from "@dicelette/utils";
+export { ALL_KARMA_OPTIONS as ALL_OPTIONS } from "@dicelette/utils";

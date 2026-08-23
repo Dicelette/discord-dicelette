@@ -97,6 +97,7 @@
 	},
 	"dashboard": {
 		"loadError": "Could not load configuration.",
+		"openNav": "Open navigation menu",
 		"refreshCharacters": "Refresh characters",
 		"refreshCharactersError": "Could not refresh characters.",
 		"refreshCharactersSuccess": "Characters refreshed!",
@@ -104,15 +105,59 @@
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
-			"admin": "Server configuration",
-			"characters": "My characters",
-			"serverCharacters": "Server characters",
-			"template": "Model configuration",
+			"admin": "Server",
+			"characters": "Sheets",
+			"groups": {
+				"characters": "Characters",
+				"configuration": "Configuration",
+				"karma": "Karma"
+			},
+			"karmaMe": "Bilan",
+			"karmaServer": "Server",
+			"serverCharacters": "Server",
+			"template": "Model",
 			"templateView": "Model",
-			"user": "Personal configuration"
+			"user": "Personal"
 		},
 		"title": "Server configuration",
 		"userOnlyNotice": "You don't have admin permissions on this server. You can still manage your personal settings below."
+	},
+	"karma": {
+		"average": "Average",
+		"leaderboard": {
+			"empty": "No player matches this ranking yet.",
+			"rankBy": "Rank by",
+			"share": "Share this leaderboard",
+			"title": "Leaderboard"
+		},
+		"loadError": "Could not load karma data.",
+		"noData": "No karma data available on this server yet.",
+		"noPersonalData": "You don't have any recorded rolls yet.",
+		"noSearchResults": "No player matches the search.",
+		"notFound": "No karma data for this user.",
+		"publicTitle": "Karma",
+		"reset": {
+			"button": "Reset",
+			"confirmBodySelf": "This will permanently reset your own karma. This action cannot be undone.",
+			"confirmBodyUser": "This will permanently reset {name}'s karma. This action cannot be undone.",
+			"confirmButton": "Reset",
+			"confirmTitle": "Are you sure?",
+			"error": "Could not reset karma.",
+			"searchLabel": "Select a player",
+			"success": "Karma reset successfully.",
+			"title": "Reset karma"
+		},
+		"rollCountOne": "{total} roll",
+		"rollCountOther": "{total} rolls",
+		"searchPlaceholder": "Search by name…",
+		"searchTitle": "Search a player",
+		"serverStats": "Server statistics",
+		"share": "Share this karma page",
+		"streakActive": "{count} in a row",
+		"streakRecord": "Record: {count}",
+		"title": "Karma",
+		"totalRolls": "Total rolls: {rollTotal} by {usersWithCounts} players",
+		"unnamed": "Unknown player"
 	},
 	"login": {
 		"button": "Sign in with Discord",

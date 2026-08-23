@@ -1,5 +1,5 @@
 import type { EventEmitter } from "node:events";
-import { resolveCsvImportAvatar } from "@dicelette/helpers";
+import { fetchAvatarUrl, resolveCsvImportAvatar } from "@dicelette/helpers";
 import { ln } from "@dicelette/localization";
 import { startDashboardServer } from "@dicelette/server";
 import type { UserData, UserGuildData } from "@dicelette/types";
@@ -27,6 +27,7 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 		userPreferences: client.userPreferences,
 		template: client.template,
 		characters: client.characters,
+		criticalCount: client.criticalCount,
 		bulkEditTemplateUser: (guildId, template) => {
 			const lang = client.settings.get(guildId, "lang");
 			const ul = ln(lang ?? Djs.Locale.EnglishUS);
@@ -85,6 +86,15 @@ export function startBotDashboard(client: EClient, guildEvents: EventEmitter): v
 							const m =
 								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
 							return `@${m.user.username}`;
+						} catch {
+							return null;
+						}
+					},
+					fetchMemberAvatar: async (userId) => {
+						try {
+							const m =
+								guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
+							return await fetchAvatarUrl(guild, m.user, m);
 						} catch {
 							return null;
 						}

@@ -1,28 +1,10 @@
 import type { EClient } from "@dicelette/client";
-import type { DBCount, Translation } from "@dicelette/types";
-import { fontPath } from "@dicelette/utils";
+import type { Translation } from "@dicelette/types";
+import { fontPath, type LeaderBoardRow, normalizeGuildCount } from "@dicelette/utils";
 import { loadImage } from "canvas";
 import type { ChartConfiguration, ChartOptions, Plugin } from "chart.js";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import * as Djs from "discord.js";
-import type { LeaderBoardRow } from "./types";
-
-export function normalizeGuildCount(guildCount: DBCount): LeaderBoardRow[] {
-	return Object.entries(guildCount).map(([userId, data]) => {
-		const success = data?.success ?? 0;
-		const failure = data?.failure ?? 0;
-		const criticalSuccess = data?.criticalSuccess ?? 0;
-		const criticalFailure = data?.criticalFailure ?? 0;
-		return {
-			userId,
-			success,
-			failure,
-			criticalSuccess,
-			criticalFailure,
-			total: success + failure,
-		};
-	});
-}
 
 async function buildLeaderBoardChart(
 	interaction: Djs.ChatInputCommandInteraction,

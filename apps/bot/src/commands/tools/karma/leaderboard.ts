@@ -1,41 +1,43 @@
 import type { EClient } from "@dicelette/client";
 import type { Count, DBCount, Translation } from "@dicelette/types";
+import {
+	calculateServerStats,
+	mergeCountDefaults,
+	normalizeGuildCount,
+	percentage,
+	serverStats,
+	sortKarmaEntries,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { t } from "i18next";
 import { generateRandomColor } from "./bilan";
 import { ALL_OPTIONS, type Options, type SortMode } from "./types";
-import { getTitle, percentage, serverStats } from "./utils";
+import { getTitle } from "./utils";
+
+export { calculateServerStats };
 
 function descriptionLeaderBoard(
 	guildCount: DBCount,
 	option: Options,
 	sortMode: SortMode
 ) {
-	const sorted = Object.entries(guildCount).sort((a, b) => {
-		if (sortMode === "ratio" && option !== "total") {
-			const ratioA =
-				(a[1]?.total ?? 0) === 0 ? 0 : (a[1]?.[option] ?? 0) / (a[1]?.total ?? 1);
-			const ratioB =
-				(b[1]?.total ?? 0) === 0 ? 0 : (b[1]?.[option] ?? 0) / (b[1]?.total ?? 1);
-			return ratioB - ratioA;
-		}
-		return (b[1]?.[option] ?? 0) - (a[1]?.[option] ?? 0);
-	});
-	const top10 = sorted.slice(0, 10);
+	const top10 = sortKarmaEntries(normalizeGuildCount(guildCount), option, sortMode).slice(
+		0,
+		10
+	);
 
 	return top10
-		.filter(([, data]) => (data?.[option] ?? 0) > 0)
-		.map(([userId, data], i) => {
-			const value = data?.[option] ?? 0;
-			const total = data?.total ?? 0;
+		.map((row, i) => {
+			const value = row[option] ?? 0;
+			const total = row.total ?? 0;
 			if (option === "total") {
-				return `**${i + 1}.** ${Djs.userMention(userId)}: ${value}`;
+				return `**${i + 1}.** ${Djs.userMention(row.userId)}: ${value}`;
 			}
 			const pct = percentage(value, total);
 			if (sortMode === "ratio") {
-				return `**${i + 1}.** ${Djs.userMention(userId)}: ${pct}% [${value}/${total}]`;
+				return `**${i + 1}.** ${Djs.userMention(row.userId)}: ${pct}% [${value}/${total}]`;
 			}
-			return `**${i + 1}.** ${Djs.userMention(userId)}: ${value}/${total} [${pct}%]`;
+			return `**${i + 1}.** ${Djs.userMention(row.userId)}: ${value}/${total} [${pct}%]`;
 		})
 		.join("\n");
 }
@@ -101,21 +103,12 @@ export async function leaderboard(
 	}
 
 	for (const userId in guildCount) {
-		const defaultCount: Count = {
-			criticalFailure: 0,
-			criticalSuccess: 0,
-			failure: 0,
-			success: 0,
-			total: 0,
-		};
-		//fusion des valeurs manquantes
-		guildCount[userId] = Object.assign(defaultCount, guildCount[userId]);
-		const total = guildCount[userId].success + guildCount[userId].failure;
-		if (total < threshold) {
+		const merged = mergeCountDefaults(guildCount[userId]);
+		if ((merged.total ?? 0) < threshold) {
 			delete guildCount[userId];
 			continue;
 		}
-		guildCount[userId].total = total;
+		guildCount[userId] = merged;
 	}
 	if (!option) {
 		// Display all leaderboards if no specific option is chosen
@@ -187,43 +180,4 @@ export async function leaderboard(
 	}
 
 	await interaction.editReply({ embeds: [embed] });
-}
-
-/**
- * Calcule les totaux et moyennes pour tous les utilisateurs
- */
-export function calculateServerStats(guildCount: Record<string, Count>) {
-	const totalCount: Count = {
-		criticalFailure: 0,
-		criticalSuccess: 0,
-		failure: 0,
-		success: 0,
-	};
-
-	let usersWithCounts = 0;
-	let rollTotal = 0;
-
-	for (const userId in guildCount) {
-		const defaultCount: Count = {
-			criticalFailure: 0,
-			criticalSuccess: 0,
-			failure: 0,
-			success: 0,
-			total: 0,
-		};
-		//fusion des valeurs manquantes
-		const userCount = Object.assign(defaultCount, guildCount[userId]);
-		const totalRolls = userCount.success + userCount.failure;
-
-		if (totalRolls > 0) {
-			totalCount.success += userCount.success;
-			totalCount.failure += userCount.failure;
-			totalCount.criticalSuccess += userCount.criticalSuccess;
-			totalCount.criticalFailure += userCount.criticalFailure;
-			usersWithCounts++;
-			rollTotal += totalRolls;
-		}
-	}
-
-	return { rollTotal, totalCount, usersWithCounts };
 }

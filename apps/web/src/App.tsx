@@ -6,6 +6,8 @@ import {
 	CharDetailPage,
 	CharPage,
 	Dashboard,
+	KarmaLeaderboardPage,
+	KarmaPage,
 	Login,
 	LoginError,
 	Playground,
@@ -26,6 +28,8 @@ function App() {
 			<Route path="/playground" element={<Playground />} />
 			<Route path="/char/:guildId/:userId" element={<CharPage />} />
 			<Route path="/char/:guildId/:userId/:charName" element={<CharDetailPage />} />
+			<Route path="/karma/:guildId/leaderboard" element={<KarmaLeaderboardPage />} />
+			<Route path="/karma/:guildId/:userId" element={<KarmaPage />} />
 			<Route path="/" element={user ? <AppLayout /> : <Navigate to="/login" />}>
 				<Route index element={<Servers />} />
 				<Route path="dashboard/:guildId" element={<Dashboard />} />

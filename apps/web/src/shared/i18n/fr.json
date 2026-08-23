@@ -97,6 +97,7 @@
 	},
 	"dashboard": {
 		"loadError": "Impossible de charger la configuration.",
+		"openNav": "Ouvrir le menu de navigation",
 		"refreshCharacters": "Actualiser les personnages",
 		"refreshCharactersError": "Impossible d'actualiser les personnages.",
 		"refreshCharactersSuccess": "Personnages actualisés !",
@@ -104,15 +105,59 @@
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
-			"admin": "Configuration serveur",
-			"characters": "Mes personnages",
-			"serverCharacters": "Personnages du serveur",
-			"template": "Configuration du modèle",
+			"admin": "Serveur",
+			"characters": "Fiches",
+			"groups": {
+				"characters": "Personnages",
+				"configuration": "Configuration",
+				"karma": "Karma"
+			},
+			"karmaMe": "Bilan",
+			"karmaServer": "Serveur",
+			"serverCharacters": "Serveur",
+			"template": "Modèle",
 			"templateView": "Modèle",
-			"user": "Configuration personnelle"
+			"user": "Personnel"
 		},
 		"title": "Configuration du serveur",
 		"userOnlyNotice": "Vous n'avez pas les permissions d'administration sur ce serveur. Vous pouvez tout de même gérer vos paramètres personnels ci-dessous."
+	},
+	"karma": {
+		"average": "Moyenne",
+		"leaderboard": {
+			"empty": "Aucun joueur ne correspond encore à ce classement.",
+			"rankBy": "Trier par",
+			"share": "Partager ce classement",
+			"title": "Classement"
+		},
+		"loadError": "Impossible de charger les données de karma.",
+		"noData": "Aucune donnée de karma disponible sur ce serveur pour le moment.",
+		"noPersonalData": "Vous n'avez encore aucun jet enregistré.",
+		"noSearchResults": "Aucun joueur ne correspond à la recherche.",
+		"notFound": "Aucune donnée de karma pour cet utilisateur.",
+		"publicTitle": "Karma",
+		"reset": {
+			"button": "Réinitialiser",
+			"confirmBodySelf": "Ceci réinitialisera définitivement votre propre karma. Cette action est irréversible.",
+			"confirmBodyUser": "Ceci réinitialisera définitivement le karma de {name}. Cette action est irréversible.",
+			"confirmButton": "Réinitialiser",
+			"confirmTitle": "Êtes-vous sûr ?",
+			"error": "Impossible de réinitialiser le karma.",
+			"searchLabel": "Sélectionner un joueur",
+			"success": "Karma réinitialisé avec succès.",
+			"title": "Réinitialiser le karma"
+		},
+		"rollCountOne": "{total} jet",
+		"rollCountOther": "{total} jets",
+		"searchPlaceholder": "Rechercher par nom…",
+		"searchTitle": "Rechercher un joueur",
+		"serverStats": "Statistiques du serveur",
+		"share": "Partager cette page de karma",
+		"streakActive": "{count} d'affilée",
+		"streakRecord": "Record : {count}",
+		"title": "Karma",
+		"totalRolls": "Total des jets : {rollTotal} par {usersWithCounts} joueurs",
+		"unnamed": "Joueur inconnu"
 	},
 	"login": {
 		"button": "Se connecter avec Discord",
