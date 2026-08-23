@@ -1,4 +1,4 @@
-import type { ApiKarmaEntry } from "@dicelette/api";
+import type { ApiKarmaEntry, ApiKarmaOverview } from "@dicelette/api";
 import SearchIcon from "@mui/icons-material/Search";
 import {
 	Alert,
@@ -16,7 +16,6 @@ import { buildKarmaShareHref } from "./shareLink";
 import KarmaCountCard from "./ui/KarmaCountCard";
 import KarmaLeaderboard from "./ui/KarmaLeaderboard";
 import KarmaServerStats from "./ui/KarmaServerStats";
-import { useKarmaOverview } from "./useKarmaOverview";
 
 const PAGE_SIZE = 5;
 
@@ -27,16 +26,19 @@ const paginationBoxSx = { display: "flex", justifyContent: "center", mt: 3 } as 
 interface Props {
 	guildId: string;
 	currentUserId: string;
-	refreshToken?: number;
+	overview: ApiKarmaOverview | null;
+	loading: boolean;
+	error: string | null;
 }
 
 export default function KarmaServerTab({
 	guildId,
 	currentUserId,
-	refreshToken = 0,
+	overview,
+	loading,
+	error,
 }: Props) {
 	const { t } = useI18n();
-	const { overview, loading, error } = useKarmaOverview(guildId, refreshToken);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 

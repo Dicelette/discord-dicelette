@@ -1,16 +1,19 @@
+import type { ApiKarmaOverview } from "@dicelette/api";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 import { useI18n } from "@shared";
 import { buildKarmaShareHref } from "./shareLink";
 import KarmaCountCard from "./ui/KarmaCountCard";
 import KarmaResetPanel from "./ui/KarmaResetPanel";
-import { useKarmaOverview } from "./useKarmaOverview";
 
 interface Props {
 	guildId: string;
 	currentUserId: string;
 	currentUserName: string;
 	isAdmin: boolean;
-	refreshToken?: number;
+	overview: ApiKarmaOverview | null;
+	loading: boolean;
+	error: string | null;
+	onReset: () => void;
 }
 
 export default function KarmaPersonalTab({
@@ -18,10 +21,12 @@ export default function KarmaPersonalTab({
 	currentUserId,
 	currentUserName,
 	isAdmin,
-	refreshToken = 0,
+	overview,
+	loading,
+	error,
+	onReset,
 }: Props) {
 	const { t } = useI18n();
-	const { overview, loading, error, reload } = useKarmaOverview(guildId, refreshToken);
 
 	if (loading) {
 		return (
@@ -40,7 +45,7 @@ export default function KarmaPersonalTab({
 				guildId={guildId}
 				isAdmin={isAdmin}
 				users={overview.users}
-				onReset={reload}
+				onReset={onReset}
 			/>
 			<Box sx={{ mb: 3 }}>
 				{overview.me ? (

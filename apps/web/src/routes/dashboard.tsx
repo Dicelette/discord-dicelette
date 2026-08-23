@@ -41,6 +41,7 @@ import {
 	KarmaServerTab,
 	ServerCharactersTab,
 	UserConfigForm,
+	useKarmaOverview,
 } from "../features";
 import { GuildConfigProvider } from "../features/guild-config/context";
 import { useAuth, useToast } from "../providers";
@@ -116,6 +117,19 @@ export default function Dashboard() {
 		handleTabChange,
 		refetchConfig,
 	} = useDashboard(guildId);
+
+	const karmaOverview = useKarmaOverview(guildId ?? "");
+	const [refreshingKarma, setRefreshingKarma] = useState(false);
+
+	const handleKarmaRefresh = async () => {
+		setRefreshingKarma(true);
+		const ok = await karmaOverview.reload();
+		setRefreshingKarma(false);
+		enqueueToast(
+			ok ? t("dashboard.refreshKarmaSuccess") : t("dashboard.refreshKarmaError"),
+			ok ? undefined : "error"
+		);
+	};
 
 	const guildIconUrl =
 		guildId && guildIcon
@@ -267,24 +281,46 @@ export default function Dashboard() {
 						{headerLabel}
 					</Typography>
 				</Box>
-				<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
-					<Box component="span">
-						<IconButton
-							onClick={handleCharactersRefresh}
-							disabled={refreshingCharacters}
-							size="small"
-							aria-label={t("dashboard.refreshCharacters")}
-						>
-							<RefreshIcon
-								sx={{
-									animation: refreshingCharacters
-										? `${spinAnimation} 1.4s linear infinite`
-										: "none",
-								}}
-							/>
-						</IconButton>
-					</Box>
-				</Tooltip>
+				{(tab === "characters" || tab === "server-characters") && (
+					<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
+						<Box component="span">
+							<IconButton
+								onClick={handleCharactersRefresh}
+								disabled={refreshingCharacters}
+								size="small"
+								aria-label={t("dashboard.refreshCharacters")}
+							>
+								<RefreshIcon
+									sx={{
+										animation: refreshingCharacters
+											? `${spinAnimation} 1.4s linear infinite`
+											: "none",
+									}}
+								/>
+							</IconButton>
+						</Box>
+					</Tooltip>
+				)}
+				{(tab === "karma-server" || tab === "karma-me") && (
+					<Tooltip title={t("dashboard.refreshKarmaTooltip")}>
+						<Box component="span">
+							<IconButton
+								onClick={handleKarmaRefresh}
+								disabled={refreshingKarma}
+								size="small"
+								aria-label={t("dashboard.refreshKarma")}
+							>
+								<RefreshIcon
+									sx={{
+										animation: refreshingKarma
+											? `${spinAnimation} 1.4s linear infinite`
+											: "none",
+									}}
+								/>
+							</IconButton>
+						</Box>
+					</Tooltip>
+				)}
 			</Box>
 			{error && (
 				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
@@ -362,7 +398,9 @@ export default function Dashboard() {
 						<KarmaServerTab
 							guildId={guildId!}
 							currentUserId={user!.id}
-							refreshToken={charactersRefreshToken}
+							overview={karmaOverview.overview}
+							loading={karmaOverview.loading}
+							error={karmaOverview.error}
 						/>
 					</TabPanel>
 					<TabPanel value="karma-me" current={tab} mounted={mountedTabs}>
@@ -371,7 +409,10 @@ export default function Dashboard() {
 							currentUserId={user!.id}
 							currentUserName={user!.global_name ?? user!.username}
 							isAdmin={isAdmin}
-							refreshToken={charactersRefreshToken}
+							overview={karmaOverview.overview}
+							loading={karmaOverview.loading}
+							error={karmaOverview.error}
+							onReset={karmaOverview.reload}
 						/>
 					</TabPanel>
 				</Box>

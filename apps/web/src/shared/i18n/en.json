@@ -102,6 +102,10 @@
 		"refreshCharactersError": "Could not refresh characters.",
 		"refreshCharactersSuccess": "Characters refreshed!",
 		"refreshCharactersTooltip": "Refreshes characters data.",
+		"refreshKarma": "Refresh karma",
+		"refreshKarmaError": "Could not refresh karma.",
+		"refreshKarmaSuccess": "Karma refreshed!",
+		"refreshKarmaTooltip": "Refreshes karma data.",
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
