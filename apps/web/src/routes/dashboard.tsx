@@ -97,7 +97,6 @@ export default function Dashboard() {
 		isStrictAdmin,
 		userCharCount,
 		hasTemplate,
-		serverCharCount,
 		config,
 		userConfigData,
 		loading,
@@ -127,7 +126,7 @@ export default function Dashboard() {
 		switch (value) {
 			case "admin":
 			case "template":
-				refetchConfig();
+				void refetchConfig();
 				break;
 			case "characters":
 			case "server-characters":
@@ -135,7 +134,7 @@ export default function Dashboard() {
 				break;
 			case "karma-server":
 			case "karma-me":
-				karmaOverview.reload();
+				void karmaOverview.reload();
 				break;
 			default:
 				break;
