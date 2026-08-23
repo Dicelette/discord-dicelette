@@ -88,6 +88,18 @@ const SUCCESS_STREAK_EMOJI = ["😎", "🔥", "🐐"];
 const FAILURE_STREAK_EMOJI = ["😔", "💔", "💀"];
 
 /**
+ * Buckets a consecutive-streak length into the 3 tiers used for both the
+ * bot's gauge emoji and the dashboard's streak icon — shared so the two
+ * stay in lockstep. 0 means no active streak (value ≤ 1).
+ */
+export function streakTier(value: number): 0 | 1 | 2 | 3 {
+	if (value <= 1) return 0;
+	if (value <= 5) return 1;
+	if (value <= 10) return 2;
+	return 3;
+}
+
+/**
  * Selects an emoji representing a consecutive success or failure streak.
  *
  * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
@@ -95,11 +107,10 @@ const FAILURE_STREAK_EMOJI = ["😔", "💔", "💀"];
  * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji; for `value` > 5 and ≤ 10 the second emoji; for `value` > 10 the third emoji
  */
 export function gaugeEmoji(type: "success" | "failure", value: number) {
-	if (value <= 1) return "";
+	const tier = streakTier(value);
+	if (tier === 0) return "";
 	const emoji = type === "success" ? SUCCESS_STREAK_EMOJI : FAILURE_STREAK_EMOJI;
-	if (value <= 5) return emoji[0];
-	if (value <= 10) return emoji[1];
-	return emoji[2];
+	return emoji[tier - 1];
 }
 
 export type KarmaOption =

@@ -1,6 +1,7 @@
-import { gaugeEmoji } from "@dicelette/utils";
+import { Icon } from "@iconify/react";
 import { Chip, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
+import { streakIcon } from "./streakIcon";
 
 interface Props {
 	type: "success" | "failure";
@@ -10,17 +11,18 @@ interface Props {
 	longest?: number;
 }
 
-/** Mirrors the bot's own /karma bilan streak display — same gauge emoji, same wording. */
+/** Mirrors the bot's own /karma bilan streak display — same gauge tiers, same wording. */
 export default function KarmaStreakChip({ type, current, longest }: Props) {
 	const { t } = useI18n();
 
 	if (current && current > 1) {
-		const label = `${t("karma.streakActive", { count: current })} ${gaugeEmoji(type, current)}`;
+		const icon = streakIcon(type, current);
 		return (
 			<Tooltip title={t(`luckMeter.count.consecutive.${type}`)}>
 				<Chip
 					size="small"
-					label={label}
+					icon={icon ? <Icon icon={icon} width="16" height="16" /> : undefined}
+					label={t("karma.streakActive", { count: current })}
 					color={type === "success" ? "warning" : "error"}
 					variant="filled"
 				/>
