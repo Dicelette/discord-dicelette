@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.8.0](https://github.com/Dicelette/discord-dicelette/compare/4.7.2...4.8.0) (2026-08-23)
+
+### Features
+
+* **dashboard:** add karma + better menu / refresh ([b77510d](https://github.com/Dicelette/discord-dicelette/commit/b77510d7a122f5620f488774e6387f3425753d26))
 ## [4.7.2](https://github.com/Dicelette/discord-dicelette/compare/4.7.1...4.7.2) (2026-08-22)
 
 ### Bug Fixes
