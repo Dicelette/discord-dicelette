@@ -241,8 +241,8 @@ export default function Dashboard() {
 
 	const selectTab = (value: ActiveTab) => {
 		setDrawerOpen(false);
-		if (hasUnsavedChanges || value === tab) return;
-		handleTabChange(undefined, value);
+		if (hasUnsavedChanges) return;
+		if (value !== tab) handleTabChange(undefined, value);
 		refreshTabData(value);
 	};
 
