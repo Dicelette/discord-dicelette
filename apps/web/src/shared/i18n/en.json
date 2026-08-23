@@ -106,13 +106,13 @@
 		"saveSuccess": "Configuration saved!",
 		"tabs": {
 			"admin": "Server",
-			"characters": "Mine",
+			"characters": "Sheets",
 			"groups": {
 				"characters": "Characters",
 				"configuration": "Configuration",
 				"karma": "Karma"
 			},
-			"karmaMe": "Personal",
+			"karmaMe": "Bilan",
 			"karmaServer": "Server",
 			"serverCharacters": "Server",
 			"template": "Model",

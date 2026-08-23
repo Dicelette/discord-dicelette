@@ -106,13 +106,13 @@
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
 			"admin": "Serveur",
-			"characters": "Les miens",
+			"characters": "Fiches",
 			"groups": {
 				"characters": "Personnages",
 				"configuration": "Configuration",
 				"karma": "Karma"
 			},
-			"karmaMe": "Personnel",
+			"karmaMe": "Bilan",
 			"karmaServer": "Serveur",
 			"serverCharacters": "Serveur",
 			"template": "Modèle",
