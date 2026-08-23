@@ -43,9 +43,6 @@ export default function KarmaPersonalTab({
 				onReset={reload}
 			/>
 			<Box sx={{ mb: 3 }}>
-				<Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
-					{t("karma.myKarma")}
-				</Typography>
 				{overview.me ? (
 					<KarmaCountCard
 						displayName={currentUserName}

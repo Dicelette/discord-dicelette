@@ -131,7 +131,6 @@
 			"title": "Leaderboard"
 		},
 		"loadError": "Could not load karma data.",
-		"myKarma": "My karma",
 		"noData": "No karma data available on this server yet.",
 		"noPersonalData": "You don't have any recorded rolls yet.",
 		"noSearchResults": "No player matches the search.",

@@ -131,7 +131,6 @@
 			"title": "Classement"
 		},
 		"loadError": "Impossible de charger les données de karma.",
-		"myKarma": "Mon karma",
 		"noData": "Aucune donnée de karma disponible sur ce serveur pour le moment.",
 		"noPersonalData": "Vous n'avez encore aucun jet enregistré.",
 		"noSearchResults": "Aucun joueur ne correspond à la recherche.",

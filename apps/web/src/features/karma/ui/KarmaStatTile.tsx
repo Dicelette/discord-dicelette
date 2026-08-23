@@ -73,7 +73,7 @@ export default function KarmaStatTile({ tone, label, value, caption, extra, sx }
 				>
 					{label}
 				</Typography>
-				<Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
+				<Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
 					<Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
 						{value}
 					</Typography>
