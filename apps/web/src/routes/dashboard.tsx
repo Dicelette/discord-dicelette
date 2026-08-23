@@ -8,7 +8,16 @@ const spinAnimation = keyframes`
 	to { transform: rotate(360deg); }
 `;
 
-import { Badge, Casino, Menu as MenuIcon, Settings } from "@mui/icons-material";
+import {
+	Badge,
+	Casino,
+	Description,
+	Groups,
+	Leaderboard,
+	Menu as MenuIcon,
+	Person,
+	Settings,
+} from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -130,25 +139,43 @@ export default function Dashboard() {
 
 	const configurationItems: DashboardNavGroup["items"] = [];
 	if (isAdmin) {
-		configurationItems.push({ value: "admin", label: t("dashboard.tabs.admin") });
-		configurationItems.push({ value: "template", label: t("dashboard.tabs.template") });
+		configurationItems.push({
+			value: "admin",
+			label: t("dashboard.tabs.admin"),
+			icon: <Settings sx={navIconSx} />,
+		});
+		configurationItems.push({
+			value: "template",
+			label: t("dashboard.tabs.template"),
+			icon: <Description sx={navIconSx} />,
+		});
 	} else if (hasTemplate) {
 		configurationItems.push({
 			value: "template",
 			label: t("dashboard.tabs.templateView"),
+			icon: <Description sx={navIconSx} />,
 		});
 	}
-	configurationItems.push({ value: "user", label: t("dashboard.tabs.user") });
+	configurationItems.push({
+		value: "user",
+		label: t("dashboard.tabs.user"),
+		icon: <Person sx={navIconSx} />,
+	});
 
 	const charactersItems: DashboardNavGroup["items"] = [];
 	if (isAdmin && config?.templateID?.channelId) {
 		charactersItems.push({
 			value: "server-characters",
 			label: t("dashboard.tabs.serverCharacters"),
+			icon: <Groups sx={navIconSx} />,
 		});
 	}
 	if (userCharCount > 0) {
-		charactersItems.push({ value: "characters", label: t("dashboard.tabs.characters") });
+		charactersItems.push({
+			value: "characters",
+			label: t("dashboard.tabs.characters"),
+			icon: <Badge sx={navIconSx} />,
+		});
 	}
 
 	const navGroups: DashboardNavGroup[] = [
@@ -172,8 +199,16 @@ export default function Dashboard() {
 		label: t("dashboard.tabs.groups.karma"),
 		icon: <Casino sx={navIconSx} />,
 		items: [
-			{ value: "karma-server", label: t("dashboard.tabs.karmaServer") },
-			{ value: "karma-me", label: t("dashboard.tabs.karmaMe") },
+			{
+				value: "karma-server",
+				label: t("dashboard.tabs.karmaServer"),
+				icon: <Leaderboard sx={navIconSx} />,
+			},
+			{
+				value: "karma-me",
+				label: t("dashboard.tabs.karmaMe"),
+				icon: <Person sx={navIconSx} />,
+			},
 		],
 	});
 

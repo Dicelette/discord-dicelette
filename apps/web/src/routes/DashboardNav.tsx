@@ -14,6 +14,7 @@ import type { ActiveTab } from "./hooks/useDashboard";
 export interface DashboardNavItem {
 	value: ActiveTab;
 	label: string;
+	icon: ReactNode;
 }
 
 export interface DashboardNavGroup {
@@ -26,7 +27,8 @@ export interface DashboardNavGroup {
 const groupButtonSx = { borderRadius: 1.5, mb: 0.25 } as const;
 const groupIconSx = { minWidth: 36 } as const;
 const groupLabelSx = { primary: { sx: { fontWeight: 600 } } } as const;
-const subItemSx = { borderRadius: 1.5, mb: 0.25, pl: 4 } as const;
+const subItemSx = { borderRadius: 1.5, mb: 0.25, pl: 2 } as const;
+const subItemIconSx = { minWidth: 32 } as const;
 
 interface Props {
 	groups: DashboardNavGroup[];
@@ -69,6 +71,7 @@ export default function DashboardNav({ groups, current, onSelect }: Props) {
 										onClick={() => onSelect(item.value)}
 										sx={subItemSx}
 									>
+										<ListItemIcon sx={subItemIconSx}>{item.icon}</ListItemIcon>
 										<ListItemText primary={item.label} />
 									</ListItemButton>
 								))}
