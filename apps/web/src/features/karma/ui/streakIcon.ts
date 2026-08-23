@@ -22,3 +22,8 @@ export function streakIcon(type: "success" | "failure", value: number): string |
 	const icons = type === "success" ? SUCCESS_STREAK_ICON : FAILURE_STREAK_ICON;
 	return icons[tier - 1];
 }
+
+/** Icon for a "longest streak ever" chip — a trophy for a success record, a grave for a failure one. */
+export function recordIcon(type: "success" | "failure"): string {
+	return type === "success" ? "tabler:trophy" : "tabler:grave";
+}

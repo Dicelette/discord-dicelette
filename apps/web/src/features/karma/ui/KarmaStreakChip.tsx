@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Chip, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
-import { streakIcon } from "./streakIcon";
+import { recordIcon, streakIcon } from "./streakIcon";
 
 interface Props {
 	type: "success" | "failure";
@@ -35,6 +35,7 @@ export default function KarmaStreakChip({ type, current, longest }: Props) {
 			<Tooltip title={t(`luckMeter.count.longest.${type}`)}>
 				<Chip
 					size="small"
+					icon={<Icon icon={recordIcon(type)} width="16" height="16" />}
 					label={t("karma.streakRecord", { count: longest })}
 					variant="outlined"
 				/>
