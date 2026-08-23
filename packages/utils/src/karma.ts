@@ -84,6 +84,24 @@ export function serverStats(
 	return { avg, percent };
 }
 
+const SUCCESS_STREAK_EMOJI = ["😎", "🔥", "🐐"];
+const FAILURE_STREAK_EMOJI = ["😔", "💔", "💀"];
+
+/**
+ * Selects an emoji representing a consecutive success or failure streak.
+ *
+ * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
+ * @param value - The consecutive-streak length
+ * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji; for `value` > 5 and ≤ 10 the second emoji; for `value` > 10 the third emoji
+ */
+export function gaugeEmoji(type: "success" | "failure", value: number) {
+	if (value <= 1) return "";
+	const emoji = type === "success" ? SUCCESS_STREAK_EMOJI : FAILURE_STREAK_EMOJI;
+	if (value <= 5) return emoji[0];
+	if (value <= 10) return emoji[1];
+	return emoji[2];
+}
+
 export type KarmaOption =
 	| "criticalSuccess"
 	| "criticalFailure"

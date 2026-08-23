@@ -1,5 +1,12 @@
 import { AutoAwesome, Bolt, Cancel, CheckCircle } from "@mui/icons-material";
-import { alpha, Box, Typography, useTheme } from "@mui/material";
+import {
+	alpha,
+	Box,
+	type SxProps,
+	type Theme,
+	Typography,
+	useTheme,
+} from "@mui/material";
 import { purple } from "@mui/material/colors";
 import type { ReactNode } from "react";
 
@@ -30,9 +37,11 @@ interface Props {
 	caption?: string;
 	/** Extra content shown inline next to the value — e.g. a streak indicator for this category. */
 	extra?: ReactNode;
+	/** Extra sx merged onto the tile's root Box — e.g. to position it in a parent grid. */
+	sx?: SxProps<Theme>;
 }
 
-export default function KarmaStatTile({ tone, label, value, caption, extra }: Props) {
+export default function KarmaStatTile({ tone, label, value, caption, extra, sx }: Props) {
 	const theme = useTheme();
 	const toneColor =
 		tone === "success"
@@ -46,11 +55,14 @@ export default function KarmaStatTile({ tone, label, value, caption, extra }: Pr
 
 	return (
 		<Box
-			sx={{
-				...tileSx,
-				bgcolor: alpha(toneColor, isDark ? 0.16 : 0.08),
-				borderColor: alpha(toneColor, isDark ? 0.4 : 0.28),
-			}}
+			sx={[
+				{
+					...tileSx,
+					bgcolor: alpha(toneColor, isDark ? 0.16 : 0.08),
+					borderColor: alpha(toneColor, isDark ? 0.4 : 0.28),
+				},
+				...(Array.isArray(sx) ? sx : [sx]),
+			]}
 		>
 			<Box sx={{ color: toneColor, display: "flex" }}>{TONE_ICON[tone]}</Box>
 			<Box sx={{ minWidth: 0, flex: 1 }}>

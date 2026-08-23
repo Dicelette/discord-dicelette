@@ -1,21 +1,26 @@
 import type { Count } from "@dicelette/types";
 import { Share } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
-import { Avatar, Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
+import {
+	Avatar,
+	Box,
+	IconButton,
+	Paper,
+	type SxProps,
+	type Theme,
+	Tooltip,
+	Typography,
+} from "@mui/material";
 import { useI18n } from "@shared";
 import type { ReactNode } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import KarmaStatTile, { type KarmaTone } from "./KarmaStatTile";
 import KarmaStreakChip from "./KarmaStreakChip";
+import { statsGridSx, tilePositionSx } from "./karmaStatGrid";
 
 const cardPaperSx = { p: 3 } as const;
 const headerBoxSx = { display: "flex", alignItems: "center", gap: 2, mb: 2 } as const;
 const nameSectionSx = { flex: 1, minWidth: 0 } as const;
-const statsGridSx = {
-	display: "grid",
-	gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
-	gap: 1.5,
-} as const;
 const shareButtonSx = { flexShrink: 0 } as const;
 
 function pct(partial: number, total: number): string {
@@ -46,20 +51,8 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 		value: number;
 		caption: string;
 		extra?: ReactNode;
+		sx: SxProps<Theme>;
 	}[] = [
-		{
-			tone: "success",
-			label: t("roll.success"),
-			value: count.success,
-			caption: `${pct(count.success, total)}%`,
-			extra: hasSuccessStreakInfo ? (
-				<KarmaStreakChip
-					type="success"
-					current={count.consecutive?.success}
-					longest={count.longestStreak?.success}
-				/>
-			) : undefined,
-		},
 		{
 			tone: "failure",
 			label: t("roll.failure"),
@@ -72,22 +65,39 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 					longest={count.longestStreak?.failure}
 				/>
 			) : undefined,
+			sx: tilePositionSx("failure"),
+		},
+		{
+			tone: "success",
+			label: t("roll.success"),
+			value: count.success,
+			caption: `${pct(count.success, total)}%`,
+			extra: hasSuccessStreakInfo ? (
+				<KarmaStreakChip
+					type="success"
+					current={count.consecutive?.success}
+					longest={count.longestStreak?.success}
+				/>
+			) : undefined,
+			sx: tilePositionSx("success"),
 		},
 	];
-	if (count.criticalSuccess > 0) {
-		tiles.push({
-			tone: "criticalSuccess",
-			label: t("roll.critical.success"),
-			value: count.criticalSuccess,
-			caption: `${pct(count.criticalSuccess, total)}%`,
-		});
-	}
 	if (count.criticalFailure > 0) {
 		tiles.push({
 			tone: "criticalFailure",
 			label: t("roll.critical.failure"),
 			value: count.criticalFailure,
 			caption: `${pct(count.criticalFailure, total)}%`,
+			sx: tilePositionSx("criticalFailure"),
+		});
+	}
+	if (count.criticalSuccess > 0) {
+		tiles.push({
+			tone: "criticalSuccess",
+			label: t("roll.critical.success"),
+			value: count.criticalSuccess,
+			caption: `${pct(count.criticalSuccess, total)}%`,
+			sx: tilePositionSx("criticalSuccess"),
 		});
 	}
 
@@ -123,7 +133,7 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 			</Box>
 			<Box sx={statsGridSx}>
 				{tiles.map((tile) => (
-					<KarmaStatTile key={tile.label} {...tile} />
+					<KarmaStatTile key={tile.tone} {...tile} />
 				))}
 			</Box>
 		</Paper>
