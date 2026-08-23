@@ -52,6 +52,36 @@ async function resolveMemberInfo(
 	return new Map(entries);
 }
 
+/**
+ * Build the list of every tracked karma entry for a guild (userId, resolved
+ * display name/avatar, and their Count) — shared by the authenticated
+ * overview route and the public leaderboard route so both return the exact
+ * same ranking data.
+ */
+async function buildUsersList(
+	guildCount: DBCount,
+	guildId: string,
+	botGuilds: DashboardDeps["botGuilds"],
+	extraUserIds: string[] = []
+): Promise<{ users: ApiKarmaEntry[]; memberInfo: Map<string, MemberInfo> }> {
+	const trackedEntries = Object.entries(guildCount)
+		.map(([uid, count]) => [uid, mergeCountDefaults(count)] as const)
+		.filter(([, count]) => (count.total ?? 0) > 0);
+
+	const allUserIds = new Set(trackedEntries.map(([uid]) => uid));
+	for (const uid of extraUserIds) allUserIds.add(uid);
+	const memberInfo = await resolveMemberInfo([...allUserIds], guildId, botGuilds);
+
+	const users: ApiKarmaEntry[] = trackedEntries.map(([uid, count]) => ({
+		userId: uid,
+		displayName: memberInfo.get(uid)?.displayName ?? null,
+		avatar: memberInfo.get(uid)?.avatar ?? null,
+		...count,
+	}));
+
+	return { users, memberInfo };
+}
+
 export function createKarmaRouter(deps: DashboardDeps) {
 	const { criticalCount, botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
@@ -70,22 +100,11 @@ export function createKarmaRouter(deps: DashboardDeps) {
 			const userId = req.auth!.userId;
 			const guildCount: DBCount = criticalCount.get(guildId) ?? {};
 
-			const trackedEntries = Object.entries(guildCount)
-				.map(([uid, count]) => [uid, mergeCountDefaults(count)] as const)
-				.filter(([, count]) => (count.total ?? 0) > 0);
-
 			// Fetch the current user's info in the same batch even if they have
 			// no tracked karma yet, so `meAvatar` still resolves.
-			const allUserIds = new Set(trackedEntries.map(([uid]) => uid));
-			allUserIds.add(userId);
-			const memberInfo = await resolveMemberInfo([...allUserIds], guildId, botGuilds);
-
-			const users: ApiKarmaEntry[] = trackedEntries.map(([uid, count]) => ({
-				userId: uid,
-				displayName: memberInfo.get(uid)?.displayName ?? null,
-				avatar: memberInfo.get(uid)?.avatar ?? null,
-				...count,
-			}));
+			const { users, memberInfo } = await buildUsersList(guildCount, guildId, botGuilds, [
+				userId,
+			]);
 
 			const { rollTotal, totalCount, usersWithCounts } = calculateServerStats(guildCount);
 			const { avg, percent } = serverStats(totalCount, rollTotal, usersWithCounts);
@@ -102,6 +121,17 @@ export function createKarmaRouter(deps: DashboardDeps) {
 			});
 		}
 	);
+
+	// GET /:guildId/karma/public — public, read-only leaderboard data (every
+	// tracked user's karma) for a shareable leaderboard link. No auth, mirrors
+	// the characters/public route; same data any authenticated guild member
+	// can already see via the "/" route above.
+	router.get("/public", async (req: Request, res: Response) => {
+		const guildId = req.params.guildId as string;
+		const guildCount: DBCount = criticalCount.get(guildId) ?? {};
+		const { users } = await buildUsersList(guildCount, guildId, botGuilds);
+		sendNoStoreJson(res, { users });
+	});
 
 	// GET /:guildId/karma/public/:userId — public, read-only karma for a single
 	// user, for a shareable profile link. No auth, mirrors the characters/public route.

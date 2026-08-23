@@ -74,6 +74,11 @@ export interface ApiKarmaOverview {
 	users: ApiKarmaEntry[];
 }
 
+/** Public, unauthenticated payload for a shareable leaderboard link. */
+export interface ApiKarmaLeaderboard {
+	users: ApiKarmaEntry[];
+}
+
 export interface DiscordUser {
 	id: string;
 	username: string;

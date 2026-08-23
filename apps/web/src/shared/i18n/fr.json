@@ -121,6 +121,7 @@
 		"leaderboard": {
 			"empty": "Aucun joueur ne correspond encore à ce classement.",
 			"rankBy": "Trier par",
+			"share": "Partager ce classement",
 			"title": "Classement"
 		},
 		"loadError": "Impossible de charger les données de karma.",

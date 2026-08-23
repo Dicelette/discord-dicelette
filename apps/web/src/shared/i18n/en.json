@@ -121,6 +121,7 @@
 		"leaderboard": {
 			"empty": "No player matches this ranking yet.",
 			"rankBy": "Rank by",
+			"share": "Share this leaderboard",
 			"title": "Leaderboard"
 		},
 		"loadError": "Could not load karma data.",

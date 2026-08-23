@@ -5,20 +5,30 @@ import {
 	type KarmaSortMode,
 	sortKarmaEntries,
 } from "@dicelette/utils";
+import { Share } from "@mui/icons-material";
 import {
 	Box,
+	IconButton,
 	MenuItem,
 	Paper,
 	TextField,
 	ToggleButton,
 	ToggleButtonGroup,
+	Tooltip,
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
 import { useMemo, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import { buildKarmaLeaderboardShareHref } from "../shareLink";
 import KarmaLeaderboardRow from "./KarmaLeaderboardRow";
 
 const panelPaperSx = { p: 3, mb: 3 } as const;
+const headerRowSx = {
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "space-between",
+} as const;
 const controlsRowSx = {
 	display: "flex",
 	gap: 2,
@@ -46,12 +56,21 @@ function optionLabel(t: (key: string) => string, option: KarmaOption): string {
 interface Props {
 	guildId: string;
 	users: ApiKarmaEntry[];
+	initialOption?: KarmaOption;
+	initialSortMode?: KarmaSortMode;
 }
 
-export default function KarmaLeaderboard({ guildId, users }: Props) {
+export default function KarmaLeaderboard({
+	guildId,
+	users,
+	initialOption = "total",
+	initialSortMode = "brut",
+}: Props) {
 	const { t } = useI18n();
-	const [option, setOption] = useState<KarmaOption>("total");
-	const [sortMode, setSortMode] = useState<KarmaSortMode>("brut");
+	const [option, setOption] = useState<KarmaOption>(initialOption);
+	const [sortMode, setSortMode] = useState<KarmaSortMode>(
+		initialOption === "total" ? "brut" : initialSortMode
+	);
 
 	const ranked = useMemo(
 		() => sortKarmaEntries(users, option, sortMode).slice(0, 10),
@@ -65,9 +84,23 @@ export default function KarmaLeaderboard({ guildId, users }: Props) {
 
 	return (
 		<Paper variant="outlined" sx={panelPaperSx}>
-			<Typography variant="h6" sx={{ fontWeight: 600 }}>
-				{t("karma.leaderboard.title")}
-			</Typography>
+			<Box sx={headerRowSx}>
+				<Typography variant="h6" sx={{ fontWeight: 600 }}>
+					{t("karma.leaderboard.title")}
+				</Typography>
+				<Tooltip title={t("karma.leaderboard.share")}>
+					<IconButton
+						component={RouterLink}
+						to={buildKarmaLeaderboardShareHref(guildId, option, sortMode)}
+						target="_blank"
+						rel="noopener noreferrer"
+						size="small"
+						aria-label={t("karma.leaderboard.share")}
+					>
+						<Share fontSize="small" />
+					</IconButton>
+				</Tooltip>
+			</Box>
 			<Box sx={controlsRowSx}>
 				<TextField
 					select
