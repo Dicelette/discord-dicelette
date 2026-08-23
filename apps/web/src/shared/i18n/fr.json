@@ -105,13 +105,19 @@
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
-			"admin": "Configuration serveur",
-			"characters": "Mes personnages",
-			"karma": "Karma",
-			"serverCharacters": "Personnages du serveur",
-			"template": "Configuration du modèle",
+			"admin": "Serveur",
+			"characters": "Les miens",
+			"groups": {
+				"characters": "Personnages",
+				"configuration": "Configuration",
+				"karma": "Karma"
+			},
+			"karmaMe": "Personnel + Réinitialisation",
+			"karmaServer": "Serveur + Recherche",
+			"serverCharacters": "Serveur",
+			"template": "Modèle",
 			"templateView": "Modèle",
-			"user": "Configuration personnelle"
+			"user": "Personnel"
 		},
 		"title": "Configuration du serveur",
 		"userOnlyNotice": "Vous n'avez pas les permissions d'administration sur ce serveur. Vous pouvez tout de même gérer vos paramètres personnels ci-dessous."

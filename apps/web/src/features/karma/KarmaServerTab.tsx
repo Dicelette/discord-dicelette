@@ -1,5 +1,4 @@
-import type { ApiKarmaEntry, ApiKarmaOverview } from "@dicelette/api";
-import { karmaApi } from "@dicelette/api";
+import type { ApiKarmaEntry } from "@dicelette/api";
 import SearchIcon from "@mui/icons-material/Search";
 import {
 	Alert,
@@ -11,13 +10,13 @@ import {
 	Typography,
 } from "@mui/material";
 import { useI18n } from "@shared";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import "uniformize";
 import { buildKarmaShareHref } from "./shareLink";
 import KarmaCountCard from "./ui/KarmaCountCard";
 import KarmaLeaderboard from "./ui/KarmaLeaderboard";
-import KarmaResetPanel from "./ui/KarmaResetPanel";
 import KarmaServerStats from "./ui/KarmaServerStats";
+import { useKarmaOverview } from "./useKarmaOverview";
 
 const PAGE_SIZE = 5;
 
@@ -28,48 +27,18 @@ const paginationBoxSx = { display: "flex", justifyContent: "center", mt: 3 } as 
 interface Props {
 	guildId: string;
 	currentUserId: string;
-	currentUserName: string;
-	isAdmin: boolean;
 	refreshToken?: number;
 }
 
-export default function KarmaTab({
+export default function KarmaServerTab({
 	guildId,
 	currentUserId,
-	currentUserName,
-	isAdmin,
 	refreshToken = 0,
 }: Props) {
 	const { t } = useI18n();
-	const [overview, setOverview] = useState<ApiKarmaOverview | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const { overview, loading, error } = useKarmaOverview(guildId, refreshToken);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
-	const lastRefreshToken = useRef(refreshToken);
-
-	const load = useCallback(async () => {
-		setLoading(true);
-		setError(null);
-		try {
-			const res = await karmaApi.getOverview(guildId);
-			setOverview(res.data);
-		} catch {
-			setError(t("karma.loadError"));
-		} finally {
-			setLoading(false);
-		}
-	}, [guildId, t]);
-
-	useEffect(() => {
-		load();
-	}, [load]);
-
-	useEffect(() => {
-		if (lastRefreshToken.current === refreshToken) return;
-		lastRefreshToken.current = refreshToken;
-		load();
-	}, [load, refreshToken]);
 
 	const query = useMemo(() => search.trim().toLowerCase(), [search]);
 	const otherUsers = useMemo(
@@ -98,30 +67,6 @@ export default function KarmaTab({
 
 	return (
 		<Box>
-			<KarmaResetPanel
-				guildId={guildId}
-				isAdmin={isAdmin}
-				users={overview.users}
-				onReset={load}
-			/>
-			<Box sx={{ mb: 3 }}>
-				<Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
-					{t("karma.myKarma")}
-				</Typography>
-				{overview.me ? (
-					<KarmaCountCard
-						displayName={currentUserName}
-						avatar={overview.meAvatar}
-						count={overview.me}
-						shareHref={buildKarmaShareHref(guildId, currentUserId)}
-					/>
-				) : (
-					<Typography sx={{ color: "text.secondary" }}>
-						{t("karma.noPersonalData")}
-					</Typography>
-				)}
-			</Box>
-
 			<Box sx={{ mb: 3 }}>
 				<KarmaServerStats server={overview.server} />
 			</Box>

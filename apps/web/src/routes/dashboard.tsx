@@ -8,15 +8,7 @@ const spinAnimation = keyframes`
 	to { transform: rotate(360deg); }
 `;
 
-import {
-	Badge,
-	Casino,
-	Description,
-	Groups,
-	Menu as MenuIcon,
-	Person,
-	Settings,
-} from "@mui/icons-material";
+import { Badge, Casino, Menu as MenuIcon, Settings } from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -34,13 +26,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
 	CharactersTab,
 	GuildConfigForm,
-	KarmaTab,
+	KarmaPersonalTab,
+	KarmaServerTab,
 	ServerCharactersTab,
 	UserConfigForm,
 } from "../features";
 import { GuildConfigProvider } from "../features/guild-config/context";
 import { useAuth, useToast } from "../providers";
-import DashboardNav, { type DashboardNavItem } from "./DashboardNav";
+import DashboardNav, { type DashboardNavGroup } from "./DashboardNav";
 import { type ActiveTab, useDashboard } from "./hooks/useDashboard";
 
 const ModelConfigForm = lazy(() => import("../features/template-config/ModelConfigForm"));
@@ -135,48 +128,53 @@ export default function Dashboard() {
 		);
 	}
 
-	const navItems: DashboardNavItem[] = [];
+	const configurationItems: DashboardNavGroup["items"] = [];
 	if (isAdmin) {
-		navItems.push({
-			value: "admin",
-			label: t("dashboard.tabs.admin"),
-			icon: <Settings sx={navIconSx} />,
-		});
-		navItems.push({
-			value: "template",
-			label: t("dashboard.tabs.template"),
-			icon: <Description sx={navIconSx} />,
-		});
+		configurationItems.push({ value: "admin", label: t("dashboard.tabs.admin") });
+		configurationItems.push({ value: "template", label: t("dashboard.tabs.template") });
 	} else if (hasTemplate) {
-		navItems.push({
+		configurationItems.push({
 			value: "template",
 			label: t("dashboard.tabs.templateView"),
-			icon: <Description sx={navIconSx} />,
 		});
 	}
+	configurationItems.push({ value: "user", label: t("dashboard.tabs.user") });
+
+	const charactersItems: DashboardNavGroup["items"] = [];
 	if (isAdmin && config?.templateID?.channelId) {
-		navItems.push({
+		charactersItems.push({
 			value: "server-characters",
 			label: t("dashboard.tabs.serverCharacters"),
-			icon: <Groups sx={navIconSx} />,
 		});
 	}
-	navItems.push({
-		value: "user",
-		label: t("dashboard.tabs.user"),
-		icon: <Person sx={navIconSx} />,
-	});
 	if (userCharCount > 0) {
-		navItems.push({
-			value: "characters",
-			label: t("dashboard.tabs.characters"),
+		charactersItems.push({ value: "characters", label: t("dashboard.tabs.characters") });
+	}
+
+	const navGroups: DashboardNavGroup[] = [
+		{
+			id: "configuration",
+			label: t("dashboard.tabs.groups.configuration"),
+			icon: <Settings sx={navIconSx} />,
+			items: configurationItems,
+		},
+	];
+	if (charactersItems.length > 0) {
+		navGroups.push({
+			id: "characters",
+			label: t("dashboard.tabs.groups.characters"),
 			icon: <Badge sx={navIconSx} />,
+			items: charactersItems,
 		});
 	}
-	navItems.push({
-		value: "karma",
-		label: t("dashboard.tabs.karma"),
+	navGroups.push({
+		id: "karma",
+		label: t("dashboard.tabs.groups.karma"),
 		icon: <Casino sx={navIconSx} />,
+		items: [
+			{ value: "karma-server", label: t("dashboard.tabs.karmaServer") },
+			{ value: "karma-me", label: t("dashboard.tabs.karmaMe") },
+		],
 	});
 
 	const selectTab = (value: ActiveTab) => {
@@ -258,7 +256,7 @@ export default function Dashboard() {
 			)}
 			<Box sx={layoutRowSx}>
 				<Box component="nav" sx={sidebarBoxSx}>
-					<DashboardNav items={navItems} current={tab} onSelect={selectTab} />
+					<DashboardNav groups={navGroups} current={tab} onSelect={selectTab} />
 				</Box>
 				<Drawer
 					anchor="left"
@@ -266,7 +264,7 @@ export default function Dashboard() {
 					onClose={() => setDrawerOpen(false)}
 					slotProps={{ paper: { sx: drawerPaperSx } }}
 				>
-					<DashboardNav items={navItems} current={tab} onSelect={selectTab} />
+					<DashboardNav groups={navGroups} current={tab} onSelect={selectTab} />
 				</Drawer>
 				<Box sx={contentBoxSx}>
 					{isAdmin && config && (
@@ -323,8 +321,15 @@ export default function Dashboard() {
 							/>
 						</TabPanel>
 					)}
-					<TabPanel value="karma" current={tab} mounted={mountedTabs}>
-						<KarmaTab
+					<TabPanel value="karma-server" current={tab} mounted={mountedTabs}>
+						<KarmaServerTab
+							guildId={guildId!}
+							currentUserId={user!.id}
+							refreshToken={charactersRefreshToken}
+						/>
+					</TabPanel>
+					<TabPanel value="karma-me" current={tab} mounted={mountedTabs}>
+						<KarmaPersonalTab
 							guildId={guildId!}
 							currentUserId={user!.id}
 							currentUserName={user!.global_name ?? user!.username}
