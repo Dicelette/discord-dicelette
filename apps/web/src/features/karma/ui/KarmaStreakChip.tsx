@@ -1,4 +1,3 @@
-import { Icon } from "@iconify/react";
 import { Chip, Tooltip } from "@mui/material";
 import { useI18n } from "@shared";
 import { recordIcon, streakIcon } from "./streakIcon";
@@ -16,12 +15,12 @@ export default function KarmaStreakChip({ type, current, longest }: Props) {
 	const { t } = useI18n();
 
 	if (current && current > 1) {
-		const icon = streakIcon(type, current);
+		const StreakIcon = streakIcon(type, current);
 		return (
 			<Tooltip title={t(`luckMeter.count.consecutive.${type}`)}>
 				<Chip
 					size="small"
-					icon={icon ? <Icon icon={icon} width="16" height="16" /> : undefined}
+					icon={StreakIcon ? <StreakIcon fontSize="small" /> : undefined}
 					label={t("karma.streakActive", { count: current })}
 					color={type === "success" ? "warning" : "error"}
 					variant="filled"
@@ -31,11 +30,12 @@ export default function KarmaStreakChip({ type, current, longest }: Props) {
 	}
 
 	if (longest && longest > 1) {
+		const RecordIcon = recordIcon(type);
 		return (
 			<Tooltip title={t(`luckMeter.count.longest.${type}`)}>
 				<Chip
 					size="small"
-					icon={<Icon icon={recordIcon(type)} width="16" height="16" />}
+					icon={<RecordIcon fontSize="small" />}
 					label={t("karma.streakRecord", { count: longest })}
 					variant="outlined"
 				/>
