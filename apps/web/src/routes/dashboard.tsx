@@ -108,6 +108,7 @@ export default function Dashboard() {
 		refreshingCharacters,
 		refreshSuccess,
 		charactersRefreshToken,
+		hasUnsavedChanges,
 		channels,
 		roles,
 		guildName,
@@ -116,17 +117,26 @@ export default function Dashboard() {
 		handleCharactersRefresh,
 		handleTabChange,
 		refetchConfig,
+		refreshDashboardData,
 	} = useDashboard(guildId);
 
 	const karmaOverview = useKarmaOverview(guildId ?? "");
-	const [refreshingKarma, setRefreshingKarma] = useState(false);
+	const [refreshingGlobal, setRefreshingGlobal] = useState(false);
 
-	const handleKarmaRefresh = async () => {
-		setRefreshingKarma(true);
-		const ok = await karmaOverview.reload();
-		setRefreshingKarma(false);
+	const handleGlobalRefresh = async () => {
+		if (hasUnsavedChanges) {
+			enqueueToast(t("dashboard.refreshBlockedUnsaved"), "warning");
+			return;
+		}
+		setRefreshingGlobal(true);
+		const [dashboardOk, karmaOk] = await Promise.all([
+			refreshDashboardData(),
+			karmaOverview.reload(),
+		]);
+		setRefreshingGlobal(false);
+		const ok = dashboardOk && karmaOk;
 		enqueueToast(
-			ok ? t("dashboard.refreshKarmaSuccess") : t("dashboard.refreshKarmaError"),
+			ok ? t("dashboard.refreshAllSuccess") : t("dashboard.refreshAllError"),
 			ok ? undefined : "error"
 		);
 	};
@@ -281,46 +291,24 @@ export default function Dashboard() {
 						{headerLabel}
 					</Typography>
 				</Box>
-				{(tab === "characters" || tab === "server-characters") && (
-					<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
-						<Box component="span">
-							<IconButton
-								onClick={handleCharactersRefresh}
-								disabled={refreshingCharacters}
-								size="small"
-								aria-label={t("dashboard.refreshCharacters")}
-							>
-								<RefreshIcon
-									sx={{
-										animation: refreshingCharacters
-											? `${spinAnimation} 1.4s linear infinite`
-											: "none",
-									}}
-								/>
-							</IconButton>
-						</Box>
-					</Tooltip>
-				)}
-				{(tab === "karma-server" || tab === "karma-me") && (
-					<Tooltip title={t("dashboard.refreshKarmaTooltip")}>
-						<Box component="span">
-							<IconButton
-								onClick={handleKarmaRefresh}
-								disabled={refreshingKarma}
-								size="small"
-								aria-label={t("dashboard.refreshKarma")}
-							>
-								<RefreshIcon
-									sx={{
-										animation: refreshingKarma
-											? `${spinAnimation} 1.4s linear infinite`
-											: "none",
-									}}
-								/>
-							</IconButton>
-						</Box>
-					</Tooltip>
-				)}
+				<Tooltip title={t("dashboard.refreshAllTooltip")}>
+					<Box component="span">
+						<IconButton
+							onClick={handleGlobalRefresh}
+							disabled={refreshingGlobal}
+							size="small"
+							aria-label={t("dashboard.refreshAll")}
+						>
+							<RefreshIcon
+								sx={{
+									animation: refreshingGlobal
+										? `${spinAnimation} 1.4s linear infinite`
+										: "none",
+								}}
+							/>
+						</IconButton>
+					</Box>
+				</Tooltip>
 			</Box>
 			{error && (
 				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
