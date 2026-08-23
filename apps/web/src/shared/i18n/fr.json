@@ -102,10 +102,10 @@
 		"refreshCharactersError": "Impossible d'actualiser les personnages.",
 		"refreshCharactersSuccess": "Personnages actualisés !",
 		"refreshCharactersTooltip": "Rafraîchir les données des personnages.",
-		"refreshKarma": "Actualiser le karma",
-		"refreshKarmaError": "Impossible d'actualiser le karma.",
+		"refreshKarma": "Actualiser",
+		"refreshKarmaError": "Impossible d'actualiser.",
 		"refreshKarmaSuccess": "Karma actualisé !",
-		"refreshKarmaTooltip": "Rafraîchir les données de karma.",
+		"refreshKarmaTooltip": "Rafraîchir les données.",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
 		"tabs": {
