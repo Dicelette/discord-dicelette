@@ -98,11 +98,6 @@
 	"dashboard": {
 		"loadError": "Impossible de charger la configuration.",
 		"openNav": "Ouvrir le menu de navigation",
-		"refreshAll": "Tout actualiser",
-		"refreshAllError": "Impossible d'actualiser les données.",
-		"refreshAllSuccess": "Données actualisées !",
-		"refreshAllTooltip": "Rafraîchir toutes les données (configuration, personnages, karma).",
-		"refreshBlockedUnsaved": "Enregistrez ou annulez vos modifications avant d'actualiser.",
 		"refreshCharacters": "Actualiser les personnages",
 		"refreshCharactersError": "Impossible d'actualiser les personnages.",
 		"refreshCharactersSuccess": "Personnages actualisés !",

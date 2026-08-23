@@ -117,28 +117,29 @@ export default function Dashboard() {
 		handleCharactersRefresh,
 		handleTabChange,
 		refetchConfig,
-		refreshDashboardData,
+		bumpCharactersRefreshToken,
 	} = useDashboard(guildId);
 
 	const karmaOverview = useKarmaOverview(guildId ?? "");
-	const [refreshingGlobal, setRefreshingGlobal] = useState(false);
 
-	const handleGlobalRefresh = async () => {
-		if (hasUnsavedChanges) {
-			enqueueToast(t("dashboard.refreshBlockedUnsaved"), "warning");
-			return;
+	/** Cheap, cache-respecting re-fetch of the tab's own data — fired on every tab switch. */
+	const refreshTabData = (value: ActiveTab) => {
+		switch (value) {
+			case "admin":
+			case "template":
+				refetchConfig();
+				break;
+			case "characters":
+			case "server-characters":
+				bumpCharactersRefreshToken();
+				break;
+			case "karma-server":
+			case "karma-me":
+				karmaOverview.reload();
+				break;
+			default:
+				break;
 		}
-		setRefreshingGlobal(true);
-		const [dashboardOk, karmaOk] = await Promise.all([
-			refreshDashboardData(),
-			karmaOverview.reload(),
-		]);
-		setRefreshingGlobal(false);
-		const ok = dashboardOk && karmaOk;
-		enqueueToast(
-			ok ? t("dashboard.refreshAllSuccess") : t("dashboard.refreshAllError"),
-			ok ? undefined : "error"
-		);
 	};
 
 	const guildIconUrl =
@@ -239,8 +240,10 @@ export default function Dashboard() {
 	});
 
 	const selectTab = (value: ActiveTab) => {
-		handleTabChange(undefined, value);
 		setDrawerOpen(false);
+		if (hasUnsavedChanges || value === tab) return;
+		handleTabChange(undefined, value);
+		refreshTabData(value);
 	};
 
 	return (
@@ -291,24 +294,26 @@ export default function Dashboard() {
 						{headerLabel}
 					</Typography>
 				</Box>
-				<Tooltip title={t("dashboard.refreshAllTooltip")}>
-					<Box component="span">
-						<IconButton
-							onClick={handleGlobalRefresh}
-							disabled={refreshingGlobal}
-							size="small"
-							aria-label={t("dashboard.refreshAll")}
-						>
-							<RefreshIcon
-								sx={{
-									animation: refreshingGlobal
-										? `${spinAnimation} 1.4s linear infinite`
-										: "none",
-								}}
-							/>
-						</IconButton>
-					</Box>
-				</Tooltip>
+				{(tab === "characters" || tab === "server-characters") && (
+					<Tooltip title={t("dashboard.refreshCharactersTooltip")}>
+						<Box component="span">
+							<IconButton
+								onClick={handleCharactersRefresh}
+								disabled={refreshingCharacters}
+								size="small"
+								aria-label={t("dashboard.refreshCharacters")}
+							>
+								<RefreshIcon
+									sx={{
+										animation: refreshingCharacters
+											? `${spinAnimation} 1.4s linear infinite`
+											: "none",
+									}}
+								/>
+							</IconButton>
+						</Box>
+					</Tooltip>
+				)}
 			</Box>
 			{error && (
 				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>

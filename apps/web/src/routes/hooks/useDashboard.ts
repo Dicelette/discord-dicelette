@@ -73,14 +73,6 @@ type Action =
 			hasTemplate: boolean;
 			tab: ActiveTab;
 	  }
-	| {
-			type: "refresh_user";
-			isAdmin: boolean;
-			isStrictAdmin: boolean;
-			userCharCount: number;
-			userConfigData: ApiUserConfig["userConfig"];
-			hasTemplate: boolean;
-	  }
 	| { type: "config_loaded"; config: ApiGuildData }
 	| { type: "set_channels"; channels: Channel[] }
 	| { type: "set_roles"; roles: Role[] }
@@ -110,15 +102,6 @@ function reducer(state: State, action: Action): State {
 				hasTemplate: action.hasTemplate,
 				tab: action.tab,
 				mountedTabs: new Set([action.tab]),
-			};
-		case "refresh_user":
-			return {
-				...state,
-				isAdmin: action.isAdmin,
-				isStrictAdmin: action.isStrictAdmin,
-				userCharCount: action.userCharCount,
-				userConfigData: action.userConfigData,
-				hasTemplate: action.hasTemplate,
 			};
 		case "config_loaded":
 			return { ...state, config: action.config };
@@ -370,75 +353,14 @@ export function useDashboard(guildId: string | undefined) {
 	}, [guildId]);
 
 	/**
-	 * Re-fetches every piece of guild-scoped data the dashboard bootstrapped on
-	 * load (config, channels, roles, template flag, user's own settings) plus
-	 * busts the characters server cache — everything a bot slash command could
-	 * have changed since the page loaded, without a full page reload (which
-	 * would otherwise be the only way to see it, since switching React tabs
-	 * never re-fetches). Preserves the current tab. Resolves to whether it
-	 * succeeded.
+	 * Bumps the characters refresh token without busting the server-side cache
+	 * — used to re-fetch characters on tab click (cheap: the server just
+	 * returns the cached list if it's still fresh). For a guaranteed-fresh
+	 * read that bypasses the cache, use `handleCharactersRefresh` instead.
 	 */
-	const refreshDashboardData = useCallback(async (): Promise<boolean> => {
-		if (!guildId) return false;
-		dispatch({ type: "set_error", value: null });
-		try {
-			await charactersApi.refreshDashboard(guildId);
-			const bootstrapRes = await guildApi.getDashboardBootstrap(guildId);
-			const {
-				isAdmin,
-				isStrictAdmin,
-				userConfig,
-				userCharCount,
-				hasTemplate,
-				serverCharCount,
-				config,
-				channels,
-				roles,
-				guildName,
-				guildIcon,
-			} = bootstrapRes.data;
-			const nextServerCharCount = isAdmin ? serverCharCount : 0;
-			const nextConfig = isAdmin ? config : null;
-			const nextChannels = isAdmin ? channels : [];
-			const nextRoles = isAdmin ? roles : [];
-
-			dispatch({
-				type: "refresh_user",
-				isAdmin,
-				isStrictAdmin,
-				userCharCount,
-				userConfigData: userConfig,
-				hasTemplate,
-			});
-			dispatch({ type: "set_server_char_count", count: nextServerCharCount });
-			dispatch({ type: "set_channels", channels: nextChannels });
-			dispatch({ type: "set_roles", roles: nextRoles });
-			dispatch({ type: "set_guild_identity", name: guildName, icon: guildIcon });
-			if (nextConfig) dispatch({ type: "config_loaded", config: nextConfig });
-			dispatch({ type: "increment_refresh_token" });
-
-			dashboardClientCache.set(guildId, {
-				expiresAt: Date.now() + DASHBOARD_CACHE_TTL_MS,
-				data: {
-					isAdmin,
-					isStrictAdmin,
-					userCharCount,
-					userConfigData: userConfig,
-					hasTemplate,
-					serverCharCount: nextServerCharCount,
-					config: nextConfig,
-					channels: nextChannels,
-					roles: nextRoles,
-					guildName,
-					guildIcon,
-				},
-			});
-
-			return true;
-		} catch {
-			return false;
-		}
-	}, [guildId]);
+	const bumpCharactersRefreshToken = useCallback(() => {
+		dispatch({ type: "increment_refresh_token" });
+	}, []);
 
 	const handleCharactersRefresh = useCallback(async () => {
 		if (!guildId) return;
@@ -491,6 +413,6 @@ export function useDashboard(guildId: string | undefined) {
 		handleCharactersRefresh,
 		handleTabChange,
 		refetchConfig,
-		refreshDashboardData,
+		bumpCharactersRefreshToken,
 	};
 }

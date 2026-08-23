@@ -98,11 +98,6 @@
 	"dashboard": {
 		"loadError": "Could not load configuration.",
 		"openNav": "Open navigation menu",
-		"refreshAll": "Refresh everything",
-		"refreshAllError": "Could not refresh data.",
-		"refreshAllSuccess": "Data refreshed!",
-		"refreshAllTooltip": "Refreshes all data (configuration, characters, karma).",
-		"refreshBlockedUnsaved": "Save or discard your changes before refreshing.",
 		"refreshCharacters": "Refresh characters",
 		"refreshCharactersError": "Could not refresh characters.",
 		"refreshCharactersSuccess": "Characters refreshed!",
