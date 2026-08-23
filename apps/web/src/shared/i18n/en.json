@@ -118,6 +118,11 @@
 	},
 	"karma": {
 		"average": "Average",
+		"leaderboard": {
+			"empty": "No player matches this ranking yet.",
+			"rankBy": "Rank by",
+			"title": "Leaderboard"
+		},
 		"loadError": "Could not load karma data.",
 		"myKarma": "My karma",
 		"noData": "No karma data available on this server yet.",

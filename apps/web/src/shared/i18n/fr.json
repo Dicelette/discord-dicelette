@@ -118,6 +118,11 @@
 	},
 	"karma": {
 		"average": "Moyenne",
+		"leaderboard": {
+			"empty": "Aucun joueur ne correspond encore à ce classement.",
+			"rankBy": "Trier par",
+			"title": "Classement"
+		},
 		"loadError": "Impossible de charger les données de karma.",
 		"myKarma": "Mon karma",
 		"noData": "Aucune donnée de karma disponible sur ce serveur pour le moment.",

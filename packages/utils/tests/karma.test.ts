@@ -1,4 +1,4 @@
-import type { DBCount } from "@dicelette/types";
+import type { Count, DBCount } from "@dicelette/types";
 import { describe, expect, it } from "vitest";
 import {
 	averageValue,
@@ -7,6 +7,7 @@ import {
 	normalizeGuildCount,
 	percentage,
 	serverStats,
+	sortKarmaEntries,
 } from "../src/karma";
 
 describe("percentage", () => {
@@ -97,6 +98,71 @@ describe("serverStats", () => {
 		expect(percent.success).toBe("62.50");
 		expect(percent.failure).toBe("37.50");
 		expect(avg.success).toBe("2.50");
+	});
+});
+
+describe("sortKarmaEntries", () => {
+	type Entry = Count & { userId: string };
+	const entries: Entry[] = [
+		{
+			userId: "alice",
+			success: 9,
+			failure: 1,
+			criticalSuccess: 2,
+			criticalFailure: 0,
+			total: 10,
+		},
+		{
+			userId: "bob",
+			success: 3,
+			failure: 7,
+			criticalSuccess: 0,
+			criticalFailure: 1,
+			total: 10,
+		},
+		{
+			userId: "carol",
+			success: 0,
+			failure: 0,
+			criticalSuccess: 0,
+			criticalFailure: 0,
+			total: 0,
+		},
+	];
+
+	it("ranks by raw count, dropping zero-value entries", () => {
+		const ranked = sortKarmaEntries(entries, "success", "brut");
+		expect(ranked.map((e) => e.userId)).toEqual(["alice", "bob"]);
+	});
+
+	it("ranks by each entry's own ratio, not the raw count", () => {
+		// bob: 3/10 = 30% success, alice: 9/10 = 90% success — alice still wins either way,
+		// so use failure to show ratio flips the raw-count order (bob has more raw failures
+		// but alice has the higher failure *ratio* relative to... use a case where they diverge).
+		const skewed: Entry[] = [
+			{ userId: "dan", success: 1, failure: 9, criticalSuccess: 0, criticalFailure: 0 }, // 90% failure
+			{
+				userId: "eve",
+				success: 90,
+				failure: 10,
+				criticalSuccess: 0,
+				criticalFailure: 0,
+			}, // 10% failure, but higher raw count
+		];
+		expect(sortKarmaEntries(skewed, "failure", "brut").map((e) => e.userId)).toEqual([
+			"eve",
+			"dan",
+		]);
+		expect(sortKarmaEntries(skewed, "failure", "ratio").map((e) => e.userId)).toEqual([
+			"dan",
+			"eve",
+		]);
+	});
+
+	it("ignores ratio mode for the total option", () => {
+		expect(sortKarmaEntries(entries, "total", "ratio").map((e) => e.userId)).toEqual(
+			sortKarmaEntries(entries, "total", "brut").map((e) => e.userId)
+		);
 	});
 });
 

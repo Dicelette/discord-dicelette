@@ -84,6 +84,47 @@ export function serverStats(
 	return { avg, percent };
 }
 
+export type KarmaOption =
+	| "criticalSuccess"
+	| "criticalFailure"
+	| "success"
+	| "failure"
+	| "total";
+export type KarmaSortMode = "brut" | "ratio";
+export const ALL_KARMA_OPTIONS: KarmaOption[] = [
+	"total",
+	"success",
+	"failure",
+	"criticalSuccess",
+	"criticalFailure",
+];
+
+/**
+ * Rank karma entries by a given option, either by raw count ("brut") or by
+ * each user's ratio of that option against their own total ("ratio" — a
+ * no-op for the "total" option, since a total-over-itself ratio is always 1
+ * and carries no ranking information). Entries with a zero value for
+ * `option` are dropped, matching the bot's own /karma leaderboard behavior.
+ */
+export function sortKarmaEntries<T extends Count>(
+	entries: T[],
+	option: KarmaOption,
+	sortMode: KarmaSortMode
+): T[] {
+	return entries
+		.filter((entry) => (entry[option] ?? 0) > 0)
+		.sort((a, b) => {
+			if (sortMode === "ratio" && option !== "total") {
+				const totalA = a.total ?? 0;
+				const totalB = b.total ?? 0;
+				const ratioA = totalA === 0 ? 0 : (a[option] ?? 0) / totalA;
+				const ratioB = totalB === 0 ? 0 : (b[option] ?? 0) / totalB;
+				return ratioB - ratioA;
+			}
+			return (b[option] ?? 0) - (a[option] ?? 0);
+		});
+}
+
 export type LeaderBoardRow = {
 	userId: string;
 	success: number;

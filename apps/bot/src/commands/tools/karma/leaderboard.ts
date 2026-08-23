@@ -3,8 +3,10 @@ import type { Count, DBCount, Translation } from "@dicelette/types";
 import {
 	calculateServerStats,
 	mergeCountDefaults,
+	normalizeGuildCount,
 	percentage,
 	serverStats,
+	sortKarmaEntries,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { t } from "i18next";
@@ -19,31 +21,23 @@ function descriptionLeaderBoard(
 	option: Options,
 	sortMode: SortMode
 ) {
-	const sorted = Object.entries(guildCount).sort((a, b) => {
-		if (sortMode === "ratio" && option !== "total") {
-			const ratioA =
-				(a[1]?.total ?? 0) === 0 ? 0 : (a[1]?.[option] ?? 0) / (a[1]?.total ?? 1);
-			const ratioB =
-				(b[1]?.total ?? 0) === 0 ? 0 : (b[1]?.[option] ?? 0) / (b[1]?.total ?? 1);
-			return ratioB - ratioA;
-		}
-		return (b[1]?.[option] ?? 0) - (a[1]?.[option] ?? 0);
-	});
-	const top10 = sorted.slice(0, 10);
+	const top10 = sortKarmaEntries(normalizeGuildCount(guildCount), option, sortMode).slice(
+		0,
+		10
+	);
 
 	return top10
-		.filter(([, data]) => (data?.[option] ?? 0) > 0)
-		.map(([userId, data], i) => {
-			const value = data?.[option] ?? 0;
-			const total = data?.total ?? 0;
+		.map((row, i) => {
+			const value = row[option] ?? 0;
+			const total = row.total ?? 0;
 			if (option === "total") {
-				return `**${i + 1}.** ${Djs.userMention(userId)}: ${value}`;
+				return `**${i + 1}.** ${Djs.userMention(row.userId)}: ${value}`;
 			}
 			const pct = percentage(value, total);
 			if (sortMode === "ratio") {
-				return `**${i + 1}.** ${Djs.userMention(userId)}: ${pct}% [${value}/${total}]`;
+				return `**${i + 1}.** ${Djs.userMention(row.userId)}: ${pct}% [${value}/${total}]`;
 			}
-			return `**${i + 1}.** ${Djs.userMention(userId)}: ${value}/${total} [${pct}%]`;
+			return `**${i + 1}.** ${Djs.userMention(row.userId)}: ${value}/${total} [${pct}%]`;
 		})
 		.join("\n");
 }

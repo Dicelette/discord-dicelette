@@ -15,6 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "uniformize";
 import { buildKarmaShareHref } from "./shareLink";
 import KarmaCountCard from "./ui/KarmaCountCard";
+import KarmaLeaderboard from "./ui/KarmaLeaderboard";
 import KarmaResetPanel from "./ui/KarmaResetPanel";
 import KarmaServerStats from "./ui/KarmaServerStats";
 
@@ -124,6 +125,8 @@ export default function KarmaTab({
 			<Box sx={{ mb: 3 }}>
 				<KarmaServerStats server={overview.server} />
 			</Box>
+
+			<KarmaLeaderboard guildId={guildId} users={overview.users} />
 
 			<Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
 				{t("karma.searchTitle")}
