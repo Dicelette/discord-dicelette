@@ -33,8 +33,12 @@
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
+		"reload": "Reload page",
+		"retry": "Retry",
 		"save": "Save",
-		"saving": "Saving..."
+		"saving": "Saving...",
+		"unexpectedError": "Something went wrong",
+		"unexpectedErrorHint": "An unexpected error occurred. You can reload the page to continue."
 	},
 	"config": {
 		"fields": {

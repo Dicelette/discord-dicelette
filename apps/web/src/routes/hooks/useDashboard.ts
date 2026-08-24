@@ -1,7 +1,14 @@
 import { type ApiUserConfig, charactersApi, guildApi } from "@dicelette/api";
 import type { ApiGuildData } from "@dicelette/types";
 import { type Channel, type Role, useI18n } from "@shared";
-import { startTransition, useCallback, useEffect, useReducer, useRef } from "react";
+import {
+	startTransition,
+	useCallback,
+	useEffect,
+	useReducer,
+	useRef,
+	useState,
+} from "react";
 
 const DASHBOARD_LOAD_DEBOUNCE_MS = 150;
 const DASHBOARD_CACHE_TTL_MS = 20_000;
@@ -155,6 +162,7 @@ export function useDashboard(guildId: string | undefined) {
 	// always translated in the current locale when they are actually dispatched.
 	const tRef = useRef(t);
 	tRef.current = t;
+	const [reloadToken, setReloadToken] = useState(0);
 
 	const [state, dispatch] = useReducer(reducer, {
 		tab: "admin",
@@ -180,10 +188,13 @@ export function useDashboard(guildId: string | undefined) {
 		guildIcon: null,
 	});
 
+	// `t` removed — tRef always holds the current translator. `reloadToken` is a
+	// bump-only counter from retryLoad() to force a re-run; it's never read in the body.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reloadToken is a deliberate re-run trigger
 	useEffect(() => {
 		if (!guildId) return;
-		const cached = dashboardClientCache.get(guildId);
-		if (cached && Date.now() < cached.expiresAt) {
+
+		const applyCachedData = (cached: DashboardCacheEntry) => {
 			const {
 				isAdmin,
 				isStrictAdmin,
@@ -211,6 +222,11 @@ export function useDashboard(guildId: string | undefined) {
 			dispatch({ type: "set_roles", roles });
 			dispatch({ type: "set_server_char_count", count: serverCharCount });
 			dispatch({ type: "set_guild_identity", name: guildName, icon: guildIcon });
+		};
+
+		const cached = dashboardClientCache.get(guildId);
+		if (cached && Date.now() < cached.expiresAt) {
+			applyCachedData(cached);
 			dispatch({ type: "set_error", value: null });
 			dispatch({ type: "set_loading", value: false });
 			return;
@@ -287,7 +303,14 @@ export function useDashboard(guildId: string | undefined) {
 				}
 			} catch {
 				if (!isActive || signal.aborted) return;
-				dispatch({ type: "set_error", value: tRef.current("dashboard.loadError") });
+				// A stale-but-present cache entry beats a hard error — silently keep
+				// showing it rather than surfacing a "couldn't refresh" message the
+				// user can't act on; only a guild with no cache at all shows an error.
+				if (cached) {
+					applyCachedData(cached);
+				} else {
+					dispatch({ type: "set_error", value: tRef.current("dashboard.loadError") });
+				}
 			} finally {
 				if (isActive && !signal.aborted) {
 					dispatch({ type: "set_loading", value: false });
@@ -302,7 +325,9 @@ export function useDashboard(guildId: string | undefined) {
 			clearTimeout(timeoutId);
 			controller.abort();
 		};
-	}, [guildId]); // `t` removed — tRef always holds the current translator
+	}, [guildId, reloadToken]);
+
+	const retryLoad = useCallback(() => setReloadToken((n) => n + 1), []);
 
 	const handleSave = useCallback(
 		async (updates: Partial<ApiGuildData>) => {
@@ -414,5 +439,6 @@ export function useDashboard(guildId: string | undefined) {
 		handleTabChange,
 		refetchConfig,
 		bumpCharactersRefreshToken,
+		retryLoad,
 	};
 }

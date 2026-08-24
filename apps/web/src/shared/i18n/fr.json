@@ -33,8 +33,12 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
+		"reload": "Recharger la page",
+		"retry": "Réessayer",
 		"save": "Sauvegarder",
-		"saving": "Sauvegarde..."
+		"saving": "Sauvegarde...",
+		"unexpectedError": "Une erreur inattendue s'est produite",
+		"unexpectedErrorHint": "Quelque chose s'est mal passé. Vous pouvez recharger la page pour continuer."
 	},
 	"config": {
 		"fields": {

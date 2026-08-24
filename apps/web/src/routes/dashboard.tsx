@@ -117,6 +117,7 @@ export default function Dashboard() {
 		handleTabChange,
 		refetchConfig,
 		bumpCharactersRefreshToken,
+		retryLoad,
 	} = useDashboard(guildId);
 
 	const karmaOverview = useKarmaOverview(guildId ?? "");
@@ -315,7 +316,16 @@ export default function Dashboard() {
 				)}
 			</Box>
 			{error && (
-				<Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+				<Alert
+					severity="error"
+					sx={{ mb: 3 }}
+					onClose={() => setError(null)}
+					action={
+						<Button color="inherit" size="small" onClick={retryLoad}>
+							{t("common.retry")}
+						</Button>
+					}
+				>
 					{error}
 				</Alert>
 			)}

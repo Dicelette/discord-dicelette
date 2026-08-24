@@ -150,10 +150,13 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			cookieSecure
 		)
 	);
-	// Guild data routes: 120 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE).
+	// Guild data routes: 300 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE).
+	// The read limit is shared across every guild the user visits (keyed by userId, not
+	// guildId), and each guild switch fires a couple of reads (bootstrap + karma overview) —
+	// 300/min leaves room for fast browsing across many servers without tripping the limiter.
 	// Limiters are built once at startup — building them per-request would create a new bucket Map
 	// on every call, losing state and leaking memory.
-	const guildReadLimit = makeRateLimit(120, 60_000);
+	const guildReadLimit = makeRateLimit(300, 60_000);
 	const guildWriteLimit = makeRateLimit(30, 60_000);
 	app.use("/api/guilds", (req: Request, res: Response, next: NextFunction) => {
 		const isWrite = ["POST", "PATCH", "DELETE"].includes(req.method);
