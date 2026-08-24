@@ -104,34 +104,18 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 			emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
 			renderCard={(char) => (
 				<Box key={`${char.channelId}-${char.messageId}`}>
-					{char.ownerName && (
+					{char.ownerUsername && (
 						<Box sx={ownerLabelBoxSx}>
 							<PersonIcon sx={ownerIconSx} />
-							<Box sx={{ minWidth: 0 }}>
-								<Typography
-									variant="subtitle1"
-									noWrap
-									sx={{
-										color: "text.secondary",
-										fontFamily: "var(--code-font-family)",
-									}}
-								>
-									{char.ownerName}
-								</Typography>
-								{char.ownerUsername && (
-									<Typography
-										variant="caption"
-										noWrap
-										sx={{
-											color: "text.secondary",
-											fontFamily: "var(--code-font-family)",
-											display: "block",
-										}}
-									>
-										{char.ownerUsername}
-									</Typography>
-								)}
-							</Box>
+							<Typography
+								variant="subtitle1"
+								sx={{
+									color: "text.secondary",
+									fontFamily: "var(--code-font-family)",
+								}}
+							>
+								{char.ownerUsername}
+							</Typography>
 						</Box>
 					)}
 					<CharacterCard char={char} />
