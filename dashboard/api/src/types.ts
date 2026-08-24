@@ -57,8 +57,10 @@ export interface ApiCharacter {
 	damage: ApiCharacterField[] | null;
 	/** Only present in admin server-wide character list */
 	userId?: string;
-	/** Owner's display name ("globalName (@username)", or just "@username") — only present in admin server-wide character list */
+	/** Owner's display name (globalName, or the raw username if unset) — only present in admin server-wide character list */
 	ownerName?: string;
+	/** Owner's Discord handle, formatted as @username — only present in admin server-wide character list */
+	ownerUsername?: string;
 }
 
 /**
@@ -68,8 +70,10 @@ export interface ApiCharacter {
  */
 export interface ApiKarmaEntry extends Count {
 	userId: string;
-	/** Display name ("globalName (@username)", or just "@username") — `null` if unresolvable. */
+	/** Display name (globalName, or the raw username if unset) — `null` if unresolvable. */
 	displayName: string | null;
+	/** Discord handle, formatted as @username — `null` if unresolvable. */
+	username: string | null;
 	/** Per-guild avatar URL (falls back to the global Discord avatar) — `null` if unresolvable. */
 	avatar: string | null;
 }

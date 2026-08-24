@@ -49,7 +49,9 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 		search,
 		page,
 		filterFn: (char: ApiCharacter, q: string) =>
-			(char.charName ?? "").subText(q) || (char.ownerName ?? "").subText(q),
+			(char.charName ?? "").subText(q) ||
+			(char.ownerName ?? "").subText(q) ||
+			(char.ownerUsername ?? "").subText(q),
 	});
 
 	const handleExportCharacters = async () => {
@@ -105,15 +107,31 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 					{char.ownerName && (
 						<Box sx={ownerLabelBoxSx}>
 							<PersonIcon sx={ownerIconSx} />
-							<Typography
-								variant="subtitle1"
-								sx={{
-									color: "text.secondary",
-									fontFamily: "var(--code-font-family)",
-								}}
-							>
-								{char.ownerName}
-							</Typography>
+							<Box sx={{ minWidth: 0 }}>
+								<Typography
+									variant="subtitle1"
+									noWrap
+									sx={{
+										color: "text.secondary",
+										fontFamily: "var(--code-font-family)",
+									}}
+								>
+									{char.ownerName}
+								</Typography>
+								{char.ownerUsername && (
+									<Typography
+										variant="caption"
+										noWrap
+										sx={{
+											color: "text.secondary",
+											fontFamily: "var(--code-font-family)",
+											display: "block",
+										}}
+									>
+										{char.ownerUsername}
+									</Typography>
+								)}
+							</Box>
 						</Box>
 					)}
 					<CharacterCard char={char} />

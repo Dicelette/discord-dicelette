@@ -77,6 +77,15 @@ export default function KarmaLeaderboardRow({
 				<Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
 					{name}
 				</Typography>
+				{entry.username && (
+					<Typography
+						variant="caption"
+						noWrap
+						sx={{ color: "text.secondary", display: "block" }}
+					>
+						{entry.username}
+					</Typography>
+				)}
 			</Box>
 			<Box sx={{ textAlign: "right", flexShrink: 0 }}>
 				<Typography variant="body1" sx={{ fontWeight: 700 }}>

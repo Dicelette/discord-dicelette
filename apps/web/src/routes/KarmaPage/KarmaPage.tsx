@@ -85,6 +85,7 @@ export default function KarmaPage() {
 					entry && (
 						<KarmaCountCard
 							displayName={entry.displayName}
+							username={entry.username}
 							avatar={entry.avatar}
 							count={entry}
 						/>

@@ -74,6 +74,7 @@ export default function KarmaSearchList({ guildId, users, excludeUserId }: Props
 							<KarmaCountCard
 								key={entry.userId}
 								displayName={entry.displayName}
+								username={entry.username}
 								avatar={entry.avatar}
 								count={entry}
 								shareHref={buildKarmaShareHref(guildId, entry.userId)}
