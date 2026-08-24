@@ -1,5 +1,13 @@
 import { authApi, type DiscordGuild, guildApi } from "@dicelette/api";
-import { Add, Person, Refresh, Search, Star, StarBorder } from "@mui/icons-material";
+import {
+	Add,
+	Casino,
+	Person,
+	Refresh,
+	Search,
+	Star,
+	StarBorder,
+} from "@mui/icons-material";
 import {
 	Alert,
 	Avatar,
@@ -243,6 +251,12 @@ export default function Servers() {
 	const handleOpenCharacters = useCallback(() => {
 		if (!contextMenu || !user) return;
 		startTransition(() => navigate(`/char/${contextMenu.guild.id}/${user.id}`));
+		handleCloseContextMenu();
+	}, [contextMenu, user, navigate, handleCloseContextMenu]);
+
+	const handleOpenKarma = useCallback(() => {
+		if (!contextMenu || !user) return;
+		startTransition(() => navigate(`/karma/${contextMenu.guild.id}/${user.id}`));
 		handleCloseContextMenu();
 	}, [contextMenu, user, navigate, handleCloseContextMenu]);
 
@@ -559,6 +573,12 @@ export default function Servers() {
 						<Person fontSize="small" />
 					</ListItemIcon>
 					{t("servers.myCharacters")}
+				</MenuItem>
+				<MenuItem onClick={handleOpenKarma} disabled={!user}>
+					<ListItemIcon>
+						<Casino fontSize="small" />
+					</ListItemIcon>
+					{t("servers.myKarma")}
 				</MenuItem>
 			</Menu>
 		</Box>
