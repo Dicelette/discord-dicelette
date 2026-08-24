@@ -154,6 +154,16 @@ export function sortKarmaEntries<T extends Count>(
 		});
 }
 
+/**
+ * Drops entries with fewer total rolls than `threshold` — matches the bot's
+ * own /karma leaderboard threshold option (players with too few rolls to be
+ * meaningfully ranked).
+ */
+export function filterByThreshold<T extends Count>(entries: T[], threshold: number): T[] {
+	if (threshold <= 0) return entries;
+	return entries.filter((entry) => (entry.total ?? 0) >= threshold);
+}
+
 export type LeaderBoardRow = {
 	userId: string;
 	success: number;

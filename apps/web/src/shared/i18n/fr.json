@@ -128,6 +128,7 @@
 			"empty": "Aucun joueur ne correspond encore à ce classement.",
 			"rankBy": "Trier par",
 			"share": "Partager ce classement",
+			"threshold": "Jets min.",
 			"title": "Classement"
 		},
 		"loadError": "Impossible de charger les données de karma.",

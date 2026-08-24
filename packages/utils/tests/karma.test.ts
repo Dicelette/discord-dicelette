@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
 	averageValue,
 	calculateServerStats,
+	filterByThreshold,
 	mergeCountDefaults,
 	normalizeGuildCount,
 	percentage,
@@ -163,6 +164,49 @@ describe("sortKarmaEntries", () => {
 		expect(sortKarmaEntries(entries, "total", "ratio").map((e) => e.userId)).toEqual(
 			sortKarmaEntries(entries, "total", "brut").map((e) => e.userId)
 		);
+	});
+});
+
+describe("filterByThreshold", () => {
+	type Entry = Count & { userId: string };
+	const entries: Entry[] = [
+		{
+			userId: "alice",
+			success: 9,
+			failure: 1,
+			criticalSuccess: 0,
+			criticalFailure: 0,
+			total: 10,
+		},
+		{
+			userId: "bob",
+			success: 3,
+			failure: 2,
+			criticalSuccess: 0,
+			criticalFailure: 0,
+			total: 5,
+		},
+		{
+			userId: "carol",
+			success: 1,
+			failure: 0,
+			criticalSuccess: 0,
+			criticalFailure: 0,
+			total: 1,
+		},
+	];
+
+	it("drops entries below the threshold", () => {
+		expect(filterByThreshold(entries, 5).map((e) => e.userId)).toEqual(["alice", "bob"]);
+	});
+
+	it("keeps entries exactly at the threshold", () => {
+		expect(filterByThreshold(entries, 10).map((e) => e.userId)).toEqual(["alice"]);
+	});
+
+	it("is a no-op for a threshold of 0 or below", () => {
+		expect(filterByThreshold(entries, 0)).toEqual(entries);
+		expect(filterByThreshold(entries, -5)).toEqual(entries);
 	});
 });
 

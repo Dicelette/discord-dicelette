@@ -72,12 +72,17 @@ async function buildUsersList(
 	for (const uid of extraUserIds) allUserIds.add(uid);
 	const memberInfo = await resolveMemberInfo([...allUserIds], guildId, botGuilds);
 
-	const users: ApiKarmaEntry[] = trackedEntries.map(([uid, count]) => ({
-		userId: uid,
-		displayName: memberInfo.get(uid)?.displayName ?? null,
-		avatar: memberInfo.get(uid)?.avatar ?? null,
-		...count,
-	}));
+	// Drop entries whose member couldn't be resolved (left the server, etc.) —
+	// an unnamed "Unknown player" row isn't actionable in any of the UIs that
+	// consume this list (search, leaderboard, admin reset autocomplete).
+	const users: ApiKarmaEntry[] = trackedEntries
+		.map(([uid, count]) => ({
+			userId: uid,
+			displayName: memberInfo.get(uid)?.displayName ?? null,
+			avatar: memberInfo.get(uid)?.avatar ?? null,
+			...count,
+		}))
+		.filter((entry) => entry.displayName !== null);
 
 	return { users, memberInfo };
 }

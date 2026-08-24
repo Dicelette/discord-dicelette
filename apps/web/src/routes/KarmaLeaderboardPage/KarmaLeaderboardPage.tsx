@@ -23,6 +23,11 @@ function parseSortMode(value: string | null): KarmaSortMode {
 	return value === "ratio" ? "ratio" : "brut";
 }
 
+function parseThreshold(value: string | null): number {
+	const parsed = Number(value);
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 const mainSx = {
 	maxWidth: "56rem",
 	mx: "auto",
@@ -97,6 +102,7 @@ export default function KarmaLeaderboardPage() {
 						users={users}
 						initialOption={parseOption(searchParams.get("option"))}
 						initialSortMode={parseSortMode(searchParams.get("sortMode"))}
+						initialThreshold={parseThreshold(searchParams.get("threshold"))}
 					/>
 				)}
 			</Box>

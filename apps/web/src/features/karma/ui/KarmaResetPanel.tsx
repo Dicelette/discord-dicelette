@@ -27,6 +27,7 @@ const controlsRowSx = {
 } as const;
 const searchFieldSx = { flex: "1 1 240px", minWidth: 200 } as const;
 const buttonSx = { flexShrink: 0 } as const;
+const selfButtonSx = { mb: 3 } as const;
 
 interface Props {
 	guildId: string;
@@ -63,60 +64,80 @@ export default function KarmaResetPanel({ guildId, isAdmin, users, onReset }: Pr
 		}
 	};
 
+	const confirmDialog = (
+		<Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+			<DialogTitle>{t("karma.reset.confirmTitle")}</DialogTitle>
+			<DialogContent>
+				<Typography>
+					{isAdmin && targetName
+						? t("karma.reset.confirmBodyUser", { name: targetName })
+						: t("karma.reset.confirmBodySelf")}
+				</Typography>
+			</DialogContent>
+			<DialogActions>
+				<Button onClick={() => setConfirmOpen(false)} disabled={resetting}>
+					{t("common.cancel")}
+				</Button>
+				<Button
+					color="error"
+					variant="contained"
+					onClick={handleConfirm}
+					disabled={resetting}
+				>
+					{t("karma.reset.confirmButton")}
+				</Button>
+			</DialogActions>
+		</Dialog>
+	);
+
+	if (!isAdmin) {
+		return (
+			<>
+				<Button
+					sx={selfButtonSx}
+					size="small"
+					variant="outlined"
+					color="error"
+					startIcon={<RestartAlt fontSize="small" />}
+					onClick={() => setConfirmOpen(true)}
+				>
+					{t("karma.reset.button")}
+				</Button>
+				{confirmDialog}
+			</>
+		);
+	}
+
 	return (
 		<Paper variant="outlined" sx={panelPaperSx}>
 			<Typography variant="h6" sx={{ fontWeight: 600 }}>
 				{t("karma.reset.title")}
 			</Typography>
 			<Box sx={controlsRowSx}>
-				{isAdmin && (
-					<Autocomplete
-						sx={searchFieldSx}
-						size="small"
-						options={users}
-						getOptionLabel={(u) => u.displayName ?? u.userId}
-						isOptionEqualToValue={(a, b) => a.userId === b.userId}
-						value={target}
-						onChange={(_e, newValue) => setTarget(newValue)}
-						renderInput={(params) => (
-							<TextField {...params} label={t("karma.reset.searchLabel")} />
-						)}
-					/>
-				)}
+				<Autocomplete
+					sx={searchFieldSx}
+					size="small"
+					options={users}
+					getOptionLabel={(u) => u.displayName ?? u.userId}
+					isOptionEqualToValue={(a, b) => a.userId === b.userId}
+					value={target}
+					onChange={(_e, newValue) => setTarget(newValue)}
+					renderInput={(params) => (
+						<TextField {...params} label={t("karma.reset.searchLabel")} />
+					)}
+				/>
 				<Button
 					sx={buttonSx}
 					variant="outlined"
 					color="error"
 					startIcon={<RestartAlt />}
-					disabled={isAdmin && !target}
+					disabled={!target}
 					onClick={() => setConfirmOpen(true)}
 				>
 					{t("karma.reset.button")}
 				</Button>
 			</Box>
-			<Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-				<DialogTitle>{t("karma.reset.confirmTitle")}</DialogTitle>
-				<DialogContent>
-					<Typography>
-						{isAdmin && targetName
-							? t("karma.reset.confirmBodyUser", { name: targetName })
-							: t("karma.reset.confirmBodySelf")}
-					</Typography>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={() => setConfirmOpen(false)} disabled={resetting}>
-						{t("common.cancel")}
-					</Button>
-					<Button
-						color="error"
-						variant="contained"
-						onClick={handleConfirm}
-						disabled={resetting}
-					>
-						{t("karma.reset.confirmButton")}
-					</Button>
-				</DialogActions>
-			</Dialog>
+			{confirmDialog}
 		</Paper>
 	);
 }
