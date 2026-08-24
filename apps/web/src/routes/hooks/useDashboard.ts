@@ -1,7 +1,19 @@
 import { type ApiUserConfig, charactersApi, guildApi } from "@dicelette/api";
 import type { ApiGuildData } from "@dicelette/types";
 import { type Channel, type Role, useI18n } from "@shared";
-import { startTransition, useCallback, useEffect, useReducer, useRef } from "react";
+import {
+	startTransition,
+	useCallback,
+	useEffect,
+	useReducer,
+	useRef,
+	useState,
+} from "react";
+
+/** Duck-types an axios error rather than importing axios just for `isAxiosError`. */
+function isRateLimited(err: unknown): boolean {
+	return (err as { response?: { status?: number } })?.response?.status === 429;
+}
 
 const DASHBOARD_LOAD_DEBOUNCE_MS = 150;
 const DASHBOARD_CACHE_TTL_MS = 20_000;
@@ -155,6 +167,7 @@ export function useDashboard(guildId: string | undefined) {
 	// always translated in the current locale when they are actually dispatched.
 	const tRef = useRef(t);
 	tRef.current = t;
+	const [reloadToken, setReloadToken] = useState(0);
 
 	const [state, dispatch] = useReducer(reducer, {
 		tab: "admin",
@@ -180,6 +193,9 @@ export function useDashboard(guildId: string | undefined) {
 		guildIcon: null,
 	});
 
+	// `t` removed — tRef always holds the current translator. `reloadToken` is a
+	// bump-only counter from retryLoad() to force a re-run; it's never read in the body.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reloadToken is a deliberate re-run trigger
 	useEffect(() => {
 		if (!guildId) return;
 		const cached = dashboardClientCache.get(guildId);
@@ -285,9 +301,14 @@ export function useDashboard(guildId: string | undefined) {
 				if (nextConfig) {
 					dispatch({ type: "config_loaded", config: nextConfig });
 				}
-			} catch {
+			} catch (err) {
 				if (!isActive || signal.aborted) return;
-				dispatch({ type: "set_error", value: tRef.current("dashboard.loadError") });
+				dispatch({
+					type: "set_error",
+					value: isRateLimited(err)
+						? tRef.current("common.rateLimitedGeneric")
+						: tRef.current("dashboard.loadError"),
+				});
 			} finally {
 				if (isActive && !signal.aborted) {
 					dispatch({ type: "set_loading", value: false });
@@ -302,7 +323,9 @@ export function useDashboard(guildId: string | undefined) {
 			clearTimeout(timeoutId);
 			controller.abort();
 		};
-	}, [guildId]); // `t` removed — tRef always holds the current translator
+	}, [guildId, reloadToken]);
+
+	const retryLoad = useCallback(() => setReloadToken((n) => n + 1), []);
 
 	const handleSave = useCallback(
 		async (updates: Partial<ApiGuildData>) => {
@@ -414,5 +437,6 @@ export function useDashboard(guildId: string | undefined) {
 		handleTabChange,
 		refetchConfig,
 		bumpCharactersRefreshToken,
+		retryLoad,
 	};
 }

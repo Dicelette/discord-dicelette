@@ -36,6 +36,7 @@
 		"rateLimited": "Too many requests sent too fast. Try again in {seconds}s.",
 		"rateLimitedGeneric": "Too many requests sent too fast. Try again in a moment.",
 		"reload": "Reload page",
+		"retry": "Retry",
 		"save": "Save",
 		"saving": "Saving...",
 		"unexpectedError": "Something went wrong",

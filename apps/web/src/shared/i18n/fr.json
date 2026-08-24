@@ -36,6 +36,7 @@
 		"rateLimited": "Trop de requêtes envoyées trop vite. Réessayez dans {seconds}s.",
 		"rateLimitedGeneric": "Trop de requêtes envoyées trop vite. Réessayez dans un instant.",
 		"reload": "Recharger la page",
+		"retry": "Réessayer",
 		"save": "Sauvegarder",
 		"saving": "Sauvegarde...",
 		"unexpectedError": "Une erreur inattendue s'est produite",
