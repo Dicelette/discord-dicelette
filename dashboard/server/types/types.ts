@@ -38,7 +38,7 @@ export interface ApiCharacter {
 	damage: EmbedField[] | null;
 	/** Only present in admin server-wide character list */
 	userId?: string;
-	/** Discord display name of the owner — only present in admin server-wide character list */
+	/** Owner's display name ("globalName (@username)", or just "@username") — only present in admin server-wide character list */
 	ownerName?: string;
 }
 
@@ -49,7 +49,7 @@ export interface ApiCharacter {
  */
 export interface ApiKarmaEntry extends Count {
 	userId: string;
-	/** Discord handle (@username), resolved via the bot's guild cache — `null` if unresolvable. */
+	/** Display name ("globalName (@username)", or just "@username"), resolved via the bot's guild cache — `null` if unresolvable. */
 	displayName: string | null;
 	/** Per-guild avatar URL (falls back to the global Discord avatar) — `null` if unresolvable. */
 	avatar: string | null;
@@ -113,7 +113,7 @@ export interface BotGuild {
 	fetchMember: (userId: string) => Promise<BotMember | null>;
 	/** Returns true if the member can view/read the target channel */
 	memberCanAccessChannel: (userId: string, channelId: string) => Promise<boolean>;
-	/** Fetch the user's Discord handle (pomelo), formatted as @username */
+	/** Fetch the user's display name: "globalName (@username)", or just "@username" when no global name is set */
 	fetchMemberName: (userId: string) => Promise<string | null>;
 	/** Fetch the member's per-guild avatar URL, falling back to their global Discord avatar */
 	fetchMemberAvatar: (userId: string) => Promise<string | null>;
