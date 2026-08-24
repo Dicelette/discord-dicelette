@@ -110,6 +110,8 @@
 		"refreshCharactersTooltip": "Rafraîchir les données des personnages.",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
+		"staleDataError": "Affichage des dernières données connues — la configuration n'a pas pu être actualisée.",
+		"staleDataRateLimited": "Trop de requêtes envoyées trop vite — affichage des dernières données connues.",
 		"tabs": {
 			"admin": "Serveur",
 			"characters": "Fiches",

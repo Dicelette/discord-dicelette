@@ -198,8 +198,8 @@ export function useDashboard(guildId: string | undefined) {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reloadToken is a deliberate re-run trigger
 	useEffect(() => {
 		if (!guildId) return;
-		const cached = dashboardClientCache.get(guildId);
-		if (cached && Date.now() < cached.expiresAt) {
+
+		const applyCachedData = (cached: DashboardCacheEntry) => {
 			const {
 				isAdmin,
 				isStrictAdmin,
@@ -227,6 +227,11 @@ export function useDashboard(guildId: string | undefined) {
 			dispatch({ type: "set_roles", roles });
 			dispatch({ type: "set_server_char_count", count: serverCharCount });
 			dispatch({ type: "set_guild_identity", name: guildName, icon: guildIcon });
+		};
+
+		const cached = dashboardClientCache.get(guildId);
+		if (cached && Date.now() < cached.expiresAt) {
+			applyCachedData(cached);
 			dispatch({ type: "set_error", value: null });
 			dispatch({ type: "set_loading", value: false });
 			return;
@@ -303,12 +308,25 @@ export function useDashboard(guildId: string | undefined) {
 				}
 			} catch (err) {
 				if (!isActive || signal.aborted) return;
-				dispatch({
-					type: "set_error",
-					value: isRateLimited(err)
-						? tRef.current("common.rateLimitedGeneric")
-						: tRef.current("dashboard.loadError"),
-				});
+				// A stale-but-present cache entry beats a hard error, especially when
+				// the failure is just a rate limit that clears itself shortly — show
+				// the last known data instead of blocking the whole dashboard on it.
+				if (cached) {
+					applyCachedData(cached);
+					dispatch({
+						type: "set_error",
+						value: isRateLimited(err)
+							? tRef.current("dashboard.staleDataRateLimited")
+							: tRef.current("dashboard.staleDataError"),
+					});
+				} else {
+					dispatch({
+						type: "set_error",
+						value: isRateLimited(err)
+							? tRef.current("common.rateLimitedGeneric")
+							: tRef.current("dashboard.loadError"),
+					});
+				}
 			} finally {
 				if (isActive && !signal.aborted) {
 					dispatch({ type: "set_loading", value: false });
