@@ -95,10 +95,10 @@ export default function KarmaResetPanel({ guildId, isAdmin, users, onReset }: Pr
 			<>
 				<Button
 					sx={selfButtonSx}
-					size="small"
+					size="large"
 					variant="outlined"
 					color="error"
-					startIcon={<RestartAlt fontSize="small" />}
+					startIcon={<RestartAlt />}
 					onClick={() => setConfirmOpen(true)}
 				>
 					{t("karma.reset.button")}
