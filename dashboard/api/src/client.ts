@@ -10,18 +10,6 @@ export const api = axios.create({
 	withCredentials: true,
 });
 
-/**
- * Fired on `window` whenever the server responds 429 (rate limited), so the
- * UI can surface a single "slow down" toast instead of every in-flight
- * request's own hook rendering its own error state.
- */
-export const RATE_LIMIT_EVENT = "dicelette:rate-limited";
-
-export interface RateLimitEventDetail {
-	/** Seconds until the rate limit window resets, from the `Retry-After` header — `null` if absent/unparsable. */
-	retryAfter: number | null;
-}
-
 interface EtagCacheEntry {
 	etag: string;
 	data: unknown;
@@ -118,21 +106,6 @@ api.interceptors.response.use(
 	(error: AxiosError) => {
 		const response = error.response;
 		const config = error.config as InternalAxiosRequestConfig | undefined;
-		if (response?.status === 429) {
-			// Cast via `unknown` rather than assuming the DOM lib: this package is
-			// also typechecked under the (Node-only, no DOM lib) root tsconfig.
-			const browser = globalThis as unknown as {
-				dispatchEvent?: (event: unknown) => void;
-				CustomEvent?: new (type: string, init?: { detail?: unknown }) => unknown;
-			};
-			if (browser.dispatchEvent && browser.CustomEvent) {
-				const parsed = Number(response.headers?.["retry-after"]);
-				const detail: RateLimitEventDetail = {
-					retryAfter: Number.isFinite(parsed) ? parsed : null,
-				};
-				browser.dispatchEvent(new browser.CustomEvent(RATE_LIMIT_EVENT, { detail }));
-			}
-		}
 		if (response?.status === 304 && config) {
 			const key = buildGetCacheKey(config);
 			if (key) {

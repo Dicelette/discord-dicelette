@@ -10,11 +10,6 @@ import {
 	useState,
 } from "react";
 
-/** Duck-types an axios error rather than importing axios just for `isAxiosError`. */
-function isRateLimited(err: unknown): boolean {
-	return (err as { response?: { status?: number } })?.response?.status === 429;
-}
-
 const DASHBOARD_LOAD_DEBOUNCE_MS = 150;
 const DASHBOARD_CACHE_TTL_MS = 20_000;
 
@@ -306,26 +301,15 @@ export function useDashboard(guildId: string | undefined) {
 				if (nextConfig) {
 					dispatch({ type: "config_loaded", config: nextConfig });
 				}
-			} catch (err) {
+			} catch {
 				if (!isActive || signal.aborted) return;
-				// A stale-but-present cache entry beats a hard error, especially when
-				// the failure is just a rate limit that clears itself shortly — show
-				// the last known data instead of blocking the whole dashboard on it.
+				// A stale-but-present cache entry beats a hard error — silently keep
+				// showing it rather than surfacing a "couldn't refresh" message the
+				// user can't act on; only a guild with no cache at all shows an error.
 				if (cached) {
 					applyCachedData(cached);
-					dispatch({
-						type: "set_error",
-						value: isRateLimited(err)
-							? tRef.current("dashboard.staleDataRateLimited")
-							: tRef.current("dashboard.staleDataError"),
-					});
 				} else {
-					dispatch({
-						type: "set_error",
-						value: isRateLimited(err)
-							? tRef.current("common.rateLimitedGeneric")
-							: tRef.current("dashboard.loadError"),
-					});
+					dispatch({ type: "set_error", value: tRef.current("dashboard.loadError") });
 				}
 			} finally {
 				if (isActive && !signal.aborted) {

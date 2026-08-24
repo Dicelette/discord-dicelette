@@ -33,8 +33,6 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
-		"rateLimited": "Trop de requêtes envoyées trop vite. Réessayez dans {seconds}s.",
-		"rateLimitedGeneric": "Trop de requêtes envoyées trop vite. Réessayez dans un instant.",
 		"reload": "Recharger la page",
 		"retry": "Réessayer",
 		"save": "Sauvegarder",
@@ -110,8 +108,6 @@
 		"refreshCharactersTooltip": "Rafraîchir les données des personnages.",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveSuccess": "Configuration sauvegardée !",
-		"staleDataError": "Affichage des dernières données connues — la configuration n'a pas pu être actualisée.",
-		"staleDataRateLimited": "Trop de requêtes envoyées trop vite — affichage des dernières données connues.",
 		"tabs": {
 			"admin": "Serveur",
 			"characters": "Fiches",

@@ -33,8 +33,6 @@
 		"logout": "Logout",
 		"none": "None",
 		"owner": "Admin",
-		"rateLimited": "Too many requests sent too fast. Try again in {seconds}s.",
-		"rateLimitedGeneric": "Too many requests sent too fast. Try again in a moment.",
 		"reload": "Reload page",
 		"retry": "Retry",
 		"save": "Save",
@@ -110,8 +108,6 @@
 		"refreshCharactersTooltip": "Refreshes characters data.",
 		"saveError": "Error while saving.",
 		"saveSuccess": "Configuration saved!",
-		"staleDataError": "Showing the last known data — the configuration could not be refreshed.",
-		"staleDataRateLimited": "Too many requests sent too fast — showing the last known data.",
 		"tabs": {
 			"admin": "Server",
 			"characters": "Sheets",
