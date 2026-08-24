@@ -1,6 +1,19 @@
+import { RATE_LIMIT_EVENT, type RateLimitEventDetail } from "@dicelette/api";
 import { Alert, Box } from "@mui/material";
+import { useI18n } from "@shared";
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+
+/** Minimum gap between rate-limit toasts — a 429 burst fires many rejected
+ * requests at once, and only one "slow down" message is useful. */
+const RATE_LIMIT_TOAST_COOLDOWN_MS = 5000;
 
 type Severity = "success" | "error" | "warning" | "info";
 
@@ -23,8 +36,10 @@ export function useToast() {
 const TOAST_DURATION = 3000;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+	const { t } = useI18n();
 	const [toasts, setToasts] = useState<Toast[]>([]);
 	const counter = useRef(0);
+	const lastRateLimitToastAt = useRef(0);
 
 	const dismiss = useCallback((id: number) => {
 		setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -38,6 +53,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 		},
 		[dismiss]
 	);
+
+	useEffect(() => {
+		const handleRateLimited = (e: Event) => {
+			const now = Date.now();
+			if (now - lastRateLimitToastAt.current < RATE_LIMIT_TOAST_COOLDOWN_MS) return;
+			lastRateLimitToastAt.current = now;
+			const { retryAfter } = (e as CustomEvent<RateLimitEventDetail>).detail;
+			enqueueToast(
+				retryAfter
+					? t("common.rateLimited", { seconds: retryAfter })
+					: t("common.rateLimitedGeneric"),
+				"warning"
+			);
+		};
+		window.addEventListener(RATE_LIMIT_EVENT, handleRateLimited);
+		return () => window.removeEventListener(RATE_LIMIT_EVENT, handleRateLimited);
+	}, [t, enqueueToast]);
 
 	return (
 		<ToastContext.Provider value={{ enqueueToast }}>

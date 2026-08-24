@@ -33,8 +33,13 @@
 		"logout": "Déconnexion",
 		"none": "Aucun",
 		"owner": "Admin",
+		"rateLimited": "Trop de requêtes envoyées trop vite. Réessayez dans {seconds}s.",
+		"rateLimitedGeneric": "Trop de requêtes envoyées trop vite. Réessayez dans un instant.",
+		"reload": "Recharger la page",
 		"save": "Sauvegarder",
-		"saving": "Sauvegarde..."
+		"saving": "Sauvegarde...",
+		"unexpectedError": "Une erreur inattendue s'est produite",
+		"unexpectedErrorHint": "Quelque chose s'est mal passé. Vous pouvez recharger la page pour continuer."
 	},
 	"config": {
 		"fields": {

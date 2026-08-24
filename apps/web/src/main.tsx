@@ -7,6 +7,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider, I18nProvider, ToastProvider } from "./providers";
+import { ErrorBoundary } from "./shared";
 import "./styles.css";
 
 const headingFont = { fontFamily: '"Karla Variable", "Inter", sans-serif' };
@@ -100,11 +101,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 			<ThemeProvider theme={theme}>
 				<CssBaseline enableColorScheme />
 				<ToastProvider>
-					<BrowserRouter>
-						<AuthProvider>
-							<App />
-						</AuthProvider>
-					</BrowserRouter>
+					<ErrorBoundary>
+						<BrowserRouter>
+							<AuthProvider>
+								<App />
+							</AuthProvider>
+						</BrowserRouter>
+					</ErrorBoundary>
 				</ToastProvider>
 			</ThemeProvider>
 		</I18nProvider>
