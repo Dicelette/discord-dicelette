@@ -128,6 +128,7 @@
 			"empty": "No player matches this ranking yet.",
 			"rankBy": "Rank by",
 			"share": "Share this leaderboard",
+			"threshold": "Min. rolls",
 			"title": "Leaderboard"
 		},
 		"loadError": "Could not load karma data.",
@@ -229,6 +230,7 @@
 		"refreshTooltip": "The list is cached for 15 min. Click to force an update.",
 		"removeFavorite": "Remove from favorites",
 		"searchPlaceholder": "Search for a server...",
+		"serverKarma": "Server karma",
 		"subtitle": "Select a server to manage its configuration.",
 		"title": "Your servers"
 	},

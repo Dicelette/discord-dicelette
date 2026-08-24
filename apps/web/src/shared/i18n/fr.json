@@ -128,6 +128,7 @@
 			"empty": "Aucun joueur ne correspond encore à ce classement.",
 			"rankBy": "Trier par",
 			"share": "Partager ce classement",
+			"threshold": "Jets min.",
 			"title": "Classement"
 		},
 		"loadError": "Impossible de charger les données de karma.",
@@ -229,6 +230,7 @@
 		"refreshTooltip": "La liste est mise en cache 15 min. Cliquez pour forcer une mise à jour.",
 		"removeFavorite": "Supprimer des favoris",
 		"searchPlaceholder": "Rechercher un serveur...",
+		"serverKarma": "Karma du serveur",
 		"subtitle": "Sélectionnez un serveur pour gérer sa configuration.",
 		"title": "Vos serveurs"
 	},

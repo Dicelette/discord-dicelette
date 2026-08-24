@@ -11,6 +11,7 @@ import { AppTopBar, DocsButton, PlaygroundButton, useI18n } from "@shared";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import KarmaLeaderboard from "../../features/karma/ui/KarmaLeaderboard";
+import KarmaSearchList from "../../features/karma/ui/KarmaSearchList";
 import { useAuth } from "../../providers";
 
 function parseOption(value: string | null): KarmaOption {
@@ -21,6 +22,11 @@ function parseOption(value: string | null): KarmaOption {
 
 function parseSortMode(value: string | null): KarmaSortMode {
 	return value === "ratio" ? "ratio" : "brut";
+}
+
+function parseThreshold(value: string | null): number {
+	const parsed = Number(value);
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
 const mainSx = {
@@ -92,12 +98,16 @@ export default function KarmaLeaderboardPage() {
 				) : error ? (
 					<Alert severity="error">{error}</Alert>
 				) : (
-					<KarmaLeaderboard
-						guildId={guildId}
-						users={users}
-						initialOption={parseOption(searchParams.get("option"))}
-						initialSortMode={parseSortMode(searchParams.get("sortMode"))}
-					/>
+					<>
+						<KarmaLeaderboard
+							guildId={guildId}
+							users={users}
+							initialOption={parseOption(searchParams.get("option"))}
+							initialSortMode={parseSortMode(searchParams.get("sortMode"))}
+							initialThreshold={parseThreshold(searchParams.get("threshold"))}
+						/>
+						<KarmaSearchList guildId={guildId} users={users} />
+					</>
 				)}
 			</Box>
 		</Box>

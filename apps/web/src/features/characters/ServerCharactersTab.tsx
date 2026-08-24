@@ -49,7 +49,9 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 		search,
 		page,
 		filterFn: (char: ApiCharacter, q: string) =>
-			(char.charName ?? "").subText(q) || (char.ownerName ?? "").subText(q),
+			(char.charName ?? "").subText(q) ||
+			(char.ownerName ?? "").subText(q) ||
+			(char.ownerUsername ?? "").subText(q),
 	});
 
 	const handleExportCharacters = async () => {
@@ -102,7 +104,7 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 			emptyText={query ? t("characters.noResults") : t("characters.noCharacters")}
 			renderCard={(char) => (
 				<Box key={`${char.channelId}-${char.messageId}`}>
-					{char.ownerName && (
+					{char.ownerUsername && (
 						<Box sx={ownerLabelBoxSx}>
 							<PersonIcon sx={ownerIconSx} />
 							<Typography
@@ -112,7 +114,7 @@ export default function ServerCharactersTab({ guildId, refreshToken = 0 }: Props
 									fontFamily: "var(--code-font-family)",
 								}}
 							>
-								{char.ownerName}
+								{char.ownerUsername}
 							</Typography>
 						</Box>
 					)}

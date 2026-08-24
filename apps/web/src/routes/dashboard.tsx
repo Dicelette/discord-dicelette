@@ -400,6 +400,7 @@ export default function Dashboard() {
 							guildId={guildId!}
 							currentUserId={user!.id}
 							currentUserName={user!.global_name ?? user!.username}
+							currentUserHandle={`@${user!.username}`}
 							isAdmin={isAdmin}
 							overview={karmaOverview.overview}
 							loading={karmaOverview.loading}

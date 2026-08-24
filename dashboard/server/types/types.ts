@@ -38,8 +38,10 @@ export interface ApiCharacter {
 	damage: EmbedField[] | null;
 	/** Only present in admin server-wide character list */
 	userId?: string;
-	/** Discord display name of the owner — only present in admin server-wide character list */
+	/** Owner's display name (globalName, or the raw username if unset) — only present in admin server-wide character list */
 	ownerName?: string;
+	/** Owner's Discord handle, formatted as @username — only present in admin server-wide character list */
+	ownerUsername?: string;
 }
 
 /**
@@ -49,8 +51,10 @@ export interface ApiCharacter {
  */
 export interface ApiKarmaEntry extends Count {
 	userId: string;
-	/** Discord handle (@username), resolved via the bot's guild cache — `null` if unresolvable. */
+	/** Display name (globalName, or the raw username if unset), resolved via the bot's guild cache — `null` if unresolvable. */
 	displayName: string | null;
+	/** Discord handle, formatted as @username — `null` if unresolvable. */
+	username: string | null;
 	/** Per-guild avatar URL (falls back to the global Discord avatar) — `null` if unresolvable. */
 	avatar: string | null;
 }
@@ -103,6 +107,14 @@ export interface BotMember {
 	readonly roleIds: string[];
 }
 
+/** A member's resolved name, split so the UI can render the handle as a smaller subtitle. */
+export interface ResolvedMemberName {
+	/** globalName if set, else the raw username — the primary display name */
+	displayName: string;
+	/** The Discord handle, formatted as @username */
+	username: string;
+}
+
 /** A guild accessible through the bot's Discord.js client cache */
 export interface BotGuild {
 	/** Discord display name of the guild */
@@ -113,8 +125,8 @@ export interface BotGuild {
 	fetchMember: (userId: string) => Promise<BotMember | null>;
 	/** Returns true if the member can view/read the target channel */
 	memberCanAccessChannel: (userId: string, channelId: string) => Promise<boolean>;
-	/** Fetch the user's Discord handle (pomelo), formatted as @username */
-	fetchMemberName: (userId: string) => Promise<string | null>;
+	/** Fetch the user's display name and @username handle */
+	fetchMemberName: (userId: string) => Promise<ResolvedMemberName | null>;
 	/** Fetch the member's per-guild avatar URL, falling back to their global Discord avatar */
 	fetchMemberAvatar: (userId: string) => Promise<string | null>;
 	/** All channels in the guild (all types, let the caller filter) */

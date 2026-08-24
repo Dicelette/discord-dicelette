@@ -1,6 +1,7 @@
 import type { ApiKarmaEntry } from "@dicelette/api";
 import {
 	ALL_KARMA_OPTIONS,
+	filterByThreshold,
 	type KarmaOption,
 	type KarmaSortMode,
 	sortKarmaEntries,
@@ -58,6 +59,7 @@ interface Props {
 	users: ApiKarmaEntry[];
 	initialOption?: KarmaOption;
 	initialSortMode?: KarmaSortMode;
+	initialThreshold?: number;
 }
 
 export default function KarmaLeaderboard({
@@ -65,16 +67,22 @@ export default function KarmaLeaderboard({
 	users,
 	initialOption = "total",
 	initialSortMode = "brut",
+	initialThreshold = 0,
 }: Props) {
 	const { t } = useI18n();
 	const [option, setOption] = useState<KarmaOption>(initialOption);
 	const [sortMode, setSortMode] = useState<KarmaSortMode>(
 		initialOption === "total" ? "brut" : initialSortMode
 	);
+	const [threshold, setThreshold] = useState(initialThreshold);
 
 	const ranked = useMemo(
-		() => sortKarmaEntries(users, option, sortMode).slice(0, 10),
-		[users, option, sortMode]
+		() =>
+			sortKarmaEntries(filterByThreshold(users, threshold), option, sortMode).slice(
+				0,
+				10
+			),
+		[users, option, sortMode, threshold]
 	);
 
 	const handleOptionChange = (value: KarmaOption) => {
@@ -91,7 +99,7 @@ export default function KarmaLeaderboard({
 				<Tooltip title={t("karma.leaderboard.share")}>
 					<IconButton
 						component={RouterLink}
-						to={buildKarmaLeaderboardShareHref(guildId, option, sortMode)}
+						to={buildKarmaLeaderboardShareHref(guildId, option, sortMode, threshold)}
 						target="_blank"
 						rel="noopener noreferrer"
 						size="small"
@@ -127,6 +135,15 @@ export default function KarmaLeaderboard({
 						{t("luckMeter.leaderboard.sort.ratio")}
 					</ToggleButton>
 				</ToggleButtonGroup>
+				<TextField
+					type="number"
+					size="small"
+					label={t("karma.leaderboard.threshold")}
+					value={threshold}
+					onChange={(e) => setThreshold(Math.max(0, Number(e.target.value) || 0))}
+					slotProps={{ htmlInput: { min: 0 } }}
+					sx={{ width: 130 }}
+				/>
 			</Box>
 			{ranked.length === 0 ? (
 				<Typography sx={{ color: "text.secondary" }}>

@@ -9,6 +9,7 @@ interface Props {
 	guildId: string;
 	currentUserId: string;
 	currentUserName: string;
+	currentUserHandle: string;
 	isAdmin: boolean;
 	overview: ApiKarmaOverview | null;
 	loading: boolean;
@@ -20,6 +21,7 @@ export default function KarmaPersonalTab({
 	guildId,
 	currentUserId,
 	currentUserName,
+	currentUserHandle,
 	isAdmin,
 	overview,
 	loading,
@@ -51,6 +53,7 @@ export default function KarmaPersonalTab({
 				{overview.me ? (
 					<KarmaCountCard
 						displayName={currentUserName}
+						username={currentUserHandle}
 						avatar={overview.meAvatar}
 						count={overview.me}
 						shareHref={buildKarmaShareHref(guildId, currentUserId)}

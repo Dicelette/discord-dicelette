@@ -29,13 +29,20 @@ function pct(partial: number, total: number): string {
 
 interface Props {
 	displayName: string | null;
+	username?: string | null;
 	avatar?: string | null;
 	count: Count;
 	/** When set, shows a share icon (top-right, level with the name) linking here. */
 	shareHref?: string;
 }
 
-export default function KarmaCountCard({ displayName, avatar, count, shareHref }: Props) {
+export default function KarmaCountCard({
+	displayName,
+	username,
+	avatar,
+	count,
+	shareHref,
+}: Props) {
 	const { t } = useI18n();
 	const total = count.total ?? count.success + count.failure;
 	const name = displayName ?? t("karma.unnamed");
@@ -111,6 +118,15 @@ export default function KarmaCountCard({ displayName, avatar, count, shareHref }
 					<Typography variant="h6" noWrap sx={{ fontWeight: 600 }}>
 						{name}
 					</Typography>
+					{username && (
+						<Typography
+							variant="caption"
+							noWrap
+							sx={{ color: "text.secondary", display: "block" }}
+						>
+							{username}
+						</Typography>
+					)}
 					<Typography variant="body2" sx={{ color: "text.secondary" }}>
 						{t(total === 1 ? "karma.rollCountOne" : "karma.rollCountOther", { total })}
 					</Typography>

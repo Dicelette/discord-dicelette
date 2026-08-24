@@ -28,6 +28,7 @@ const KARMA_FETCH_CONCURRENCY = 10;
 
 interface MemberInfo {
 	displayName: string | null;
+	username: string | null;
 	avatar: string | null;
 }
 
@@ -42,11 +43,18 @@ async function resolveMemberInfo(
 		userIds,
 		KARMA_FETCH_CONCURRENCY,
 		async (userId) => {
-			const [displayName, avatar] = await Promise.all([
+			const [nameInfo, avatar] = await Promise.all([
 				guild.fetchMemberName(userId).catch(() => null),
 				guild.fetchMemberAvatar(userId).catch(() => null),
 			]);
-			return [userId, { displayName, avatar }] as const;
+			return [
+				userId,
+				{
+					displayName: nameInfo?.displayName ?? null,
+					username: nameInfo?.username ?? null,
+					avatar,
+				},
+			] as const;
 		}
 	);
 	return new Map(entries);
@@ -72,12 +80,18 @@ async function buildUsersList(
 	for (const uid of extraUserIds) allUserIds.add(uid);
 	const memberInfo = await resolveMemberInfo([...allUserIds], guildId, botGuilds);
 
-	const users: ApiKarmaEntry[] = trackedEntries.map(([uid, count]) => ({
-		userId: uid,
-		displayName: memberInfo.get(uid)?.displayName ?? null,
-		avatar: memberInfo.get(uid)?.avatar ?? null,
-		...count,
-	}));
+	// Drop entries whose member couldn't be resolved (left the server, etc.) —
+	// an unnamed "Unknown player" row isn't actionable in any of the UIs that
+	// consume this list (search, leaderboard, admin reset autocomplete).
+	const users: ApiKarmaEntry[] = trackedEntries
+		.map(([uid, count]) => ({
+			userId: uid,
+			displayName: memberInfo.get(uid)?.displayName ?? null,
+			username: memberInfo.get(uid)?.username ?? null,
+			avatar: memberInfo.get(uid)?.avatar ?? null,
+			...count,
+		}))
+		.filter((entry) => entry.displayName !== null);
 
 	return { users, memberInfo };
 }
@@ -152,7 +166,7 @@ export function createKarmaRouter(deps: DashboardDeps) {
 
 		const count = mergeCountDefaults(raw);
 		const guild = botGuilds.get(guildId);
-		const [displayName, avatar] = guild
+		const [nameInfo, avatar] = guild
 			? await Promise.all([
 					guild.fetchMemberName(userId).catch(() => null),
 					guild.fetchMemberAvatar(userId).catch(() => null),
@@ -161,7 +175,8 @@ export function createKarmaRouter(deps: DashboardDeps) {
 
 		sendNoStoreJson(res, {
 			userId,
-			displayName,
+			displayName: nameInfo?.displayName ?? null,
+			username: nameInfo?.username ?? null,
 			avatar,
 			...count,
 		} satisfies ApiKarmaEntry);

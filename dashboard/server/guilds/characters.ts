@@ -394,14 +394,15 @@ export function createCharactersRouter(deps: DashboardDeps) {
 						DISCORD_FETCH_CONCURRENCY,
 						async (uid) => {
 							const name = await guild?.fetchMemberName(uid).catch(() => null);
-							return [uid, name ?? null] as const;
+							return [uid, name] as const;
 						}
 					);
-					const ownerNames = new Map<string, string | null>(nameEntries);
+					const ownerNames = new Map(nameEntries);
 
 					type Job = {
 						userId: string;
 						ownerName: string | undefined;
+						ownerUsername: string | undefined;
 						memMaps: ReturnType<typeof buildMemMaps>;
 						char: UserGuildData;
 					};
@@ -409,18 +410,19 @@ export function createCharactersRouter(deps: DashboardDeps) {
 					for (const [userId, userChars] of Object.entries(allUsers)) {
 						const memChars: UserData[] = allMemChars[userId] ?? [];
 						const memMaps = buildMemMaps(memChars);
-						const ownerName = ownerNames.get(userId) ?? undefined;
+						const ownerName = ownerNames.get(userId)?.displayName;
+						const ownerUsername = ownerNames.get(userId)?.username;
 						for (const char of userChars) {
 							const mem = memMaps.memByMessageId.get(char.messageId[0]);
 							if (mem?.isFromTemplate) continue;
-							jobs.push({ userId, ownerName, memMaps, char });
+							jobs.push({ userId, ownerName, ownerUsername, memMaps, char });
 						}
 					}
 
 					return mapConcurrent(
 						jobs,
 						DISCORD_FETCH_CONCURRENCY,
-						async ({ userId, ownerName, memMaps, char }) => {
+						async ({ userId, ownerName, ownerUsername, memMaps, char }) => {
 							const [messageId, channelId] = char.messageId;
 							const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 							const { avatar, stats, damage } = await resolveCharacterData(
@@ -443,6 +445,7 @@ export function createCharactersRouter(deps: DashboardDeps) {
 								damage,
 								userId,
 								ownerName,
+								ownerUsername,
 							} satisfies ApiCharacter;
 						}
 					);
