@@ -254,11 +254,11 @@ export default function Servers() {
 		handleCloseContextMenu();
 	}, [contextMenu, user, navigate, handleCloseContextMenu]);
 
-	const handleOpenKarma = useCallback(() => {
-		if (!contextMenu || !user) return;
-		startTransition(() => navigate(`/karma/${contextMenu.guild.id}/${user.id}`));
+	const handleOpenServerKarma = useCallback(() => {
+		if (!contextMenu) return;
+		startTransition(() => navigate(`/karma/${contextMenu.guild.id}/leaderboard`));
 		handleCloseContextMenu();
-	}, [contextMenu, user, navigate, handleCloseContextMenu]);
+	}, [contextMenu, navigate, handleCloseContextMenu]);
 
 	const botGuilds = useMemo(
 		() =>
@@ -574,11 +574,11 @@ export default function Servers() {
 					</ListItemIcon>
 					{t("servers.myCharacters")}
 				</MenuItem>
-				<MenuItem onClick={handleOpenKarma} disabled={!user}>
+				<MenuItem onClick={handleOpenServerKarma}>
 					<ListItemIcon>
 						<Casino fontSize="small" />
 					</ListItemIcon>
-					{t("servers.myKarma")}
+					{t("servers.serverKarma")}
 				</MenuItem>
 			</Menu>
 		</Box>

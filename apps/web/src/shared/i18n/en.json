@@ -222,7 +222,6 @@
 		"favorites": "Favorites",
 		"loadError": "Could not load servers.",
 		"myCharacters": "My characters",
-		"myKarma": "My karma",
 		"noSearchResults": "No server matches your search.",
 		"noServers": "No servers found. Make sure you are an administrator on at least one Discord server.",
 		"rateLimitError": "Too many requests. Please wait before refreshing again.",
@@ -231,6 +230,7 @@
 		"refreshTooltip": "The list is cached for 15 min. Click to force an update.",
 		"removeFavorite": "Remove from favorites",
 		"searchPlaceholder": "Search for a server...",
+		"serverKarma": "Server karma",
 		"subtitle": "Select a server to manage its configuration.",
 		"title": "Your servers"
 	},
