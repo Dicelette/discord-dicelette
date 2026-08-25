@@ -9,22 +9,13 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import type { ApiKarmaEntry, DashboardDeps } from "../types";
 import {
+	DISCORD_FETCH_CONCURRENCY,
 	isValidSnowflake,
 	makeRequireAdmin,
 	makeRequireGuildMember,
 	requireAuth,
+	sendNoStoreJson,
 } from "../utils";
-
-function sendNoStoreJson(res: Response, payload: unknown) {
-	res.setHeader("Cache-Control", "no-store");
-	res.json(payload);
-}
-
-/**
- * Concurrency cap for resolving Discord display names/avatars when listing
- * karma entries — mirrors the cap used for character owner-name resolution.
- */
-const KARMA_FETCH_CONCURRENCY = 10;
 
 interface MemberInfo {
 	displayName: string | null;
@@ -41,12 +32,15 @@ async function resolveMemberInfo(
 	if (!guild) return new Map();
 	const entries = await mapConcurrent(
 		userIds,
-		KARMA_FETCH_CONCURRENCY,
+		DISCORD_FETCH_CONCURRENCY,
 		async (userId) => {
-			const [nameInfo, avatar] = await Promise.all([
-				guild.fetchMemberName(userId).catch(() => null),
-				guild.fetchMemberAvatar(userId).catch(() => null),
-			]);
+			// Sequential, not Promise.all: both callbacks fall back to
+			// guild.members.fetch(userId) when the member isn't cached yet, and
+			// running them in parallel means both miss the cache and each fire
+			// their own Discord API request. fetchMemberName's fetch populates
+			// the cache, so fetchMemberAvatar's own cache check then hits it.
+			const nameInfo = await guild.fetchMemberName(userId).catch(() => null);
+			const avatar = await guild.fetchMemberAvatar(userId).catch(() => null);
 			return [
 				userId,
 				{
@@ -165,19 +159,15 @@ export function createKarmaRouter(deps: DashboardDeps) {
 		}
 
 		const count = mergeCountDefaults(raw);
-		const guild = botGuilds.get(guildId);
-		const [nameInfo, avatar] = guild
-			? await Promise.all([
-					guild.fetchMemberName(userId).catch(() => null),
-					guild.fetchMemberAvatar(userId).catch(() => null),
-				])
-			: [null, null];
+		const memberInfo = (await resolveMemberInfo([userId], guildId, botGuilds)).get(
+			userId
+		);
 
 		sendNoStoreJson(res, {
 			userId,
-			displayName: nameInfo?.displayName ?? null,
-			username: nameInfo?.username ?? null,
-			avatar,
+			displayName: memberInfo?.displayName ?? null,
+			username: memberInfo?.username ?? null,
+			avatar: memberInfo?.avatar ?? null,
 			...count,
 		} satisfies ApiKarmaEntry);
 	});

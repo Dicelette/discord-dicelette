@@ -13,11 +13,13 @@ import {
 	type EmbedField,
 } from "../types";
 import {
+	DISCORD_FETCH_CONCURRENCY,
 	fetchCharacterEmbeds,
 	isStaleDiscordCdnUrl,
 	isValidSnowflake,
 	makeRequireAdmin,
 	requireAuth,
+	sendNoStoreJson,
 	userCanAccessChannel,
 	userCanManageGuild,
 	userCanRefreshServerCharacters,
@@ -47,11 +49,6 @@ function mapMemStats(mem?: UserData): EmbedField[] | null {
 function mapMemDamage(mem?: UserData): EmbedField[] | null {
 	if (!mem?.damage) return null;
 	return Object.entries(mem.damage).map(([name, value]) => ({ name, value }));
-}
-
-function sendNoStoreJson(res: Response, payload: unknown) {
-	res.setHeader("Cache-Control", "no-store");
-	res.json(payload);
 }
 
 function isTimeoutError(err: unknown): err is Error {
@@ -135,13 +132,6 @@ function makeCanLinkMemo(
 		return p;
 	};
 }
-
-/**
- * Concurrency cap for outgoing Discord API fan-out. Guild list + character
- * fetches happen on the hot path and must not saturate the bot's shared
- * Discord client with hundreds of parallel requests.
- */
-const DISCORD_FETCH_CONCURRENCY = 10;
 
 function invalidateGuildCharacterCache(guildId: string) {
 	charCache.deleteGuild(guildId);

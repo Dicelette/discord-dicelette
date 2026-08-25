@@ -15,6 +15,13 @@ import {
 	USER_EMBED_MARKERS,
 } from "./types";
 
+/**
+ * Concurrency cap for outgoing Discord API fan-out (member/character lookups
+ * on the hot path) — must not saturate the bot's shared Discord client with
+ * hundreds of parallel requests.
+ */
+export const DISCORD_FETCH_CONCURRENCY = 10;
+
 const ADMINISTRATOR = BigInt(0x8);
 const MANAGE_GUILD = BigInt(0x20);
 const MANAGE_ROLES = BigInt(0x10000000);
@@ -443,5 +450,11 @@ export function sendEtaggedJson(req: Request, res: Response, payload: unknown): 
 		}
 	}
 
+	res.json(payload);
+}
+
+/** Sends JSON explicitly marked non-cacheable, for responses that must never be served stale. */
+export function sendNoStoreJson(res: Response, payload: unknown): void {
+	res.setHeader("Cache-Control", "no-store");
 	res.json(payload);
 }

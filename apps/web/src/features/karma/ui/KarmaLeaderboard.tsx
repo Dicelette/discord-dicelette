@@ -74,7 +74,13 @@ export default function KarmaLeaderboard({
 	const [sortMode, setSortMode] = useState<KarmaSortMode>(
 		initialOption === "total" ? "brut" : initialSortMode
 	);
-	const [threshold, setThreshold] = useState(initialThreshold);
+	// Kept as raw text (not a number) so the field can be emptied while typing —
+	// a controlled numeric value would snap back to "0" on every clear, making
+	// it impossible to backspace the leading zero before typing a new number.
+	const [thresholdText, setThresholdText] = useState(
+		initialThreshold > 0 ? String(initialThreshold) : ""
+	);
+	const threshold = Math.max(0, Number(thresholdText) || 0);
 
 	const ranked = useMemo(
 		() =>
@@ -139,8 +145,11 @@ export default function KarmaLeaderboard({
 					type="number"
 					size="small"
 					label={t("karma.leaderboard.threshold")}
-					value={threshold}
-					onChange={(e) => setThreshold(Math.max(0, Number(e.target.value) || 0))}
+					value={thresholdText}
+					onChange={(e) => {
+						const raw = e.target.value;
+						if (raw === "" || /^\d+$/.test(raw)) setThresholdText(raw);
+					}}
 					slotProps={{ htmlInput: { min: 0 } }}
 					sx={{ width: 130 }}
 				/>
