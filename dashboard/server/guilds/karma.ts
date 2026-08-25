@@ -90,6 +90,49 @@ async function buildUsersList(
 	return { users, memberInfo };
 }
 
+/**
+ * Public, read-only leaderboard data (every tracked user's karma) for a
+ * shareable leaderboard link. Shared by the `/public` route and the
+ * share-link meta-tag injection (see `../meta.ts`).
+ */
+export async function getPublicLeaderboardUsers(
+	guildId: string,
+	deps: Pick<DashboardDeps, "criticalCount" | "botGuilds">
+): Promise<ApiKarmaEntry[]> {
+	const guildCount: DBCount = deps.criticalCount.get(guildId) ?? {};
+	const { users } = await buildUsersList(guildCount, guildId, deps.botGuilds);
+	return users;
+}
+
+/**
+ * Public, read-only karma for a single user, for a shareable profile link.
+ * Shared by the `/public/:userId` route and the share-link meta-tag
+ * injection (see `../meta.ts`). Returns `null` when the user has no tracked
+ * karma in this guild.
+ */
+export async function getPublicKarmaEntry(
+	guildId: string,
+	userId: string,
+	deps: Pick<DashboardDeps, "criticalCount" | "botGuilds">
+): Promise<ApiKarmaEntry | null> {
+	const guildCount: DBCount = deps.criticalCount.get(guildId) ?? {};
+	const raw = guildCount[userId];
+	if (!raw) return null;
+
+	const count = mergeCountDefaults(raw);
+	const memberInfo = (await resolveMemberInfo([userId], guildId, deps.botGuilds)).get(
+		userId
+	);
+
+	return {
+		userId,
+		displayName: memberInfo?.displayName ?? null,
+		username: memberInfo?.username ?? null,
+		avatar: memberInfo?.avatar ?? null,
+		...count,
+	} satisfies ApiKarmaEntry;
+}
+
 export function createKarmaRouter(deps: DashboardDeps) {
 	const { criticalCount, botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
@@ -136,8 +179,7 @@ export function createKarmaRouter(deps: DashboardDeps) {
 	// can already see via the "/" route above.
 	router.get("/public", async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
-		const guildCount: DBCount = criticalCount.get(guildId) ?? {};
-		const { users } = await buildUsersList(guildCount, guildId, botGuilds);
+		const users = await getPublicLeaderboardUsers(guildId, deps);
 		sendNoStoreJson(res, { users });
 	});
 
@@ -151,25 +193,13 @@ export function createKarmaRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const guildCount: DBCount = criticalCount.get(guildId) ?? {};
-		const raw = guildCount[userId];
-		if (!raw) {
+		const entry = await getPublicKarmaEntry(guildId, userId, deps);
+		if (!entry) {
 			res.status(404).json({ error: "No karma data" });
 			return;
 		}
 
-		const count = mergeCountDefaults(raw);
-		const memberInfo = (await resolveMemberInfo([userId], guildId, botGuilds)).get(
-			userId
-		);
-
-		sendNoStoreJson(res, {
-			userId,
-			displayName: memberInfo?.displayName ?? null,
-			username: memberInfo?.username ?? null,
-			avatar: memberInfo?.avatar ?? null,
-			...count,
-		} satisfies ApiKarmaEntry);
+		sendNoStoreJson(res, entry);
 	});
 
 	// POST /:guildId/karma/reset — resets the current user's own karma.
