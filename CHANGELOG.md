@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.8.3](https://github.com/Dicelette/discord-dicelette/compare/4.8.2...4.8.3) (2026-08-25)
+
+### Bug Fixes
+
+* **logger:** improve logging behavior in development and production environments ([80f29d5](https://github.com/Dicelette/discord-dicelette/commit/80f29d517af9650ade929e0cbaf5320523789b93))
 ## [4.8.2](https://github.com/Dicelette/discord-dicelette/compare/4.8.1...4.8.2) (2026-08-25)
 ## [4.8.1](https://github.com/Dicelette/discord-dicelette/compare/4.8.0...4.8.1) (2026-08-24)
 ## [4.8.0](https://github.com/Dicelette/discord-dicelette/compare/4.7.2...4.8.0) (2026-08-23)
