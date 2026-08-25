@@ -43,10 +43,13 @@ async function resolveMemberInfo(
 		userIds,
 		KARMA_FETCH_CONCURRENCY,
 		async (userId) => {
-			const [nameInfo, avatar] = await Promise.all([
-				guild.fetchMemberName(userId).catch(() => null),
-				guild.fetchMemberAvatar(userId).catch(() => null),
-			]);
+			// Sequential, not Promise.all: both callbacks fall back to
+			// guild.members.fetch(userId) when the member isn't cached yet, and
+			// running them in parallel means both miss the cache and each fire
+			// their own Discord API request. fetchMemberName's fetch populates
+			// the cache, so fetchMemberAvatar's own cache check then hits it.
+			const nameInfo = await guild.fetchMemberName(userId).catch(() => null);
+			const avatar = await guild.fetchMemberAvatar(userId).catch(() => null);
 			return [
 				userId,
 				{
@@ -166,12 +169,9 @@ export function createKarmaRouter(deps: DashboardDeps) {
 
 		const count = mergeCountDefaults(raw);
 		const guild = botGuilds.get(guildId);
-		const [nameInfo, avatar] = guild
-			? await Promise.all([
-					guild.fetchMemberName(userId).catch(() => null),
-					guild.fetchMemberAvatar(userId).catch(() => null),
-				])
-			: [null, null];
+		// Sequential: see the comment in resolveMemberInfo above.
+		const nameInfo = guild ? await guild.fetchMemberName(userId).catch(() => null) : null;
+		const avatar = guild ? await guild.fetchMemberAvatar(userId).catch(() => null) : null;
 
 		sendNoStoreJson(res, {
 			userId,
