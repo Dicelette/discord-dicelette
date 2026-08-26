@@ -88,3 +88,6 @@ Notes:
 - Read the code first before creating a new function. Understand the existing codebase and see if there are any existing functions or modules that can be reused or extended to achieve your goal.
 - Always reply in the language used by the user
 - Push on a branch based on the feature or fixes, followed by a resume of the demande, e.g fixes/dice-duplicates or feat/dashboard-karma
+- Always use conventional commit 
+- Don't include unnecessary comments in commits; the title should be enough to describe the commit.
+- The title of the commit should be concise.
