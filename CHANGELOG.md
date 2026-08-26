@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.9.0](https://github.com/Dicelette/discord-dicelette/compare/4.8.3...4.9.0) (2026-08-26)
+
+### Features
+
+* **share:** add public character list and leaderboard metadata handling ([a6f1ce5](https://github.com/Dicelette/discord-dicelette/commit/a6f1ce52b20ccf2dbe5d7a9ff39234f2c7c4b990))
 ## [4.8.3](https://github.com/Dicelette/discord-dicelette/compare/4.8.2...4.8.3) (2026-08-25)
 
 ### Bug Fixes
