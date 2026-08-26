@@ -61,20 +61,6 @@ export default function KarmaCountCard({
 		sx: SxProps<Theme>;
 	}[] = [
 		{
-			tone: "failure",
-			label: t("roll.failure"),
-			value: count.failure,
-			caption: `${pct(count.failure, total)}%`,
-			extra: hasFailureStreakInfo ? (
-				<KarmaStreakChip
-					type="failure"
-					current={count.consecutive?.failure}
-					longest={count.longestStreak?.failure}
-				/>
-			) : undefined,
-			sx: tilePositionSx("failure"),
-		},
-		{
 			tone: "success",
 			label: t("roll.success"),
 			value: count.success,
@@ -88,16 +74,21 @@ export default function KarmaCountCard({
 			) : undefined,
 			sx: tilePositionSx("success"),
 		},
+		{
+			tone: "failure",
+			label: t("roll.failure"),
+			value: count.failure,
+			caption: `${pct(count.failure, total)}%`,
+			extra: hasFailureStreakInfo ? (
+				<KarmaStreakChip
+					type="failure"
+					current={count.consecutive?.failure}
+					longest={count.longestStreak?.failure}
+				/>
+			) : undefined,
+			sx: tilePositionSx("failure"),
+		},
 	];
-	if (count.criticalFailure > 0) {
-		tiles.push({
-			tone: "criticalFailure",
-			label: t("roll.critical.failure"),
-			value: count.criticalFailure,
-			caption: `${pct(count.criticalFailure, total)}%`,
-			sx: tilePositionSx("criticalFailure"),
-		});
-	}
 	if (count.criticalSuccess > 0) {
 		tiles.push({
 			tone: "criticalSuccess",
@@ -105,6 +96,15 @@ export default function KarmaCountCard({
 			value: count.criticalSuccess,
 			caption: `${pct(count.criticalSuccess, total)}%`,
 			sx: tilePositionSx("criticalSuccess"),
+		});
+	}
+	if (count.criticalFailure > 0) {
+		tiles.push({
+			tone: "criticalFailure",
+			label: t("roll.critical.failure"),
+			value: count.criticalFailure,
+			caption: `${pct(count.criticalFailure, total)}%`,
+			sx: tilePositionSx("criticalFailure"),
 		});
 	}
 
@@ -136,8 +136,6 @@ export default function KarmaCountCard({
 						<IconButton
 							component={RouterLink}
 							to={shareHref}
-							target="_blank"
-							rel="noopener noreferrer"
 							size="small"
 							aria-label={t("karma.share")}
 							sx={shareButtonSx}

@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import { AUTH_COOKIE, createAuthRouter } from "./auth";
 import type { JwtPayload } from "./express";
 import { createGuildRouter } from "./guilds";
+import { createShareMetaHandler } from "./meta";
 import { makeRateLimit } from "./rateLimit";
 import type { DashboardDeps } from "./types";
 
@@ -166,11 +167,35 @@ export function startDashboardServer(deps: DashboardDeps): void {
 
 	if (process.env.NODE_ENV === "production") {
 		const distPath = fileURLToPath(new URL("../../../apps/web/dist", import.meta.url));
+		const indexHtmlPath = fileURLToPath(
+			new URL("../../../apps/web/dist/index.html", import.meta.url)
+		);
 		app.use(express.static(distPath));
+
+		// Public share links (karma leaderboard/profile, character sheets) get
+		// per-page Open Graph/Twitter Card meta tags patched into index.html, so
+		// links unfurl with a real summary instead of the generic site card.
+		// "/karma/:guildId/leaderboard" is registered before the "/karma/:guildId/:userId"
+		// route so its literal "leaderboard" segment is tried first — otherwise the
+		// :userId route would shadow it.
+		const shareMetaLimit = makeRateLimit(60, 60_000);
+		const shareMetaRoute = (kind: Parameters<typeof createShareMetaHandler>[0]) =>
+			createShareMetaHandler(kind, deps, indexHtmlPath, FrontendUrl);
+		app.get(
+			"/karma/:guildId/leaderboard",
+			shareMetaLimit,
+			shareMetaRoute("karma-leaderboard")
+		);
+		app.get("/karma/:guildId/:userId", shareMetaLimit, shareMetaRoute("karma-profile"));
+		app.get("/char/:guildId/:userId", shareMetaLimit, shareMetaRoute("characters"));
+		app.get(
+			"/char/:guildId/:userId/:charName",
+			shareMetaLimit,
+			shareMetaRoute("character")
+		);
+
 		app.get("/{*path}", (_req, res) => {
-			res.sendFile(
-				fileURLToPath(new URL("../../../apps/web/dist/index.html", import.meta.url))
-			);
+			res.sendFile(indexHtmlPath);
 		});
 	}
 

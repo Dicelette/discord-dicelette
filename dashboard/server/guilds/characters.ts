@@ -138,6 +138,59 @@ function invalidateGuildCharacterCache(guildId: string) {
 	charForceRefresh.deleteGuild(guildId);
 }
 
+/**
+ * Builds the public, read-only character list for a shareable profile link
+ * (private characters and Discord links stripped, since we can't check the
+ * viewer's channel permissions). Shared by the `/public/:userId` route and
+ * the share-link meta-tag injection (see `../meta.ts`).
+ */
+export async function getPublicCharacterList(
+	guildId: string,
+	userId: string,
+	deps: Pick<DashboardDeps, "settings" | "characters" | "botChannels">
+): Promise<ApiCharacter[]> {
+	const { settings, characters, botChannels } = deps;
+	const guildData = settings.get(guildId);
+	if (!guildData) return [];
+
+	const userChars = guildData.user?.[userId] ?? [];
+	const memChars: UserData[] =
+		(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
+	const memMaps = buildMemMaps(memChars);
+
+	const pending = userChars.filter((char) => {
+		if (char.isPrivate) return false;
+		const mem = memMaps.memByMessageId.get(char.messageId[0]);
+		return !mem?.isFromTemplate;
+	});
+
+	return withTimeout(
+		mapConcurrent(pending, DISCORD_FETCH_CONCURRENCY, async (char) => {
+			const [messageId, channelId] = char.messageId;
+			const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+			const data = await resolveCharacterData(
+				char.charName,
+				messageId,
+				channelId,
+				memMaps,
+				botChannels
+			);
+			return {
+				charName: char.charName ?? null,
+				messageId,
+				channelId,
+				discordLink,
+				canLink: false,
+				isPrivate: false,
+				avatar: data.avatar,
+				stats: data.stats,
+				damage: data.damage,
+			} satisfies ApiCharacter;
+		}),
+		15_000
+	);
+}
+
 export function createCharactersRouter(deps: DashboardDeps) {
 	const { settings, characters, botGuilds, botChannels } = deps;
 	const router = Router({ mergeParams: true });
@@ -239,50 +292,14 @@ export function createCharactersRouter(deps: DashboardDeps) {
 			return;
 		}
 
-		const guildData = settings.get(guildId);
-		if (!guildData) {
+		if (!settings.get(guildId)) {
 			res.status(404).json({ error: "Guild not found" });
 			return;
 		}
 
-		const userChars = guildData.user?.[userId] ?? [];
-		const memChars: UserData[] =
-			(characters.get(guildId, userId) as UserData[] | undefined) ?? [];
-		const memMaps = buildMemMaps(memChars);
-
-		const pending = userChars.filter((char) => {
-			if (char.isPrivate) return false;
-			const mem = memMaps.memByMessageId.get(char.messageId[0]);
-			return !mem?.isFromTemplate;
-		});
-
 		let result: ApiCharacter[];
 		try {
-			result = await withTimeout(
-				mapConcurrent(pending, DISCORD_FETCH_CONCURRENCY, async (char) => {
-					const [messageId, channelId] = char.messageId;
-					const discordLink = `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-					const data = await resolveCharacterData(
-						char.charName,
-						messageId,
-						channelId,
-						memMaps,
-						botChannels
-					);
-					return {
-						charName: char.charName ?? null,
-						messageId,
-						channelId,
-						discordLink,
-						canLink: false,
-						isPrivate: false,
-						avatar: data.avatar,
-						stats: data.stats,
-						damage: data.damage,
-					} satisfies ApiCharacter;
-				}),
-				15_000
-			);
+			result = await getPublicCharacterList(guildId, userId, deps);
 		} catch (err) {
 			if (isTimeoutError(err)) {
 				res.status(504).json({ error: "Request timed out" });
