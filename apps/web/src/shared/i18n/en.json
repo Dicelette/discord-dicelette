@@ -128,6 +128,7 @@
 	},
 	"karma": {
 		"average": "Average",
+		"backToLeaderboard": "Back to leaderboard",
 		"leaderboard": {
 			"empty": "No player matches this ranking yet.",
 			"rankBy": "Rank by",

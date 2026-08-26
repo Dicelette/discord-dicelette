@@ -71,7 +71,7 @@ export default function KarmaPage() {
 					startIcon={<ArrowBack />}
 					sx={backButtonSx}
 				>
-					{t("common.back")}
+					{t("karma.backToLeaderboard")}
 				</Button>
 				<Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
 					{title}
