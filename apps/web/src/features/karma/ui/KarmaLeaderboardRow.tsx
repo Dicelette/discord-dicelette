@@ -104,8 +104,6 @@ export default function KarmaLeaderboardRow({
 				<IconButton
 					component={RouterLink}
 					to={buildKarmaShareHref(guildId, entry.userId)}
-					target="_blank"
-					rel="noopener noreferrer"
 					size="small"
 					aria-label={t("karma.share")}
 				>
