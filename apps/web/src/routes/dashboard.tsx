@@ -120,7 +120,10 @@ export default function Dashboard() {
 		retryLoad,
 	} = useDashboard(guildId);
 
-	const karmaOverview = useKarmaOverview(guildId ?? "");
+	const karmaOverview = useKarmaOverview(
+		guildId ?? "",
+		mountedTabs.has("karma-server") || mountedTabs.has("karma-me")
+	);
 
 	/** Cheap, cache-respecting re-fetch of the tab's own data — fired on every tab switch. */
 	const refreshTabData = (value: ActiveTab) => {
