@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { mapConcurrent } from "@dicelette/utils";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
@@ -15,6 +16,7 @@ import {
 import {
 	clientId,
 	clientSecret,
+	DISCORD_FETCH_CONCURRENCY,
 	discordFetch,
 	getfrontEndUrl,
 	parseCookieHeader,
@@ -198,25 +200,29 @@ export function createAuthRouter(
 			// All guilds where the bot is present are shown (users can always
 			// access their personal config). Guilds without the bot are shown
 			// only if the user has ManageGuild (to offer the "add bot" flow).
-			const filteredGuilds: Array<
-				DiscordGuild & { botPresent: boolean; isAdmin: boolean }
-			> = [];
+			const candidates = userGuilds
+				.map((g) => ({
+					g,
+					botPresent: botGuilds.has(g.id),
+					oauthAdmin: g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild,
+				}))
+				.filter(({ botPresent, oauthAdmin }) => botPresent || oauthAdmin);
 
-			for (const g of userGuilds) {
-				const botPresent = botGuilds.has(g.id);
-				const oauthAdmin =
-					g.owner || (BigInt(g.permissions) & ManageGuild) === ManageGuild;
-
-				if (!botPresent && !oauthAdmin) continue;
-
-				let isAdmin = oauthAdmin;
-				// For bot-present guilds, also check dashboardAccess roles
-				if (botPresent) {
-					isAdmin = await userCanManageGuild(userId, g.id, botGuilds, settings);
+			// Concurrent, not sequential: each bot-present guild needs a
+			// userCanManageGuild() check (dashboardAccess roles), which falls back to
+			// a live Discord member fetch when the bot's cache misses — awaiting
+			// those one at a time made the servers list load time scale linearly
+			// with how many mutual guilds the user has.
+			const filteredGuilds = await mapConcurrent(
+				candidates,
+				DISCORD_FETCH_CONCURRENCY,
+				async ({ g, botPresent, oauthAdmin }) => {
+					const isAdmin = botPresent
+						? await userCanManageGuild(userId, g.id, botGuilds, settings)
+						: oauthAdmin;
+					return { ...g, botPresent, isAdmin };
 				}
-
-				filteredGuilds.push({ ...g, botPresent, isAdmin });
-			}
+			);
 
 			res.json(filteredGuilds);
 		} catch (err) {

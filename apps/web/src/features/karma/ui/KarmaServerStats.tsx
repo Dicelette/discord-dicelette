@@ -23,29 +23,20 @@ export default function KarmaServerStats({ server }: Props) {
 		sx: SxProps<Theme>;
 	}[] = [
 		{
-			tone: "failure",
-			label: t("roll.failure"),
-			value: totalCount.failure,
-			caption: `${t("karma.average")}: ${avg.failure} (${percent.failure}%)`,
-			sx: tilePositionSx("failure"),
-		},
-		{
 			tone: "success",
 			label: t("roll.success"),
 			value: totalCount.success,
 			caption: `${t("karma.average")}: ${avg.success} (${percent.success}%)`,
 			sx: tilePositionSx("success"),
 		},
+		{
+			tone: "failure",
+			label: t("roll.failure"),
+			value: totalCount.failure,
+			caption: `${t("karma.average")}: ${avg.failure} (${percent.failure}%)`,
+			sx: tilePositionSx("failure"),
+		},
 	];
-	if (totalCount.criticalFailure > 0) {
-		tiles.push({
-			tone: "criticalFailure",
-			label: t("roll.critical.failure"),
-			value: totalCount.criticalFailure,
-			caption: `${t("karma.average")}: ${avg.criticalFailure} (${percent.criticalFailure}%)`,
-			sx: tilePositionSx("criticalFailure"),
-		});
-	}
 	if (totalCount.criticalSuccess > 0) {
 		tiles.push({
 			tone: "criticalSuccess",
@@ -53,6 +44,15 @@ export default function KarmaServerStats({ server }: Props) {
 			value: totalCount.criticalSuccess,
 			caption: `${t("karma.average")}: ${avg.criticalSuccess} (${percent.criticalSuccess}%)`,
 			sx: tilePositionSx("criticalSuccess"),
+		});
+	}
+	if (totalCount.criticalFailure > 0) {
+		tiles.push({
+			tone: "criticalFailure",
+			label: t("roll.critical.failure"),
+			value: totalCount.criticalFailure,
+			caption: `${t("karma.average")}: ${avg.criticalFailure} (${percent.criticalFailure}%)`,
+			sx: tilePositionSx("criticalFailure"),
 		});
 	}
 

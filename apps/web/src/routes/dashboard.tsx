@@ -120,7 +120,8 @@ export default function Dashboard() {
 		retryLoad,
 	} = useDashboard(guildId);
 
-	const karmaOverview = useKarmaOverview(guildId ?? "");
+	const karmaTabMounted = mountedTabs.has("karma-server") || mountedTabs.has("karma-me");
+	const karmaOverview = useKarmaOverview(guildId ?? "", karmaTabMounted);
 
 	/** Cheap, cache-respecting re-fetch of the tab's own data — fired on every tab switch. */
 	const refreshTabData = (value: ActiveTab) => {
@@ -135,7 +136,11 @@ export default function Dashboard() {
 				break;
 			case "karma-server":
 			case "karma-me":
-				void karmaOverview.reload();
+				// Skip on the very first visit to either karma tab: useKarmaOverview's
+				// own effect already fires there (karmaTabMounted just turned true).
+				// Force it explicitly on every later visit, since that effect won't
+				// re-run just because the same tab was clicked again.
+				if (karmaTabMounted) void karmaOverview.reload();
 				break;
 			default:
 				break;
