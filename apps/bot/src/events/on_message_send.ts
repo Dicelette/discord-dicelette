@@ -128,7 +128,8 @@ export default (client: EClient): void => {
 							undefined,
 							undefined,
 							statsName,
-							ul
+							ul,
+							userSettingsData?.ignoreNotfound
 						).formula,
 						customFormula
 					)
