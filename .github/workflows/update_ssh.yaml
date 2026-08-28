@@ -18,7 +18,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd dicelette/
-            fnm use lts
+            fnm use
             git stash push --include-untracked --message "Locales temporaires"
             git pull --rebase
             pnpm i
