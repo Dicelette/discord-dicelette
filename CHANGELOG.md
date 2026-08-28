@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.10.0](https://github.com/Dicelette/discord-dicelette/compare/4.9.0...4.10.0) (2026-08-28)
+
+### Features
+
+* **auth:** optimize guild filtering with concurrent processing and enhance karma overview loading ([a1e655c](https://github.com/Dicelette/discord-dicelette/commit/a1e655c3c3d4626830072d29e6bde2a7cc062e7a))
+
+### Bug Fixes
+
+* **roll:** unrecognized stats settings was ignored ([70d05e9](https://github.com/Dicelette/discord-dicelette/commit/70d05e9bf5975b3d5096525f96891e44dc31e8ab))
 ## [4.9.0](https://github.com/Dicelette/discord-dicelette/compare/4.8.3...4.9.0) (2026-08-26)
 
 ### Features
