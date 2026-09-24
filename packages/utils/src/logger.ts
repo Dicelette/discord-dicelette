@@ -3,42 +3,24 @@ import process from "node:process";
 import * as Sentry from "@sentry/node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
-import {
-	type ILogObj,
-	type IPrettyLogStyles,
-	type ISettingsParam,
-	Logger,
-	type Transport,
-} from "tslog";
+import { type ILogObj, type IPrettyLogStyles, type ISettingsParam, Logger } from "tslog";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { BotError, BotErrorLevel } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
-// tslog log level ids: SILLY=0, TRACE=1, DEBUG=2, INFO=3, WARN=4, ERROR=5, FATAL=6
-function writeToConsole(output: string, logLevelId: number) {
-	if (logLevelId >= 5) {
-		console.error(output); // ERROR, FATAL
-	} else if (logLevelId === 4) {
-		console.warn(output); // WARN
-	} else if (logLevelId === 3) {
-		console.info(output); // INFO
-	} else {
-		console.debug(output); // SILLY, TRACE, DEBUG
-	}
-}
-
-/**
- * tslog's default pretty transport always writes through console.log, no matter
- * the log level. PM2 splits stdout -> out.log and stderr -> error.log, so WARN/
- * ERROR/FATAL logs never reached error.log. This transport dispatches to the console
- * method matching each level (console.debug/info/warn/error), which also keeps Sentry's
- * consoleLoggingIntegration below tagging breadcrumbs with the correct level. Every logger
- * below sets `type: "hidden"` so this attached transport is the only thing writing to console.
- */
-const consoleByLevelTransport: Transport<ILogObj> = {
-	format: "pretty",
-	write: (record, line) => writeToConsole(line, record._logMeta.logLevelId),
+// tslog's default pretty output always writes through console.log, no matter the log level. PM2
+// splits stdout -> out.log and stderr -> error.log, so WARN/ERROR/FATAL never reached error.log.
+// `pretty.levelMethod` routes each level to the matching console method instead, which also keeps
+// Sentry's consoleLoggingIntegration below tagging breadcrumbs with the correct level.
+const LEVEL_METHOD = {
+	DEBUG: console.debug,
+	ERROR: console.error,
+	FATAL: console.error,
+	INFO: console.info,
+	SILLY: console.debug,
+	TRACE: console.debug,
+	WARN: console.warn,
 };
 
 const LOG_LEVEL_COLORS = {
@@ -68,34 +50,32 @@ const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
 const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
 const prodSettings: ISettingsParam<ILogObj> = {
-	attachedTransports: [consoleByLevelTransport],
 	minLevel: 6,
 	name: "LOGGER",
 	pretty: {
 		errorStackTemplate: BASE_STACK_TEMPLATE,
 		errorTemplate: BASE_ERROR_TEMPLATE,
+		levelMethod: LEVEL_METHOD,
 		style: true,
 		styles: BASE_STYLE,
 		template: PROD_TEMPLATE,
 		timeZone: "local",
 	},
 	stack: { capture: "off" },
-	type: "hidden",
 };
 
 const devSettings: ISettingsParam<ILogObj> = {
-	attachedTransports: [consoleByLevelTransport],
 	minLevel: 0, // everything
 	pretty: {
 		errorStackTemplate: BASE_STACK_TEMPLATE,
 		errorTemplate: BASE_ERROR_TEMPLATE,
+		levelMethod: LEVEL_METHOD,
 		style: true,
 		styles: BASE_STYLE,
 		template:
 			"{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} {{logLevelName}} [{{filePathWithLine}}{{name}}] ",
 		timeZone: "local",
 	},
-	type: "hidden",
 };
 
 export const logger: Logger<ILogObj> = new Logger(
@@ -108,12 +88,12 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
-	attachedTransports: [consoleByLevelTransport],
 	minLevel: 1,
 	name: "IMPORTANT",
 	pretty: {
 		errorStackTemplate: BASE_STACK_TEMPLATE,
 		errorTemplate: BASE_ERROR_TEMPLATE,
+		levelMethod: LEVEL_METHOD,
 		style: true,
 		styles: {
 			...BASE_STYLE,
@@ -123,7 +103,6 @@ export const important: Logger<ILogObj> = new Logger({
 		timeZone: "local",
 	},
 	stack: { capture: "off" },
-	type: "hidden",
 });
 
 const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "production";
