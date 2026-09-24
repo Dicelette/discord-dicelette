@@ -139,7 +139,6 @@ if (hasSentry) {
 			return breadcrumb;
 		},
 		dsn: process.env.SENTRY_DSN,
-		enableLogs: true,
 		environment: process.env.NODE_ENV ?? "production",
 		integrations: [
 			Sentry.consoleLoggingIntegration({
@@ -149,7 +148,6 @@ if (hasSentry) {
 		profileLifecycle: "manual",
 		profileSessionSampleRate: 1.0,
 		release: `dicelette@${pkgJson.version}`,
-		sendDefaultPii: true,
 		tracesSampleRate: 1.0,
 	});
 }
