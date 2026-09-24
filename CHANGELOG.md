@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.10.1](https://github.com/Dicelette/discord-dicelette/compare/4.10.0...4.10.1) (2026-09-24)
+
+### Bug Fixes
+
+* **shared:** comments colliding with bracket + collision with opposition. Shared should works normally now ([9152bcd](https://github.com/Dicelette/discord-dicelette/commit/9152bcd60a4a5639b60f8e8302df217f284041b8))
+
 ## [4.10.0](https://github.com/Dicelette/discord-dicelette/compare/4.9.0...4.10.0) (2026-08-28)
 
 ### Features
