@@ -41,6 +41,7 @@ export class ResultAsText {
 	private headerCompare?: ComparedValue;
 	private readonly statsPerSegment?: string[];
 	private readonly commentsPerSegment?: string[];
+	private readonly hiddenSegments: number;
 
 	private ignoreCount = "";
 
@@ -63,6 +64,7 @@ export class ResultAsText {
 			? statsPerSegment
 			: undefined;
 		this.commentsPerSegment = this.extractCommentsPerSegment();
+		this.hiddenSegments = this.countHiddenSegments();
 		let parser = "";
 		if (!result) {
 			this.error = true;
@@ -97,7 +99,9 @@ export class ResultAsText {
 		if (time) user += `${timestamp(this.data?.config?.timestamp)}`;
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
-		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
+		const isSharedRoll = PARSE_RESULT_PATTERNS.allSharedSymbols.test(
+			this.resultat?.result || ""
+		);
 		if (header && !isSharedRoll)
 			compareHint = ` (\`${header.sign} ${this.formatCompare(header)}\`)`;
 
@@ -207,23 +211,18 @@ export class ResultAsText {
 		const messageResult = this.resultat.result.split(";");
 		const isSharedRoll = messageResult.length > 1;
 		let msgSuccess: string;
-		let criticalState: {
-			isCritical?: "failure" | "success" | "custom";
-			successOrFailure?: string;
-		} = {};
 
 		if (this.resultat.compare) {
-			const result = this.compare(messageResult, critical, customCritical, opposition);
-			msgSuccess = result.msgSuccess;
-			criticalState = result.criticalState;
+			msgSuccess = this.compare(messageResult, critical, customCritical, opposition);
 		} else {
 			const hasStatsPerSegment = this.statsPerSegment && this.statsPerSegment.length > 0;
 			if (messageResult.length > 1) {
 				msgSuccess = "";
 				for (let i = 0; i < messageResult.length; i++) {
 					let r = messageResult[i];
-					if (hasStatsPerSegment && this.commentsPerSegment?.[i]) {
-						const commentToRemove = this.commentsPerSegment[i];
+					const commentIndex = i + this.hiddenSegments;
+					if (hasStatsPerSegment && this.commentsPerSegment?.[commentIndex]) {
+						const commentToRemove = this.commentsPerSegment[commentIndex];
 						r = r.replace(`[${commentToRemove}]`, "").trim();
 					}
 					const marker = hasStatsPerSegment ? "⚐" : "";
@@ -233,7 +232,7 @@ export class ResultAsText {
 			} else msgSuccess = this.message(this.resultat.result, " = ` [$1] `");
 		}
 		const comment = this.comment(interaction);
-		const finalRes = this.formatMultipleRes(msgSuccess, criticalState);
+		const finalRes = this.formatMultipleRes(msgSuccess);
 		const hasComment = comment.trim().length > 0 && comment !== "_ _";
 		const separator = hasComment ? "\n  " : "\n ";
 		const joinedRes = finalRes.filter((x) => x.trim().length > 0).join(separator);
@@ -242,27 +241,47 @@ export class ResultAsText {
 		return ` ${joinedRes}`;
 	}
 
+	/**
+	 * A segment the engine already judged (`✓ 1d100<=65: [20] = 20<=65`): its verdict is in the
+	 * symbol and the engine already inverted the sign on a failure, but its criticals still have
+	 * to be resolved against its own dice. Rebuilt in the shape `display()` gives the main
+	 * segment — comparator out of the displayed dice, comparison only in the final value.
+	 */
+	private comparedSegment(
+		r: string,
+		critical?: { failure?: number; success?: number },
+		customCritical?: Record<string, CustomCritical>
+	): string {
+		const cut = r.lastIndexOf(" = ");
+		const head = cut === -1 ? r : r.slice(0, cut);
+		const tail = cut === -1 ? "" : r.slice(cut + 3);
+		const compared = PARSE_RESULT_PATTERNS.comparedTail.exec(tail);
+		const total = Number.parseInt(compared?.groups?.total ?? tail, 10) || 0;
+		const natural: number[] = [];
+		this.naturalDice(r, natural);
+		const verdict =
+			this.critical(natural, total, critical, customCritical)?.successOrFailure ??
+			`**${this.ul(r.startsWith("✓") ? "roll.success" : "roll.failure")}**`;
+		const rendered = compared?.groups
+			? this.message(
+					`${head.replace(PARSE_RESULT_PATTERNS.compareSuffix, "")} = ${total}`,
+					` = \`[${total}] ${asciiSign(compared.groups.sign)} ${compared.groups.value}\``
+				)
+			: this.message(r);
+		return rendered.replace(PARSE_RESULT_PATTERNS.formulaDiceSymbols, `◈ ${verdict} —`);
+	}
+
 	private compare(
 		messageResult: string[],
 		critical?: { failure?: number; success?: number },
 		customCritical?: Record<string, CustomCritical>,
 		opposition?: ComparedValue
-	): {
-		msgSuccess: string;
-		criticalState: {
-			isCritical?: "failure" | "success" | "custom";
-			successOrFailure?: string;
-		};
-	} {
+	): string {
 		let msgSuccess = "";
-		let currentCriticalState: {
-			isCritical?: "failure" | "success" | "custom";
-			successOrFailure?: string;
-		} = {};
 
 		for (const r of messageResult) {
 			if (r.match(PARSE_RESULT_PATTERNS.formulaDiceSymbols)) {
-				msgSuccess += `${this.message(r)}\n`;
+				msgSuccess += `${this.comparedSegment(r, critical, customCritical)}\n`;
 				continue;
 			}
 
@@ -279,8 +298,7 @@ export class ResultAsText {
 			if (criticalResult) {
 				successOrFailure = criticalResult.successOrFailure;
 				isCritical = criticalResult.isCritical;
-				currentCriticalState = { ...criticalResult };
-			} else currentCriticalState = { isCritical: undefined, successOrFailure };
+			}
 
 			msgSuccess += this.display(
 				r,
@@ -293,7 +311,7 @@ export class ResultAsText {
 			);
 		}
 
-		return { criticalState: currentCriticalState, msgSuccess };
+		return msgSuccess;
 	}
 
 	private roll(r: string, opposition?: ComparedValue) {
@@ -444,8 +462,12 @@ export class ResultAsText {
 			return `${this.message(r, totalSuccess).replace(PARSE_RESULT_PATTERNS.formulaDiceSymbols, `${successOrFailure} — `)}\n`;
 		}
 		if (resMsg.startsWith("※")) {
-			const rest = resMsg.replace(/^※\s*/, "");
-			return `※ ${successOrFailure} — ${rest}\n`;
+			const withoutSymbol = resMsg.replace(/^※\s*/, "");
+			// The engine already embeds the main segment's own comment ahead of the verdict.
+			const header =
+				PARSE_RESULT_PATTERNS.sharedCommentHeader.exec(withoutSymbol)?.[0] ?? "";
+			const rest = withoutSymbol.slice(header.length);
+			return `※ ${header}${successOrFailure} — ${rest}\n`;
 		}
 		if (resMsg.startsWith("◈")) return `${resMsg}\n`;
 		return `${successOrFailure} — ${resMsg}\n`;
@@ -459,6 +481,16 @@ export class ResultAsText {
 		)
 			return ` ${IGNORE_COUNT_KEY.emoji} `;
 		return "";
+	}
+
+	/**
+	 * The engine drops the parenthesised common segment of a shared roll from its output, so the
+	 * per-segment metadata — indexed on the dice — starts one segment ahead of the rendered lines.
+	 */
+	private countHiddenSegments(): number {
+		if (!this.resultat?.dice?.includes(";")) return 0;
+		const segments = this.resultat.dice.split(";").length;
+		return Math.max(0, segments - this.resultat.result.split(";").length);
 	}
 
 	private extractCommentsPerSegment(): string[] | undefined {
@@ -512,13 +544,7 @@ export class ResultAsText {
 				: `${info ? `${info}\n` : ""}_ _`;
 	}
 
-	private formatMultipleRes(
-		msgSuccess: string,
-		criticalState: {
-			isCritical?: "failure" | "success" | "custom";
-			successOrFailure?: string;
-		}
-	): string[] {
+	private formatMultipleRes(msgSuccess: string): string[] {
 		const splitted = msgSuccess.split("\n");
 		const finalRes = [];
 		let segmentIndex = 0;
@@ -552,11 +578,7 @@ export class ResultAsText {
 					res = res.replace(calc, `\`${calcStr.trim()}\``);
 				}
 			}
-			res = this.formatCriticalSymbols(
-				res,
-				criticalState.isCritical,
-				criticalState.successOrFailure
-			);
+			res = this.formatCriticalSymbols(res);
 			const hasStats = this.statsPerSegment && this.statsPerSegment.length > 0;
 			const hasComments = this.commentsPerSegment && this.commentsPerSegment.length > 0;
 
@@ -567,16 +589,17 @@ export class ResultAsText {
 
 				if (hasMarker) res = res.substring(1);
 
+				const index = segmentIndex + this.hiddenSegments;
 				if (
 					(hasSharedSymbol || hasMarker || isDiceResult) &&
-					segmentIndex <
+					index <
 						Math.max(
 							this.statsPerSegment?.length ?? 0,
 							this.commentsPerSegment?.length ?? 0
 						)
 				) {
-					const statName = this.statsPerSegment?.[segmentIndex] || "";
-					const commentSource = this.commentsPerSegment?.[segmentIndex] || "";
+					const statName = this.statsPerSegment?.[index] || "";
+					const commentSource = this.commentsPerSegment?.[index] || "";
 					const comment = this.removeIgnore(commentSource) || "";
 					this.ignoreCount = this.setIgnoreCount(commentSource);
 
@@ -587,16 +610,15 @@ export class ResultAsText {
 					if (parts.length > 0) {
 						const header = parts.join(" — ");
 
-						if (res.match(PARSE_RESULT_PATTERNS.sharedStartSymbol)) {
-							res = res.replace(
-								PARSE_RESULT_PATTERNS.sharedStartSymbol,
-								`◈ ${header} — `
-							);
-						} else if (res.startsWith("※")) {
+						const sharedPrefix = PARSE_RESULT_PATTERNS.sharedStartSymbol.exec(res);
+						if (sharedPrefix) {
+							// The engine already prints a segment's own comment on its line; only the
+							// compared (`✓`/`✕`) segments arrive bare.
+							const symbol = sharedPrefix[1];
 							if (!res.includes(`__${comment}__`))
-								res = res.replace(/^※\s*/, `※ ${header} — `);
+								res = res.replace(sharedPrefix[0], `${symbol} ${header} — `);
 							else if (statName && !res.includes(`__${statName}__`))
-								res = res.replace(/^※\s*/, `※ __${statName}__ — `);
+								res = res.replace(sharedPrefix[0], `${symbol} __${statName}__ — `);
 						} else if (isDiceResult && !hasSharedSymbol) {
 							const symbol = segmentIndex === 0 ? "※" : "◈";
 							let cleanRes = res;
@@ -622,22 +644,8 @@ export class ResultAsText {
 		return finalRes;
 	}
 
-	private formatCriticalSymbols(
-		res: string,
-		isCritical: undefined | "failure" | "success" | "custom",
-		successOrFailure?: string
-	): string {
-		if (isCritical === "failure")
-			return res.replace("✕", `◈ **${this.ul("roll.critical.failure")}** —`);
-
-		if (isCritical === "success")
-			return res.replace("✓", `◈ **${this.ul("roll.critical.success")}** —`);
-
-		if (isCritical === "custom")
-			return res.replace(
-				PARSE_RESULT_PATTERNS.formulaDiceSymbols,
-				`${successOrFailure} —`
-			);
+	/** Fallback for the segments `compare()` never sees — a shared roll without a global compare. */
+	private formatCriticalSymbols(res: string): string {
 		return res
 			.replace("✕", `◈ **${this.ul("roll.failure")}** —`)
 			.replace("✓", `◈ **${this.ul("roll.success")}** —`);
@@ -688,7 +696,9 @@ export class ResultAsText {
 			mention = `**__${this.charName.capitalize()}__**${mention.length > 0 ? ` (${mention})` : ""}`;
 		let compareHint = "";
 		const header = this.headerCompare ?? this.resultat?.compare;
-		const isSharedRoll = (this.resultat?.result || "").startsWith("※");
+		const isSharedRoll = PARSE_RESULT_PATTERNS.allSharedSymbols.test(
+			this.resultat?.result || ""
+		);
 		if (header && !isSharedRoll)
 			compareHint = ` (\`${asciiSign(header.sign)} ${this.formatCompare(header)}\`)`;
 		const headerLine = `${mention}${compareHint}${this.ignoreCount}${timestamp(this.data.config?.timestamp)}`;

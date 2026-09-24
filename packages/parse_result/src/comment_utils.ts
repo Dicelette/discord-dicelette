@@ -1,5 +1,29 @@
-import { bareComment, DICE_PATTERNS, matchBareComment } from "@dicelette/utils";
+import {
+	bareComment,
+	DICE_PATTERNS,
+	maskBracketComments,
+	matchBareComment,
+} from "@dicelette/utils";
 import { extractDiceData } from "./dice_extractor";
+
+/** `#`, `//` and `/*` only: unlike `[`, they have no closing marker and end the whole dice. */
+const GLOBAL_COMMENT_MARKER = /\s(#|\/{2}|\/\*)(?<comment>.*)/i;
+
+/**
+ * `splitDiceComment` of the core, minus its `[` marker: in a shared roll a bracketed comment
+ * belongs to its own `;` segment and must stay in the dice for the engine to render it.
+ */
+export function splitGlobalComment(dice: string): {
+	dice: string;
+	comment: string | undefined;
+} {
+	const match = GLOBAL_COMMENT_MARKER.exec(maskBracketComments(dice));
+	if (!match?.groups) return { dice: dice.trimEnd(), comment: undefined };
+	const comment = dice
+		.slice(match.index + match[0].length - match.groups.comment.length)
+		.trim();
+	return { dice: dice.slice(0, match.index).trimEnd(), comment: comment || undefined };
+}
 
 export function getComments(content: string, comments?: string) {
 	let globalComments = content.match(DICE_PATTERNS.GLOBAL_COMMENTS)?.[1];

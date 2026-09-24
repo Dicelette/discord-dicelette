@@ -206,28 +206,41 @@ export function filterStatsInDamage(
 	return Object.keys(damages).filter((key) => !damages[key].standardize().match(regex));
 }
 
+/**
+ * Finds the opposition comparator of a dice (`1d20>15>20` → `>20`) and the dice without it.
+ *
+ * Custom critical and `{{...}}` formula blocks are masked by a same-length filler rather than
+ * removed: a comparator inside a still-unresolved block (e.g. `{{$>=85?85:$}}`) must not be read
+ * as an opposition, and keeping the offsets lets the match be cut out of the original string —
+ * so an identical comparator sitting in another `;` segment is never removed instead.
+ */
+export function extractOpposition(
+	dice: string
+): { dice: string; first: string; second: string } | undefined {
+	const mask = (block: string) => "0".repeat(block.length);
+	const masked = dice
+		.replace(REMOVER_PATTERN.CRITICAL_BLOCK, mask)
+		.replace(FORMULA_BLOCK_PATTERN, mask);
+	const match = DICE_COMPILED_PATTERNS.OPPOSITION.exec(masked);
+	if (!match?.groups) return undefined;
+	const { first, second } = match.groups;
+	const start = match.index + match[0].length - second.length;
+	return {
+		dice: `${dice.slice(0, start)}${dice.slice(start + second.length)}`.trim(),
+		first: dice.slice(match.index, match.index + first.length),
+		second: dice.slice(start, start + second.length),
+	};
+}
+
 export function parseComparator(
 	dice: string,
 	userStatistique?: Record<string, number>,
 	userStatStr?: string,
 	sort?: SortOrder
 ) {
-	// Ignore custom critical blocks and neutralize {{...}} formula blocks during detection:
-	// a comparator inside a still-unresolved {{...}} block (e.g. {{$>=85?85:$}}) must not
-	// be mistaken for a second/opposition comparator.
-	const cleanedDice = dice
-		.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "")
-		.replace(FORMULA_BLOCK_PATTERN, "0");
-	const comparatorMatch = DICE_COMPILED_PATTERNS.OPPOSITION.exec(cleanedDice);
-	let comparator = "";
-	let opposition: string | undefined;
-	if (comparatorMatch?.groups) {
-		comparator = comparatorMatch.groups?.first;
-		opposition = comparatorMatch.groups?.second;
-	}
-	if (opposition)
-		return parseOpposition(opposition, comparator, userStatistique, userStatStr, sort);
-	return undefined;
+	const found = extractOpposition(dice);
+	if (!found) return undefined;
+	return parseOpposition(found.second, found.first, userStatistique, userStatStr, sort);
 }
 
 /**

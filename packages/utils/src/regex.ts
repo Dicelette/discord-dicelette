@@ -40,9 +40,16 @@ const DETECT_DICE_MESSAGE_INDICES = new RegExp(
  */
 function maskFormulaBlocks(content: string): string {
 	// Global, but only ever used through `replace`, which resets `lastIndex` itself.
-	return content.replace(FORMULA_BLOCK_MASK, (block) => "0".repeat(block.length));
+	return content.replace(FORMULA_BLOCK_MASK, maskRun);
 }
 const FORMULA_BLOCK_MASK = new RegExp(FORMULA_BLOCK_SOURCE, "g");
+/** Same-length stand-in, so a match found on a masked copy maps 1:1 onto the original. */
+const maskRun = (block: string) => "0".repeat(block.length);
+
+/** Neutralizes every `[…]` comment span while preserving offsets. */
+export function maskBracketComments(content: string): string {
+	return content.replace(DICE_COMPILED_PATTERNS.COMMENTS_REGEX, maskRun);
+}
 
 /** The `DETECT_DICE_MESSAGE` split of a dice message, blind to the interior of `{{…}}` blocks. */
 export function matchBareComment(content: string):
@@ -57,14 +64,22 @@ export function matchBareComment(content: string):
 			comment: string;
 	  }
 	| undefined {
-	const match = DETECT_DICE_MESSAGE_INDICES.exec(maskFormulaBlocks(content));
+	const masked = maskFormulaBlocks(content);
+	// In a shared roll each `;` segment owns its comment, so only the tail after the last
+	// separator can hold a global bare comment — and never a bracketed one, which belongs to
+	// its segment. Brackets are masked before looking for that separator so a `;` typed inside
+	// a comment doesn't split the dice.
+	const start = maskBracketComments(masked).lastIndexOf(";") + 1;
+	const tail = masked.slice(start);
+	if (start > 0 && tail.includes("[")) return undefined;
+	const match = DETECT_DICE_MESSAGE_INDICES.exec(tail);
 	const indices = match?.indices;
 	if (!match || !indices?.[1] || !indices[3]) return undefined;
 	return {
-		comment: content.slice(indices[3][0], indices[3][1]),
-		dice: content.slice(indices[1][0], indices[1][1]),
-		end: match.index + match[0].length,
-		start: match.index,
+		comment: content.slice(start + indices[3][0], start + indices[3][1]),
+		dice: content.slice(start + indices[1][0], start + indices[1][1]),
+		end: start + match.index + match[0].length,
+		start: start + match.index,
 	};
 }
 
@@ -91,7 +106,13 @@ export const DICE_COMPILED_PATTERNS = {
 	/** Matches dice notation (e.g. `1d6`, `d20`, `2d10`) within a larger expression. Used for search-and-replace inside `{{...}}` formula blocks. */
 	DICE_IN_FORMULA: /\b\d*d\d+\b/gi,
 	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
-	OPPOSITION: /(?<first>(([><=]|!=)+)([^<>=!]+))(?<second>(([><=]|!=)+)([^<>=!]+))/,
+	/** Two comparators on the SAME dice (`1d20>15>20`): a compared value never contains a space
+	 * nor a `;`, so the pattern cannot swallow a trailing comment or reach the next segment. A
+	 * value is either a whole `[...]` block (an unresolved custom-formula placeholder) or a run
+	 * of characters that stops at `[` — so a bracket comment glued without a space (`>34[chat]`,
+	 * legal per the engine's own comment syntax) is never read as part of the value. */
+	OPPOSITION:
+		/(?<first>(([><=]|!=)+)(\[[^\]]*\]|[^<>=!;\s[]+))\s*(?<second>(([><=]|!=)+)(\[[^\]]*\]|[^<>=!;\s[]+))/,
 	/** `(stat1|stat2|…)` compiled once per alphabet. Used by `filterStatsInDamage`. */
 	STATS_REGEX_CACHE: new Map<string, RegExp>(),
 	/** `\((stat1|stat2|…)\)` for `replaceStatInDiceName` — same hot path, same keys. */
@@ -105,6 +126,14 @@ export const PARSE_RESULT_PATTERNS = {
 	allSharedSymbols: /[✓✕◈※]/,
 	beforeArrow: /^(?:※\s|◈\s[^—]+—\s)?/,
 	commentBracket: /\[([^\]]+)\]/,
+	/** Tail of a segment the engine judged: `20<=65` → total, sign, compared value. */
+	comparedTail:
+		/^(?<total>-?\d+(?:\.\d+)?)(?<sign>[<>=!]=|[<>=])(?<value>-?\d+(?:\.\d+)?)$/,
+	/**
+	 * A comparator closing a displayed dice (`1d100<=65`, `[1d6]+2>5`). The lookbehind mirrors
+	 * the core's `SIGN_REGEX` so an exploding-success notation (`2d6!>>4`) is never amputated.
+	 */
+	compareSuffix: /(?<![!<>])([<>=!]=|[<>=])-?\d+(?:\.\d+)?(?=:|$)/g,
 	diceResultPattern: /(?<entry>\S+) ⟶ (?<calc>.*) =/,
 	dynamicDice: /(\d+d\([^)]+\))/,
 	extractInfo: /%%(.*)%%/,
@@ -113,7 +142,9 @@ export const PARSE_RESULT_PATTERNS = {
 	naturalDice: /\[(\d+)\]/gi,
 	parenExpression: /\(([^)]+)\)/,
 	resultEquals: / = (\S+)/g,
-	sharedStartSymbol: /^◈\s+/,
+	sharedStartSymbol: /^([※◈])\s*/,
+	/** A `__comment__ — ` header the engine embeds at the start of a shared roll's main line. */
+	sharedCommentHeader: /^__.+?__\s*—\s*/,
 	sharedSymbol: /^([※◈])/,
 	successSymbol: /^◈\s+\*\*/,
 	/**

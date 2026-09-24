@@ -24,11 +24,16 @@ import {
 	DICE_PATTERNS,
 	FORMULA_BLOCK_SOURCE,
 	logger,
+	maskBracketComments,
 	stripBareComment,
 } from "@dicelette/utils";
 import { evaluate } from "mathjs";
-import { extractAndMergeComments, getComments } from "./comment_utils";
-import { trimAll } from "./utils";
+import {
+	extractAndMergeComments,
+	getComments,
+	splitGlobalComment,
+} from "./comment_utils";
+import { extractOpposition, trimAll } from "./utils";
 
 /**
  * Matches a `{{...}}` formula block.
@@ -114,7 +119,11 @@ export function performDiceRoll(
 	sort?: SortOrder
 ): { resultat: Resultat | undefined; infoRoll?: string } | undefined {
 	try {
-		let rollContent = bracketRoll ? trimAll(bracketRoll) : trimAll(content);
+		const source = bracketRoll ?? content;
+		// `trimAll` strips every `[comment]`, which a shared roll needs the engine to render per
+		// segment — so those go through `getRoll`, the same entry point the slash command uses.
+		const shared = isSharedRoll(source);
+		let rollContent = shared ? source : trimAll(source);
 
 		// Clean markers before the dice parser
 		rollContent = rollContent
@@ -124,6 +133,7 @@ export function performDiceRoll(
 			.replace(/ @\w+/, "")
 			.trimEnd();
 		if (/`.*`/.test(rollContent) || /^[\\/]/.test(rollContent)) return undefined;
+		if (shared) return { infoRoll, resultat: getRoll(rollContent, pity, sort) };
 		// Extract and pass the comment separately so roll() receives a clean dice string
 		const { dice: cleanDice, comment } = splitDiceComment(rollContent);
 		return { infoRoll, resultat: roll(cleanDice, undefined, pity, sort, comment) };
@@ -267,15 +277,7 @@ export function processChainedDiceRoll(
 	finalContent = replaceFormulaInDice(finalContent);
 
 	// Remove opposition before rolling (but keep original content for comments)
-	const contentForOpposition = finalContent.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "");
-	const oppositionMatch = /(?<first>([><=!]+)(.+?))(?<second>([><=!]+)(.+))/.exec(
-		contentForOpposition
-	);
-
-	if (oppositionMatch?.groups) {
-		// Remove the second comparator (opposition) only for the roll
-		finalContent = finalContent.replace(oppositionMatch.groups.second, "").trim();
-	}
+	finalContent = extractOpposition(finalContent)?.dice ?? finalContent;
 
 	try {
 		// Remove critical blocks before rolling
@@ -405,37 +407,8 @@ export function isRolling(
 	const originalContent = content;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
 	if (!evaluated) {
-		// Preclean to ignore {cs|cf:...} blocs and neutralize {{...}} formula blocks
-		// (a still-unresolved `$stat` prevents their pre-evaluation, so a comparison
-		// operator inside them must not be detected as a second/opposition comparator).
-		const contentForOpposition = content
-			.replace(REMOVER_PATTERN.CRITICAL_BLOCK, "")
-			.replace(FORMULA_BLOCK_PATTERN, "0");
-		const reg = DICE_COMPILED_PATTERNS.OPPOSITION.exec(contentForOpposition);
-
-		// Extract comments before removing opposition part
-		let preservedComments: string | undefined;
-		if (reg?.groups) {
-			// Extract any comments from the content before removing the opposition
-			// Use DETECT_DICE_MESSAGE which captures comments without the leading "#"
-			preservedComments = bareComment(content) || undefined;
-
-			// Also check for # comments using GLOBAL_COMMENTS which captures the content after #
-			if (!preservedComments) {
-				const hashComment = content.match(DICE_PATTERNS.GLOBAL_COMMENTS);
-				if (hashComment?.[1]) preservedComments = hashComment[1];
-			}
-
-			content = content.replace(reg.groups.second, "").trim();
-
-			if (disableCompare) content = `{${content}}`;
-			// Re-append the comment if it was lost during opposition removal
-			if (preservedComments && !content.includes(preservedComments)) {
-				// Add back the comment as an inline comment (without #)
-				// The processing pipeline will handle it correctly
-				content = `${content} ${preservedComments}`;
-			}
-		} else if (disableCompare) {
+		content = extractOpposition(content)?.dice ?? content;
+		if (disableCompare) {
 			//preserve comments
 			const val = extractAndMergeComments(content);
 			content = `{${val.cleanedDice}}`;
@@ -586,7 +559,7 @@ export function isRolling(
  * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
  */
 function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
-	const { dice: cleanDice, comment } = splitDiceComment(dice);
+	const { dice: cleanDice, comment } = splitGlobalComment(dice);
 	const rollDice = roll(cleanDice, undefined, pity, sort, comment);
 	if (!rollDice) return undefined;
 	rollDice.dice = cleanDice;
@@ -601,8 +574,8 @@ function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
  */
 function isSharedRoll(dice: string): boolean {
 	// Remove comment to avoid false positive on ";" in comment text
-	const { dice: cleanedDice } = splitDiceComment(dice);
-	return cleanedDice.includes(";");
+	const { dice: cleanedDice } = splitGlobalComment(dice);
+	return maskBracketComments(cleanedDice).includes(";");
 }
 
 /**
