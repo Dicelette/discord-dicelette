@@ -18,8 +18,7 @@ interface PermEntry {
 
 /**
  * Character-sheet cache. Keys: `${guildId}:${userId}` or `${guildId}:*all*`.
- * A per-guild index allows O(1) invalidation of all entries of a guild without
- * scanning the full map. Entries past CHAR_CACHE_TTL are evicted lazily on read.
+ * Entries past CHAR_CACHE_TTL are evicted lazily on read.
  */
 const charStore = new Map<string, CharEntry>();
 const charByGuild = new Map<string, Set<string>>();
@@ -102,9 +101,8 @@ export const charForceRefresh = {
 };
 
 /**
- * Permission cache. Keys end with `:${guildId}` (e.g. `${userId}:${guildId}`,
- * `refresh:${userId}:${guildId}`, `channel:${userId}:${guildId}:${channelId}`,
- * `oauth:${userId}:${guildId}`). A per-guild index enables O(1) invalidation.
+ * Permission cache.
+ * Keys end with `:${guildId}`
  * Entries past `expiresAt` are evicted lazily on read.
  */
 const permStore = new Map<string, PermEntry>();

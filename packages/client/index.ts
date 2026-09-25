@@ -67,7 +67,7 @@ export class EClient extends Djs.Client {
 
 	/**
 	 * Map of timeouts for trivial cache cleanup
-	 * - Used to prevent memory leaks by clearing timeouts when cache entries are manually deleted
+	 * Used to prevent memory leaks by clearing timeouts when cache entries are manually deleted
 	 * @key `guildId:authorId:channelId:(timestamp/60_000)`
 	 */
 	public trivialCacheTimeouts: Map<string, NodeJS.Timeout> = new Map();
@@ -181,15 +181,7 @@ export class EClient extends Djs.Client {
 
 	/**
 	 * Write a user's character list to the in-memory cache **and** stamp its TTL timestamp.
-	 *
-	 * Always prefer this over calling `characters.set(...)` directly: the periodic cleanup
-	 * (see `startCacheCleanup`) can only evict entries that have a matching timestamp in
-	 * `characterCacheTimestamps`. A bare `characters.set` creates an entry the sweeper can
-	 * never reclaim, leaking memory until the next restart.
-	 *
-	 * @param guildId - Guild the character belongs to.
-	 * @param value - The user's full character list.
-	 * @param userId - Owner of the character list.
+	 * The periodic cleanup can only evict entries that have a matching timestamp in `characterCacheTimestamps`*
 	 */
 	setCharacter(guildId: string, value: UserData[], userId: string) {
 		this.characters.set(guildId, value, userId);
@@ -200,8 +192,8 @@ export class EClient extends Djs.Client {
 	 * Remove character data from the in-memory cache and drop the matching TTL timestamp(s),
 	 * keeping `characters` and `characterCacheTimestamps` in sync.
 	 *
-	 * @param guildId - Guild to clear.
-	 * @param userId - When provided, only that user's entry is removed; otherwise the whole guild.
+	 * @param guildId {string} Guild to clear.
+	 * @param userId {string} When provided, only that user's entry is removed; otherwise the whole guild.
 	 */
 	deleteCharacter(guildId: string, userId?: string) {
 		if (userId) {
@@ -221,8 +213,6 @@ export class EClient extends Djs.Client {
 
 /**
  * Create a new EClient instance with default intents and partials.
- * Use this factory function instead of instantiating EClient directly.
- *
  * @param options - Discord.js ClientOptions to override defaults
  * @returns Configured EClient instance
  */

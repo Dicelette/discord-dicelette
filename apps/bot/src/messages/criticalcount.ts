@@ -7,7 +7,6 @@ import { clearCacheKey, createCacheKey } from "../commands";
 
 /**
  * Extracts counts of critical and regular successes and failures from a Discord message's content.
- *
  * @param message - The Discord message to parse for roll outcome lines (Djs.Message or Djs.PartialMessage).
  * @returns A Count object with `criticalFailure`, `criticalSuccess`, `failure`, and `success` fields representing the number of occurrences found in the message content.
  */
@@ -130,14 +129,8 @@ export function addCount(
 }
 
 /**
- * Subtracts a message's counts from a user's stored counts for a guild.
- *
- * Adjusts the user's cumulative fields (criticalFailure, criticalSuccess, failure, success)
- * by subtracting the provided `messageCount`, clamps each field at zero, and updates
- * the stored consecutive values unless `isTrivial` is true. The historical `longestStreak`
- * is preserved and not modified by removals. If no existing record is found for the user
- * in the guild, the function returns without effect.
- *
+ * - Subtracts a message's counts from a user's stored counts for a guild and adjust the user cumulative fields by substracting the messagecount
+ * -update the stored values unless `isTrivial` is true
  * @param criticalCount - The per-guild/per-user counts store to update.
  * @param userId - The user identifier whose counts will be decreased.
  * @param guildId - The guild identifier where the counts are stored.

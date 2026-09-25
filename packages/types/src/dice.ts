@@ -1,9 +1,6 @@
 import type { ComparedValue, CustomCritical, Resultat } from "@dicelette/core";
 import type * as Djs from "discord.js";
 
-/**
- * Interface pour le résultat de l'extraction de dés
- */
 export interface DiceExtractionResult {
 	result: Resultat;
 	detectRoll: string | undefined;
@@ -13,16 +10,13 @@ export interface DiceExtractionResult {
 }
 
 /**
- * Interface pour les commentaires enchaînés
+ * Comments chained in shared dice roll. (`1d20;&+5[comments for roll] comments global`
  */
 export interface ChainedComments {
 	content: string;
 	comments: string | undefined;
 }
 
-/**
- * Interface pour les données de dés extraites
- */
 export interface DiceData {
 	bracketRoll: string | undefined;
 	comments: string | undefined;

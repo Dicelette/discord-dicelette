@@ -273,10 +273,7 @@ async function buildLeaderBoardChart(
 }
 
 /**
- * Goal : Create a graph (whichtype) for karma
- * @param interaction
- * @param client
- * @param ul
+ * Create a graph for karma
  */
 export async function chart(
 	interaction: Djs.ChatInputCommandInteraction,

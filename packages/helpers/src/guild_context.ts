@@ -55,7 +55,6 @@ export function getGuildContext(
 
 /**
  * Get user snippets for a specific guild and user.
- * Convenience wrapper to avoid repeated userSettings lookups.
  *
  * @param client - Discord client with user settings
  * @param guildId - Guild ID
@@ -70,14 +69,6 @@ export function getUserSnippets(
 	return client.userSettings.get(guildId, userId)?.snippets ?? {};
 }
 
-/**
- * Cached comparison result to avoid repeated standardize calls.
- * Use this when comparing the same values multiple times.
- *
- * @param a - First string to compare
- * @param b - Second string to compare
- * @returns True if standardized values match
- */
 export function standardizeEquals(a: string, b: string): boolean {
 	return a.standardize() === b.standardize();
 }

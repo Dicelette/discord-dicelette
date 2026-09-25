@@ -6,8 +6,7 @@ import type * as Djs from "discord.js";
 import { reply } from "messages";
 
 /**
- * Set or clear the guild's pity threshold and reply with a localized confirmation.
- *
+ * Set or clear the guild's pity threshold and reply with confirmation.
  * If a numeric pity value is provided, stores it in the guild settings under the key `"pity"` and replies with a success message including the value.
  * If no pity value is provided (falsy), deletes the guild's pity setting and replies with a deletion message.
  *
@@ -38,9 +37,9 @@ export async function setPity(
 
 /**
  * Determine whether the pity mechanic triggers for a user based on the configured threshold and the user's consecutive failures.
- *
- * Between 75% and 100% of the threshold, the trigger probability increases linearly from 50% to 100%; at or above the threshold pity always triggers, below 75% it never triggers.
- *
+ * - Between 75% and 100% of the threshold, the trigger probability increases linearly from 50% to 100%;
+ * - at or above the threshold pity always triggers,
+ * - below 75% it never triggers
  * @param threshold - Guild-configured failure threshold for pity
  * @param userFailNb - Number of consecutive failures for the user
  * @returns `true` if pity triggers, `false` otherwise
@@ -67,7 +66,6 @@ export function triggerPity(threshold?: number, userFailNb?: number): boolean {
 
 /**
  * Build minute-granular cache keys for a user within the context of a guild channel message or interaction.
- *
  * @param source - The message or command interaction used to derive guildId, channelId and timestamp
  * @param userId - The target user's ID included in the key prefix
  * @returns An object containing `cacheKey` for the current minute, `prevCacheKey` for the previous minute, and `timeMin` (minutes since epoch)

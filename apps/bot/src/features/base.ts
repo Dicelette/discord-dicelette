@@ -4,8 +4,7 @@ import type { Characters, Settings, Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
 
 /**
- * Context object containing common dependencies for feature operations
- * Extended to support more complex feature requirements
+ * Common dependencies for feature operations
  */
 export interface FeatureContext {
 	interaction: Djs.BaseInteraction;
@@ -22,7 +21,6 @@ export interface FeatureContext {
 
 /**
  * Base class for features with context management
- * Stores common dependencies as instance properties
  */
 export abstract class BaseFeature {
 	protected interaction: Djs.BaseInteraction;

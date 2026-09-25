@@ -21,8 +21,7 @@ const botErrorOptions: BotErrorOptions = {
 };
 
 /**
- * Rename feature class - handles character renaming operations
- * Uses instance properties to store context and reduce parameter passing
+ * Handles character renaming operations
  */
 export class RenameFeature extends BaseFeature {
 	/**
@@ -37,7 +36,6 @@ export class RenameFeature extends BaseFeature {
 
 	/**
 	 * Extracts the current character name from the message embed associated with the interaction.
-	 * @param interaction - The Discord StringSelectMenuInteraction containing the message and embeds.
 	 * @returns The character name as a string, or null if not found or not set.
 	 */
 	private getCurrentName(interaction: Djs.StringSelectMenuInteraction): string | null {
@@ -80,9 +78,7 @@ export class RenameFeature extends BaseFeature {
 
 	/**
 	 * Handles validation and execution of a character rename operation from a Discord modal submission.
-	 *
 	 * Retrieves and validates the relevant message, user, and character data, then updates the character's name and database records accordingly.
-	 *
 	 * @throws {Error} If the required embed, user ID, user object, or character data cannot be found.
 	 */
 	async validate(): Promise<void> {

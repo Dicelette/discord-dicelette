@@ -74,9 +74,8 @@ const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
 
 /**
  * Generic helper to apply setNames and setDescriptions methods to multiple prototypes.
- * Reduces duplication and ensures consistency across all builder types.
  *
- * @param prototypes - Array of constructor prototypes to extend
+ * @param prototypes Array of constructor prototypes to extend
  */
 function applyLocalizationMethods(prototypes: (object | undefined)[]) {
 	for (const prototype of prototypes) {

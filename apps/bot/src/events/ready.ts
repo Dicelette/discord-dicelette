@@ -137,9 +137,6 @@ export default (client: EClient): void => {
 
 /**
  * Migrates user data for a guild to the updated message ID format if not already converted.
- *
- * For each user in the guild, updates character entries with a legacy `messageId` field to use the new array format, associating the message with either a private or default channel. Removes entries that cannot be updated due to missing channel information. Marks the guild as converted upon completion.
- *
  * @param db - The settings database instance.
  * @param guild - The Discord guild whose user data will be migrated.
  */
@@ -183,9 +180,7 @@ function convertDatabaseUser(db: Settings, guild: Djs.Guild) {
 }
 
 /**
- * Fetches and caches the statistical template for a guild.
- *
- * Retrieves the guild's language setting, loads the appropriate localization, fetches the statistical template, and stores it in the client's template cache if found.
+ * Fetches and caches the statistical template for a guild and stores it in the client's template cache
  */
 async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
 	const lang = client.settings.get(guild.id, "lang") ?? Djs.Locale.EnglishUS;
@@ -196,8 +191,6 @@ async function cacheStatisticalTemplate(client: EClient, guild: Djs.Guild) {
 }
 /**
  * Removes settings for guilds the bot is no longer a member of.
- *
- * Iterates through all guild IDs in the settings database and deletes entries for any guilds that are not present in the client's current guild cache.
  */
 function cleanData(client: EClient) {
 	const guilds = client.guilds.cache;
@@ -235,9 +228,8 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 }
 
 /**
- * Periodically evicts character cache entries that haven't been refreshed within `maxAge` ms.
- * Evicted entries are re-fetched from Discord on next access, so data is never lost.
- *
+ * - Periodically evicts character cache entries that haven't been refreshed within `maxAge` ms.
+ * - Evicted entries are re-fetched from Discord on next access (to prevent losing informations)
  * @param client - The bot client holding the caches.
  * @param maxAge - Maximum age of a cache entry in ms before eviction (default: 24 h).
  * @param interval - How often to run the cleanup in ms (default: 1 h).

@@ -13,9 +13,6 @@ export * from "./src/logger";
 export * from "./src/redosGuard";
 export * from "./src/regex";
 
-/**
- * Get the random engine using node's crypto module
- */
 export const random = new Random(getEngine("nodeCrypto"));
 
 /**
@@ -46,11 +43,6 @@ function uniqueValues(array: string[]) {
 	return uniqueArray;
 }
 
-/**
- * Verify if an array is equal to another
- * @param array1 {string[]|undefined}
- * @param array2 {string[]|undefined}
- */
 export function isArrayEqual(array1: string[] | undefined, array2: string[] | undefined) {
 	if (!array1 || !array2) return false;
 	return (
@@ -116,9 +108,6 @@ export function fontPath(fontName: string) {
 
 /**
  * Run async tasks over `items` with at most `limit` in-flight at once.
- * Use this instead of an unbounded `Promise.all(items.map(...))` when the worker
- * hits an external API (Discord, HTTP) — a wide fan-out across hundreds of
- * items will otherwise trigger rate limits or starve the event loop.
  */
 export async function mapConcurrent<T, R>(
 	items: readonly T[],

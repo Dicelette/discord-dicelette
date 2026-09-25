@@ -48,12 +48,9 @@ export function ln(userLang: Djs.Locale) {
 
 /**
  * Returns a localized error message based on the error type and user language or interaction locale.
- *
- * Selects the appropriate translation for a wide range of custom and Discord.js errors, providing user-friendly messages in the user's language when possible.
- *
- * @param e - The error to localize.
- * @param interaction - Optional Discord interaction to determine the user's locale.
- * @param userLang - Optional user language override.
+ * @param e The error to localize.
+ * @param interaction Optional Discord interaction to determine the user's locale.
+ * @param userLang Optional user language override.
  * @returns The localized error message string.
  */
 export function lError(

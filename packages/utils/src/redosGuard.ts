@@ -16,9 +16,7 @@ const REDOS_TIMEOUT_MS = 80;
 
 /**
  * Checks that a user-supplied regex pattern can't be used to freeze the event loop.
- * Runs the pattern against several adversarial inputs inside a `vm` context with a
- * hard timeout: a real V8 execution budget catches catastrophic backtracking that
- * static "does it contain (x+)+" checks would miss or false-positive on.
+ * Runs the pattern against several adversarial inputs inside a `vm` context with a hard timeout
  */
 export function isRegexSafe(pattern: string, flags = ""): boolean {
 	try {

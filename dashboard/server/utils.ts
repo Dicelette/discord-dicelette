@@ -16,9 +16,8 @@ import {
 } from "./types";
 
 /**
- * Concurrency cap for outgoing Discord API fan-out (member/character lookups
- * on the hot path) — must not saturate the bot's shared Discord client with
- * hundreds of parallel requests.
+ * Concurrency cap for outgoing Discord API fan-out (member/character lookups on the hot path)
+ * must not saturate the bot's shared Discord client with hundreds of parallel requests.
  */
 export const DISCORD_FETCH_CONCURRENCY = 10;
 
@@ -77,9 +76,8 @@ function setCached(key: string, result: boolean): boolean {
 }
 
 /**
- * Détecte une URL Discord CDN dont les paramètres d'expiration ont été supprimés
- * par cleanAvatarUrl(). Ces URLs sont invalides car Discord requiert les params
- * ?ex=...&is=...&hm=... pour les fichiers attachés depuis 2023.
+ * Detect a Discord CDN url where extra params (ex, is, hm) has been deleted.
+ * These kind of url are invalid because the extra params are mandatory since 2023.
  */
 export function isStaleDiscordCdnUrl(url: string | null): boolean {
 	if (!url) return false;
@@ -103,10 +101,6 @@ export function isValidSnowflake(id: string): boolean {
 	return SNOWFLAKE_RE.test(id);
 }
 
-/**
- * Applique une fonction de validation à chaque entrée d'un objet et retourne
- * les résultats séparés en deux groupes : `valid` et `errors`.
- */
 export function validateEntries(
 	entries: Record<string, unknown>,
 	validateFn: (
@@ -150,10 +144,7 @@ export function requireAuth(req: Request, res: Response, next: () => void) {
 }
 
 /**
- * Middleware factory qui vérifie que l'utilisateur courant dispose des droits
- * « Manage Guild » ou « Administrator » via le cache Discord.js bot,
- * ou possède un des rôles listés dans `dashboardAccess` (si configuré).
- * À instancier une fois dans le router et à réutiliser sur les routes admin.
+ * Check if the user in the dashboard have the manage guild/admin right in the discord bot (cache) or have the role listed in the dashboard access right.
  */
 export function makeRequireAdmin(
 	botGuilds: DashboardDeps["botGuilds"],
@@ -172,17 +163,10 @@ export function makeRequireAdmin(
 }
 
 /**
- * Vérifie si un utilisateur peut gérer un serveur via le cache Discord.js du bot.
+ * Check if an user can manage a guild via the discord bot cache.
+ * If `dashboardAccess` is configured in the guild's setting, only user with these roles or admin right can access.
  *
- * Quand `dashboardAccess` est configuré (non-vide) dans les settings du serveur,
- * seuls les utilisateurs possédant l'un de ces rôles (ou la permission Administrator)
- * ont accès. La permission ManageGuild seule ne suffit plus.
- *
- * Sans `dashboardAccess`, le comportement par défaut est conservé :
- * ManageGuild ou Administrator.
- *
- * Les résultats sont mis en cache 5 minutes pour limiter les appels à
- * `guild.fetchMember()`.
+ * Result are cached 5min to prevent spamming `guild.fetchMember()`
  */
 export async function userCanManageGuild(
 	userId: string,
@@ -224,11 +208,11 @@ export async function userCanManageGuild(
 }
 
 /**
- * Vérifie si un utilisateur peut rafraîchir les fiches de tout le serveur.
- * Autorisé si l'utilisateur a au moins une permission parmi:
- * - Administrator
- * - Manage Guild
- * - Manage Roles
+ * Check if the user can refresh all character sheet (in a guild)
+ * Only allowed if the user have one of these permissions:
+ * - Administration
+ * - Manage guild
+ * - Manage roles
  */
 export async function userCanRefreshServerCharacters(
 	userId: string,
@@ -255,11 +239,6 @@ export async function userCanRefreshServerCharacters(
 	}
 }
 
-/**
- * Vérifie si un utilisateur est simplement membre du serveur (sans exigence de
- * permission particulière). Utilisé pour les routes en lecture seule ouvertes à
- * tout le monde, comme la consultation du modèle statistique.
- */
 export async function userIsGuildMember(
 	userId: string,
 	guildId: string,
@@ -281,8 +260,7 @@ export async function userIsGuildMember(
 }
 
 /**
- * Middleware factory qui autorise tout membre du serveur (pas seulement les
- * admins). À utiliser sur les routes en lecture seule accessibles à tous.
+ * Middleware factory allowing all server member.
  */
 export function makeRequireGuildMember(botGuilds: DashboardDeps["botGuilds"]) {
 	return async (req: Request, res: Response, next: () => void) => {
@@ -319,9 +297,8 @@ export async function userCanAccessChannel(
 }
 
 /**
- * Vérifie si un utilisateur peut gérer un serveur via son token OAuth.
- * Utilisé pour les serveurs où le bot n'est pas encore présent (ex. /invite),
- * car le token bot ne peut pas récupérer les membres de serveurs non rejoints.
+ * Check if a user can manage a guild via OAuth.
+ * Used to invit the bot in a new guild.
  */
 export async function userCanManageGuildViaOAuth(
 	userId: string,
@@ -414,10 +391,8 @@ export function getfrontEndUrl() {
 }
 
 /**
- * Memoize ETag computation by payload reference. When a route returns the same
- * object across requests (e.g. a cached bootstrap payload), we skip the
- * JSON.stringify + SHA1 roundtrip entirely. The WeakMap is keyed by object
- * identity so it's GC-safe and requires no eviction policy.
+ * Memoize ETag computation by payload reference.
+ * When a route returns the same object across requests (e.g. a cached bootstrap payload), we skip the JSON.stringify + SHA1 roundtrip entirely.
  */
 const etagMemo = new WeakMap<object, string>();
 

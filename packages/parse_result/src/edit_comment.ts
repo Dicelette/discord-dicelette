@@ -2,13 +2,10 @@ import { PARSE_RESULT_PATTERNS } from "@dicelette/utils";
 import { stripCommentPrefix } from "./comment_utils";
 
 /**
- * Rebuilds a rendered roll-result message (as produced by `ResultAsText.onMessageSend`)
- * with its comment replaced by `newComment`, inserting one if the roll had none.
- *
+ * Rebuilds a rendered roll-result message with its comment replaced by `newComment`, inserting one if the roll had none.
  * @param content - The full text of the bot's roll-result message
  * @param newComment - The replacement comment, taken verbatim from the user's reply
- * @returns The rebuilt message content, or `undefined` if `content` doesn't look like a
- * roll-result message, or `newComment` is empty once sanitized
+ * @returns The rebuilt message content, or `undefined` if `content` doesn't look like a roll-result message, or `newComment` is empty once sanitized
  */
 export function replaceRollComment(
 	content: string,

@@ -1,14 +1,4 @@
-// ---------------------------------------------------------------------------
-// Dynamic Open Graph / Twitter Card metadata for shareable public links.
-//
-// The dashboard is a client-rendered SPA: link-preview crawlers (Discord,
-// Twitter, Slack, ...) never execute its JS, so they only ever see the
-// static `index.html`. To get a real "summary card" on a shared karma or
-// character link, the server has to patch that HTML's <title>/<meta> tags
-// per-request, before it's sent — this module does exactly that, for the
-// small set of public share routes, and falls through to the plain SPA
-// shell for everything else (including when a lookup fails).
-// ---------------------------------------------------------------------------
+/* Dynamic Open Graph / Twitter Card metadata for shareable public links. */
 
 import { readFileSync } from "node:fs";
 import type { NextFunction, Request, Response } from "express";
@@ -82,8 +72,7 @@ function guildIconUrl(guildId: string, icon: string | null): string | null {
 
 /**
  * Mirrors `matchesCharSlug` in apps/web/src/features/characters/shareLink.ts
- * (client-only module, not reachable from the server bundle) — kept in sync
- * by hand since it's a few stable lines, not worth sharing across bundles.
+ * (client-only module, not reachable from the server bundle)
  */
 function matchesCharSlug(charName: string | null, slug: string): boolean {
 	const decoded = decodeURIComponent(slug);
@@ -241,9 +230,9 @@ function injectMeta(
 }
 
 /**
- * Express handler for one public share route — patches `index.html`'s meta
- * tags with per-guild/per-character data when it can, and otherwise calls
- * `next()` so the generic SPA catch-all serves the plain shell.
+ * Express handler for one public share route
+ * patches `index.html`'s meta tags with per-guild/per-character data when it can
+ * otherwise calls `next()` so the generic SPA catch-all serves the plain shell.
  */
 export function createShareMetaHandler(
 	kind: ShareRouteKind,

@@ -23,10 +23,6 @@ const PATH_TO_REPLACE: Target = {
 	"help.register.message": "register",
 };
 
-/**
- * Remonte depuis `dir` jusqu'à trouver un répertoire contenant `marker`.
- * Lance une erreur si la racine du système de fichiers est atteinte sans succès.
- */
 function findRoot(dir: string, marker: string): string {
 	let current = dir;
 	while (true) {
@@ -63,8 +59,8 @@ function getLocalesPath(): string {
 }
 
 /**
- * Compare les valeurs des clés dans le JSON existant avec le contenu des .md.
- * Retourne true si au moins une clé diffère.
+ * Compare value of the key with the markdown content.
+ * @returns `true` if at last one key is different.
  */
 // biome-ignore lint/suspicious/noExplicitAny: dynamic object structure
 function hasChanges(lang: string, existingContent: any): boolean {

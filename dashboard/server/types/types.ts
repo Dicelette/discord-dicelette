@@ -42,9 +42,13 @@ export interface ApiCharacter {
 	damage: EmbedField[] | null;
 	/** Only present in admin server-wide character list */
 	userId?: string;
-	/** Owner's display name (globalName, or the raw username if unset) — only present in admin server-wide character list */
+	/** Owner's display name (globalName, or the raw username if unset)
+	 * Only present in admin server-wide character list
+	 */
 	ownerName?: string;
-	/** Owner's Discord handle, formatted as @username — only present in admin server-wide character list */
+	/** Owner's Discord handle, formatted as @username
+	 * Only present in admin server-wide character list
+	 */
 	ownerUsername?: string;
 }
 
@@ -84,7 +88,9 @@ export interface ResolvedMemberName {
 export interface BotGuild {
 	/** Discord display name of the guild */
 	readonly name: string;
-	/** Discord icon hash (not the full URL) — `null` when the guild has no icon */
+	/** Discord icon hash (not the full URL)
+	 * `null` when the guild has no icon
+	 */
 	readonly icon: string | null;
 	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
 	fetchMember: (userId: string) => Promise<BotMember | null>;
@@ -124,8 +130,8 @@ export interface BotChannels {
 	sendMessage: (channelId: string, content: string) => Promise<boolean>;
 	/**
 	 * Post the template message (embed + template.json attachment + register button) and pin it.
-	 * If publicChannel is not provided and the channel supports threads, a default thread is
-	 * created automatically; its id is returned as publicChannelId.
+	 * If publicChannel is not provided and the channel supports threads, a default thread is created automatically
+	 * its id is returned as publicChannelId.
 	 */
 	sendTemplate: (
 		channelId: string,
@@ -136,8 +142,7 @@ export interface BotChannels {
 	) => Promise<{ messageId: string; publicChannelId?: string } | null>;
 	/**
 	 * Import characters from CSV text, posting real Discord messages with embeds.
-	 * Mirrors the /import bot command logic: parses CSV, builds embeds, posts to Discord,
-	 * registers data in settings + memory. Optionally deletes the previous message on reimport.
+	 * Optionally deletes the previous message on reimport.
 	 */
 	bulkImportCharacters: (
 		guildId: string,

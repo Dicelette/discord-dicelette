@@ -37,10 +37,8 @@ import { extractOpposition, trimAll } from "./utils";
 
 /**
  * Matches a `{{...}}` formula block.
- * Used to neutralize formula blocks before opposition detection so that
- * comparison operators inside them (e.g. `{{$>=85?85:$}}`) are not mistaken
- * for an opposition comparator when the block still contains an unresolved
- * `$stat` and therefore could not be pre-evaluated.
+ * Used to neutralize formula blocks before opposition detection
+ * Prevent mistake between an opposition comparated when the block still contains unresolved `$stats`
  */
 export const FORMULA_BLOCK_PATTERN = new RegExp(FORMULA_BLOCK_SOURCE, "g");
 
@@ -157,9 +155,8 @@ export function applyCommentsToResult(
 
 /**
  * Process a chained dice expression (supports shared segments and stat substitutions) and execute the resulting roll.
- *
- * Replaces stat tokens using the provided user stats, cleans global comments and opposition clauses, executes the roll (honoring the optional `pity` flag), and attaches comment/info metadata when appropriate.
- *
+ * Replaces stat tokens using the provided user stats, cleans global comments and opposition clauses, executes the roll (honoring the optional `pity` flag),
+ * Attaches comment/info metadata when appropriate.
  * @param content - The raw dice expression to process (may include chained segments, global comments, opposition, and stat tokens)
  * @param userData - Optional user data containing `stats` to substitute into the formula
  * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
@@ -190,13 +187,8 @@ function compareTotal(total: number, sign: string, value: number): boolean {
 
 /**
  * Collapse a compared roll into a 0/1 success count for `disableCompare`.
- *
- * A pure `XdY>Z` pool already rolls as a success count, but core cannot pool an
- * expression with a modifier (e.g. `1d20+5>=20`), so the result still carries a
- * `compare` and the formatter would show a success/failure verdict. To keep the
- * behaviour consistent, replace the total with the 0/1 count, re-inject the
- * comparator into the dice label (so the threshold stays visible) and drop the
- * comparison. Shared rolls are left untouched.
+ * Re-inject the comparator into the dice label (so the threshold stays visible) and drop the comparison.
+ * Shared rolls are left untouched.
  */
 function collapseCompareToCount(result?: Resultat): void {
 	if (!result?.compare || result.total === undefined || result.result.includes(";"))
@@ -301,16 +293,12 @@ export function processChainedDiceRoll(
 }
 
 /**
- * Pre-rolls any dice notation found inside `{{...}}` formula blocks so that
- * `replaceFormulaInDice` (which uses a pure math evaluator) can evaluate the
- * remaining expression without stumbling on unknown dice symbols like `d6`.
+ * - Pre-rolls any dice notation found inside `{{...}}` formula blocks
+ * - Strips any `{cs:...}` / `{cf:...}` blocks from the inner formula
+ * - evaluates the numeric expression inside each block,
+ * -  reattaches the simplified blocks to the numeric result.
  *
- * Also strips any `{cs:...}` / `{cf:...}` blocks from the inner formula before
- * math evaluation (they are not valid mathjs syntax), evaluates the numeric
- * expression inside each block, then reattaches the simplified blocks to the
- * numeric result.
- *
- * For example `{{(90)>=85?69{cs:<=5+((90)-85)}:(90)}}` becomes `69{cs:<=10}`.
+ * @example `{{(90)>=85?69{cs:<=5+((90)-85)}:(90)}}` -> `69{cs:<=10}`.
  */
 function preRollDiceInBrackets(content: string): string {
 	if (!content.includes("{{")) return content;
@@ -328,8 +316,7 @@ function preRollDiceInBrackets(content: string): string {
 					return diceExpr;
 				}
 			);
-			// Strip {cs/cf:...} blocks so the math evaluator can handle the remaining
-			// expression; evaluate their numeric sub-expressions and save them for later.
+			// Strip {cs/cf:...} blocks
 			const criticalBlocks: string[] = [];
 			const cleanedInner = rolledInner.replace(
 				REMOVER_PATTERN.CRITICAL_BLOCK,
@@ -352,8 +339,8 @@ function preRollDiceInBrackets(content: string): string {
 					const result = replaceFormulaInDice(`{{${cleanedInner}}}`);
 					return `${result}${criticalBlocks.join("")}`;
 				} catch {
-					// Formula evaluation failed; return with cs/cf stripped so
-					// replaceFormulaInDice can still try to evaluate the formula.
+					// Formula evaluation failed;
+					// return with cs/cf stripped so replaceFormulaInDice can still try to evaluate the formula.
 					if (!cleanedInner.includes("$"))
 						logger.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
 
@@ -806,7 +793,7 @@ export function buildInfoRollFromStats(
 
 /**
  * Builds a lookup map from normalized stat names to [originalName, value] tuples.
- * Used by replaceStatsInDiceFormula and graph utilities to avoid rebuilding the map inline.
+ * Avoid rebuilding the map inline.
  */
 export function normalizeStatsMap(
 	stats: Record<string, number>
@@ -847,9 +834,9 @@ export function findStatInDiceFormula(
 }
 
 /**
- * Returns true if the content of a [...] bracket should be treated as a custom formula
- * invocation rather than an inline comment.
+ * Returns true if the content of a `[...]` bracket should be treated as a custom formula invocation rather than an inline comment.
  * Rule: contains a `$` stat reference, or is a pure math expression (digits + operators).
+ * Allow also dice notation
  */
 function isFormulaExpression(expr: string): boolean {
 	const trimmed = expr.trim();
@@ -883,28 +870,19 @@ function dropUnreachableCriticals(formula: string): string {
 }
 
 /**
- * Replaces `[expr]` markers in a dice string with the custom formula, injecting `(expr)`
- * in place of every `$` placeholder and wrapping the result in `{{...}}` for mathjs evaluation.
- *
- * A `{cs:…}`/`{cf:…}` block the formula cannot reach is dropped, so the branch it sits in does not
- * override the template's criticals from afar.
- *
- * `[expr]` is only treated as a formula invocation when the expression contains `$` or
- * consists solely of math characters — leaving plain text comments untouched.
- *
- * @example
- * // formula = "$>=85?85{cs:>=5+($-85)}:$"
- * applyCustomFormula("1d100<=[90]", formula)
- * // → "1d100<={{(90)>=85?85{cs:>=5+((90)-85)}:(90)}}"  (above the cap: the block applies)
- *
- * applyCustomFormula("1d100<=[50]", formula)
- * // → "1d100<={{(50)>=85?85:(50)}}"                    (below the cap: the block is dropped)
- *
- * applyCustomFormula("1d100<=[$dex+$str]", formula)
- * // → "1d100<={{($dex+$str)>=85?85{cs:>=5+(($dex+$str)-85)}:($dex+$str)}}"  (stats unresolved)
- *
- * applyCustomFormula("1d20 [attack roll]", formula)
- * // → "1d20 [attack roll]"  (comment left intact)
+ * - Replaces `[expr]` markers in a dice string with the custom formula, injecting `(expr)`
+ * - Drop not reached `{cs:…}`/`{cf:…}` block
+ * - `[expr]` is only treated as a formula invocation when the expression contains `$`, maath or dice character
+ * @example Above the cap : Block aplied
+ * formula = "$>=85?85{cs:>=5+($-85)}:$"
+ * applyCustomFormula("1d100<=[90]", formula) → "1d100<={{(90)>=85?85{cs:>=5+((90)-85)}:(90)}}"
+ * (above the cap: the block applies)
+ * @example Block dropped (below the cap)
+ * applyCustomFormula("1d100<=[50]", formula) → "1d100<={{(50)>=85?85:(50)}}"
+ * @example Stat unresolved
+ * applyCustomFormula("1d100<=[$dex+$str]", formula) → "1d100<={{($dex+$str)>=85?85{cs:>=5+(($dex+$str)-85)}:($dex+$str)}}"
+ * @example Comment left intact
+ * applyCustomFormula("1d20 [attack roll]", formula) → "1d20 [attack roll]"
  */
 export function applyCustomFormula(dice: string, formula: string): string {
 	return dice.replace(/\[([^\]]+)\]/g, (match, expr: string) => {

@@ -1,24 +1,25 @@
 import type { Count } from "..";
 
 /**
- * A single user's karma entry — a `DBCount` value (see `@dicelette/types`)
- * augmented with the id/display name needed to render it in the dashboard.
- * Used both for the own/search list and the public share page.
+ * A single user's karma entry — a `DBCount` value
  */
 export interface ApiKarmaEntry extends Count {
 	userId: string;
-	/** Display name (globalName, or the raw username if unset) — `null` if unresolvable. */
+	/** Display name (globalName, or the raw username if unset */
 	displayName: string | null;
-	/** Discord handle, formatted as @username — `null` if unresolvable. */
+	/** Discord handle, formatted as @username */
 	username: string | null;
-	/** Per-guild avatar URL (falls back to the global Discord avatar) — `null` if unresolvable. */
+	/** Per-guild avatar URL (falls back to the global Discord avatar) */
 	avatar: string | null;
 }
 
 export interface ApiKarmaOverview {
-	/** The requesting user's own karma — `null` if they have no tracked rolls yet. */
+	/**
+	 * The requesting user's own karma
+	 * `null` if they have no tracked rolls yet.
+	 */
 	me: Count | null;
-	/** The requesting user's own avatar URL — `null` if unresolvable. */
+	/** The requesting user's own avatar URL */
 	meAvatar: string | null;
 	server: {
 		rollTotal: number;
@@ -30,7 +31,10 @@ export interface ApiKarmaOverview {
 			string
 		>;
 	};
-	/** Every user tracked in the karma DB — powers the dashboard's search. */
+	/**
+	 * Every user tracked in the karma DB
+	 * powers the dashboard's search.
+	 */
 	users: ApiKarmaEntry[];
 }
 

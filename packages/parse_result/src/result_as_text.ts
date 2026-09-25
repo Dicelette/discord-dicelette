@@ -242,10 +242,11 @@ export class ResultAsText {
 	}
 
 	/**
-	 * A segment the engine already judged (`✓ 1d100<=65: [20] = 20<=65`): its verdict is in the
-	 * symbol and the engine already inverted the sign on a failure, but its criticals still have
-	 * to be resolved against its own dice. Rebuilt in the shape `display()` gives the main
-	 * segment — comparator out of the displayed dice, comparison only in the final value.
+	 * Rebuild success/fail/critical message (with taking into account the custom/critical from template or dice)
+	 * @param r {string} result
+	 * @param critical
+	 * @param customCritical
+	 * @private
 	 */
 	private comparedSegment(
 		r: string,
@@ -484,8 +485,8 @@ export class ResultAsText {
 	}
 
 	/**
-	 * The engine drops the parenthesised common segment of a shared roll from its output, so the
-	 * per-segment metadata — indexed on the dice — starts one segment ahead of the rendered lines.
+	 * Count the number of dice in a shared roll based on the dice vs the result object to find hidden segment (like `(1d20);&+5`)
+	 * @private
 	 */
 	private countHiddenSegments(): number {
 		if (!this.resultat?.dice?.includes(";")) return 0;

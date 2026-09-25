@@ -4,8 +4,7 @@ import { trimAll } from "./utils";
 
 /**
  * Extract a comparator token (e.g. ">=12" or "<=5") from a dice string.
- * Executes the pattern regex only once and returns both the cleaned dice string
- * and the extracted comparator portion.
+ * Executes the pattern regex only once and returns both the cleaned dice string and the extracted comparator portion.
  */
 export function extractComparator(
 	dice: string,
@@ -18,8 +17,8 @@ export function extractComparator(
 
 /**
  * Apply threshold override logic to a dice formula.
- * If threshold contains a full comparator expression (e.g. ">=15"), replaces any existing one.
- * If threshold is just a number and dice has a comparator, replaces only the numeric part.
+ * - If threshold contains a full comparator expression (e.g. ">=15"), replaces any existing one.
+ * - If threshold is just a number and dice has a comparator, replaces only the numeric part.
  * Executes each regex at most once for optimal performance.
  */
 export function getThreshold(dice: string, threshold?: string): string {
@@ -38,8 +37,8 @@ export function getThreshold(dice: string, threshold?: string): string {
 }
 
 /**
- * `generateStatsDice` (core) intentionally leaves `$stat` tokens inside `[...]` brackets untouched — that syntax is reserved for the custom-formula feature, which re-wraps the bracket in `{{...}}` afterwards.
- * But nothing resolves the `$stat` to a number before that wrapping (or at all, when no custom formula is configured), so the bracket reaches the roll engine as inert literal text and the comparator silently falls back to 0.
+ * `generateStatsDice` (core) intentionally leaves `$stat` tokens inside `[...]` brackets untouched
+ * Syntax is reserved for the custom-formula feature, which re-wraps the bracket in `{{...}}` afterwards.
  * Resolve `$stat` inside brackets here, the same way it's already resolved outside of them.
  */
 function resolveStatsInBrackets(

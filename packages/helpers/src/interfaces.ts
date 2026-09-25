@@ -42,7 +42,6 @@ export interface RollInteractionOptions {
 
 /**
  * CSV Row type for import/export functionality.
- * Used when parsing CSV data containing user statistics and character information.
  */
 export type CSVRow = {
 	user: string;
@@ -55,8 +54,7 @@ export type CSVRow = {
 };
 
 /**
- * Complete interaction context with locale, translation, and guild configuration.
- * Reduces repeated getLangAndConfig pattern throughout the codebase.
+ * Complete interaction context for translation et guild config.
  */
 export interface InteractionContext {
 	/** Translation function for the interaction's locale */

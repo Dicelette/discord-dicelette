@@ -5,10 +5,7 @@ import * as Djs from "discord.js";
 import { gaugeEmoji, percentage } from "./utils";
 
 /**
- * Shows a user's success and failure counts for the current guild using component-based output.
- *
- * If the user has no recorded counts, edits the reply with a localized error message.
- *
+ * Shows a user's success and failure counts for the current guild
  * @param interaction - The command interaction used to read options and edit the deferred reply
  * @param client - The bot client instance that stores user counts
  * @param ul - Localization function for generating translated messages
@@ -44,7 +41,6 @@ export async function bilan(
 
 /**
  * Build a component-based bilan (stat summary) display for a member's luck meter.
- *
  * @param count - The user's counts (expects `success`, `failure`, `criticalSuccess`, `criticalFailure`, optional `consecutive` and `longestStreak` objects).
  * @param ul - Translation helper used to localize titles and labels.
  * @param member - Guild member whose avatar and mention are shown.

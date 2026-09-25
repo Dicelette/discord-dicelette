@@ -1,5 +1,5 @@
 export const DISCORD_API = "https://discord.com/api/v10";
-/** Marqueurs identifiant un embed "fiche utilisateur" */
+/** Identify a user embed" */
 export const USER_EMBED_MARKERS = [
 	"⌈⌋",
 	"registration",
@@ -8,6 +8,6 @@ export const USER_EMBED_MARKERS = [
 	"joueur enregistré",
 ];
 export const STATS_TITLES = ["statistic", "statistique", "statistics", "statistiques"];
-/** Discord snowflake : chaîne numérique de 17 à 20 chiffres */
+/** Discord snowflake */
 export const SNOWFLAKE_RE = /^\d{17,20}$/;
 export const OAUTH_SCOPES = "identify guilds";

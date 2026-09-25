@@ -26,8 +26,7 @@ import { continueCancelButtons, selfRegisterAllowance } from "utils";
 import { BaseFeature } from "./base";
 
 /**
- * User feature class - handles user registration and management
- * Uses instance properties to store context and reduce parameter passing
+ * Handles user registration and management
  */
 export class UserFeature extends BaseFeature {
 	/**
@@ -128,15 +127,6 @@ export class UserFeature extends BaseFeature {
 			const privateInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 				.setLabel(this.ul("modals.private.name"))
 				.setDescription(this.ul("modals.private.description"))
-				/*
-				.setTextInputComponent(
-					new Djs.TextInputBuilder()
-						.setCustomId("private")
-						.setRequired(false)
-						.setValue("")
-						.setStyle(Djs.TextInputStyle.Short)
-				);*/
-				/*checkbox!yipee*/
 				.setCheckboxComponent((checkbox) => checkbox.setCustomId("private"));
 			components.push(privateInput);
 		}

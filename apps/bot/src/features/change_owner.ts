@@ -19,14 +19,12 @@ const botErrorOptions: BotErrorOptions = {
 };
 
 /**
- * ChangeOwner feature class - handles transferring characters between users
- * Uses instance properties to store context and reduce parameter passing
+ * Handles transferring characters between users
  */
 export class ChangeOwnerFeature extends BaseFeature {
 	/**
 	 * Handles the start of the change owner operation from a select menu interaction
-	 * Note: Unlike Avatar and Rename, ChangeOwner doesn't require the db parameter
-	 * as it only checks moderator permissions via guild member cache
+	 * @Note: doesn't require the db paramete -> only checks moderator permissions via guild member cache
 	 */
 	async start(): Promise<void> {
 		const interaction = this.interaction as Djs.StringSelectMenuInteraction;
@@ -62,8 +60,6 @@ export class ChangeOwnerFeature extends BaseFeature {
 
 	/**
 	 * Handles a Discord modal submission to validate and process the transfer of a character between users within a guild.
-	 *
-	 * Validates user input, retrieves and updates character ownership, and invokes the changeOwner command to complete the transfer. Provides localized error feedback and resets the interaction state if validation fails at any step.
 	 */
 	async validate(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;

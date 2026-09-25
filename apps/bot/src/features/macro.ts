@@ -88,9 +88,8 @@ interface MacroEditorAuth {
 }
 
 /**
- * Helper function to check macro editor authorization and extract user information.
- * Consolidates authorization logic used across add, edit, store methods.
- *
+ * - Helper function to check macro editor authorization and extract user information.
+ * - Consolidates authorization logic used across add, edit, store methods.
  * @param params - Parameters including interaction, ul translation, and optional message
  * @param params.interaction - The Discord interaction (button, modal, or select menu)
  * @param params.ul - Translation utility for localized responses
@@ -153,7 +152,6 @@ async function ensureMacroEditor(params: {
 
 /**
  * MacroFeature handles all macro/damage dice operations for characters.
- * This includes adding, editing, and validating macro dice.
  */
 export class MacroFeature extends BaseFeature {
 	static normalizeName(value: string): string {
@@ -207,8 +205,8 @@ export class MacroFeature extends BaseFeature {
 	}
 
 	/**
-	 * Initiates the dice editing process when the corresponding button is pressed,
-	 * verifying the user's permission before displaying the edit modal.
+	 * Initiates the dice editing process when the corresponding button is pressed
+	 * Verify the user's permission before displaying the edit modal.
 	 */
 	async edit() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
@@ -219,9 +217,8 @@ export class MacroFeature extends BaseFeature {
 	}
 
 	/**
-	 * Displays a modal allowing the user to edit all registered skill dice.
-	 * Parses the current dice from the message embed and pre-fills the modal input
-	 * with a formatted list of skill-dice pairs.
+	 * - Displays a modal allowing the user to edit all registered skill dice.
+	 * - Parses the current dice from the message embed and pre-fills the modal input with a formatted list of skill-dice pairs.
 	 */
 	private async showEdit() {
 		const interaction = this.interaction as Djs.ButtonInteraction;
@@ -257,8 +254,7 @@ export class MacroFeature extends BaseFeature {
 
 	/**
 	 * Handles a modal submit interaction to register new skill damage dice for a user.
-	 * Allows the operation only if the interacting user is the owner referenced in the embed
-	 * or has moderator permissions.
+	 * Allows the operation only if the interacting user is the owner referenced in the embed or has moderator permissions.
 	 */
 	async store() {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
@@ -295,7 +291,6 @@ export class MacroFeature extends BaseFeature {
 
 	/**
 	 * Static method to generate buttons for user registration process
-	 * (adding the "add dice" button).
 	 */
 	static buttons(ul: Translation, sendToValidation = false, moderationSent = false) {
 		const validateButton = new Djs.ButtonBuilder()
@@ -330,9 +325,7 @@ export class MacroFeature extends BaseFeature {
 	}
 
 	/**
-	 * Registers a new skill damage dice from modal input, updating the corresponding
-	 * embed and database entry. Handles both initial dice registration for a user and
-	 * subsequent additions or edits.
+	 * Registers a new skill damage dice from modal input
 	 */
 	private async registerDamageDice(first?: boolean) {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;

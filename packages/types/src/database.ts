@@ -21,7 +21,7 @@ export interface GuildData {
 	 */
 	disableThread?: boolean;
 	/**
-	 * Hidden channel or result for mj roll
+	 * Hidden channel or result for gmroll
 	 * If true => hide result, doesn't send logs ; result are send in DM
 	 * if string => channel/thread.id where result will be send
 	 * In all cases; result are hidden in the channel when used (unless used in configured channel)
@@ -99,9 +99,9 @@ export interface GuildData {
 	sortOrder?: SortOrder;
 	/**
 	 * List of role IDs that grant access to the dashboard admin panel.
-	 * When set (non-empty), only users with one of these roles can access admin config.
-	 * ManageGuild permission alone is no longer sufficient; Administrator still works.
-	 * Dashboard-only setting — has no effect on the Discord bot itself.
+	 * When set (non-empty), only users with one of these roles can access admin config and manageguild permission is no longer sufficient.
+	 * (Administrator still works).
+	 * **Dashboard-only setting**: has no effect on the Discord bot itself.
 	 */
 	dashboardAccess?: string[];
 	/**

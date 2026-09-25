@@ -167,8 +167,8 @@ function formatInvalidAttributeFormulaError(name?: string, value?: string) {
 }
 
 /**
- * Single-pass builder: separates number attributes from formula attributes and
- * pre-populates plain number values.
+ * Single-pass builder
+ * separates number attributes from formula attributes and pre-populates plain number values.
  */
 function buildAttributeMaps(attributes: Record<string, number | string>) {
 	const numbersOnly: Record<string, number> = {};
@@ -193,9 +193,6 @@ function buildAttributeMaps(attributes: Record<string, number | string>) {
 
 /**
  * Resolves user attributes that may reference each other as formulas.
- *
- * Uses the shared fuzzy resolver from @dicelette/core so dashboard and bot
- * evaluate formulas with the exact same matching behavior.
  */
 export function resolveUserAttributes(
 	attributes?: Record<string, number | string>

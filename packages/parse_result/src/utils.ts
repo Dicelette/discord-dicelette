@@ -143,11 +143,11 @@ export function trimAll(dice: string) {
 /**
  * Generates a formatted URL string linking to a Discord message or a provided log URL.
  *
- * If a {@link logUrl} is given, returns it as a formatted string. Otherwise, if {@link context} is provided, returns a markdown link to the Discord message using the supplied IDs. Returns an empty string if neither is provided.
- *
- * @param ul - Translation function for localizing the link text.
- * @param context - Optional Discord message context containing guild, channel, and message IDs.
- * @param logUrl - Optional direct log URL to use instead of constructing a Discord link.
+ * If a {@link logUrl} is given, returns it as a formatted string.
+ * Otherwise, if {@link context} is provided, returns a markdown link to the Discord message using the supplied IDs.
+ * @param ul {Translation} Translation function for localizing the link text.
+ * @param context Optional Discord message context containing guild, channel, and message IDs.
+ * @param logUrl {string} Optional direct log URL to use instead of constructing a Discord link.
  * @returns A formatted string containing the appropriate URL or an empty string.
  */
 export function createUrl(

@@ -9,9 +9,7 @@ import { embedError } from "./embeds";
 const COPY_WARNING_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000;
 
 /**
- * Reads the roll-result text of a bot message, regardless of whether it was sent as
- * plain `content` (the common case) or, for results between 2000 and 4000 characters,
- * as a Components V2 text display.
+ * Reads the roll-result text of a bot message
  */
 function getRollMessageText(message: Djs.Message): string | undefined {
 	if (message.content) return message.content;
@@ -34,9 +32,7 @@ async function applyCommentEdit(message: Djs.Message, updated: string): Promise<
 }
 
 /**
- * DMs `rollAuthorId` that a roll-result copy couldn't be located to sync, unless they were
- * already warned about this within the last `COPY_WARNING_COOLDOWN_MS` — otherwise every
- * comment edit on a guild without `linkToLogs` would re-send the same DM.
+ * DMs `rollAuthorId` that a roll-result copy couldn't be located to sync, unless they were already warned about this within the last `COPY_WARNING_COOLDOWN_MS`
  */
 async function warnCopyNotSynced(
 	guildId: string,
@@ -57,11 +53,8 @@ async function warnCopyNotSynced(
 }
 
 /**
- * When a roll is posted outside the dedicated roll channel, `handleRollResult` also posts
- * a copy of the result into a thread. If the guild has `linkToLogs` enabled, the directly
- * replied-to message ends with a link back to that copy — parse it, fetch the copy, and
- * apply the same comment edit to it. Otherwise, if the settings suggest a copy was plausibly
- * made but we have no way to locate it, DM the roll's owner so the mismatch isn't silent.
+ * Apply the content edit within thread if needed
+ * If cannot, send a DM to the user so it knows that the edit could be synced
  */
 async function syncThreadCopy(
 	original: Djs.Message,
@@ -109,13 +102,9 @@ async function syncThreadCopy(
 }
 
 /**
- * If `message` is a reply to one of the bot's own roll-result messages and starts with
- * `COMMENT_EDIT_PREFIX`, overwrites that roll's comment with the rest of `message`'s content
- * and edits the original message (and its thread copy, if any) in place.
- *
- * @returns `true` if the reply was recognized as a comment-edit attempt (whether it
- * succeeded or was rejected for permission reasons), `false` otherwise — in which case the
- * caller should keep treating `message` as ordinary input (a new roll, OOC text, etc).
+ * Allow to edit or add a comment to a dice
+ * Works from a reply stating with the {@link COMMENT_EDIT_PREFIX}
+ * only work for own roll (fetch the @<ID> to check that)
  */
 export async function handleCommentEditReply(
 	message: Djs.Message,

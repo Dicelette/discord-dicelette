@@ -9,9 +9,8 @@ const DEFAULT_COUNT: Count = {
 };
 
 /**
- * Fill in the missing (optional) fields of a `Count` with their defaults and
- * recompute `total` from `success` + `failure`. Centralizes the "fusion des
- * valeurs manquantes" logic previously duplicated across the karma leaderboard.
+ * Fill in the missing (optional) fields of a `Count` with their defaults
+ * Also recompute `total` from `success` + `failure`.
  */
 export function mergeCountDefaults(count?: Partial<Count>): Count {
 	const merged: Count = { ...DEFAULT_COUNT, ...count };
@@ -61,7 +60,6 @@ export function calculateServerStats(guildCount: DBCount) {
 
 /**
  * Compute the average-per-user and server-wide percentage for each roll
- * category, given the server totals from `calculateServerStats`.
  */
 export function serverStats(
 	totalCount: Count,
@@ -88,9 +86,8 @@ const SUCCESS_STREAK_EMOJI = ["😎", "🔥", "🐐"];
 const FAILURE_STREAK_EMOJI = ["😔", "💔", "💀"];
 
 /**
- * Buckets a consecutive-streak length into the 3 tiers used for both the
- * bot's gauge emoji and the dashboard's streak icon — shared so the two
- * stay in lockstep. 0 means no active streak (value ≤ 1).
+ * Buckets a consecutive-streak length into the 3 tiers
+ * 0 means no active streak (value ≤ 1).
  */
 export function streakTier(value: number): 0 | 1 | 2 | 3 {
 	if (value <= 1) return 0;
@@ -104,7 +101,7 @@ export function streakTier(value: number): 0 | 1 | 2 | 3 {
  *
  * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
  * @param value - The consecutive-streak length
- * @returns An emoji chosen by `type` and `value`: empty string for `value` ≤ 1; for `value` > 1 and ≤ 5 the first emoji; for `value` > 5 and ≤ 10 the second emoji; for `value` > 10 the third emoji
+ * @returns An emoji chosen by `type` and `value`
  */
 export function gaugeEmoji(type: "success" | "failure", value: number) {
 	const tier = streakTier(value);
@@ -129,11 +126,8 @@ export const ALL_KARMA_OPTIONS: KarmaOption[] = [
 ];
 
 /**
- * Rank karma entries by a given option, either by raw count ("brut") or by
- * each user's ratio of that option against their own total ("ratio" — a
- * no-op for the "total" option, since a total-over-itself ratio is always 1
- * and carries no ranking information). Entries with a zero value for
- * `option` are dropped, matching the bot's own /karma leaderboard behavior.
+ * Rank karma entries by a given option, either by raw count or by a ratio
+ * Entries with a zero value for `option` are dropped
  */
 export function sortKarmaEntries<T extends Count>(
 	entries: T[],
@@ -154,11 +148,6 @@ export function sortKarmaEntries<T extends Count>(
 		});
 }
 
-/**
- * Drops entries with fewer total rolls than `threshold` — matches the bot's
- * own /karma leaderboard threshold option (players with too few rolls to be
- * meaningfully ranked).
- */
 export function filterByThreshold<T extends Count>(entries: T[], threshold: number): T[] {
 	if (threshold <= 0) return entries;
 	return entries.filter((entry) => (entry.total ?? 0) >= threshold);

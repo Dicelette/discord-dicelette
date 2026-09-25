@@ -152,9 +152,6 @@ export const editAvatar = {
 
 /**
  * Updates a character's avatar image in the associated embed message.
- *
- * Validates and sets a new avatar URL for the character, updates the embed in the message thread, and provides a success message with a mention and message link. If the avatar URL is invalid or the embed is not found, replies with an appropriate error message.
- *
  * @param options - The command interaction options containing the new avatar URL.
  * @param interaction - The Discord command interaction context.
  * @param ul - The translation function for localized responses.
@@ -247,9 +244,6 @@ async function generateButton(
 
 /**
  * Renames a character in the associated embed message and updates the database and client cache.
- *
- * Updates the character's name in the embed, persists the change in the database, and synchronizes the client cache. Handles duplicate name errors and replies with localized success or error messages. Also updates message components and cleans up old user data in guild settings.
- *
  * @param name - The new name for the character.
  * @param interaction - The Discord interaction triggering the rename.
  * @param ul - Localization function for translations.
@@ -258,7 +252,6 @@ async function generateButton(
  * @param sheetLocation - Identifiers for the character's message and location.
  * @param oldData - Previous character data, including the old name and message ID.
  * @param thread - The Discord channel (thread) containing the character message.
- *
  * @throws {Error} If the embed or character field is not found in the message.
  */
 export async function rename(

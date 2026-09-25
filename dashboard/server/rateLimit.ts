@@ -1,18 +1,3 @@
-/*
- * Sliding-window rate limiter.
- *
- * Design notes:
- *  - `makeRateLimit(max, windowMs)` returns a middleware backed by a single
- *    bucket Map. Callers MUST call it once at module load (never per-request)
- *    to avoid memory leaks and losing bucket state between requests.
- *  - Expired buckets are pruned lazily on each request (the bucket for the
- *    current key is filtered before insertion) and on a bounded sweep that
- *    runs only when the map grows past a soft threshold. No setInterval is
- *    kept, which avoids unrefed timers leaking when many limiters are
- *    created in tests or short-lived contexts.
- *
- * The stricter refresh limiter (5/min) is exposed as a pre-built singleton.
- */
 import type { NextFunction, Request, Response } from "express";
 
 const PRUNE_THRESHOLD = 1024;

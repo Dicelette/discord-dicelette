@@ -13,8 +13,7 @@ import { allowEdit } from "utils";
 import { BaseFeature } from "./base";
 
 /**
- * Avatar feature class - handles avatar editing operations
- * Uses instance properties to store context and reduce parameter passing
+ * handles avatar editing operations
  */
 export class AvatarFeature extends BaseFeature {
 	/**
@@ -29,7 +28,6 @@ export class AvatarFeature extends BaseFeature {
 
 	/**
 	 * Displays a modal for editing a user's avatar, pre-filling the input with the current avatar URL.
-	 *
 	 * @throws {Error} If the user embed is not found in the interaction message.
 	 */
 	private async showAvatarEdit(
@@ -75,9 +73,6 @@ export class AvatarFeature extends BaseFeature {
 
 	/**
 	 * Handles a Discord modal submission to update a user's avatar in an embed message.
-	 *
-	 * Validates the provided avatar URL, updates the embed's thumbnail if valid, edits the original message with the new embed, and sends an ephemeral confirmation reply to the user.
-	 *
 	 * @throws {Error} If the user embed is not found in the message.
 	 */
 	async edit(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {

@@ -32,11 +32,7 @@ const DETECT_DICE_MESSAGE_INDICES = new RegExp(
 /**
  * Replaces every `{{…}}` formula block with a same-length, space-free stand-in.
  *
- * `DETECT_DICE_MESSAGE` splits a message on its first space, so a custom formula expanded
- * before stat substitution (`1d100<={{($vita + $combat)}}`) would be cut in half and its
- * tail parsed as a comment — leaving `$stat` tokens behind for the dice parser. Masking
- * preserves offsets and lengths, so a match found on the masked copy maps 1:1 onto the
- * original string.
+ * Use a masking to prevent leaving `$stats` token behing, preserving also offsets/length
  */
 function maskFormulaBlocks(content: string): string {
 	// Global, but only ever used through `replace`, which resets `lastIndex` itself.
@@ -65,10 +61,7 @@ export function matchBareComment(content: string):
 	  }
 	| undefined {
 	const masked = maskFormulaBlocks(content);
-	// In a shared roll each `;` segment owns its comment, so only the tail after the last
-	// separator can hold a global bare comment — and never a bracketed one, which belongs to
-	// its segment. Brackets are masked before looking for that separator so a `;` typed inside
-	// a comment doesn't split the dice.
+	// In a shared roll each `;` segment owns its comment, so only the tail after the last separator can hold a global bare comment
 	const start = maskBracketComments(masked).lastIndexOf(";") + 1;
 	const tail = masked.slice(start);
 	if (start > 0 && tail.includes("[")) return undefined;
@@ -84,8 +77,8 @@ export function matchBareComment(content: string):
 }
 
 /**
- * The trailing free-text comment of a dice message (the `DETECT_DICE_MESSAGE` group 3),
- * without ever cutting into a `{{…}}` formula block.
+ * The trailing free-text comment of a dice message (the `DETECT_DICE_MESSAGE` group 3)
+ * doesn't cut into a `{{…}}` formula block.
  */
 export function bareComment(content: string): string | undefined {
 	return matchBareComment(content)?.comment;
@@ -106,11 +99,8 @@ export const DICE_COMPILED_PATTERNS = {
 	/** Matches dice notation (e.g. `1d6`, `d20`, `2d10`) within a larger expression. Used for search-and-replace inside `{{...}}` formula blocks. */
 	DICE_IN_FORMULA: /\b\d*d\d+\b/gi,
 	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
-	/** Two comparators on the SAME dice (`1d20>15>20`): a compared value never contains a space
-	 * nor a `;`, so the pattern cannot swallow a trailing comment or reach the next segment. A
-	 * value is either a whole `[...]` block (an unresolved custom-formula placeholder) or a run
-	 * of characters that stops at `[` — so a bracket comment glued without a space (`>34[chat]`,
-	 * legal per the engine's own comment syntax) is never read as part of the value. */
+	/** Two comparators on the SAME dice (`1d20>15>20`).
+	 * Works also in shared dice */
 	OPPOSITION:
 		/(?<first>(([><=]|!=)+)(\[[^\]]*\]|[^<>=!;\s[]+))\s*(?<second>(([><=]|!=)+)(\[[^\]]*\]|[^<>=!;\s[]+))/,
 	/** `(stat1|stat2|…)` compiled once per alphabet. Used by `filterStatsInDamage`. */
