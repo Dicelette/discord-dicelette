@@ -2,8 +2,8 @@
 import "uniformize";
 import path from "node:path";
 import { getEngine, standardizeDice } from "@dicelette/core";
-import { logger } from "@sentry/node";
 import { Random } from "random-js";
+import { logger } from "./src/logger";
 
 export * from "./src/changelog";
 export { default as dev } from "./src/dev";

@@ -16,7 +16,6 @@ import {
 	CHARACTER_DETECTION,
 	DICE_PATTERNS,
 	logger,
-	sentry,
 } from "@dicelette/utils";
 import { getCharFromText, getUserFromMessage, resolveStatsNames } from "database";
 import * as Djs from "discord.js";
@@ -180,7 +179,6 @@ export default (client: EClient): void => {
 			}
 			if (!isApiError(e) && !(e instanceof DiceTypeError)) {
 				logger.fatal(e as Error);
-				sentry.fatal(e);
 			}
 			const guildSettings = client.settings.get(message.guild.id);
 			const userLang =

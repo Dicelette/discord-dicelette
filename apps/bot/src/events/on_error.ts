@@ -3,7 +3,7 @@ import type { EClient } from "@dicelette/client";
 import { fetchChannel } from "@dicelette/helpers";
 import { lError } from "@dicelette/localization";
 import { DISCORD_ERROR_CODE, MATCH_API_ERROR, type Translation } from "@dicelette/types";
-import { type BotError, consoleError, important, sentry } from "@dicelette/utils";
+import { type BotError, consoleError, important } from "@dicelette/utils";
 import { DiscordAPIError } from "@discordjs/rest";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
@@ -22,7 +22,6 @@ export function isApiError(error: unknown) {
 export default (client: EClient): void => {
 	client.on("error", (error) => {
 		important.error(error);
-		sentry.error(error);
 	});
 };
 
@@ -35,7 +34,6 @@ export async function interactionError(
 ) {
 	const isUnknownInteractionError = e instanceof Djs.DiscordAPIError && e.code === 10062;
 	if (!e.name.includes("Invalid_Dice_Type") && !isUnknownInteractionError) {
-		sentry.error(e);
 		consoleError(e);
 	}
 	if (interaction.guild && client.settings.has(interaction.guild.id)) {

@@ -14,7 +14,7 @@ import type {
 	Translation,
 	UserData,
 } from "@dicelette/types";
-import { filterChoices, logger, sentry } from "@dicelette/utils";
+import { filterChoices, logger } from "@dicelette/utils";
 import {
 	findChara,
 	getRecordChar,
@@ -419,8 +419,7 @@ async function graphError(
 		interaction.guild!,
 		client.settings
 	);
-	logger.fatal(error);
-	sentry.fatal(error, {
+	logger.fatal("graph-command", error, {
 		interaction: {
 			guildId: interaction.guild?.id,
 			id: interaction.id,
