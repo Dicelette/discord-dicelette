@@ -14,11 +14,7 @@ import {
 import type { Message } from "discord.js";
 import * as Djs from "discord.js";
 
-/**
- * Retrieves the statistical template for a guild based on the interaction context.
- * Use cached if possible or fetch from the guild settings
- * @returns The statistical template for the guild, or undefined if the interaction is not in a guild.
- */
+/** Gets the guild's statistical template (from cache if possible, else guild settings). */
 export async function getTemplateByInteraction(
 	interaction: Djs.BaseInteraction,
 	client: EClient,
@@ -33,18 +29,7 @@ export async function getTemplateByInteraction(
 	return hasCache;
 }
 
-/**
- * - Retrieves and validates a statistical template for a guild from stored settings.
- * - Attempts to fetch the template message from the configured channel and message ID in the guild's settings.
- * @param guild The Discord guild to retrieve the template for.
- * @param enmap The settings storage containing template configuration.
- * @param ul  Localization function for error messages.
- * @param skipNoFound Optional flag to skip the error if the template is not found. Only used when the bot initializes.
- * @param updateCache
- * @returns The validated statistical template, or undefined if the channel is not a text channel.
- * @throws {Error} If the guild data or template ID is missing in settings.
- * @throws {Error} If the template message is not found or cannot be retrieved.
- */
+/** Fetches and validates a guild's statistical template from its configured message; `skipNoFound` suppresses errors (used at bot init). */
 export async function getTemplate(
 	guild: Djs.Guild,
 	enmap: Settings,
@@ -95,14 +80,7 @@ export async function getTemplate(
 	}
 }
 
-/**
- * - Retrieves and validates a statistical template from a message attachment.
- * - Downloads the first attachment from the given message, parses its JSON content, and validates it as a statistical template.
- * - Set the validity flag if not found
- * @param message - The Discord message containing the template attachment.
- * @param enmap - The settings storage used to track template validity.
- * @returns The parsed and validated statistical template, or undefined if no attachment is found.
- */
+/** Downloads and validates a statistical template from a message's first attachment, flagging validity once resolved. */
 export async function fetchTemplate(
 	message: Message,
 	enmap: Settings

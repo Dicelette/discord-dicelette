@@ -273,10 +273,7 @@ async function processCharacter(params: {
 	}
 }
 
-/**
- * ! Note: Bulk data doesn't allow to register dice-per-user, as each user can have different dice
- * I don't want to think about a specific way to handle this, so I will just ignore it for now.
- */
+/** Bulk import doesn't support per-user dice (each user could have a different dice type), so it's ignored for now. */
 export const bulkAdd = {
 	data: new Djs.SlashCommandBuilder()
 		.setContexts(Djs.InteractionContextType.Guild)

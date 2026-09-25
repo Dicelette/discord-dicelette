@@ -156,8 +156,8 @@ export async function baseRoll(
 		dice = `{${dice}}${comments}`;
 	}
 
-	// Extraire le commentaire trailing non marqué (ex: "1d100 cc" → dice="1d100", trailingComment="cc")
-	// extractDiceData utilise DICE_PATTERNS.DETECT_DICE_MESSAGE qui capture le texte libre après le dé
+	// Extracts the unmarked trailing comment (e.g. "1d100 cc" → dice="1d100", trailingComment="cc"),
+	// via DICE_PATTERNS.DETECT_DICE_MESSAGE which captures free text after the dice.
 	const diceData = extractDiceData(dice);
 	let trailingComment: string | undefined;
 	if (diceData.comments) {

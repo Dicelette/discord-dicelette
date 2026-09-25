@@ -4,14 +4,8 @@ import { parse } from "discord-markdown-parser";
 import { Fragment, type ReactNode, useMemo } from "react";
 import { type Locale, useI18n } from "../i18n";
 
-/**
- * Renders Discord-flavored markdown (the exact output of the bot's roll
- * formatter) into styled React, as a visual counterpart to the raw "code"
- * view. Parsing is delegated to `discord-markdown-parser` (an AST), and each
- * node type is mapped to a MUI-styled element here so we control the look and
- * can render Discord-specific tokens (`<t:…>` timestamps, `<@id>` mentions) the
- * way the client would.
- */
+/** Renders Discord-flavored markdown (the bot's roll formatter output) into styled React, via `discord-markdown-parser`'s
+ * AST — each node type maps to a MUI-styled element so Discord-specific tokens (`<t:…>`, `<@id>`) render like the client. */
 
 /** Loose shape of a `discord-markdown-parser` AST node. */
 type MdNode = {

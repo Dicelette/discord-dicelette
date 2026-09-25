@@ -150,11 +150,8 @@ function reducer(state: State, action: Action): State {
 	}
 }
 
-/**
- * Encapsulates all data-loading, permission, and action state for the Dashboard route.
- * Navigation (`useNavigate`) is intentionally kept in the component since it is
- * only used for the back-button click handler.
- */
+/** Encapsulates data-loading, permission, and action state for the Dashboard route. Navigation stays in the
+ * component (only used by the back button). */
 export function useDashboard(guildId: string | undefined) {
 	const { t } = useI18n();
 	// Keep a stable ref to `t` so effects don't re-run on locale changes.
@@ -377,12 +374,8 @@ export function useDashboard(guildId: string | undefined) {
 		}
 	}, [guildId]);
 
-	/**
-	 * Bumps the characters refresh token without busting the server-side cache
-	 * — used to re-fetch characters on tab click (cheap: the server just
-	 * returns the cached list if it's still fresh). For a guaranteed-fresh
-	 * read that bypasses the cache, use `handleCharactersRefresh` instead.
-	 */
+	/** Bumps the characters refresh token without busting the server-side cache, for cheap re-fetch on tab click
+	 * (server returns the cached list if fresh). Use `handleCharactersRefresh` instead for a guaranteed-fresh read. */
 	const bumpCharactersRefreshToken = useCallback(() => {
 		dispatch({ type: "increment_refresh_token" });
 	}, []);

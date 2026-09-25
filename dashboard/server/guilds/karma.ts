@@ -34,11 +34,8 @@ async function resolveMemberInfo(
 		userIds,
 		DISCORD_FETCH_CONCURRENCY,
 		async (userId) => {
-			// Sequential, not Promise.all: both callbacks fall back to
-			// guild.members.fetch(userId) when the member isn't cached yet, and
-			// running them in parallel means both miss the cache and each fire
-			// their own Discord API request. fetchMemberName's fetch populates
-			// the cache, so fetchMemberAvatar's own cache check then hits it.
+			// Sequential, not Promise.all: both fall back to guild.members.fetch() when uncached, and running
+			// them in parallel would double the Discord API calls; fetchMemberName's fetch populates the cache first.
 			const nameInfo = await guild.fetchMemberName(userId).catch(() => null);
 			const avatar = await guild.fetchMemberAvatar(userId).catch(() => null);
 			return [
@@ -54,12 +51,8 @@ async function resolveMemberInfo(
 	return new Map(entries);
 }
 
-/**
- * Build the list of every tracked karma entry for a guild (userId, resolved
- * display name/avatar, and their Count) — shared by the authenticated
- * overview route and the public leaderboard route so both return the exact
- * same ranking data.
- */
+/** Builds every tracked karma entry for a guild (userId, resolved display name/avatar, Count) — shared by the
+ * authenticated overview route and the public leaderboard route so both return identical rankings. */
 async function buildUsersList(
 	guildCount: DBCount,
 	guildId: string,
@@ -74,9 +67,8 @@ async function buildUsersList(
 	for (const uid of extraUserIds) allUserIds.add(uid);
 	const memberInfo = await resolveMemberInfo([...allUserIds], guildId, botGuilds);
 
-	// Drop entries whose member couldn't be resolved (left the server, etc.) —
-	// an unnamed "Unknown player" row isn't actionable in any of the UIs that
-	// consume this list (search, leaderboard, admin reset autocomplete).
+	// Drops entries whose member couldn't be resolved (left the server, etc.) — an unnamed "Unknown player" row
+	// isn't actionable in any consuming UI (search, leaderboard, admin reset autocomplete).
 	const users: ApiKarmaEntry[] = trackedEntries
 		.map(([uid, count]) => ({
 			userId: uid,
@@ -90,11 +82,8 @@ async function buildUsersList(
 	return { users, memberInfo };
 }
 
-/**
- * Public, read-only leaderboard data (every tracked user's karma) for a
- * shareable leaderboard link. Shared by the `/public` route and the
- * share-link meta-tag injection (see `../meta.ts`).
- */
+/** Public, read-only leaderboard data (every tracked user's karma) for a shareable link. Shared by the `/public`
+ * route and the share-link meta-tag injection (see `../meta.ts`). */
 export async function getPublicLeaderboardUsers(
 	guildId: string,
 	deps: Pick<DashboardDeps, "criticalCount" | "botGuilds">
@@ -104,12 +93,8 @@ export async function getPublicLeaderboardUsers(
 	return users;
 }
 
-/**
- * Public, read-only karma for a single user, for a shareable profile link.
- * Shared by the `/public/:userId` route and the share-link meta-tag
- * injection (see `../meta.ts`). Returns `null` when the user has no tracked
- * karma in this guild.
- */
+/** Public, read-only karma for a single user, for a shareable profile link. Shared by `/public/:userId` and the
+ * share-link meta-tag injection (see `../meta.ts`); returns `null` if the user has no tracked karma. */
 export async function getPublicKarmaEntry(
 	guildId: string,
 	userId: string,
@@ -139,9 +124,8 @@ export function createKarmaRouter(deps: DashboardDeps) {
 	const requireGuildMember = makeRequireGuildMember(botGuilds);
 	const requireAdmin = makeRequireAdmin(botGuilds, settings);
 
-	// GET /:guildId/karma — the current user's karma, server-wide stats, and the
-	// list of every user tracked in the karma DB (used for the dashboard's search).
-	// Open to any guild member, matching the /karma bot command's own access level.
+	// GET /:guildId/karma — current user's karma, server-wide stats, and every tracked user (dashboard search).
+	// Open to any guild member, matching the /karma bot command's access level.
 	router.get(
 		"/",
 		requireAuth,
@@ -173,10 +157,8 @@ export function createKarmaRouter(deps: DashboardDeps) {
 		}
 	);
 
-	// GET /:guildId/karma/public — public, read-only leaderboard data (every
-	// tracked user's karma) for a shareable leaderboard link. No auth, mirrors
-	// the characters/public route; same data any authenticated guild member
-	// can already see via the "/" route above.
+	// GET /:guildId/karma/public — public, read-only leaderboard for a shareable link. No auth; mirrors
+	// characters/public and returns the same data any authenticated guild member already sees via "/".
 	router.get("/public", async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const users = await getPublicLeaderboardUsers(guildId, deps);

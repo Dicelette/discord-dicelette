@@ -10,12 +10,8 @@ type TextfieldProps = TextFieldProps & {
 	type?: HTMLInputTypeAttribute;
 };
 
-/**
- * Uses FastField + local state so keystrokes update the input immediately
- * and the Formik store only after 120 ms of inactivity.
- * This prevents the heavy Statistics / Macro / CustomCritical blocks
- * from re-rendering on every keystroke.
- */
+/** Uses FastField + local state so keystrokes update the input immediately, syncing to Formik only after 120ms
+ * of inactivity — keeps the heavy Statistics/Macro/CustomCritical blocks from re-rendering on every keystroke. */
 const DebouncedTextfield = ({
 	field,
 	meta,

@@ -9,10 +9,8 @@ import { extractDiceData } from "./dice_extractor";
 /** `#`, `//` and `/*` only: unlike `[`, they have no closing marker and end the whole dice. */
 const GLOBAL_COMMENT_MARKER = /\s(#|\/{2}|\/\*)(?<comment>.*)/i;
 
-/**
- * `splitDiceComment` of the core, minus its `[` marker: in a shared roll a bracketed comment
- * belongs to its own `;` segment and must stay in the dice for the engine to render it.
- */
+/** Like the core's `splitDiceComment`, minus its `[` marker: in a shared roll a bracketed comment belongs to
+ * its own `;` segment and must stay in the dice for the engine to render it. */
 export function splitGlobalComment(dice: string): {
 	dice: string;
 	comment: string | undefined;
@@ -41,27 +39,14 @@ export function getComments(content: string, comments?: string) {
 	return globalComments;
 }
 
-/**
- * Strip a leading `#` comment marker (and one following space) and trim whitespace.
- */
+/** Strips a leading `#` comment marker (and one following space) and trims whitespace. */
 export function stripCommentPrefix(c?: string): string | undefined {
 	if (!c) return undefined;
 	return c.replace(/^# ?/, "").trim();
 }
 
-/**
- * Extract and merge comments from multiple sources (dice formula, user input)
- * Handles stat markers (%%[__stat__]%%), deduplicates comments, and formats
- * for shared vs single dice rolls.
- *
- * @param dice - The dice formula string potentially containing comments
- * @param userComments - Optional user-provided comments to merge
- * @returns Object with cleaned dice string and merged comments
- *
- * @example
- * extractAndMergeComments("2d6 # attack", "damage roll")
- * => { cleanedDice: "2d6", mergedComments: "# attack damage roll" }
- */
+/** Merges comments from the dice formula and user input, handling stat markers (%%[__stat__]%%), deduplication,
+ * and shared-vs-single dice formatting. */
 export function extractAndMergeComments(
 	dice: string,
 	userComments?: string
@@ -71,11 +56,8 @@ export function extractAndMergeComments(
 	const diceData = extractDiceData(dice);
 	let tailComments = diceData.comments;
 
-	// `tailComments` is a heuristic for messages with no explicit "#" comment
-	// (DETECT_DICE_MESSAGE isn't anchored, so it can otherwise land mid-way
-	// through a multi-word bracketed comment and capture a fragment that
-	// overlaps — but doesn't exactly equal — the real global comment).
-	// Once an explicit "#" comment exists, it is authoritative; drop the heuristic.
+	// tailComments is a heuristic for messages with no explicit "#" comment (DETECT_DICE_MESSAGE isn't anchored,
+	// so it can capture a fragment overlapping the real comment); once a "#" comment exists, it wins.
 	if (tailComments && globalRaw) tailComments = undefined;
 
 	const partsRaw = [globalRaw, tailComments, userComments];
@@ -91,7 +73,6 @@ export function extractAndMergeComments(
 		if (cleanedPart && cleanedPart.length > 0) commentTexts.push(cleanedPart);
 	}
 
-	// Deduplicate comment texts
 	const uniqueComments: string[] = [];
 	for (const c of commentTexts) {
 		if (!uniqueComments.includes(c)) uniqueComments.push(c);
@@ -104,10 +85,9 @@ export function extractAndMergeComments(
 	let cleaned = dice
 		.replace(/%%\[__.*?__]%%/g, "")
 		.replace(DICE_PATTERNS.GLOBAL_COMMENTS, "")
-		// In some cases, empty markers may leave residual "%%%%" that break the dice parser.
-		// We remove them cleanly.
+		// Cleans up residual "%%%%" left by empty markers, which would otherwise break the dice parser.
 		.replace(/%{4,}/g, "")
-		// And we normalize occurrences of "%%" isolated surrounded by possible spaces
+		// Normalizes stray "%%" left surrounded by spaces.
 		.replace(/\s*%%+\s*/g, " ")
 		.trim();
 

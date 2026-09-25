@@ -11,13 +11,8 @@ import { AuthProvider, I18nProvider, ToastProvider } from "./providers";
 import { ErrorBoundary } from "./shared";
 import "./styles.css";
 
-/**
- * `@dicelette/core`'s template schemas (zod) probe `Function("")` in a
- * try/catch to decide whether they can JIT-compile — the throw is caught,
- * but the strict CSP still reports it as a blocked `script-src` eval to the
- * console. `jitless: true` skips the probe entirely (zod reads this from
- * `globalThis` before running it, regardless of which bundle imports zod).
- */
+/** Skips core's zod schemas' `Function("")` JIT probe, which a strict CSP reports as a blocked script-src eval
+ * even though the throw is caught; zod reads `jitless` from `globalThis` regardless of which bundle imports it. */
 z.config({ jitless: true });
 
 const headingFont = { fontFamily: '"Karla Variable", "Inter", sans-serif' };

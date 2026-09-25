@@ -13,15 +13,7 @@ import {
 } from "messages";
 import { searchUserChannel } from "utils";
 
-/**
- * Core logic to update all user character template embeds.
- * No user interaction — silent on errors.
- *
- * @param client - The Discord bot client
- * @param guildId - Guild ID where characters are located
- * @param template - The updated statistical template
- * @param ul - Localization function for building embeds
- */
+/** Core logic to update all user character template embeds; silent on errors, no user interaction. */
 export async function bulkEditTemplateUser(
 	client: EClient,
 	guildId: string,
@@ -99,11 +91,8 @@ export async function bulkEditTemplateUser(
 	});
 }
 
-/**
- * Prompts for confirmation and deletes all character data and messages in the guild.
- *
- * Displays a confirmation dialog to the user. If confirmed, removes all character messages, clears character data from guild settings and cache, and updates the confirmation message. If canceled or timed out, no characters are deleted.
- */
+/** Prompts for confirmation, then deletes all character data/messages in the guild if confirmed.
+ * Cancel or timeout leaves everything untouched. */
 export async function bulkDeleteCharacters(
 	client: EClient,
 	interaction: Djs.CommandInteraction,

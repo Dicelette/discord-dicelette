@@ -127,24 +127,8 @@ function reverseSign(sign: string) {
 	}
 }
 
-/**
- * Evaluates a mathematical or comparison expression using user statistics and returns the formatted result
- * - Retrieves the relevant statistic value,
- * - processes the input formula (including dice rolls and optional transformations),
- * - evaluates the expression,
- * - Send formatted result message.
- * - Handles invalid signs and evaluation errors by replying with an error embed.
- * @param options - The command interaction options containing the formula, sign, statistic, and optional transform or comments.
- * @param userStatistique - The user's statistics used for variable substitution in the formula.
- * @param ul - The translation utility for localization.
- * @param interaction - The Discord command interaction context.
- * @param client
- * @param optionChar - Optional character name for display in the result.
- * @param hide - Whether to hide the result from other users.
- * @param user - The Discord user to mention in the result; defaults to the interaction user.
- * @param isCalc
- * @returns A promise that resolves when the result or error message has been sent to the user.
- */
+/** Evaluates a math/comparison expression against user statistics (with dice rolls and optional transforms),
+ * sending the formatted result or an error embed on invalid signs/evaluation failures. */
 export async function calculate(
 	options: Djs.CommandInteractionOptionResolver,
 	ul: Translation,

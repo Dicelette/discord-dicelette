@@ -252,7 +252,7 @@ async function buildLeaderBoardChart(
 
 					ctx.lineWidth = 3;
 					ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
-					ctx.lineJoin = "round"; // rend le contour plus propre
+					ctx.lineJoin = "round"; // makes the outline cleaner
 					ctx.strokeText(`${value}`, bar.x, bar.y + (bar.base - bar.y) / 2);
 
 					ctx.fillStyle = "#ffffff";

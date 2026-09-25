@@ -1,7 +1,4 @@
-/**
- * Browser-safe replacement for `@dicelette/utils`.
- *
- */
+/** Browser-safe replacement for `@dicelette/utils`. */
 
 export * from "@dicelette/utils/errors";
 export * from "@dicelette/utils/karma";

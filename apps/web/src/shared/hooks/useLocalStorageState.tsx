@@ -4,18 +4,8 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/**
- * Drop-in replacement for `useState` that persists the value to `localStorage`
- * under `key`. The initial value is read from storage on mount (falling back to
- * `initialValue` when absent or malformed), and every change is written back.
- *
- * When both the stored value and `initialValue` are plain objects, the stored
- * value is shallow-merged over `initialValue` so keys added to the schema after
- * a value was persisted fall back to their default instead of being `undefined`.
- *
- * Storage access is wrapped in try/catch so the hook degrades gracefully when
- * `localStorage` is unavailable (private browsing, quota exceeded, SSR).
- */
+/** Drop-in `useState` replacement that persists to `localStorage` under `key` (read on mount, written on every
+ * change); shallow-merges a plain-object stored value over `initialValue`, and degrades gracefully if storage is unavailable. */
 export function useLocalStorageState<T>(
 	key: string,
 	initialValue: T

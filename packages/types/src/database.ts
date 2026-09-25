@@ -2,72 +2,33 @@ import type { Critical, CustomCritical, SortOrder } from "@dicelette/core";
 import type * as Djs from "discord.js";
 
 export interface GuildData {
-	/**
-	 * Language to use with the bot
-	 */
 	lang?: Djs.Locale;
-	/**
-	 * Save a channel to send every long related to the sheet edit
-	 */
+	/** Channel ID for sheet-edit logs. */
 	logs?: string;
-	/**
-	 * Allow to send every result into a specific channel
-	 */
+	/** Channel where all roll results are sent. */
 	rollChannel?: string;
-	/**
-	 * Disable the thread creation for roll
-	 * - Disable roll channel
-	 * - Disable the auto deletion
-	 */
+	/** Disables thread creation for rolls (also disables the roll channel and auto-deletion). */
 	disableThread?: boolean;
-	/**
-	 * Hidden channel or result for gmroll
-	 * If true => hide result, doesn't send logs ; result are send in DM
-	 * if string => channel/thread.id where result will be send
-	 * In all cases; result are hidden in the channel when used (unless used in configured channel)
-	 */
+	/** `true` hides gmroll results (sent by DM instead); a string sends them to that channel/thread ID instead. */
 	hiddenRoll?: boolean | string;
-	/**
-	 * The default channel for the character sheet
-	 */
+	/** Default channel for character sheets. */
 	managerId?: string;
-	/**
-	 * Disable the auto deletion of the dice result
-	 * Registered in ms
-	 */
+	/** Auto-deletion delay for dice results, in ms. */
 	deleteAfter?: number;
-	/**
-	 * Add a timestamp to the log result
-	 */
 	timestamp?: boolean;
-	/**
-	 * Private chan for private sheet (default)
-	 */
+	/** Default channel for private sheets. */
 	privateChannel?: string;
-	/**
-	 * If the guild was converted for the userMessageId
-	 */
+	/** Whether the guild's userMessageId was migrated. */
 	converted?: boolean;
-	/**
-	 * Auto role when a user is created or edited
-	 */
+	/** Auto role when a user is created or edited. */
 	autoRole?: {
 		dice?: string;
 		stats?: string;
 	};
-	/**
-	 * In the logs, add a context link to the message. The link will change depending of the auto deletion:
-	 * - If disabled, the link will be the result interaction
-	 * - If enabled, the link will be the message before the interaction
-	 */
+	/** Adds a context link in logs, pointing to the interaction, or the prior message when auto-deletion is enabled. */
 	context?: boolean;
-	/**
-	 * In the result dice interaction, add a link to the logs receipt
-	 */
+	/** Adds a link to the log entry in the roll result. */
 	linkToLogs?: boolean;
-	/**
-	 * The template ID for the guild
-	 */
 	templateID: {
 		channelId: string;
 		messageId: string;
@@ -79,74 +40,35 @@ export interface GuildData {
 	user: Record<string, UserGuildData[]>;
 	allowSelfRegister?: boolean | string;
 	stripOOC?: Partial<StripOOC>;
-	/**
-	 * If set, will take that format when using the menu to export the result as text
-	 * @defaultValue `[[__{{stats}}__: **{{info}}** — {{result}}]](<{{link}}>)`
-	 * @see LinksVariables
-	 */
+	/** Format used when exporting a result as text via the menu. @see LinksVariables */
 	createLinkTemplate?: TemplateResult;
 	pity?: number;
-	/**
-	 * If enabled, all dice throw will be encapsulated with `{}` to match the diceroller library
-	 * The Fail/Success won't never be displayed.
-	 * @default false
-	 */
+	/** Wraps rolls in `{}` (diceroller compare syntax); success/failure is never displayed. */
 	disableCompare?: boolean;
-	/**
-	 * Sort output results
-	 * @default undefined
-	 */
 	sortOrder?: SortOrder;
-	/**
-	 * List of role IDs that grant access to the dashboard admin panel.
-	 * When set (non-empty), only users with one of these roles can access admin config and manageguild permission is no longer sufficient.
-	 * (Administrator still works).
-	 * **Dashboard-only setting**: has no effect on the Discord bot itself.
-	 */
+	/** Role IDs granted dashboard admin access (Administrator still works too). Dashboard-only, no effect on the bot. */
 	dashboardAccess?: string[];
-	/**
-	 * A mathjs formula applied server-wide when users use the [expr] syntax in dice rolls.
-	 * `$` in the formula is replaced by the expression inside the brackets.
-	 * Takes priority over the per-user customFormula.
-	 * @example "$>=85?85{cs:>=5+($-85)}:$"
-	 */
+	/** Server-wide mathjs formula for the `[expr]` roll syntax (`$` = bracket content); takes priority over the per-user formula. */
 	customFormula?: string;
 }
 
 export interface TemplateResult {
-	/**
-	 * @default {{info}} {{result}}
-	 */
+	/** Default: `{{info}} {{result}}` */
 	results: string;
-	/**
-	 * @default [[{{stats}} {{results}}]](<{{link}}>)
-	 */
+	/** Default: `[[{{stats}} {{results}}]](<{{link}}>)` */
 	final: string;
-	/*
-	 * @default: `; `
-	 */
+	/** Default: `; ` */
 	joinResult: string;
 	format: {
-		/**
-		 * The format to use when no statistics is used
-		 * @default __{{stat}}__:
-		 */
+		/** Format when no statistic is used. Default: `__{{stat}}__:` */
 		name: string;
-		/**
-		 * @default {{info}} -
-		 */
+		/** Default: `{{info}} -` */
 		info: string;
-		/**
-		 * @default {{dice}}
-		 */
+		/** Default: `{{dice}}` */
 		dice: string;
-		/*
-		 * @default {{original_dice}}
-		 */
+		/** Default: `{{original_dice}}` */
 		originalDice: string;
-		/*
-		 * @default {{character}}
-		 */
+		/** Default: `{{character}}` */
 		character: string;
 	};
 }
@@ -165,9 +87,7 @@ export type UserGuildData = {
 	damageName?: string[];
 	isPrivate?: boolean;
 };
-/**
- * `[messageId, channelId]`
- */
+/** `[messageId, channelId]` */
 export type UserMessageId = [string, string];
 
 export type PersonnageIds = { channelId: string; messageId: string };
@@ -179,56 +99,27 @@ export type UserRegistration = {
 	msgId: UserMessageId;
 };
 
-/**
- * When a user is registered, a message will be sent in the corresponding channel for the template
- * When any user roll on a statistique:
- * - The bot will check the user in the database.
- * - If it is, it will get the message with the statistique attached:
- * 	- The bot will get the content of the JSON file and parse it to get the statistique of the user
- * 	- Using it, it will roll normally and send the result to the user
- * - If the user doesn't exists or their stat was deleted: the bot will send a message to inform the user that he is not registered and roll normally, ignoring the statistique/characters (theses will be send into the comments part)
- */
+/** A registered user's character sheet: stats, template and dice, used to auto-fill rolls. */
 export interface UserData {
-	/** by default, will be the id of the user, if changed to a string, it will be used */
+	/** Falls back to the user ID if unset. */
 	userName?: string | null;
-	/** The statistics as value */
 	stats?: Record<string, number>;
-	/**
-	 * Display names for stats (non-normalized), deduplicated by normalized key.
-	 * Used for UI/info rendering while `stats` remains normalized for lookups.
-	 */
+	/** Display names for stats (non-normalized); `stats` keys stay normalized for lookups. */
 	displayStats?: string[];
-	/**
-	 * Allow to prevent returning each time to the JSON template for roll
-	 */
+	/** Cached template snapshot, avoids re-fetching it for every roll. */
 	template: {
 		diceType?: string;
 		critical?: Critical;
 		customCritical?: Record<string, CustomCritical>;
 	};
-	/**
-	 * The skill dice that the user can do
-	 */
+	/** Named damage/skill dice formulas. */
 	damage?: Record<string, string>;
-	/**
-	 * If the character is private or not
-	 */
 	private?: boolean;
-	/**
-	 * Thumbnail of the user, if exists
-	 */
 	avatar?: string;
-	/**
-	 * The channelID where the message is stored
-	 */
+	/** Channel ID storing the character sheet message. */
 	channel?: string;
-	/**
-	 * Message ID of the user data
-	 */
 	messageId?: string;
-	/**
-	 * Useful to know if it's a userData created from the template and not an actual user data
-	 */
+	/** True when this is a template-only placeholder, not a real registered user. */
 	isFromTemplate?: boolean;
 }
 
@@ -245,25 +136,14 @@ export type CharDataWithName = Record<string, CharacterData>;
 export type UserDatabase = Record<string, UserData[]>;
 
 export type CustomCriticalRoll = CustomCritical & {
-	/**
-	 * If the original value is a dice throw, set the result of the dice here
-	 */
+	/** Set when the original value was itself a dice throw. */
 	dice?: {
-		/**
-		 * The original dice throw
-		 */
 		originalDice: string;
-		/**
-		 * The result of the dice throw
-		 */
 		rollValue: string;
 	};
 };
 
-/**
- * API-serialized version of GuildData: identical structure but `lang` is a plain string
- * (avoids importing discord.js `Locale` enum in non-bot packages).
- */
+/** Same shape as `GuildData`, but `lang` is a plain string (avoids importing discord.js in non-bot packages). */
 export type ApiGuildData = Omit<GuildData, "lang"> & { lang?: string };
 
 export type Snippets = Record<string, string>;
@@ -275,17 +155,9 @@ export type UserSettingsData = {
 	snippets?: Snippets;
 	attributes?: Record<string, number | string>;
 	ignoreNotfound?: string;
-	/**
-	 * A personal mathjs formula applied when using the [expr] syntax in dice rolls.
-	 * `$` in the formula is replaced by the expression inside the brackets.
-	 * Overridden by the guild-level customFormula if set.
-	 * @example "$>=85?85{cs:>=5+($-85)}:$"
-	 */
+	/** Personal mathjs formula for the `[expr]` roll syntax; overridden by the guild's customFormula if set. */
 	customFormula?: string;
-	/**
-	 * Unix timestamp (ms) of the last time this user was DM'd that a roll-result copy couldn't be synced after a comment edit.
-	 * Used to throttle that warning.
-	 */
+	/** Timestamp (ms) of the last DM warning about a failed comment-edit sync; throttles repeat warnings. */
 	commentEditWarnedAt?: number;
 };
 

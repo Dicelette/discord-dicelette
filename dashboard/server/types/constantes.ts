@@ -1,5 +1,5 @@
 export const DISCORD_API = "https://discord.com/api/v10";
-/** Identify a user embed" */
+/** Identifies a user embed. */
 export const USER_EMBED_MARKERS = [
 	"⌈⌋",
 	"registration",

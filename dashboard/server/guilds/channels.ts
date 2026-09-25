@@ -3,9 +3,6 @@ import { Router } from "express";
 import type { DashboardDeps } from "../types";
 import { makeRequireAdmin, requireAuth, userCanManageGuildViaOAuth } from "../utils";
 
-/*
-GET /guildId/channels
-*/
 export function createChannelsRouter(deps: DashboardDeps) {
 	const { botGuilds, settings } = deps;
 	const router = Router({ mergeParams: true });
@@ -49,7 +46,7 @@ export function createChannelsRouter(deps: DashboardDeps) {
 	});
 
 	// GET /:guildId/invite
-	// Utilise le token OAuth de l'utilisateur car le bot n'est pas encore dans ce serveur.
+	// Uses the user's OAuth token since the bot isn't in this server yet.
 	router.get("/invite", requireAuth, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 		const userId = req.auth!.userId;

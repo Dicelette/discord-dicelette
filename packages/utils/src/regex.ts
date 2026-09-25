@@ -29,11 +29,7 @@ const DETECT_DICE_MESSAGE_INDICES = new RegExp(
 	"di"
 );
 
-/**
- * Replaces every `{{…}}` formula block with a same-length, space-free stand-in.
- *
- * Use a masking to prevent leaving `$stats` token behing, preserving also offsets/length
- */
+/** Replaces every `{{…}}` formula block with a same-length, space-free stand-in, preserving offsets. */
 function maskFormulaBlocks(content: string): string {
 	// Global, but only ever used through `replace`, which resets `lastIndex` itself.
 	return content.replace(FORMULA_BLOCK_MASK, maskRun);
@@ -76,10 +72,7 @@ export function matchBareComment(content: string):
 	};
 }
 
-/**
- * The trailing free-text comment of a dice message (the `DETECT_DICE_MESSAGE` group 3)
- * doesn't cut into a `{{…}}` formula block.
- */
+/** Trailing free-text comment of a dice message (`DETECT_DICE_MESSAGE` group 3), blind to `{{…}}` blocks. */
 export function bareComment(content: string): string | undefined {
 	return matchBareComment(content)?.comment;
 }
@@ -99,8 +92,7 @@ export const DICE_COMPILED_PATTERNS = {
 	/** Matches dice notation (e.g. `1d6`, `d20`, `2d10`) within a larger expression. Used for search-and-replace inside `{{...}}` formula blocks. */
 	DICE_IN_FORMULA: /\b\d*d\d+\b/gi,
 	DOUBLE_TARGET: /^\{2}(?<dice>.*?)\{{2}(?<comments>(?:^|\s)# ?(.*))?$/,
-	/** Two comparators on the SAME dice (`1d20>15>20`).
-	 * Works also in shared dice */
+	/** Two comparators on the SAME dice (e.g. `1d20>15>20`); also works in shared dice. */
 	OPPOSITION:
 		/(?<first>(([><=]|!=)+)(\[[^\]]*\]|[^<>=!;\s[]+))\s*(?<second>(([><=]|!=)+)(\[[^\]]*\]|[^<>=!;\s[]+))/,
 	/** `(stat1|stat2|…)` compiled once per alphabet. Used by `filterStatsInDamage`. */
@@ -137,13 +129,8 @@ export const PARSE_RESULT_PATTERNS = {
 	sharedCommentHeader: /^__.+?__\s*—\s*/,
 	sharedSymbol: /^([※◈])/,
 	successSymbol: /^◈\s+\*\*/,
-	/**
-	 * A single line's trailing italic span, capturing whatever precedes it (e.g. an
-	 * `[__Stat__] ` info-roll header) as `prefix`. Unlike `COMPILED_COMMENTS`, the prefix
-	 * isn't restricted to whitespace/`_ _` — callers that need to rule out matching inside a
-	 * dice-result line (which can itself contain `**bold**`) must do so before testing this.
-	 * `comment` is `undefined` when the line has no trailing italic span at all.
-	 */
+	/** A line's trailing italic span as `comment` (`undefined` if none), plus whatever precedes it as `prefix`.
+	 * Callers must rule out dice-result lines (which can contain `**bold**`) themselves. */
 	trailingComment: /^(?<prefix>.*?)(?:\*(?<comment>.*)\*)?$/,
 } as const;
 
@@ -178,7 +165,6 @@ export function cleanAvatarUrl(url: string) {
 }
 
 export function capitalizeBetweenPunct(input: string) {
-	// Regex to find sections enclosed by punctuation marks
 	let remainingText = input;
 	let result = input;
 	for (const match of input.matchAll(QUERY_URL_PATTERNS.PUNCTUATION_ENCLOSED)) {
@@ -193,7 +179,6 @@ export function capitalizeBetweenPunct(input: string) {
 	result = result.replace(QUERY_URL_PATTERNS.WORD_BOUNDARY(remainingText), remainingText);
 	return result;
 }
-// Cache for compiled regex patterns to improve performance
 
 // Generic overload: the return type depends on the input type
 export function getIdFromMention<T extends string | undefined>(

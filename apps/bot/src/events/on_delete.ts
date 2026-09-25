@@ -21,7 +21,6 @@ export const onDeleteChannel = (client: EClient): void => {
 };
 export const onKick = (client: EClient): void => {
 	client.on("guildDelete", async (guild) => {
-		//delete guild from database
 		try {
 			const templateID = client.settings.get(guild.id, "templateID");
 			client.clearTemplateAutocompleteCache(templateID);
@@ -93,9 +92,7 @@ export const onUserQuit = (client: EClient): void => {
 export const onDeleteThread = (client: EClient): void => {
 	client.on("threadDelete", async (thread) => {
 		try {
-			//search channelID in database and delete it
 			const guildID = thread.guild.id;
-			//verify if the user message was in the thread
 			await deleteIfChannelOrThread(client, guildID, thread);
 		} catch (error) {
 			logger.warn(error as Error);
@@ -108,7 +105,7 @@ export const onDeleteThread = (client: EClient): void => {
 export async function addRestriction(client: EClient, guildId: string) {
 	const guildCommmands = await client.application?.commands.fetch({ guildId });
 	const cmds = guildCommmands?.filter((cmd) => DATABASE_NAMES.includes(cmd.name));
-	//convert to promise to be faster
+	// Runs all command edits in parallel.
 	await Promise.all(
 		cmds?.map(async (cmd) => {
 			logger.trace("Adding defaultMemberPermissions to command", cmd.name);
@@ -130,7 +127,6 @@ export const onDeleteMessage = (client: EClient): void => {
 				}
 			}
 
-			//search channelID in database and delete it
 			const guildID = message.guild.id;
 			const channel = message.channel;
 			if (channel.isDMBased()) return;
@@ -138,7 +134,7 @@ export const onDeleteMessage = (client: EClient): void => {
 				const templateID = client.settings.get(guildID, "templateID");
 				client.clearTemplateAutocompleteCache(templateID);
 				client.settings.delete(guildID, "templateID");
-				client.template.delete(guildID); //template is deleted
+				client.template.delete(guildID);
 				await addRestriction(client, guildID);
 			}
 
@@ -153,7 +149,6 @@ export const onDeleteMessage = (client: EClient): void => {
 						if (persoId.messageId === messageId && persoId.channelId === channel.id) {
 							logger.info(`Deleted character ${value.charName} for user ${user}`);
 							values.splice(index, 1);
-							//delete in characters database
 							deleteUserInChar(
 								client.characters,
 								user,

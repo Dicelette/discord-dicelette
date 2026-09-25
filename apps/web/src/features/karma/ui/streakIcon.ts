@@ -23,13 +23,8 @@ const FAILURE_STREAK_ICON: IconComponent[] = [
 	Dangerous,
 ];
 
-/**
- * Icon component for a consecutive-streak chip, mirroring the bot's own
- * gaugeEmoji tiers (😎/🔥/🐐 and 😔/💔/💀) with an equivalent icon set.
- * Bundled MUI icons (not a runtime-fetched icon set) so the streak chip
- * never depends on reaching a third-party CDN. Returns null when there's
- * no active streak (value ≤ 1).
- */
+/** Icon for a consecutive-streak chip, mirroring the bot's gaugeEmoji tiers (😎/🔥/🐐 and 😔/💔/💀) with bundled
+ * MUI icons (no third-party CDN dependency). Returns null with no active streak (value ≤ 1). */
 export function streakIcon(
 	type: "success" | "failure",
 	value: number

@@ -52,17 +52,15 @@ async function refreshThreadCacheIfNeeded(
 }
 
 export async function createDefaultThread(
-	from: Djs.ThreadChannel | Djs.TextChannel, //Si on est sur un thread on va remonter sur le parent, sinon on va créer dedans
+	from: Djs.ThreadChannel | Djs.TextChannel, // If on a thread, walk up to the parent; otherwise create directly in the channel.
 	guildData: Settings,
 	guild?: Djs.Guild,
 	save = true
 ) {
 	if (from instanceof Djs.ThreadChannel) {
-		//n'est du coup pas le parent, mais un thread dont on va chercher à avoir le parent
+		// Not the parent itself — a thread whose parent we still need to resolve.
 		const resolved = from.parent ? from : await from.fetch(true);
-		//resolved.parentId as an open issue about typing for that
-		//cf: https://github.com/discordjs/discord.js/issues/8471
-
+		// resolved.parentId's typing is an open discord.js issue: https://github.com/discordjs/discord.js/issues/8471
 		const parent =
 			from.parent ??
 			(await from.guild.channels.fetch(resolved.parentId!).catch(() => null));
@@ -105,7 +103,6 @@ export async function fetchThread(
 		return threads.first();
 	}
 
-	//fetch
 	const fetchedThreads = await parent.threads.fetchActive();
 	return fetchedThreads.threads.find(
 		(thread) => thread.name.startsWith("📄") && thread.parentId === parent.id
@@ -120,7 +117,6 @@ export async function setTags(
 	tagName = "Dice Roll",
 	tagEmoji = "🪡"
 ) {
-	//check if the tags `🪡 roll logs` exists
 	const allTags = forum.availableTags;
 	const diceRollTag = allTags.find(
 		(tag) => tag.name === tagName && tag.emoji?.name === tagEmoji
@@ -146,25 +142,8 @@ export async function setTags(
 	) as Djs.GuildForumTagData;
 }
 
-/**
- * Reposts a character sheet embed in the specified thread or channel, creating a new thread if necessary.
- *
- * If the target thread does not exist and the channel is a forum, creates a new forum thread for the user and sends the embed with interactive components. Updates user registration and memory with the new message and thread IDs.
- *
- * @param embed - The embed(s) representing the character sheet.
- * @param interaction - The Discord interaction triggering the repost.
- * @param userTemplate - The user's character data template.
- * @param userId - The Discord user ID for whom the sheet is being reposted.
- * @param ul - Translation utility for localized strings.
- * @param which - Flags indicating which edit buttons to display.
- * @param guildData - Guild settings and configuration.
- * @param threadId - The ID of the thread or channel to repost in.
- * @param characters - Character data for the guild.
- *
- * @param files
- * @param deleteMsg - When true, also delete the previously registered message during database update.
- * @throws {Error} If the target thread or starter message cannot be found or created.
- */
+/** Reposts a character sheet embed in a thread/channel (creating a new forum thread if needed), and updates
+ * registration/memory with the new message and thread IDs. */
 export async function repostInThread(
 	embed: Djs.EmbedBuilder[],
 	interaction: Djs.BaseInteraction,
@@ -213,7 +192,6 @@ export async function repostInThread(
 			const userName =
 				userTemplate.userName ??
 				(await fetchMember(interaction.guild!, userId))?.displayName;
-			//create a new thread in the forum
 			const newThread = await channel.threads.create({
 				autoArchiveDuration: Djs.ThreadAutoArchiveDuration.OneWeek,
 				message: dataToSend,
@@ -254,19 +232,8 @@ export async function repostInThread(
 	await registerUser(userRegister, interaction, guildData, deleteMsg);
 }
 
-/**
- * Retrieves the thread and message location of a user's character sheet, ensuring access permissions.
- *
- * If the thread channel cannot be found, or if the user does not have permission to view a private sheet, an error embed is sent as a reply and only the sheet location is returned.
- *
- * @param {CharacterData} userData - Character data containing message and channel IDs.
- * @param {Djs.CommandInteraction} interaction - The Discord command interaction context.
- * @param {EClient} client
- * @param {Translation} ul
- * @param {CharDataWithName} charData - Character data keyed by user ID, used to check privacy settings.
- * @param {Djs.User|null} user - Optional user to check access for; defaults to the interaction user.
- * @returns An object containing the thread channel (if accessible) and the sheet location identifiers.
- */
+/** Gets the thread and message location of a user's character sheet, checking access permissions; replies with
+ * an error embed and returns just the location if the thread is missing or access is denied. */
 export async function findLocation(
 	userData: CharacterData,
 	interaction: Djs.CommandInteraction,
@@ -310,17 +277,8 @@ export async function findLocation(
 	return { sheetLocation, thread };
 }
 
-/**
- * Finds or creates a thread for dice rolls in a text channel.
- *
- * If a roll channel is configured in the guild settings, attempts to fetch and return it. If not found or invalid, removes the setting and logs an error. Otherwise, searches for the most recent unarchived thread with a dice roll prefix, archiving any others. If no suitable thread exists, unarchives an archived thread with the correct name or creates a new one.
- *
- * @param db - Guild settings database.
- * @param channel - The text channel to search for or create the roll thread in.
- * @param ul - Translation utility for localized strings.
- * @param hidden - Optional ID for a hidden roll channel.
- * @returns The found or newly created thread channel for dice rolls.
- */
+/** Finds or creates the dice-roll thread for a text channel: uses the configured roll channel if valid, else the
+ * most recent unarchived "🎲" thread (archiving others), else unarchives or creates one. */
 export async function findThread(
 	db: Settings,
 	channel: Djs.TextChannel,
@@ -385,28 +343,17 @@ export async function findThread(
 		await archivedNamedThread.setArchived(false);
 		return archivedNamedThread;
 	}
-	//create thread
 	const newThread = await channel.threads.create({
 		name: threadName,
 		reason: ul("roll.reason"),
 	});
-	//delete the message about thread creation
+	// Delete the message about thread creation.
 	await channel.lastMessage?.delete();
 	return newThread;
 }
 
-/**
- * Finds or creates a forum thread for dice rolls within a specified forum channel.
- *
- * If a roll channel is configured in the guild settings, attempts to fetch and return it. If not found or invalid, removes the setting and logs an error. Otherwise, searches for an existing forum thread named "🎲 <topic>" matching the provided thread's name. If found, ensures it is unarchived and applies the "Dice Roll" tag. If not found, creates a new forum thread with the appropriate name, tag, and a reason message.
- *
- * @param forum - The forum channel to search or create the thread in.
- * @param thread - The reference thread or text channel whose name is used for the roll thread.
- * @param db - The settings database for guild configuration.
- * @param ul - The translation utility for localized messages.
- * @param hidden - Optional ID for a hidden roll channel.
- * @returns The found or newly created forum thread for dice rolls.
- */
+/** Finds or creates the dice-roll forum thread: uses the configured roll channel if valid, else an existing
+ * "🎲 <topic>" thread (unarchived + tagged), else creates a new one. */
 export async function findForumChannel(
 	forum: Djs.ForumChannel,
 	thread: Djs.ThreadChannel | Djs.TextChannel,
@@ -450,12 +397,10 @@ export async function findForumChannel(
 	}
 	const tags = await setTags(forum);
 	if (rollTopic) {
-		//archive all other roll topic
 		if (rollTopic.archived) await rollTopic.setArchived(false);
 		await rollTopic.setAppliedTags([tags.id as string]);
 		return rollTopic;
 	}
-	//create new forum thread
 	return await forum.threads.create({
 		appliedTags: [tags.id as string],
 		message: { content: ul("roll.reason") },

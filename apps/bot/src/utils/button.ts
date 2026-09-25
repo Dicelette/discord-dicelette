@@ -5,13 +5,7 @@ import type { DataToFooter, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { ensureEmbed, reply } from "messages";
 
-/**
- * Button to edit the user embed character sheet
- * By default, only add the "add dice" button
- * @param ul {Translation}
- * @param stats {boolean} Only add it if true
- * @param dice {boolean} Only add the edit dice button it if true
- */
+/** Buttons to edit the user embed character sheet; by default only "add dice" is included. */
 export function editUserButtons(ul: Translation, stats?: boolean, dice?: boolean) {
 	const addDice = new Djs.ButtonBuilder()
 		.setCustomId("add_dice")
@@ -71,11 +65,7 @@ export function selectEditMenu(ul: Translation) {
 	return new Djs.ActionRowBuilder<Djs.StringSelectMenuBuilder>().addComponents(select);
 }
 
-/**
- * Handles the cancel button interaction, deleting the message if the user is authorized.
- *
- * Deletes the interaction message if the interacting user is either the user referenced in the embed or has moderator permissions. Otherwise, replies with a localized no-permission message.
- */
+/** Handles the cancel button: deletes the message if the user is the embed's owner or a moderator, else replies with a no-permission message. */
 export async function cancel(
 	interaction: Djs.ButtonInteraction,
 	ul: Translation,
@@ -152,14 +142,8 @@ export async function cancel(
 	});
 }
 
-/**
- * Creates an action row with "continue" and "cancel" buttons for multi-page user registration.
- *
- * @param page - The page the sheet currently sits on; the continue button carries it so the
- * next modal knows which page to open. Buttons posted before this was tracked have a bare
- * `continue` customId and are read back as page 1.
- * @returns An action row containing the "continue" and "cancel" buttons.
- */
+/** Action row with "continue"/"cancel" buttons for multi-page registration; `page` is embedded in the continue
+ * button's customId (older buttons without it are read back as page 1). */
 export function continueCancelButtons(ul: Translation, page = 1) {
 	const continueButton = new Djs.ButtonBuilder()
 		.setCustomId(`continue${page}`)
@@ -175,13 +159,7 @@ export function continueCancelButtons(ul: Translation, page = 1) {
 	]);
 }
 
-/**
- * Reconstructs the appropriate edit buttons and select menu for a user character sheet message.
- *
- * Determines which edit buttons ("edit stats" and "edit dice") are present in the given message and generates a new action row of buttons accordingly, along with the select menu for editing options.
- *
- * @returns An object containing the reconstructed buttons action row and the select menu action row.
- */
+/** Reconstructs the edit buttons and select menu for a character sheet message, based on which buttons it already has. */
 export function getButton(message: Djs.Message, ul: Translation) {
 	const oldsButtons =
 		message.components as Djs.ActionRow<Djs.MessageActionRowComponent>[];

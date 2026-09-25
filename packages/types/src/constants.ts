@@ -41,13 +41,6 @@ export const LINKS = {
 export const DISCORD_ERROR_CODE = [50001, 50013, 50007];
 export const MATCH_API_ERROR = /DiscordAPIError\[(50001|50013|50007)\]/;
 
-// Regex patterns for dice detection
-
-/*const MATH = {
-	dev: "<:math:1394002307431010334>_ _",
-	prod: "<:math:1394002540143710358>_ _",
-} as const;
-*/
 export const EMOJI_MATH = `<:math:${process.env.MATH_EMOJI_ID ?? "1394002540143710358"}>_ _`;
 
 export const AND = "&";
@@ -57,10 +50,7 @@ export const IGNORE_COUNT_KEY = {
 	key: "/ignore/",
 };
 
-/**
- * Required prefix on a reply to a roll-result message for it to be treated as a comment edit, rather than an ordinary reply.
- * Not configurable per-guild by design.
- */
+/** Prefix marking a reply as a comment edit rather than an ordinary reply (not configurable per-guild). */
 export const COMMENT_EDIT_PREFIX = "///";
 
 export enum LinksVariables {

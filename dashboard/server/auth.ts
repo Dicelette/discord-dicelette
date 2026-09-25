@@ -164,9 +164,8 @@ export function createAuthRouter(
 			res.status(401).json({ error: "Not authenticated" });
 			return;
 		}
-		// Only clear this user's own guild cache — bot guild presence is provided
-		// by client.guilds.cache (kept up-to-date via guildCreate/guildDelete events)
-		// so no global state is affected by a single user's refresh
+		// Only clears this user's own guild cache — bot guild presence comes from client.guilds.cache (kept
+		// current via guildCreate/guildDelete events), so no global state is affected by one user's refresh.
 		if (req.auth.userId) userGuildCache.delete(req.auth.userId);
 		res.json({ ok: true });
 	});
@@ -197,9 +196,8 @@ export function createAuthRouter(
 
 			const ManageGuild = BigInt(0x20);
 
-			// All guilds where the bot is present are shown (users can always
-			// access their personal config). Guilds without the bot are shown
-			// only if the user has ManageGuild (to offer the "add bot" flow).
+			// Guilds with the bot present are always shown (users can access their personal config); guilds
+			// without it are shown only if the user has ManageGuild (to offer the "add bot" flow).
 			const candidates = userGuilds
 				.map((g) => ({
 					g,
@@ -208,11 +206,8 @@ export function createAuthRouter(
 				}))
 				.filter(({ botPresent, oauthAdmin }) => botPresent || oauthAdmin);
 
-			// Concurrent, not sequential: each bot-present guild needs a
-			// userCanManageGuild() check (dashboardAccess roles), which falls back to
-			// a live Discord member fetch when the bot's cache misses — awaiting
-			// those one at a time made the servers list load time scale linearly
-			// with how many mutual guilds the user has.
+			// Concurrent, not sequential: each bot-present guild needs a userCanManageGuild() check, which can
+			// fall back to a live Discord fetch on a cache miss — awaiting these one at a time made load time scale with guild count.
 			const filteredGuilds = await mapConcurrent(
 				candidates,
 				DISCORD_FETCH_CONCURRENCY,

@@ -1,6 +1,4 @@
-/**
- * Export some dev template for testing purpose.
- */
+/** Exports dev templates for testing. */
 
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -17,7 +15,7 @@ export default function (template: Enmap<StatisticalTemplate>) {
 			if (file.endsWith(".json")) {
 				const filePath = path.resolve(TESTING_DIRECTORY, file);
 				const data = fs.readFileSync(filePath, "utf-8");
-				//as we are in testing, we assume the given file is a valid json
+				// Testing context: assume the file is valid JSON.
 				const json = JSON.parse(data) as StatisticalTemplate;
 				const guildId = path.basename(filePath, ".json");
 				logger.debug(`Loading guild: ${guildId}`);

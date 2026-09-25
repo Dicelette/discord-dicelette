@@ -52,9 +52,8 @@ export default (client: EClient): void => {
 			let content = message.content;
 			if (isNotADice(message.content)) return await stripOOC(message, client, ul);
 			let author = message.author;
-			//allow to roll for another member in the on_message_send, based on the first mention present in the dice
+			// Lets a moderator roll for another member by @mentioning them in the message.
 			if (message.member?.permissions.has(Djs.PermissionFlagsBits.ManageRoles)) {
-				//verify if they are any mentions
 				if (message.mentions.users.size > 0) {
 					author = message.mentions.users.first()!;
 					content = content.replaceAll(`<@${author.id}>`, "").trim();
@@ -96,7 +95,7 @@ export default (client: EClient): void => {
 			const sortOrder = guildSettings?.sortOrder || undefined;
 			const userSettingsData = client.userSettings.get(message.guild.id, author.id);
 			const customFormula = resolveCustomFormula(guildSettings, userSettingsData) ?? "$";
-			// Free-text rolls have no "expression" option to feed getExpression, so
+			// Free-text rolls have no "expression" option, so getExpression() is called with a hardcoded "0".
 			content = getExpression(content, "0").dice;
 			const rawContent = content;
 			content = applySemiDirectCustomFormula(content, customFormula);
@@ -155,7 +154,6 @@ export default (client: EClient): void => {
 				? { name: infoRoll, standardized: infoRoll.standardize() }
 				: undefined;
 
-			// Use the unified roll handler
 			await handleRollResult({
 				charName,
 				client,

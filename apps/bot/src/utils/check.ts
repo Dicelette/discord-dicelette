@@ -7,16 +7,8 @@ import { verifyIfEmbedInDB } from "database";
 import * as Djs from "discord.js";
 import { embedError, ensureEmbed, reply } from "messages";
 
-/**
- * Determines whether a user is permitted to edit a Discord message embed in an interaction.
- *
- * Checks if the user is the original embed author or has moderator permissions. If the interaction is not the initial ("first") type, verifies the embed's existence in the database. If the embed is missing, sends an ephemeral error message, attempts to delete the message, and denies permission. Otherwise, denies permission with an ephemeral message if the user lacks the required rights.
- *
- * @param interaction - The Discord button or select menu interaction.
- * @param db - The settings database instance.
- * @param interactionUser - The user attempting the edit.
- * @returns `true` if the user is allowed to edit; otherwise, `false`.
- */
+/** Checks if a user may edit an embed: the original author or a moderator, and (unless "first") that the embed
+ * still matches the DB — replying with an error and deleting the message if it's stale. */
 export async function allowEdit(
 	interaction: Djs.ButtonInteraction | Djs.StringSelectMenuInteraction,
 	db: Settings,
@@ -51,7 +43,6 @@ export async function allowEdit(
 				embeds: [embedError(ul("error.embed.old", { fiche: urlNew }), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
-			//delete the message
 			try {
 				await interaction.message.delete();
 			} catch (e) {
@@ -88,13 +79,8 @@ export function isSerializedNameEquals(
 	);
 }
 
-/**
- * Extracts command interaction options, guild configuration, language, localization utility, and user from a Discord command interaction.
- *
- * Sends an error embed reply and returns nothing if the guild configuration is not found.
- *
- * @returns An object containing the interaction options, guild configuration, language, localization utility, and the user option.
- */
+/** Extracts interaction options, guild config, language, and translation function; replies with an error and
+ * returns nothing if the guild isn't configured. */
 export async function optionInteractions(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient

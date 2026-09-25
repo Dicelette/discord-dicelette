@@ -241,13 +241,7 @@ export class ResultAsText {
 		return ` ${joinedRes}`;
 	}
 
-	/**
-	 * Rebuild success/fail/critical message (with taking into account the custom/critical from template or dice)
-	 * @param r {string} result
-	 * @param critical
-	 * @param customCritical
-	 * @private
-	 */
+	/** Rebuilds success/fail/critical message text, accounting for template/dice custom criticals. */
 	private comparedSegment(
 		r: string,
 		critical?: { failure?: number; success?: number },
@@ -484,10 +478,7 @@ export class ResultAsText {
 		return "";
 	}
 
-	/**
-	 * Count the number of dice in a shared roll based on the dice vs the result object to find hidden segment (like `(1d20);&+5`)
-	 * @private
-	 */
+	/** Counts dice in a shared roll not present in the result (hidden segments like `(1d20);&+5`). */
 	private countHiddenSegments(): number {
 		if (!this.resultat?.dice?.includes(";")) return 0;
 		const segments = this.resultat.dice.split(";").length;

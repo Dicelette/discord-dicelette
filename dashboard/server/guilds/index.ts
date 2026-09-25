@@ -12,7 +12,7 @@ import { createUserRouter } from "./user";
 export function createGuildRouter(deps: DashboardDeps) {
 	const router = Router();
 
-	// Valide le format du guildId pour toutes les routes /:guildId
+	// Validates the guildId format for all /:guildId routes.
 	router.param("guildId", (_req, res, next, guildId) => {
 		if (!isValidSnowflake(guildId)) {
 			res.status(400).json({ error: "Invalid guild ID" });

@@ -19,9 +19,8 @@ import { resources } from "./types";
 
 export const t = i18next.getFixedT("en");
 
-// Memoize the Djs.Locale → i18n-tag lookup. `ln()` is called on every interaction,
-// every message, every roll — the linear `Object.entries(Djs.Locale).find(...)`
-// scan is pure waste once the table has been resolved once.
+// Memoizes the Djs.Locale → i18n-tag lookup: `ln()` runs on every interaction/message/roll,
+// so the linear Object.entries scan is only worth doing once.
 const lnCache = new Map<string, TFunction<"translation", undefined>>();
 const localeTagIndex = (() => {
 	const index = new Map<string, string>();
@@ -46,13 +45,7 @@ export function ln(userLang: Djs.Locale) {
 	return fn;
 }
 
-/**
- * Returns a localized error message based on the error type and user language or interaction locale.
- * @param e The error to localize.
- * @param interaction Optional Discord interaction to determine the user's locale.
- * @param userLang Optional user language override.
- * @returns The localized error message string.
- */
+/** Localizes an error message from its type and the user's language or interaction locale. */
 export function lError(
 	e: Error,
 	interaction?: Djs.BaseInteraction,
@@ -196,11 +189,6 @@ export function diceTypeError(
 		});
 	}
 	if (error.cause === "invalidDice.compare") {
-		//method => {
-		// 					total,
-		// 					compare: asciiSign(this.resultat.compare.sign),
-		// 					rollValue,
-		// 				}
 		const { total, compare, rollValue } = error.method as {
 			total: number;
 			compare: string;

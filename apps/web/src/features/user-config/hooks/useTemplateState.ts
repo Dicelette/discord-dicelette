@@ -40,16 +40,8 @@ function reducer(state: State, action: Action): State {
 	}
 }
 
-/**
- * Encapsulates the template link state and save/reset logic.
- *
- * @param initialTemplate - initial template value (from config or user config)
- * @param saveFn - async function that persists the template
- * @param options
- * @param options.externalValue - when provided, syncs the template state when this value changes
- *   (useful for GuildConfigForm where config can be updated from outside)
- * @param options.errorKey - i18n key used when save fails (default: "userConfig.saveError")
- */
+/** Encapsulates template-link state and save/reset logic. `options.externalValue` re-syncs the state when it
+ * changes (e.g. GuildConfigForm's external config updates); `options.errorKey` sets the save-failure i18n key. */
 export function useTemplateState(
 	initialTemplate: TemplateResult | null | undefined,
 	saveFn: (template: TemplateResult) => Promise<unknown>,

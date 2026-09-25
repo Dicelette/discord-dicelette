@@ -124,7 +124,6 @@ export function getUserId(interaction: Djs.ButtonInteraction) {
 	}
 	if (userId) return { url, userId };
 
-	//get footer to find userId
 	const apiEmbed = interaction.message.embeds[0];
 	if (apiEmbed) {
 		const data = getModerationFooter(new Djs.EmbedBuilder(apiEmbed.data));

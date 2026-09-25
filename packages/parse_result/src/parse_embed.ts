@@ -13,7 +13,7 @@ export function parseEmbedToCritical(embed: Record<string, string>): {
 	[name: string]: CustomCritical;
 } {
 	const customCritical: Record<string, CustomCritical> = {};
-	//remove the 3 first field from the embed
+	// Remove the first 3 fields from the embed.
 	embed["roll.critical.success"] = "";
 	embed["roll.critical.failure"] = "";
 	embed["common.dice"] = "";
@@ -36,8 +36,7 @@ export function parseEmbedToStats(
 		stats = {};
 		for (const [name, damageValue] of Object.entries(embed)) {
 			if (!isNumber(damageValue)) {
-				//it's a combinaison
-				//remove the `x` = text;
+				// Combination stat: strip the "x =" prefix before parsing the number.
 				const combinaison = damageValue.split("=")[1].trim();
 				if (integrateCombinaison)
 					stats[name.unidecode()] = Number.parseInt(combinaison, 10);
@@ -66,9 +65,7 @@ export function parseTemplateField(embed: Record<string, string>): {
 	};
 }
 
-/**
- * Parse the embed fields and remove the backtick if any
- */
+/** Parses embed fields and strips backticks. */
 export function parseEmbedFields(
 	embed: Djs.Embed,
 	findKey = true

@@ -45,10 +45,7 @@ export async function timestamp(
 	}
 }
 
-/**
- * - Enables or disables the display of context links in dice roll results for the guild.
- * - Updates the guild's settings to show or hide context links
- */
+/** Enables or disables context links in dice roll results for the guild. */
 export async function setContextLink(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,

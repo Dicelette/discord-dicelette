@@ -57,16 +57,7 @@ function flattenDamage(entries: MacroSourceEntry[]) {
 	return result;
 }
 
-/**
- * Build autocomplete choices for damage/skill names.
- * Handles both user-specific and template damage names with filtering.
- *
- * @param interaction - Autocomplete interaction
- * @param client - Discord client
- * @param focused - Focused option info
- * @param options - Command options resolver
- * @returns Filtered choices array ready for respond()
- */
+/** Builds autocomplete choices for damage/skill names (user-specific + template, filtered). */
 export function buildDamageAutocompleteChoices(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,
@@ -151,14 +142,7 @@ export function buildDamageAutocompleteChoices(
 	}));
 }
 
-/**
- * Build autocomplete choices for stat names.
- * Uses cached standardized arrays for optimal performance.
- *
- * @param interaction - Autocomplete interaction
- * @param client - Discord client
- * @returns Filtered choices array ready for respond()
- */
+/** Builds autocomplete choices for stat names, using cached standardized arrays for performance. */
 export function buildStatsAutocompleteChoices(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient

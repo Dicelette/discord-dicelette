@@ -16,9 +16,7 @@ import { parseOpposition } from "./custom_critical";
 import { FORMULA_BLOCK_PATTERN, findStatInDiceFormula, getRoll } from "./dice_extractor";
 import type { AsciiSign } from "./interfaces";
 
-/**
- * Get or create cached regex for stats filtering
- */
+/** Gets or creates a cached regex for stats filtering. */
 function getStatsRegex(statNames: string[]): RegExp {
 	const key = statNames.join("|");
 	let regex = DICE_COMPILED_PATTERNS.STATS_REGEX_CACHE.get(key);
@@ -55,7 +53,6 @@ export function convertExpression(
 		const evaluated = evaluate(dice);
 		if (isNumber(evaluated)) return evaluated > 0 ? `+${evaluated}` : `${evaluated}`;
 	} catch (error) {
-		//pass
 		logger.warn(error as Error);
 	}
 	if (!dice.startsWith("+") && !dice.startsWith("-")) return `+${dice}`;
@@ -73,8 +70,7 @@ export function replaceStatInDiceName(
 		.join("|");
 	if (!statName) return originalDice;
 
-	// Regex to detect parentheses with content matching one of the names in "statName".
-	// Cached by stat-name signature because this function is on the hot roll path.
+	// Detects parens containing one of the stat names; cached by signature since this is on the hot roll path.
 	let regex = DICE_COMPILED_PATTERNS.STATS_PAREN_REGEX_CACHE.get(statName);
 	if (!regex) {
 		const escapedStatName = statName
@@ -140,16 +136,7 @@ export function trimAll(dice: string) {
 	return result.join(";");
 }
 
-/**
- * Generates a formatted URL string linking to a Discord message or a provided log URL.
- *
- * If a {@link logUrl} is given, returns it as a formatted string.
- * Otherwise, if {@link context} is provided, returns a markdown link to the Discord message using the supplied IDs.
- * @param ul {Translation} Translation function for localizing the link text.
- * @param context Optional Discord message context containing guild, channel, and message IDs.
- * @param logUrl {string} Optional direct log URL to use instead of constructing a Discord link.
- * @returns A formatted string containing the appropriate URL or an empty string.
- */
+/** Formats a link to a Discord message (or `logUrl` if given), or an empty string if neither is available. */
 export function createUrl(
 	ul: Translation,
 	context?: { guildId: string; channelId: string; messageId: string },
@@ -161,12 +148,7 @@ export function createUrl(
 	return `\n\n-# ↪ [${ul("common.context")}](<https://discord.com/channels/${guildId}/${channelId}/${messageId}>)`;
 }
 
-/**
- * Replaces `{exp}` or `{exp || default}` placeholders in a dice string with an evaluated expression or a default value.
- *
- * If the provided {@link expression} evaluates to `"0"`, placeholders are replaced with the specified default value (or `"1"` if not provided). Otherwise, placeholders are replaced with the evaluated expression string (without a leading plus sign). If any replacement occurs, the returned `expressionStr` is set to an empty string.
- *
- */
+/** Replaces `{exp}`/`{exp || default}` placeholders with the evaluated expression, or the default (default: "1") when `expression` is "0". */
 export function getExpression(
 	dice: string,
 	expression: string,
@@ -202,18 +184,12 @@ export function filterStatsInDamage(
 ) {
 	if (!statistics?.length) return Object.keys(damages);
 	const regex = getStatsRegex(statistics);
-	//remove all damage value that match the regex and return the key
+	// Drops damage entries whose value matches the stat regex, returns the remaining keys.
 	return Object.keys(damages).filter((key) => !damages[key].standardize().match(regex));
 }
 
-/**
- * Finds the opposition comparator of a dice (`1d20>15>20` → `>20`) and the dice without it.
- *
- * Custom critical and `{{...}}` formula blocks are masked by a same-length filler rather than
- * removed: a comparator inside a still-unresolved block (e.g. `{{$>=85?85:$}}`) must not be read
- * as an opposition, and keeping the offsets lets the match be cut out of the original string —
- * so an identical comparator sitting in another `;` segment is never removed instead.
- */
+/** Finds a dice's opposition comparator (`1d20>15>20` → `>20`) and the dice without it. Critical/`{{...}}` blocks
+ * are masked (not removed) so a comparator inside an unresolved block isn't mistaken for one, and offsets stay intact. */
 export function extractOpposition(
 	dice: string
 ): { dice: string; first: string; second: string } | undefined {
@@ -243,21 +219,12 @@ export function parseComparator(
 	return parseOpposition(found.second, found.first, userStatistique, userStatStr, sort);
 }
 
-/**
- * Detect if a message is a dice to make an early return for "obviously" not a dice, like:
- * - Empty message (rare, but... Well?)
- * - message containing only "_ _"
- * - Message starting with some characteres (non words doesn't works as non words can be included in a valid dice)
- * - Links
- * @param {string} content the content of the message
- */
+/** Early-return check for messages that are obviously not dice: empty, "_ _", a link, or starting with a character that can't lead a valid dice. */
 export function isNotADice(content: string) {
 	if (content.trim().length === 0 || content === "_ _" || content.startsWith("https://"))
 		return true;
-	// Strip a leading run of Discord markdown emphasis markers (*bold*, _italic_,
-	// ~~strikethrough~~, ||spoiler||) before the "obviously not dice" leading-character
-	// check, so a wrapped semi-direct roll (e.g. "*mon message [1d6]*") isn't rejected
-	// just because of the marker used to style it.
+	// Strips a leading run of Discord markdown emphasis markers (*bold*, _italic_, ~~strike~~, ||spoiler||) first,
+	// so a wrapped semi-direct roll (e.g. "*mon message [1d6]*") isn't rejected just for its styling marker.
 	const unmarked = content.replace(/^[*_~|]+/, "");
 	if (unmarked.trim().length === 0) return true;
 	return !!unmarked.match(/^[|\\_`/¤!µ*>~\-#§:;.,?%£€"'&°=]/);

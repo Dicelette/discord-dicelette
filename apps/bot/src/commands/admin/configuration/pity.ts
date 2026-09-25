@@ -5,17 +5,7 @@ import { random } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { reply } from "messages";
 
-/**
- * Set or clear the guild's pity threshold and reply with confirmation.
- * If a numeric pity value is provided, stores it in the guild settings under the key `"pity"` and replies with a success message including the value.
- * If no pity value is provided (falsy), deletes the guild's pity setting and replies with a deletion message.
- *
- * @param interaction
- * @param options - Command options resolver used to read the pity integer option
- * @param client
- * @param ul - Translation helper for localized reply messages
- * @returns The reply sent to the interaction
- */
+/** Sets or clears the guild's pity threshold and replies with confirmation (clears if `pity` is falsy). */
 export async function setPity(
 	interaction: Djs.CommandInteraction,
 	options: Djs.CommandInteractionOptionResolver,
@@ -35,41 +25,23 @@ export async function setPity(
 	});
 }
 
-/**
- * Determine whether the pity mechanic triggers for a user based on the configured threshold and the user's consecutive failures.
- * - Between 75% and 100% of the threshold, the trigger probability increases linearly from 50% to 100%;
- * - at or above the threshold pity always triggers,
- * - below 75% it never triggers
- * @param threshold - Guild-configured failure threshold for pity
- * @param userFailNb - Number of consecutive failures for the user
- * @returns `true` if pity triggers, `false` otherwise
- */
+/** Whether pity triggers for a user: never below 75% of `threshold`, always at/above it, and linearly scaling
+ * from 50% to 100% chance in between. */
 export function triggerPity(threshold?: number, userFailNb?: number): boolean {
 	if (!threshold || !userFailNb) return false;
-	// At 75% of threshold: 50% chance to trigger pity
-	// At 100% of threshold: 100% chance to trigger pity
-	// Below 75%: no pity
 	const triggerChance = Math.min(userFailNb / threshold, 1);
 	if (triggerChance < 0.75) return false;
 	if (triggerChance >= 1) return true;
-	//the roll should be lower and lower when we approach the threshold so we need to set the max to something that decrease with triggerChance
-	const normalizedValue = (triggerChance - 0.75) / 0.25; // normalize to [0,1]
+	// Linearly scale the trigger probability from 0.5 to 1 as triggerChance goes from 0.75 to 1.
+	const normalizedValue = (triggerChance - 0.75) / 0.25;
 	const alpha = 1;
-	// Probability calculation
-	// starting at 0.5 when t=0, going to 1 when t=1
 	const p = 0.5 + 0.5 * normalizedValue ** alpha;
 
-	// Perform the random trial
 	const u = random.real(0, 1, false);
 	return u <= p;
 }
 
-/**
- * Build minute-granular cache keys for a user within the context of a guild channel message or interaction.
- * @param source - The message or command interaction used to derive guildId, channelId and timestamp
- * @param userId - The target user's ID included in the key prefix
- * @returns An object containing `cacheKey` for the current minute, `prevCacheKey` for the previous minute, and `timeMin` (minutes since epoch)
- */
+/** Builds minute-granular cache keys (current + previous minute) for a user within a guild/channel context. */
 export function createCacheKey(
 	source: Djs.Message | Djs.PartialMessage | Djs.CommandInteraction,
 	userId: string

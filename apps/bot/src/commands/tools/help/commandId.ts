@@ -42,7 +42,7 @@ export function getConfigIds(
 	ids[t("config.selfRegister.name")] = idConfig;
 	ids[t("config.lang.options.name")] = idConfig;
 
-	// Recherche des subcommandes qui commencent par /config
+	// Finds subcommands that start with /config
 	commandsID.forEach((command) => {
 		if (command.name.startsWith("config")) {
 			ids[command.name] = command.id;

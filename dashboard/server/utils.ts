@@ -15,10 +15,7 @@ import {
 	USER_EMBED_MARKERS,
 } from "./types";
 
-/**
- * Concurrency cap for outgoing Discord API fan-out (member/character lookups on the hot path)
- * must not saturate the bot's shared Discord client with hundreds of parallel requests.
- */
+/** Concurrency cap for outgoing Discord API fan-out, so member/character lookups don't saturate the bot's shared client. */
 export const DISCORD_FETCH_CONCURRENCY = 10;
 
 const ADMINISTRATOR = BigInt(0x8);
@@ -75,10 +72,7 @@ function setCached(key: string, result: boolean): boolean {
 	return result;
 }
 
-/**
- * Detect a Discord CDN url where extra params (ex, is, hm) has been deleted.
- * These kind of url are invalid because the extra params are mandatory since 2023.
- */
+/** Detects a Discord CDN URL missing its mandatory params (ex/is/hm, required since 2023). */
 export function isStaleDiscordCdnUrl(url: string | null): boolean {
 	if (!url) return false;
 	return /(cdn|media)\.discordapp\.(net|com)/i.test(url) && !url.includes("?");
@@ -143,9 +137,7 @@ export function requireAuth(req: Request, res: Response, next: () => void) {
 	next();
 }
 
-/**
- * Check if the user in the dashboard have the manage guild/admin right in the discord bot (cache) or have the role listed in the dashboard access right.
- */
+/** Checks the user has manage-guild/admin rights (bot cache) or a role listed in `dashboardAccess`. */
 export function makeRequireAdmin(
 	botGuilds: DashboardDeps["botGuilds"],
 	settings: Settings
@@ -162,12 +154,8 @@ export function makeRequireAdmin(
 	};
 }
 
-/**
- * Check if an user can manage a guild via the discord bot cache.
- * If `dashboardAccess` is configured in the guild's setting, only user with these roles or admin right can access.
- *
- * Result are cached 5min to prevent spamming `guild.fetchMember()`
- */
+/** Checks if a user can manage a guild via the bot's cache: only `dashboardAccess` roles (or admin) qualify when
+ * that setting is configured. Cached 5 min to avoid spamming `guild.fetchMember()`. */
 export async function userCanManageGuild(
 	userId: string,
 	guildId: string,
@@ -194,7 +182,6 @@ export async function userCanManageGuild(
 
 		let result: boolean;
 		if (dashboardAccess && dashboardAccess.length > 0) {
-			// When dashboardAccess is set, only users with one of those roles have access
 			result = member.roleIds.some((roleId) => dashboardAccess.includes(roleId));
 		} else {
 			// Default: ManageGuild grants access
@@ -207,13 +194,7 @@ export async function userCanManageGuild(
 	}
 }
 
-/**
- * Check if the user can refresh all character sheet (in a guild)
- * Only allowed if the user have one of these permissions:
- * - Administration
- * - Manage guild
- * - Manage roles
- */
+/** Checks if a user can refresh a guild's character sheets: requires Administrator, Manage Guild, or Manage Roles. */
 export async function userCanRefreshServerCharacters(
 	userId: string,
 	guildId: string,
@@ -259,9 +240,7 @@ export async function userIsGuildMember(
 	}
 }
 
-/**
- * Middleware factory allowing all server member.
- */
+/** Middleware factory allowing any server member. */
 export function makeRequireGuildMember(botGuilds: DashboardDeps["botGuilds"]) {
 	return async (req: Request, res: Response, next: () => void) => {
 		const guildId = req.params.guildId as string;
@@ -296,10 +275,7 @@ export async function userCanAccessChannel(
 	}
 }
 
-/**
- * Check if a user can manage a guild via OAuth.
- * Used to invit the bot in a new guild.
- */
+/** Checks if a user can manage a guild via OAuth (used to invite the bot to a new guild). */
 export async function userCanManageGuildViaOAuth(
 	userId: string,
 	guildId: string,
@@ -390,10 +366,8 @@ export function getfrontEndUrl() {
 	return process.env.FRONTEND_URL ?? "http://localhost:5173";
 }
 
-/**
- * Memoize ETag computation by payload reference.
- * When a route returns the same object across requests (e.g. a cached bootstrap payload), we skip the JSON.stringify + SHA1 roundtrip entirely.
- */
+/** Memoizes ETag computation by payload reference, skipping the JSON.stringify + SHA1 roundtrip when a route
+ * returns the same object across requests (e.g. a cached bootstrap payload). */
 const etagMemo = new WeakMap<object, string>();
 
 export function computeWeakEtag(payload: unknown): string {

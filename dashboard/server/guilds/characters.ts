@@ -110,11 +110,8 @@ async function resolveCanLink(
 	return isAdmin || (await userCanAccessChannel(userId, guildId, channelId, botGuilds));
 }
 
-/**
- * Build a per-request memo that resolves canLink for a given channel once.
- * Two characters in the same channel would otherwise re-enter the permission
- * cache path (and incur the extra Map lookup / Date.now() per entry).
- */
+/** Per-request memo resolving canLink for a channel once, so two characters in the same channel don't each
+ * re-enter the permission-cache path (extra Map lookup + Date.now() per entry). */
 function makeCanLinkMemo(
 	isAdmin: boolean,
 	userId: string,
@@ -138,12 +135,8 @@ function invalidateGuildCharacterCache(guildId: string) {
 	charForceRefresh.deleteGuild(guildId);
 }
 
-/**
- * Builds the public, read-only character list for a shareable profile link
- * (private characters and Discord links stripped, since we can't check the
- * viewer's channel permissions). Shared by the `/public/:userId` route and
- * the share-link meta-tag injection (see `../meta.ts`).
- */
+/** Public, read-only character list for a shareable profile link (private characters and Discord links stripped,
+ * since viewer channel permissions can't be checked). Shared by `/public/:userId` and `../meta.ts`. */
 export async function getPublicCharacterList(
 	guildId: string,
 	userId: string,

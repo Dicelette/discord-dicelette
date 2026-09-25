@@ -87,16 +87,7 @@ interface MacroEditorAuth {
 	isSameUser: boolean;
 }
 
-/**
- * - Helper function to check macro editor authorization and extract user information.
- * - Consolidates authorization logic used across add, edit, store methods.
- * @param params - Parameters including interaction, ul translation, and optional message
- * @param params.interaction - The Discord interaction (button, modal, or select menu)
- * @param params.ul - Translation utility for localized responses
- * @param params.interactionUser - The user initiating the interaction
- * @param params.message - Optional message to check, defaults to interaction.message
- * @returns Authorization result with user info and permissions
- */
+/** Checks macro-editor authorization and extracts target user info from the message embed (shared by add/edit/store). */
 async function ensureMacroEditor(params: {
 	interaction:
 		| Djs.ButtonInteraction
@@ -117,14 +108,12 @@ async function ensureMacroEditor(params: {
 		};
 	}
 
-	// Extract user info from embed
 	const embed = ensureEmbed(msg);
 	const userMention = embed.fields.find(
 		(field) => findln(field.name) === "common.user"
 	)?.value;
 	const targetUserId = getIdFromMention(userMention);
 
-	// Get character name
 	const charNameField = embed.fields.find(
 		(field) => findln(field.name) === "common.character"
 	);
@@ -133,7 +122,6 @@ async function ensureMacroEditor(params: {
 			? charNameField.value
 			: undefined;
 
-	// Check permissions
 	const isSameUser = targetUserId === interactionUser.id;
 	const isModerator = !!interaction.guild?.members.cache
 		.get(interactionUser.id)

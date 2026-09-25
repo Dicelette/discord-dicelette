@@ -2,10 +2,7 @@ import { DETECT_CRITICAL, generateStatsDice, MIN_THRESHOLD_MATCH } from "@dicele
 import { DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { trimAll } from "./utils";
 
-/**
- * Extract a comparator token (e.g. ">=12" or "<=5") from a dice string.
- * Executes the pattern regex only once and returns both the cleaned dice string and the extracted comparator portion.
- */
+/** Extracts a comparator token (e.g. ">=12") from a dice string in a single regex pass. */
 export function extractComparator(
 	dice: string,
 	pattern: RegExp
@@ -15,12 +12,8 @@ export function extractComparator(
 	return { comparator: match[0], dice: dice.replace(match[0], "").trim() };
 }
 
-/**
- * Apply threshold override logic to a dice formula.
- * - If threshold contains a full comparator expression (e.g. ">=15"), replaces any existing one.
- * - If threshold is just a number and dice has a comparator, replaces only the numeric part.
- * Executes each regex at most once for optimal performance.
- */
+/** Applies a threshold override to a dice formula: a full comparator (">=15") replaces any existing one; a bare
+ * number replaces just the numeric part of an existing comparator. */
 export function getThreshold(dice: string, threshold?: string): string {
 	if (!threshold) return dice;
 	const diceMatch = DICE_COMPILED_PATTERNS.COMPARATOR.exec(dice);
@@ -36,11 +29,8 @@ export function getThreshold(dice: string, threshold?: string): string {
 	return dice;
 }
 
-/**
- * `generateStatsDice` (core) intentionally leaves `$stat` tokens inside `[...]` brackets untouched
- * Syntax is reserved for the custom-formula feature, which re-wraps the bracket in `{{...}}` afterwards.
- * Resolve `$stat` inside brackets here, the same way it's already resolved outside of them.
- */
+/** `generateStatsDice` (core) leaves `$stat` tokens inside `[...]` untouched (reserved for the custom-formula
+ * feature); this resolves them the same way they're resolved outside brackets. */
 function resolveStatsInBrackets(
 	dice: string,
 	stats: Record<string, number> | undefined,
@@ -53,14 +43,8 @@ function resolveStatsInBrackets(
 	});
 }
 
-/**
- * Compose the final roll string by applying critical removal, threshold substitution,
- * comparator extraction and evaluation in a single, optimized pass.
- * Centralizes duplicated logic from bot layer.
- *
- * The comment (if any) is returned separately and should be passed directly to the
- * roll function rather than appended to the dice string, avoiding redundant strip/re-add cycles.
- */
+/** Composes the final roll string: critical removal, threshold substitution, comparator extraction/evaluation
+ * in one pass. The comment (if any) is returned separately, to pass directly to the roll function. */
 export function composeRollBase(
 	dice: string,
 	threshold: string | undefined,

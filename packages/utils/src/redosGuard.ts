@@ -1,9 +1,6 @@
 import vm from "node:vm";
 
-/**
- * Strings shaped to trigger catastrophic backtracking (nested/ambiguous quantifiers)
- * regardless of which characters the untrusted pattern actually targets.
- */
+/** Strings shaped to trigger catastrophic backtracking, regardless of the pattern's actual target characters. */
 const REDOS_PROBES = [
 	`${"a".repeat(50)}!`,
 	`${" ".repeat(50)}!`,
@@ -14,10 +11,7 @@ const REDOS_PROBES = [
 
 const REDOS_TIMEOUT_MS = 80;
 
-/**
- * Checks that a user-supplied regex pattern can't be used to freeze the event loop.
- * Runs the pattern against several adversarial inputs inside a `vm` context with a hard timeout
- */
+/** Checks that a user-supplied regex can't freeze the event loop, via adversarial inputs run with a hard timeout. */
 export function isRegexSafe(pattern: string, flags = ""): boolean {
 	try {
 		new RegExp(pattern, flags);
