@@ -10,7 +10,6 @@ import {
 	logger,
 	NoChannel,
 	NoEmbed,
-	sentry,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { default as i18next, type TFunction } from "i18next";
@@ -118,7 +117,7 @@ export function lError(
 		}
 		if (e.code === 50001) return ul("error.missingPermission");
 		if (e.code === 50013) return ul("error.botMissingPermission");
-		sentry.error(e);
+		logger.error(e);
 		return ul("error.discord", { code: e.code, stack: e.stack });
 	}
 	if (e.message.includes(":warning:")) return ul("error.generic.e", { e });

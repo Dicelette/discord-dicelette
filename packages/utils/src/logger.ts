@@ -3,11 +3,19 @@ import process from "node:process";
 import * as Sentry from "@sentry/node";
 import dotenv from "dotenv";
 import stripAnsi from "strip-ansi";
-import { type ILogObj, type IPrettyLogStyles, type ISettingsParam, Logger } from "tslog";
+import {
+	type ILogObj,
+	type IPrettyLogStyles,
+	type ISettingsParam,
+	Logger,
+	type Transport,
+} from "tslog";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { BotError, BotErrorLevel } from "./errors";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
+
+const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "production";
 
 // tslog's default pretty output always writes through console.log, no matter the log level. PM2
 // splits stdout -> out.log and stderr -> error.log, so WARN/ERROR/FATAL never reached error.log.
@@ -49,7 +57,39 @@ const TEMPLATE = "{{logLevelName}} [{{filePathWithLine}}{{name}}] ";
 const TIME_TEMPLATE = "{{yyyy}}-{{mm}}-{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}} ";
 const PROD_TEMPLATE = process.env.PROD ? `${TIME_TEMPLATE}${TEMPLATE}` : TEMPLATE;
 
+const SENTRY_ISSUE_LEVEL: Record<string, Sentry.SeverityLevel> = {
+	ERROR: "error",
+	FATAL: "fatal",
+	WARN: "warning",
+};
+
+// Forwards WARN/ERROR/FATAL records to Sentry as issues, alongside the normal console output.
+// The record still carries the native Error instance (record.nativeError, set by tslog before
+// JSON-stringifying it into `line`), so Sentry gets the real exception with its stack/cause chain
+// instead of a stringified copy; a message-only log falls back to captureMessage.
+const sentryTransport: Transport<ILogObj> = {
+	format: "json",
+	minLevel: "WARN",
+	write(record, line) {
+		if (!hasSentry) return;
+		const { _logMeta, ...fields } = JSON.parse(line);
+		const nativeError = [record, ...Object.values(record)]
+			.map((value) => (value as { nativeError?: unknown } | null)?.nativeError)
+			.find((candidate): candidate is Error => candidate instanceof Error);
+		if (
+			nativeError instanceof BotError &&
+			nativeError.level != null &&
+			nativeError.level < 2
+		)
+			return;
+		const level = SENTRY_ISSUE_LEVEL[_logMeta.logLevelName as string] ?? "error";
+		if (nativeError) Sentry.captureException(nativeError, { extra: fields, level });
+		else Sentry.captureMessage(String(fields.message ?? line), { extra: fields, level });
+	},
+};
+
 const prodSettings: ISettingsParam<ILogObj> = {
+	attachedTransports: [sentryTransport],
 	minLevel: 6,
 	name: "LOGGER",
 	pretty: {
@@ -65,6 +105,7 @@ const prodSettings: ISettingsParam<ILogObj> = {
 };
 
 const devSettings: ISettingsParam<ILogObj> = {
+	attachedTransports: [sentryTransport],
 	minLevel: 0, // everything
 	pretty: {
 		errorStackTemplate: BASE_STACK_TEMPLATE,
@@ -88,6 +129,7 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 
 // Logger pour les trucs importants (notifications, etc)
 export const important: Logger<ILogObj> = new Logger({
+	attachedTransports: [sentryTransport],
 	minLevel: 1,
 	name: "IMPORTANT",
 	pretty: {
@@ -104,8 +146,6 @@ export const important: Logger<ILogObj> = new Logger({
 	},
 	stack: { capture: "off" },
 });
-
-const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "production";
 
 if (hasSentry) {
 	important.info("Sentry is enabled for logging errors.");
@@ -138,13 +178,11 @@ export async function sentryFlush(timeout = 2000): Promise<void> {
 export function setupProcessErrorHandlers() {
 	process.on("unhandledRejection", (reason) => {
 		logger.error("Unhandled rejection:", reason);
-		if (hasSentry) Sentry.captureException(reason);
 	});
 
 	process.on("uncaughtException", (err) => {
 		logger.fatal("Uncaught exception:", err);
 		if (hasSentry) {
-			Sentry.captureException(err);
 			void Sentry.flush(2000).finally(() => process.exit(1));
 		} else {
 			process.exit(1);
@@ -159,38 +197,6 @@ export function setupProcessErrorHandlers() {
 	process.on("SIGTERM", () => shutdown("SIGTERM"));
 	process.on("SIGINT", () => shutdown("SIGINT"));
 }
-
-export const sentry = {
-	debug: (e: unknown, extra?: Record<string, unknown>) => {
-		if (!hasSentry) return;
-		if (e instanceof BotError && e.level && e.level < 2) return;
-		Sentry.captureException(e, { extra, level: "debug" });
-	},
-	error: (e: unknown, extra?: Record<string, unknown>) => {
-		if (!hasSentry) return;
-		if (e instanceof BotError && e.level && e.level < 2) return;
-
-		Sentry.captureException(e, { extra, level: "error" });
-	},
-	fatal: (e: unknown, extra?: Record<string, unknown>) => {
-		if (!hasSentry) return;
-		if (e instanceof BotError && e.level && e.level < 2) return;
-
-		Sentry.captureException(e, { extra, level: "fatal" });
-	},
-	info: (e: unknown, extra: Record<string, unknown>) => {
-		if (!hasSentry) return;
-		if (e instanceof BotError && e.level && e.level < 2) return;
-
-		Sentry.captureException(e, { extra, level: "info" });
-	},
-	warn: (e: unknown, extra?: Record<string, unknown>) => {
-		if (!hasSentry) return;
-		if (e instanceof BotError && e.level && e.level < 2) return;
-
-		Sentry.captureException(e, { extra, level: "warning" });
-	},
-};
 
 export function consoleError(e: BotError | Error) {
 	if (e instanceof BotError) {

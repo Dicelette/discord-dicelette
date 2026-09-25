@@ -5,7 +5,6 @@ import {
 	humanizeDuration,
 	important,
 	logger,
-	sentry,
 	setupProcessErrorHandlers,
 } from "@dicelette/utils";
 import { client } from "client";
@@ -40,8 +39,7 @@ try {
 	event.onMemberJoin(client);
 	event.shardDebug(client);
 } catch (error) {
-	logger.fatal(error as Error);
-	sentry.fatal("Failed to register bot events", { error });
+	logger.fatal("Failed to register bot events", error as Error);
 }
 
 const app = express();
@@ -78,7 +76,6 @@ client
 		important.info("Bot started");
 	})
 	.catch((error) => {
-		console.error(error);
-		sentry.fatal("Failed to login bot", { error });
+		logger.fatal("Failed to login bot", error);
 		process.exit(1);
 	});

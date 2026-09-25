@@ -3,7 +3,7 @@ import {
 	getInteractionContext as getLangAndConfig,
 	macroOptions,
 } from "@dicelette/helpers";
-import { logger, sentry } from "@dicelette/utils";
+import { logger } from "@dicelette/utils";
 import { getMacro } from "database";
 import * as Djs from "discord.js";
 import { replyEphemeralError } from "messages";
@@ -52,14 +52,7 @@ export default {
 				optionChar
 			);
 		} catch (e) {
-			logger.fatal(e as Error);
-			const errorMessage = e instanceof Error ? e.message : String(e);
-			await replyEphemeralError(
-				interaction,
-				ul("error.generic.e", { e: errorMessage }),
-				ul
-			);
-			sentry.fatal(e, {
+			logger.fatal("macro-command", e, {
 				interaction: {
 					guildId: interaction.guild?.id,
 					id: interaction.id,
@@ -67,6 +60,12 @@ export default {
 					userId: interaction.user.id,
 				},
 			});
+			const errorMessage = e instanceof Error ? e.message : String(e);
+			await replyEphemeralError(
+				interaction,
+				ul("error.generic.e", { e: errorMessage }),
+				ul
+			);
 			return;
 		}
 	},

@@ -7,7 +7,7 @@ import {
 	BotErrorLevel,
 	type BotErrorOptions,
 	isRegexSafe,
-	sentry,
+	logger,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { reply } from "messages";
@@ -122,8 +122,7 @@ export async function stripOOC(
 			}
 		});
 	} catch (e) {
-		console.error("Error in stripOOC selection:", e);
-		sentry.error("Error in stripOOC selection", { error: e });
+		logger.error("Error in stripOOC selection", e);
 		await interaction.editReply({
 			components: [],
 			content: ul("config.stripOOC.timeOut"),
