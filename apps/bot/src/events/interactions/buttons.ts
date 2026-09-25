@@ -190,10 +190,7 @@ const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
 			const isModerator = interaction.guild?.members.cache
 				.get(interactionUser.id)
 				?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
-			/*
-				If the moderation want to validate the sheet before the user mark it as finished
-				we should return early
-		  */
+			// If a moderator tries to validate before the user marks the sheet finished, bail out early.
 			if (isModerator) {
 				await reply(interaction, {
 					content: ul("register.notFinished"),

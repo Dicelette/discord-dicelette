@@ -19,7 +19,6 @@ export async function chunkMessage(
 	if (appendText) lines.push(appendText);
 	const lineLinked = lines.join("\n");
 	if (lineLinked.length <= 2000) {
-		//send as normal message
 		await interaction.reply({
 			content: lineLinked,
 			flags: Djs.MessageFlags.Ephemeral,
@@ -27,7 +26,6 @@ export async function chunkMessage(
 		return;
 	}
 	if (lineLinked.length <= 4000) {
-		//send as component v2
 		const textDisplay = new Djs.TextDisplayBuilder().setContent(lineLinked);
 		await interaction.reply({
 			components: [textDisplay],
@@ -41,12 +39,10 @@ export async function chunkMessage(
 	for (let i = 0; i < lines.length; i += chunkSize) {
 		chunkedLines.push(lines.slice(i, i + chunkSize));
 	}
-	//send the first message
 	await interaction.reply({
 		content: chunkedLines[0].join("\n"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
-	//send the rest as follow ups
 	for (const chunk of chunkedLines.slice(1)) {
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
@@ -60,7 +56,6 @@ export async function chunkErrorMessage(
 	const maxLength = 4000;
 	const mindLength = 2000;
 	if (error.length <= mindLength) {
-		//send as normal message
 		await interaction.reply({
 			content: error,
 			flags: Djs.MessageFlags.Ephemeral,
@@ -68,7 +63,6 @@ export async function chunkErrorMessage(
 		return;
 	}
 	if (error.length <= maxLength) {
-		//send as component v2
 		const textDisplay = new Djs.TextDisplayBuilder().setContent(error);
 		await interaction.reply({
 			components: [textDisplay],
@@ -77,7 +71,6 @@ export async function chunkErrorMessage(
 		return;
 	}
 	const errorLines = error.split("\n");
-	//send the first message
 	await interaction.reply({
 		content: errorLines[0],
 		flags: Djs.MessageFlags.Ephemeral,
@@ -87,7 +80,6 @@ export async function chunkErrorMessage(
 	for (let i = 0; i < errorLines.length; i += chunkSize) {
 		chunkedLines.push(errorLines.slice(i, i + chunkSize));
 	}
-	//send the rest as follow ups
 	for (const chunk of chunkedLines.slice(1)) {
 		const text = chunk.join("\n");
 		await interaction.followUp({ content: text, flags: Djs.MessageFlags.Ephemeral });
@@ -166,10 +158,7 @@ function formatInvalidAttributeFormulaError(name?: string, value?: string) {
 	return `invalidAttributeFormula:${JSON.stringify({ name, value })}`;
 }
 
-/**
- * Single-pass builder
- * separates number attributes from formula attributes and pre-populates plain number values.
- */
+/** Single-pass split of attributes into number-only and formula-only maps. */
 function buildAttributeMaps(attributes: Record<string, number | string>) {
 	const numbersOnly: Record<string, number> = {};
 	const formulaOnly: Record<string, string> = {};
@@ -247,11 +236,9 @@ export function validateAttributeEntry(
 		const trimmed = value.trim();
 		if (!trimmed) return { error: JSON.stringify(value), ok: false };
 
-		// Validate formula using the same resolver as the dashboard
-		// Pass existing attributes as context to validate formulas against known attributes
+		// Validates the formula the same way the dashboard does, using existing attributes as context.
 		const hint = resolveFormulaHint(trimmed, existingAttributes ?? {});
 		if (hint.kind === "resolved") {
-			// Formula was successfully resolved using existing attributes
 			return { ok: true, value: trimmed };
 		}
 		if (hint.kind === "not-formula") {
@@ -267,15 +254,7 @@ export function validateAttributeEntry(
 	return { error: JSON.stringify(value), ok: false };
 }
 
-/**
- * Validates a snippet (dice formula) against resolved user attributes.
- * Automatically resolves formula-based attributes (e.g., "strength + 2") to numeric values.
- *
- * @param content - The dice formula string to validate
- * @param attributes - User attributes, can be plain numbers or formula strings
- * @param replaceUnknow - Optional fallback value for unknown attributes
- * @returns Validation result with the original content if valid
- */
+/** Validates a dice-formula snippet against resolved user attributes (formula attributes like "strength + 2" are auto-resolved). */
 export function validateSnippetEntry(
 	content: unknown,
 	attributes?: Record<string, number | string>,
@@ -421,7 +400,7 @@ export async function registerEntry<T>(
 	const store: Record<string, unknown> =
 		client.userSettings.get(guildId, userId)?.[type] ?? {};
 	if (store[name.standardize()]) {
-		//already in it, we should delete it before to add the new one, to avoid keeping the old one if the user change only the case for example
+		// Delete first so a case-only rename doesn't leave the old key behind.
 		delete store[name.standardize()];
 	}
 	store[name] = value as unknown;

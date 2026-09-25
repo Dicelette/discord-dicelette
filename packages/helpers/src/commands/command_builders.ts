@@ -2,9 +2,7 @@ import type * as Djs from "discord.js";
 import type { SlashCommandSubcommandBuilder } from "discord.js";
 // Type-only local augmentation comment: runtime augmentation lives in bot package.
 
-/**
- * Adds user + character options (display or edit mode)
- */
+/** Adds user + character options (display or edit mode). */
 export function charUserOptions(
 	buider: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 	type: "display" | "edit" = "display"
@@ -27,9 +25,7 @@ export function charUserOptions(
 	return buider;
 }
 
-/**
- * Adds common character, expression, threshold, opposition, comments options
- */
+/** Adds common character, expression, threshold, opposition, and comments options. */
 export function commonOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 	opts: Partial<{
@@ -85,9 +81,7 @@ export function commonOptions(
 	return builder;
 }
 
-/**
- * Macro builder options
- */
+/** Macro builder options. */
 export function macroOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 	character = true
@@ -121,9 +115,7 @@ export function macroOptions(
 	});
 }
 
-/**
- * dbRoll builder options
- */
+/** dbRoll builder options. */
 export function dbRollOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder
 ) {
@@ -142,9 +134,7 @@ export function dbRollOptions(
 	});
 }
 
-/**
- * Calculation builder options
- */
+/** Calculation builder options. */
 export function calcOptions(
 	builder: Djs.SlashCommandBuilder | Djs.SlashCommandSubcommandBuilder,
 	isCalc = true
@@ -187,9 +177,7 @@ export function calcOptions(
 	});
 }
 
-/**
- * GM common options (adds hidden + user option)
- */
+/** GM common options (adds hidden + user option). */
 export function gmCommonOptions(
 	builder: Djs.SlashCommandSubcommandBuilder,
 	type: "dbroll" | "macro" | "calc" | "roll"

@@ -102,9 +102,8 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		next();
 	});
 
-	// CSRF: reject state-changing requests originating from unexpected origins.
-	// Same-origin requests from the SPA always carry a matching Origin header.
-	// Non-browser clients (monitoring, server-to-server) typically omit Origin and are allowed through.
+	// CSRF: reject state-changing requests from unexpected origins. Same-origin SPA requests always carry a
+	// matching Origin header; non-browser clients (monitoring, server-to-server) typically omit it and are allowed.
 	const allowedOrigin = (() => {
 		try {
 			return new URL(FrontendUrl).origin;
@@ -151,12 +150,8 @@ export function startDashboardServer(deps: DashboardDeps): void {
 			cookieSecure
 		)
 	);
-	// Guild data routes: 300 req/min per user for reads, 30 req/min for writes (POST/PATCH/DELETE).
-	// The read limit is shared across every guild the user visits (keyed by userId, not
-	// guildId), and each guild switch fires a couple of reads (bootstrap + karma overview) —
-	// 300/min leaves room for fast browsing across many servers without tripping the limiter.
-	// Limiters are built once at startup — building them per-request would create a new bucket Map
-	// on every call, losing state and leaking memory.
+	// Guild routes: 300 req/min per user for reads, 30 req/min for writes — shared across every guild the user
+	// visits (keyed by userId), leaving room for fast browsing. Built once at startup to avoid leaking memory.
 	const guildReadLimit = makeRateLimit(300, 60_000);
 	const guildWriteLimit = makeRateLimit(30, 60_000);
 	app.use("/api/guilds", (req: Request, res: Response, next: NextFunction) => {
@@ -172,12 +167,8 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		);
 		app.use(express.static(distPath));
 
-		// Public share links (karma leaderboard/profile, character sheets) get
-		// per-page Open Graph/Twitter Card meta tags patched into index.html, so
-		// links unfurl with a real summary instead of the generic site card.
-		// "/karma/:guildId/leaderboard" is registered before the "/karma/:guildId/:userId"
-		// route so its literal "leaderboard" segment is tried first — otherwise the
-		// :userId route would shadow it.
+		// Public share links (karma leaderboard/profile, character sheets) get per-page Open Graph/Twitter Card
+		// meta tags patched into index.html. The literal "leaderboard" route is registered before ":userId" so it isn't shadowed.
 		const shareMetaLimit = makeRateLimit(60, 60_000);
 		const shareMetaRoute = (kind: Parameters<typeof createShareMetaHandler>[0]) =>
 			createShareMetaHandler(kind, deps, indexHtmlPath, FrontendUrl);
@@ -199,8 +190,7 @@ export function startDashboardServer(deps: DashboardDeps): void {
 		});
 	}
 
-	// Scanners routinely probe for path traversal using malformed/overlong percent-encoding
-	//prevent spam in log from these malformed requests
+	// Scanners probe with malformed percent-encoding; catch here to avoid spamming logs with URIErrors.
 	app.use((err: unknown, _req: Request, res: Response, next: NextFunction): void => {
 		if (err instanceof URIError) {
 			logger.debug(`[dashboard] Rejected malformed request URI: ${err.message}`);

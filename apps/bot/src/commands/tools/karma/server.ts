@@ -58,12 +58,7 @@ function serverStatsEmbed(
 		.setTimestamp();
 }
 
-/**
- * Display the average stats for the server
- * @param interaction The interaction that triggered the command
- * @param client The bot client
- * @param ul The translation function
- */
+/** Displays average karma stats for the server. */
 export async function server(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,

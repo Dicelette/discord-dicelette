@@ -24,16 +24,8 @@ export type CSVRow = {
 	[key: string]: string | number | undefined | boolean | null;
 };
 
-/**
- * Parses CSV data containing user statistics and character information for a Discord guild.
- *
- * Accepts either a remote CSV file URL or raw CSV text, validates headers and required fields based on the provided guild template, and returns structured user data. Supports localization and can report errors via a Discord interaction if provided.
- *
- * @returns A promise resolving to structured user data grouped by user ID.
- *
- * @throws {InvalidCsvContent} If the CSV content is empty or missing.
- * @throws {Error} If required headers are missing or the CSV cannot be parsed.
- */
+/** Parses CSV data (URL or raw text) into structured user data for a guild, validating headers/required fields
+ * against the guild template; can report errors via a Discord interaction. */
 export async function parseCSV(
 	url: string,
 	guildTemplate: StatisticalTemplate,
@@ -52,7 +44,6 @@ export async function parseCSV(
 	const ul = ln(lang);
 	header.push("dice");
 	header = header.map((key) => key.standardize());
-	//papaparse can't be used in Node, we need first to create a readable stream
 
 	const csvText = url.startsWith("https://") ? await readCSV(url) : url;
 	if (!csvText || csvText.length === 0) throw new InvalidCsvContent("url");
@@ -60,15 +51,13 @@ export async function parseCSV(
 	let error: string | undefined;
 	let csvData: CSVRow[] = [];
 	Papa.parse(csvText.replaceAll(/\s+;\s*/gi, ";"), {
-		//in case the file was wrongly parsed, we need to trim the space before and after the key
-
 		async complete(results) {
 			if (!results.data) {
 				logger.warn("Error while parsing CSV", results.errors);
 				error = "Error while parsing CSV";
 				return;
 			}
-			//throw error if missing header (it shouldn't not throw if a header is added)
+			// Missing header check — an extra header being present is fine.
 			const dataHeader = results.meta.fields?.map((key) => key.standardize());
 			if (!dataHeader) {
 				logger.warn("Error while parsing CSV, missing header");
@@ -79,7 +68,6 @@ export async function parseCSV(
 				error = "Missing header";
 				return;
 			}
-			//throw error only if missing values for the header
 			const missingHeader = header
 				.filter((key) => !dataHeader.includes(key))
 				.filter((key) => key !== "dice" && key !== "avatar" && key !== "channel");
@@ -106,11 +94,7 @@ export async function parseCSV(
 	return await step(csvData, guildTemplate, interaction, allowPrivate, lang);
 }
 
-/**
- * Read the distant CSV file
- * @param url {string} The URL of the CSV file
- * @returns {Promise<string>}
- */
+/** Reads a remote CSV file's contents. */
 async function readCSV(url: string): Promise<string> {
 	if (process.env.NODE_ENV === "development" && process.env.PROXY_DISCORD_CDN)
 		url = url.replace("https://cdn.discordapp.com", process.env.PROXY_DISCORD_CDN);
@@ -120,13 +104,8 @@ async function readCSV(url: string): Promise<string> {
 	return response.text();
 }
 
-/**
- * Processes parsed CSV rows into structured user data grouped by user ID, validating character names and required statistics according to the guild template.
- *
- * @returns An object containing `members`, a mapping of user IDs to arrays of user data, and `errors`, an array of error messages encountered during processing.
- *
- * @remark Replies to the provided Discord interaction with error messages for missing users, character names, duplicate character names, or missing statistics.
- */
+/** Processes parsed CSV rows into user data grouped by user ID, validating character names and required stats.
+ * Replies to the interaction (if given) with errors for missing users/names/duplicates/stats. */
 async function step(
 	csv: CSVRow[],
 	guildTemplate: StatisticalTemplate,

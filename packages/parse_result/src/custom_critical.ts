@@ -23,9 +23,7 @@ const botErrorOptions: BotErrorOptions = {
 	level: BotErrorLevel.Warning,
 };
 
-/**
- * A function that turn `(N) Name SIGN VALUE` into the custom critical object as `{[name]: CustomCritical}`
- */
+/** Turns `(N) Name SIGN VALUE` into a custom critical object: `{[name]: CustomCritical}`. */
 export function parseCustomCritical(
 	name: string,
 	customCritical: string
@@ -141,16 +139,8 @@ export function mergeCustomCriticals(
 	return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
-/**
- * - Filters and processes custom critical conditions that affect skills.
- * - If a critical's value does not contain a dollar sign and no {@link dollarsValue} is provided, it is included as-is.
- * - Otherwise, if {@link dollarsValue} is provided, the critical's value is updated using {@link generateStatsDice} and rolled with {@link rollOneCustomCritical}.
- * @param customCritical - The set of custom critical conditions to filter and process.
- * @param statistics - Optional statistics used for dice expression generation.
- * @param dollarsValue - Optional value used to substitute into dice expressions containing a dollar sign.
- * @param sort
- * @returns A a record of custom criticals with the `affectSkill` flag set to true, or `undefined` if none match.
- */
+/** Filters custom criticals that affect skills: kept as-is if their value has no `$` and no `dollarsValue` is
+ * given, otherwise substituted via `generateStatsDice` and rolled. */
 export function skillCustomCritical(
 	customCritical?: Record<string, CustomCritical>,
 	statistics?: Record<string, number>,
@@ -176,12 +166,7 @@ export function skillCustomCritical(
 	return customCriticalFiltered;
 }
 
-/**
- * Dice can have the {cs:value} and/or {fs:value} to indicate a custom critical or a failure success. It overrides the template critical.
- * @param dice {string} the dice to parse
- * @param ul
- * @return {success?: number, failure?: number}
- */
+/** Parses `{cs:value}`/`{cf:value}` in a dice string into custom criticals, overriding the template's. */
 export function getCriticalFromDice(
 	dice: string,
 	ul: Translation

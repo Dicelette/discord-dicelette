@@ -4,12 +4,7 @@ import type { Count, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { gaugeEmoji, percentage } from "./utils";
 
-/**
- * Shows a user's success and failure counts for the current guild
- * @param interaction - The command interaction used to read options and edit the deferred reply
- * @param client - The bot client instance that stores user counts
- * @param ul - Localization function for generating translated messages
- */
+/** Shows a user's success/failure counts for the current guild. */
 export async function bilan(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,
@@ -39,14 +34,7 @@ export async function bilan(
 	});
 }
 
-/**
- * Build a component-based bilan (stat summary) display for a member's luck meter.
- * @param count - The user's counts (expects `success`, `failure`, `criticalSuccess`, `criticalFailure`, optional `consecutive` and `longestStreak` objects).
- * @param ul - Translation helper used to localize titles and labels.
- * @param member - Guild member whose avatar and mention are shown.
- * @param guild - Guild used to resolve the member's avatar URL.
- * @returns An array containing a single `ContainerBuilder` configured with thumbnail, localized text sections, separators, and a final total line representing the member's bilan.
- */
+/** Builds the component-based bilan (stat summary) display for a member's luck meter. */
 async function generateComponentsForBilan(
 	count: Count,
 	ul: Translation,

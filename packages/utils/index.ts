@@ -15,13 +15,8 @@ export * from "./src/regex";
 
 export const random = new Random(getEngine("nodeCrypto"));
 
-/**
- * filter the choices by removing the accents and check if it includes the removedAccents focused
- * @param choices {string[]}
- * @param focused {string}
- */
+/** Filters choices to those matching `focused`, accent-insensitive. */
 export function filterChoices(choices: string[], focused: string) {
-	//remove duplicate from choices, without using set
 	const values = uniqueValues(choices).filter((choice) =>
 		choice.subText(focused.removeAccents())
 	);
@@ -106,9 +101,7 @@ export function fontPath(fontName: string) {
 	return path.resolve(`assets/fonts/${fontName}.ttf`).replace("dist/", "");
 }
 
-/**
- * Run async tasks over `items` with at most `limit` in-flight at once.
- */
+/** Runs async tasks over `items` with at most `limit` in-flight at once. */
 export async function mapConcurrent<T, R>(
 	items: readonly T[],
 	limit: number,

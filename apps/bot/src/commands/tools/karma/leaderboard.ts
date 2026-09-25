@@ -72,12 +72,7 @@ function componentServerStats(
 		.addTextDisplayComponents(component);
 }
 
-/**
- * Display the leaderboard for the specified option or all options if none is specified
- * @param interaction The interaction that triggered the command
- * @param client The bot client
- * @param ul The translation function
- */
+/** Displays the leaderboard for the given option, or all options if none specified. */
 export async function leaderboard(
 	interaction: Djs.ChatInputCommandInteraction,
 	client: EClient,

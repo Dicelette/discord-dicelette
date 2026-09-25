@@ -8,10 +8,7 @@ const DEFAULT_COUNT: Count = {
 	total: 0,
 };
 
-/**
- * Fill in the missing (optional) fields of a `Count` with their defaults
- * Also recompute `total` from `success` + `failure`.
- */
+/** Fills in missing `Count` fields with defaults and recomputes `total`. */
 export function mergeCountDefaults(count?: Partial<Count>): Count {
 	const merged: Count = { ...DEFAULT_COUNT, ...count };
 	merged.total = merged.success + merged.failure;
@@ -26,10 +23,7 @@ export function averageValue(total: number, count: number) {
 	return count === 0 ? "0.00" : (total / count).toFixed(2);
 }
 
-/**
- * Aggregate every user's karma counts for a guild into server-wide totals.
- * Users with no roll at all are excluded from `usersWithCounts`/`rollTotal`.
- */
+/** Aggregates every user's karma counts into server-wide totals; users with no rolls are excluded. */
 export function calculateServerStats(guildCount: DBCount) {
 	const totalCount: Count = {
 		criticalFailure: 0,
@@ -58,9 +52,7 @@ export function calculateServerStats(guildCount: DBCount) {
 	return { rollTotal, totalCount, usersWithCounts };
 }
 
-/**
- * Compute the average-per-user and server-wide percentage for each roll
- */
+/** Computes the average-per-user and server-wide percentage for each roll type. */
 export function serverStats(
 	totalCount: Count,
 	rollTotal: number,
@@ -85,10 +77,7 @@ export function serverStats(
 const SUCCESS_STREAK_EMOJI = ["😎", "🔥", "🐐"];
 const FAILURE_STREAK_EMOJI = ["😔", "💔", "💀"];
 
-/**
- * Buckets a consecutive-streak length into the 3 tiers
- * 0 means no active streak (value ≤ 1).
- */
+/** Buckets a streak length into 3 tiers; 0 means no active streak (value ≤ 1). */
 export function streakTier(value: number): 0 | 1 | 2 | 3 {
 	if (value <= 1) return 0;
 	if (value <= 5) return 1;
@@ -96,13 +85,7 @@ export function streakTier(value: number): 0 | 1 | 2 | 3 {
 	return 3;
 }
 
-/**
- * Selects an emoji representing a consecutive success or failure streak.
- *
- * @param type - "success" to choose from success emojis, "failure" to choose from failure emojis
- * @param value - The consecutive-streak length
- * @returns An emoji chosen by `type` and `value`
- */
+/** Emoji representing a consecutive success/failure streak, scaled by streak length. */
 export function gaugeEmoji(type: "success" | "failure", value: number) {
 	const tier = streakTier(value);
 	if (tier === 0) return "";
@@ -125,10 +108,7 @@ export const ALL_KARMA_OPTIONS: KarmaOption[] = [
 	"criticalFailure",
 ];
 
-/**
- * Rank karma entries by a given option, either by raw count or by a ratio
- * Entries with a zero value for `option` are dropped
- */
+/** Ranks karma entries by raw count or ratio for the given option; zero-value entries are dropped. */
 export function sortKarmaEntries<T extends Count>(
 	entries: T[],
 	option: KarmaOption,

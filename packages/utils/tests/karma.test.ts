@@ -137,9 +137,8 @@ describe("sortKarmaEntries", () => {
 	});
 
 	it("ranks by each entry's own ratio, not the raw count", () => {
-		// bob: 3/10 = 30% success, alice: 9/10 = 90% success — alice still wins either way,
-		// so use failure to show ratio flips the raw-count order (bob has more raw failures
-		// but alice has the higher failure *ratio* relative to... use a case where they diverge).
+		// dan: 9 failures (90%), eve: 10 failures (10% of a larger total) — raw count ranks eve
+		// first, but ratio mode flips the order to dan first.
 		const skewed: Entry[] = [
 			{ userId: "dan", success: 1, failure: 9, criticalSuccess: 0, criticalFailure: 0 }, // 90% failure
 			{

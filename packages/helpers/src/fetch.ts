@@ -84,7 +84,7 @@ export async function reuploadAvatar(
 			cause: "FETCH_AVATAR",
 			level: BotErrorLevel.Warning,
 		});
-	//we have only a link so we need to fetch the attachment again
+	// Only a link was given; fetch it and re-wrap it as an attachment.
 	const fetched = await fetch(avatar.url);
 	const newAttachment = new Djs.AttachmentBuilder(
 		Buffer.from(await fetched.arrayBuffer()),
@@ -94,10 +94,7 @@ export async function reuploadAvatar(
 	return { name, newAttachment };
 }
 
-/**
- * Resolve avatar for CSV import: prefer input avatar, fallback to member/user avatar if CDN is stale,
- * optionally reupload Discord CDN URLs to attachments.
- */
+/** Resolves avatar for CSV import: prefers the input avatar, falls back to member/user avatar if stale, optionally reuploads Discord CDN URLs. */
 export async function resolveCsvImportAvatar(params: {
 	avatar?: string | null;
 	guild: Guild;

@@ -48,15 +48,7 @@ export async function reply(
 	}
 }
 
-/**
- * Convenient wrapper to reply with an error embed in ephemeral mode.
- * Use this when you need to show an error message that only the user can see.
- *
- * @param interaction - Command or modal interaction to reply to
- * @param errorText - Error message to display
- * @param ul - Translation function
- * @param cause - Optional additional context/cause string
- */
+/** Replies with an ephemeral error embed. */
 export async function replyEphemeralError(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
 	errorText: string,
@@ -69,13 +61,7 @@ export async function replyEphemeralError(
 	});
 }
 
-/**
- * Deletes a given message after a specified time delay.
- * If the time delay is zero, the function exits immediately.
- * Uses setTimeout to schedule the deletion and handles any errors silently.
- * @param message - An instance of InteractionResponse or Message that needs to be deleted.
- * @param time - A number representing the delay in milliseconds before the message is deleted.
- */
+/** Deletes a message after `time` ms (no-op if zero); errors are handled silently. */
 export async function deleteAfter(
 	message: Djs.InteractionResponse | Djs.Message,
 	time: number

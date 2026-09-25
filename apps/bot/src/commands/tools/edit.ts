@@ -150,16 +150,7 @@ export const editAvatar = {
 	},
 };
 
-/**
- * Updates a character's avatar image in the associated embed message.
- * @param options - The command interaction options containing the new avatar URL.
- * @param interaction - The Discord command interaction context.
- * @param ul - The translation function for localized responses.
- * @param user - The user associated with the character, or null.
- * @param charName - The name of the character, if provided.
- * @param sheetLocation - Identifiers for the character's message and location.
- * @param thread - The Discord channel thread containing the character's message.
- */
+/** Updates a character's avatar image in its embed message. */
 async function avatar(
 	options: Djs.CommandInteractionOptionResolver,
 	interaction: Djs.CommandInteraction,
@@ -242,18 +233,7 @@ async function generateButton(
 	await message.edit({ components: [buttons, select], embeds: embedsList, files });
 }
 
-/**
- * Renames a character in the associated embed message and updates the database and client cache.
- * @param name - The new name for the character.
- * @param interaction - The Discord interaction triggering the rename.
- * @param ul - Localization function for translations.
- * @param user - The user associated with the character, or null to use the interaction user.
- * @param client - The Discord bot client instance.
- * @param sheetLocation - Identifiers for the character's message and location.
- * @param oldData - Previous character data, including the old name and message ID.
- * @param thread - The Discord channel (thread) containing the character message.
- * @throws {Error} If the embed or character field is not found in the message.
- */
+/** Renames a character in its embed message, updating the database and client cache. */
 export async function rename(
 	name: string | null,
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -350,22 +330,8 @@ export async function rename(
 	});
 }
 
-/**
- * Changes the user associated with a character and updates all related data.
- *
- * Updates the character embed in the Discord message to mention the new user, moves the character data in the database from the old user to the new user, registers the new user, deletes the old user data from guild settings, updates message buttons, and replies with a localized success or error message.
- *
- * @param newUser - The user to associate with the character.
- * @param interaction - The Discord interaction triggering the change.
- * @param ul - Localization function for translations.
- * @param user - The previous user associated with the character, or null.
- * @param client - The Discord bot client instance.
- * @param sheetLocation - Identifiers for the character's message and location.
- * @param oldData - Data about the character and previous association.
- * @param thread - The Discord channel containing the character message.
- *
- * @throws {Error} If the character embed or user field is not found in the message.
- */
+/** Changes a character's owner: updates the embed mention, moves the character data between users in the DB,
+ * registers the new user, deletes old data, refreshes buttons, and replies with success/error. */
 export async function changeOwner(
 	newUser: Djs.User,
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,

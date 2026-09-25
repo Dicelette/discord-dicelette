@@ -65,14 +65,8 @@ export class TravelFeature extends BaseFeature {
 		await interaction.showModal(modal);
 	}
 
-	/**
-	 * Validates the modal submission and moves the character sheet to the selected channel.
-	 *
-	 * - Reconstructs the embeds and buttons from the original message,
-	 * - sends them to the target channel,
-	 * - updates the database with the new location,
-	 * - deletes the old message.
-	 */
+	/** Validates the modal and moves the sheet to the selected channel: rebuilds embeds/buttons, sends them there,
+	 * updates the database, and deletes the old message. */
 	async validate(): Promise<undefined | Djs.Message | Djs.InteractionResponse> {
 		const interaction = this.interaction as Djs.ModalSubmitInteraction;
 		if (!interaction.message || !interaction.channel || !interaction.guild) return;

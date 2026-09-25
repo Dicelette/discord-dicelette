@@ -72,11 +72,7 @@ const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
 	return this.setDescription(t(key as any)).setDescriptionLocalizations(cmdLn(key));
 };
 
-/**
- * Generic helper to apply setNames and setDescriptions methods to multiple prototypes.
- *
- * @param prototypes Array of constructor prototypes to extend
- */
+/** Applies setNames/setDescriptions to multiple Discord.js builder prototypes. */
 function applyLocalizationMethods(prototypes: (object | undefined)[]) {
 	for (const prototype of prototypes) {
 		if (prototype) {
@@ -88,7 +84,6 @@ function applyLocalizationMethods(prototypes: (object | undefined)[]) {
 	}
 }
 
-// Apply localization methods to all Discord.js builders and options
 applyLocalizationMethods([
 	// Command builders
 	Djs.SlashCommandBuilder.prototype,

@@ -3,12 +3,8 @@ import type { EClient } from "@dicelette/client";
 import type { SortOrder } from "@dicelette/core";
 import type { GuildData, UserSettingsData } from "@dicelette/types";
 
-/**
- * Cached guild context to avoid repeated settings lookups.
- * Contains frequently accessed guild data with pre-computed values.
- */
+/** Cached guild context, pre-computed to avoid repeated settings lookups. */
 export interface GuildContext {
-	/** Guild settings including template and user data */
 	settings: GuildData;
 	/** Pre-standardized damage names for faster autocomplete */
 	standardizedDamageNames?: string[];
@@ -16,24 +12,12 @@ export interface GuildContext {
 	standardizedStatsNames?: string[];
 	/** Pre-standardized excluded stat names for faster checks */
 	standardizedExcludedStats?: string[];
-	/** Template ID data */
 	templateID?: GuildData["templateID"];
 	sortOrder?: SortOrder;
 	disableCompare?: boolean;
 }
 
-/**
- * Get comprehensive guild context with pre-computed values for optimal performance.
- * Caches standardized arrays to avoid repeated map operations in autocomplete and validation.
- * Use ctx.standardizedDamageNames instead of damageNames.map(x => x.standardize())
- * @param client - Discord client with settings
- * @param guildId - Guild ID to fetch context for
- * @returns Guild context with cached values or undefined if guild not found
- *
- * @example
- * const ctx = getGuildContext(client, interaction.guild!.id);
- * if (!ctx?.templateID) return;
- */
+/** Guild context with cached values (e.g. `ctx.standardizedDamageNames` instead of re-mapping each time), or undefined if the guild isn't found. */
 export function getGuildContext(
 	client: EClient,
 	guildId: string
@@ -53,14 +37,7 @@ export function getGuildContext(
 	};
 }
 
-/**
- * Get user snippets for a specific guild and user.
- *
- * @param client - Discord client with user settings
- * @param guildId - Guild ID
- * @param userId - User ID
- * @returns User snippets object or empty object if not found
- */
+/** Gets a user's snippets for a guild (empty object if none). */
 export function getUserSnippets(
 	client: EClient,
 	guildId: string,
@@ -73,14 +50,7 @@ export function standardizeEquals(a: string, b: string): boolean {
 	return a.standardize() === b.standardize();
 }
 
-/**
- * Resolves the active custom formula for a roll.
- * Guild-level formula takes priority over the user-level formula.
- *
- * @param guildData - Guild settings (may be undefined/null)
- * @param userSettings - Per-user settings (may be undefined/null)
- * @returns The formula string to apply, or undefined if neither is set
- */
+/** Resolves the active custom formula; guild-level takes priority over user-level. */
 export function resolveCustomFormula(
 	guildData?: GuildData | null,
 	userSettings?: UserSettingsData | null

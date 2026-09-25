@@ -24,7 +24,6 @@ export async function haveAccess(
 ): Promise<boolean> {
 	if (!user) return false;
 	if (user === interaction.user.id) return true;
-	//verify if the user have access to the channel/thread, like reading the channel
 	const member = interaction.member as Djs.GuildMember;
 	return (
 		member.permissions.has(Djs.PermissionFlagsBits.ManageRoles) ||
@@ -60,13 +59,11 @@ export async function addAutoRole(
 				}
 			);
 
-		//fetch roles in parallel
 		const [diceRole, statsRole] = await Promise.all([
 			fetchDiceRole(diceEmbed, interaction.guild!, autoRole.dice),
 			fetchStatsRole(statsEmbed, interaction.guild!, autoRole.stats),
 		]);
 
-		// add roles in parallel
 		const rolePromises: Promise<Djs.GuildMember>[] = [];
 		if (diceEmbed && diceRole) rolePromises.push(guildMember.roles.add(diceRole));
 		if (statsEmbed && statsRole) rolePromises.push(guildMember.roles.add(statsRole));
@@ -74,7 +71,7 @@ export async function addAutoRole(
 		if (rolePromises.length > 0) await Promise.all(rolePromises);
 	} catch (e) {
 		logger.warn("Error while adding role", e);
-		//delete the role from database so it will be skip next time
+		// Delete the misconfigured role so it's skipped next time.
 		db.delete(interaction.guild!.id, "autoRole");
 		const dbLogs = db.get(interaction.guild!.id, "logs");
 		const errorMessage = `\`\`\`\n${(e as Error).message}\n\`\`\``;
@@ -84,7 +81,7 @@ export async function addAutoRole(
 				await logs.send(errorMessage);
 			}
 		} else {
-			//Dm the server owner because it's pretty important to know
+			// DM the server owner; this is important enough to surface directly.
 			const owner = await interaction.guild!.fetchOwner();
 			await owner.send(errorMessage);
 		}

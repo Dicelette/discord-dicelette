@@ -4,13 +4,7 @@ import type { Options } from "./types";
 
 export { averageValue, gaugeEmoji, percentage, serverStats };
 
-/**
- * Return the localized title corresponding to the given option.
- *
- * @param option - The option key to localize
- * @param ul - Translation helper that maps localization keys to strings
- * @returns The localized title for `option`
- */
+/** Localized title for a karma option (success/failure/critical/total). */
 export function getTitle(option: Options, ul: Translation) {
 	const titles: Record<Options, string> = {
 		criticalFailure: ul("roll.critical.failure"),

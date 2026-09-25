@@ -141,13 +141,7 @@ export function getEmbeds(
 	}
 }
 
-/**
- * Create the userEmbed and embedding the avatar user in the thumbnail
- * @param ul {Translation}
- * @param thumbnail {string} The avatar of the user in the server (use server profile first, after global avatar)
- * @param user
- * @param charName
- */
+/** Creates the user embed with the avatar thumbnail (server profile avatar first, then global). */
 export function createUserEmbed(
 	ul: Translation,
 	thumbnail: string | null,

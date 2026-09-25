@@ -5,12 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const KARMA_LOAD_DEBOUNCE_MS = 150;
 
-/**
- * Loads a guild's karma overview (server stats, leaderboard rows, "me").
- * `reload()` resolves to whether it succeeded. Pass `enabled: false` to skip
- * the automatic load (e.g. while neither karma tab has been opened yet) —
- * `reload()` still works regardless, for an explicit fetch-on-tab-switch.
- */
+/** Loads a guild's karma overview (server stats, leaderboard, "me"); `reload()` resolves to success and works
+ * even with `enabled: false` (which just skips the automatic load, e.g. before a karma tab opens). */
 export function useKarmaOverview(guildId: string, enabled = true) {
 	const { t } = useI18n();
 	const tRef = useRef(t);

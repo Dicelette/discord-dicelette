@@ -186,10 +186,8 @@ export default function Playground() {
 		[t]
 	);
 
-	// Roll-affecting inputs (including statistics) are snapshotted here only when
-	// "Roll" is pressed, so typing in the dice/formula fields or editing a stat
-	// value never triggers a fresh (random) roll on its own.
-	// Lazy-init from the restored options so the result matches on first load.
+	// Roll-affecting inputs are snapshotted here only when "Roll" is pressed, so typing in the dice/formula
+	// fields or editing a stat never triggers a fresh roll on its own. Lazy-init to match the restored options.
 	const [rollInput, setRollInput] = useState(() => ({
 		expression,
 		customFormula,
@@ -233,15 +231,13 @@ export default function Playground() {
 							error: "error" in valid ? String(valid.error) : "",
 						}),
 					};
-				// Free-text mode has no "expression" option to feed getExpression, so
-				// `{exp}`/`{exp||X}` macros (e.g. inside a custom-formula `[...]` bracket)
-				// can only fall back to their default value here.
+				// Free-text mode has no "expression" option, so `{exp}`/`{exp||X}` macros (e.g. inside a
+				// custom-formula `[...]` bracket) can only fall back to their default value here.
 				content = getExpression(content, "0").dice;
 				content = applyCustomFormula(content, formula);
 			}
-			// User statistics referenced in the dice via `$name`. Passing them lets the
-			// engine substitute the value (e.g. `1d20+$force` → `1d20+3`) like the bot.
-			// Snapshotted, so editing a stat value only applies on the next roll.
+			// User statistics referenced via `$name`, substituted like the bot (e.g. `1d20+$force` → `1d20+3`);
+			// snapshotted, so editing a stat value only applies on the next roll.
 			const { stats, statsName } = buildStats(rollInput.statistics);
 			const userData = statsName.length ? { stats, template: {} } : undefined;
 			const isRoll = isRolling(

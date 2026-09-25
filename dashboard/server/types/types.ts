@@ -1,6 +1,4 @@
-// ---------------------------------------------------------------------------
-// Types, interfaces and shared constants for /guilds routes
-// ---------------------------------------------------------------------------
+// Types, interfaces and shared constants for /guilds routes.
 
 import type { StatisticalTemplate } from "@dicelette/core";
 import type {
@@ -42,13 +40,9 @@ export interface ApiCharacter {
 	damage: EmbedField[] | null;
 	/** Only present in admin server-wide character list */
 	userId?: string;
-	/** Owner's display name (globalName, or the raw username if unset)
-	 * Only present in admin server-wide character list
-	 */
+	/** Owner's display name (globalName, or the raw username if unset); admin server-wide list only */
 	ownerName?: string;
-	/** Owner's Discord handle, formatted as @username
-	 * Only present in admin server-wide character list
-	 */
+	/** Owner's Discord handle, formatted as @username; admin server-wide list only */
 	ownerUsername?: string;
 }
 
@@ -88,9 +82,7 @@ export interface ResolvedMemberName {
 export interface BotGuild {
 	/** Discord display name of the guild */
 	readonly name: string;
-	/** Discord icon hash (not the full URL)
-	 * `null` when the guild has no icon
-	 */
+	/** Discord icon hash (not the full URL); `null` when the guild has no icon */
 	readonly icon: string | null;
 	/** Fetch a guild member; checks Discord.js cache first, falls back to API if needed */
 	fetchMember: (userId: string) => Promise<BotMember | null>;
@@ -128,11 +120,8 @@ export interface BotChannels {
 	deleteMessage: (channelId: string, messageId: string) => Promise<boolean>;
 	/** Send a plain-text message to a channel; returns true if sent */
 	sendMessage: (channelId: string, content: string) => Promise<boolean>;
-	/**
-	 * Post the template message (embed + template.json attachment + register button) and pin it.
-	 * If publicChannel is not provided and the channel supports threads, a default thread is created automatically
-	 * its id is returned as publicChannelId.
-	 */
+	/** Posts the template message (embed + template.json + register button) and pins it. If `publicChannel` is
+	 * omitted and the channel supports threads, a default thread is created and returned as `publicChannelId`. */
 	sendTemplate: (
 		channelId: string,
 		template: StatisticalTemplate,
@@ -140,19 +129,13 @@ export interface BotChannels {
 		publicChannel?: string,
 		privateChannel?: string
 	) => Promise<{ messageId: string; publicChannelId?: string } | null>;
-	/**
-	 * Import characters from CSV text, posting real Discord messages with embeds.
-	 * Optionally deletes the previous message on reimport.
-	 */
+	/** Imports characters from CSV text, posting real Discord messages with embeds; optionally deletes the previous message on reimport. */
 	bulkImportCharacters: (
 		guildId: string,
 		csvText: string,
 		deleteOldMessages: boolean
 	) => Promise<{ success: number; failed: number; errors: string[] }>;
-	/**
-	 * Export characters to CSV buffer. Fetches all character data, builds CSV with proper backtick cleaning.
-	 * Same logic as /export bot command.
-	 */
+	/** Exports characters to a CSV buffer, same logic as the `/export` bot command. */
 	exportCharactersCsv: (guildId: string, isPrivate?: boolean) => Promise<Buffer | null>;
 }
 

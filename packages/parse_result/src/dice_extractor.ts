@@ -35,16 +35,12 @@ import {
 } from "./comment_utils";
 import { extractOpposition, trimAll } from "./utils";
 
-/**
- * Matches a `{{...}}` formula block.
- * Used to neutralize formula blocks before opposition detection
- * Prevent mistake between an opposition comparated when the block still contains unresolved `$stats`
- */
+/** Matches a `{{...}}` formula block, to neutralize it before opposition detection (so a comparator inside an
+ * unresolved `$stat` isn't mistaken for an opposition). */
 export const FORMULA_BLOCK_PATTERN = new RegExp(FORMULA_BLOCK_SOURCE, "g");
 
 export function extractDiceData(content: string): DiceData {
-	//exclude if the content is between codeblocks
-
+	// Strip the %%...%% info marker before matching.
 	const bracketRoll = content
 		.replace(/%%.*%%/, "")
 		.match(DICE_PATTERNS.BRACKET_ROLL)?.[1];
@@ -99,16 +95,7 @@ export function processChainedComments(
 	};
 }
 
-/**
- * Execute a cleaned dice roll from given content or an explicit bracketed roll and return the roll result.
- *
- * @param content - Original message content containing a dice expression and optional comment markers
- * @param bracketRoll - Optional explicit bracketed dice expression to prioritize over `content`
- * @param infoRoll - Optional metadata about the roll (e.g., resolved stat name) to include in the result
- * @param pity - Optional flag passed to the underlying roll engine to alter roll behavior
- * @param sort
- * @returns An object with `resultat` containing the roll result (if the roll ran) and optional `infoRoll`, or `undefined` when the content is invalid or an error occurred
- */
+/** Rolls a cleaned dice expression from `content` or an explicit `bracketRoll`, returning the result and optional info/stat metadata. */
 export function performDiceRoll(
 	content: string,
 	bracketRoll: string | undefined,
@@ -153,20 +140,6 @@ export function applyCommentsToResult(
 	return result;
 }
 
-/**
- * Process a chained dice expression (supports shared segments and stat substitutions) and execute the resulting roll.
- * Replaces stat tokens using the provided user stats, cleans global comments and opposition clauses, executes the roll (honoring the optional `pity` flag),
- * Attaches comment/info metadata when appropriate.
- * @param content - The raw dice expression to process (may include chained segments, global comments, opposition, and stat tokens)
- * @param userData - Optional user data containing `stats` to substitute into the formula
- * @param statsName - Optional list of original stat names used to preserve casing when building `infoRoll` and `statsPerSegment`
- * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
- * @param disableCompare - Encapsulate the roll with `{}`
- * @param sort - Sort the result passed to roll
- * @param ul
- * @param replaceUnknown
- * @returns An object with `resultat` (the roll result), optional `infoRoll` (primary stat used for the roll), and optional `statsPerSegment` (per-segment stat names) when the roll succeeds, or `undefined` if the roll could not be performed
- */
 /** Evaluate `total <sign> value` for the disable-compare success count. */
 function compareTotal(total: number, sign: string, value: number): boolean {
 	switch (sign) {
@@ -185,11 +158,8 @@ function compareTotal(total: number, sign: string, value: number): boolean {
 	}
 }
 
-/**
- * Collapse a compared roll into a 0/1 success count for `disableCompare`.
- * Re-inject the comparator into the dice label (so the threshold stays visible) and drop the comparison.
- * Shared rolls are left untouched.
- */
+/** Collapses a compared roll into a 0/1 success count for `disableCompare`, keeping the comparator visible
+ * in the dice label. Shared rolls are left untouched. */
 function collapseCompareToCount(result?: Resultat): void {
 	if (!result?.compare || result.total === undefined || result.result.includes(";"))
 		return;
@@ -200,9 +170,8 @@ function collapseCompareToCount(result?: Resultat): void {
 	let updated = result.result
 		.replace(/^([^:]*?)(\s*:)/, `$1${sign}${value}$2`)
 		.replace(/=\s*-?\d+(?:\.\d+)?\s*$/, `= ${count}`);
-	// Mirror pool behaviour: mark each die that individually passes the threshold.
-	// The total may pass via a modifier even when no individual die does, so we
-	// compare die values rather than `count`.
+	// Mirrors pool behavior: marks each die that individually passes the threshold (the total can pass via
+	// a modifier even when no die does, so we compare die values, not `count`).
 	updated = updated.replace(
 		/\[([^\]]+)\]/g,
 		(_m, inner) =>
@@ -222,6 +191,7 @@ function collapseCompareToCount(result?: Resultat): void {
 	result.compare = undefined;
 }
 
+/** Processes a chained dice expression (shared segments, stat substitution), cleans comments/opposition, and executes the roll. */
 export function processChainedDiceRoll(
 	content: string,
 	userData?: UserData,
@@ -232,7 +202,6 @@ export function processChainedDiceRoll(
 	ul?: Translation,
 	replaceUnknown?: string
 ): { resultat: Resultat; infoRoll?: string; statsPerSegment?: string[] } | undefined {
-	// Process stats replacement if userData is available
 	let processedContent = content;
 	let infoRoll: string | undefined;
 	let statsPerSegment: string[] | undefined;
@@ -259,12 +228,13 @@ export function processChainedDiceRoll(
 		.replace(/%%.*%%/, "")
 		.trim();
 
-	// getComments() falls back to a bare trailing-text heuristic (DETECT_DICE_MESSAGE) when no "#"-marked comment is found.
-	// GLOBAL_COMMENTS above only strips "#"-marked comments, so that bare text (e.g. "4#1d100<=55 cacax") would otherwise still be attached to finalContent and reach the dice parser, which rejects it as invalid syntax.
+	// getComments() falls back to a bare-text heuristic when no "#" comment is found; GLOBAL_COMMENTS above only
+	// strips "#"-marked comments, so leftover bare text (e.g. "4#1d100<=55 cacax") must be stripped here too.
 	if (globalComments && finalContent.includes(globalComments))
 		finalContent = finalContent.replace(globalComments, "").trim();
 
-	// Evaluate {{...}} formula blocks before opposition detection so that comparison operators inside the formula (e.g. {{($>=0?$:0)}}) are not mistaken for a second opposition comparator.
+	// Evaluates {{...}} formula blocks before opposition detection, so a comparator inside a formula isn't
+	// mistaken for a second opposition comparator.
 	finalContent = preRollDiceInBrackets(finalContent);
 	finalContent = replaceFormulaInDice(finalContent);
 
@@ -279,8 +249,7 @@ export function processChainedDiceRoll(
 		if (!rollResult) return undefined;
 		if (disableCompare) collapseCompareToCount(rollResult);
 		rollResult.dice = cleaned;
-		// For chained rolls with & and ;, only add comment if it's a true # comment
-		// (not the bracketed formula parts)
+		// For chained rolls (& and ;), only attach the comment if it's a real "#" comment, not bracketed formula text.
 		const isChainedRoll = content.includes("&") && content.includes(";");
 		const hasHashComment = content.includes("#");
 		if (globalComments && (!isChainedRoll || hasHashComment))
@@ -292,14 +261,8 @@ export function processChainedDiceRoll(
 	}
 }
 
-/**
- * - Pre-rolls any dice notation found inside `{{...}}` formula blocks
- * - Strips any `{cs:...}` / `{cf:...}` blocks from the inner formula
- * - evaluates the numeric expression inside each block,
- * -  reattaches the simplified blocks to the numeric result.
- *
- * @example `{{(90)>=85?69{cs:<=5+((90)-85)}:(90)}}` -> `69{cs:<=10}`.
- */
+/** Pre-rolls dice notation inside `{{...}}` formula blocks, strips `{cs:...}`/`{cf:...}`, evaluates the numeric
+ * expression, and reattaches the critical blocks. @example `{{(90)>=85?69{cs:<=5+((90)-85)}:(90)}}` → `69{cs:<=10}`. */
 function preRollDiceInBrackets(content: string): string {
 	if (!content.includes("{{")) return content;
 	return content.replace(
@@ -339,8 +302,7 @@ function preRollDiceInBrackets(content: string): string {
 					const result = replaceFormulaInDice(`{{${cleanedInner}}}`);
 					return `${result}${criticalBlocks.join("")}`;
 				} catch {
-					// Formula evaluation failed;
-					// return with cs/cf stripped so replaceFormulaInDice can still try to evaluate the formula.
+					// Formula evaluation failed; return with cs/cf stripped so replaceFormulaInDice can still try.
 					if (!cleanedInner.includes("$"))
 						logger.info(`Failed to evaluate pre-rolled inner formula: ${cleanedInner}`);
 
@@ -353,19 +315,7 @@ function preRollDiceInBrackets(content: string): string {
 	);
 }
 
-/**
- * Determine whether a message contains a dice roll and, if so, extract, process (including stat substitution and chained/shared syntax), and execute the roll.
- *
- * @param content - The raw message or formula to analyze for dice expressions
- * @param userData - Optional user data containing stats used to substitute stat tokens in formulas
- * @param statsName - Optional list of original stat names used to preserve original casing in info roll metadata
- * @param pity - Optional flag passed to the underlying roll implementation to modify roll behavior
- * @param disableCompare - If true, encapsulate the roll in `{}` to disable success/failure comparison
- * @param sort - Optional sort order for the roll results
- * @param ul
- * @param replaceUnknown
- * @returns `DiceExtractionResult` when a valid roll is detected and executed, `undefined` otherwise
- */
+/** Detects a dice roll in a message and, if found, extracts, processes (stat substitution, chained/shared syntax), and executes it. */
 export function isRolling(
 	content: string,
 	userData?: UserData,
@@ -376,13 +326,10 @@ export function isRolling(
 	ul?: Translation,
 	replaceUnknown?: string
 ): DiceExtractionResult | undefined {
-	// Process stats replacement if userData is available
 	let processedContent: string;
 
-	// Evaluate {{...}} formula blocks before any opposition/comment detection so that
-	// comparison operators inside the formula (e.g. {{$>=85?85:$}}) are not mistaken
-	// for dice opposition syntax or comment markers.
-	// Pre-roll dice inside {{...}} so the math evaluator doesn't choke on dice notation.
+	// Evaluates {{...}} formula blocks before opposition/comment detection (so a comparator inside a formula
+	// isn't mistaken for dice syntax), and pre-rolls dice notation inside {{...}} so the math evaluator doesn't choke on it.
 	content = preRollDiceInBrackets(content);
 	try {
 		content = replaceFormulaInDice(content);
@@ -390,7 +337,7 @@ export function isRolling(
 		// If formula evaluation fails, proceed with the original content unchanged.
 	}
 
-	// Preserve original content before any modifications for processChainedDiceRoll
+	// Preserved for processChainedDiceRoll, before further modification.
 	const originalContent = content;
 	const evaluated = DICE_COMPILED_PATTERNS.TARGET_VALUE.exec(content);
 	if (!evaluated) {
@@ -422,7 +369,7 @@ export function isRolling(
 	if (userData?.stats) {
 		const bracketMatch = content.match(DICE_PATTERNS.BRACKET_ROLL);
 		const isDiceTarget = !!bracketMatch && /\b\d*d\d+\b/i.test(bracketMatch[1]);
-		//allow to preserve comments in brackets and only apply to stats/formula
+		// Preserves comments in brackets; only stats/formula get substituted.
 		const isStatTarget = !!bracketMatch && isFormulaExpression(bracketMatch[1]);
 		if (bracketMatch?.index !== undefined && (isDiceTarget || isStatTarget)) {
 			const inner = replaceStatsInDiceFormula(
@@ -537,14 +484,7 @@ export function isRolling(
 	return undefined;
 }
 
-/**
- * Execute a shared roll expression (semicolon-separated) and attach any top-level global comment.
- *
- * @param dice - The shared dice expression, possibly containing a global comment group and multiple segments separated by `;`.
- * @param pity - If `true`, enable pity mode for the underlying roll which may alter roll behavior.
- * @param sort
- * @returns The roll result with `dice` set to the cleaned expression and `comment` set to the extracted main comment, or `undefined` if the roll failed.
- */
+/** Executes a shared roll (semicolon-separated) and attaches any top-level global comment. */
 function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
 	const { dice: cleanDice, comment } = splitGlobalComment(dice);
 	const rollDice = roll(cleanDice, undefined, pity, sort, comment);
@@ -553,26 +493,14 @@ function getRollInShared(dice: string, pity?: boolean, sort?: SortOrder) {
 	return rollDice;
 }
 
-/**
- * Detects whether a dice expression represents a shared roll (multiple segments separated by semicolons) after stripping inline comment markers.
- *
- * @param dice - The dice expression to inspect
- * @returns `true` if the cleaned expression contains a semicolon, `false` otherwise
- */
+/** True if a dice expression has multiple `;`-separated segments (after stripping inline comment markers). */
 function isSharedRoll(dice: string): boolean {
 	// Remove comment to avoid false positive on ";" in comment text
 	const { dice: cleanedDice } = splitGlobalComment(dice);
 	return maskBracketComments(cleanedDice).includes(";");
 }
 
-/**
- * Obtain a roll result for a dice expression, handling shared rolls and inline comments.
- *
- * @param dice - Dice expression to evaluate; may contain inline comment markers or shared-segment syntax.
- * @param pity - Optional flag forwarded to the rolling engine that alters roll behavior.
- * @param sort
- * @returns The computed Resultat with the comment set and adjusted dice string, or `undefined` if the expression is invalid or rolling failed.
- */
+/** Gets a roll result for a dice expression, handling shared rolls and inline comments. */
 export function getRoll(
 	dice: string,
 	pity?: boolean,
@@ -584,18 +512,12 @@ export function getRoll(
 	return roll(cleanDice, undefined, pity, sort, comment);
 }
 
-/**
- * A fresh instance per use: `STAT_MATCHER` is global, and `matchAll` starts from the
- * shared instance's `lastIndex` — a stale offset silently skips the leading `$stat` of
- * the formula, which then reaches the dice parser unresolved.
- */
+/** Fresh instance per use: `STAT_MATCHER` is global, and `matchAll` continues from its shared `lastIndex` —
+ * a stale offset silently skips the formula's leading `$stat`, which then reaches the dice parser unresolved. */
 const statMatcher = () => new RegExp(REMOVER_PATTERN.STAT_MATCHER.source, "giu");
 
-/**
- * Replaces stat variables like $force, $dexterity in dice formulas (excluding comments)
- * Supports partial matching: $sag will match "sagesse", $dex will match "dexterite"
- * For shared rolls (with ;), returns statsPerSegment to track which stat applies to each segment
- */
+/** Replaces stat variables like `$force`/`$dexterity` in dice formulas, excluding comments (partial matching:
+ * `$sag` matches "sagesse"). For shared rolls (with `;`), also returns `statsPerSegment` per segment. */
 export function replaceStatsInDiceFormula(
 	content: string,
 	stats?: Record<string, number>,
@@ -606,18 +528,13 @@ export function replaceStatsInDiceFormula(
 	replaceUnknow?: string
 ): { formula: string; infoRoll?: string; statsPerSegment?: string[] } {
 	if (!stats) return { formula: verifyStatMatcherPattern(content, replaceUnknow) };
-	//remove secondary opposition
-
 	let comments = bareComment(content);
 	let diceFormula = content;
 	const statsFounds: string[] = [];
 	if (comments) diceFormula = diceFormula.replace(comments, "").trim() ?? "";
 	else comments = "";
 
-	// Pre-process stats for better performance
 	const normalizedStats = normalizeStatsMap(stats);
-
-	// Check if this is a shared roll (contains ;)
 	const isSharedRoll = diceFormula.includes(";");
 
 	// For shared rolls, process each segment separately to track stats per segment
@@ -625,9 +542,8 @@ export function replaceStatsInDiceFormula(
 	const statsPerSegment: string[] = [];
 
 	if (isSharedRoll) {
-		// Split by ; using lookahead/lookbehind to preserve the delimiter
-		// (?=;) matches position before ;, (?<=;) matches position after ;
-		// This results in [segment1, ";", segment2, ";", ...] after filtering empty strings
+		// Splits on ';' using lookahead/lookbehind so the delimiter survives as its own segment
+		// (yields [segment1, ";", segment2, ...] once empty strings are filtered).
 		const segments = diceFormula.split(/(?=;)|(?<=;)/).filter((s) => s.length > 0);
 		const processedSegments: string[] = [];
 
@@ -676,7 +592,6 @@ export function replaceStatsInDiceFormula(
 				const uniqueSegmentStats = Array.from(new Set(segmentStats));
 				let statForSegment = "";
 				if (uniqueSegmentStats.length > 0) {
-					// If statsName is provided, try to restore original casing
 					statForSegment = statsName
 						? unNormalizeStatsName(uniqueSegmentStats, statsName).join(" × ")
 						: uniqueSegmentStats.map((s) => s.capitalize()).join(" × ");
@@ -707,9 +622,8 @@ export function replaceStatsInDiceFormula(
 			if (foundStat) {
 				const [original, statValue] = foundStat;
 				statsFounds.push(original.capitalize());
-				// Preserve a dangling paren only when the regex consumed it on one side only.
-				// `($var)` → both parens consumed → drop them (just the value).
-				// `($s1` or `$s2)` → one paren consumed → keep it so `1d($s1+$s2)` → `1d(X+Y)`.
+				// Keep a dangling paren only when the regex consumed just one side: `($var)` (both sides)
+				// drops them, but `($s1` or `$s2)` (one side) keeps it so `1d($s1+$s2)` → `1d(X+Y)`.
 				const prefix = fullMatch.startsWith("(") && !fullMatch.endsWith(")") ? "(" : "";
 				const suffix = fullMatch.endsWith(")") && !fullMatch.startsWith("(") ? ")" : "";
 				processedFormula = processedFormula.replace(
@@ -756,12 +670,10 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	const normalizedStats = normalizedMap(statsName);
 	for (const stat of stats) {
 		const standardized = stat.standardize();
-		// First, try exact match
 		const exactMatch = normalizedStats.get(standardized);
 		if (exactMatch) {
 			unNormalized.push(exactMatch.capitalize());
 		} else {
-			// If no exact match, try fuzzy match
 			const found = findBestStatMatch<string>(
 				standardized,
 				normalizedStats,
@@ -774,9 +686,7 @@ export function unNormalizeStatsName(stats: string[], statsName: string[]): stri
 	return unNormalized;
 }
 
-/**
- * Build an infoRoll object from found stats, restoring original accents using statsName list.
- */
+/** Builds an infoRoll object from found stats, restoring original accents using statsName. */
 export function buildInfoRollFromStats(
 	statsFound: string[] | undefined,
 	statsName?: string[]
@@ -791,10 +701,7 @@ export function buildInfoRollFromStats(
 	return { name, standardized: name.standardize() };
 }
 
-/**
- * Builds a lookup map from normalized stat names to [originalName, value] tuples.
- * Avoid rebuilding the map inline.
- */
+/** Builds a lookup map from normalized stat names to [originalName, value] tuples (avoids rebuilding it inline). */
 export function normalizeStatsMap(
 	stats: Record<string, number>
 ): Map<string, [string, number]> {
@@ -822,7 +729,6 @@ export function findStatInDiceFormula(
 	const text = diceFormula.standardize();
 	const tokens = text.match(/\p{L}[\p{L}0-9_.]*/gu) || [];
 
-	// Prepare the map of normalized stats -> original
 	const normalizedStats = normalizedMap(statsToFind);
 
 	for (const token of tokens) {
@@ -833,11 +739,8 @@ export function findStatInDiceFormula(
 	return unique.length > 0 ? unique : undefined;
 }
 
-/**
- * Returns true if the content of a `[...]` bracket should be treated as a custom formula invocation rather than an inline comment.
- * Rule: contains a `$` stat reference, or is a pure math expression (digits + operators).
- * Allow also dice notation
- */
+/** True if a `[...]` bracket's content is a custom formula invocation rather than a comment: contains a `$`
+ * stat reference, is a pure math expression, or is dice notation. */
 function isFormulaExpression(expr: string): boolean {
 	const trimmed = expr.trim();
 	if (trimmed.includes("$")) return true;
@@ -869,21 +772,8 @@ function dropUnreachableCriticals(formula: string): string {
 	);
 }
 
-/**
- * - Replaces `[expr]` markers in a dice string with the custom formula, injecting `(expr)`
- * - Drop not reached `{cs:…}`/`{cf:…}` block
- * - `[expr]` is only treated as a formula invocation when the expression contains `$`, maath or dice character
- * @example Above the cap : Block aplied
- * formula = "$>=85?85{cs:>=5+($-85)}:$"
- * applyCustomFormula("1d100<=[90]", formula) → "1d100<={{(90)>=85?85{cs:>=5+((90)-85)}:(90)}}"
- * (above the cap: the block applies)
- * @example Block dropped (below the cap)
- * applyCustomFormula("1d100<=[50]", formula) → "1d100<={{(50)>=85?85:(50)}}"
- * @example Stat unresolved
- * applyCustomFormula("1d100<=[$dex+$str]", formula) → "1d100<={{($dex+$str)>=85?85{cs:>=5+(($dex+$str)-85)}:($dex+$str)}}"
- * @example Comment left intact
- * applyCustomFormula("1d20 [attack roll]", formula) → "1d20 [attack roll]"
- */
+/** Replaces `[expr]` markers with the custom formula (injecting `(expr)`), dropping unreached `{cs:…}`/`{cf:…}`
+ * blocks; `[expr]` only counts as a formula when it contains `$`, math, or dice notation. */
 export function applyCustomFormula(dice: string, formula: string): string {
 	return dice.replace(/\[([^\]]+)\]/g, (match, expr: string) => {
 		if (!isFormulaExpression(expr)) return match;

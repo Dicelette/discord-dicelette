@@ -229,11 +229,8 @@ function injectMeta(
 	return out;
 }
 
-/**
- * Express handler for one public share route
- * patches `index.html`'s meta tags with per-guild/per-character data when it can
- * otherwise calls `next()` so the generic SPA catch-all serves the plain shell.
- */
+/** Express handler for one public share route: patches `index.html`'s meta tags with per-guild/per-character
+ * data when possible, else calls `next()` so the SPA catch-all serves the plain shell. */
 export function createShareMetaHandler(
 	kind: ShareRouteKind,
 	deps: DashboardDeps,

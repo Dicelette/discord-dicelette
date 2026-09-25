@@ -5,11 +5,7 @@ import { ROLL_MENTION_PATTERN } from "@dicelette/utils";
 import type * as Djs from "discord.js";
 import { clearCacheKey, createCacheKey } from "../commands";
 
-/**
- * Extracts counts of critical and regular successes and failures from a Discord message's content.
- * @param message - The Discord message to parse for roll outcome lines (Djs.Message or Djs.PartialMessage).
- * @returns A Count object with `criticalFailure`, `criticalSuccess`, `failure`, and `success` fields representing the number of occurrences found in the message content.
- */
+/** Counts critical/regular successes and failures from a Discord message's content. */
 function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 	const count: Count = {
 		criticalFailure: 0,
@@ -50,12 +46,7 @@ function getTypeFroMessage(message: Djs.Message | Djs.PartialMessage): Count {
 	return count;
 }
 
-/**
- * Extracts the author user ID from a Discord message, if present.
- *
- * @param message - The message to inspect for an author identifier
- * @returns The extracted user ID if found, `undefined` otherwise
- */
+/** Extracts the author's user ID from a Discord message, if present. */
 export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | undefined {
 	if (message.interactionMetadata?.user && !message.content)
 		return message.interactionMetadata.user.id;
@@ -63,15 +54,7 @@ export function getAuthor(message: Djs.Message | Djs.PartialMessage): string | u
 	return ROLL_MENTION_PATTERN.exec(message.content)?.groups?.id;
 }
 
-/**
- * Update a user's cumulative counts for a guild by adding the provided message counts and adjusting consecutive and longest streaks.
- *
- * @param criticalCount - Store managing per-guild/per-user counts
- * @param userId - ID of the user to update
- * @param guildId - ID of the guild where the counts apply
- * @param messageCount - Counts extracted from a single message to add
- * @param isTrivial - When true, preserve existing consecutive and longestStreak values (do not modify streaks)
- */
+/** Adds a message's counts to a user's cumulative guild counts, updating consecutive/longest streaks (unless `isTrivial`). */
 export function addCount(
 	criticalCount: CriticalCount,
 	userId: string,
@@ -128,15 +111,7 @@ export function addCount(
 	criticalCount.set(guildId, newCount, userId);
 }
 
-/**
- * - Subtracts a message's counts from a user's stored counts for a guild and adjust the user cumulative fields by substracting the messagecount
- * -update the stored values unless `isTrivial` is true
- * @param criticalCount - The per-guild/per-user counts store to update.
- * @param userId - The user identifier whose counts will be decreased.
- * @param guildId - The guild identifier where the counts are stored.
- * @param messageCount - The counts to subtract from the stored totals.
- * @param isTrivial - When true, preserve existing `consecutive` values and do not adjust streak logic.
- */
+/** Subtracts a message's counts from a user's cumulative guild counts, adjusting consecutive streaks (unless `isTrivial`). */
 function removeCount(
 	criticalCount: CriticalCount,
 	userId: string,
@@ -145,13 +120,13 @@ function removeCount(
 	isTrivial = false
 ) {
 	const existingCount = criticalCount.get(guildId, userId);
-	if (!existingCount) return; //we can't remove what doesn't exist
+	if (!existingCount) return; // Nothing stored yet, nothing to remove.
 
 	const consecutive = existingCount.consecutive ?? { failure: 0, success: 0 };
 	const newConsecutive = isTrivial
 		? consecutive
 		: {
-				// We remove only if we are in the consecutive serie
+				// Only decrement while still inside the active streak.
 				failure:
 					consecutive.failure > 0
 						? Math.max(0, consecutive.failure - messageCount.failure)
@@ -180,19 +155,8 @@ function removeCount(
 	criticalCount.set(guildId, newCount, userId);
 }
 
-/**
- * Compute outcome counts from a message and update the per-guild user critical counts store.
- *
- * Determines the author for the message, computes the count of successes/failures (including criticals),
- * checks the guild's "pity" setting and a per-user trivial-roll cache to decide whether the update is trivial,
- * and then either adds to or removes from the provided CriticalCount store.
- *
- * @param message - The Discord message to analyze for roll outcomes
- * @param criticalCount - The per-guild/per-user counts store to update
- * @param guildId - The guild identifier where the message originated
- * @param client - The bot client (used to read settings and the trivial-roll cache)
- * @param type - Whether to add the computed counts to the store or remove them (`"add"` or `"remove"`)
- */
+/** Computes success/failure counts from a message and updates the guild's critical-count store, treating the
+ * roll as trivial if it's cached as such (per the guild's pity setting). */
 export function saveCount(
 	message: Djs.Message | Djs.PartialMessage,
 	criticalCount: CriticalCount,
@@ -204,15 +168,13 @@ export function saveCount(
 	let userId = getAuthor(message);
 	if (!userId) return;
 
-	//verify that the user is not a bot
+	// Fall back to the bot's own ID if the author can't be resolved from cache.
 	const author = message.client.users.cache.get(userId);
 	if (!author) userId = message.client.user?.id ?? "0";
 	const pity = client.settings.get(guildId, "pity");
 	let isTrivial = false;
-	//only check the cache if pity is enabled
 	if (pity) {
-		// Check if this roll has a trivial comparison
-		// Check both the current minute's cache key and the previous minute's key to handle edge cases around minute boundaries.
+		// Checks both the current and previous minute's cache key, to handle edge cases around minute boundaries.
 		const { cacheKey, prevCacheKey } = createCacheKey(message, userId);
 		const trivialCache = client.trivialCache;
 		isTrivial = trivialCache.has(cacheKey) || trivialCache.has(prevCacheKey);

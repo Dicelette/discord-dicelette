@@ -101,11 +101,8 @@ async function syncThreadCopy(
 		await warnCopyNotSynced(guild.id, rollAuthorId, client, ul);
 }
 
-/**
- * Allow to edit or add a comment to a dice
- * Works from a reply stating with the {@link COMMENT_EDIT_PREFIX}
- * only work for own roll (fetch the @<ID> to check that)
- */
+/** Edits or adds a comment on a dice roll from a reply starting with {@link COMMENT_EDIT_PREFIX}; only works on
+ * the replier's own roll (checked via the @mention). */
 export async function handleCommentEditReply(
 	message: Djs.Message,
 	client: EClient,

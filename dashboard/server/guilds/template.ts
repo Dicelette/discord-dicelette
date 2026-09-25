@@ -115,7 +115,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 			? privateChannelId || undefined
 			: current?.privateChannel;
 
-		// Poste (ou reposte) le message template sur Discord
+		// Posts (or re-posts) the template message to Discord.
 		let newMessageId: string | undefined;
 		if (channelId) {
 			const oldMessageId = current?.templateID?.messageId;
@@ -183,7 +183,7 @@ export function createTemplateRouter(deps: DashboardDeps) {
 		res.json({ ok: true });
 	});
 
-	// DELETE /:guildId/template — supprime le template statistique (admin uniquement)
+	// DELETE /:guildId/template — deletes the statistical template (admin only)
 	router.delete("/", requireAuth, requireAdmin, async (req: Request, res: Response) => {
 		const guildId = req.params.guildId as string;
 

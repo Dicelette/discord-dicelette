@@ -121,7 +121,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 			});
 			return await resetButton(message, this.ul);
 		}
-		//update the characters in the database characters
+		// Updates the character records for both users.
 		const allCharsNewUser =
 			this.client.characters.get(interaction.guild.id, user.id) || [];
 		const allCharsOldUser = this.client.characters.get(interaction.guild.id, oldUserId);

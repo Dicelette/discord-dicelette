@@ -227,13 +227,7 @@ async function fetchAllCharacter(client: EClient, guild: Djs.Guild) {
 	});
 }
 
-/**
- * - Periodically evicts character cache entries that haven't been refreshed within `maxAge` ms.
- * - Evicted entries are re-fetched from Discord on next access (to prevent losing informations)
- * @param client - The bot client holding the caches.
- * @param maxAge - Maximum age of a cache entry in ms before eviction (default: 24 h).
- * @param interval - How often to run the cleanup in ms (default: 1 h).
- */
+/** Periodically evicts character cache entries older than `maxAge`; evicted entries are re-fetched on next access. */
 function startCacheCleanup(
 	client: EClient,
 	maxAge = 24 * 60 * 60 * 1000,

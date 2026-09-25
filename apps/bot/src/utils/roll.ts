@@ -43,15 +43,7 @@ import { embedError, handleRollResult, reply } from "messages";
 import { triggerPity } from "../commands";
 import { findBestMatchingDice } from "./find_macro";
 
-/**
- * Create and execute a dice roll from a command interaction and present its result according to provided options.
- *
- * @param interaction - The originating command interaction
- * @param dice - The dice expression or template string to roll
- * @param client - The bot client and services used to resolve templates, settings, and state
- * @param opts - Roll presentation and calculation options (e.g., user, charName, infoRoll, critical, customCritical, opposition, hideResult, silent, statsPerSegment)
- * @returns The value returned by the roll result handler when the roll is presented, `undefined` otherwise
- */
+/** Creates and executes a dice roll from a command interaction, presenting the result per `opts`. */
 export async function rollWithInteraction(
 	interaction: Djs.CommandInteraction,
 	dice: string,
@@ -225,9 +217,6 @@ export async function rollMacro(
 	);
 	dice = expr.dice;
 	const expressionStr = expr.expressionStr;
-	//dice = generateStatsDice(dice, userStatistique.stats, dollarValue?.total);
-	//if (threshold)
-	//	threshold = generateStatsDice(threshold, userStatistique.stats, dollarValue?.total);
 	const rCC = getCriticalFromDice(dice, ul);
 	// Unified dice composition (critical removal, threshold application, comparator extraction)
 	const composed = composeRollBase(
@@ -392,9 +381,6 @@ export async function rollStatistique(
 		expressionStr,
 		comments
 	);
-	//dice = composed.diceWithoutComparator;
-	//const rawComparator = composed.rawComparator;
-	//const diceEvaluated = replaceFormulaInDice(dice);
 	const opposition = oppositionVal
 		? parseOpposition(
 				oppositionVal,

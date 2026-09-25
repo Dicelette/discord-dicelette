@@ -11,7 +11,6 @@ export function deleteUser(
 	user?: Djs.User | null,
 	charName?: string | null
 ) {
-	//delete the character from the database
 	const userCharIndex = guildData.user[user?.id ?? interaction.user.id].findIndex(
 		(char) => {
 			return char.charName?.standardize() === charName?.standardize();
@@ -58,13 +57,7 @@ export function deleteByMessageIds(
 	}
 }
 
-/**
- * - Removes user character data and guild settings associated with a specific channel or thread.
- * - Cleans up user character entries linked to the given channel or thread and deletes related guild configuration keys if they reference the channel.
- * @param {EClient} client
- * @param {string} guildID - The ID of the guild where the channel or thread exists.
- * @param {Djs.NonThreadGuildBasedChannel | Djs.AnyThreadChannel} channel - The channel or thread being deleted or cleaned up.
- */
+/** Removes user character data and guild settings referencing a deleted channel/thread. */
 export async function deleteIfChannelOrThread(
 	client: EClient,
 	guildID: string,
@@ -96,8 +89,7 @@ function cleanUserDB(
 	const dbUser = guildDB.get(thread.guild.id, "user");
 	if (!dbUser) return;
 	if (!thread.isTextBased()) return;
-	/** if private channel was deleted, delete only the private charactersheet */
-
+	// If a private channel was deleted, only that character's sheet is removed here.
 	for (const [user, data] of Object.entries(dbUser)) {
 		const filterChar = data.filter((char) => {
 			return char.messageId[1] !== thread.id;

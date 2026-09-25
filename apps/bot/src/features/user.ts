@@ -69,7 +69,6 @@ export class UserFeature extends BaseFeature {
 			.setCustomId("firstPage")
 			.setTitle(this.ul("modals.firstPage", { page: nbOfPages }));
 
-		//create a new Label builder component with a text input for the character name
 		const charNameInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("common.charName"))
 			.setTextInputComponent((text) =>
@@ -81,7 +80,6 @@ export class UserFeature extends BaseFeature {
 					.setStyle(Djs.TextInputStyle.Short)
 			);
 
-		//we will use the new LabelBuilder component to create a label with a user select for the user!
 		const userIdInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("common.user"))
 			.setUserSelectMenuComponent((user) =>
@@ -93,7 +91,6 @@ export class UserFeature extends BaseFeature {
 					.setMaxValues(1)
 			);
 
-		//we will use the new LabelBuilder component to create a label with a text input for the avatar!
 		const avatarInputs: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("modals.avatar.name"))
 			.setDescription(this.ul("modals.avatar.file.description"))
@@ -101,7 +98,6 @@ export class UserFeature extends BaseFeature {
 				file.setCustomId("avatarFile").setRequired(false).setMaxValues(1)
 			);
 
-		//we will use the new LabelBuilder component to create a label with a channel select for the channel!
 		const channelIdInput: Djs.LabelBuilder = new Djs.LabelBuilder()
 			.setLabel(this.ul("modals.channel.name"))
 			.setDescription(this.ul("modals.channel.description"))
@@ -244,7 +240,7 @@ export class UserFeature extends BaseFeature {
 		);
 		const isPrivate =
 			privateChannel && moderator // Allow private channel only if the user is a moderator
-				? interaction.fields.getCheckbox("private") //interaction.fields.getTextInputValue("private")?.toLowerCase() === "x"
+				? interaction.fields.getCheckbox("private")
 				: false;
 		const avatar = interaction.fields.getUploadedFiles("avatarFile")?.first();
 		const files = [];
@@ -311,7 +307,6 @@ export class UserFeature extends BaseFeature {
 			embed.addFields({ inline: true, name: "_ _", value: "_ _" });
 		}
 
-		//add continue button
 		if (template.statistics) {
 			await Messages.reply(interaction, {
 				components: [continueCancelButtons(this.ul)],
@@ -435,7 +430,6 @@ export class UserFeature extends BaseFeature {
 				true
 			);
 		else {
-			//send a message in system channel if any
 			const systemChannel = interaction.guild?.safetyAlertsChannel;
 			if (systemChannel?.isSendable()) {
 				await systemChannel.send({
@@ -446,7 +440,6 @@ export class UserFeature extends BaseFeature {
 					}),
 				});
 			} else {
-				//send a DM to the owner
 				const owner = await interaction.guild?.fetchOwner();
 				if (owner) {
 					try {

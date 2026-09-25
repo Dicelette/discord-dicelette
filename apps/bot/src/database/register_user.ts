@@ -24,10 +24,7 @@ export function setDefaultManagerId(
 	guildData.set(guild.id, channel, "managerId");
 }
 
-/**
- * Register an user in the database
- * @returns
- */
+/** Registers a user in the database. */
 export async function registerUser(
 	userData: UserRegistration,
 	interaction: Djs.BaseInteraction,
@@ -84,11 +81,8 @@ export async function registerUser(
 						`Failed to delete or find old message from ${charName} (${char.messageId.join("/")})`,
 						error
 					);
-					//logger.warn(error);
-					//skip unknown message
 				}
 			}
-			//overwrite the message id
 			char.messageId = msgId;
 			if (damage) char.damageName = damage;
 			enmap.set(interaction.guild.id, char, `user.${userID}.${charIndex}`);

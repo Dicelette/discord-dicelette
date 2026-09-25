@@ -9,9 +9,7 @@ export interface DiceExtractionResult {
 	statsPerSegment?: string[];
 }
 
-/**
- * Comments chained in shared dice roll. (`1d20;&+5[comments for roll] comments global`
- */
+/** Comments chained in a shared dice roll, e.g. `1d20;&+5[comments for roll] comments global`. */
 export interface ChainedComments {
 	content: string;
 	comments: string | undefined;

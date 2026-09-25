@@ -1,10 +1,6 @@
 import { createContext, useContext } from "react";
 
-/**
- * Provides a single `useMediaQuery` result for the xl breakpoint (1536 px)
- * to all button children, avoiding N individual media-query listeners per row.
- * true  → narrow viewport, show text buttons
- * false → wide viewport, show icon buttons
- */
+/** Single `useMediaQuery` result for the xl breakpoint (1536px), shared with all button children instead of N
+ * separate listeners. `true` = narrow (text buttons), `false` = wide (icon buttons). */
 export const CompactContext = createContext(false);
 export const useCompact = () => useContext(CompactContext);

@@ -74,12 +74,7 @@ function setTrivialCacheEntry(client: EClient, cacheKey: string): void {
 	client.trivialCacheTimeouts.set(cacheKey, timeoutId);
 }
 
-/**
- * Orchestrates sending a dice roll result to the appropriate destination (direct reply, channel reply, or threaded message) and handles caching, logging links, and cleanup timers.
- *
- * @param opts - Options describing the roll result, source (Message or CommandInteraction), visibility settings, caching/logging settings, and related metadata
- * @returns The message or interaction response sent to the user, or `undefined` if no reply was produced
- */
+/** Sends a roll result to the right destination (direct reply, channel reply, or thread), handling caching, log links, and cleanup timers. */
 export async function handleRollResult(
 	opts: RollHandlerOptions
 ): Promise<Djs.Message | Djs.InteractionResponse | undefined> {
@@ -180,7 +175,6 @@ export async function handleRollResult(
 	const useContext = client.settings.get(guild.id, "context");
 	let messageId = source instanceof Djs.Message ? source.id : "";
 
-	// Find message before for context if needed
 	if (deleteInput && useContext && source instanceof Djs.Message) {
 		const messageBefore = await findMessageBefore(
 			channel as DiscordTextChannel,
@@ -265,26 +259,8 @@ export async function handleRollResult(
 	return reply;
 }
 
-/**
- * Sends the rendered roll result to the originating Message or CommandInteraction, handling large-content fallback, ephemeral responses, and optional log forwarding.
- *
- * If `resultAsText.resultat.pityLogs` exists and `source.guild` + `settings` are provided, a pity log message is forwarded to the guild logs.
- *
- * Behavior details:
- * - If rendered content length is > 2000 and <= 4000 characters, the content is sent as a Components-v2 text display.
- * - If rendered content length is > 4000 characters, the first line is kept as the message summary and the remaining content is attached as a file named `roll_result.md`. Compiled comment blocks (matching COMPILED_COMMENTS) are appended to the summary when present.
- * - For Message sources, `deleteInput = true` sends a new message to the channel; otherwise the function replies to the original message.
- * - For CommandInteraction sources, `hideResult = true` marks the response ephemeral.
- *
- * @param source - The original Message or CommandInteraction to reply to
- * @param resultAsText - Prepared result renderer that produces the message content and may include pity log data
- * @param authorId - The ID of the roll's author (used when rendering the message)
- * @param idMessage - Optional context message id passed to the renderer
- * @param deleteInput - When true and `source` is a Message, send a new message instead of replying to the original input
- * @param hideResult - When true and `source` is a CommandInteraction, mark the reply ephemeral
- * @param settings - Optional guild settings used when forwarding pity logs
- * @returns The sent Message for message-based replies, or the interaction reply result for interaction-based replies
- */
+/** Sends the rendered roll result to the source (Message or CommandInteraction): components-v2 for 2-4k chars,
+ * a file attachment + summary line above 4k, ephemeral if `hideResult`, or a new message if `deleteInput`. */
 async function replyToSource(
 	source: Djs.Message | Djs.CommandInteraction,
 	resultAsText: ResultAsText,
@@ -316,9 +292,7 @@ async function replyToSource(
 		flags.push(Djs.MessageFlags.IsComponentsV2);
 		replyOptions.flags = [Djs.MessageFlags.IsComponentsV2];
 	} else if (content.length > 4000) {
-		//we should keep the first line as a summary in the message
 		replyOptions.content = content.split("\n")[0];
-		//and after remove it from content and send as a file
 		let newContent = content.split("\n").slice(1).join("\n");
 
 		const compiledComments = new RegExp(COMPILED_COMMENTS).exec(newContent)?.groups
@@ -329,7 +303,6 @@ async function replyToSource(
 			compiledComments.length <= 4000
 		) {
 			replyOptions.content += `\n${compiledComments}`;
-			//remove from newContent
 			newContent = newContent.replace(compiledComments, "").trim();
 		}
 		replyOptions.files = [
@@ -346,12 +319,6 @@ async function replyToSource(
 			: await source.reply(replyOptions);
 	}
 
-	// -- CommandInteraction ---
-	//
-	/* Not needed as we use the reply wrapped that handle this
-		if (source.replied || source.deferred)
-		return await source.editReply(replyOptions as Djs.InteractionEditReplyOptions);
-	*/
 	const replyInteraction = replyOptions as Djs.InteractionReplyOptions;
 
 	if (hideResult) {

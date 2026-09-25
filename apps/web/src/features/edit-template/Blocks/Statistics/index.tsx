@@ -124,9 +124,8 @@ const StatisticsBlock = ({ values, setFieldValue }: StatisticsProps) => {
 	);
 };
 
-// Only re-render when the statistics array reference itself changes.
-// Typing in General fields (diceType, total…) keeps values.statistics as the
-// same reference, so this block stays frozen and skips its entire subtree.
+// Only re-renders when the statistics array reference changes; typing in General fields (diceType, total…)
+// keeps values.statistics the same reference, so this block stays frozen.
 export default memo(
 	StatisticsBlock,
 	(prev, next) =>

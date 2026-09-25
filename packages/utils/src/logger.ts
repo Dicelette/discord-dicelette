@@ -17,10 +17,8 @@ dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
 const hasSentry = !!process.env.SENTRY_DSN && process.env.NODE_ENV === "production";
 
-// tslog's default pretty output always writes through console.log, no matter the log level. PM2
-// splits stdout -> out.log and stderr -> error.log, so WARN/ERROR/FATAL never reached error.log.
-// `pretty.levelMethod` routes each level to the matching console method instead, which also keeps
-// Sentry's consoleLoggingIntegration below tagging breadcrumbs with the correct level.
+// tslog's pretty output always uses console.log, so PM2's stdout/stderr split misses WARN/ERROR/FATAL.
+// `levelMethod` routes each level to the matching console method (also keeps Sentry breadcrumb levels correct).
 const LEVEL_METHOD = {
 	DEBUG: console.debug,
 	ERROR: console.error,
@@ -63,10 +61,8 @@ const SENTRY_ISSUE_LEVEL: Record<string, Sentry.SeverityLevel> = {
 	WARN: "warning",
 };
 
-// Forwards WARN/ERROR/FATAL records to Sentry as issues, alongside the normal console output.
-// The record still carries the native Error instance (record.nativeError, set by tslog before
-// JSON-stringifying it into `line`), so Sentry gets the real exception with its stack/cause chain
-// instead of a stringified copy; a message-only log falls back to captureMessage.
+// Forwards WARN/ERROR/FATAL to Sentry as issues, using tslog's captured nativeError for a real
+// stack/cause chain when available, else falling back to captureMessage.
 const sentryTransport: Transport<ILogObj> = {
 	format: "json",
 	minLevel: "WARN",
@@ -127,7 +123,7 @@ const IMPORTANT_LOG_TEMPLATE = process.env.PROD
 	? `${TIME_TEMPLATE}[{{logLevelName}}] `
 	: "[{{logLevelName}}] ";
 
-// Logger pour les trucs importants (notifications, etc)
+// Logger for important events (notifications, etc.)
 export const important: Logger<ILogObj> = new Logger({
 	attachedTransports: [sentryTransport],
 	minLevel: 1,

@@ -42,11 +42,8 @@ export function parseNumber(value: string): number | undefined {
 	return isNumber(value) ? Number(value) : undefined;
 }
 
-/**
- * Returns `record` with `name → value` added, or unchanged when the (trimmed)
- * name is empty or already present (case-insensitive). Shared by the stat add
- * row and the roll snapshot so both dedupe identically.
- */
+/** Returns `record` with `name → value` added, unchanged if the trimmed name is empty or already present
+ * (case-insensitive). Shared by the stat-add row and roll snapshot for identical dedup. */
 export function withStat(
 	record: Record<string, string>,
 	name: string,
@@ -69,11 +66,8 @@ function resolveStatValue(raw: string, all: Record<string, string>): number | un
 	return hint.kind === "resolved" ? hint.value : undefined;
 }
 
-/**
- * Turns the attribute-style stat record into the `{ stats, statsName }` shape the
- * roll engine expects: `stats` is keyed by the normalized name (looked up when
- * resolving `$name` in a dice), `statsName` keeps the original casing for display.
- */
+/** Turns an attribute-style stat record into `{ stats, statsName }`: `stats` is keyed by normalized name (for
+ * `$name` lookups), `statsName` keeps original casing for display. */
 export function buildStats(entries: Record<string, string>): {
 	stats: Record<string, number>;
 	statsName: string[];

@@ -177,10 +177,7 @@ export const configuration = {
 						.setRequired(true)
 				)
 		)
-		/**
-		 * LOGS IN DICE RESULT
-		 * For the result interaction, not the logs
-		 */
+		// Logs shown in the dice-result interaction itself, not the guild log channel.
 		.addSubcommand((sub) =>
 			sub
 				.setNames("config.logLink.name")
@@ -239,12 +236,7 @@ export const configuration = {
 						.setRequired(false)
 				)
 		)
-		/**
-		 * Strip OOC
-		 * @example /config strip_ooc prefix suffix timer channel
-		 * @example /config strip_ooc regex timer channel
-		 * @example /config strip_ooc prefix suffix timer (will only delete)
-		 */
+		// Strip OOC: /config strip_ooc prefix suffix timer channel | regex timer channel | prefix suffix timer (delete only)
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setNames("config.stripOOC.name")
@@ -287,11 +279,7 @@ export const configuration = {
 						.setDescriptions("config.stripOOC.thread_mode.description")
 				)
 		)
-		/**
-		 * EditMe : Change the bot avatar, name, bio, banner
-		 * @param interaction
-		 * @param client
-		 */
+		// Change the bot's avatar, name, bio, and banner.
 		.addSubcommand((sub) =>
 			sub
 				.setNames("editMe.name")

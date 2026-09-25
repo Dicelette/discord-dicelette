@@ -5,23 +5,7 @@ import type { Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
 import type { CommonOptions, RollInteractionOptions } from "../interfaces";
 
-/**
- * Extract commonly used interaction options in a single call.
- * Simplifies the common pattern of repeatedly calling options.getString(t(...)).
- *
- * @param options - Command interaction option resolver
- * @param required - Specify which options are required (will use getString(key, true))
- * @returns Object containing all requested options
- *
- * @example
- * // Before:
- * const char = options.getString(t("common.character"));
- * const stat = options.getString(t("common.statistic"));
- * const name = options.getString(t("common.name"));
- *
- * // After:
- * const { character, statistic, name } = extractCommonOptions(options);
- */
+/** Extracts commonly used interaction options (character, statistic, name, etc.) in a single call. */
 export function extractCommonOptions(
 	options: Djs.CommandInteractionOptionResolver,
 	required?: {
@@ -46,14 +30,7 @@ export function extractCommonOptions(
 	};
 }
 
-/**
- * Get character option with common transformations applied.
- * Handles normalization and lowercasing automatically.
- *
- * @param options - Command interaction option resolver
- * @param toLowerCase - Whether to convert to lowercase (default: true)
- * @returns Normalized character name or undefined
- */
+/** Gets the character option, normalized and optionally lowercased. */
 export function getCharacterOption(
 	options: Djs.CommandInteractionOptionResolver,
 	toLowerCase = true
@@ -64,13 +41,7 @@ export function getCharacterOption(
 	return toLowerCase ? normalized.toLowerCase() : normalized;
 }
 
-/**
- * Get statistic option with standardization.
- *
- * @param options - Command interaction option resolver
- * @param required - Whether the option is required
- * @returns Statistic name (or standardized version)
- */
+/** Gets the statistic option, standardized. */
 export function getStatisticOption(
 	options: Djs.CommandInteractionOptionResolver,
 	required = false
@@ -78,13 +49,7 @@ export function getStatisticOption(
 	return options.getString(t("common.statistic"), required) ?? undefined;
 }
 
-/**
- * Get name/skill option.
- *
- * @param options - Command interaction option resolver
- * @param required - Whether the option is required
- * @returns Name/skill value
- */
+/** Gets the name/skill option. */
 export function getNameOption(
 	options: Djs.CommandInteractionOptionResolver,
 	required = false
@@ -92,19 +57,6 @@ export function getNameOption(
 	return options.getString(t("common.name"), required) ?? undefined;
 }
 
-/**
- * Extracts and normalizes common roll-related options from a Discord command interaction.
- * Centralizes the repetitive option extraction logic present in rollMacro, rollStatistique,
- * and snippet commands.
- *
- * @returns Normalized roll options object
- *
- * @example
- * const opts = extractRollOptions(interaction.options);
- * // => { expression: "0", threshold: ">=15", oppositionVal: "12", userComments: "test", comments: "# test" }
- * @param value
- * @param name
- */
 function parseRollCriticalOption(
 	value: string | undefined,
 	name: string
@@ -115,6 +67,7 @@ function parseRollCriticalOption(
 	return parseCustomCritical(name, normalized);
 }
 
+/** Extracts and normalizes roll options (expression, threshold, opposition, custom criticals, comments). */
 export function extractRollOptions(
 	options: Djs.CommandInteractionOptionResolver,
 	ul: Translation
@@ -136,8 +89,6 @@ export function extractRollOptions(
 			? Object.assign({}, customCriticalFailure ?? {}, customCriticalSuccess ?? {})
 			: undefined;
 	const userComments = options.getString(t("common.comments")) ?? undefined;
-
-	// Format comments with # prefix if present
 	const comments = userComments ? `# ${userComments}` : "";
 
 	return {

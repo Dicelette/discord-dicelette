@@ -58,10 +58,7 @@ function getLocalesPath(): string {
 	return path.resolve(SOURCE_PATH, "../locales");
 }
 
-/**
- * Compare value of the key with the markdown content.
- * @returns `true` if at last one key is different.
- */
+/** True if at least one key's value differs from its markdown file's content. */
 // biome-ignore lint/suspicious/noExplicitAny: dynamic object structure
 function hasChanges(lang: string, existingContent: any): boolean {
 	for (const [key, value] of Object.entries(PATH_TO_REPLACE)) {
@@ -105,7 +102,7 @@ const localesPath = getLocalesPath();
 console.log(`Mode: ${BUILD_MODE ? "build (dist)" : "dev (source)"}`);
 const updated = replaceInLocales(localesPath);
 
-// biome format uniquement en mode dev (inutile de reformater le dist)
+// Only reformat in dev mode (no point reformatting dist)
 if (!BUILD_MODE && updated) {
 	exec(`biome format --write ${localesPath}`, (error, stdout, stderr) => {
 		if (error) {

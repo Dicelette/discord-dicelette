@@ -2,11 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import * as semver from "semver";
 
-/**
- * Read CHANGELOG.md and return entries more recent than (or equal to) the provided version.
- * @param version - The reference version
- * @param inclusive - If true, include the version itself
- */
+/** Reads CHANGELOG.md and returns entries at or after `version` (`inclusive` controls the boundary). */
 export function getChangelogSince(version: string, inclusive = false): string {
 	const file = resolve(process.cwd(), "CHANGELOG.md");
 	const content = readFileSync(file, "utf8");
@@ -23,7 +19,6 @@ export function getChangelogSince(version: string, inclusive = false): string {
 		entries.push({ end, start, version: matches[i][1] });
 	}
 
-	// Inclusive or strict depending on the flag
 	const filtered = entries.filter((e) =>
 		inclusive ? semver.gte(e.version, version) : semver.gt(e.version, version)
 	);
@@ -31,9 +26,7 @@ export function getChangelogSince(version: string, inclusive = false): string {
 	return filtered.map((e) => content.slice(e.start, e.end).trim()).join("\n\n");
 }
 
-/**
- * Returns all versions found in the CHANGELOG.md, sorted in descending order (most recent first).
- */
+/** All versions found in CHANGELOG.md, sorted most-recent first. */
 export function getAllVersions(): string[] {
 	const file = resolve(process.cwd(), "CHANGELOG.md");
 	const content = readFileSync(file, "utf8");
@@ -58,7 +51,7 @@ export function splitChangelogByVersion(fullChangelog: string, limit = 4000): st
 	const regex = /^## \[(\d+\.\d+\.\d+)](?:\([^)]+\))?/gm;
 
 	const matches = [...fullChangelog.matchAll(regex)];
-	if (matches.length === 0) return [fullChangelog]; // aucun titre ? tout en un bloc
+	if (matches.length === 0) return [fullChangelog]; // no heading found, treat as one block
 
 	const slices: string[] = [];
 	let current = "";

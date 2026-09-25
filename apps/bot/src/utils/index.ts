@@ -1,4 +1,3 @@
-//export all function from utils
 export * from "./button";
 export * from "./check";
 export * from "./find_macro";

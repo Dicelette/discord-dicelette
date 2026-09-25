@@ -6,10 +6,7 @@ import { getGuildContext } from "../guild_context";
 import { getInteractionContext } from "../interaction_context";
 import { haveAccess } from "../roles";
 
-/**
- * Generic autocomplete helper that extracts common context
- * Returns choices array, focused option, guild data, translation function, and user ID
- */
+/** Extracts common autocomplete context: choices array, focused option, guild data, translation function, and user ID. */
 export function autoComplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 	const options = interaction.options as Djs.CommandInteractionOptionResolver;
 	const fixed = options.getFocused(true);
@@ -49,10 +46,7 @@ export async function autoCompleteEdit(
 	);
 }
 
-/**
- * Autocomplete helper for character names and statistics
- * Filters choices based on guild template and user data
- */
+/** Autocomplete for character names and statistics, filtered by guild template and user data. */
 export function autoCompleteCharacters(
 	interaction: Djs.AutocompleteInteraction,
 	client: EClient,
@@ -72,7 +66,6 @@ export function autoCompleteCharacters(
 				return !ctx.standardizedExcludedStats?.includes(standardized);
 			});
 	} else if (focused.name === t("common.character")) {
-		//get user characters
 		const userData = client.settings.get(
 			interaction.guild!.id,
 			`user.${interaction.user.id}`
