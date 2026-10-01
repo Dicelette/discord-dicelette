@@ -435,9 +435,9 @@ export const configuration = {
 					break;
 				case t("userSettings.formula.title"):
 					if (subcommand === t("userSettings.formula.set.title"))
-						return formulaSet(client, interaction, true);
+						return formulaSet(client, interaction);
 					if (subcommand === t("display.title"))
-						return formulaDisplay(client, interaction, true);
+						return formulaDisplay(client, interaction);
 			}
 		switch (subcommand) {
 			case t("logs.name"):
