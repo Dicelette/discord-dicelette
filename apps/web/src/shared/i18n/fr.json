@@ -335,7 +335,6 @@
 		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
 		"attrValue": "Valeur",
-		"customFormulaHelper": "Applique une formule {link} personnelle aux jets où [expr] remplace $. Écrasé par la configuration du serveur si présente.",
 		"export": "Exporter",
 		"exportTooltip": "Télécharger en JSON",
 		"formulaError": "Impossible de résoudre la formule (attributs inconnus ou expression invalide).",
@@ -347,6 +346,13 @@
 		"invalidSnippetHelper": "Snippet « {name} » invalide : {value}",
 		"noAttributes": "Aucun attribut défini.",
 		"noSnippets": "Aucun raccourci défini.",
+		"optionInvalid": "Valeur invalide : {error}",
+		"options": {
+			"customFormula": {
+				"helper": "Applique une formule {link} personnelle aux jets où [expr] remplace $. Écrasé par la configuration du serveur si présente.",
+				"label": "Formule personnalisée"
+			}
+		},
 		"resetTemplate": "Réinitialiser",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveNoValidSnippets": "Aucun snippet valide à sauvegarder.",

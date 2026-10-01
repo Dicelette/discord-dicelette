@@ -36,7 +36,7 @@ export default function UserConfigForm({ guildId, initialConfig }: Props) {
 
 	return (
 		<Stack spacing={2}>
-			<General guildId={guildId} initialFormula={initialConfig?.customFormula} />
+			<General guildId={guildId} initialConfig={initialConfig} />
 			<Snippets state={snippets} />
 			<Attributes state={attrs} />
 			<Links state={templateState} />

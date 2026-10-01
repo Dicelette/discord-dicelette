@@ -1,5 +1,6 @@
 import type { Critical, CustomCritical, SortOrder } from "@dicelette/core";
 import type * as Djs from "discord.js";
+import type { UserOptionValues } from "./userOptions";
 
 export interface GuildData {
 	lang?: Djs.Locale;
@@ -154,12 +155,9 @@ export type UserSettingsData = {
 	createLinkTemplate: TemplateResult;
 	snippets?: Snippets;
 	attributes?: Record<string, number | string>;
-	ignoreNotfound?: string;
-	/** Personal mathjs formula for the `[expr]` roll syntax; overridden by the guild's customFormula if set. */
-	customFormula?: string;
 	/** Timestamp (ms) of the last DM warning about a failed comment-edit sync; throttles repeat warnings. */
 	commentEditWarnedAt?: number;
-};
+} & Partial<UserOptionValues>;
 
 export type UserPreferences = {
 	favoris?: string[];
