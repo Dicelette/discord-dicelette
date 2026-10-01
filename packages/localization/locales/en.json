@@ -1284,6 +1284,21 @@
 			"title": "custom_formula"
 		},
 		"name": "user_config",
+		"options": {
+			"title": "options",
+			"description": "Personal options.",
+			"list": {
+				"title": "list",
+				"description": "Display your options."
+			},
+			"value": {
+				"title": "value",
+				"description": "New value. Leave empty to reset."
+			},
+			"saved": "`{{- name}}` is now set to `{{- value}}`.",
+			"reset": "`{{- name}}` has been reset.",
+			"invalid": "Invalid value for `{{- name}}`: {{- error}}"
+		},
 		"replaceUnknown": {
 			"title": "Replace unknown value"
 		},

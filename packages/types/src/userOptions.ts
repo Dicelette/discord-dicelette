@@ -3,6 +3,8 @@ import { validateCustomFormula } from "@dicelette/core";
 type OptionBase = {
 	/** Rendered automatically in this dashboard section. Options without it are handled by hand. */
 	section?: "general";
+	/** Generates a `/user_config options <name>` subcommand. Needs `userSettings.options.<key>.name|description` keys. */
+	slash?: boolean;
 };
 
 type StringOption = OptionBase & {
@@ -51,6 +53,10 @@ export function getUserOptionsBySection(section: NonNullable<OptionBase["section
 	return USER_OPTION_KEYS.filter((key) => getUserOption(key).section === section);
 }
 
+export const SLASH_USER_OPTION_KEYS = USER_OPTION_KEYS.filter(
+	(key) => getUserOption(key).slash
+);
+
 export type ParsedUserOption =
 	| { ok: true; value: string | boolean | undefined }
 	| { ok: false; error: string };
@@ -68,4 +74,21 @@ export function parseUserOption(key: UserOptionKey, raw: unknown): ParsedUserOpt
 	if (!value) return { ok: true, value: undefined };
 	const error = def.validate?.(value);
 	return error ? { error, ok: false } : { ok: true, value };
+}
+
+type UserOptionStore = {
+	set(guildId: string, value: string | boolean, path: string): unknown;
+	delete(guildId: string, path: string): unknown;
+};
+
+export function storeUserOption(
+	store: UserOptionStore,
+	guildId: string,
+	userId: string,
+	key: UserOptionKey,
+	value: string | boolean | undefined
+) {
+	const path = `${userId}.${key}`;
+	if (value === undefined) store.delete(guildId, path);
+	else store.set(guildId, value, path);
 }

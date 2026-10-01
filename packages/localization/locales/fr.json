@@ -1284,6 +1284,21 @@
 			"title": "formule_personnalisée"
 		},
 		"name": "user_config",
+		"options": {
+			"title": "options",
+			"description": "Options personnelles.",
+			"list": {
+				"title": "liste",
+				"description": "Afficher vos options."
+			},
+			"value": {
+				"title": "valeur",
+				"description": "Nouvelle valeur. Laisser vide pour réinitialiser."
+			},
+			"saved": "`{{- name}}` est maintenant défini sur `{{- value}}`.",
+			"reset": "`{{- name}}` a été réinitialisé.",
+			"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}"
+		},
 		"replaceUnknown": {
 			"title": "Remplacer les valeurs inconnues"
 		},

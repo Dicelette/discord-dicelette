@@ -8,6 +8,7 @@ import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
 import * as attributes from "./attributes";
 import { formulaDisplay, formulaSet } from "./formula";
+import { hasGeneratedOptions, userOptionsExecute, userOptionsGroup } from "./options";
 import {
 	createLinksCmdOptions,
 	getTemplateValues,
@@ -25,6 +26,173 @@ async function autoComplete(
 	await interaction.respond(choices);
 }
 
+const data = new Djs.SlashCommandBuilder()
+	.setNames("userSettings.name")
+	.setDescriptions("userSettings.description")
+	.setContexts(Djs.InteractionContextType.Guild)
+	.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+	.addSubcommandGroup((group) =>
+		createLinksCmdOptions(
+			group
+				.setNames("userSettings.createLink.title")
+				.setDescriptions("userSettings.createLink.description")
+		)
+	)
+	.addSubcommandGroup((group) =>
+		group
+			.setNames("common.snippets")
+			.setDescriptions("userSettings.snippets.description")
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("userSettings.snippets.create.title")
+					.setDescriptions("userSettings.snippets.create.description")
+					.addStringOption((option) =>
+						option
+							.setNames("common.name")
+							.setDescriptions("userSettings.snippets.create.name")
+							.setRequired(true)
+					)
+					.addStringOption((option) =>
+						option
+							.setNames("common.dice")
+							.setDescriptions("userSettings.snippets.create.content.description")
+							.setRequired(true)
+					)
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("common.delete")
+					.setDescriptions("userSettings.snippets.delete.description")
+					.addStringOption((option) =>
+						option
+							.setNames("common.name")
+							.setDescriptions("userSettings.snippets.delete.name")
+							.setRequired(true)
+							.setAutocomplete(true)
+					)
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("userSettings.snippets.list.title")
+					.setDescriptions("userSettings.snippets.list.description")
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("export.name")
+					.setDescriptions("userSettings.snippets.export.description")
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("import.name")
+					.setDescriptions("userSettings.snippets.import.description")
+					.addAttachmentOption((option) =>
+						option
+							.setNames("userSettings.snippets.import.file.title")
+							.setDescriptions("userSettings.snippets.import.file.description")
+							.setRequired(true)
+					)
+					.addBooleanOption((option) =>
+						option
+							.setNames("userSettings.snippets.import.overwrite.title")
+							.setDescriptions("userSettings.snippets.import.overwrite.description")
+					)
+			)
+	)
+	.addSubcommandGroup((group) =>
+		group
+			.setNames("userSettings.attributes.title")
+			.setDescriptions("userSettings.attributes.description")
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("userSettings.snippets.create.title")
+					.setDescriptions("userSettings.attributes.create.description")
+					.addStringOption((option) =>
+						option
+							.setNames("common.name")
+							.setDescriptions("userSettings.attributes.create.name")
+							.setRequired(true)
+					)
+					.addStringOption((option) =>
+						option
+							.setNames("userSettings.attributes.create.value.title")
+							.setDescriptions("userSettings.attributes.create.value.description")
+							.setRequired(true)
+					)
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("common.delete")
+					.setDescriptions("userSettings.attributes.delete.description")
+					.addStringOption((option) =>
+						option
+							.setNames("common.name")
+							.setDescriptions("userSettings.attributes.delete.name")
+							.setRequired(true)
+							.setAutocomplete(true)
+					)
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("userSettings.attributes.replaceUnknown.title")
+					.setDescriptions("userSettings.attributes.replaceUnknown.description")
+					.addStringOption((option) =>
+						option
+							.setNames("userSettings.attributes.create.value.title")
+							.setDescriptions("userSettings.attributes.replaceUnknown.options")
+							.setRequired(false)
+					)
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("userSettings.snippets.list.title")
+					.setDescriptions("userSettings.attributes.list.description")
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("export.name")
+					.setDescriptions("userSettings.attributes.export.description")
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("import.name")
+					.setDescriptions("userSettings.attributes.import.description")
+					.addAttachmentOption((option) =>
+						option
+							.setNames("userSettings.snippets.import.file.title")
+							.setDescriptions("userSettings.snippets.import.file.description")
+							.setRequired(true)
+					)
+					.addBooleanOption((option) =>
+						option
+							.setNames("userSettings.snippets.import.overwrite.title")
+							.setDescriptions("userSettings.snippets.import.overwrite.description")
+					)
+			)
+	)
+	.addSubcommandGroup((group) =>
+		group
+			.setNames("userSettings.formula.title")
+			.setDescriptions("userSettings.formula.description")
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("userSettings.formula.set.title")
+					.setDescriptions("userSettings.formula.set.description")
+					.addStringOption((option) =>
+						option
+							.setNames("common.formula")
+							.setDescriptions("userSettings.formula.set.formula")
+							.setRequired(false)
+					)
+			)
+			.addSubcommand((subcommand) =>
+				subcommand
+					.setNames("display.title")
+					.setDescriptions("userSettings.formula.display.description")
+			)
+	);
+
+if (hasGeneratedOptions) data.addSubcommandGroup(userOptionsGroup());
+
 export const userSettings = {
 	async autocomplete(interaction: Djs.AutocompleteInteraction, client: EClient) {
 		const group = interaction.options.getSubcommandGroup(true);
@@ -36,170 +204,7 @@ export const userSettings = {
 			await autoComplete(interaction, client, type);
 		}
 	},
-	data: new Djs.SlashCommandBuilder()
-		.setNames("userSettings.name")
-		.setDescriptions("userSettings.description")
-		.setContexts(Djs.InteractionContextType.Guild)
-		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
-		.addSubcommandGroup((group) =>
-			createLinksCmdOptions(
-				group
-					.setNames("userSettings.createLink.title")
-					.setDescriptions("userSettings.createLink.description")
-			)
-		)
-		.addSubcommandGroup((group) =>
-			group
-				.setNames("common.snippets")
-				.setDescriptions("userSettings.snippets.description")
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("userSettings.snippets.create.title")
-						.setDescriptions("userSettings.snippets.create.description")
-						.addStringOption((option) =>
-							option
-								.setNames("common.name")
-								.setDescriptions("userSettings.snippets.create.name")
-								.setRequired(true)
-						)
-						.addStringOption((option) =>
-							option
-								.setNames("common.dice")
-								.setDescriptions("userSettings.snippets.create.content.description")
-								.setRequired(true)
-						)
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("common.delete")
-						.setDescriptions("userSettings.snippets.delete.description")
-						.addStringOption((option) =>
-							option
-								.setNames("common.name")
-								.setDescriptions("userSettings.snippets.delete.name")
-								.setRequired(true)
-								.setAutocomplete(true)
-						)
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("userSettings.snippets.list.title")
-						.setDescriptions("userSettings.snippets.list.description")
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("export.name")
-						.setDescriptions("userSettings.snippets.export.description")
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("import.name")
-						.setDescriptions("userSettings.snippets.import.description")
-						.addAttachmentOption((option) =>
-							option
-								.setNames("userSettings.snippets.import.file.title")
-								.setDescriptions("userSettings.snippets.import.file.description")
-								.setRequired(true)
-						)
-						.addBooleanOption((option) =>
-							option
-								.setNames("userSettings.snippets.import.overwrite.title")
-								.setDescriptions("userSettings.snippets.import.overwrite.description")
-						)
-				)
-		)
-		.addSubcommandGroup((group) =>
-			group
-				.setNames("userSettings.attributes.title")
-				.setDescriptions("userSettings.attributes.description")
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("userSettings.snippets.create.title")
-						.setDescriptions("userSettings.attributes.create.description")
-						.addStringOption((option) =>
-							option
-								.setNames("common.name")
-								.setDescriptions("userSettings.attributes.create.name")
-								.setRequired(true)
-						)
-						.addStringOption((option) =>
-							option
-								.setNames("userSettings.attributes.create.value.title")
-								.setDescriptions("userSettings.attributes.create.value.description")
-								.setRequired(true)
-						)
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("common.delete")
-						.setDescriptions("userSettings.attributes.delete.description")
-						.addStringOption((option) =>
-							option
-								.setNames("common.name")
-								.setDescriptions("userSettings.attributes.delete.name")
-								.setRequired(true)
-								.setAutocomplete(true)
-						)
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("userSettings.attributes.replaceUnknown.title")
-						.setDescriptions("userSettings.attributes.replaceUnknown.description")
-						.addStringOption((option) =>
-							option
-								.setNames("userSettings.attributes.create.value.title")
-								.setDescriptions("userSettings.attributes.replaceUnknown.options")
-								.setRequired(false)
-						)
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("userSettings.snippets.list.title")
-						.setDescriptions("userSettings.attributes.list.description")
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("export.name")
-						.setDescriptions("userSettings.attributes.export.description")
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("import.name")
-						.setDescriptions("userSettings.attributes.import.description")
-						.addAttachmentOption((option) =>
-							option
-								.setNames("userSettings.snippets.import.file.title")
-								.setDescriptions("userSettings.snippets.import.file.description")
-								.setRequired(true)
-						)
-						.addBooleanOption((option) =>
-							option
-								.setNames("userSettings.snippets.import.overwrite.title")
-								.setDescriptions("userSettings.snippets.import.overwrite.description")
-						)
-				)
-		)
-		.addSubcommandGroup((group) =>
-			group
-				.setNames("userSettings.formula.title")
-				.setDescriptions("userSettings.formula.description")
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("userSettings.formula.set.title")
-						.setDescriptions("userSettings.formula.set.description")
-						.addStringOption((option) =>
-							option
-								.setNames("common.formula")
-								.setDescriptions("userSettings.formula.set.formula")
-								.setRequired(false)
-						)
-				)
-				.addSubcommand((subcommand) =>
-					subcommand
-						.setNames("display.title")
-						.setDescriptions("userSettings.formula.display.description")
-				)
-		),
+	data,
 	execute: async (interaction: Djs.ChatInputCommandInteraction, client: EClient) => {
 		const group = interaction.options.getSubcommandGroup(true);
 		const subcommand = interaction.options.getSubcommand(true);
@@ -237,6 +242,8 @@ export const userSettings = {
 				case t("userSettings.attributes.replaceUnknown.title"):
 					return await attributes.setUnknowReplace(client, interaction);
 			}
+		} else if (group === t("userSettings.options.title")) {
+			return await userOptionsExecute(client, interaction);
 		} else if (group === t("userSettings.formula.title")) {
 			switch (subcommand) {
 				case t("userSettings.formula.set.title"):

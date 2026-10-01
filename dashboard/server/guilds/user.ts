@@ -1,5 +1,10 @@
 import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
-import { parseUserOption, USER_OPTION_KEYS } from "@dicelette/types";
+import {
+	parseUserOption,
+	storeUserOption,
+	USER_OPTION_KEYS,
+	type UserOptionKey,
+} from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "../types";
@@ -93,7 +98,7 @@ export function createUserRouter(deps: DashboardDeps) {
 		} & Record<string, unknown>;
 		const { snippets, attributes, createLinkTemplate } = body;
 
-		const options = new Map<string, string | boolean | undefined>();
+		const options = new Map<UserOptionKey, string | boolean | undefined>();
 		for (const key of USER_OPTION_KEYS) {
 			if (body[key] === undefined) continue;
 			const parsed = parseUserOption(key, body[key]);
@@ -147,10 +152,8 @@ export function createUserRouter(deps: DashboardDeps) {
 		if (validAttributes !== undefined)
 			userSettings.set(guildId, validAttributes, `${userId}.attributes`);
 
-		for (const [key, value] of options) {
-			if (value === undefined) userSettings.delete(guildId, `${userId}.${key}`);
-			else userSettings.set(guildId, value, `${userId}.${key}`);
-		}
+		for (const [key, value] of options)
+			storeUserOption(userSettings, guildId, userId, key, value);
 
 		if (createLinkTemplate !== undefined)
 			userSettings.set(guildId, createLinkTemplate, `${userId}.createLinkTemplate`);
