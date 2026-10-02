@@ -219,6 +219,7 @@
 		"total": "Total",
 		"true": "Vrai",
 		"user": "Joueur",
+		"value": "valeur",
 		"yes": "✓"
 	},
 	"config": {
@@ -1296,9 +1297,6 @@
 			"set": {
 				"description": "Définir la valeur. Lancer sans valeur pour réinitialiser.",
 				"title": "configurer"
-			},
-			"value": {
-				"title": "valeur"
 			}
 		},
 		"replaceUnknown": {

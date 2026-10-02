@@ -219,6 +219,7 @@
 		"total": "Total",
 		"true": "True",
 		"user": "Player",
+		"value": "value",
 		"yes": "✓"
 	},
 	"config": {
@@ -1296,9 +1297,6 @@
 			"set": {
 				"description": "Set the value. Run it without value to reset.",
 				"title": "configure"
-			},
-			"value": {
-				"title": "value"
 			}
 		},
 		"replaceUnknown": {

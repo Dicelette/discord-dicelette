@@ -19,7 +19,7 @@ export function resolveSlash(key: string, slash: true | SlashOverrides): SlashSp
 		groupDescription: `${base}.${key}.description`,
 		subcommand: `${base}.set.title`,
 		valueDescription: `${base}.${key}.value`,
-		valueName: `${base}.value.title`,
+		valueName: "common.value",
 		valueParam: "value",
 		...spec,
 		messages: {
