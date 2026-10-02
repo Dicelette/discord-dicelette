@@ -5,7 +5,8 @@ import type { UserOptionDef } from "./types";
 
 /**
  * Scalar per-user options. Adding an entry types `UserSettingsData`, validates the
- * dashboard PATCH and renders the field. Labels live in `userConfig.options.<key>.label|helper`.
+ * dashboard PATCH and renders the field. The label lives in `userConfig.options.<key>.label`; the helper is
+ * `userSettings.options.<key>.description` (or `userConfig.options.<key>.helper` with a `helperLink`).
  */
 export const USER_OPTIONS = {
 	customFormula: {

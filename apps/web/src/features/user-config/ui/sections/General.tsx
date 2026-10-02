@@ -92,7 +92,9 @@ function General({ guildId, initialConfig }: Props) {
 				{GENERAL_KEYS.map((key) => {
 					const def = getUserOption(key);
 					const label = t(`userConfig.options.${key}.label`);
-					const helperKey = `userConfig.options.${key}.helper`;
+					const helperKey = def.helperLink
+						? `userConfig.options.${key}.helper`
+						: `userSettings.options.${key}.description`;
 					if (def.kind === "boolean")
 						return (
 							<FormControlLabel
