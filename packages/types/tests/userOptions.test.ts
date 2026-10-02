@@ -29,7 +29,11 @@ describe("parseUserOption", () => {
 
 describe("USER_OPTIONS", () => {
 	it("lists every key and filters by section", () => {
-		expect(USER_OPTION_KEYS).toEqual(["customFormula", "ignoreNotfound"]);
+		expect(USER_OPTION_KEYS).toEqual([
+			"customFormula",
+			"prefixEditComment",
+			"ignoreNotfound",
+		]);
 		expect(getUserOptionsBySection("general")).toEqual(["customFormula"]);
 	});
 });

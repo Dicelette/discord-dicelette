@@ -21,6 +21,7 @@ i18next.addResourceBundle(
 			options: {
 				flag: { description: "Toggle the flag", group: "flag", value: "New state" },
 				prefixEditComments: { description: "Prefix", value: "New prefix" },
+				plainOption: { description: "Plain" },
 			},
 		},
 	},
@@ -54,7 +55,7 @@ describe("addGeneratedGroups", () => {
 
 	it("keeps the existing formula command and leaves the attributes group to its builder", () => {
 		const groups = groupsOf();
-		expect(groups.map((g) => g.name)).toEqual(["custom_formula"]);
+		expect(groups.map((g) => g.name)).toEqual(["custom_formula", "prefix_edit_comment"]);
 		const subs = groups[0].options as Sub[];
 		expect(subs.map((s) => s.name)).toEqual(["configure", "display"]);
 		expect(subs[0].options![0]).toMatchObject({ name: "formula", required: false });
@@ -117,5 +118,17 @@ describe("group name fallback", () => {
 			prefixEditComments: { kind: "string", slash: true },
 		});
 		expect(group.name).toBe("prefix_edit_comments");
+	});
+});
+
+describe("value description fallback", () => {
+	it("uses the generic description when the option has no .value key", () => {
+		const [group] = groupsOf({
+			plainOption: { kind: "string", slash: true },
+		});
+		const configure = group.options![0] as Sub;
+		expect(configure.options![0].description).toBe(
+			i18next.t("userSettings.options.set.description", { lng: "en" })
+		);
 	});
 });

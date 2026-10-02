@@ -4,10 +4,10 @@ type OptionBase = {
 	/** Rendered automatically in this dashboard section. Options without it are handled by hand. */
 	section?: "general";
 	/**
-	 * Generates a slash group. `true` creates `/user_config <name> configure|display` from the
-	 * `userSettings.options.<key>.description|value` keys (the group name falls back to the snake_cased
-	 * key without `.group`); a partial spec overrides the keys
-	 * to keep an existing command or to extend a handwritten group.
+	 * Generates a slash group. `true` creates `/user_config <name> configure|display` from
+	 * `userSettings.options.<key>.description` (required), plus optional `.group` (else the
+	 * snake_cased key) and `.value` (else the generic description). A partial spec overrides
+	 * the keys to keep an existing command or to extend a handwritten group.
 	 */
 	slash?: true | SlashOverrides;
 };

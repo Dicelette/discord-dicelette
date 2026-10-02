@@ -119,10 +119,7 @@ export async function register(
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const statName = interaction.options.getString(t("common.name"), true);
-	const initialValue = interaction.options.getString(
-		t("userSettings.attributes.create.value.title"),
-		true
-	);
+	const initialValue = interaction.options.getString(t("common.value"), true);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
 	const existingAttributes = client.userSettings.get(guildId, userId)?.attributes ?? {};

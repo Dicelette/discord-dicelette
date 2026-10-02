@@ -32,6 +32,15 @@ export function groupName(
 	return hasKey(spec.group) ? translate(spec.group) : snakeCase(key);
 }
 
+const VALUE_DESCRIPTION_FALLBACK = "userSettings.options.set.description";
+
+/** Option description of the value, or the generic one when the option has none. */
+export function valueDescriptionKey(spec: SlashSpec) {
+	return hasKey(spec.valueDescription)
+		? spec.valueDescription
+		: VALUE_DESCRIPTION_FALLBACK;
+}
+
 export function slashEntries(defs: Defs) {
 	return Object.entries(defs)
 		.filter(([, def]) => def.slash)
@@ -45,7 +54,6 @@ export function slashI18nKeys(spec: SlashSpec) {
 		spec.subcommand,
 		spec.description,
 		spec.valueName,
-		spec.valueDescription,
 		...Object.values(messages),
 		...(display ? Object.values(display) : []),
 	].filter((key): key is string => !!key);
@@ -94,8 +102,12 @@ export function addGeneratedSubcommands(
 		group.addSubcommand((sub) => {
 			sub.setNames(spec.subcommand).setDescriptions(spec.description);
 			return def.kind === "boolean"
-				? sub.addBooleanOption((o) => addValue(o, spec.valueName, spec.valueDescription))
-				: sub.addStringOption((o) => addValue(o, spec.valueName, spec.valueDescription));
+				? sub.addBooleanOption((o) =>
+						addValue(o, spec.valueName, valueDescriptionKey(spec))
+					)
+				: sub.addStringOption((o) =>
+						addValue(o, spec.valueName, valueDescriptionKey(spec))
+					);
 		});
 		const display = spec.display;
 		if (display)
