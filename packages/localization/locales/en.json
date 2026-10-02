@@ -1187,8 +1187,7 @@
 				"name": "Attribute's name",
 				"success": "The {{- name}} attribute has been created successfully.",
 				"value": {
-					"description": "Number that will be used",
-					"title": "value"
+					"description": "Number that will be used"
 				}
 			},
 			"delete": {
@@ -1292,6 +1291,9 @@
 				"reply": "`{{- name}}`: `{{- value}}`"
 			},
 			"invalid": "Invalid value for `{{- name}}`: {{- error}}",
+			"prefixEditComment": {
+				"description": "Adjust the prefix for editing comments in a rolled dice"
+			},
 			"reset": "`{{- name}}` has been reset.",
 			"saved": "`{{- name}}` is now set to `{{- value}}`.",
 			"set": {

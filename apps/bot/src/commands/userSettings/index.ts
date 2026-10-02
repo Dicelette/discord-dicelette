@@ -115,7 +115,7 @@ const data = new Djs.SlashCommandBuilder()
 						)
 						.addStringOption((option) =>
 							option
-								.setNames("userSettings.attributes.create.value.title")
+								.setNames("common.value")
 								.setDescriptions("userSettings.attributes.create.value.description")
 								.setRequired(true)
 						)
