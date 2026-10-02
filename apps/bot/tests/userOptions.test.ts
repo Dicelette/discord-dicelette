@@ -1,10 +1,14 @@
 import "@dicelette/discord_ext";
+import { resources } from "@dicelette/localization";
+import { USER_OPTIONS } from "@dicelette/types";
 import * as Djs from "discord.js";
 import i18next from "i18next";
 import { describe, expect, it } from "vitest";
 import {
 	addGeneratedGroups,
 	addGeneratedSubcommands,
+	missingSlashKeys,
+	slashEntries,
 } from "../src/commands/userSettings/options";
 
 i18next.addResourceBundle(
@@ -65,5 +69,33 @@ describe("addGeneratedSubcommands", () => {
 		const [sub] = group.toJSON().options as Sub[];
 		expect(sub.name).toBe("replace_unknown");
 		expect(sub.options![0].type).toBe(Djs.ApplicationCommandOptionType.String);
+	});
+});
+
+describe("slash translations", () => {
+	it("has every key of every slash option in every locale", () => {
+		const languages = Object.keys(resources);
+		const missing = slashEntries(USER_OPTIONS).flatMap(({ key, spec }) =>
+			missingSlashKeys(spec, languages).map((m) => `${key} -> ${m}`)
+		);
+		expect(missing).toEqual([]);
+	});
+
+	it("uses Discord-valid names in every locale", () => {
+		const invalid = slashEntries(USER_OPTIONS).flatMap(({ key, spec }) =>
+			Object.keys(resources).flatMap((lng) =>
+				[spec.group, spec.subcommand, spec.valueName, spec.display?.subcommand]
+					.filter((k): k is string => !!k)
+					.map((k) => ({ key, lng, name: i18next.t(k, { lng }) as string }))
+					.filter(({ name }) => !/^[\p{Ll}\p{N}_-]{1,32}$/u.test(name))
+			)
+		);
+		expect(invalid).toEqual([]);
+	});
+
+	it("names the missing keys instead of failing in the Discord builder", () => {
+		expect(() => groupsOf({ unknown: { kind: "string", slash: true } })).toThrow(
+			/"unknown" is missing translations[\s\S]*userSettings\.options\.unknown\.group/
+		);
 	});
 });

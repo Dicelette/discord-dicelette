@@ -1,5 +1,11 @@
-import { resolveSlash, USER_OPTIONS, type UserOptionDef } from "@dicelette/types";
+import {
+	resolveSlash,
+	type SlashSpec,
+	USER_OPTIONS,
+	type UserOptionDef,
+} from "@dicelette/types";
 import type * as Djs from "discord.js";
+import i18next from "i18next";
 
 type Defs = Record<string, UserOptionDef>;
 
@@ -10,6 +16,41 @@ export function slashEntries(defs: Defs) {
 	return Object.entries(defs)
 		.filter(([, def]) => def.slash)
 		.map(([key, def]) => ({ def, key, spec: resolveSlash(key, def.slash!) }));
+}
+
+export function slashI18nKeys(spec: SlashSpec) {
+	const { display, messages } = spec;
+	return [
+		spec.group,
+		spec.groupDescription,
+		spec.subcommand,
+		spec.description,
+		spec.valueName,
+		spec.valueDescription,
+		...Object.values(messages),
+		...(display ? Object.values(display) : []),
+	].filter((key): key is string => !!key);
+}
+
+export function missingSlashKeys(spec: SlashSpec, languages: string[]) {
+	return languages.flatMap((lng) =>
+		slashI18nKeys(spec)
+			.filter((key) => i18next.getResource(lng, "translation", key) === undefined)
+			.map((key) => `${lng}: ${key}`)
+	);
+}
+
+/** Fails at startup with the missing keys instead of an opaque Discord builder error. */
+function checkedSlashEntries(defs: Defs) {
+	const entries = slashEntries(defs);
+	for (const { key, spec } of entries) {
+		const missing = missingSlashKeys(spec, ["en"]);
+		if (missing.length > 0)
+			throw new Error(
+				`Slash option "${key}" is missing translations:\n${missing.join("\n")}`
+			);
+	}
+	return entries;
 }
 
 export function addGeneratedSubcommands(
@@ -28,7 +69,7 @@ export function addGeneratedSubcommands(
 		return option;
 	};
 
-	for (const { def, spec } of slashEntries(defs).filter(
+	for (const { def, spec } of checkedSlashEntries(defs).filter(
 		(e) => e.spec.group === groupKey
 	)) {
 		group.addSubcommand((sub) => {
@@ -52,7 +93,7 @@ export function addGeneratedGroups(
 	defs: Defs = USER_OPTIONS
 ) {
 	const groups = new Map<string, string>();
-	for (const { spec } of slashEntries(defs))
+	for (const { spec } of checkedSlashEntries(defs))
 		if (!HANDWRITTEN_GROUPS.has(spec.group))
 			groups.set(spec.group, spec.groupDescription);
 	for (const [title, description] of groups)
