@@ -1,14 +1,7 @@
-import {
-	DEFAULT_SLASH_GROUP,
-	resolveSlash,
-	USER_OPTIONS,
-	type UserOptionDef,
-} from "@dicelette/types";
+import { resolveSlash, USER_OPTIONS, type UserOptionDef } from "@dicelette/types";
 import type * as Djs from "discord.js";
 
 type Defs = Record<string, UserOptionDef>;
-
-export const LIST_TITLE = "userSettings.options.list.title";
 
 /** Groups whose builder is written by hand and extended with `addGeneratedSubcommands`. */
 const HANDWRITTEN_GROUPS = new Set(["userSettings.attributes.title"]);
@@ -50,10 +43,6 @@ export function addGeneratedSubcommands(
 				sub.setNames(display.subcommand).setDescriptions(display.description)
 			);
 	}
-	if (groupKey === DEFAULT_SLASH_GROUP)
-		group.addSubcommand((sub) =>
-			sub.setNames(LIST_TITLE).setDescriptions("userSettings.options.list.description")
-		);
 	return group;
 }
 

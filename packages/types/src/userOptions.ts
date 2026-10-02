@@ -4,8 +4,9 @@ type OptionBase = {
 	/** Rendered automatically in this dashboard section. Options without it are handled by hand. */
 	section?: "general";
 	/**
-	 * Generates a slash subcommand. `true` uses `/user_config options <name>` and the
-	 * `userSettings.options.*` keys; a partial spec overrides them to keep an existing command.
+	 * Generates a slash group. `true` creates `/user_config <name> configure|display` from the
+	 * `userSettings.options.<key>.group|description|value` keys; a partial spec overrides the keys
+	 * to keep an existing command or to extend a handwritten group.
 	 */
 	slash?: true | SlashOverrides;
 };
@@ -29,17 +30,25 @@ type SlashOverrides = Partial<Omit<SlashSpec, "messages">> & {
 	messages?: Partial<SlashSpec["messages"]>;
 };
 
-export const DEFAULT_SLASH_GROUP = "userSettings.options.title";
-
+/** Same layout as `custom_formula`: `<option> configure [value]` and `<option> display`. */
 export function resolveSlash(key: string, slash: true | SlashOverrides): SlashSpec {
 	const base = "userSettings.options";
 	const spec = slash === true ? {} : slash;
 	return {
-		description: `${base}.${key}.description`,
-		group: DEFAULT_SLASH_GROUP,
-		groupDescription: `${base}.description`,
-		subcommand: `${base}.${key}.name`,
-		valueDescription: `${base}.value.description`,
+		description: `${base}.set.description`,
+		display:
+			slash === true
+				? {
+						description: `${base}.display.description`,
+						empty: `${base}.display.empty`,
+						reply: `${base}.display.reply`,
+						subcommand: "display.title",
+					}
+				: undefined,
+		group: `${base}.${key}.group`,
+		groupDescription: `${base}.${key}.description`,
+		subcommand: `${base}.set.title`,
+		valueDescription: `${base}.${key}.value`,
 		valueName: `${base}.value.title`,
 		valueParam: "value",
 		...spec,

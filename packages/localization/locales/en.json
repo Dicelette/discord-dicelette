@@ -1285,19 +1285,21 @@
 		},
 		"name": "user_config",
 		"options": {
-			"title": "options",
-			"description": "Personal options.",
-			"list": {
-				"title": "list",
-				"description": "Display your options."
+			"display": {
+				"description": "Display the current value.",
+				"empty": "`{{- name}}` is not set.",
+				"reply": "`{{- name}}`: `{{- value}}`"
+			},
+			"invalid": "Invalid value for `{{- name}}`: {{- error}}",
+			"reset": "`{{- name}}` has been reset.",
+			"saved": "`{{- name}}` is now set to `{{- value}}`.",
+			"set": {
+				"description": "Set the value. Run it without value to reset.",
+				"title": "configure"
 			},
 			"value": {
-				"title": "value",
-				"description": "New value. Leave empty to reset."
-			},
-			"saved": "`{{- name}}` is now set to `{{- value}}`.",
-			"reset": "`{{- name}}` has been reset.",
-			"invalid": "Invalid value for `{{- name}}`: {{- error}}"
+				"title": "value"
+			}
 		},
 		"replaceUnknown": {
 			"title": "Replace unknown value"

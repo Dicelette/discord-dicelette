@@ -1285,19 +1285,21 @@
 		},
 		"name": "user_config",
 		"options": {
-			"title": "options",
-			"description": "Options personnelles.",
-			"list": {
-				"title": "liste",
-				"description": "Afficher vos options."
+			"display": {
+				"description": "Afficher la valeur actuelle.",
+				"empty": "`{{- name}}` n'est pas défini.",
+				"reply": "`{{- name}}` : `{{- value}}`"
+			},
+			"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}",
+			"reset": "`{{- name}}` a été réinitialisé.",
+			"saved": "`{{- name}}` est maintenant défini sur `{{- value}}`.",
+			"set": {
+				"description": "Définir la valeur. Lancer sans valeur pour réinitialiser.",
+				"title": "configurer"
 			},
 			"value": {
-				"title": "valeur",
-				"description": "Nouvelle valeur. Laisser vide pour réinitialiser."
-			},
-			"saved": "`{{- name}}` est maintenant défini sur `{{- value}}`.",
-			"reset": "`{{- name}}` a été réinitialisé.",
-			"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}"
+				"title": "valeur"
+			}
 		},
 		"replaceUnknown": {
 			"title": "Remplacer les valeurs inconnues"

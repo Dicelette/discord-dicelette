@@ -2,7 +2,6 @@ import type { EClient } from "@dicelette/client";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import {
-	DEFAULT_SLASH_GROUP,
 	parseUserOption,
 	storeUserOption,
 	USER_OPTIONS,
@@ -10,7 +9,7 @@ import {
 } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { reply } from "messages";
-import { LIST_TITLE, slashEntries } from "./options";
+import { slashEntries } from "./options";
 
 type Tr = (key: string, options?: Record<string, unknown>) => string;
 
@@ -31,26 +30,18 @@ export async function userOptionsExecute(
 	const stored = client.userSettings.get(guildId, userId);
 	const ephemeral = Djs.MessageFlags.Ephemeral;
 
-	if (group === tr(DEFAULT_SLASH_GROUP) && subcommand === tr(LIST_TITLE)) {
-		const lines = entries.map(
-			({ key, spec }) =>
-				`- __${ulr(spec.subcommand)}__ : \`${stored?.[key as UserOptionKey] ?? ul("common.noSet")}\``
-		);
-		await reply(interaction, { content: lines.join("\n"), flags: ephemeral });
-		return true;
-	}
-
 	const displayed = entries.find(
 		(e) => e.spec.display && tr(e.spec.display.subcommand) === subcommand
 	);
 	if (displayed?.spec.display) {
-		const { display, valueParam } = displayed.spec;
+		const { display, group: groupKey, valueParam } = displayed.spec;
+		const name = ulr(groupKey);
 		const value = stored?.[displayed.key as UserOptionKey];
 		await reply(interaction, {
 			content:
 				value === undefined
-					? ulr(display!.empty)
-					: ulr(display!.reply, { [valueParam]: value, value }),
+					? ulr(display!.empty, { name })
+					: ulr(display!.reply, { [valueParam]: value, name, value }),
 		});
 		return true;
 	}
@@ -59,7 +50,7 @@ export async function userOptionsExecute(
 	if (!entry) return false;
 	const { def, spec } = entry;
 	const key = entry.key as UserOptionKey;
-	const name = ulr(spec.subcommand);
+	const name = ulr(spec.group);
 	const optionName = tr(spec.valueName);
 	const raw =
 		def.kind === "boolean"

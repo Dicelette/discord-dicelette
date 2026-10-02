@@ -11,7 +11,11 @@ i18next.addResourceBundle(
 	"en",
 	"translation",
 	{
-		userSettings: { options: { flag: { description: "Toggle the flag", name: "flag" } } },
+		userSettings: {
+			options: {
+				flag: { description: "Toggle the flag", group: "flag", value: "New state" },
+			},
+		},
 	},
 	true
 );
@@ -26,16 +30,19 @@ const groupsOf = (defs?: Parameters<typeof addGeneratedGroups>[1]) => {
 };
 
 describe("addGeneratedGroups", () => {
-	it("builds a default group with a typed subcommand per flagged option", () => {
-		const [group] = groupsOf({
+	it("builds a group per option like custom_formula, typed by kind", () => {
+		const groups = groupsOf({
 			flag: { kind: "boolean", slash: true },
 			hidden: { kind: "string" },
 		});
-		expect(group.name).toBe("options");
-		expect(group.options!.map((sub) => sub.name)).toEqual(["flag", "list"]);
-		const flag = group.options![0] as Sub;
-		expect(flag.options![0].type).toBe(Djs.ApplicationCommandOptionType.Boolean);
-		expect(flag.options![0].required).toBe(false);
+		expect(groups.map((g) => g.name)).toEqual(["flag"]);
+		const subs = groups[0].options as Sub[];
+		expect(subs.map((sub) => sub.name)).toEqual(["configure", "display"]);
+		expect(subs[0].options![0]).toMatchObject({
+			name: "value",
+			required: false,
+			type: Djs.ApplicationCommandOptionType.Boolean,
+		});
 	});
 
 	it("keeps the existing formula command and leaves the attributes group to its builder", () => {
