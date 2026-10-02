@@ -1,4 +1,5 @@
 import { validateCustomFormula } from "@dicelette/core";
+import { createRegexFromText, isRegex, isRegexSafe } from "../../../utils";
 import type { UserOptionDef } from "./types";
 
 /**
@@ -39,6 +40,19 @@ export const USER_OPTIONS = {
 	prefixEditComment: {
 		kind: "string",
 		slash: true,
+		section: "general",
+		validate: (value: string) => {
+			if (isRegex(value)) {
+				try {
+					const regex = createRegexFromText(value);
+					isRegexSafe(regex.source, regex.flags);
+					return null;
+				} catch (e) {
+					return "userSettings.prefixEditComment.invalidRegex";
+				}
+			}
+			return null;
+		},
 	},
 	ignoreNotfound: {
 		kind: "string",

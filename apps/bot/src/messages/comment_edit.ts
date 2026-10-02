@@ -2,7 +2,12 @@ import type { EClient } from "@dicelette/client";
 import { replaceRollComment } from "@dicelette/parse_result";
 import type { DiscordTextChannel, Translation } from "@dicelette/types";
 import { COMMENT_EDIT_PREFIX } from "@dicelette/types";
-import { MESSAGE_LINK_PATTERN, ROLL_MENTION_PATTERN } from "@dicelette/utils";
+import {
+	createRegexFromText,
+	isRegex,
+	MESSAGE_LINK_PATTERN,
+	ROLL_MENTION_PATTERN,
+} from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError } from "./embeds";
 
@@ -111,8 +116,24 @@ export async function handleCommentEditReply(
 	if (!message.reference?.messageId) return false;
 
 	const trimmed = message.content.trimStart();
-	if (!trimmed.toLowerCase().startsWith(COMMENT_EDIT_PREFIX.toLowerCase())) return false;
-	const newComment = trimmed.slice(COMMENT_EDIT_PREFIX.length);
+	const prefix = client.userSettings.get(
+		message.guild?.id ?? "",
+		message.author.id
+	)?.prefixEditComment;
+	//3 cas :
+	// - undefined (=> on retourne sur COMMENT_EDIT_PREFIX)
+	// - regex (commence et termine par /)
+	// - string (simple text => commence par ce texte)
+	// En soit, pour les deux derniers cas, on peut juste faire un regex commun => ^(prefixEditComment|COMMENT_EDIT_PREFIX) ou regex pour le regex
+	let regex: RegExp | undefined = new RegExp(`^${COMMENT_EDIT_PREFIX}`);
+	if (prefix) {
+		if (isRegex(prefix)) {
+			regex = createRegexFromText(prefix);
+		} else regex = new RegExp(`^${prefix}`);
+	}
+
+	if (!trimmed.toLowerCase().match(regex)) return false;
+	const newComment = trimmed.replace(regex, "");
 
 	let original: Djs.Message;
 	try {

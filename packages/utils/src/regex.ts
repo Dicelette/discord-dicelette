@@ -189,3 +189,13 @@ export function getIdFromMention(mention: string | undefined): string | undefine
 export function getIdFromMention(mention?: string): string | undefined {
 	return mention?.replace(MENTION_ID_DETECTION, "$1");
 }
+
+export function isRegex(text: string): boolean {
+	return /^\/.*\/[gimy]*$/.test(text);
+}
+
+export function createRegexFromText(toReplace: string): RegExp {
+	const flagsRegex = toReplace.match(/\/([gimy]+)$/);
+	const flags = flagsRegex ? Array.from(new Set(flagsRegex[1].split(""))).join("") : "";
+	return new RegExp(toReplace.replace(/\/(.+)\/.*/, "$1"), flags);
+}
