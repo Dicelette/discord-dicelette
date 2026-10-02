@@ -12,6 +12,26 @@ type Defs = Record<string, UserOptionDef>;
 /** Groups whose builder is written by hand and extended with `addGeneratedSubcommands`. */
 const HANDWRITTEN_GROUPS = new Set(["userSettings.attributes.title"]);
 
+export function snakeCase(str: string) {
+	return str
+		.replace(/\W+/g, " ")
+		.split(/ |\B(?=[A-Z])/)
+		.map((word) => word.toLowerCase())
+		.join("_");
+}
+
+const hasKey = (key: string, lng = "en") =>
+	i18next.getResource(lng, "translation", key) !== undefined;
+
+/** Translated group name, or the option key in snake_case when no translation exists. */
+export function groupName(
+	key: string,
+	spec: SlashSpec,
+	translate: (key: string) => string = i18next.getFixedT("en")
+) {
+	return hasKey(spec.group) ? translate(spec.group) : snakeCase(key);
+}
+
 export function slashEntries(defs: Defs) {
 	return Object.entries(defs)
 		.filter(([, def]) => def.slash)
@@ -21,7 +41,6 @@ export function slashEntries(defs: Defs) {
 export function slashI18nKeys(spec: SlashSpec) {
 	const { display, messages } = spec;
 	return [
-		spec.group,
 		spec.groupDescription,
 		spec.subcommand,
 		spec.description,
@@ -92,16 +111,17 @@ export function addGeneratedGroups(
 	data: Pick<Djs.SlashCommandBuilder, "addSubcommandGroup">,
 	defs: Defs = USER_OPTIONS
 ) {
-	const groups = new Map<string, string>();
-	for (const { spec } of checkedSlashEntries(defs))
-		if (!HANDWRITTEN_GROUPS.has(spec.group))
-			groups.set(spec.group, spec.groupDescription);
-	for (const [title, description] of groups)
-		data.addSubcommandGroup((group) =>
-			addGeneratedSubcommands(
-				group.setNames(title).setDescriptions(description),
-				title,
+	const groups = new Map<string, { key: string; spec: SlashSpec }>();
+	for (const { key, spec } of checkedSlashEntries(defs))
+		if (!HANDWRITTEN_GROUPS.has(spec.group)) groups.set(spec.group, { key, spec });
+	for (const [groupKey, { key, spec }] of groups)
+		data.addSubcommandGroup((group) => {
+			if (hasKey(groupKey)) group.setNames(groupKey);
+			else group.setName(snakeCase(key));
+			return addGeneratedSubcommands(
+				group.setDescriptions(spec.groupDescription),
+				groupKey,
 				defs
-			)
-		);
+			);
+		});
 }

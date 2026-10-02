@@ -9,7 +9,7 @@ import {
 } from "@dicelette/types";
 import * as Djs from "discord.js";
 import { reply } from "messages";
-import { slashEntries } from "./options";
+import { groupName, slashEntries } from "./options";
 
 type Tr = (key: string, options?: Record<string, unknown>) => string;
 
@@ -22,7 +22,9 @@ export async function userOptionsExecute(
 ) {
 	const group = interaction.options.getSubcommandGroup(false);
 	const subcommand = interaction.options.getSubcommand(true);
-	const entries = slashEntries(USER_OPTIONS).filter((e) => tr(e.spec.group) === group);
+	const entries = slashEntries(USER_OPTIONS).filter(
+		(e) => groupName(e.key, e.spec, tr) === group
+	);
 	const { ul } = getLangAndConfig(client, interaction);
 	const ulr = ul as unknown as Tr;
 	const guildId = interaction.guild!.id;
@@ -35,7 +37,7 @@ export async function userOptionsExecute(
 	);
 	if (displayed?.spec.display) {
 		const { display, group: groupKey, valueParam } = displayed.spec;
-		const name = ulr(groupKey);
+		const name = groupName(displayed.key, displayed.spec, ulr);
 		const value = stored?.[displayed.key as UserOptionKey];
 		await reply(interaction, {
 			content:
@@ -50,7 +52,7 @@ export async function userOptionsExecute(
 	if (!entry) return false;
 	const { def, spec } = entry;
 	const key = entry.key as UserOptionKey;
-	const name = ulr(spec.group);
+	const name = groupName(entry.key, spec, ulr);
 	const optionName = tr(spec.valueName);
 	const raw =
 		def.kind === "boolean"

@@ -7,8 +7,10 @@ import { describe, expect, it } from "vitest";
 import {
 	addGeneratedGroups,
 	addGeneratedSubcommands,
+	groupName,
 	missingSlashKeys,
 	slashEntries,
+	snakeCase,
 } from "../src/commands/userSettings/options";
 
 i18next.addResourceBundle(
@@ -18,6 +20,7 @@ i18next.addResourceBundle(
 		userSettings: {
 			options: {
 				flag: { description: "Toggle the flag", group: "flag", value: "New state" },
+				prefixEditComments: { description: "Prefix", value: "New prefix" },
 			},
 		},
 	},
@@ -84,9 +87,13 @@ describe("slash translations", () => {
 	it("uses Discord-valid names in every locale", () => {
 		const invalid = slashEntries(USER_OPTIONS).flatMap(({ key, spec }) =>
 			Object.keys(resources).flatMap((lng) =>
-				[spec.group, spec.subcommand, spec.valueName, spec.display?.subcommand]
-					.filter((k): k is string => !!k)
-					.map((k) => ({ key, lng, name: i18next.t(k, { lng }) as string }))
+				[
+					groupName(key, spec, i18next.getFixedT(lng)),
+					...[spec.subcommand, spec.valueName, spec.display?.subcommand]
+						.filter((k): k is string => !!k)
+						.map((k) => i18next.t(k, { lng }) as string),
+				]
+					.map((name) => ({ key, lng, name }))
 					.filter(({ name }) => !/^[\p{Ll}\p{N}_-]{1,32}$/u.test(name))
 			)
 		);
@@ -95,7 +102,20 @@ describe("slash translations", () => {
 
 	it("names the missing keys instead of failing in the Discord builder", () => {
 		expect(() => groupsOf({ unknown: { kind: "string", slash: true } })).toThrow(
-			/"unknown" is missing translations[\s\S]*userSettings\.options\.unknown\.group/
+			/"unknown" is missing translations[\s\S]*userSettings\.options\.unknown\.description/
 		);
+	});
+});
+
+describe("group name fallback", () => {
+	it("snake-cases the option key", () => {
+		expect(snakeCase("prefixEditComments")).toBe("prefix_edit_comments");
+	});
+
+	it("uses it when the group has no translation", () => {
+		const [group] = groupsOf({
+			prefixEditComments: { kind: "string", slash: true },
+		});
+		expect(group.name).toBe("prefix_edit_comments");
 	});
 });
