@@ -34,6 +34,9 @@ describe("USER_OPTIONS", () => {
 			"prefixEditComment",
 			"ignoreNotfound",
 		]);
-		expect(getUserOptionsBySection("general")).toEqual(["customFormula"]);
+		expect(getUserOptionsBySection("general")).toEqual([
+			"customFormula",
+			"prefixEditComment",
+		]);
 	});
 });

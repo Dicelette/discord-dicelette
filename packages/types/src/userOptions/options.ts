@@ -1,5 +1,6 @@
+/** Shared with the browser: only import browser-safe modules here (never `@dicelette/utils` barrel, `node:*` or Sentry). */
 import { validateCustomFormula } from "@dicelette/core";
-import { createRegexFromText, isRegex, isRegexSafe } from "../../../utils";
+import { createRegexFromText, isRegex } from "../../../utils/src/regex";
 import type { UserOptionDef } from "./types";
 
 /**
@@ -44,8 +45,7 @@ export const USER_OPTIONS = {
 		validate: (value: string) => {
 			if (isRegex(value)) {
 				try {
-					const regex = createRegexFromText(value);
-					isRegexSafe(regex.source, regex.flags);
+					createRegexFromText(value);
 					return null;
 				} catch (e) {
 					return "userSettings.prefixEditComment.invalidRegex";
