@@ -219,6 +219,7 @@
 		"total": "Total",
 		"true": "Vrai",
 		"user": "Joueur",
+		"value": "valeur",
 		"yes": "✓"
 	},
 	"config": {
@@ -1186,8 +1187,7 @@
 				"name": "Nom de l'attribut",
 				"success": "L'attribut {{- name}} a été créé avec succès.",
 				"value": {
-					"description": "Nombre qui sera utilisé",
-					"title": "valeur"
+					"description": "Nombre qui sera utilisé"
 				}
 			},
 			"delete": {
@@ -1291,14 +1291,14 @@
 				"reply": "`{{- name}}` : `{{- value}}`"
 			},
 			"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}",
+			"prefixEditComment": {
+				"description": "Ajuster le préfixe pour l'édition de commentaire dans un dé déjà lancé"
+			},
 			"reset": "`{{- name}}` a été réinitialisé.",
 			"saved": "`{{- name}}` est maintenant défini sur `{{- value}}`.",
 			"set": {
 				"description": "Définir la valeur. Lancer sans valeur pour réinitialiser.",
 				"title": "configurer"
-			},
-			"value": {
-				"title": "valeur"
 			}
 		},
 		"replaceUnknown": {

@@ -36,6 +36,10 @@ export const USER_OPTIONS = {
 			return result.ok ? null : result.error;
 		},
 	},
+	prefixEditComment: {
+		kind: "string",
+		slash: true,
+	},
 	ignoreNotfound: {
 		kind: "string",
 		slash: {
@@ -48,7 +52,7 @@ export const USER_OPTIONS = {
 			},
 			subcommand: "userSettings.attributes.replaceUnknown.title",
 			valueDescription: "userSettings.attributes.replaceUnknown.options",
-			valueName: "userSettings.attributes.create.value.title",
+			valueName: "common.value",
 		},
 	},
 } as const satisfies Record<string, UserOptionDef>;
