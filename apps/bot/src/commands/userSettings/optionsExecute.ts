@@ -11,7 +11,10 @@ import * as Djs from "discord.js";
 import { reply } from "messages";
 import { displayedCommandName, groupName, slashEntries } from "./options";
 
-/** Returns `false` when the interaction does not target a generated subcommand. */
+/**
+ * Returns `false` when the interaction does not target a generated subcommand.
+ * Discord always sends the default (English) names, so they are matched with `t`, never with `ul`.
+ */
 export async function userOptionsExecute(
 	client: EClient,
 	interaction: Djs.ChatInputCommandInteraction
@@ -22,11 +25,6 @@ export async function userOptionsExecute(
 	const entries = slashEntries(USER_OPTIONS).filter(
 		(e) => groupName(e.key, e.spec, t) === group
 	);
-	console.log("userOptionsExecute", {
-		group,
-		subcommand,
-		entries: entries.map((e) => e.key),
-	});
 	const guildId = interaction.guild!.id;
 	const userId = interaction.user.id;
 	const stored = client.userSettings.get(guildId, userId);
@@ -35,8 +33,6 @@ export async function userOptionsExecute(
 	const displayed = entries.find(
 		(e) => e.spec.display && t(e.spec.display.subcommand) === subcommand
 	);
-
-	console.log("displayed", displayed);
 
 	if (displayed?.spec.display) {
 		const { display, group: groupKey, valueParam } = displayed.spec;
@@ -56,12 +52,12 @@ export async function userOptionsExecute(
 		return true;
 	}
 
-	const entry = entries.find((e) => ul(e.spec.subcommand) === subcommand);
+	const entry = entries.find((e) => t(e.spec.subcommand) === subcommand);
 	if (!entry) return false;
 	const { def, spec } = entry;
 	const key = entry.key as UserOptionKey;
 	const name = displayedCommandName(entry.key, spec, ul);
-	const optionName = ul(spec.valueName);
+	const optionName = t(spec.valueName);
 	const raw =
 		def.kind === "boolean"
 			? interaction.options.getBoolean(optionName)
