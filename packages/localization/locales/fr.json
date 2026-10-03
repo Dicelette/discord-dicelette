@@ -1265,6 +1265,13 @@
 			"title": "créer_lien"
 		},
 		"description": "Permets de configurer certaines fonctions non-critique du bot par les utilisateurs.",
+		"display": {
+			"description": "Afficher la valeur actuelle.",
+			"empty_female": "{{- name}} n'est pas définie.",
+			"empty_male": "Le {{- name}} n'est pas défini.",
+			"reply_female": "La valeur de la {{- name}} est : `{{- value}}`",
+			"reply_male": "La valeur du {{- name}} est définie sur `{{- value}}`"
+		},
 		"formula": {
 			"description": " Définit une formule mathjs où $ est remplacé par [expr] dans vos jets",
 			"display": {
@@ -1283,26 +1290,20 @@
 			},
 			"title": "formule_personnalisée"
 		},
+		"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}",
 		"name": "user_config",
-		"options": {
-			"display": {
-				"description": "Afficher la valeur actuelle.",
-				"empty": "`{{- name}}` n'est pas défini.",
-				"reply": "`{{- name}}` : `{{- value}}`"
-			},
-			"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}",
-			"prefixEditComment": {
-				"description": "Ajuster le préfixe pour l'édition de commentaire dans un dé déjà lancé"
-			},
-			"reset": "`{{- name}}` a été réinitialisé.",
-			"saved": "`{{- name}}` est maintenant défini sur `{{- value}}`.",
-			"set": {
-				"description": "Définir la valeur. Lancer sans valeur pour réinitialiser.",
-				"title": "configurer"
-			}
+		"prefixEditComment": {
+			"description": "Ajuster le préfixe pour l'édition de commentaire dans un dé déjà lancé",
+			"title": "préfix d'édition des commentaires"
 		},
 		"replaceUnknown": {
 			"title": "Remplacer les valeurs inconnues"
+		},
+		"reset": "{{- name}} a été réinitialisé.",
+		"saved": "{{- name}} est maintenant défini sur `{{- value}}`.",
+		"set": {
+			"description": "Définir la valeur. Lancer sans valeur pour réinitialiser.",
+			"title": "configurer"
 		},
 		"snippets": {
 			"create": {

@@ -128,7 +128,7 @@ describe("value description fallback", () => {
 		});
 		const configure = group.options![0] as Sub;
 		expect(configure.options![0].description).toBe(
-			i18next.t("userSettings.options.set.description", { lng: "en" })
+			i18next.t("userSettings.set.description", { lng: "en" })
 		);
 	});
 });

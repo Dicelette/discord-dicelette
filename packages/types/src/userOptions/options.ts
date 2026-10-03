@@ -1,12 +1,11 @@
-/** Shared with the browser: only import browser-safe modules here (never `@dicelette/utils` barrel, `node:*` or Sentry). */
 import { validateCustomFormula } from "@dicelette/core";
-import { createRegexFromText, isRegex } from "../../../utils/src/regex";
+import { createRegexFromText, isRegex } from "@dicelette/utils";
 import type { UserOptionDef } from "./types";
 
 /**
  * Scalar per-user options. Adding an entry types `UserSettingsData`, validates the
  * dashboard PATCH and renders the field. The label lives in `userConfig.options.<key>.label`; the helper is
- * `userSettings.options.<key>.description` (or `userConfig.options.<key>.helper` with a `helperLink`).
+ * `userSettings.<key>.description` (or `userConfig.options.<key>.helper` with a `helperLink`).
  */
 export const USER_OPTIONS = {
 	customFormula: {
@@ -43,13 +42,14 @@ export const USER_OPTIONS = {
 		kind: "string",
 		slash: true,
 		section: "general",
+		context: "male",
 		validate: (value: string) => {
 			if (isRegex(value)) {
 				try {
 					createRegexFromText(value);
 					return null;
 				} catch (e) {
-					return "userSettings.prefixEditComment.invalidRegex";
+					return `Invalid regex: ${(e as Error).message}`;
 				}
 			}
 			return null;

@@ -5,11 +5,12 @@ type OptionBase = {
 	section?: "general";
 	/**
 	 * Generates a slash group. `true` creates `/user_config <name> configure|display` from
-	 * `userSettings.options.<key>.description` (required), plus optional `.group` (else the
+	 * `userSettings.<key>.description` (required), plus optional `.group` (else the
 	 * snake_cased key) and `.value` (else the generic description). A partial spec overrides
 	 * the keys to keep an existing command or to extend a handwritten group.
 	 */
 	slash?: true | SlashOverrides;
+	context?: "male" | "female";
 };
 
 type StringOption = OptionBase & {

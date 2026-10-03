@@ -2,7 +2,7 @@ import type { SlashOverrides, SlashSpec } from "./types";
 
 /** Same layout as `custom_formula`: `<option> configure [value]` and `<option> display`. */
 export function resolveSlash(key: string, slash: true | SlashOverrides): SlashSpec {
-	const base = "userSettings.options";
+	const base = "userSettings";
 	const spec = slash === true ? {} : slash;
 	return {
 		description: `${base}.set.description`,

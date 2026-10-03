@@ -1265,6 +1265,13 @@
 			"title": "create_link"
 		},
 		"description": "Allows users to configure certain non-critical functions of the bot.",
+		"display": {
+			"description": "Display the current value.",
+			"empty_female": "{{- name}} is not set.",
+			"empty_male": "{{- name}} is not set.",
+			"reply_female": "The {{- name}} value is: `{{- value}}`",
+			"reply_male": "The {{- name}} value is : `{{- value}}`"
+		},
 		"formula": {
 			"description": "Set a mathjs formula where $ is replaced by [expr] in dice rolls",
 			"display": {
@@ -1283,26 +1290,20 @@
 			},
 			"title": "custom_formula"
 		},
+		"invalid": "Invalid value for `{{- name}}`: {{- error}}",
 		"name": "user_config",
-		"options": {
-			"display": {
-				"description": "Display the current value.",
-				"empty": "`{{- name}}` is not set.",
-				"reply": "`{{- name}}`: `{{- value}}`"
-			},
-			"invalid": "Invalid value for `{{- name}}`: {{- error}}",
-			"prefixEditComment": {
-				"description": "Adjust the prefix for editing comments in a rolled dice"
-			},
-			"reset": "`{{- name}}` has been reset.",
-			"saved": "`{{- name}}` is now set to `{{- value}}`.",
-			"set": {
-				"description": "Set the value. Run it without value to reset.",
-				"title": "configure"
-			}
+		"prefixEditComment": {
+			"description": "Adjust the prefix for editing comments in a rolled dice",
+			"title": "comment editing prefix"
 		},
 		"replaceUnknown": {
 			"title": "Replace unknown value"
+		},
+		"reset": "{{- name}} has been reset.",
+		"saved": "{{- name}} is now set to `{{- value}}`.",
+		"set": {
+			"description": "Set the value. Run it without value to reset.",
+			"title": "configure"
 		},
 		"snippets": {
 			"create": {

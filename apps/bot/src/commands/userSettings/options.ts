@@ -1,6 +1,7 @@
 import {
 	resolveSlash,
 	type SlashSpec,
+	type Translation,
 	USER_OPTIONS,
 	type UserOptionDef,
 } from "@dicelette/types";
@@ -24,15 +25,18 @@ const hasKey = (key: string, lng = "en") =>
 	i18next.getResource(lng, "translation", key) !== undefined;
 
 /** Translated group name, or the option key in snake_case when no translation exists. */
-export function groupName(
-	key: string,
-	spec: SlashSpec,
-	translate: (key: string) => string = i18next.getFixedT("en")
-) {
-	return hasKey(spec.group) ? translate(spec.group) : snakeCase(key);
+export function groupName(key: string, spec: SlashSpec, t: Translation) {
+	return hasKey(spec.group) ? t(spec.group) : snakeCase(key);
 }
 
-const VALUE_DESCRIPTION_FALLBACK = "userSettings.options.set.description";
+export function displayedCommandName(key: string, spec: SlashSpec, t: Translation) {
+	const defaultName = `userSettings.${key}.title`;
+	if (hasKey(spec.group)) return t(spec.group);
+	if (hasKey(defaultName)) return t(defaultName);
+	return snakeCase(key);
+}
+
+const VALUE_DESCRIPTION_FALLBACK = "userSettings.set.description";
 
 /** Option description of the value, or the generic one when the option has none. */
 export function valueDescriptionKey(spec: SlashSpec) {
