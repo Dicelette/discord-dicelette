@@ -52,22 +52,27 @@ export function slashEntries(defs: Defs) {
 		.map(([key, def]) => ({ def, key, spec: resolveSlash(key, def.slash!) }));
 }
 
-export function slashI18nKeys(spec: SlashSpec) {
-	const { display, messages } = spec;
+type SlashEntry = { def: UserOptionDef; spec: SlashSpec };
+
+/** `invalid` can only be shown by options that validate their value. */
+export function slashI18nKeys({ def, spec }: SlashEntry) {
+	const { invalid, ...messages } = spec.messages;
+	const validates = def.kind === "string" && !!def.validate;
 	return [
 		spec.groupDescription,
 		spec.subcommand,
 		spec.description,
 		spec.valueName,
 		...Object.values(messages),
-		...(display ? Object.values(display) : []),
+		...(validates ? [invalid] : []),
+		...(spec.display ? Object.values(spec.display) : []),
 	].filter((key): key is string => !!key);
 }
 
-export function missingSlashKeys(spec: SlashSpec, languages: string[], context?: string) {
+export function missingSlashKeys(entry: SlashEntry, languages: string[]) {
 	return languages.flatMap((lng) =>
-		slashI18nKeys(spec)
-			.filter((key) => !hasKey(key, lng, context))
+		slashI18nKeys(entry)
+			.filter((key) => !hasKey(key, lng, entry.def.context))
 			.map((key) => `${lng}: ${key}`)
 	);
 }
@@ -76,7 +81,7 @@ export function missingSlashKeys(spec: SlashSpec, languages: string[], context?:
 function checkedSlashEntries(defs: Defs) {
 	const entries = slashEntries(defs);
 	for (const { def, key, spec } of entries) {
-		const missing = missingSlashKeys(spec, ["en"], def.context);
+		const missing = missingSlashKeys({ def, spec }, ["en"]);
 		if (missing.length > 0)
 			throw new Error(
 				`Slash option "${key}" is missing translations:\n${missing.join("\n")}`

@@ -10,6 +10,7 @@ import {
 	groupName,
 	missingSlashKeys,
 	slashEntries,
+	slashI18nKeys,
 	snakeCase,
 } from "../src/commands/userSettings/options";
 
@@ -78,7 +79,7 @@ describe("slash translations", () => {
 	it("has every key of every slash option in every locale", () => {
 		const languages = Object.keys(resources);
 		const missing = slashEntries(USER_OPTIONS).flatMap(({ def, key, spec }) =>
-			missingSlashKeys(spec, languages, def.context).map((m) => `${key} -> ${m}`)
+			missingSlashKeys({ def, spec }, languages).map((m) => `${key} -> ${m}`)
 		);
 		expect(missing).toEqual([]);
 	});
@@ -100,11 +101,25 @@ describe("slash translations", () => {
 	});
 
 	it("finds contextual keys such as reply_male through the option context", () => {
-		const [{ spec }] = slashEntries({
+		const [{ def, spec }] = slashEntries({
 			flag: { context: "male", kind: "boolean", slash: true },
 		});
-		expect(missingSlashKeys(spec, ["en"], "male")).toEqual([]);
-		expect(missingSlashKeys(spec, ["en"])).toContain("en: userSettings.display.reply");
+		expect(missingSlashKeys({ def, spec }, ["en"])).toEqual([]);
+		const withoutContext = { ...def, context: undefined };
+		expect(missingSlashKeys({ def: withoutContext, spec }, ["en"])).toContain(
+			"en: userSettings.display.reply"
+		);
+	});
+
+	it("only requires the invalid message from options that validate", () => {
+		const [plain] = slashEntries({
+			flag: { context: "male", kind: "boolean", slash: true },
+		});
+		const [validated] = slashEntries({
+			flag: { context: "male", kind: "string", slash: true, validate: () => null },
+		});
+		expect(slashI18nKeys(plain)).not.toContain("userSettings.invalid");
+		expect(slashI18nKeys(validated)).toContain("userSettings.invalid");
 	});
 
 	it("names the missing keys instead of failing in the Discord builder", () => {
