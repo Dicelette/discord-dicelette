@@ -21,8 +21,9 @@ export function snakeCase(str: string) {
 		.join("_");
 }
 
-const hasKey = (key: string, lng = "en") =>
-	i18next.getResource(lng, "translation", key) !== undefined;
+/** Resolves i18next contexts too: with `male`, `reply` is found through `reply_male` or `reply`. */
+export const hasKey = (key: string, lng = "en", context?: string) =>
+	i18next.exists(key, { context, fallbackLng: false, lng });
 
 /** Translated group name, or the option key in snake_case when no translation exists. */
 export function groupName(key: string, spec: SlashSpec, t: Translation) {
@@ -63,10 +64,10 @@ export function slashI18nKeys(spec: SlashSpec) {
 	].filter((key): key is string => !!key);
 }
 
-export function missingSlashKeys(spec: SlashSpec, languages: string[]) {
+export function missingSlashKeys(spec: SlashSpec, languages: string[], context?: string) {
 	return languages.flatMap((lng) =>
 		slashI18nKeys(spec)
-			.filter((key) => i18next.getResource(lng, "translation", key) === undefined)
+			.filter((key) => !hasKey(key, lng, context))
 			.map((key) => `${lng}: ${key}`)
 	);
 }
@@ -74,8 +75,8 @@ export function missingSlashKeys(spec: SlashSpec, languages: string[]) {
 /** Fails at startup with the missing keys instead of an opaque Discord builder error. */
 function checkedSlashEntries(defs: Defs) {
 	const entries = slashEntries(defs);
-	for (const { key, spec } of entries) {
-		const missing = missingSlashKeys(spec, ["en"]);
+	for (const { def, key, spec } of entries) {
+		const missing = missingSlashKeys(spec, ["en"], def.context);
 		if (missing.length > 0)
 			throw new Error(
 				`Slash option "${key}" is missing translations:\n${missing.join("\n")}`

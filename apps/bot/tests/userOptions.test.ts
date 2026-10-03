@@ -18,11 +18,9 @@ i18next.addResourceBundle(
 	"translation",
 	{
 		userSettings: {
-			options: {
-				flag: { description: "Toggle the flag", group: "flag", value: "New state" },
-				prefixEditComments: { description: "Prefix", value: "New prefix" },
-				plainOption: { description: "Plain" },
-			},
+			flag: { description: "Toggle the flag", group: "flag", value: "New state" },
+			plainOption: { description: "Plain" },
+			prefixEditComments: { description: "Prefix", value: "New prefix" },
 		},
 	},
 	true
@@ -40,7 +38,7 @@ const groupsOf = (defs?: Parameters<typeof addGeneratedGroups>[1]) => {
 describe("addGeneratedGroups", () => {
 	it("builds a group per option like custom_formula, typed by kind", () => {
 		const groups = groupsOf({
-			flag: { kind: "boolean", slash: true },
+			flag: { context: "male", kind: "boolean", slash: true },
 			hidden: { kind: "string" },
 		});
 		expect(groups.map((g) => g.name)).toEqual(["flag"]);
@@ -79,8 +77,8 @@ describe("addGeneratedSubcommands", () => {
 describe("slash translations", () => {
 	it("has every key of every slash option in every locale", () => {
 		const languages = Object.keys(resources);
-		const missing = slashEntries(USER_OPTIONS).flatMap(({ key, spec }) =>
-			missingSlashKeys(spec, languages).map((m) => `${key} -> ${m}`)
+		const missing = slashEntries(USER_OPTIONS).flatMap(({ def, key, spec }) =>
+			missingSlashKeys(spec, languages, def.context).map((m) => `${key} -> ${m}`)
 		);
 		expect(missing).toEqual([]);
 	});
@@ -101,9 +99,17 @@ describe("slash translations", () => {
 		expect(invalid).toEqual([]);
 	});
 
+	it("finds contextual keys such as reply_male through the option context", () => {
+		const [{ spec }] = slashEntries({
+			flag: { context: "male", kind: "boolean", slash: true },
+		});
+		expect(missingSlashKeys(spec, ["en"], "male")).toEqual([]);
+		expect(missingSlashKeys(spec, ["en"])).toContain("en: userSettings.display.reply");
+	});
+
 	it("names the missing keys instead of failing in the Discord builder", () => {
 		expect(() => groupsOf({ unknown: { kind: "string", slash: true } })).toThrow(
-			/"unknown" is missing translations[\s\S]*userSettings\.options\.unknown\.description/
+			/"unknown" is missing translations[\s\S]*userSettings\.unknown\.description/
 		);
 	});
 });
@@ -115,7 +121,7 @@ describe("group name fallback", () => {
 
 	it("uses it when the group has no translation", () => {
 		const [group] = groupsOf({
-			prefixEditComments: { kind: "string", slash: true },
+			prefixEditComments: { context: "male", kind: "string", slash: true },
 		});
 		expect(group.name).toBe("prefix_edit_comments");
 	});
@@ -124,7 +130,7 @@ describe("group name fallback", () => {
 describe("value description fallback", () => {
 	it("uses the generic description when the option has no .value key", () => {
 		const [group] = groupsOf({
-			plainOption: { kind: "string", slash: true },
+			plainOption: { context: "male", kind: "string", slash: true },
 		});
 		const configure = group.options![0] as Sub;
 		expect(configure.options![0].description).toBe(
