@@ -4,6 +4,7 @@ import type { SlashOverrides, SlashSpec } from "./types";
 /**
  * Same layout as `custom_formula`: `<option> configure [value]` and `<option> display`.
  * The overrides are merged over the conventional keys and always win, translated or not.
+ * The `display` subcommand is on by default; `display: false` removes it.
  * `exists` only picks the default value description (`<key>.value`, else the generic one).
  */
 export function resolveSlash(
@@ -16,15 +17,12 @@ export function resolveSlash(
 	const valueKey = `${base}.${key}.value`;
 	const defaults: SlashSpec = {
 		description: `${base}.set.description`,
-		display:
-			slash === true || overrides.display
-				? {
-						description: `${base}.display.description`,
-						empty: `${base}.display.empty`,
-						reply: `${base}.display.reply`,
-						subcommand: "display.title",
-					}
-				: undefined,
+		display: {
+			description: `${base}.display.description`,
+			empty: `${base}.display.empty`,
+			reply: `${base}.display.reply`,
+			subcommand: "display.title",
+		},
 		group: `${base}.${key}.group`,
 		groupDescription: `${base}.${key}.description`,
 		messages: {
@@ -37,5 +35,6 @@ export function resolveSlash(
 		valueName: "common.value",
 		valueParam: "value",
 	};
-	return merge(defaults, overrides) as SlashSpec;
+	const spec = merge(defaults, overrides) as SlashSpec;
+	return { ...spec, display: spec.display || undefined };
 }

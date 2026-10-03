@@ -63,6 +63,7 @@ export const USER_OPTIONS = {
 		kind: "string",
 		slash: {
 			description: "userSettings.attributes.replaceUnknown.description",
+			display: false,
 			group: "userSettings.attributes.title",
 			groupDescription: "userSettings.attributes.description",
 			messages: {
