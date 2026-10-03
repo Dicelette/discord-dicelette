@@ -1,21 +1,6 @@
 import { merge } from "ts-deepmerge";
 import type { SlashOverrides, SlashSpec } from "./types";
 
-type Exists = (key: string) => boolean;
-type Tree = { [key: string]: string | Tree | undefined };
-
-/** Drops the overridden keys that have no translation, so the defaults take over. */
-function translated({ valueParam, ...keys }: SlashOverrides, exists: Exists) {
-	const prune = (node: Tree): Tree =>
-		Object.fromEntries(
-			Object.entries(node).flatMap<[string, string | Tree]>(([name, value]) => {
-				if (typeof value === "string") return exists(value) ? [[name, value]] : [];
-				return value ? [[name, prune(value)]] : [];
-			})
-		);
-	return { ...prune(keys as Tree), valueParam };
-}
-
 /**
  * Same layout as `custom_formula`: `<option> configure [value]` and `<option> display`.
  * The overrides are merged over the conventional keys; an overridden key without
@@ -24,10 +9,11 @@ function translated({ valueParam, ...keys }: SlashOverrides, exists: Exists) {
 export function resolveSlash(
 	key: string,
 	slash: true | SlashOverrides,
-	exists: Exists = () => true
+	exists: (key: string) => boolean = () => true
 ): SlashSpec {
 	const base = "userSettings";
 	const overrides = slash === true ? {} : slash;
+	const valueKey = `${base}.${key}.value`;
 	const defaults: SlashSpec = {
 		description: `${base}.set.description`,
 		display:
@@ -47,16 +33,21 @@ export function resolveSlash(
 			saved: `${base}.saved`,
 		},
 		subcommand: `${base}.set.title`,
-		valueDescription: `${base}.${key}.value`,
+		valueDescription: exists(valueKey) ? valueKey : `${base}.set.description`,
 		valueName: "common.value",
 		valueParam: "value",
 	};
-	const spec = merge.withOptions(
+	// A reviver returning `undefined` drops the key: untranslated overrides never reach the merge.
+	const translated: SlashOverrides = JSON.parse(
+		JSON.stringify(overrides),
+		(name, value) =>
+			typeof value === "string" && name !== "valueParam" && !exists(value)
+				? undefined
+				: value
+	);
+	return merge.withOptions(
 		{ allowUndefinedOverrides: false },
 		defaults,
-		translated(overrides, exists)
+		translated
 	) as SlashSpec;
-	return exists(spec.valueDescription)
-		? spec
-		: { ...spec, valueDescription: `${base}.set.description` };
 }
