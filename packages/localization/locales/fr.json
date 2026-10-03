@@ -1290,7 +1290,8 @@
 			},
 			"title": "formule_personnalisée"
 		},
-		"invalid": "Valeur invalide pour `{{- name}}` : {{- error}}",
+		"invalid_female": "La valeur est invalide pour la {{- name}} : {{- error}}.",
+		"invalid_male": "La valeur est invalide pour le {{- name}} : {{- error}}",
 		"name": "user_config",
 		"prefixEditComment": {
 			"description": "Ajuster le préfixe pour l'édition de commentaire dans un dé déjà lancé",
@@ -1299,10 +1300,12 @@
 		"replaceUnknown": {
 			"title": "Remplacer les valeurs inconnues"
 		},
-		"reset": "{{- name}} a été réinitialisé.",
-		"saved": "{{- name}} est maintenant défini sur `{{- value}}`.",
+		"reset_female": "La valeur de la {{- name}} a été réinitialisée.",
+		"reset_male": "La valeur du {{- name}} a été réinitialisé.",
+		"saved_female": "La {{- name}} est maintenant définie sur `{{- value}}`.",
+		"saved_male": "Le {{- name}} est maintenant défini sur `{{- value}}`.",
 		"set": {
-			"description": "Définir la valeur. Lancer sans valeur pour réinitialiser.",
+			"description": "Défini la valeur. Lancer sans valeur pour réinitialiser.",
 			"title": "configurer"
 		},
 		"snippets": {

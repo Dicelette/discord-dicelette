@@ -1290,7 +1290,8 @@
 			},
 			"title": "custom_formula"
 		},
-		"invalid": "Invalid value for `{{- name}}`: {{- error}}",
+		"invalid_female": "Invalid value for {{- name}}: {{- error}}",
+		"invalid_male": "Invalid value for {{- name}}: {{- error}}",
 		"name": "user_config",
 		"prefixEditComment": {
 			"description": "Adjust the prefix for editing comments in a rolled dice",
@@ -1299,8 +1300,10 @@
 		"replaceUnknown": {
 			"title": "Replace unknown value"
 		},
-		"reset": "{{- name}} has been reset.",
-		"saved": "{{- name}} is now set to `{{- value}}`.",
+		"reset_female": "{{- name}} has been reset.",
+		"reset_male": "{{- name}} has been reset.",
+		"saved_female": "The {{- name}} is now set to `{{- value}}`.",
+		"saved_male": "The {{- name}} is now set to `{{- value}}`.",
 		"set": {
 			"description": "Set the value. Run it without value to reset.",
 			"title": "configure"
