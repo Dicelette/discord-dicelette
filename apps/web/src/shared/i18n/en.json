@@ -335,6 +335,10 @@
 		"alreadyExists": "Name \"{name}\" already exists.",
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
 		"attrValue": "Value",
+		"customFormula": {
+			"helper": "Applies a personal {link} formula to the rolls where [expr] replaces $. Overridden by the server configuration if any.",
+			"label": "Custom formula"
+		},
 		"export": "Export",
 		"exportTooltip": "Download as JSON",
 		"formulaError": "Cannot resolve formula (unknown attributes or invalid expression).",
@@ -347,11 +351,8 @@
 		"noAttributes": "No attributes defined yet.",
 		"noSnippets": "No snippets defined yet.",
 		"optionInvalid": "Invalid value: {error}",
-		"options": {
-			"customFormula": {
-				"helper": "Applies a personal {link} formula to the rolls where [expr] replaces $. Overridden by the server configuration if any.",
-				"label": "Custom formula"
-			}
+		"prefixEditComment": {
+			"label": "Edit comment prefix"
 		},
 		"resetTemplate": "Reset to defaults",
 		"saveError": "Error while saving.",

@@ -1295,6 +1295,7 @@
 		"name": "user_config",
 		"prefixEditComment": {
 			"description": "Adjust the prefix for editing comments in a rolled dice",
+			"reset": "The edit comment prefix was reset.\nThe default value is `///`.",
 			"title": "comment editing prefix"
 		},
 		"replaceUnknown": {

@@ -86,12 +86,14 @@ function General({ guildId, initialConfig }: Props) {
 		}
 	};
 
+	const actionsBoxStyles = { ...actionsBoxSx, paddingTop: 1 };
+
 	return (
 		<FormAccordion title={t("userConfig.sections.general")} defaultExpanded>
 			<Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
 				{GENERAL_KEYS.map((key) => {
 					const def = getUserOption(key);
-					const label = t(`userConfig.options.${key}.label`);
+					const label = t(`userConfig.${key}.label`);
 					if (def.kind === "boolean")
 						return (
 							<FormControlLabel
@@ -106,8 +108,8 @@ function General({ guildId, initialConfig }: Props) {
 							/>
 						);
 					const helperKey = def.helperLink
-						? `userConfig.options.${key}.helper`
-						: `userSettings.options.${key}.description`;
+						? `userConfig.${key}.helper`
+						: `userSettings.${key}.description`;
 					const helper = def.helperLink ? (
 						<TransWithLink
 							i18nKey={helperKey}
@@ -134,7 +136,8 @@ function General({ guildId, initialConfig }: Props) {
 					);
 				})}
 			</Box>
-			<Box sx={actionsBoxSx}>
+
+			<Box sx={actionsBoxStyles}>
 				<Button
 					variant="contained"
 					onClick={handleSave}

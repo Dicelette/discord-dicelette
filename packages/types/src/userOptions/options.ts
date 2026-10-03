@@ -4,8 +4,8 @@ import type { UserOptionDef } from "./types";
 
 /**
  * Scalar per-user options. Adding an entry types `UserSettingsData`, validates the
- * dashboard PATCH and renders the field. The label lives in `userConfig.options.<key>.label`; the helper is
- * `userSettings.<key>.description` (or `userConfig.options.<key>.helper` with a `helperLink`).
+ * dashboard PATCH and renders the field. The label lives in `userConfig.<key>.label`; the helper is
+ * `userSettings.<key>.description` (or `userConfig.<key>.helper` with a `helperLink`).
  */
 export const USER_OPTIONS = {
 	customFormula: {
@@ -40,7 +40,11 @@ export const USER_OPTIONS = {
 	},
 	prefixEditComment: {
 		kind: "string",
-		slash: true,
+		slash: {
+			messages: {
+				reset: "userSettings.prefixEditComment.reset",
+			},
+		},
 		section: "general",
 		context: "male",
 		validate: (value: string) => {

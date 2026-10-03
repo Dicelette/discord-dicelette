@@ -1295,6 +1295,7 @@
 		"name": "user_config",
 		"prefixEditComment": {
 			"description": "Ajuster le préfixe pour l'édition de commentaire dans un dé déjà lancé",
+			"reset": "Le préfix pour l'édition des commentaires a été réinitialisée.\nLa valeur par défaut est `///`.",
 			"title": "préfix d'édition des commentaires"
 		},
 		"replaceUnknown": {
