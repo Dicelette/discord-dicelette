@@ -44,6 +44,7 @@ export function storeUserOption(
 	value: string | boolean | undefined
 ) {
 	const path = `${userId}.${key}`;
-	if (value === undefined) store.delete(guildId, path);
-	else store.set(guildId, value, path);
+	if (value !== undefined) store.set(guildId, value, path);
+	// Enmap throws on a path delete when the guild has no entry yet.
+	else if (store.has(guildId, path)) store.delete(guildId, path);
 }

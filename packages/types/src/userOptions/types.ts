@@ -59,5 +59,6 @@ export type ParsedUserOption =
 
 export type UserOptionStore = {
 	set(guildId: string, value: string | boolean, path: string): unknown;
+	has(guildId: string, path: string): boolean;
 	delete(guildId: string, path: string): unknown;
 };

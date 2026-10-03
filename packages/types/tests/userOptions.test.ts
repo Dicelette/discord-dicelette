@@ -1,7 +1,9 @@
+import Enmap from "enmap";
 import { describe, expect, it } from "vitest";
 import {
 	getUserOptionsBySection,
 	parseUserOption,
+	storeUserOption,
 	USER_OPTION_KEYS,
 } from "../src/userOptions";
 
@@ -38,5 +40,25 @@ describe("USER_OPTIONS", () => {
 			"customFormula",
 			"prefixEditComment",
 		]);
+	});
+});
+
+describe("storeUserOption", () => {
+	const newStore = () =>
+		new Enmap<Record<string, Record<string, unknown>>>({ inMemory: true });
+
+	it("resets an option on a guild that has no user settings yet", () => {
+		const store = newStore();
+		expect(() =>
+			storeUserOption(store, "guild", "user", "prefixEditComment", undefined)
+		).not.toThrow();
+	});
+
+	it("sets then unsets an option", () => {
+		const store = newStore();
+		storeUserOption(store, "guild", "user", "prefixEditComment", "~");
+		expect(store.get("guild", "user.prefixEditComment")).toBe("~");
+		storeUserOption(store, "guild", "user", "prefixEditComment", undefined);
+		expect(store.get("guild", "user.prefixEditComment")).toBeUndefined();
 	});
 });
