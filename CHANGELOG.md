@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [5.0.0](https://github.com/Dicelette/discord-dicelette/compare/4.10.1...5.0.0) (2026-10-03)
+
+### ⚠ BREAKING CHANGES
+
+* **user-settings:** rename `/config` to `/admin` and `/user_config` to `/settings`
+
+### Features
+
+* **user-settings:** add user option management & configuration ([88e94cc](https://github.com/Dicelette/discord-dicelette/commit/88e94cc14d66c49f97508a37992c2d7be17e5128))
+
 ## [4.10.2](https://github.com/Dicelette/discord-dicelette/compare/4.10.1...4.10.2) (2026-09-24)
 
 ## [4.10.1](https://github.com/Dicelette/discord-dicelette/compare/4.10.0...4.10.1) (2026-09-24)
