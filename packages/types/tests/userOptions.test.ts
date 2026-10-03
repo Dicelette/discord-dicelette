@@ -102,8 +102,17 @@ describe("resolveSlash", () => {
 		);
 	});
 
-	it("only adds a display subcommand for `true` or an explicit display override", () => {
+	it("keeps the display subcommand unless it is disabled", () => {
 		expect(resolveSlash("opt", true).display?.subcommand).toBe("display.title");
-		expect(resolveSlash("opt", { description: "x" }).display).toBeUndefined();
+		expect(resolveSlash("opt", { description: "x" }).display?.reply).toBe(
+			"userSettings.display.reply"
+		);
+		expect(resolveSlash("opt", { display: false }).display).toBeUndefined();
+	});
+
+	it("merges a partial display override over the defaults", () => {
+		const { display } = resolveSlash("opt", { display: { reply: "custom.reply" } });
+		expect(display?.reply).toBe("custom.reply");
+		expect(display?.empty).toBe("userSettings.display.empty");
 	});
 });

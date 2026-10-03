@@ -41,8 +41,10 @@ export type SlashSpec = {
 	display?: { subcommand: string; description: string; reply: string; empty: string };
 };
 
-export type SlashOverrides = Partial<Omit<SlashSpec, "messages">> & {
+export type SlashOverrides = Partial<Omit<SlashSpec, "messages" | "display">> & {
 	messages?: Partial<SlashSpec["messages"]>;
+	/** Partial keys are merged over the defaults; `false` removes the `display` subcommand. */
+	display?: false | Partial<NonNullable<SlashSpec["display"]>>;
 };
 
 type OptionValueByKind = { string: string; boolean: boolean };
