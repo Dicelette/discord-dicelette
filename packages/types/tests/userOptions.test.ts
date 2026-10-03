@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
 	getUserOptionsBySection,
 	parseUserOption,
+	resolveSlash,
 	storeUserOption,
 	USER_OPTION_KEYS,
 } from "../src/userOptions";
@@ -60,5 +61,44 @@ describe("storeUserOption", () => {
 		expect(store.get("guild", "user.prefixEditComment")).toBe("~");
 		storeUserOption(store, "guild", "user", "prefixEditComment", undefined);
 		expect(store.get("guild", "user.prefixEditComment")).toBeUndefined();
+	});
+});
+
+describe("resolveSlash", () => {
+	const override = {
+		description: "custom.description",
+		messages: { notFound: "custom.notFound", saved: "custom.saved" },
+		valueDescription: "custom.value",
+	};
+
+	it("keeps the override when its translation exists", () => {
+		const spec = resolveSlash("opt", override, () => true);
+		expect(spec.description).toBe("custom.description");
+		expect(spec.messages.saved).toBe("custom.saved");
+		expect(spec.messages.notFound).toBe("custom.notFound");
+	});
+
+	it("falls back to the default key when the override has no translation", () => {
+		const exists = (key: string) => !key.startsWith("custom.");
+		const spec = resolveSlash("opt", override, exists);
+		expect(spec.description).toBe("userSettings.set.description");
+		expect(spec.messages.saved).toBe("userSettings.saved");
+		expect(spec.messages.notFound).toBeUndefined();
+		expect(spec.valueDescription).toBe("userSettings.opt.value");
+	});
+
+	it("chains to the generic value description, then reports the first default", () => {
+		const onlyGeneric = (key: string) => key === "userSettings.set.description";
+		expect(resolveSlash("opt", true, onlyGeneric).valueDescription).toBe(
+			"userSettings.set.description"
+		);
+		expect(resolveSlash("opt", true, () => false).groupDescription).toBe(
+			"userSettings.opt.description"
+		);
+	});
+
+	it("only adds a display subcommand for `true` or an explicit display override", () => {
+		expect(resolveSlash("opt", true).display?.subcommand).toBe("display.title");
+		expect(resolveSlash("opt", { description: "x" }).display).toBeUndefined();
 	});
 });

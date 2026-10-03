@@ -37,19 +37,14 @@ export function displayedCommandName(key: string, spec: SlashSpec, t: Translatio
 	return snakeCase(key);
 }
 
-const VALUE_DESCRIPTION_FALLBACK = "userSettings.set.description";
-
-/** Option description of the value, or the generic one when the option has none. */
-export function valueDescriptionKey(spec: SlashSpec) {
-	return hasKey(spec.valueDescription)
-		? spec.valueDescription
-		: VALUE_DESCRIPTION_FALLBACK;
-}
-
 export function slashEntries(defs: Defs) {
 	return Object.entries(defs)
 		.filter(([, def]) => def.slash)
-		.map(([key, def]) => ({ def, key, spec: resolveSlash(key, def.slash!) }));
+		.map(([key, def]) => ({
+			def,
+			key,
+			spec: resolveSlash(key, def.slash!, (k) => hasKey(k, "en", def.context)),
+		}));
 }
 
 type SlashEntry = { def: UserOptionDef; spec: SlashSpec };
@@ -112,12 +107,8 @@ export function addGeneratedSubcommands(
 		group.addSubcommand((sub) => {
 			sub.setNames(spec.subcommand).setDescriptions(spec.description);
 			return def.kind === "boolean"
-				? sub.addBooleanOption((o) =>
-						addValue(o, spec.valueName, valueDescriptionKey(spec))
-					)
-				: sub.addStringOption((o) =>
-						addValue(o, spec.valueName, valueDescriptionKey(spec))
-					);
+				? sub.addBooleanOption((o) => addValue(o, spec.valueName, spec.valueDescription))
+				: sub.addStringOption((o) => addValue(o, spec.valueName, spec.valueDescription));
 		});
 		const display = spec.display;
 		if (display)
