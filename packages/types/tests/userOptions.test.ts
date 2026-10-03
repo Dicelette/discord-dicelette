@@ -71,23 +71,28 @@ describe("resolveSlash", () => {
 		valueDescription: "custom.value",
 	};
 
-	it("keeps the override when its translation exists", () => {
-		const spec = resolveSlash("opt", override, () => true);
+	it("merges partial overrides over the defaults", () => {
+		const spec = resolveSlash("opt", override);
 		expect(spec.description).toBe("custom.description");
 		expect(spec.messages.saved).toBe("custom.saved");
 		expect(spec.messages.notFound).toBe("custom.notFound");
 	});
 
-	it("falls back to the default key when the override has no translation", () => {
-		const exists = (key: string) => !key.startsWith("custom.");
-		const spec = resolveSlash("opt", override, exists);
-		expect(spec.description).toBe("userSettings.set.description");
+	it("keeps the override even when it has no translation", () => {
+		const spec = resolveSlash("opt", override, () => false);
+		expect(spec.description).toBe("custom.description");
+		expect(spec.messages.saved).toBe("custom.saved");
+		expect(spec.valueDescription).toBe("custom.value");
+	});
+
+	it("uses the defaults for what the override does not set", () => {
+		const spec = resolveSlash("opt", { description: "custom.description" });
 		expect(spec.messages.saved).toBe("userSettings.saved");
 		expect(spec.messages.notFound).toBeUndefined();
 		expect(spec.valueDescription).toBe("userSettings.opt.value");
 	});
 
-	it("chains to the generic value description, then reports the first default", () => {
+	it("picks the default value description from the translations that exist", () => {
 		const onlyGeneric = (key: string) => key === "userSettings.set.description";
 		expect(resolveSlash("opt", true, onlyGeneric).valueDescription).toBe(
 			"userSettings.set.description"

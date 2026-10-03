@@ -3,8 +3,8 @@ import type { SlashOverrides, SlashSpec } from "./types";
 
 /**
  * Same layout as `custom_formula`: `<option> configure [value]` and `<option> display`.
- * The overrides are merged over the conventional keys; an overridden key without
- * translation (`exists`) falls back to the default one.
+ * The overrides are merged over the conventional keys and always win, translated or not.
+ * `exists` only picks the default value description (`<key>.value`, else the generic one).
  */
 export function resolveSlash(
 	key: string,
@@ -37,17 +37,5 @@ export function resolveSlash(
 		valueName: "common.value",
 		valueParam: "value",
 	};
-	// A reviver returning `undefined` drops the key: untranslated overrides never reach the merge.
-	const translated: SlashOverrides = JSON.parse(
-		JSON.stringify(overrides),
-		(name, value) =>
-			typeof value === "string" && name !== "valueParam" && !exists(value)
-				? undefined
-				: value
-	);
-	return merge.withOptions(
-		{ allowUndefinedOverrides: false },
-		defaults,
-		translated
-	) as SlashSpec;
+	return merge(defaults, overrides) as SlashSpec;
 }
