@@ -119,10 +119,7 @@ export async function register(
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const statName = interaction.options.getString(t("common.name"), true);
-	const initialValue = interaction.options.getString(
-		t("userSettings.attributes.create.value.title"),
-		true
-	);
+	const initialValue = interaction.options.getString(t("common.value"), true);
 	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
 	const existingAttributes = client.userSettings.get(guildId, userId)?.attributes ?? {};
@@ -146,36 +143,4 @@ export async function register(
 			value: `**${value}**`,
 		})
 	);
-}
-
-export async function setUnknowReplace(
-	client: EClient,
-	interaction: Djs.ChatInputCommandInteraction
-) {
-	const { ul } = getLangAndConfig(client, interaction);
-	const value = interaction.options.getString(
-		t("userSettings.attributes.create.value.title"),
-		false
-	);
-	if (!value) {
-		client.userSettings.delete(
-			interaction.guild!.id,
-			`${interaction.user.id}.ignoreNotfound`
-		);
-		await reply(interaction, {
-			content: ul("userSettings.attributes.replaceUnknown.reset"),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		return;
-	}
-	client.userSettings.set(
-		interaction.guild!.id,
-		value,
-		`${interaction.user.id}.ignoreNotfound`
-	);
-	await reply(interaction, {
-		content: ul("userSettings.attributes.replaceUnknown.set", { value }),
-		flags: Djs.MessageFlags.Ephemeral,
-	});
-	return;
 }

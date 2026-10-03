@@ -1,0 +1,155 @@
+import "@dicelette/discord_ext";
+import { resources } from "@dicelette/localization";
+import { USER_OPTIONS } from "@dicelette/types";
+import * as Djs from "discord.js";
+import i18next from "i18next";
+import { describe, expect, it } from "vitest";
+import {
+	addGeneratedGroups,
+	addGeneratedSubcommands,
+	groupName,
+	missingSlashKeys,
+	slashEntries,
+	slashI18nKeys,
+	snakeCase,
+} from "../src/commands/userSettings/options";
+
+i18next.addResourceBundle(
+	"en",
+	"translation",
+	{
+		userSettings: {
+			flag: { description: "Toggle the flag", group: "flag", value: "New state" },
+			plainOption: { description: "Plain" },
+			prefixEditComments: { description: "Prefix", value: "New prefix" },
+		},
+	},
+	true
+);
+
+type Group = Djs.APIApplicationCommandSubcommandGroupOption;
+type Sub = Djs.APIApplicationCommandSubcommandOption;
+
+const groupsOf = (defs?: Parameters<typeof addGeneratedGroups>[1]) => {
+	const builder = new Djs.SlashCommandBuilder().setName("test").setDescription("test");
+	addGeneratedGroups(builder, defs);
+	return (builder.toJSON().options ?? []) as Group[];
+};
+
+describe("addGeneratedGroups", () => {
+	it("builds a group per option like custom_formula, typed by kind", () => {
+		const groups = groupsOf({
+			flag: { context: "male", kind: "boolean", slash: true },
+			hidden: { kind: "string" },
+		});
+		expect(groups.map((g) => g.name)).toEqual(["flag"]);
+		const subs = groups[0].options as Sub[];
+		expect(subs.map((sub) => sub.name)).toEqual(["configure", "display"]);
+		expect(subs[0].options![0]).toMatchObject({
+			name: "value",
+			required: false,
+			type: Djs.ApplicationCommandOptionType.Boolean,
+		});
+	});
+
+	it("keeps the existing formula command and leaves the attributes group to its builder", () => {
+		const groups = groupsOf();
+		expect(groups.map((g) => g.name)).toEqual(["custom_formula", "prefix_edit_comment"]);
+		const subs = groups[0].options as Sub[];
+		expect(subs.map((s) => s.name)).toEqual(["configure", "display"]);
+		expect(subs[0].options![0]).toMatchObject({ name: "formula", required: false });
+	});
+});
+
+describe("addGeneratedSubcommands", () => {
+	it("adds replace_unknown to the handwritten attributes group", () => {
+		const group = addGeneratedSubcommands(
+			new Djs.SlashCommandSubcommandGroupBuilder()
+				.setName("attributes")
+				.setDescription("a"),
+			"userSettings.attributes.title"
+		);
+		const [sub] = group.toJSON().options as Sub[];
+		expect(sub.name).toBe("replace_unknown");
+		expect(sub.options![0].type).toBe(Djs.ApplicationCommandOptionType.String);
+	});
+});
+
+describe("slash translations", () => {
+	it("has every key of every slash option in every locale", () => {
+		const languages = Object.keys(resources);
+		const missing = slashEntries(USER_OPTIONS).flatMap(({ def, key, spec }) =>
+			missingSlashKeys({ def, spec }, languages).map((m) => `${key} -> ${m}`)
+		);
+		expect(missing).toEqual([]);
+	});
+
+	it("uses Discord-valid names in every locale", () => {
+		const invalid = slashEntries(USER_OPTIONS).flatMap(({ key, spec }) =>
+			Object.keys(resources).flatMap((lng) =>
+				[
+					groupName(key, spec, i18next.getFixedT(lng)),
+					...[spec.subcommand, spec.valueName, spec.display?.subcommand]
+						.filter((k): k is string => !!k)
+						.map((k) => i18next.t(k, { lng }) as string),
+				]
+					.map((name) => ({ key, lng, name }))
+					.filter(({ name }) => !/^[\p{Ll}\p{N}_-]{1,32}$/u.test(name))
+			)
+		);
+		expect(invalid).toEqual([]);
+	});
+
+	it("finds contextual keys such as reply_male through the option context", () => {
+		const [{ def, spec }] = slashEntries({
+			flag: { context: "male", kind: "boolean", slash: true },
+		});
+		expect(missingSlashKeys({ def, spec }, ["en"])).toEqual([]);
+		const withoutContext = { ...def, context: undefined };
+		expect(missingSlashKeys({ def: withoutContext, spec }, ["en"])).toContain(
+			"en: userSettings.display.reply"
+		);
+	});
+
+	it("only requires the invalid message from options that validate", () => {
+		const [plain] = slashEntries({
+			flag: { context: "male", kind: "boolean", slash: true },
+		});
+		const [validated] = slashEntries({
+			flag: { context: "male", kind: "string", slash: true, validate: () => null },
+		});
+		expect(slashI18nKeys(plain)).not.toContain("userSettings.invalid");
+		expect(slashI18nKeys(validated)).toContain("userSettings.invalid");
+	});
+
+	it("names the missing keys instead of failing in the Discord builder", () => {
+		expect(() => groupsOf({ unknown: { kind: "string", slash: true } })).toThrow(
+			/"unknown" is missing translations[\s\S]*userSettings\.unknown\.description/
+		);
+	});
+});
+
+describe("group name fallback", () => {
+	it("snake-cases the option key", () => {
+		expect(snakeCase("prefixEditComments")).toBe("prefix_edit_comments");
+	});
+
+	it("uses it when the group has no translation", () => {
+		const [group] = groupsOf({
+			prefixEditComments: { context: "male", kind: "string", slash: true },
+		});
+		expect(group.name).toBe("prefix_edit_comments");
+	});
+});
+
+describe("value description fallback", () => {
+	it("uses the generic description when the option has no .value key", () => {
+		const [group] = groupsOf({
+			plainOption: { context: "male", kind: "string", slash: true },
+		});
+		const configure = group.options![0] as Sub;
+		expect(configure.options![0].description).toBe(
+			i18next.t("userSettings.set.description", { lng: "en" })
+		);
+	});
+});

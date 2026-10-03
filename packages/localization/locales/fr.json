@@ -135,7 +135,7 @@
 		"delete": "Les résultats des dés ne seront plus envoyés",
 		"description": "Enregistrer un channel pour y envoyer les résultats des dés ou utiliser un thread automatiquement.",
 		"name": "result_channel",
-		"noChan": "Aucun channel de sauvegarde n'a été paramétré auparavant: Annulation de la commande.\n\nSi vous voulez désactiver la création des threads, utiliser la commande `/config result_channel true`.",
+		"noChan": "Aucun channel de sauvegarde n'a été paramétré auparavant: Annulation de la commande.\n\nSi vous voulez désactiver la création des threads, utiliser la commande `/admin result_channel true`.",
 		"options": "Channel des résultats",
 		"set": "Le channel {{- channel}} a été enregistré pour y envoyer les résultats des dés."
 	},
@@ -219,6 +219,7 @@
 		"total": "Total",
 		"true": "Vrai",
 		"user": "Joueur",
+		"value": "valeur",
 		"yes": "✓"
 	},
 	"config": {
@@ -283,7 +284,7 @@
 			"name": "lien_sauvegarde"
 		},
 		"logs": "Journalisation",
-		"name": "config",
+		"name": "admin",
 		"noTemplate": "Il n'y a pas de modèle configuré pour ce serveur.",
 		"pity": {
 			"delete": "La pitié a été désactivée.",
@@ -497,7 +498,7 @@
 			"reply": "La création automatique des threads a été désactivée : les résultats des dés seront maintenant conservés dans le channel où la commande a été utilisée."
 		},
 		"enable": {
-			"autoDelete": "L'effacement automatique des réponses a été autorisé. Vous pouvez la configurer avec `/config supprimer_après`.",
+			"autoDelete": "L'effacement automatique des réponses a été autorisé. Vous pouvez la configurer avec `/admin supprimer_après`.",
 			"mention": "Le channel {{- mention}} recevra de nouveaux les logs des dés.",
 			"prefix": "Les channels préfixés par `🎲` recevront à nouveau les résultats des dés.",
 			"reply": "Les résultats des dés seront automatiquement envoyés à un fil de discussion créé automatiquement."
@@ -800,14 +801,14 @@
 			"name": "info"
 		},
 		"invit": {
-			"change_language": "__Par défaut__, je répondrai en {{- lang}}, mais cela peut être modifié avec </config change_language:{{- id.lang}}>.\nPour le moment, cependant, seul le français et l'anglais sont disponibles !",
+			"change_language": "__Par défaut__, je répondrai en {{- lang}}, mais cela peut être modifié avec </admin change_language:{{- id.lang}}>.\nPour le moment, cependant, seul le français et l'anglais sont disponibles !",
 			"channel": "Avec **`channel`** = **`#channel`** → Au lieu de créer des fils automatiquement, les résultats seront copiés dans ce salon !",
-			"copy": "De plus, je peux __copier__ les résultats des jets de dés dans des fils commençant par `🎲`, qui seront créés automatiquement lorsqu'un lancé est fait.\nCela peut être modifié par la commande </config result_channel:{{-id.result}}>.\nPar défaut, ce comportement est **désactivé** : tous les jets seront laissés où ils sont.",
+			"copy": "De plus, je peux __copier__ les résultats des jets de dés dans des fils commençant par `🎲`, qui seront créés automatiquement lorsqu'un lancé est fait.\nCela peut être modifié par la commande </admin result_channel:{{-id.result}}>.\nPar défaut, ce comportement est **désactivé** : tous les jets seront laissés où ils sont.",
 			"default": "Il suffit de mettre sur `0` pour désactiver l'auto-suppression.",
 			"disable": "Avec **`désactiver_thread`** = **`True`** → Les résultats seront conservés là où la commande a été faite, sans auto-suppression au bout de 3 minutes.",
 			"link": "Vous pouvez retrouver [la documentation ici]({{- docLink}}), car j'ai encore de nombreuses options de personnalisation !",
 			"serv": "Salut ! Je suis Dicelette !\nMerci de m'avoir ajouté sur {{- serv}}.",
-			"timer": "Si vous souhaitez modifier le temps avant la suppression des résultats après cette configuration, il suffit d'utiliser </config delete_after:{{-id.delete}}>. Je suis paramétré pour supprimer après 3 minutes !"
+			"timer": "Si vous souhaitez modifier le temps avant la suppression des résultats après cette configuration, il suffit d'utiliser </admin delete_after:{{-id.delete}}>. Je suis paramétré pour supprimer après 3 minutes !"
 		},
 		"message": "# :game_die: **Dicelette** :game_die: `v.{{- version}}`\r\n\r\n## Ressources :\r\n- Trouvez le *bot* sur [GitHub](<https://github.com/Dicelette/discord-dicelette/>)\r\n- Accédez à la [Documentation](<https://dicelette.github.io/>) pour des instructions détaillées.\r\n- Trouvez le [Dashboard](<https://dashboard.dicelette.app/>) pour gérer la configuration et les paramètres de votre serveur.\r\n\r\n## Utilisation :\r\n### Commandes :\r\n- **</roll:{{- rollId}}>** : Lancez un dé. Exemple : `d6` ou `2d6`.\r\n- **</scene:{{- sceneId}}>** : Crée un nouveau fil de discussion pour les lancers de dés. Archive automatiquement tous les fils précédents.\r\n- **</math:{{- mathId}}>** : Effectuez des opérations mathématiques, telles que `2+2`, `3*4` ou `sqrt(16)`.\r\n\r\n### Fonctionnalités avancées :\r\n- **Bulle temporelle** : Utilisez `/scene tempo:True` pour créer un fil nommé avec la date actuelle.\r\n- **Dés directs** : Lancez des dés directement dans un message, par exemple `d6` ou `2d6`.\r\n- **Dés indirects** : Incluez des lancers de dés dans un message, par exemple `*Phibi saute sur Wumpus et lui inflige [2d6] dégâts*`.\r\n- **Dés semi-directs** : Combinez des lancers de dés avec un message, par exemple `1d100 Phibi saute sur Wumpus et lui inflige des dégâts`.",
 		"messageDB": "# Commandes liées aux feuilles de personnage\r\nCes commandes permettent d'interagir avec les feuilles de personnage, de lancer des dés et d'analyser les statistiques.\r\n\r\n- **</dbroll:{{- dbroll}}> :** Lance un dé de statistiques basé sur les données sauvegardées dans une feuille de personnage. Utile pour évaluer les capacités ou caractéristiques d'un personnage.\r\n- **</macro:{{- macro}}> :** Lance un dé enregistré dans votre feuille de personnage. Idéal pour des lancers de dés prédéfinis liés à des actions ou compétences spécifiques.\r\n- **</graph:{{- graph}}> :** Génère un graphique à partir des statistiques d'un personnage. Pratique pour visualiser les tendances ou comparer les attributs.\r\n- **</display:{{- display}}> :** Affiche les statistiques et les dés d'un personnage. Utilisez cette commande pour consulter ou partager les détails d'un personnage.\r\n- **</calc:{{- calc}}> :** Effectue des calculs en utilisant les statistiques d'un personnage. Parfait pour dériver des valeurs ou des résultats basés sur les données du personnage.",
@@ -1186,8 +1187,7 @@
 				"name": "Nom de l'attribut",
 				"success": "L'attribut {{- name}} a été créé avec succès.",
 				"value": {
-					"description": "Nombre qui sera utilisé",
-					"title": "valeur"
+					"description": "Nombre qui sera utilisé"
 				}
 			},
 			"delete": {
@@ -1200,7 +1200,7 @@
 			"export": {
 				"description": "Exporter les attributs sauvegardés dans un fichier JSON.",
 				"empty": "Il n'y a pas d'attributs sauvegardés.",
-				"success": "Les attributs ont été exportés avec succès. Vous pouvez les importer à l'aide de la commande `/user_config attributs import`."
+				"success": "Les attributs ont été exportés avec succès. Vous pouvez les importer à l'aide de la commande `/settings attributs import`."
 			},
 			"import": {
 				"containsHyphen": "Le nom ne doit pas inclure de tiret",
@@ -1265,6 +1265,13 @@
 			"title": "créer_lien"
 		},
 		"description": "Permets de configurer certaines fonctions non-critique du bot par les utilisateurs.",
+		"display": {
+			"description": "Afficher la valeur actuelle.",
+			"empty_female": "{{- name}} n'est pas définie.",
+			"empty_male": "Le {{- name}} n'est pas défini.",
+			"reply_female": "La valeur de la {{- name}} est : `{{- value}}`",
+			"reply_male": "La valeur du {{- name}} est définie sur `{{- value}}`"
+		},
 		"formula": {
 			"description": " Définit une formule mathjs où $ est remplacé par [expr] dans vos jets",
 			"display": {
@@ -1283,9 +1290,24 @@
 			},
 			"title": "formule_personnalisée"
 		},
-		"name": "user_config",
+		"invalid_female": "La valeur est invalide pour la {{- name}} : {{- error}}.",
+		"invalid_male": "La valeur est invalide pour le {{- name}} : {{- error}}",
+		"name": "settings",
+		"prefixEditComment": {
+			"description": "Ajuster le préfixe pour l'édition de commentaire dans un dé déjà lancé",
+			"reset": "Le préfix pour l'édition des commentaires a été réinitialisée.\nLa valeur par défaut est `///`.",
+			"title": "préfix d'édition des commentaires"
+		},
 		"replaceUnknown": {
 			"title": "Remplacer les valeurs inconnues"
+		},
+		"reset_female": "La valeur de la {{- name}} a été réinitialisée.",
+		"reset_male": "La valeur du {{- name}} a été réinitialisé.",
+		"saved_female": "La {{- name}} est maintenant définie sur `{{- value}}`.",
+		"saved_male": "Le {{- name}} est maintenant défini sur `{{- value}}`.",
+		"set": {
+			"description": "Défini la valeur. Lancer sans valeur pour réinitialiser.",
+			"title": "configurer"
 		},
 		"snippets": {
 			"create": {
@@ -1308,7 +1330,7 @@
 			"export": {
 				"description": "Exporter les snippets sauvegardé en JSON",
 				"empty": "Aucun snippet à exporter.",
-				"success": "Les extraits ont été exportés avec succès. Vous pouvez les importer à l'aide de la commande `/user_config snippets import`."
+				"success": "Les extraits ont été exportés avec succès. Vous pouvez les importer à l'aide de la commande `/settings snippets import`."
 			},
 			"import": {
 				"description": "Importer des snippets depuis un fichier JSON",

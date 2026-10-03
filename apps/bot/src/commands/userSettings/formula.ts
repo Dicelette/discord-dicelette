@@ -4,89 +4,39 @@ import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import * as Djs from "discord.js";
 import { reply } from "messages";
 
-function set(
-	guildId: string,
-	userId: string,
-	client: EClient,
-	formula: string,
-	toGuild?: boolean
-) {
-	if (toGuild) client.settings.set(guildId, formula, "customFormula");
-	else client.userSettings.set(guildId, formula, `${userId}.customFormula`);
-	return;
-}
-
-function reset(guildId: string, userId: string, client: EClient, toGuild?: boolean) {
-	if (toGuild) {
-		if (client.settings.has(guildId, "customFormula")) {
-			client.settings.delete(guildId, "customFormula");
-			return true;
-		}
-		return false;
-	}
-	if (client.userSettings.has(guildId, `${userId}.customFormula`)) {
-		client.userSettings.delete(guildId, `${userId}.customFormula`);
-		return true;
-	}
-	return false;
-}
-
+/** Guild formula; the user's one is generated from `USER_OPTIONS`. */
 export async function formulaSet(
 	client: EClient,
-	interaction: Djs.ChatInputCommandInteraction,
-	toGuild?: boolean
+	interaction: Djs.ChatInputCommandInteraction
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
-	const userId = interaction.user.id;
 	const guildId = interaction.guild!.id;
 	const formula = interaction.options.getString("formula", false);
+	const send = (content: string) =>
+		reply(interaction, { content, flags: Djs.MessageFlags.Ephemeral });
+
 	if (!formula) {
-		const ok = reset(guildId, userId, client, toGuild);
-		if (ok)
-			await reply(interaction, {
-				content: ul("userSettings.formula.reset"),
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-		else
-			await reply(interaction, {
-				content: ul("userSettings.formula.notFound"),
-				flags: Djs.MessageFlags.Ephemeral,
-			});
-		return;
+		if (!client.settings.has(guildId, "customFormula"))
+			return await send(ul("userSettings.formula.notFound"));
+		client.settings.delete(guildId, "customFormula");
+		return await send(ul("userSettings.formula.reset"));
 	}
 	const valided = validateCustomFormula(formula);
-	if (valided.ok) {
-		await reply(interaction, {
-			content: ul("userSettings.formula.saved", { formula }),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-		set(guildId, userId, client, formula, toGuild);
-	} else {
-		await reply(interaction, {
-			content: ul("userSettings.formula.invalid", { error: valided.error }),
-			flags: Djs.MessageFlags.Ephemeral,
-		});
-	}
+	if (!valided.ok)
+		return await send(ul("userSettings.formula.invalid", { error: valided.error }));
+	client.settings.set(guildId, formula, "customFormula");
+	await send(ul("userSettings.formula.saved", { formula }));
 }
 
 export async function formulaDisplay(
 	client: EClient,
-	interaction: Djs.ChatInputCommandInteraction,
-	fromGuild?: boolean
+	interaction: Djs.ChatInputCommandInteraction
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
-	const userId = interaction.user.id;
-	const guildId = interaction.guild!.id;
-	let formula: string | undefined;
-	if (fromGuild) formula = client.settings.get(guildId, "customFormula");
-	else formula = client.userSettings.get(guildId, `${userId}.customFormula`);
-	if (formula) {
-		await reply(interaction, {
-			content: ul("userSettings.formula.display.reply", { formula }),
-		});
-	} else {
-		let content = ul("config.formula.noDisplay");
-		if (!fromGuild) content = ul("userSettings.formula.noDisplay");
-		await reply(interaction, { content });
-	}
+	const formula = client.settings.get(interaction.guild!.id, "customFormula");
+	await reply(interaction, {
+		content: formula
+			? ul("userSettings.formula.display.reply", { formula })
+			: ul("config.formula.noDisplay"),
+	});
 }

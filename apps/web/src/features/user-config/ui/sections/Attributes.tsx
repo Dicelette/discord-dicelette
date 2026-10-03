@@ -245,7 +245,7 @@ function Attributes({ state }: AttributeSectionProps) {
 				>
 					<TextField
 						size="small"
-						label={t("userSettings.attributes.create.value.title").toTitle()}
+						label={t("common.value").toTitle()}
 						value={newValue}
 						onChange={(e) => {
 							setNewValue(e.target.value);

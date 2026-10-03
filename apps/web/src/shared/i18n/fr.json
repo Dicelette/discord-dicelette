@@ -335,7 +335,10 @@
 		"alreadyExists": "Le nom « {name} » existe déjà.",
 		"attrHyphenError": "Le nom de l'attribut ne doit pas contenir de tiret (-).",
 		"attrValue": "Valeur",
-		"customFormulaHelper": "Applique une formule {link} personnelle aux jets où [expr] remplace $. Écrasé par la configuration du serveur si présente.",
+		"customFormula": {
+			"helper": "Applique une formule {link} personnelle aux jets où [expr] remplace $. Écrasé par la configuration du serveur si présente.",
+			"label": "Formule personnalisée"
+		},
 		"export": "Exporter",
 		"exportTooltip": "Télécharger en JSON",
 		"formulaError": "Impossible de résoudre la formule (attributs inconnus ou expression invalide).",
@@ -347,6 +350,10 @@
 		"invalidSnippetHelper": "Snippet « {name} » invalide : {value}",
 		"noAttributes": "Aucun attribut défini.",
 		"noSnippets": "Aucun raccourci défini.",
+		"optionInvalid": "Valeur invalide : {error}",
+		"prefixEditComment": {
+			"label": "Préfix d'édition des commentaires"
+		},
 		"resetTemplate": "Réinitialiser",
 		"saveError": "Erreur lors de la sauvegarde.",
 		"saveNoValidSnippets": "Aucun snippet valide à sauvegarder.",
@@ -373,7 +380,7 @@
 		"templateFormatSection": "Sous-formats",
 		"templateJoin": "Séparateur de résultats",
 		"templateJoinDesc": "Joins les valeurs du résultat",
-		"templateLinkDoc": "https://www.dicelette.app/docs/config/context_menu",
+		"templateLinkDoc": "https://www.dicelette.app/docs/admin/context_menu",
 		"templateResults": "Format d'une ligne de résultat",
 		"templateResultsDesc": "Liste jointe, composée de dé, info et dé original."
 	}

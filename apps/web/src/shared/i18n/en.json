@@ -335,7 +335,10 @@
 		"alreadyExists": "Name \"{name}\" already exists.",
 		"attrHyphenError": "Attribute name must not contain a hyphen (-).",
 		"attrValue": "Value",
-		"customFormulaHelper": "Applies a personal {link} formula to the rolls where [expr] replaces $. Overridden by the server configuration if any.",
+		"customFormula": {
+			"helper": "Applies a personal {link} formula to the rolls where [expr] replaces $. Overridden by the server configuration if any.",
+			"label": "Custom formula"
+		},
 		"export": "Export",
 		"exportTooltip": "Download as JSON",
 		"formulaError": "Cannot resolve formula (unknown attributes or invalid expression).",
@@ -347,6 +350,10 @@
 		"invalidSnippetHelper": "Invalid snippet \"{name}\": {value}",
 		"noAttributes": "No attributes defined yet.",
 		"noSnippets": "No snippets defined yet.",
+		"optionInvalid": "Invalid value: {error}",
+		"prefixEditComment": {
+			"label": "Edit comment prefix"
+		},
 		"resetTemplate": "Reset to defaults",
 		"saveError": "Error while saving.",
 		"saveNoValidSnippets": "No valid snippet to save.",
@@ -373,7 +380,7 @@
 		"templateFormatSection": "Sub-formats",
 		"templateJoin": "Result separator",
 		"templateJoinDesc": "Concatenate the values in the result",
-		"templateLinkDoc": "https://www.dicelette.app/en/docs/config/context_menu",
+		"templateLinkDoc": "https://www.dicelette.app/en/docs/admin/context_menu",
 		"templateResults": "Result line format",
 		"templateResultsDesc": "List joined, composed by dice, info and original dice."
 	}

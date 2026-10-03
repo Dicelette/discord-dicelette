@@ -135,7 +135,7 @@
 		"delete": "Dice results will no longer be sent",
 		"description": "Register a channel to send dice results there or use a automatic thread.",
 		"name": "result_channel",
-		"noChan": "No backup channel has been configured: cancellation of the command.\n\nIf you want to disable the auto-thread creation, use `/config result_channel true`.",
+		"noChan": "No backup channel has been configured: cancellation of the command.\n\nIf you want to disable the auto-thread creation, use `/admin result_channel true`.",
 		"options": "Results channel",
 		"set": "The channel {{- channel}} has been registered to send the dice results."
 	},
@@ -219,6 +219,7 @@
 		"total": "Total",
 		"true": "True",
 		"user": "Player",
+		"value": "value",
 		"yes": "✓"
 	},
 	"config": {
@@ -283,7 +284,7 @@
 			"name": "save_link"
 		},
 		"logs": "Logging",
-		"name": "config",
+		"name": "admin",
 		"noTemplate": "There is no template configured for the server.",
 		"pity": {
 			"delete": "Pity has been disabled.",
@@ -497,7 +498,7 @@
 			"reply": "Automatic thread creation has been disabled: dice results will now be kept in the channel where the command was used."
 		},
 		"enable": {
-			"autoDelete": "The auto-deletion of reply has been authorized. You can configure it with `/config delete_after`.",
+			"autoDelete": "The auto-deletion of reply has been authorized. You can configure it with `/admin delete_after`.",
 			"mention": "The {{- mention}} channel will receive new dice logs.",
 			"prefix": "Channels prefixed with `:game_die:` will again receive dice results.",
 			"reply": "The dice results will be automatically sent to an automatically created thread."
@@ -800,14 +801,14 @@
 			"name": "info"
 		},
 		"invit": {
-			"change_language": "__By default__, I'll respond in {{- lang}}, but this can be changed with </config change_language:{{- id.lang}}>.\nFor the moment, however, only French and English are available!",
+			"change_language": "__By default__, I'll respond in {{- lang}}, but this can be changed with </admin change_language:{{- id.lang}}>.\nFor the moment, however, only French and English are available!",
 			"channel": "With **`channel`** = **`#channel`** → Instead of creating threads automatically, the results will be copied into this channel!",
-			"copy": "In addition, I can __copy__ the results of dice rolls into threads starting with `🎲`, which will be created automatically when a roll is made.\nThis can be modified by the command </config result_channel:{{-id.result}}>.\nBy default, this behavior is **disabled** : all roll will be left where they are.",
+			"copy": "In addition, I can __copy__ the results of dice rolls into threads starting with `🎲`, which will be created automatically when a roll is made.\nThis can be modified by the command </admin result_channel:{{-id.result}}>.\nBy default, this behavior is **disabled** : all roll will be left where they are.",
 			"default": "Simply set to `0` to disable auto-delete.",
 			"disable": "With **`disable_thread`** = **`True`** → Results will be kept where the command was made, without auto-deletion after 3 minutes.",
 			"link": "You can find [the documentation here]({{- docLink}}), as I still have lots of customization options!",
 			"serv": "Hello ! I'm Dicelette !\nThank you for adding me to {{- serv}}.",
-			"timer": "If you want to change the time before results are deleted after configuring it, just use </config delete_after:{{-id.delete}}>. I'm set to delete after 3 minutes!"
+			"timer": "If you want to change the time before results are deleted after configuring it, just use </admin delete_after:{{-id.delete}}>. I'm set to delete after 3 minutes!"
 		},
 		"message": "# :game_die: **Dicelette** :game_die: `v.{{- version}}`\r\n\r\n## Resources:\r\n- Find the *bot* on [GitHub](<https://github.com/Dicelette/discord-dicelette/>)\r\n- Access the [Documentation](<https://dicelette.github.io/en>) for detailed usage instructions.\r\n- Find the [Dashboard](<https://dashboard.dicelette.app/>) to manage your server's configuration and settings.\r\n\r\n## Usage:\r\n### Commands:\r\n- **</roll:{{- rollId}}>**: Roll a die. Example: `d6` or `2d6`.\r\n- **</scene:{{- sceneId}}>**: Creates a new thread for dice rolls. Automatically archives all previous threads.\r\n- **</math:{{- mathId}}>**: Perform mathematical operations, such as `2+2`, `3*4`, or `sqrt(16)`.\r\n\r\n### Advanced Features:\r\n- **Time Bubble**: Use `/scene tempo:True` to create a thread named with the current date.\r\n- **Direct Dice**: Roll dice directly in a message, e.g., `d6` or `2d6`.\r\n- **Indirect Dice**: Include dice rolls in a message, e.g., `*Phibi jumps on Wumpus and inflicts [2d6] damage*`.\r\n- **Semi-Direct Dice**: Combine dice rolls with a message, e.g., `1d100 Phibi jumps on Wumpus and inflicts damage`.",
 		"messageDB": "# Commands Linked to Character Sheets\r\nThese commands allow you to interact with character sheets, perform dice rolls, and analyze statistics.\r\n\r\n- **</dbroll:{{- dbroll}}>:** Rolls a statistics dice based on the data saved in a character sheet. Useful for evaluating character abilities or traits.\r\n- **</macro:{{- macro}}>:** Rolls a die recorded in your character sheet. Ideal for predefined dice rolls linked to specific actions or abilities.\r\n- **</graph:{{- graph}}>:** Generates a graph from a character's statistics. This is helpful for visualizing data trends or comparing attributes.\r\n- **</display:{{- display}}>:** Displays the statistics and dice of a character. Use this to review or share character details.\r\n- **</calc:{{- calc}}>:** Performs calculations using the statistics of a character. Perfect for deriving values or outcomes based on character data.",
@@ -1186,8 +1187,7 @@
 				"name": "Attribute's name",
 				"success": "The {{- name}} attribute has been created successfully.",
 				"value": {
-					"description": "Number that will be used",
-					"title": "value"
+					"description": "Number that will be used"
 				}
 			},
 			"delete": {
@@ -1200,7 +1200,7 @@
 			"export": {
 				"description": "Export attributes saved in a JSON file.",
 				"empty": "There are no attributes data.",
-				"success": "Attributes have been exported successfully. You can import them with `/user_config attributes import`. "
+				"success": "Attributes have been exported successfully. You can import them with `/settings attributes import`. "
 			},
 			"import": {
 				"containsHyphen": "Name can't include hyphen",
@@ -1265,6 +1265,13 @@
 			"title": "create_link"
 		},
 		"description": "Allows users to configure certain non-critical functions of the bot.",
+		"display": {
+			"description": "Display the current value.",
+			"empty_female": "{{- name}} is not set.",
+			"empty_male": "{{- name}} is not set.",
+			"reply_female": "The {{- name}} value is: `{{- value}}`",
+			"reply_male": "The {{- name}} value is : `{{- value}}`"
+		},
 		"formula": {
 			"description": "Set a mathjs formula where $ is replaced by [expr] in dice rolls",
 			"display": {
@@ -1283,9 +1290,24 @@
 			},
 			"title": "custom_formula"
 		},
-		"name": "user_config",
+		"invalid_female": "Invalid value for {{- name}}: {{- error}}",
+		"invalid_male": "Invalid value for {{- name}}: {{- error}}",
+		"name": "settings",
+		"prefixEditComment": {
+			"description": "Adjust the prefix for editing comments in a rolled dice",
+			"reset": "The edit comment prefix was reset.\nThe default value is `///`.",
+			"title": "comment editing prefix"
+		},
 		"replaceUnknown": {
 			"title": "Replace unknown value"
+		},
+		"reset_female": "{{- name}} has been reset.",
+		"reset_male": "{{- name}} has been reset.",
+		"saved_female": "The {{- name}} is now set to `{{- value}}`.",
+		"saved_male": "The {{- name}} is now set to `{{- value}}`.",
+		"set": {
+			"description": "Set the value. Run it without value to reset.",
+			"title": "configure"
 		},
 		"snippets": {
 			"create": {
@@ -1308,7 +1330,7 @@
 			"export": {
 				"description": "Export saved snippets in JSON",
 				"empty": "No snippets to export.",
-				"success": "Snippets were successfully exported. You can import them with `/user_config snippets import`."
+				"success": "Snippets were successfully exported. You can import them with `/settings snippets import`."
 			},
 			"import": {
 				"description": "Import snippets from a JSON file",

@@ -1,4 +1,10 @@
 import { validateAttributeEntry, validateSnippetEntry } from "@dicelette/helpers";
+import {
+	parseUserOption,
+	storeUserOption,
+	USER_OPTION_KEYS,
+	type UserOptionKey,
+} from "@dicelette/types";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "../types";
@@ -85,21 +91,24 @@ export function createUserRouter(deps: DashboardDeps) {
 		const guildId = req.params.guildId as string;
 		const userId = req.auth!.userId;
 
-		const { snippets, attributes, createLinkTemplate, ignoreNotfound, customFormula } =
-			req.body as {
-				snippets?: Record<string, unknown>;
-				attributes?: Record<string, unknown>;
-				createLinkTemplate?: unknown;
-				ignoreNotfound?: unknown;
-				customFormula?: unknown;
-			};
+		const body = req.body as {
+			snippets?: Record<string, unknown>;
+			attributes?: Record<string, unknown>;
+			createLinkTemplate?: unknown;
+		} & Record<string, unknown>;
+		const { snippets, attributes, createLinkTemplate } = body;
 
-		if (ignoreNotfound !== undefined && typeof ignoreNotfound !== "string") {
-			res.status(400).json({ error: "Invalid ignoreNotfound format" });
-			return;
+		const options = new Map<UserOptionKey, string | boolean | undefined>();
+		for (const key of USER_OPTION_KEYS) {
+			if (body[key] === undefined) continue;
+			const parsed = parseUserOption(key, body[key]);
+			if (!parsed.ok) {
+				res.status(400).json({ error: parsed.error });
+				return;
+			}
+			options.set(key, parsed.value);
 		}
 
-		const normalizedIgnoreNotfound = ignoreNotfound?.trim();
 		const currentUserSettings = userSettings.get(guildId, userId);
 
 		let validAttributes: Record<string, number | string> | undefined;
@@ -121,10 +130,9 @@ export function createUserRouter(deps: DashboardDeps) {
 
 		const currentAttrs = currentUserSettings?.attributes;
 		const effectiveAttributes = validAttributes ?? currentAttrs;
-		const effectiveReplaceUnknown =
-			ignoreNotfound === undefined
-				? currentUserSettings?.ignoreNotfound
-				: normalizedIgnoreNotfound || undefined;
+		const effectiveReplaceUnknown = options.has("ignoreNotfound")
+			? (options.get("ignoreNotfound") as string | undefined)
+			: currentUserSettings?.ignoreNotfound;
 
 		if (snippets !== undefined) {
 			if (typeof snippets !== "object" || Array.isArray(snippets)) {
@@ -144,24 +152,11 @@ export function createUserRouter(deps: DashboardDeps) {
 		if (validAttributes !== undefined)
 			userSettings.set(guildId, validAttributes, `${userId}.attributes`);
 
-		if (ignoreNotfound !== undefined) {
-			if (normalizedIgnoreNotfound)
-				userSettings.set(guildId, normalizedIgnoreNotfound, `${userId}.ignoreNotfound`);
-			else userSettings.delete(guildId, `${userId}.ignoreNotfound`);
-		}
+		for (const [key, value] of options)
+			storeUserOption(userSettings, guildId, userId, key, value);
 
 		if (createLinkTemplate !== undefined)
 			userSettings.set(guildId, createLinkTemplate, `${userId}.createLinkTemplate`);
-
-		if (customFormula !== undefined) {
-			if (typeof customFormula !== "string") {
-				res.status(400).json({ error: "customFormula must be a string" });
-				return;
-			}
-			const trimmed = customFormula.trim();
-			if (trimmed) userSettings.set(guildId, trimmed, `${userId}.customFormula`);
-			else userSettings.delete(guildId, `${userId}.customFormula`);
-		}
 
 		res.json({ ok: true });
 	});

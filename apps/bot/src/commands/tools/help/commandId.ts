@@ -44,7 +44,7 @@ export function getConfigIds(
 
 	// Finds subcommands that start with /config
 	commandsID.forEach((command) => {
-		if (command.name.startsWith("config")) {
+		if (command.name.startsWith(t("config.name"))) {
 			ids[command.name] = command.id;
 		}
 	});

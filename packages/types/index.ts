@@ -37,3 +37,4 @@ export * from "./src/database";
 export * from "./src/dice";
 export * from "./src/discord";
 export * from "./src/karma";
+export * from "./src/userOptions";
