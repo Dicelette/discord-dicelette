@@ -191,11 +191,11 @@ export function getIdFromMention(mention?: string): string | undefined {
 }
 
 export function isRegex(text: string): boolean {
-	return /^\/.*\/[gimy]*$/.test(text);
+	return /^\$\/.*\/[gimy]*\$$/.test(text);
 }
 
 export function createRegexFromText(toReplace: string): RegExp {
-	const flagsRegex = toReplace.match(/\/([gimy]+)$/);
+	const flagsRegex = toReplace.match(/\/([gimy]+)\$$/);
 	const flags = flagsRegex ? Array.from(new Set(flagsRegex[1].split(""))).join("") : "";
-	return new RegExp(toReplace.replace(/\/(.+)\/.*/, "$1"), flags);
+	return new RegExp(toReplace.replace(/^\$\/(.+)\/[gimy]*\$$/, "$1"), flags);
 }
