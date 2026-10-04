@@ -1,5 +1,5 @@
 import { validateCustomFormula } from "@dicelette/core";
-import { createRegexFromText, isRegex } from "@dicelette/utils";
+import { createRegexFromText, regexTest } from "@dicelette/utils";
 import type { UserOptionDef } from "./types";
 
 /**
@@ -40,6 +40,13 @@ export const USER_OPTIONS = {
 	},
 	prefixEditComment: {
 		kind: "string",
+		format: (value) => {
+			if (regexTest(value)) {
+				const reg = createRegexFromText(value);
+				return `/${reg.source}/${reg.flags}`;
+			}
+			return value;
+		},
 		slash: {
 			messages: {
 				reset: "userSettings.prefixEditComment.reset",
@@ -48,7 +55,7 @@ export const USER_OPTIONS = {
 		section: "general",
 		context: "male",
 		validate: (value: string) => {
-			if (isRegex(value)) {
+			if (regexTest(value)) {
 				try {
 					createRegexFromText(value);
 					return null;

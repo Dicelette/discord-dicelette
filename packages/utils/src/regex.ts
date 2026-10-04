@@ -190,7 +190,7 @@ export function getIdFromMention(mention?: string): string | undefined {
 	return mention?.replace(MENTION_ID_DETECTION, "$1");
 }
 
-export function isRegex(text: string): boolean {
+export function regexTest(text: string): boolean {
 	return /^\$\/.*\/[gimy]*\$$/.test(text);
 }
 

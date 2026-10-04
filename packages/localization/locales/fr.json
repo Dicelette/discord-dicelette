@@ -1265,6 +1265,8 @@
 			"title": "créer_lien"
 		},
 		"description": "Permets de configurer certaines fonctions non-critique du bot par les utilisateurs.",
+		"disabled_female": "{{- name}} est maintenant désactivée.",
+		"disabled_male": "{{- name}} est maintenant désactivé. ",
 		"display": {
 			"description": "Afficher la valeur actuelle.",
 			"empty_female": "{{- name}} n'est pas définie.",
@@ -1272,6 +1274,8 @@
 			"reply_female": "La valeur de la {{- name}} est : `{{- value}}`",
 			"reply_male": "La valeur du {{- name}} est définie sur `{{- value}}`"
 		},
+		"enabled_female": "{{- name}} est maintenant activée.",
+		"enabled_male": "{{- name}} est maintenant activé.",
 		"formula": {
 			"description": " Définit une formule mathjs où $ est remplacé par [expr] dans vos jets",
 			"display": {

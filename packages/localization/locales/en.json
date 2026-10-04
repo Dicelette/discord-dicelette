@@ -1265,6 +1265,8 @@
 			"title": "create_link"
 		},
 		"description": "Allows users to configure certain non-critical functions of the bot.",
+		"disabled_female": "{{- name}} is now disabled.",
+		"disabled_male": "{{- name}} is now disabled.",
 		"display": {
 			"description": "Display the current value.",
 			"empty_female": "{{- name}} is not set.",
@@ -1272,6 +1274,8 @@
 			"reply_female": "The {{- name}} value is: `{{- value}}`",
 			"reply_male": "The {{- name}} value is : `{{- value}}`"
 		},
+		"enabled_female": "{{- name}} is now enabled.",
+		"enabled_male": "{{- name}} is now enabled.",
 		"formula": {
 			"description": "Set a mathjs formula where $ is replaced by [expr] in dice rolls",
 			"display": {

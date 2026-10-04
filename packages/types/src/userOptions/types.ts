@@ -18,9 +18,12 @@ type StringOption = OptionBase & {
 	/** Returns an error message, or `null` when the value is valid. */
 	validate?: (value: string) => string | null;
 	helperLink?: { href: string; text: string };
+	format?: (value: string) => string;
 };
 
-type BooleanOption = OptionBase & { kind: "boolean" };
+type BooleanOption = OptionBase & {
+	kind: "boolean";
+};
 
 export type UserOptionDef = StringOption | BooleanOption;
 

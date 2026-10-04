@@ -4,7 +4,9 @@ import { t } from "@dicelette/localization";
 import {
 	parseUserOption,
 	storeUserOption,
+	type Translation,
 	USER_OPTIONS,
+	type UserOptionDef,
 	type UserOptionKey,
 } from "@dicelette/types";
 import * as Djs from "discord.js";
@@ -38,6 +40,7 @@ export async function userOptionsExecute(
 		const { display, group: groupKey, valueParam } = displayed.spec;
 		const name = displayedCommandName(displayed.key, displayed.spec, ul);
 		const value = stored?.[displayed.key as UserOptionKey];
+		const displayedValue = formatResult(displayed.def, value, ul);
 		await reply(interaction, {
 			content:
 				value === undefined
@@ -46,7 +49,7 @@ export async function userOptionsExecute(
 							[valueParam]: value,
 							name,
 							context: displayed.def.context,
-							value,
+							value: displayedValue,
 						}),
 		});
 		return true;
@@ -86,12 +89,34 @@ export async function userOptionsExecute(
 		value: String(parsed.value),
 		context: entry.def.context,
 	};
+	params.value = formatResult(entry.def, parsed.value, ul);
+
 	const message =
 		parsed.value !== undefined
-			? spec.messages.saved
+			? savedMessage(entry.def, parsed.value)
 			: !existed && spec.messages.notFound
 				? spec.messages.notFound
 				: spec.messages.reset;
 	await reply(interaction, { content: ul(message, params), flags: ephemeral });
 	return true;
+}
+
+function formatResult(
+	def: UserOptionDef,
+	value: string | boolean | undefined,
+	ul: Translation
+) {
+	if (def.kind === "string" && def.format) return def.format(value as string);
+	if (def.kind === "boolean") {
+		if (!value) return ul("common.no");
+		return ul("common.yes");
+	}
+}
+
+function savedMessage(def: UserOptionDef, value?: unknown) {
+	if (def.kind === "boolean") {
+		if (!value) return "userSettings.disabled";
+		return "userSettings.enabled";
+	}
+	return "userSettings.saved";
 }

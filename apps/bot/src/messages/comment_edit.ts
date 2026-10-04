@@ -4,9 +4,9 @@ import type { DiscordTextChannel, Translation } from "@dicelette/types";
 import { COMMENT_EDIT_PREFIX } from "@dicelette/types";
 import {
 	createRegexFromText,
-	isRegex,
 	MESSAGE_LINK_PATTERN,
 	ROLL_MENTION_PATTERN,
+	regexTest,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
 import { embedError } from "./embeds";
@@ -125,15 +125,18 @@ export async function handleCommentEditReply(
 	// - regex (commence et termine par /)
 	// - string (simple text => commence par ce texte)
 	// En soit, pour les deux derniers cas, on peut juste faire un regex commun => ^(prefixEditComment|COMMENT_EDIT_PREFIX) ou regex pour le regex
+	let isRegex = false;
 	let regex: RegExp | undefined = new RegExp(`^${COMMENT_EDIT_PREFIX}`);
 	if (prefix) {
-		if (isRegex(prefix)) {
+		if (regexTest(prefix)) {
 			regex = createRegexFromText(prefix);
+			isRegex = true;
 		} else regex = new RegExp(`^${prefix}`);
 	}
-
 	if (!trimmed.toLowerCase().match(regex)) return false;
-	const newComment = trimmed.replace(regex, "");
+	let newComment = trimmed.replace(regex, "");
+
+	if (isRegex) newComment = trimmed.replace(regex, (match, group1) => group1 || match);
 
 	let original: Djs.Message;
 	try {
