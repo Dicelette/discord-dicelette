@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [5.0.1](https://github.com/Dicelette/discord-dicelette/compare/5.0.0...5.0.1) (2026-10-04)
+
+### Bug Fixes
+
+* **editComments:** make the regex detection more strict ([bb9c7fe](https://github.com/Dicelette/discord-dicelette/commit/bb9c7fe0d7a42564ac2748913031ead354135023))
+
 ## [5.0.0](https://github.com/Dicelette/discord-dicelette/compare/4.10.1...5.0.0) (2026-10-03)
 
 ### ⚠ BREAKING CHANGES
