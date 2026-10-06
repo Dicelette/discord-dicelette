@@ -1,11 +1,13 @@
 import { createHash } from "node:crypto";
 import { findln } from "@dicelette/localization";
 import type { Settings } from "@dicelette/types";
+import { PermissionFlagsBits } from "discord-api-types/v10";
 import type { Request, Response } from "express";
 import {
 	type BotChannels,
 	type DashboardDeps,
 	DISCORD_API,
+	type DiscordGuild,
 	type EmbedField,
 	PERM_CACHE_TTL,
 	permCache,
@@ -18,9 +20,11 @@ import {
 /** Concurrency cap for outgoing Discord API fan-out, so member/character lookups don't saturate the bot's shared client. */
 export const DISCORD_FETCH_CONCURRENCY = 10;
 
-const ADMINISTRATOR = BigInt(0x8);
-const MANAGE_GUILD = BigInt(0x20);
-const MANAGE_ROLES = BigInt(0x10000000);
+const {
+	Administrator: ADMINISTRATOR,
+	ManageGuild: MANAGE_GUILD,
+	ManageRoles: MANAGE_ROLES,
+} = PermissionFlagsBits;
 const USER_EMBED_KEYS = ["embed.user", "embed.add", "embed.old"] as const;
 const STATS_EMBED_KEYS = ["common.statistic", "common.statistics"] as const;
 const DAMAGE_EMBED_KEYS = ["embed.dice", "legacy.dice", "common.macro"] as const;
@@ -155,12 +159,14 @@ export function makeRequireAdmin(
 }
 
 /** Checks if a user can manage a guild via the bot's cache: only `dashboardAccess` roles (or admin) qualify when
- * that setting is configured. Cached 5 min to avoid spamming `guild.fetchMember()`. */
+ * that setting is configured. Cached 5 min to avoid spamming `guild.fetchMember()`.
+ * When `oauthGuild` is given, its permissions settle the answer without a member fetch unless roles are needed. */
 export async function userCanManageGuild(
 	userId: string,
 	guildId: string,
 	botGuilds: DashboardDeps["botGuilds"],
-	settings?: Settings
+	settings?: Settings,
+	oauthGuild?: Pick<DiscordGuild, "owner" | "permissions">
 ): Promise<boolean> {
 	const cacheKey = `${userId}:${guildId}`;
 	const hit = getCached(cacheKey);
@@ -168,6 +174,17 @@ export async function userCanManageGuild(
 
 	const guild = botGuilds.get(guildId);
 	if (!guild) return setCached(cacheKey, false);
+
+	if (oauthGuild) {
+		const perms = BigInt(oauthGuild.permissions);
+		if (oauthGuild.owner || (perms & ADMINISTRATOR) !== BigInt(0))
+			return setCached(cacheKey, true);
+		const dashboardAccess = settings?.get(guildId, "dashboardAccess") as
+			| string[]
+			| undefined;
+		if (!dashboardAccess?.length)
+			return setCached(cacheKey, (perms & MANAGE_GUILD) !== BigInt(0));
+	}
 
 	try {
 		const member = await guild.fetchMember(userId);
