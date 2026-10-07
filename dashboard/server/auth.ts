@@ -213,7 +213,7 @@ export function createAuthRouter(
 				DISCORD_FETCH_CONCURRENCY,
 				async ({ g, botPresent, oauthAdmin }) => {
 					const isAdmin = botPresent
-						? await userCanManageGuild(userId, g.id, botGuilds, settings)
+						? await userCanManageGuild(userId, g.id, botGuilds, settings, g)
 						: oauthAdmin;
 					return { ...g, botPresent, isAdmin };
 				}

@@ -1,6 +1,6 @@
 import { type StatisticalTemplate, verifyTemplateValue } from "@dicelette/core";
 import type { GuildData } from "@dicelette/types";
-import { Locale } from "discord-api-types/v6";
+import { Locale } from "discord-api-types/v10";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import type { DashboardDeps } from "../types";
