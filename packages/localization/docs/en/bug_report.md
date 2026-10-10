@@ -2,7 +2,7 @@ Please file your bug report [here](<{{- link}}>).
 
 ### Before Reporting:
 1. **Check Existing Reports**: Ensure there isn't already a report for your bug.
-2. **Read the Documentation**: Visit the [documentation](<https://dicelette.github.io/en/>) to find answers to common questions.
+2. **Read the Documentation**: Visit the [documentation](<https://www.dicelette.app/en/>) to find answers to common questions.
 
 ### What to Include in Your Report:
 - **Command Used**: Specify the command and arguments that caused the issue.

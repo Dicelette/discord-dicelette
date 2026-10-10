@@ -24,4 +24,4 @@ La commande </roll:{{- rollId}}> fonctionne aussi : `/roll 1d20+3`.
 - Plusieurs jets : `[commentaire]` pour chaque dé (précédé d'un espace) et `#commentaire` pour l'ensemble → `1d20 [Attaque];1d8+3 [Dégâts] #Coup d'épée`.
 - Pour modifier un commentaire : répondez au résultat du bot avec `/// Nouveau commentaire` (préfixe par défaut, modifiable).
 
-Plus de détails dans la [documentation](<https://dicelette.github.io/>).
+Plus de détails dans la [documentation](<https://www.dicelette.app/>).

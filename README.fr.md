@@ -1,6 +1,6 @@
 # Dicelette
 
-→ [DOCUMENTATION](https://dicelette.github.io/) ←
+→ [DOCUMENTATION](https://www.dicelette.app/) ←
 
 → [Inviter le bot](https://discord.com/api/oauth2/authorize?client_id=1182819335878754385&permissions=395137215504&scope=bot+applications.commands)
 

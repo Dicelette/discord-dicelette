@@ -8,13 +8,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to submit this feature request! Before you begin, please make sure to check the [documentation](https://dicelette.github.io/en/) to see if your request is already covered or if you can find an existing solution.
+        Thank you for taking the time to submit this feature request! Before you begin, please make sure to check the [documentation](https://www.dicelette.app/en/) to see if your request is already covered or if you can find an existing solution.
   - type: checkboxes
     id: validation-read
     attributes:
       label: Code of Conduct
       options:
-        - label: I have read the [documentation](https://dicelette.github.io/en/) thoroughly.
+        - label: I have read the [documentation](https://www.dicelette.app/en/) thoroughly.
           required: true
         - label: I have checked existing issues to avoid creating duplicates.
           required: true        

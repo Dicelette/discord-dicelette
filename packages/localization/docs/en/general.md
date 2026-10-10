@@ -24,4 +24,4 @@ The </roll:{{- rollId}}> command works too: `/roll 1d20+3`.
 - Multiple rolls: `[comment]` for each die (preceded by a space) and `#comment` for the whole roll → `1d20 [Attack];1d8+3 [Damage] #Sword strike`.
 - To edit a comment: reply to the bot's result with `/// New comment` (default prefix, can be changed).
 
-More details in the [documentation](<https://dicelette.github.io/en/>).
+More details in the [documentation](<https://www.dicelette.app/en/>).

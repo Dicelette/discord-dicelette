@@ -8,13 +8,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to fill out this bug report! Don't forget to read the [documentation](https://dicelette.github.io/en/) as you may find the answer to your questions there!
+        Thank you for taking the time to fill out this bug report! Don't forget to read the [documentation](https://www.dicelette.app/en/) as you may find the answer to your questions there!
   - type: checkboxes
     id: validation-read
     attributes:
       label: Code of Conduct
       options:
-        - label: I have read the [documentation](https://dicelette.github.io/en/) thoroughly.
+        - label: I have read the [documentation](https://www.dicelette.app/en/) thoroughly.
           required: true
         - label: I have checked existing issues to avoid creating duplicates.
           required: true

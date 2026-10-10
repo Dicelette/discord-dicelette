@@ -3,7 +3,7 @@
 ⇾ [Invite the bot](https://discord.com/api/oauth2/authorize?client_id=1182819335878754385&permissions=395137215504&scope=bot+applications.commands)
 
 
-⇾ [Documentation](https://dicelette.github.io/en/) ⇽
+⇾ [Documentation](https://www.dicelette.app/en/) ⇽
 
 ## Translation
 

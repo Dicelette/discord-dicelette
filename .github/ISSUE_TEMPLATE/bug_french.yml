@@ -8,13 +8,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Merci de prendre le temps de remplir ce rapport de bug ! N'oubliez pas de lire la [documentation](https://dicelette.github.io/) car vous pourrez trouver la réponse à vos questions !
+        Merci de prendre le temps de remplir ce rapport de bug ! N'oubliez pas de lire la [documentation](https://www.dicelette.app/) car vous pourrez trouver la réponse à vos questions !
   - type: checkboxes
     id: validation-read
     attributes:
       label: Code de conduite
       options:
-        - label: J'ai bien lut la [documentation](https://dicelette.github.io/)
+        - label: J'ai bien lut la [documentation](https://www.dicelette.app/)
           required: true
         - label: J'ai déjà regardé les autres issues pour éviter de créer un doublon.
           required: true

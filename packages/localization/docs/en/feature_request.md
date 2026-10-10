@@ -3,7 +3,7 @@ In this case, you can suggest it [here](<{{- link}}>)!
 
 ### Before Submitting Your Request:
 1. **Check Existing Requests**: Ensure a similar request has not already been submitted.
-2. **Consult the Documentation**: Visit the [documentation](<https://dicelette.github.io/en/>) to see if your idea is already covered or if a solution exists.
+2. **Consult the Documentation**: Visit the [documentation](<https://www.dicelette.app/en/>) to see if your idea is already covered or if a solution exists.
 
 ### Information to Include in Your Request:
 - **Detailed Description**: Clearly explain the feature you would like to see added.

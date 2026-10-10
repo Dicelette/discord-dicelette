@@ -4,6 +4,6 @@
 - **[Modifiers](<https://dice-roller.github.io/documentation/guide/notation/modifiers.html>)**: Apply mathematical operations to dice rolls, such as adding or subtracting values. Example: `1d20+5`.
 - **[Comments](<https://dice-roller.github.io/documentation/guide/notation/roll-descriptions.html>)**: Add descriptions to your rolls for clarity. Example: `1d6 // Attack damage`.
 - **[Math](<https://dice-roller.github.io/documentation/guide/notation/maths.html>)**: Perform advanced calculations using dice rolls. Example: `(1d6+2)*3`.
-- **[Bulk Rolls](<https://dicelette.github.io/en/docs/introduction/expression#bulk-rolls>)**: Roll multiple dice simultaneously using the format `[number of dice]#[dice]`. Example: `2#d6` rolls two 6-sided dice.
-- **[Shared Rolls](<https://dicelette.github.io/en/docs/introduction/expression#shared-unique-rolls-reusing-results>)**: Reuse the result of a previous roll in subsequent calculations. Example: `1d6;&+10`.
-- **[Critical by Die](<https://dicelette.github.io/en/docs/introduction/expression#critical-successes-and-failures>)**: Specify critical conditions for dice rolls. Example: `1d20{cs:>=10}>=20` means the roll is a critical success if the result is greater than or equal to 10.
+- **[Bulk Rolls](<https://www.dicelette.app/en/docs/introduction/expression#bulk-rolls>)**: Roll multiple dice simultaneously using the format `[number of dice]#[dice]`. Example: `2#d6` rolls two 6-sided dice.
+- **[Shared Rolls](<https://www.dicelette.app/en/docs/introduction/expression#shared-unique-rolls-reusing-results>)**: Reuse the result of a previous roll in subsequent calculations. Example: `1d6;&+10`.
+- **[Critical by Die](<https://www.dicelette.app/en/docs/introduction/expression#critical-successes-and-failures>)**: Specify critical conditions for dice rolls. Example: `1d20{cs:>=10}>=20` means the roll is a critical success if the result is greater than or equal to 10.

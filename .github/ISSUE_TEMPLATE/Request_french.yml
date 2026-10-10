@@ -8,13 +8,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Merci de prendre le temps de soumettre cette demande de fonctionnalité ! Avant de commencer, assurez-vous de consulter la [documentation](https://dicelette.github.io/) pour voir si votre demande est déjà couverte ou si vous pouvez trouver une solution existante.
+        Merci de prendre le temps de soumettre cette demande de fonctionnalité ! Avant de commencer, assurez-vous de consulter la [documentation](https://www.dicelette.app/) pour voir si votre demande est déjà couverte ou si vous pouvez trouver une solution existante.
   - type: checkboxes
     id: validation-read
     attributes:
       label: Code de conduite
       options:
-        - label: J'ai bien lut la [documentation](https://dicelette.github.io/)
+        - label: J'ai bien lut la [documentation](https://www.dicelette.app/)
           required: true
         - label: J'ai déjà regardé les autres issues pour éviter de créer un doublon.
           required: true      

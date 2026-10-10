@@ -5,7 +5,7 @@ Le bot vous permet de configurer un modèle (« modèle de serveur ») qui vous 
 - **Adaptabilité** : Le modèle est conçu pour répondre à des besoins variés, offrant une grande personnalisation.
 
 ### Premiers pas :
-1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://dicelette.github.io/docs/sheet/model>) pour configurer votre modèle de serveur.
+1. **Configurer le modèle** : Suivez les instructions détaillées disponibles [ici](<https://www.dicelette.app/docs/sheet/model>) pour configurer votre modèle de serveur.
 2. **Sauvegarder les fiches de personnage** : Une fois le modèle configuré, vous pouvez sauvegarder les fiches directement sur votre serveur via la commande </register:{{-register}}> ou directement depuis le [Dashboard](<https://dashboard.dicelette.app/>).
 
 ### Aperçu des commandes :
@@ -16,5 +16,5 @@ Après avoir configuré le modèle, vous pouvez utiliser les commandes suivantes
 - **</calc:{{-calc}}>** : Calculez des valeurs en utilisant les statistiques des personnages.
 
 ### Ressources supplémentaires :
-- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://dicelette.github.io/>).
+- **Documentation** : Pour des configurations et fonctionnalités avancées, visitez la [documentation officielle](<https://www.dicelette.app/>).
 - **Support** : En cas de problème, consultez la documentation ou contactez l'équipe de support.

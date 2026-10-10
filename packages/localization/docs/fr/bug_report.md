@@ -2,7 +2,7 @@ Veuillez déposer votre rapport de bug [ici](<{{- link}}>).
 
 ### Avant de signaler :
 1. **Vérifiez les rapports existants** : Assurez-vous qu'il n'existe pas déjà un rapport pour votre problème.
-2. **Consultez la documentation** : Visitez la [documentation](<https://dicelette.github.io/>) pour trouver des réponses aux questions courantes.
+2. **Consultez la documentation** : Visitez la [documentation](<https://www.dicelette.app/>) pour trouver des réponses aux questions courantes.
 
 ### Informations à inclure dans votre rapport :
 - **Commande utilisée** : Précisez la commande et les arguments ayant causé le problème.
