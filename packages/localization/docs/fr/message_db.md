@@ -3,8 +3,8 @@
 
 # Rôles automatiques
 Ces commandes permettent l'attribution automatique de rôles lors de la validation des fichiers :
-- **</config auto_role statistics:{{- stat}}>** : Ajoute un rôle lors de la validation des statistiques.
-- **</config auto_role dice:{{- dice}}>** : Ajoute un rôle lors de l'enregistrement d'un dé. 
+- **</admin auto_role statistics:{{- stat}}>** : Ajoute un rôle lors de la validation des statistiques.
+- **</admin auto_role dice:{{- dice}}>** : Ajoute un rôle lors de l'enregistrement d'un dé. 
 
 -# Ces rôles peuvent également être attribués directement depuis le [Dashboard](<https://dashboard.dicelette.app/>).
 

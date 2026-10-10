@@ -17,7 +17,12 @@ import { reply } from "messages";
 
 import { VERSION } from "../../../../version";
 import "@dicelette/discord_ext";
-import { getConfigIds, getHelpDBCmd, getIDForAdminDB } from "./commandId";
+import {
+	fetchAllCommands,
+	getConfigIds,
+	getHelpDBCmd,
+	getIDForAdminDB,
+} from "./commandId";
 import { createHelpMessageDB } from "./createHelpMessage";
 
 export const help = {
@@ -76,8 +81,6 @@ export const help = {
 		const subcommand = options.getSubcommand(true);
 		const { ul, langToUse } = getLangAndConfig(client, interaction);
 		const link = langToUse === "fr" ? LINKS.fr : LINKS.en;
-		const commandsID = await interaction.guild?.commands.fetch();
-		if (!commandsID) return;
 		const getInfo = new GetInfo(interaction, client, ul, link);
 		switch (subcommand) {
 			case t("help.info.name"): {
@@ -120,9 +123,8 @@ class GetInfo {
 	}
 
 	private async getCommandsID() {
-		const commandsID = await this.interaction.guild?.commands.fetch();
-		if (!commandsID) throw new Error("No commands found");
-		return commandsID;
+		if (!this.interaction.guild) throw new Error("No commands found");
+		return fetchAllCommands(this.interaction.guild);
 	}
 
 	async getChangelog() {
@@ -175,7 +177,6 @@ class GetInfo {
 				dedent(
 					this.ul("help.admin.messageNoDB", {
 						delete: idsAdmin?.[t("timer.name")],
-						disable: idsAdmin?.[t("disableThread.name")],
 						display: idsAdmin?.[t("display.title")],
 						language: idsAdmin?.[t("config.lang.options.name")],
 						logs: idsAdmin?.[t("logs.name")],
@@ -191,26 +192,26 @@ class GetInfo {
 			this.client.settings,
 			this.interaction.guild!.id
 		);
-		if (!idsAdminDB) return;
-		replySection.push(
-			new Djs.TextDisplayBuilder().setContent(
-				dedent(
-					this.ul("help.admin.messageDB", {
-						calc: idsAdminDB?.[t("calc.title")],
-						dbroll: idsAdminDB?.[t("dbRoll.name")],
-						delete_char: idsAdminDB?.[t("deleteChar.name")],
-						dice: idsAdminDB?.["auto_role dice"],
-						gm: {
-							calc: idsAdminDB?.["gm calc"],
-							dbRoll: idsAdminDB?.["gm dbroll"],
-							macro: idsAdminDB?.["gm macro"],
-						},
-						macro: idsAdminDB?.[t("common.macro")],
-						stat: idsAdminDB?.["auto_role statistics"],
-					})
+		if (idsAdminDB)
+			replySection.push(
+				new Djs.TextDisplayBuilder().setContent(
+					dedent(
+						this.ul("help.admin.messageDB", {
+							calc: idsAdminDB[t("calc.title")],
+							dbroll: idsAdminDB[t("dbRoll.name")],
+							delete_char: idsAdminDB[t("deleteChar.name")],
+							dice: idsAdminDB["auto_role dice"],
+							gm: {
+								calc: idsAdminDB["gm calc"],
+								dbRoll: idsAdminDB["gm dbroll"],
+								macro: idsAdminDB["gm macro"],
+							},
+							macro: idsAdminDB[t("common.macro")],
+							stat: idsAdminDB["auto_role statistics"],
+						})
+					)
 				)
-			)
-		);
+			);
 		await this.interaction.reply({
 			components: replySection,
 			flags: [Djs.MessageFlags.IsComponentsV2, Djs.MessageFlags.Ephemeral],

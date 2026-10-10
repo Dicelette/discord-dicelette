@@ -5,6 +5,7 @@ import * as Djs from "discord.js";
 import { deleteAfter, reply, setTags } from "messages";
 import moment from "moment";
 import "@dicelette/discord_ext";
+import { fetchAllCommands } from "./help/commandId";
 
 export default {
 	data: new Djs.SlashCommandBuilder()
@@ -29,7 +30,7 @@ export default {
 		client: EClient
 	): Promise<void> {
 		if (!interaction.guild) return;
-		const allCommands = await interaction.guild.commands.fetch();
+		const allCommands = await fetchAllCommands(interaction.guild);
 		const channel = interaction.channel;
 		if (!channel || channel.isDMBased() || !channel.isTextBased()) return;
 

@@ -2,6 +2,18 @@ import { t } from "@dicelette/localization";
 import type { Settings } from "@dicelette/types";
 import type * as Djs from "discord.js";
 
+/**
+ * Global commands (roll, config, help...) are not returned by `guild.commands`, only the guild-scoped ones.
+ * Guild commands come first so they win over a global command with the same name (dev mode).
+ */
+export async function fetchAllCommands(guild: Djs.Guild) {
+	const [guildCommands, globalCommands] = await Promise.all([
+		guild.commands.fetch(),
+		guild.client.application.commands.fetch(),
+	]);
+	return guildCommands.concat(globalCommands);
+}
+
 function getCommandIds(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 	commandNames: string[]
@@ -37,6 +49,7 @@ export function getConfigIds(
 	ids[t("logs.name")] = idConfig;
 	ids[t("changeThread.name")] = idConfig;
 	ids[t("timer.name")] = idConfig;
+	ids[t("timestamp.name")] = idConfig;
 	ids[t("display.title")] = idConfig;
 	ids[t("config.lang.name")] = idConfig;
 	ids[t("config.selfRegister.name")] = idConfig;

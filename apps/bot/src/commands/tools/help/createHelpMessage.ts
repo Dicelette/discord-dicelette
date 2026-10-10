@@ -3,7 +3,7 @@ import type { Settings, Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import dedent from "dedent";
 import * as Djs from "discord.js";
-import { getConfigIds, getHelpDBCmd } from "./commandId";
+import { fetchAllCommands, getConfigIds, getHelpDBCmd } from "./commandId";
 
 export function createHelpMessageDB(
 	guildID: Djs.Snowflake,
@@ -23,7 +23,7 @@ export function createHelpMessageDB(
 }
 
 export async function helpAtInvit(guild: Djs.Guild): Promise<void> {
-	const cmdsId = guild.commands.cache;
+	const cmdsId = await fetchAllCommands(guild);
 	const lang = guild.preferredLocale;
 	const ul = ln(lang);
 	const docLinkExt = lang === "fr" ? "" : "en/";
