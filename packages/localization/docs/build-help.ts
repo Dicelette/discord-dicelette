@@ -21,6 +21,7 @@ const PATH_TO_REPLACE: Target = {
 	"help.message": "message",
 	"help.messageDB": "cmd_db",
 	"help.register.message": "register",
+	"help.general.message": "general",
 };
 
 function findRoot(dir: string, marker: string): string {
