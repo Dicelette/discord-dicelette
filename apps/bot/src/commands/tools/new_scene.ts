@@ -2,7 +2,7 @@ import type { EClient } from "@dicelette/client";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
-import { deleteAfter, reply, setTags } from "messages";
+import { deleteAfter, setTags } from "messages";
 import moment from "moment";
 import "@dicelette/discord_ext";
 import { fetchAllCommands } from "./help/commandId";
@@ -39,7 +39,7 @@ export default {
 		const bubble = option.getBoolean(t("scene.time.name"));
 		const { ul } = getLangAndConfig(client, interaction);
 		if (!scene && !bubble) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: ul("scene.noScene"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -51,7 +51,7 @@ export default {
 			interaction.guild.members.me ??
 			(await interaction.guild.members.fetchMe().catch(() => null));
 		if (!botMember) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: noPermMsg,
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -65,7 +65,7 @@ export default {
 				Djs.PermissionFlagsBits.ViewChannel,
 			])
 		) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: noPermMsg,
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -116,7 +116,7 @@ export default {
 					});
 
 			const threadMention = Djs.channelMention(newThread.id);
-			const msgReply = await reply(interaction, {
+			const msgReply = await interaction.botReply({
 				content: ul("scene.interaction", { scene: threadMention }),
 			});
 			const time = client.settings.get(interaction.guild.id, "deleteAfter") ?? 180000;

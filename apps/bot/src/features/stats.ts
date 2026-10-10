@@ -34,14 +34,12 @@ import {
 } from "@dicelette/utils";
 import { getTemplateByInteraction, getUserNameAndChar, updateMemory } from "database";
 import * as Djs from "discord.js";
-import * as Messages from "messages";
 import {
 	createStatsEmbed,
 	displayOldAndNewStats,
 	getEmbeds,
 	removeEmbedsFromList,
 	replaceEmbedInList,
-	reply,
 	sendLogs,
 } from "messages";
 import {
@@ -100,7 +98,7 @@ export class StatsFeature extends BaseFeature {
 			statToDisplay = statToDisplay.filter((stat) => !stats.includes(stat.unidecode()));
 			if (statToDisplay.length === 0) {
 				const button = MacroFeature.buttons(ul, isModerator);
-				await reply(interaction, {
+				await interaction.botReply({
 					content: ul("modals.alreadySet"),
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -145,7 +143,7 @@ export class StatsFeature extends BaseFeature {
 		}
 		if (inputs.length === 0) {
 			//a modal without any component is rejected by the builder ("Invalid Array length")
-			await reply(interaction, {
+			await interaction.botReply({
 				content: ul("error.stats.noneToDisplay"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -305,7 +303,7 @@ export class StatsFeature extends BaseFeature {
 					max: exceeded,
 					value: this.ul("common.statistics"),
 				});
-				await reply(interaction, {
+				await interaction.botReply({
 					content: errorMessage,
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -318,7 +316,7 @@ export class StatsFeature extends BaseFeature {
 				return;
 			}
 			if (ilReste && ilReste > 0) {
-				await reply(interaction, {
+				await interaction.botReply({
 					content: this.ul("modals.stats.forceDistrib", { reste: ilReste }),
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -349,7 +347,7 @@ export class StatsFeature extends BaseFeature {
 				embeds: [userEmbed, statEmbeds],
 				files: uniqueFiles,
 			});
-			await reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.added.stats"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -370,7 +368,7 @@ export class StatsFeature extends BaseFeature {
 			embeds: [userEmbed, statEmbeds],
 			files: uniqueFiles,
 		});
-		await reply(interaction, {
+		await interaction.botReply({
 			content: `${this.ul("modals.added.stats")}${restePoints}`,
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -487,17 +485,16 @@ export class StatsFeature extends BaseFeature {
 			const toAdd = removeEmbedsFromList(list, "stats");
 			const components = editUserButtons(this.ul, false, exists.damage);
 			await message.edit({ components: [components], embeds: toAdd, files });
-			await reply(
+			await (
 				interaction as
 					| Djs.ModalSubmitInteraction
 					| Djs.ButtonInteraction
 					| Djs.CommandInteraction
-					| Djs.StringSelectMenuInteraction,
-				{
-					content: this.ul("modals.removed.stats"),
-					flags: Djs.MessageFlags.Ephemeral,
-				}
-			);
+					| Djs.StringSelectMenuInteraction
+			).botReply({
+				content: this.ul("modals.removed.stats"),
+				flags: Djs.MessageFlags.Ephemeral,
+			});
 			await sendLogs(
 				this.ul("logs.stats.removed", {
 					char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
@@ -519,19 +516,18 @@ export class StatsFeature extends BaseFeature {
 		const compare = displayOldAndNewStats(statsEmbeds.data.fields, fieldsToAppend);
 		const count = compare.added + compare.changed + compare.removed;
 
-		await reply(
+		await (
 			interaction as
 				| Djs.ModalSubmitInteraction
 				| Djs.ButtonInteraction
 				| Djs.CommandInteraction
-				| Djs.StringSelectMenuInteraction,
-			{
-				content: this.ul("embed.edit.stats", {
-					count,
-				}),
-				flags: Djs.MessageFlags.Ephemeral,
-			}
-		);
+				| Djs.StringSelectMenuInteraction
+		).botReply({
+			content: this.ul("embed.edit.stats", {
+				count,
+			}),
+			flags: Djs.MessageFlags.Ephemeral,
+		});
 		const logMessage = this.ul("logs.stats.added", {
 			char: `${Djs.userMention(userID)} ${userName ? `(${userName})` : ""}`,
 			count,
@@ -689,7 +685,7 @@ export class StatsFeature extends BaseFeature {
 		});
 
 		const row = buildModerationButtons("stats-edit", this.ul, embedKey);
-		await reply(interaction, { components: [row], embeds: [newEmbedStats] });
+		await interaction.botReply({ components: [row], embeds: [newEmbedStats] });
 		const replyMessage = await interaction.fetchReply();
 		const userFeature = new UserFeature({
 			client: this.client,
@@ -717,7 +713,7 @@ export class StatsFeature extends BaseFeature {
 				ul: this.ul,
 			});
 			await userFeature.sendValidationMessage();
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				content: notAllowedMsg,
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -798,7 +794,7 @@ export class StatsFeature extends BaseFeature {
 			? this.ul("modals.cancelled_by_user", { url })
 			: this.ul("modals.cancelled", { url });
 		await interaction.message.delete();
-		await reply(interaction, {
+		await interaction.botReply({
 			content,
 			flags: Djs.MessageFlags.Ephemeral,
 		});

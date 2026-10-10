@@ -2,7 +2,6 @@ import type { EClient } from "@dicelette/client";
 import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import type * as Djs from "discord.js";
-import { reply } from "messages";
 import { formatDuration } from "./utils";
 
 export async function deleteAfter(
@@ -13,7 +12,7 @@ export async function deleteAfter(
 ) {
 	if (!interaction.guild) return;
 	if (client.settings.get(interaction.guild.id, "disableThread"))
-		return await reply(interaction, {
+		return await interaction.botReply({
 			content: ul("timer.error"),
 		});
 
@@ -35,11 +34,11 @@ export async function timestamp(
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	client.settings.set(interaction.guild!.id, toggle, "timestamp");
 	if (toggle) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("timestamp.enabled"),
 		});
 	} else {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("timestamp.disabled"),
 		});
 	}
@@ -57,14 +56,14 @@ export async function setContextLink(
 	const deleteLogs = client.settings.get(interaction.guild!.id, "deleteAfter") === 0;
 	if (toggle) {
 		if (deleteLogs)
-			return await reply(interaction, {
+			return await interaction.botReply({
 				content: ul("anchor.enabled.noDelete"),
 			});
-		return await reply(interaction, {
+		return await interaction.botReply({
 			content: ul("anchor.enabled.logs"),
 		});
 	}
-	return await reply(interaction, {
+	return await interaction.botReply({
 		content: ul("context.disabled"),
 	});
 }
@@ -78,11 +77,11 @@ export async function linkToLog(
 	const toggle = options.getBoolean(t("disableThread.options.name"), true);
 	client.settings.set(interaction.guild!.id, toggle, "linkToLogs");
 	if (toggle) {
-		return await reply(interaction, {
+		return await interaction.botReply({
 			content: ul("linkToLog.enabled"),
 		});
 	}
-	return await reply(interaction, {
+	return await interaction.botReply({
 		content: ul("linkToLog.disabled"),
 	});
 }

@@ -62,6 +62,24 @@ declare module "discord.js" {
 		setNames(key: string): this;
 		setDescriptions(key: string): this;
 	}
+
+	interface CommandInteraction<Cached extends CacheType = CacheType> {
+		botReply(
+			options: string | MessagePayload | InteractionReplyOptions
+		): Promise<Message | InteractionResponse>;
+	}
+
+	interface ModalSubmitInteraction<Cached extends CacheType = CacheType> {
+		botReply(
+			options: string | MessagePayload | InteractionReplyOptions
+		): Promise<Message | InteractionResponse>;
+	}
+
+	interface MessageComponentInteraction<Cached extends CacheType = CacheType> {
+		botReply(
+			options: string | MessagePayload | InteractionReplyOptions
+		): Promise<Message | InteractionResponse>;
+	}
 }
 
 const SET_NAMES_IMPL = function (this: any, key: string) {
@@ -70,6 +88,27 @@ const SET_NAMES_IMPL = function (this: any, key: string) {
 
 const SET_DESCRIPTIONS_IMPL = function (this: any, key: string) {
 	return this.setDescription(t(key as any)).setDescriptionLocalizations(cmdLn(key));
+};
+
+/** Replies to the interaction, or edits/follows up when it was already replied to or deferred. */
+const BOT_REPLY_IMPL = async function (
+	this: any,
+	options: string | Djs.MessagePayload | Djs.InteractionReplyOptions
+): Promise<Djs.Message | Djs.InteractionResponse> {
+	try {
+		if (this.replied || this.deferred) {
+			const editOptions =
+				typeof options === "string" || options instanceof Djs.MessagePayload
+					? options
+					: ({ ...options } as Djs.InteractionEditReplyOptions);
+			return await this.editReply(editOptions);
+		}
+		return await this.reply(options);
+	} catch {
+		if (!this.deferred && !this.replied) return await this.reply(options);
+
+		return await this.followUp(options);
+	}
 };
 
 /** Applies setNames/setDescriptions to multiple Discord.js builder prototypes. */
@@ -100,3 +139,10 @@ applyLocalizationMethods([
 	Djs.SlashCommandUserOption.prototype,
 	Djs.SlashCommandAttachmentOption.prototype,
 ]);
+
+for (const prototype of [
+	Djs.CommandInteraction.prototype,
+	Djs.ModalSubmitInteraction.prototype,
+	Djs.MessageComponentInteraction.prototype,
+])
+	Object.defineProperty(prototype, "botReply", { value: BOT_REPLY_IMPL });

@@ -18,7 +18,6 @@ import {
 	embedError,
 	findLocation,
 	getEmbeds,
-	reply,
 } from "messages";
 import { optionInteractions } from "utils";
 
@@ -54,7 +53,7 @@ export const displayUser = {
 		if (!charData) {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
@@ -64,7 +63,7 @@ export const displayUser = {
 		if (userData && !userData.userId) userData.userId = user?.id ?? interaction.user.id;
 		if (!userData) userData = findChara(charData, charName);
 		if (!userData) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 			});
 			return;
@@ -86,7 +85,7 @@ export const displayUser = {
 				`User ${user?.id ?? interaction.user.id} access to private data: ${allowed}`
 			);
 			if (!allowed)
-				return await reply(interaction, {
+				return await interaction.botReply({
 					embeds: [embedError(ul("error.private"), ul)],
 				});
 		}
@@ -116,7 +115,7 @@ export const displayUser = {
 			const diceFields = generateDice(diceEmbed?.data.fields, statsFields);
 			const dataUserEmbeds = getEmbeds(userMessage, "user");
 			if (!statisticEmbed && !diceEmbed && !diceFields && !statsFields) {
-				await reply(interaction, {
+				await interaction.botReply({
 					embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 				});
 				return;
@@ -172,10 +171,10 @@ export const displayUser = {
 			const displayEmbeds: Djs.EmbedBuilder[] = [displayEmbed];
 			if (newStatEmbed) displayEmbeds.push(newStatEmbed);
 			if (newDiceEmbed) displayEmbeds.push(newDiceEmbed);
-			await reply(interaction, { embeds: displayEmbeds, files });
+			await interaction.botReply({ embeds: displayEmbeds, files });
 		} catch (e) {
 			logger.error("display-command", e);
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});

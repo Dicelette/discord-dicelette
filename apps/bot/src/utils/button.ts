@@ -3,7 +3,7 @@ import { fetchUser } from "@dicelette/helpers";
 import { findln } from "@dicelette/localization";
 import type { DataToFooter, Translation } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { ensureEmbed, reply } from "messages";
+import { ensureEmbed } from "messages";
 
 /** Buttons to edit the user embed character sheet; by default only "add dice" is included. */
 export function editUserButtons(ul: Translation, stats?: boolean, dice?: boolean) {
@@ -101,14 +101,14 @@ export async function cancel(
 	if (cancelByUser) {
 		if (isOwner) {
 			await interaction.message.delete();
-			await reply(interaction, {
+			await interaction.botReply({
 				content: ul("register.cancelled"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return;
 		}
 		// No other person (including a moderator) may cancel "on behalf of" the user.
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("modals.noPermission"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -118,7 +118,7 @@ export async function cancel(
 	// Main case: standard cancellation (moderator or owner without sending a rejection)
 	const canDelete = isModerator || (isOwner && !sendRefusal);
 	if (!canDelete) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("modals.noPermission"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -136,7 +136,7 @@ export async function cancel(
 			}),
 		});
 	}
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("register.cancelled"),
 		flags: Djs.MessageFlags.Ephemeral,
 	});

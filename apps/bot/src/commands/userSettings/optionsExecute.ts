@@ -10,7 +10,6 @@ import {
 	type UserOptionKey,
 } from "@dicelette/types";
 import * as Djs from "discord.js";
-import { reply } from "messages";
 import { displayedCommandName, groupName, slashEntries } from "./options";
 
 /**
@@ -41,7 +40,7 @@ export async function userOptionsExecute(
 		const name = displayedCommandName(displayed.key, displayed.spec, ul);
 		const value = stored?.[displayed.key as UserOptionKey];
 		const displayedValue = formatResult(displayed.def, value, ul);
-		await reply(interaction, {
+		await interaction.botReply({
 			content:
 				value === undefined
 					? ul(display!.empty, { name, context: displayed.def.context })
@@ -69,7 +68,7 @@ export async function userOptionsExecute(
 		raw === null ? { ok: true as const, value: undefined } : parseUserOption(key, raw);
 
 	if (!parsed.ok) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul(spec.messages.invalid, {
 				[spec.valueParam]: raw,
 				error: parsed.error,
@@ -97,7 +96,7 @@ export async function userOptionsExecute(
 			: !existed && spec.messages.notFound
 				? spec.messages.notFound
 				: spec.messages.reset;
-	await reply(interaction, { content: ul(message, params), flags: ephemeral });
+	await interaction.botReply({ content: ul(message, params), flags: ephemeral });
 	return true;
 }
 

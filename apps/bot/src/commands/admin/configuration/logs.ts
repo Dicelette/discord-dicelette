@@ -3,7 +3,6 @@ import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import dedent from "dedent";
 import * as Djs from "discord.js";
-import { reply } from "messages";
 
 export async function setErrorLogs(
 	interaction: Djs.CommandInteraction,
@@ -22,13 +21,13 @@ export async function setErrorLogs(
 		const msg = oldChan
 			? ` ${ul("logs.inChan", { chan: Djs.channelMention(oldChan) })}`
 			: ".";
-		await reply(interaction, {
+		await interaction.botReply({
 			content: `${ul("logs.delete")}${msg}`,
 		});
 		return;
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "logs");
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("logs.set", { channel: Djs.channelMention(channel.id) }),
 	});
 }
@@ -131,20 +130,20 @@ export async function hiddenRoll(
 	if (!toggle) {
 		//disable
 		client.settings.delete(interaction.guild!.id, "hiddenRoll");
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("hidden.disabled"),
 		});
 		return;
 	}
 	if (!channel) {
 		client.settings.set(interaction.guild!.id, true, "hiddenRoll");
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("hidden.enabled"),
 		});
 		return;
 	}
 	client.settings.set(interaction.guild!.id, channel.id, "hiddenRoll");
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("hidden.enabledChan", {
 			channel: Djs.channelMention(channel.id),
 		}),

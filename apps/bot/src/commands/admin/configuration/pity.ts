@@ -3,7 +3,6 @@ import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { random } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-import { reply } from "messages";
 
 /** Sets or clears the guild's pity threshold and replies with confirmation (clears if `pity` is falsy). */
 export async function setPity(
@@ -15,12 +14,12 @@ export async function setPity(
 	const pity = options.getInteger(t("config.pity.option.name"));
 	if (!pity) {
 		client.settings.delete(interaction.guild!.id, "pity");
-		return await reply(interaction, {
+		return await interaction.botReply({
 			content: ul("config.pity.delete"),
 		});
 	}
 	client.settings.set(interaction.guild!.id, pity, "pity");
-	return await reply(interaction, {
+	return await interaction.botReply({
 		content: ul("config.pity.success", { pity }),
 	});
 }

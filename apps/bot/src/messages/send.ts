@@ -22,32 +22,6 @@ export async function sendLogs(
 		return;
 	}
 }
-export async function reply(
-	interaction:
-		| Djs.CommandInteraction
-		| Djs.ModalSubmitInteraction
-		| Djs.ButtonInteraction
-		| Djs.StringSelectMenuInteraction,
-	options: string | Djs.MessagePayload | Djs.InteractionReplyOptions
-): Promise<Djs.Message | Djs.InteractionResponse> {
-	try {
-		if (interaction.replied || interaction.deferred) {
-			// Convert to EditReplyOptions if needed
-			const editOptions =
-				typeof options === "string" || options instanceof Djs.MessagePayload
-					? options
-					: ({ ...options } as Djs.InteractionEditReplyOptions);
-			return await interaction.editReply(editOptions);
-		}
-		return await interaction.reply(options);
-	} catch (e) {
-		if (!interaction.deferred && !interaction.replied)
-			return await interaction.reply(options);
-
-		return await interaction.followUp(options);
-	}
-}
-
 /** Replies with an ephemeral error embed. */
 export async function replyEphemeralError(
 	interaction: Djs.CommandInteraction | Djs.ModalSubmitInteraction,
@@ -55,7 +29,7 @@ export async function replyEphemeralError(
 	ul: Translation,
 	cause?: string
 ): Promise<Djs.Message | Djs.InteractionResponse> {
-	return reply(interaction, {
+	return interaction.botReply({
 		embeds: [embedError(errorText, ul, cause)],
 		flags: Djs.MessageFlags.Ephemeral,
 	});
@@ -149,7 +123,7 @@ export async function sendResult(
 			rollChannel = hideResultConfig;
 			isHidden = hideResultConfig;
 		} else if (typeof hideResultConfig === "boolean") {
-			return await reply(interaction, {
+			return await interaction.botReply({
 				allowedMentions,
 				content: output,
 				flags: Djs.MessageFlags.Ephemeral,
@@ -169,7 +143,7 @@ export async function sendResult(
 		disableThread ||
 		rollChannel === channel.id
 	) {
-		return await reply(interaction, {
+		return await interaction.botReply({
 			allowedMentions,
 			content: output,
 			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,
@@ -190,7 +164,7 @@ export async function sendResult(
 		const outputWithUrl =
 			result.roll?.logUrl(logUrl)?.result ??
 			`${result.expression}${createUrl(ul, undefined, logUrl)}`;
-		const replyInteraction = await reply(interaction, {
+		const replyInteraction = await interaction.botReply({
 			allowedMentions,
 			content: outputWithUrl,
 			flags: hidden ? Djs.MessageFlags.Ephemeral : undefined,

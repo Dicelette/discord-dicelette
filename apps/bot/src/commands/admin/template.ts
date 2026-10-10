@@ -20,7 +20,6 @@ import {
 	createCustomCritical,
 	createDefaultThread,
 	embedError,
-	reply,
 } from "messages";
 import { DATABASE_NAMES } from "../index";
 import "@dicelette/discord_ext";
@@ -242,7 +241,7 @@ async function getTemplateFile(
 		);
 	//fetch the template
 	if (!template.contentType?.includes("json")) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.template.json"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -295,7 +294,7 @@ async function registerTemplate(
 			false
 		);
 		if (!publicChannel) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 				],
@@ -304,7 +303,7 @@ async function registerTemplate(
 			return;
 		}
 	} else if (!(channel instanceof Djs.BaseGuildTextChannel) && !publicChannel) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [
 				embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 			],
@@ -313,7 +312,7 @@ async function registerTemplate(
 		return;
 	}
 	if (!publicChannel) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [
 				embedError(ul("error.public", { chan: Djs.channelMention(channel.id) }), ul),
 			],
@@ -334,12 +333,12 @@ async function registerTemplate(
 		msg,
 		interaction.locale
 	);
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("register.embed.registered"),
 		files: downloadTutorialImages(),
 	});
 	await userDataUpdate(client, interaction, ul, templateData, options);
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("register.embed.updated", { msg }),
 	});
 	await removeRestriction(guildId, client);
@@ -571,7 +570,7 @@ async function updateTemplateFile(
 	const oldData = client.settings.get(guildId);
 	if (!oldData) {
 		logger.warn(`No old template data found for guild ${guildId}`);
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.template.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -582,7 +581,7 @@ async function updateTemplateFile(
 	const publicChannelId = oldData.managerId;
 	if (!publicChannelId) {
 		logger.warn(`No public channel found for guild ${guildId}`);
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.template.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -595,7 +594,7 @@ async function updateTemplateFile(
 		| Djs.TextChannel;
 	if (!channel) {
 		logger.warn(`Channel ${channelId} not found in guild ${guildId}`);
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.template.notFound"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -615,7 +614,7 @@ async function updateTemplateFile(
 		interaction.locale
 	);
 	await userDataUpdate(client, interaction, ul, templateData, options);
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("register.embed.updated", { msg }),
 	});
 	await removeRestriction(guildId, client);

@@ -5,7 +5,6 @@ import type { Translation } from "@dicelette/types";
 import { desktopLink, mobileLink, resetButton } from "commands";
 import * as Djs from "discord.js";
 import { MacroFeature, StatsFeature, UserFeature } from "features";
-import { reply } from "messages";
 import { cancel } from "utils";
 
 /**
@@ -14,7 +13,7 @@ import { cancel } from "utils";
 const BUTTON_HANDLERS: Record<string, ButtonHandler> = {
 	avatar: async (interaction, ul, _interactionUser, _template, _client) => {
 		await resetButton(interaction.message, ul);
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("refresh"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -192,7 +191,7 @@ const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
 				?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 			// If a moderator tries to validate before the user marks the sheet finished, bail out early.
 			if (isModerator) {
-				await reply(interaction, {
+				await interaction.botReply({
 					content: ul("register.notFinished"),
 					flags: Djs.MessageFlags.Ephemeral,
 				});
@@ -206,7 +205,7 @@ const BUTTON_PREFIX_HANDLERS: { prefix: string; handler: ButtonHandler }[] = [
 				interactionUser,
 				ul,
 			}).sendValidationMessage();
-			await reply(interaction, {
+			await interaction.botReply({
 				content: ul("register.confirm"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});

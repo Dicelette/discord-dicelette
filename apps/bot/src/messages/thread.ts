@@ -19,7 +19,7 @@ import {
 } from "@dicelette/utils";
 import { registerUser, setDefaultManagerId, updateMemory } from "database";
 import * as Djs from "discord.js";
-import { deleteAfter, embedError, reply, sendLogs } from "messages";
+import { deleteAfter, embedError, sendLogs } from "messages";
 import { editUserButtons, searchUserChannel, selectEditMenu } from "utils";
 
 const botErrorOptions: BotErrorOptions = {
@@ -260,7 +260,7 @@ export async function findLocation(
 		sheetLocation?.channelId
 	);
 	if (!thread) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.channel.thread"), ul)],
 		});
 		return { sheetLocation };
@@ -271,7 +271,7 @@ export async function findLocation(
 		user?.id ?? interaction.user.id
 	);
 	if (!allowHidden && charData[user?.id ?? interaction.user.id]?.isPrivate) {
-		await reply(interaction, { embeds: [embedError(ul("error.private"), ul)] });
+		await interaction.botReply({ embeds: [embedError(ul("error.private"), ul)] });
 		return { sheetLocation };
 	}
 	return { sheetLocation, thread };

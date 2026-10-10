@@ -14,7 +14,6 @@ import {
 import { t } from "@dicelette/localization";
 import { getExpression, replaceStatsInDiceFormula } from "@dicelette/parse_result";
 import * as Djs from "discord.js";
-import { reply } from "messages";
 import { baseRoll } from "../roll";
 
 export async function register(
@@ -72,7 +71,7 @@ export async function displayList(
 	const entries = Object.entries(macros);
 	if (entries.length === 0) {
 		const text = ul("userSettings.snippets.list.empty");
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	await chunkMessage(entries, ul, interaction);
@@ -91,7 +90,7 @@ export async function remove(
 		const text = ul("userSettings.snippets.delete.notFound", {
 			name: `**${macroName.toTitle()}**`,
 		});
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	delete macros[macroName];
@@ -100,7 +99,7 @@ export async function remove(
 	const text = ul("userSettings.snippets.delete.success", {
 		name: `**${macroName.toTitle()}**`,
 	});
-	await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+	await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 }
 
 export async function exportSnippets(
@@ -113,14 +112,14 @@ export async function exportSnippets(
 	const macros = client.userSettings.get(guildId, userId)?.snippets ?? {};
 	if (Object.keys(macros).length === 0) {
 		const text = ul("userSettings.snippets.export.empty");
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const attachment = buildJsonAttachment(
 		macros,
 		`snippets_${interaction.user.username}.json`
 	);
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("userSettings.snippets.export.success"),
 		files: [attachment],
 		flags: Djs.MessageFlags.Ephemeral,
@@ -146,7 +145,7 @@ export async function importSnippets(
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	if (
@@ -157,7 +156,7 @@ export async function importSnippets(
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const key = `${userId}.snippets`;

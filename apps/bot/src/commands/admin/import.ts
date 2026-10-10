@@ -10,7 +10,6 @@ import {
 	createEmbedsList,
 	createStatsEmbed,
 	createUserEmbed,
-	reply,
 	repostInThread,
 } from "messages";
 import { parseCSV } from "utils";
@@ -261,7 +260,7 @@ async function processCharacter(params: {
 			char.userName ?? undefined,
 			previous
 		);
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("import.success", { user: Djs.userMention(member.id) }),
 		});
 	} catch (err) {
@@ -298,14 +297,14 @@ export const bulkAdd = {
 		await interaction.deferReply({ flags: Djs.MessageFlags.Ephemeral });
 		const ext = getFileExtension(csvFile.name);
 		if (!ext || ext !== "csv") {
-			return reply(interaction, {
+			return interaction.botReply({
 				content: ul("import.errors.invalid_file", { ext }),
 			});
 		}
 		/** download the file using paparse */
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, {
+			return interaction.botReply({
 				content: ul("error.template.notFound", {
 					guildId: interaction.guild?.name ?? interaction.guildId ?? "unknow guild",
 				}),
@@ -325,7 +324,7 @@ export const bulkAdd = {
 		const defaultChannel = client.settings.get(interaction.guild!.id, "managerId");
 		const privateChannel = privateChannelId;
 		if (!defaultChannel)
-			return reply(interaction, {
+			return interaction.botReply({
 				content: ul("error.channel.defaultChannel"),
 			});
 
@@ -365,7 +364,7 @@ export const bulkAdd = {
 		let msg = ul("import.all_success");
 		if (collectedErrors.length > 0)
 			msg += `\n${ul("import.errors.global")}\n${collectedErrors.join("\n")}`;
-		await reply(interaction, { content: msg });
+		await interaction.botReply({ content: msg });
 		return;
 	},
 };
@@ -388,7 +387,7 @@ export const bulkAddTemplate = {
 		const { ul } = getLangAndConfig(client, interaction);
 		const guildTemplate = await getTemplateByInteraction(interaction, client);
 		if (!guildTemplate) {
-			return reply(interaction, {
+			return interaction.botReply({
 				content: ul("error.template.notFound", {
 					guildId: interaction.guild.name,
 				}),

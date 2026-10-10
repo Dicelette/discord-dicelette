@@ -8,7 +8,7 @@ import {
 } from "@dicelette/utils";
 import { getUserByEmbed } from "database";
 import * as Djs from "discord.js";
-import { embedError, getEmbeds, reply, repostInThread } from "messages";
+import { embedError, getEmbeds, repostInThread } from "messages";
 import { BaseFeature } from "./base";
 
 const botErrorOptions: BotErrorOptions = {
@@ -32,7 +32,7 @@ export class TravelFeature extends BaseFeature {
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		if (moderator) await this.showTravel(interaction);
 		else
-			await reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -91,7 +91,7 @@ export class TravelFeature extends BaseFeature {
 			embed.data.fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
 		if (!userId) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(this.ul("error.user.notFound.userId", { oldUserId: "" }), this.ul),
 				],
@@ -102,7 +102,7 @@ export class TravelFeature extends BaseFeature {
 
 		const charData = getUserByEmbed({ message });
 		if (!charData) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(
 						this.ul("error.user.notFound.charData", { url: message.url }),
@@ -158,7 +158,7 @@ export class TravelFeature extends BaseFeature {
 			logger.warn("TravelFeature: failed to delete old message", error);
 		}
 
-		await reply(interaction, {
+		await interaction.botReply({
 			content: this.ul("travel.success", { channel: `<#${targetChannel.id}>` }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});

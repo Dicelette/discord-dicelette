@@ -10,7 +10,6 @@ import {
 	logger,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { reply } from "messages";
 
 const botErrorOptions: BotErrorOptions = { cause: "OOC", level: BotErrorLevel.Warning };
 
@@ -29,7 +28,7 @@ export async function stripOOC(
 	if ((!prefix && !suffix && !regex && !timer) || timer === 0) {
 		//delete
 		client.settings.delete(interaction.guild!.id, "stripOOC");
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("config.stripOOC.delete"),
 		});
 		return;

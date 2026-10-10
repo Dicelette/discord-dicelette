@@ -3,7 +3,6 @@ import { t } from "@dicelette/localization";
 import type { Translation } from "@dicelette/types";
 import { logger } from "@dicelette/utils";
 import type * as Djs from "discord.js";
-import { reply } from "messages";
 
 export async function allowSelfRegistration(
 	client: EClient,
@@ -24,7 +23,7 @@ export async function allowSelfRegistration(
 	if (allowChannel) toggle += "_channel";
 	client.settings.set(interaction.guild!.id, toggle, "allowSelfRegister");
 	if (!toggle) {
-		return await reply(interaction, {
+		return await interaction.botReply({
 			content: ul("config.selfRegister.disable"),
 		});
 	}
@@ -46,7 +45,7 @@ export async function allowSelfRegistration(
 		);
 		msg += `\n\n**__${ul("config.selfRegister.disableChannel")}__**`;
 	}
-	return await reply(interaction, {
+	return await interaction.botReply({
 		content: msg,
 	});
 }

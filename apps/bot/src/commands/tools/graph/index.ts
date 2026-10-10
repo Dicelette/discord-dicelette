@@ -22,7 +22,7 @@ import {
 	getUserByEmbed,
 } from "database";
 import * as Djs from "discord.js";
-import { embedError, reply, sendLogs } from "messages";
+import { embedError, sendLogs } from "messages";
 import { searchUserChannel } from "utils";
 import "@dicelette/discord_ext";
 import { generateColor, imagePersonalized } from "./draw";
@@ -184,7 +184,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 	let max = options.getNumber(t("graph.max.name")) ?? undefined;
 	const { ul, config: guildData } = getLangAndConfig(client, interaction);
 	if (!guildData) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [
 				embedError(
 					ul("error.template.notFound", { guildId: interaction.guild!.name }),
@@ -196,7 +196,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 	}
 	const serverTemplate = await getTemplateByInteraction(interaction, client);
 	if (!guildData?.templateID?.statsName || !serverTemplate?.statistics) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 		});
 		return;
@@ -207,7 +207,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 	let userName = `<@${user?.id ?? interaction.user.id}>`;
 	if (charName) userName += ` (${charName})`;
 	if (!charData) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 		});
 		return;
@@ -220,7 +220,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 		if (!userData) userData = findChara(charData, charName);
 
 		if (!userData) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 			});
 			return;
@@ -236,7 +236,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 			sheetLocation?.channelId
 		);
 		if (!thread)
-			return await reply(interaction, {
+			return await interaction.botReply({
 				embeds: [embedError(ul("error.channel.thread"), ul)],
 			});
 
@@ -246,7 +246,7 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 			userData.userId ?? userId
 		);
 		if (!allowHidden && userData.isPrivate) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.private"), ul)],
 			});
 			return;
@@ -255,13 +255,13 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 		const message = await thread.messages.fetch(sheetLocation.messageId);
 		const userStatistique = getUserByEmbed({ message }, undefined, false);
 		if (!userStatistique) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.notFound.generic"), ul)],
 			});
 			return;
 		}
 		if (!userStatistique.stats) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			});
 			return;
@@ -301,12 +301,12 @@ async function graphStats(client: EClient, interaction: Djs.ChatInputCommandInte
 			invert
 		);
 		if (!image) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.noMessage"), ul)],
 			});
 			return;
 		}
-		await reply(interaction, {
+		await interaction.botReply({
 			allowedMentions: { repliedUser: true, users: [] },
 			content: titleUser(),
 			files: [image],
@@ -335,13 +335,13 @@ async function graphAttributes(
 			client.userSettings.get(interaction.guild.id, userId)?.attributes ?? {};
 		const resolvedAttributes = resolveUserAttributes(userAttributes);
 		if (!resolvedAttributes.ok || !resolvedAttributes.value) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			});
 			return;
 		}
 		if (Object.keys(resolvedAttributes.value).length === 0) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			});
 			return;
@@ -355,7 +355,7 @@ async function graphAttributes(
 			attributesFilter
 		);
 		if (attributesFilter && Object.keys(filteredAttributes).length === 0) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			});
 			return;
@@ -388,14 +388,14 @@ async function graphAttributes(
 			invert
 		);
 		if (!image) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.noMessage"), ul)],
 			});
 			return;
 		}
 
 		const titleUser = `# ⌈${Djs.userMention(userId)}⌋ `;
-		await reply(interaction, {
+		await interaction.botReply({
 			allowedMentions: { repliedUser: true, users: [] },
 			content: titleUser,
 			files: [image],
@@ -411,7 +411,7 @@ async function graphError(
 	ul: Translation,
 	client: EClient
 ) {
-	await reply(interaction, {
+	await interaction.botReply({
 		embeds: [embedError(ul("error.generic.e", { e: error }), ul)],
 	});
 	await sendLogs(

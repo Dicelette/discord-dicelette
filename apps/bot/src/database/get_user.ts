@@ -40,7 +40,7 @@ import {
 import type { EmbedBuilder, Message } from "discord.js";
 import * as Djs from "discord.js";
 import equal from "fast-deep-equal";
-import { embedError, ensureEmbed, getEmbeds, reply, replyEphemeralError } from "messages";
+import { embedError, ensureEmbed, getEmbeds, replyEphemeralError } from "messages";
 import { isSerializedNameEquals, searchUserChannel } from "utils";
 
 type GetOptions = {
@@ -126,7 +126,7 @@ export async function getFirstChar(
 	);
 	if (!firstChar) {
 		if (skipNotFound) return;
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.user.youRegistered"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -409,7 +409,7 @@ export async function getRecordChar(
 	const guildData = client.settings.get(interaction.guildId as string);
 	const ul = ln(interaction.locale);
 	if (!guildData) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [
 				embedError(
 					ul("error.template.notFound", {
@@ -622,7 +622,7 @@ export async function getStatistics(
 	const selectedCharByQueries = isSerializedNameEquals(userStatistique, charName);
 
 	if (optionChar && !selectedCharByQueries) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [
 				embedError(ul("error.user.charName", { charName: optionChar.capitalize() }), ul),
 			],
@@ -668,7 +668,7 @@ export async function getStatistics(
 		optionChar = minTemp.optionChar;
 	}
 	if (!userStatistique && !skipNotFound) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.user.youRegistered"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -676,7 +676,7 @@ export async function getStatistics(
 	}
 
 	if (!userStatistique?.stats && !template?.statistics && needStats) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.stats.notFound_plural"), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});

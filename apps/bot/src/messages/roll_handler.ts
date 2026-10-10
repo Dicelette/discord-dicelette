@@ -4,7 +4,7 @@ import { ResultAsText } from "@dicelette/parse_result";
 import type { DiscordTextChannel, Settings, Translation } from "@dicelette/types";
 import { COMPILED_COMMENTS, logger } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { deleteAfter, findMessageBefore, reply, sendLogs, threadToSend } from "messages";
+import { deleteAfter, findMessageBefore, sendLogs, threadToSend } from "messages";
 import { createCacheKey } from "../commands";
 
 interface RollHandlerOptions {
@@ -325,5 +325,5 @@ async function replyToSource(
 		flags.push(Djs.MessageFlags.Ephemeral);
 		replyInteraction.flags = flags;
 	}
-	return await reply(source, replyOptions as Djs.InteractionReplyOptions);
+	return await source.botReply(replyOptions as Djs.InteractionReplyOptions);
 }

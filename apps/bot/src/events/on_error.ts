@@ -7,7 +7,7 @@ import { type BotError, consoleError, important } from "@dicelette/utils";
 import { DiscordAPIError } from "@discordjs/rest";
 import * as Djs from "discord.js";
 import dotenv from "dotenv";
-import { embedError, reply } from "messages";
+import { embedError } from "messages";
 
 dotenv.config({ path: process.env.PROD ? ".env.prod" : ".env", quiet: true });
 
@@ -58,14 +58,14 @@ export async function interactionError(
 		try {
 			// A reply was already sent: editing it would replace a legitimate answer with the
 			// error, so append it instead. A merely deferred interaction has nothing but its
-			// "thinking" placeholder, and `reply` turns that into an edit.
+			// "thinking" placeholder, and `botReply` turns that into an edit.
 			if (interaction.replied)
 				await interaction.followUp({
 					embeds: [embed],
 					flags: Djs.MessageFlags.Ephemeral,
 				});
 			else
-				await reply(interaction, {
+				await interaction.botReply({
 					embeds: [embed],
 					flags: Djs.MessageFlags.Ephemeral,
 				});

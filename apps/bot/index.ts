@@ -11,6 +11,7 @@ import { client } from "client";
 import dotenv from "dotenv";
 import * as event from "event";
 import express from "express";
+import "@dicelette/discord_ext";
 import "uniformize";
 import { startBotDashboard } from "./src/dashboard";
 import { VERSION } from "./version";

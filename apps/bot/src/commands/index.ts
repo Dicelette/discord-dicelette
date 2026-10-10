@@ -4,14 +4,14 @@ import { deleteChar } from "./admin/delete_char";
 import { PRIVATES_COMMANDS } from "./private";
 import { GLOBAL_CMD, mjRoll, ROLL_AUTO, ROLL_CMDLIST } from "./roll";
 import snippets from "./roll/snippets";
-import { GIMMICK, getCount, help, math, newScene } from "./tools";
+import { commandHelp, GIMMICK, getCount, help, math, newScene } from "./tools";
 import { userSettings } from "./userSettings";
 
 export const AUTOCOMPLETE_COMMANDS = [
 	...ROLL_AUTO,
 	...GIMMICK,
 	deleteChar,
-	help,
+	commandHelp,
 	snippets,
 	userSettings,
 	mjRoll,
@@ -20,6 +20,7 @@ export const COMMANDS_GLOBAL = [
 	...ADMIN,
 	...ROLL_CMDLIST,
 	deleteChar,
+	commandHelp,
 	help,
 	newScene,
 	getCount,

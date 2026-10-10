@@ -12,7 +12,6 @@ import * as Djs from "discord.js";
 import Papa from "papaparse";
 import "uniformize";
 import process from "node:process";
-import { reply } from "messages";
 
 export type CSVRow = {
 	user: string;
@@ -62,7 +61,7 @@ export async function parseCSV(
 			if (!dataHeader) {
 				logger.warn("Error while parsing CSV, missing header");
 				if (interaction)
-					await reply(interaction, {
+					await interaction.botReply({
 						content: ul("import.errors.missing_header"),
 					});
 				error = "Missing header";
@@ -74,7 +73,7 @@ export async function parseCSV(
 			if (missingHeader.length > 0) {
 				logger.warn("\nError while parsing CSV, missing header values", missingHeader);
 				if (interaction)
-					await reply(interaction, {
+					await interaction.botReply({
 						content: ul("import.errors.headers", {
 							name: missingHeader.join("\n- "),
 						}),
@@ -153,7 +152,7 @@ async function step(
 			);
 			if (!guildMember?.user) {
 				const msg = ul("import.errors.user_not_found", { user });
-				await reply(interaction, { content: msg });
+				await interaction.botReply({ content: msg });
 				errors.push(msg);
 				continue;
 			}
@@ -167,7 +166,7 @@ async function step(
 				const msg = ul("import.errors.missing_charName", {
 					user: Djs.userMention(userID),
 				});
-				await reply(interaction, { content: msg });
+				await interaction.botReply({ content: msg });
 				errors.push(msg);
 			}
 			logger.warn(`Missing character name for ${user}`);
@@ -186,7 +185,7 @@ async function step(
 					charName: charName ?? ul("common.default"),
 					user: Djs.userMention(userID),
 				});
-				await reply(interaction, { content: msg });
+				await interaction.botReply({ content: msg });
 				errors.push(msg);
 			}
 			logger.warn(`Duplicate character name for ${user}`);
@@ -204,7 +203,7 @@ async function step(
 						stats: emptyStats.join("\n- "),
 						user: Djs.userMention(userID),
 					});
-					await reply(interaction, { content: msg });
+					await interaction.botReply({ content: msg });
 					errors.push(msg);
 				}
 				logger.warn(`Missing stats for ${user}. Missing: ${emptyStats.join("\n- ")}`);

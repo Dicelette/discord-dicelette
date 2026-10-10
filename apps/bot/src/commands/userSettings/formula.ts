@@ -2,7 +2,6 @@ import type { EClient } from "@dicelette/client";
 import { validateCustomFormula } from "@dicelette/core";
 import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
 import * as Djs from "discord.js";
-import { reply } from "messages";
 
 /** Guild formula; the user's one is generated from `USER_OPTIONS`. */
 export async function formulaSet(
@@ -13,7 +12,7 @@ export async function formulaSet(
 	const guildId = interaction.guild!.id;
 	const formula = interaction.options.getString("formula", false);
 	const send = (content: string) =>
-		reply(interaction, { content, flags: Djs.MessageFlags.Ephemeral });
+		interaction.botReply({ content, flags: Djs.MessageFlags.Ephemeral });
 
 	if (!formula) {
 		if (!client.settings.has(guildId, "customFormula"))
@@ -34,7 +33,7 @@ export async function formulaDisplay(
 ) {
 	const { ul } = getLangAndConfig(client, interaction);
 	const formula = client.settings.get(interaction.guild!.id, "customFormula");
-	await reply(interaction, {
+	await interaction.botReply({
 		content: formula
 			? ul("userSettings.formula.display.reply", { formula })
 			: ul("config.formula.noDisplay"),

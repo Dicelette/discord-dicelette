@@ -39,7 +39,7 @@ import type {
 import { capitalizeBetweenPunct, DICE_COMPILED_PATTERNS } from "@dicelette/utils";
 import { getRightValue, getTemplate, resolveStatsNames } from "database";
 import * as Djs from "discord.js";
-import { embedError, handleRollResult, reply } from "messages";
+import { embedError, handleRollResult } from "messages";
 import { triggerPity } from "../commands";
 import { findBestMatchingDice } from "./find_macro";
 
@@ -106,7 +106,7 @@ export async function rollWithInteraction(
 	const result = getRoll(dice, pity, sort);
 	if (result && comment) result.comment = comment;
 	if (!result) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError(ul("error.invalidDice.withDice", { dice }), ul)],
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -191,7 +191,7 @@ export async function rollMacro(
 	}
 
 	if (!dice) {
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [
 				embedError(
 					ul("error.damage.notFound", {
@@ -304,14 +304,14 @@ export async function rollStatistique(
 	//return if the standardizedStatistic is excluded from the list
 	const excludedStats = ctx?.templateID?.excludedStats?.map((stat) => stat.standardize());
 	if (standardizedStatistic && excludedStats?.includes(standardizedStatistic)) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("error.stats.excluded"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 		return;
 	}
 	if (template.diceType?.includes("$") && !statistic) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("error.stats.shouldSelect"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -346,7 +346,7 @@ export async function rollStatistique(
 		dice = dice.replaceAll("$", userStat.toString());
 	}
 	if (!dice) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("error.noDice"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});

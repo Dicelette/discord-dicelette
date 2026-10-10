@@ -43,7 +43,7 @@ export class UserFeature extends BaseFeature {
 
 		if (isModerator) await this.show(moderatorPermission);
 		else
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -142,7 +142,7 @@ export class UserFeature extends BaseFeature {
 		if (!isNumber(pageNumberStr)) return;
 		const template = await getTemplateByInteraction(interaction, this.client);
 		if (!template) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					Messages.embedError(
 						this.ul("error.template.notFound", {
@@ -211,7 +211,7 @@ export class UserFeature extends BaseFeature {
 				: interaction.user;
 
 		if (!user) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				embeds: [Messages.embedError(this.ul("error.user.notFound.generic"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -268,7 +268,7 @@ export class UserFeature extends BaseFeature {
 				)
 			: undefined;
 		if (!existChannel) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				embeds: [Messages.embedError(this.ul("error.channel.thread"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -308,7 +308,7 @@ export class UserFeature extends BaseFeature {
 		}
 
 		if (template.statistics) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				components: [continueCancelButtons(this.ul)],
 				content:
 					verifiedAvatar !== false
@@ -324,7 +324,7 @@ export class UserFeature extends BaseFeature {
 			selfRegister.moderation && !moderator
 		);
 
-		await Messages.reply(interaction, { components: [allButtons], embeds: [embed] });
+		await interaction.botReply({ components: [allButtons], embeds: [embed] });
 	}
 
 	/**
@@ -340,7 +340,7 @@ export class UserFeature extends BaseFeature {
 				.get(this.interactionUser.id)
 				?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		if (!isModerator) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -364,7 +364,7 @@ export class UserFeature extends BaseFeature {
 			.filter((stat) => allTemplateStat.includes(stat.unidecode()))
 			.map((stat) => stat.unidecode());
 		if (statsAlreadySet.length === allTemplateStat.length) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.alreadySet"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -400,7 +400,7 @@ export class UserFeature extends BaseFeature {
 			let notAllowedMsg = this.ul("modals.noPermission");
 			notAllowedMsg += `\n${this.ul("modals.onlyModerator")}`;
 			await this.sendValidationMessage();
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				content: notAllowedMsg,
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -481,7 +481,7 @@ export class UserFeature extends BaseFeature {
 				getIdFromMention(channelToPost)
 			);
 			if (!channel) {
-				await Messages.reply(interaction, {
+				await interaction.botReply({
 					embeds: [
 						Messages.embedError(
 							this.ul("error.channel.notFound", { channel: channelToPost }),
@@ -495,7 +495,7 @@ export class UserFeature extends BaseFeature {
 		}
 		if (charName && charName === "common.noSet") charName = undefined;
 		if (!userID) {
-			await Messages.reply(interaction, {
+			await interaction.botReply({
 				embeds: [Messages.embedError(this.ul("error.user.notFound.generic"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -663,7 +663,7 @@ export class UserFeature extends BaseFeature {
 			!!statsEmbed,
 			this.client.settings
 		);
-		await Messages.reply(interaction, {
+		await interaction.botReply({
 			content: this.ul("modals.finished"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});

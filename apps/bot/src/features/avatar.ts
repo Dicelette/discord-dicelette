@@ -8,7 +8,7 @@ import {
 	verifyAvatarUrl,
 } from "@dicelette/utils";
 import * as Djs from "discord.js";
-import { embedError, getEmbeds, replaceEmbedInList, reply } from "messages";
+import { embedError, getEmbeds, replaceEmbedInList } from "messages";
 import { allowEdit } from "utils";
 import { BaseFeature } from "./base";
 
@@ -86,7 +86,7 @@ export class AvatarFeature extends BaseFeature {
 
 		if (uploaded) {
 			if (!uploaded.contentType?.match(QUERY_URL_PATTERNS.VALID_EXTENSIONS))
-				return await reply(interaction, {
+				return await interaction.botReply({
 					embeds: [embedError(this.ul("error.avatar.format"), this.ul)],
 				});
 			const attachment = new Djs.AttachmentBuilder(uploaded.url, { name: uploaded.name });
@@ -95,15 +95,15 @@ export class AvatarFeature extends BaseFeature {
 		} else {
 			const input = cleanAvatarUrl(interaction.fields.getTextInputValue("avatar"));
 			if (!input)
-				return await reply(interaction, {
+				return await interaction.botReply({
 					embeds: [embedError(this.ul("error.avatar.missing"), this.ul)],
 				});
 			if (input.match(QUERY_URL_PATTERNS.DISCORD_CDN))
-				return await reply(interaction, {
+				return await interaction.botReply({
 					embeds: [embedError(this.ul("error.avatar.cdn"), this.ul)],
 				});
 			if (!verifyAvatarUrl(input))
-				return await reply(interaction, {
+				return await interaction.botReply({
 					embeds: [embedError(this.ul("error.avatar.url"), this.ul)],
 				});
 			avatar = input;
@@ -132,7 +132,7 @@ export class AvatarFeature extends BaseFeature {
 		const nameMention =
 			!charName || findln(charName) === "common.noSet" ? user : `${user} (${charName})`;
 		const msgLink = message.url;
-		await reply(interaction, {
+		await interaction.botReply({
 			content: this.ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});

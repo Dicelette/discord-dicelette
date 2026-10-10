@@ -9,7 +9,7 @@ import {
 import { changeOwner, resetButton } from "commands";
 import { getUserByEmbed } from "database";
 import * as Djs from "discord.js";
-import { embedError, getEmbeds, reply } from "messages";
+import { embedError, getEmbeds } from "messages";
 import { isUserNameOrId } from "utils";
 import { BaseFeature } from "./base";
 
@@ -33,7 +33,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		if (moderator) await this.showChangeOwner(interaction);
 		else
-			await reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -76,14 +76,14 @@ export class ChangeOwnerFeature extends BaseFeature {
 			embed.data.fields?.find((field) => findln(field.name) === "common.user")?.value
 		);
 		if (oldUserId === user.id) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(this.ul("error.user.sameUser"), this.ul)],
 				flags: Djs.MessageFlags.Ephemeral,
 			});
 			return await resetButton(message, this.ul);
 		}
 		if (!oldUserId) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(this.ul("error.user.notFound.userId", { oldUserId }), this.ul),
 				],
@@ -93,7 +93,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 		}
 		const oldUser = await isUserNameOrId(oldUserId, interaction);
 		if (!oldUser) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(this.ul("error.user.notFound.oldUser", { oldUserId }), this.ul),
 				],
@@ -108,7 +108,7 @@ export class ChangeOwnerFeature extends BaseFeature {
 		};
 		const charData = getUserByEmbed({ message: message });
 		if (!charData) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(
 						this.ul("error.user.notFound.charData", {

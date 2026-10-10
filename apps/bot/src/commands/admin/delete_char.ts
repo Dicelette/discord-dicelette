@@ -13,7 +13,7 @@ import { filterChoices, logger } from "@dicelette/utils";
 import { deleteUser, deleteUserInChar, getRecordChar } from "database";
 import * as Djs from "discord.js";
 import i18next from "i18next";
-import { embedError, reply } from "messages";
+import { embedError } from "messages";
 import { optionInteractions, searchUserChannel } from "utils";
 export const t = i18next.getFixedT("en");
 
@@ -83,8 +83,7 @@ export const deleteChar = {
 				`user.${user?.id ?? interaction.user.id}`
 			);
 			if (!allDataUser) {
-				await reply(
-					interaction,
+				await interaction.botReply(
 					ul("deleteChar.noCharacters", {
 						user: Djs.userMention(user?.id ?? interaction.user.id),
 					})
@@ -142,7 +141,7 @@ export const deleteChar = {
 		if (!charData) {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
@@ -251,8 +250,7 @@ async function deleteAllUserData(
 		interaction.guild!.id,
 		`user.${user?.id ?? interaction.user.id}`
 	);
-	await reply(
-		interaction,
+	await interaction.botReply(
 		ul("deleteChar.allSuccess", {
 			user: Djs.userMention(user?.id ?? interaction.user.id),
 		})
@@ -271,8 +269,7 @@ async function deleteNoUserMessage(
 	const newGuildData = deleteUser(interaction, guildData, user, charName);
 	client.settings.set(interaction.guildId as string, newGuildData);
 	//delete in characters db
-	await reply(
-		interaction,
+	await interaction.botReply(
 		ul("deleteChar.success", {
 			user: Djs.userMention(user?.id ?? interaction.user.id),
 		})
@@ -299,14 +296,14 @@ async function deleteOneChar(
 		const message = await userChannel.messages.fetch(messageID);
 		await message.delete();
 		const newGuildData = deleteUser(interaction, guildData, user, charName);
-		await reply(interaction, ul("deleteChar.success", { user: msg }));
+		await interaction.botReply(ul("deleteChar.success", { user: msg }));
 		client.settings.set(interaction.guildId as string, newGuildData);
 	} catch (e) {
 		logger.warn(e as Error, "deleteChar: no message found - No problem");
 		//no message found, delete the character from the database
 		const newGuildData = deleteUser(interaction, guildData, user, charName);
 		client.settings.set(interaction.guildId as string, newGuildData);
-		await reply(interaction, ul("deleteChar.success", { user: msg }));
+		await interaction.botReply(ul("deleteChar.success", { user: msg }));
 	}
 }
 
@@ -332,7 +329,7 @@ async function confirmToDelete(
 		confirm,
 		cancel
 	);
-	return await reply(interaction, { components: [row], embeds: [embed] });
+	return await interaction.botReply({ components: [row], embeds: [embed] });
 }
 
 async function deleteUserByLocation(

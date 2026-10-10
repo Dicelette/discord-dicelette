@@ -1,7 +1,6 @@
 import type { EClient } from "@dicelette/client";
 import { ln, t } from "@dicelette/localization";
 import type * as Djs from "discord.js";
-import { reply } from "messages";
 import { findLocale } from "./utils";
 
 export function changeLanguage(
@@ -15,7 +14,7 @@ export function changeLanguage(
 	const nameOfLang = findLocale(lang);
 	//update memory
 	client.guildLocale.set(interaction.guild!.id, lang);
-	return reply(interaction, {
+	return interaction.botReply({
 		content: ul("config.lang.set", { lang: nameOfLang }),
 	});
 }

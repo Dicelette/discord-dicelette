@@ -53,7 +53,6 @@ import {
 	getEmbeds,
 	removeEmbedsFromList,
 	replaceEmbedInList,
-	reply,
 	sendLogs,
 	stripFooter,
 	updateUserEmbedThumbnail,
@@ -249,7 +248,7 @@ export class MacroFeature extends BaseFeature {
 		if (!this.client) return;
 
 		if (!(await getTemplateByInteraction(interaction, this.client))) {
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [
 					embedError(
 						this.ul("error.template.notFound", { guildId: interaction.guildId }),
@@ -267,7 +266,7 @@ export class MacroFeature extends BaseFeature {
 		});
 
 		if (!auth.authorized) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.noPermission"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -391,7 +390,7 @@ export class MacroFeature extends BaseFeature {
 			{} as Record<string, string>
 		);
 		if (damageName && Object.keys(damageName).length > 25) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: ul("modals.dice.max"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -453,7 +452,7 @@ export class MacroFeature extends BaseFeature {
 				});
 
 				const row = buildModerationButtons("dice-add", ul, embedKey);
-				await reply(interaction, { components: [row], embeds: [diceEmbed] });
+				await interaction.botReply({ components: [row], embeds: [diceEmbed] });
 				return;
 			}
 			const userRegister: {
@@ -523,7 +522,7 @@ export class MacroFeature extends BaseFeature {
 			allEmbeds[0] = userDataEmbed;
 			await interaction?.message?.edit({ components, embeds: allEmbeds, files });
 		}
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("modals.added.dice"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -846,7 +845,7 @@ export class MacroFeature extends BaseFeature {
 			args.interaction ?? (this.interaction as Djs.ModalSubmitInteraction);
 		const { removed, oldFields, newFields, userID, userName, message, db } = args;
 		if (removed) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.removed.dice"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -865,7 +864,7 @@ export class MacroFeature extends BaseFeature {
 		}
 		const compare = displayOldAndNewStats(oldFields ?? [], newFields);
 		const count = compare.added + compare.changed + compare.removed;
-		await reply(interaction, {
+		await interaction.botReply({
 			content: this.ul("embed.edit.dice", {
 				count,
 			}),
@@ -893,7 +892,7 @@ export class MacroFeature extends BaseFeature {
 			.get(interaction.user.id)
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 		if (!moderator) {
-			await reply(interaction, {
+			await interaction.botReply({
 				content: this.ul("modals.onlyModerator"),
 				flags: Djs.MessageFlags.Ephemeral,
 			});
@@ -914,7 +913,7 @@ export class MacroFeature extends BaseFeature {
 		let content = this.ul("modals.cancelled", { url });
 		if (samePerson) content = this.ul("modals.cancelled_by_user", { url });
 		await interaction.message.delete();
-		await reply(interaction, {
+		await interaction.botReply({
 			content,
 			flags: Djs.MessageFlags.Ephemeral,
 		});

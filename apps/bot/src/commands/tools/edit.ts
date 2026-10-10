@@ -19,7 +19,7 @@ import {
 	registerUser,
 } from "database";
 import * as Djs from "discord.js";
-import { embedError, findLocation, getEmbeds, replaceEmbedInList, reply } from "messages";
+import { embedError, findLocation, getEmbeds, replaceEmbedInList } from "messages";
 import { getButton, optionInteractions } from "utils";
 import "@dicelette/discord_ext";
 import { QUERY_URL_PATTERNS, verifyAvatarUrl } from "@dicelette/utils";
@@ -99,7 +99,7 @@ export const editAvatar = {
 			?.permissions.has(Djs.PermissionsBitField.Flags.ManageRoles);
 
 		if (user && user.id !== interaction.user.id && !isModerator) {
-			await reply(interaction, { embeds: [embedError(ul("error.noPermission"), ul)] });
+			await interaction.botReply({ embeds: [embedError(ul("error.noPermission"), ul)] });
 			return;
 		}
 		const charName = options.getString(t("common.character"))?.toLowerCase();
@@ -107,7 +107,7 @@ export const editAvatar = {
 		if (!charData) {
 			let userName = `<@${user?.id ?? interaction.user.id}>`;
 			if (charName) userName += ` (${charName})`;
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.user.registered", { user: userName }), ul)],
 			});
 			return;
@@ -196,7 +196,7 @@ async function avatar(
 			avatarURL = fileUrl;
 		}
 		if (!avatarURL || !verifyAvatarUrl(avatarURL))
-			return await reply(interaction, {
+			return await interaction.botReply({
 				embeds: [embedError(ul("error.avatar.url"), ul)],
 			});
 		const embed = getEmbeds(message, "user");
@@ -210,14 +210,14 @@ async function avatar(
 
 		const nameMention = `<@${user?.id ?? interaction.user.id}>${charName ? ` (${charName})` : ""}`;
 		const msgLink = message.url;
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("edit.avatar.success", { link: msgLink, name: nameMention }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
 	} catch (error) {
 		//send the correct error message
 		logger.warn(error as Error);
-		await reply(interaction, {
+		await interaction.botReply({
 			embeds: [embedError((error as Error).message, ul)],
 		});
 	}
@@ -310,11 +310,11 @@ export async function rename(
 	} catch (error) {
 		logger.warn(error as Error);
 		if ((error as Error).message === "DUPLICATE")
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.duplicate"), ul, "duplicate")],
 			});
 		else
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.generic.e", { e: error }), ul, "unknown")],
 			});
 		await resetButton(message, ul);
@@ -324,7 +324,7 @@ export async function rename(
 	const newdata = deleteUser(interaction, guildData!, user, oldData.charName);
 	client.settings.set(interaction.guildId as string, newdata);
 	await generateButton(message, ul, embedsList.list, embedsList.files);
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("edit.name.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});
@@ -378,9 +378,9 @@ export async function changeOwner(
 	} catch (error) {
 		logger.warn(error as Error);
 		if ((error as Error).message === "DUPLICATE")
-			await reply(interaction, { embeds: [embedError(ul("error.duplicate"), ul)] });
+			await interaction.botReply({ embeds: [embedError(ul("error.duplicate"), ul)] });
 		else
-			await reply(interaction, {
+			await interaction.botReply({
 				embeds: [embedError(ul("error.generic.e", { e: error }), ul)],
 			});
 		await resetButton(message, ul);
@@ -391,7 +391,7 @@ export async function changeOwner(
 
 	client.settings.set(interaction.guildId as string, newData);
 	await generateButton(message, ul, embedsList.list, embedsList.files);
-	await reply(interaction, {
+	await interaction.botReply({
 		content: ul("edit.user.success", { url: message.url }),
 		flags: Djs.MessageFlags.Ephemeral,
 	});

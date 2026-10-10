@@ -12,7 +12,6 @@ import {
 } from "@dicelette/helpers";
 import { t } from "@dicelette/localization";
 import * as Djs from "discord.js";
-import { reply } from "messages";
 
 export async function display(
 	client: EClient,
@@ -26,7 +25,7 @@ export async function display(
 	const defaultValue = userSettings?.ignoreNotfound;
 	const entries = Object.entries(userStats);
 	if (entries.length === 0) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("userSettings.attributes.list.empty"),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
@@ -48,12 +47,12 @@ export async function exportStats(
 	const userStats = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	if (Object.keys(userStats).length === 0) {
 		const text = ul("userSettings.attributes.export.empty");
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const attachment = buildJsonAttachment(userStats, `attributes-stats-${userId}.json`);
 	const text = ul("userSettings.attributes.export.success");
-	await reply(interaction, {
+	await interaction.botReply({
 		content: text,
 		files: [attachment],
 		flags: Djs.MessageFlags.Ephemeral,
@@ -79,7 +78,7 @@ export async function importAttributes(
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	if (
@@ -90,7 +89,7 @@ export async function importAttributes(
 		const text = ul("userSettings.snippets.import.invalidContent", {
 			ex: JSON.stringify(ex, null, 2),
 		});
-		await reply(interaction, { content: text, flags: Djs.MessageFlags.Ephemeral });
+		await interaction.botReply({ content: text, flags: Djs.MessageFlags.Ephemeral });
 		return;
 	}
 	const key = `${userId}.attributes`;
@@ -125,7 +124,7 @@ export async function register(
 	const existingAttributes = client.userSettings.get(guildId, userId)?.attributes ?? {};
 	const validated = validateAttributeEntry(statName, initialValue, existingAttributes);
 	if (!validated.ok) {
-		await reply(interaction, {
+		await interaction.botReply({
 			content: ul("userConfig.addInvalidAttr", { name: statName }),
 			flags: Djs.MessageFlags.Ephemeral,
 		});
