@@ -68,9 +68,9 @@ export function getConfigIds(
 export function getIDForAdminDB(
 	commandsID: Djs.Collection<string, Djs.ApplicationCommand<unknown>>,
 	db: Settings,
-	guildID: Djs.Snowflake
+	guildID?: Djs.Snowflake
 ) {
-	if (!db.has(guildID, "templateID.channelId")) return;
+	if (!guildID || !db.has(guildID, "templateID.channelId")) return;
 	const commandToFind = [
 		t("deleteChar.name"),
 		t("config.name"),

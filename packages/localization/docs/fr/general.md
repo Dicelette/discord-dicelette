@@ -25,3 +25,5 @@ La commande </roll:{{- rollId}}> fonctionne aussi : `/roll 1d20+3`.
 - Pour modifier un commentaire : répondez au résultat du bot avec `/// Nouveau commentaire` (préfixe par défaut, modifiable).
 
 Plus de détails dans la [documentation](<https://www.dicelette.app/>).
+
+-# Vous pouvez obtenir plus de détails sur les commandes en utilisant </commands info:{{- cmdsId}}>.

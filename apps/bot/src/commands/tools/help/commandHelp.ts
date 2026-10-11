@@ -24,8 +24,15 @@ export const commandHelp = {
 	},
 	data: new Djs.SlashCommandBuilder()
 		.setNames("help.name")
-		.setContexts(Djs.InteractionContextType.Guild)
-		.setIntegrationTypes(Djs.ApplicationIntegrationType.GuildInstall)
+		.setIntegrationTypes(
+			Djs.ApplicationIntegrationType.GuildInstall,
+			Djs.ApplicationIntegrationType.UserInstall
+		)
+		.setContexts(
+			Djs.InteractionContextType.Guild,
+			Djs.InteractionContextType.BotDM,
+			Djs.InteractionContextType.PrivateChannel
+		)
 		.setDescriptions("help.description")
 		.addSubcommand((sub) =>
 			sub.setNames("help.info.name").setDescriptions("help.info.description")

@@ -35,7 +35,8 @@ export class GetInfo {
 	}
 
 	private async getCommandsID() {
-		if (!this.interaction.guild) throw new Error("No commands found");
+		if (!this.interaction.guild)
+			return new Djs.Collection<string, Djs.ApplicationCommand>();
 		return fetchAllCommands(this.interaction.guild);
 	}
 
@@ -88,13 +89,13 @@ export class GetInfo {
 			new Djs.TextDisplayBuilder().setContent(
 				dedent(
 					this.ul("help.admin.messageNoDB", {
-						delete: idsAdmin?.[t("timer.name")],
-						display: idsAdmin?.[t("display.title")],
-						language: idsAdmin?.[t("config.lang.options.name")],
-						logs: idsAdmin?.[t("logs.name")],
-						result: idsAdmin?.[t("changeThread.name")],
-						self_register: idsAdmin?.[t("config.selfRegister.name")],
-						timestamp: idsAdmin?.[t("timestamp.name")],
+						delete: idsAdmin?.[t("timer.name")] || 0,
+						display: idsAdmin?.[t("display.title")] || 0,
+						language: idsAdmin?.[t("config.lang.options.name")] || 0,
+						logs: idsAdmin?.[t("logs.name")] || 0,
+						result: idsAdmin?.[t("changeThread.name")] || 0,
+						self_register: idsAdmin?.[t("config.selfRegister.name")] || 0,
+						timestamp: idsAdmin?.[t("timestamp.name")] || 0,
 					})
 				)
 			)
@@ -102,7 +103,7 @@ export class GetInfo {
 		const idsAdminDB = getIDForAdminDB(
 			commandsID,
 			this.client.settings,
-			this.interaction.guild!.id
+			this.interaction.guild?.id
 		);
 		if (idsAdminDB)
 			replySection.push(
@@ -133,7 +134,7 @@ export class GetInfo {
 	async getInfo() {
 		const commandsID = await this.getCommandsID();
 		const rollID = commandsID.findKey((command) => command.name === "roll");
-		const sceneID = commandsID.findKey((command) => command.name === "scene");
+		const sceneID = commandsID.findKey((command) => command.name === "scene") || 0;
 		const mathId = commandsID.findKey((command) => command.name === "math");
 		const msg = this.ul("help.message", {
 			mathId,
@@ -185,12 +186,12 @@ export class GetInfo {
 		await this.interaction.botReply({
 			content: dedent(
 				this.ul("help.register.message", {
-					calc: helpDBCmd?.[t("calc.title")],
-					dbroll: helpDBCmd?.[t("dbRoll.name")],
-					display: helpDBCmd?.[t("display.title")],
-					graph: helpDBCmd?.[t("graph.name")],
-					macro: helpDBCmd?.[t("common.macro")],
-					register: helpDBCmd?.[t("register.name")],
+					calc: helpDBCmd?.[t("calc.title")] || 0,
+					dbroll: helpDBCmd?.[t("dbRoll.name")] || 0,
+					display: helpDBCmd?.[t("display.title")] || 0,
+					graph: helpDBCmd?.[t("graph.name")] || 0,
+					macro: helpDBCmd?.[t("common.macro")] || 0,
+					register: helpDBCmd?.[t("register.name")] || 0,
 				})
 			),
 			flags: Djs.MessageFlags.Ephemeral,
