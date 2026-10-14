@@ -1,5 +1,3 @@
-import { resources } from "./types";
-
 interface JsonObject {
 	//biome-ignore lint/suspicious/noExplicitAny: we need to allow any type of value
 	[key: string]: any;
@@ -24,5 +22,3 @@ export function flattenJson(
 	}
 	return result;
 }
-
-export const ALL_TRANSLATION_KEYS = Object.keys(flattenJson(resources.en.translation));

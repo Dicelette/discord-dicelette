@@ -1,13 +1,14 @@
-import { buildTranslationKeyCache } from "./src/translate";
+import { reverseLookup } from "./src/reverse_lookup";
 import { resources } from "./src/types";
 
 export * from "./src/flattenJson";
+export { findln } from "./src/reverse_lookup";
 export * from "./src/translate";
 export * from "./src/types";
 
 import i18next from "i18next";
 
-await i18next.init({
+await i18next.use(reverseLookup).init({
 	fallbackLng: "en",
 	lng: "en",
 	resources,
@@ -25,5 +26,3 @@ i18next?.services?.formatter?.add("optional", (value, _lng, _options) => {
 	}
 	return value;
 });
-
-buildTranslationKeyCache();

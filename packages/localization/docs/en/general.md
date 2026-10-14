@@ -8,11 +8,14 @@ No command needed: the bot reads your messages and rolls any dice it finds.
 - **Semi-direct**: `1d20 I force the door` → the text after the die becomes a comment.
 
 The </roll:{{- rollId}}> command works too: `/roll 1d20+3`.
+You can also use the “comment” option there to describe your action.
 
 ## Success and failure
 - **Comparison**: `1d100<=50` tells you whether the roll is a success or a failure.
 - **Opposition**: `1d100>20>10` adds a second comparison (the last one).
 - **Criticals**: `{cs:…}` (success) and `{cf:…}` (failure), attached to the die. Example: `1d100<=50{cs:<=5}{cf:>=96}`.
+
+The </roll:{{- rollId}}> command has options that allow you to enter critical values directly without having to type out the full syntax.
 
 ## Multiple rolls
 - **Identical**: `[number]#[dice]` → `4#1d6` rolls `1d6` four times.

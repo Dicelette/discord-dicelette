@@ -14,36 +14,10 @@ import {
 import * as Djs from "discord.js";
 import { default as i18next, type TFunction } from "i18next";
 import { ZodError } from "zod";
-import { ALL_TRANSLATION_KEYS } from "./flattenJson";
-import { resources } from "./types";
 
 export const t = i18next.getFixedT("en");
 
-// Memoizes the Djs.Locale → i18n-tag lookup: `ln()` runs on every interaction/message/roll,
-// so the linear Object.entries scan is only worth doing once.
-const lnCache = new Map<string, TFunction<"translation", undefined>>();
-const localeTagIndex = (() => {
-	const index = new Map<string, string>();
-	for (const [name, abbr] of Object.entries(Djs.Locale)) {
-		index.set(name, abbr);
-		index.set(abbr, abbr);
-	}
-	return index;
-})();
-
-export function ln(userLang: Djs.Locale) {
-	const cached = lnCache.get(userLang);
-	if (cached) return cached;
-	let tag: string;
-	if (userLang === Djs.Locale.EnglishUS || userLang === Djs.Locale.EnglishGB) {
-		tag = "en";
-	} else {
-		tag = localeTagIndex.get(userLang) ?? "en";
-	}
-	const fn = i18next.getFixedT(tag);
-	lnCache.set(userLang, fn);
-	return fn;
-}
+export const ln = (locale: Djs.Locale) => i18next.getFixedT(locale);
 
 /** Localizes an error message from its type and the user's language or interaction locale. */
 export function lError(
@@ -117,44 +91,12 @@ export function lError(
 
 export function cmdLn(key: string) {
 	const localized: Djs.LocalizationMap = {};
-	const allValidLocale = Object.entries(Djs.Locale);
-	const allTranslatedLanguages = Object.keys(resources).filter(
-		(lang) => !lang.includes("en")
-	);
-	for (const [name, Locale] of allValidLocale) {
-		if (allTranslatedLanguages.includes(Locale)) {
-			const ul = ln(name as Djs.Locale);
-			// biome-ignore lint/suspicious/noExplicitAny: cmdLn accepts any valid translation key as a plain string
-			localized[Locale as Djs.Locale] = ul(key as any);
-		}
+	for (const locale of Object.values(Djs.Locale)) {
+		if (!i18next.hasResourceBundle(locale, "translation")) continue;
+		// biome-ignore lint/suspicious/noExplicitAny: cmdLn accepts any valid translation key as a plain string
+		localized[locale] = ln(locale)(key as any);
 	}
 	return localized;
-}
-
-// Cache to speed up key search by translated text
-const translationKeyCache: Record<string, string> = {};
-let cacheBuilt = false;
-export function buildTranslationKeyCache() {
-	if (cacheBuilt) return;
-	const allLocales = Object.keys(resources);
-	for (const locale of allLocales) {
-		const ul = ln(locale as Djs.Locale);
-		for (const key of ALL_TRANSLATION_KEYS) {
-			// biome-ignore lint/suspicious/noExplicitAny: ALL_TRANSLATION_KEYS contains plain strings that are valid keys at runtime
-			const translation = (ul(key as any) as string).toLowerCase();
-			if (!(translation in translationKeyCache)) {
-				translationKeyCache[translation] = key;
-			}
-		}
-	}
-	cacheBuilt = true;
-	logger.trace("Translation key cache built.");
-	return;
-}
-
-export function findln(translatedText: string) {
-	const normalized = translatedText.toLowerCase();
-	return translationKeyCache[normalized] ?? translatedText;
 }
 
 export function diceTypeError(

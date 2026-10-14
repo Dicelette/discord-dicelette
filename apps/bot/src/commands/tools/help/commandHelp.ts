@@ -1,5 +1,4 @@
-import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
-import { t } from "@dicelette/localization";
+import { ln, t } from "@dicelette/localization";
 import { LINKS } from "@dicelette/types";
 import { getOptionsVersion } from "@dicelette/utils";
 import type { EClient } from "client";
@@ -68,8 +67,9 @@ export const commandHelp = {
 	): Promise<void> {
 		const options = interaction.options as Djs.CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand(true);
-		const { ul, langToUse } = getLangAndConfig(client, interaction);
-		const link = langToUse === "fr" ? LINKS.fr : LINKS.en;
+		const langToUse = interaction.locale;
+		const ul = ln(langToUse);
+		const link = langToUse === Djs.Locale.French ? LINKS.fr : LINKS.en;
 		const getInfo = new GetInfo(interaction, client, ul, link);
 		switch (subcommand) {
 			case t("help.info.name"): {

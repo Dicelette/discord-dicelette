@@ -7,12 +7,15 @@ Pas besoin de commande : le bot lit vos messages et lance les dés qu'il y trouv
 - **Indirect** : `Je force la porte [1d20]` → votre message est conservé, seul le contenu des crochets est lancé.
 - **Semi-direct** : `1d20 Je force la porte` → le texte après le dé devient un commentaire.
 
-La commande </roll:{{- rollId}}> fonctionne aussi : `/roll 1d20+3`.
+La commande </roll:{{- rollId}}> fonctionne aussi : `/roll 1d20+3`. 
+Il y est aussi possible d'utiliser l'option commentaire pour décrire votre action.
 
 ## Réussite et échec
 - **Comparaison** : `1d100<=50` indique si le jet est un succès ou un échec.
 - **Opposition** : `1d100>20>10` ajoute une seconde comparaison (la dernière).
 - **Critiques** : `{cs:…}` (réussite) et `{cf:…}` (échec), collés au dé. Exemple : `1d100<=50{cs:<=5}{cf:>=96}`.
+
+La commande </roll:{{- rollId}}> possède des options qui permettent de rentrer directement les valeurs de critiques sans avoir à rédiger la syntaxe complète.
 
 ## Plusieurs jets
 - **Identiques** : `[nombre]#[dé]` → `4#1d6` lance quatre fois `1d6`.

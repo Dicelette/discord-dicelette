@@ -1,8 +1,6 @@
 import * as Djs from "discord.js";
 import "@dicelette/discord_ext";
-import { getInteractionContext as getLangAndConfig } from "@dicelette/helpers";
-import { t } from "@dicelette/localization";
-import type { EClient } from "client";
+import { ln, t } from "@dicelette/localization";
 import dedent from "dedent";
 import { fetchAllCommands } from "./commandId";
 export default {
@@ -18,11 +16,8 @@ export default {
 			Djs.InteractionContextType.BotDM,
 			Djs.InteractionContextType.PrivateChannel
 		),
-	async execute(
-		interaction: Djs.ChatInputCommandInteraction,
-		client: EClient
-	): Promise<void> {
-		const { ul } = getLangAndConfig(client, interaction);
+	async execute(interaction: Djs.ChatInputCommandInteraction): Promise<void> {
+		const ul = ln(interaction.locale);
 		let rollId: string | number = 0;
 		let cmdsId: string | number = 0;
 		if (interaction.guild) {
