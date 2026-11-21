@@ -592,6 +592,8 @@ export class ResultAsText {
 				) {
 					const statName = this.statsPerSegment?.[index] || "";
 					const commentSource = this.commentsPerSegment?.[index] || "";
+					if (commentSource.trim() !== commentSource)
+						res = res.replace(`__${commentSource}__`, `__${commentSource.trim()}__`);
 					const comment = this.removeIgnore(commentSource) || "";
 					this.ignoreCount = this.setIgnoreCount(commentSource);
 

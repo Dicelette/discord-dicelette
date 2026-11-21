@@ -563,3 +563,14 @@ describe("comparison against 0", () => {
 		expect(() => new ResultAsText(getRoll("1d100<={{}}"), DATA)).toThrow();
 	});
 });
+
+describe("shared roll comments with surrounding spaces", () => {
+	it.each([
+		["1d100<=40 [Résistance énergétique ! ];1d100<=80", "Résistance énergétique !"],
+		["1d100<=40;1d100<=80 [ Esquive ]", "Esquive"],
+	])("does not repeat the comment for %s", (input, comment) => {
+		const res = new ResultAsText(getRoll(input), DATA).parser;
+		expect(res.split(comment).length - 1).toBe(1);
+		expect(res).toContain(`__${comment}__`);
+	});
+});
